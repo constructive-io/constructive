@@ -28,7 +28,6 @@ import type {
   SchemaGrantWithRelations,
   SchemaGrantSelect,
   SchemaGrantFilter,
-  SchemaGrantCondition,
   SchemaGrantOrderBy,
   CreateSchemaGrantInput,
   UpdateSchemaGrantInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SchemaGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SchemaGrantSelect>(
-    args: FindManyArgs<S, SchemaGrantFilter, SchemaGrantCondition, SchemaGrantOrderBy> & {
+    args: FindManyArgs<S, SchemaGrantFilter, SchemaGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, SchemaGrantSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class SchemaGrantModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class SchemaGrantModel {
       },
       'SchemaGrantFilter',
       'SchemaGrantOrderBy',
-      connectionFieldsMap,
-      'SchemaGrantCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class SchemaGrantModel {
     });
   }
   findFirst<S extends SchemaGrantSelect>(
-    args: FindFirstArgs<S, SchemaGrantFilter, SchemaGrantCondition> & {
+    args: FindFirstArgs<S, SchemaGrantFilter> & {
       select: S;
     } & StrictSelect<S, SchemaGrantSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class SchemaGrantModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'SchemaGrantFilter',
-      connectionFieldsMap,
-      'SchemaGrantCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

@@ -28,7 +28,6 @@ import type {
   RelationProvisionWithRelations,
   RelationProvisionSelect,
   RelationProvisionFilter,
-  RelationProvisionCondition,
   RelationProvisionOrderBy,
   CreateRelationProvisionInput,
   UpdateRelationProvisionInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RelationProvisionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RelationProvisionSelect>(
-    args: FindManyArgs<
-      S,
-      RelationProvisionFilter,
-      RelationProvisionCondition,
-      RelationProvisionOrderBy
-    > & {
+    args: FindManyArgs<S, RelationProvisionFilter, RelationProvisionOrderBy> & {
       select: S;
     } & StrictSelect<S, RelationProvisionSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class RelationProvisionModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class RelationProvisionModel {
       },
       'RelationProvisionFilter',
       'RelationProvisionOrderBy',
-      connectionFieldsMap,
-      'RelationProvisionCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class RelationProvisionModel {
     });
   }
   findFirst<S extends RelationProvisionSelect>(
-    args: FindFirstArgs<S, RelationProvisionFilter, RelationProvisionCondition> & {
+    args: FindFirstArgs<S, RelationProvisionFilter> & {
       select: S;
     } & StrictSelect<S, RelationProvisionSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class RelationProvisionModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'RelationProvisionFilter',
-      connectionFieldsMap,
-      'RelationProvisionCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

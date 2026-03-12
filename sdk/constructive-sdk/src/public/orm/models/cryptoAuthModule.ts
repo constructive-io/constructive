@@ -28,7 +28,6 @@ import type {
   CryptoAuthModuleWithRelations,
   CryptoAuthModuleSelect,
   CryptoAuthModuleFilter,
-  CryptoAuthModuleCondition,
   CryptoAuthModuleOrderBy,
   CreateCryptoAuthModuleInput,
   UpdateCryptoAuthModuleInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class CryptoAuthModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CryptoAuthModuleSelect>(
-    args: FindManyArgs<
-      S,
-      CryptoAuthModuleFilter,
-      CryptoAuthModuleCondition,
-      CryptoAuthModuleOrderBy
-    > & {
+    args: FindManyArgs<S, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, CryptoAuthModuleSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class CryptoAuthModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class CryptoAuthModuleModel {
       },
       'CryptoAuthModuleFilter',
       'CryptoAuthModuleOrderBy',
-      connectionFieldsMap,
-      'CryptoAuthModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class CryptoAuthModuleModel {
     });
   }
   findFirst<S extends CryptoAuthModuleSelect>(
-    args: FindFirstArgs<S, CryptoAuthModuleFilter, CryptoAuthModuleCondition> & {
+    args: FindFirstArgs<S, CryptoAuthModuleFilter> & {
       select: S;
     } & StrictSelect<S, CryptoAuthModuleSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class CryptoAuthModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'CryptoAuthModuleFilter',
-      connectionFieldsMap,
-      'CryptoAuthModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

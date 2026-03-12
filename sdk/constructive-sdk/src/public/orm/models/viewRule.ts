@@ -28,7 +28,6 @@ import type {
   ViewRuleWithRelations,
   ViewRuleSelect,
   ViewRuleFilter,
-  ViewRuleCondition,
   ViewRuleOrderBy,
   CreateViewRuleInput,
   UpdateViewRuleInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ViewRuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ViewRuleSelect>(
-    args: FindManyArgs<S, ViewRuleFilter, ViewRuleCondition, ViewRuleOrderBy> & {
+    args: FindManyArgs<S, ViewRuleFilter, ViewRuleOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewRuleSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class ViewRuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class ViewRuleModel {
       },
       'ViewRuleFilter',
       'ViewRuleOrderBy',
-      connectionFieldsMap,
-      'ViewRuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class ViewRuleModel {
     });
   }
   findFirst<S extends ViewRuleSelect>(
-    args: FindFirstArgs<S, ViewRuleFilter, ViewRuleCondition> & {
+    args: FindFirstArgs<S, ViewRuleFilter> & {
       select: S;
     } & StrictSelect<S, ViewRuleSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class ViewRuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ViewRuleFilter',
-      connectionFieldsMap,
-      'ViewRuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

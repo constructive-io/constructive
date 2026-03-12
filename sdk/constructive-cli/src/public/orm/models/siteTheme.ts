@@ -28,7 +28,6 @@ import type {
   SiteThemeWithRelations,
   SiteThemeSelect,
   SiteThemeFilter,
-  SiteThemeCondition,
   SiteThemeOrderBy,
   CreateSiteThemeInput,
   UpdateSiteThemeInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SiteThemeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SiteThemeSelect>(
-    args: FindManyArgs<S, SiteThemeFilter, SiteThemeCondition, SiteThemeOrderBy> & {
+    args: FindManyArgs<S, SiteThemeFilter, SiteThemeOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteThemeSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class SiteThemeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class SiteThemeModel {
       },
       'SiteThemeFilter',
       'SiteThemeOrderBy',
-      connectionFieldsMap,
-      'SiteThemeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class SiteThemeModel {
     });
   }
   findFirst<S extends SiteThemeSelect>(
-    args: FindFirstArgs<S, SiteThemeFilter, SiteThemeCondition> & {
+    args: FindFirstArgs<S, SiteThemeFilter> & {
       select: S;
     } & StrictSelect<S, SiteThemeSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class SiteThemeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'SiteThemeFilter',
-      connectionFieldsMap,
-      'SiteThemeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

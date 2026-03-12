@@ -28,7 +28,6 @@ import type {
   TriggerFunctionWithRelations,
   TriggerFunctionSelect,
   TriggerFunctionFilter,
-  TriggerFunctionCondition,
   TriggerFunctionOrderBy,
   CreateTriggerFunctionInput,
   UpdateTriggerFunctionInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class TriggerFunctionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends TriggerFunctionSelect>(
-    args: FindManyArgs<
-      S,
-      TriggerFunctionFilter,
-      TriggerFunctionCondition,
-      TriggerFunctionOrderBy
-    > & {
+    args: FindManyArgs<S, TriggerFunctionFilter, TriggerFunctionOrderBy> & {
       select: S;
     } & StrictSelect<S, TriggerFunctionSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class TriggerFunctionModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class TriggerFunctionModel {
       },
       'TriggerFunctionFilter',
       'TriggerFunctionOrderBy',
-      connectionFieldsMap,
-      'TriggerFunctionCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class TriggerFunctionModel {
     });
   }
   findFirst<S extends TriggerFunctionSelect>(
-    args: FindFirstArgs<S, TriggerFunctionFilter, TriggerFunctionCondition> & {
+    args: FindFirstArgs<S, TriggerFunctionFilter> & {
       select: S;
     } & StrictSelect<S, TriggerFunctionSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class TriggerFunctionModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'TriggerFunctionFilter',
-      connectionFieldsMap,
-      'TriggerFunctionCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

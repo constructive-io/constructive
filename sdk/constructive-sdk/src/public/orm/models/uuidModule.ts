@@ -28,7 +28,6 @@ import type {
   UuidModuleWithRelations,
   UuidModuleSelect,
   UuidModuleFilter,
-  UuidModuleCondition,
   UuidModuleOrderBy,
   CreateUuidModuleInput,
   UpdateUuidModuleInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class UuidModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends UuidModuleSelect>(
-    args: FindManyArgs<S, UuidModuleFilter, UuidModuleCondition, UuidModuleOrderBy> & {
+    args: FindManyArgs<S, UuidModuleFilter, UuidModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, UuidModuleSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class UuidModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class UuidModuleModel {
       },
       'UuidModuleFilter',
       'UuidModuleOrderBy',
-      connectionFieldsMap,
-      'UuidModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class UuidModuleModel {
     });
   }
   findFirst<S extends UuidModuleSelect>(
-    args: FindFirstArgs<S, UuidModuleFilter, UuidModuleCondition> & {
+    args: FindFirstArgs<S, UuidModuleFilter> & {
       select: S;
     } & StrictSelect<S, UuidModuleSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class UuidModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'UuidModuleFilter',
-      connectionFieldsMap,
-      'UuidModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

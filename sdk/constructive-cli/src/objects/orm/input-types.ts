@@ -405,46 +405,6 @@ export interface CommitFilter {
   or?: CommitFilter[];
   not?: CommitFilter;
 }
-// ============ Table Condition Types ============
-export interface GetAllRecordCondition {
-  path?: string | null;
-  data?: unknown | null;
-}
-export interface ObjectCondition {
-  hashUuid?: string | null;
-  id?: string | null;
-  databaseId?: string | null;
-  kids?: string | null;
-  ktree?: string | null;
-  data?: unknown | null;
-  frzn?: boolean | null;
-  createdAt?: string | null;
-}
-export interface RefCondition {
-  id?: string | null;
-  name?: string | null;
-  databaseId?: string | null;
-  storeId?: string | null;
-  commitId?: string | null;
-}
-export interface StoreCondition {
-  id?: string | null;
-  name?: string | null;
-  databaseId?: string | null;
-  hash?: string | null;
-  createdAt?: string | null;
-}
-export interface CommitCondition {
-  id?: string | null;
-  message?: string | null;
-  databaseId?: string | null;
-  storeId?: string | null;
-  parentIds?: string | null;
-  authorId?: string | null;
-  committerId?: string | null;
-  treeId?: string | null;
-  date?: string | null;
-}
 // ============ OrderBy Types ============
 export type GetAllRecordsOrderBy =
   | 'PRIMARY_KEY_ASC'

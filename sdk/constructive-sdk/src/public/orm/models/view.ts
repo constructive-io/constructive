@@ -28,7 +28,6 @@ import type {
   ViewWithRelations,
   ViewSelect,
   ViewFilter,
-  ViewCondition,
   ViewOrderBy,
   CreateViewInput,
   UpdateViewInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ViewModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ViewSelect>(
-    args: FindManyArgs<S, ViewFilter, ViewCondition, ViewOrderBy> & {
+    args: FindManyArgs<S, ViewFilter, ViewOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class ViewModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class ViewModel {
       },
       'ViewFilter',
       'ViewOrderBy',
-      connectionFieldsMap,
-      'ViewCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class ViewModel {
     });
   }
   findFirst<S extends ViewSelect>(
-    args: FindFirstArgs<S, ViewFilter, ViewCondition> & {
+    args: FindFirstArgs<S, ViewFilter> & {
       select: S;
     } & StrictSelect<S, ViewSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class ViewModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ViewFilter',
-      connectionFieldsMap,
-      'ViewCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

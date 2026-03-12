@@ -28,7 +28,6 @@ import type {
   OrgMembershipWithRelations,
   OrgMembershipSelect,
   OrgMembershipFilter,
-  OrgMembershipCondition,
   OrgMembershipOrderBy,
   CreateOrgMembershipInput,
   UpdateOrgMembershipInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgMembershipModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgMembershipSelect>(
-    args: FindManyArgs<S, OrgMembershipFilter, OrgMembershipCondition, OrgMembershipOrderBy> & {
+    args: FindManyArgs<S, OrgMembershipFilter, OrgMembershipOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgMembershipSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class OrgMembershipModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class OrgMembershipModel {
       },
       'OrgMembershipFilter',
       'OrgMembershipOrderBy',
-      connectionFieldsMap,
-      'OrgMembershipCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class OrgMembershipModel {
     });
   }
   findFirst<S extends OrgMembershipSelect>(
-    args: FindFirstArgs<S, OrgMembershipFilter, OrgMembershipCondition> & {
+    args: FindFirstArgs<S, OrgMembershipFilter> & {
       select: S;
     } & StrictSelect<S, OrgMembershipSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class OrgMembershipModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'OrgMembershipFilter',
-      connectionFieldsMap,
-      'OrgMembershipCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

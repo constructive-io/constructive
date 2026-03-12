@@ -28,7 +28,6 @@ import type {
   SiteMetadatumWithRelations,
   SiteMetadatumSelect,
   SiteMetadatumFilter,
-  SiteMetadatumCondition,
   SiteMetadatumOrderBy,
   CreateSiteMetadatumInput,
   UpdateSiteMetadatumInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SiteMetadatumModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SiteMetadatumSelect>(
-    args: FindManyArgs<S, SiteMetadatumFilter, SiteMetadatumCondition, SiteMetadatumOrderBy> & {
+    args: FindManyArgs<S, SiteMetadatumFilter, SiteMetadatumOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteMetadatumSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class SiteMetadatumModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class SiteMetadatumModel {
       },
       'SiteMetadatumFilter',
       'SiteMetadatumOrderBy',
-      connectionFieldsMap,
-      'SiteMetadatumCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class SiteMetadatumModel {
     });
   }
   findFirst<S extends SiteMetadatumSelect>(
-    args: FindFirstArgs<S, SiteMetadatumFilter, SiteMetadatumCondition> & {
+    args: FindFirstArgs<S, SiteMetadatumFilter> & {
       select: S;
     } & StrictSelect<S, SiteMetadatumSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class SiteMetadatumModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'SiteMetadatumFilter',
-      connectionFieldsMap,
-      'SiteMetadatumCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

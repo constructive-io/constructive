@@ -28,7 +28,6 @@ import type {
   CommitWithRelations,
   CommitSelect,
   CommitFilter,
-  CommitCondition,
   CommitOrderBy,
   CreateCommitInput,
   UpdateCommitInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class CommitModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CommitSelect>(
-    args: FindManyArgs<S, CommitFilter, CommitCondition, CommitOrderBy> & {
+    args: FindManyArgs<S, CommitFilter, CommitOrderBy> & {
       select: S;
     } & StrictSelect<S, CommitSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class CommitModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class CommitModel {
       },
       'CommitFilter',
       'CommitOrderBy',
-      connectionFieldsMap,
-      'CommitCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class CommitModel {
     });
   }
   findFirst<S extends CommitSelect>(
-    args: FindFirstArgs<S, CommitFilter, CommitCondition> & {
+    args: FindFirstArgs<S, CommitFilter> & {
       select: S;
     } & StrictSelect<S, CommitSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class CommitModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'CommitFilter',
-      connectionFieldsMap,
-      'CommitCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

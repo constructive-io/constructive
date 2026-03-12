@@ -28,7 +28,6 @@ import type {
   GetAllRecordWithRelations,
   GetAllRecordSelect,
   GetAllRecordFilter,
-  GetAllRecordCondition,
   GetAllRecordsOrderBy,
   CreateGetAllRecordInput,
   UpdateGetAllRecordInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class GetAllRecordModel {
   constructor(private client: OrmClient) {}
   findMany<S extends GetAllRecordSelect>(
-    args: FindManyArgs<S, GetAllRecordFilter, GetAllRecordCondition, GetAllRecordsOrderBy> & {
+    args: FindManyArgs<S, GetAllRecordFilter, GetAllRecordsOrderBy> & {
       select: S;
     } & StrictSelect<S, GetAllRecordSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class GetAllRecordModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class GetAllRecordModel {
       },
       'GetAllRecordFilter',
       'GetAllRecordsOrderBy',
-      connectionFieldsMap,
-      'GetAllRecordCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class GetAllRecordModel {
     });
   }
   findFirst<S extends GetAllRecordSelect>(
-    args: FindFirstArgs<S, GetAllRecordFilter, GetAllRecordCondition> & {
+    args: FindFirstArgs<S, GetAllRecordFilter> & {
       select: S;
     } & StrictSelect<S, GetAllRecordSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class GetAllRecordModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'GetAllRecordFilter',
-      connectionFieldsMap,
-      'GetAllRecordCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

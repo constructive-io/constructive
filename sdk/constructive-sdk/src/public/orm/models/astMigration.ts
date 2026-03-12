@@ -28,7 +28,6 @@ import type {
   AstMigrationWithRelations,
   AstMigrationSelect,
   AstMigrationFilter,
-  AstMigrationCondition,
   AstMigrationOrderBy,
   CreateAstMigrationInput,
   UpdateAstMigrationInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AstMigrationModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AstMigrationSelect>(
-    args: FindManyArgs<S, AstMigrationFilter, AstMigrationCondition, AstMigrationOrderBy> & {
+    args: FindManyArgs<S, AstMigrationFilter, AstMigrationOrderBy> & {
       select: S;
     } & StrictSelect<S, AstMigrationSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class AstMigrationModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class AstMigrationModel {
       },
       'AstMigrationFilter',
       'AstMigrationOrderBy',
-      connectionFieldsMap,
-      'AstMigrationCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class AstMigrationModel {
     });
   }
   findFirst<S extends AstMigrationSelect>(
-    args: FindFirstArgs<S, AstMigrationFilter, AstMigrationCondition> & {
+    args: FindFirstArgs<S, AstMigrationFilter> & {
       select: S;
     } & StrictSelect<S, AstMigrationSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class AstMigrationModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'AstMigrationFilter',
-      connectionFieldsMap,
-      'AstMigrationCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

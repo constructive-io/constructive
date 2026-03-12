@@ -28,7 +28,6 @@ import type {
   OrgChartEdgeWithRelations,
   OrgChartEdgeSelect,
   OrgChartEdgeFilter,
-  OrgChartEdgeCondition,
   OrgChartEdgeOrderBy,
   CreateOrgChartEdgeInput,
   UpdateOrgChartEdgeInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgChartEdgeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgChartEdgeSelect>(
-    args: FindManyArgs<S, OrgChartEdgeFilter, OrgChartEdgeCondition, OrgChartEdgeOrderBy> & {
+    args: FindManyArgs<S, OrgChartEdgeFilter, OrgChartEdgeOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgChartEdgeSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class OrgChartEdgeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class OrgChartEdgeModel {
       },
       'OrgChartEdgeFilter',
       'OrgChartEdgeOrderBy',
-      connectionFieldsMap,
-      'OrgChartEdgeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class OrgChartEdgeModel {
     });
   }
   findFirst<S extends OrgChartEdgeSelect>(
-    args: FindFirstArgs<S, OrgChartEdgeFilter, OrgChartEdgeCondition> & {
+    args: FindFirstArgs<S, OrgChartEdgeFilter> & {
       select: S;
     } & StrictSelect<S, OrgChartEdgeSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class OrgChartEdgeModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'OrgChartEdgeFilter',
-      connectionFieldsMap,
-      'OrgChartEdgeCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

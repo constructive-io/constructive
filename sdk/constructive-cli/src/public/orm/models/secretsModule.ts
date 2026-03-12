@@ -28,7 +28,6 @@ import type {
   SecretsModuleWithRelations,
   SecretsModuleSelect,
   SecretsModuleFilter,
-  SecretsModuleCondition,
   SecretsModuleOrderBy,
   CreateSecretsModuleInput,
   UpdateSecretsModuleInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SecretsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SecretsModuleSelect>(
-    args: FindManyArgs<S, SecretsModuleFilter, SecretsModuleCondition, SecretsModuleOrderBy> & {
+    args: FindManyArgs<S, SecretsModuleFilter, SecretsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, SecretsModuleSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class SecretsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class SecretsModuleModel {
       },
       'SecretsModuleFilter',
       'SecretsModuleOrderBy',
-      connectionFieldsMap,
-      'SecretsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class SecretsModuleModel {
     });
   }
   findFirst<S extends SecretsModuleSelect>(
-    args: FindFirstArgs<S, SecretsModuleFilter, SecretsModuleCondition> & {
+    args: FindFirstArgs<S, SecretsModuleFilter> & {
       select: S;
     } & StrictSelect<S, SecretsModuleSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class SecretsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'SecretsModuleFilter',
-      connectionFieldsMap,
-      'SecretsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

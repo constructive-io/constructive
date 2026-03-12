@@ -28,7 +28,6 @@ import type {
   ConnectedAccountsModuleWithRelations,
   ConnectedAccountsModuleSelect,
   ConnectedAccountsModuleFilter,
-  ConnectedAccountsModuleCondition,
   ConnectedAccountsModuleOrderBy,
   CreateConnectedAccountsModuleInput,
   UpdateConnectedAccountsModuleInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ConnectedAccountsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ConnectedAccountsModuleSelect>(
-    args: FindManyArgs<
-      S,
-      ConnectedAccountsModuleFilter,
-      ConnectedAccountsModuleCondition,
-      ConnectedAccountsModuleOrderBy
-    > & {
+    args: FindManyArgs<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, ConnectedAccountsModuleSelect>
   ): QueryBuilder<{
@@ -57,7 +51,6 @@ export class ConnectedAccountsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -67,8 +60,7 @@ export class ConnectedAccountsModuleModel {
       },
       'ConnectedAccountsModuleFilter',
       'ConnectedAccountsModuleOrderBy',
-      connectionFieldsMap,
-      'ConnectedAccountsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -80,7 +72,7 @@ export class ConnectedAccountsModuleModel {
     });
   }
   findFirst<S extends ConnectedAccountsModuleSelect>(
-    args: FindFirstArgs<S, ConnectedAccountsModuleFilter, ConnectedAccountsModuleCondition> & {
+    args: FindFirstArgs<S, ConnectedAccountsModuleFilter> & {
       select: S;
     } & StrictSelect<S, ConnectedAccountsModuleSelect>
   ): QueryBuilder<{
@@ -94,11 +86,9 @@ export class ConnectedAccountsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'ConnectedAccountsModuleFilter',
-      connectionFieldsMap,
-      'ConnectedAccountsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

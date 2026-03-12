@@ -22,6 +22,9 @@ async function main() {
     },
     reactQuery: false,
     verbose: true,
+    codegen: {
+      condition: false,
+    },
     docs: {
       agents: false,
       mcp: false,

@@ -28,7 +28,6 @@ import type {
   DatabaseWithRelations,
   DatabaseSelect,
   DatabaseFilter,
-  DatabaseCondition,
   DatabaseOrderBy,
   CreateDatabaseInput,
   UpdateDatabaseInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DatabaseModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DatabaseSelect>(
-    args: FindManyArgs<S, DatabaseFilter, DatabaseCondition, DatabaseOrderBy> & {
+    args: FindManyArgs<S, DatabaseFilter, DatabaseOrderBy> & {
       select: S;
     } & StrictSelect<S, DatabaseSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class DatabaseModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class DatabaseModel {
       },
       'DatabaseFilter',
       'DatabaseOrderBy',
-      connectionFieldsMap,
-      'DatabaseCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class DatabaseModel {
     });
   }
   findFirst<S extends DatabaseSelect>(
-    args: FindFirstArgs<S, DatabaseFilter, DatabaseCondition> & {
+    args: FindFirstArgs<S, DatabaseFilter> & {
       select: S;
     } & StrictSelect<S, DatabaseSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class DatabaseModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'DatabaseFilter',
-      connectionFieldsMap,
-      'DatabaseCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

@@ -28,7 +28,6 @@ import type {
   MembershipsModuleWithRelations,
   MembershipsModuleSelect,
   MembershipsModuleFilter,
-  MembershipsModuleCondition,
   MembershipsModuleOrderBy,
   CreateMembershipsModuleInput,
   UpdateMembershipsModuleInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class MembershipsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends MembershipsModuleSelect>(
-    args: FindManyArgs<
-      S,
-      MembershipsModuleFilter,
-      MembershipsModuleCondition,
-      MembershipsModuleOrderBy
-    > & {
+    args: FindManyArgs<S, MembershipsModuleFilter, MembershipsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, MembershipsModuleSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class MembershipsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class MembershipsModuleModel {
       },
       'MembershipsModuleFilter',
       'MembershipsModuleOrderBy',
-      connectionFieldsMap,
-      'MembershipsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class MembershipsModuleModel {
     });
   }
   findFirst<S extends MembershipsModuleSelect>(
-    args: FindFirstArgs<S, MembershipsModuleFilter, MembershipsModuleCondition> & {
+    args: FindFirstArgs<S, MembershipsModuleFilter> & {
       select: S;
     } & StrictSelect<S, MembershipsModuleSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class MembershipsModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'MembershipsModuleFilter',
-      connectionFieldsMap,
-      'MembershipsModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

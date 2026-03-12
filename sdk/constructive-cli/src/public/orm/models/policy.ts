@@ -28,7 +28,6 @@ import type {
   PolicyWithRelations,
   PolicySelect,
   PolicyFilter,
-  PolicyCondition,
   PolicyOrderBy,
   CreatePolicyInput,
   UpdatePolicyInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class PolicyModel {
   constructor(private client: OrmClient) {}
   findMany<S extends PolicySelect>(
-    args: FindManyArgs<S, PolicyFilter, PolicyCondition, PolicyOrderBy> & {
+    args: FindManyArgs<S, PolicyFilter, PolicyOrderBy> & {
       select: S;
     } & StrictSelect<S, PolicySelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class PolicyModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class PolicyModel {
       },
       'PolicyFilter',
       'PolicyOrderBy',
-      connectionFieldsMap,
-      'PolicyCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class PolicyModel {
     });
   }
   findFirst<S extends PolicySelect>(
-    args: FindFirstArgs<S, PolicyFilter, PolicyCondition> & {
+    args: FindFirstArgs<S, PolicyFilter> & {
       select: S;
     } & StrictSelect<S, PolicySelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class PolicyModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'PolicyFilter',
-      connectionFieldsMap,
-      'PolicyCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

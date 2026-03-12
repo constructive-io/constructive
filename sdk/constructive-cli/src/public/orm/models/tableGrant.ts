@@ -28,7 +28,6 @@ import type {
   TableGrantWithRelations,
   TableGrantSelect,
   TableGrantFilter,
-  TableGrantCondition,
   TableGrantOrderBy,
   CreateTableGrantInput,
   UpdateTableGrantInput,
@@ -38,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class TableGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends TableGrantSelect>(
-    args: FindManyArgs<S, TableGrantFilter, TableGrantCondition, TableGrantOrderBy> & {
+    args: FindManyArgs<S, TableGrantFilter, TableGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, TableGrantSelect>
   ): QueryBuilder<{
@@ -50,7 +49,6 @@ export class TableGrantModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -60,8 +58,7 @@ export class TableGrantModel {
       },
       'TableGrantFilter',
       'TableGrantOrderBy',
-      connectionFieldsMap,
-      'TableGrantCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -73,7 +70,7 @@ export class TableGrantModel {
     });
   }
   findFirst<S extends TableGrantSelect>(
-    args: FindFirstArgs<S, TableGrantFilter, TableGrantCondition> & {
+    args: FindFirstArgs<S, TableGrantFilter> & {
       select: S;
     } & StrictSelect<S, TableGrantSelect>
   ): QueryBuilder<{
@@ -87,11 +84,9 @@ export class TableGrantModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'TableGrantFilter',
-      connectionFieldsMap,
-      'TableGrantCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,

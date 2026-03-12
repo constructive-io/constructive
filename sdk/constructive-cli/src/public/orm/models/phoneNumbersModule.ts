@@ -28,7 +28,6 @@ import type {
   PhoneNumbersModuleWithRelations,
   PhoneNumbersModuleSelect,
   PhoneNumbersModuleFilter,
-  PhoneNumbersModuleCondition,
   PhoneNumbersModuleOrderBy,
   CreatePhoneNumbersModuleInput,
   UpdatePhoneNumbersModuleInput,
@@ -38,12 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class PhoneNumbersModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends PhoneNumbersModuleSelect>(
-    args: FindManyArgs<
-      S,
-      PhoneNumbersModuleFilter,
-      PhoneNumbersModuleCondition,
-      PhoneNumbersModuleOrderBy
-    > & {
+    args: FindManyArgs<S, PhoneNumbersModuleFilter, PhoneNumbersModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, PhoneNumbersModuleSelect>
   ): QueryBuilder<{
@@ -55,7 +49,6 @@ export class PhoneNumbersModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -65,8 +58,7 @@ export class PhoneNumbersModuleModel {
       },
       'PhoneNumbersModuleFilter',
       'PhoneNumbersModuleOrderBy',
-      connectionFieldsMap,
-      'PhoneNumbersModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
@@ -78,7 +70,7 @@ export class PhoneNumbersModuleModel {
     });
   }
   findFirst<S extends PhoneNumbersModuleSelect>(
-    args: FindFirstArgs<S, PhoneNumbersModuleFilter, PhoneNumbersModuleCondition> & {
+    args: FindFirstArgs<S, PhoneNumbersModuleFilter> & {
       select: S;
     } & StrictSelect<S, PhoneNumbersModuleSelect>
   ): QueryBuilder<{
@@ -92,11 +84,9 @@ export class PhoneNumbersModuleModel {
       args.select,
       {
         where: args?.where,
-        condition: args?.condition,
       },
       'PhoneNumbersModuleFilter',
-      connectionFieldsMap,
-      'PhoneNumbersModuleCondition'
+      connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
