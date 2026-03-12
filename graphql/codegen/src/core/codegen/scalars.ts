@@ -39,6 +39,9 @@ export const SCALAR_TS_MAP: Record<string, string> = {
   TsVector: 'string',
   TsQuery: 'string',
 
+  // Vector types (pgvector)
+  Vector: 'number[]',
+
   // File upload
   Upload: 'File',
 };
