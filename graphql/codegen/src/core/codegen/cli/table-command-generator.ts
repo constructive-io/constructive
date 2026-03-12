@@ -433,7 +433,7 @@ function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDecl
  * The CreateXInput has an inner field (e.g. "database" of type DatabaseInput)
  * that contains the actual field definitions.
  */
-function resolveInnerInputType(
+export function resolveInnerInputType(
   inputTypeName: string,
   typeRegistry: TypeRegistry,
 ): { name: string; fields: Set<string> } | null {
@@ -455,7 +455,7 @@ function resolveInnerInputType(
   return null;
 }
 
-function getFieldsWithDefaults(
+export function getFieldsWithDefaults(
   table: CleanTable,
   typeRegistry?: TypeRegistry,
 ): Set<string> {

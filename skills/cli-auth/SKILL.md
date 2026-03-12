@@ -23,6 +23,9 @@ csdk auth set-token <token>
 csdk role-type list
 csdk role-type get --id <value>
 csdk role-type create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+csdk --no-tty role-type list
 ```
 
 ## Examples
@@ -34,6 +37,12 @@ csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
 csdk role-type list
+```
+
+### Non-interactive mode (for scripts and CI)
+
+```bash
+csdk --no-tty role-type create --<field> <value>
 ```
 
 ## References

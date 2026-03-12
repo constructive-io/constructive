@@ -25,7 +25,7 @@ csdk site-module list
 ### Create a siteModule
 
 ```bash
-csdk site-module create --databaseId "value" --siteId "value" --name "value" --data "value"
+csdk site-module create --databaseId <value> --siteId <value> --name <value> --data <value>
 ```
 
 ### Get a siteModule by id

@@ -175,6 +175,7 @@ export function generateModelFile(
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
   const whereTypeName = getFilterTypeName(table);
+  const conditionTypeName = `${typeName}Condition`;
   const orderByTypeName = getOrderByTypeName(table);
   const createInputTypeName = `Create${typeName}Input`;
   const updateInputTypeName = `Update${typeName}Input`;
@@ -228,6 +229,7 @@ export function generateModelFile(
         relationTypeName,
         selectTypeName,
         whereTypeName,
+        conditionTypeName,
         orderByTypeName,
         createInputTypeName,
         updateInputTypeName,
@@ -270,6 +272,7 @@ export function generateModelFile(
         t.tsTypeParameterInstantiation([
           sel,
           t.tsTypeReference(t.identifier(whereTypeName)),
+          t.tsTypeReference(t.identifier(conditionTypeName)),
           t.tsTypeReference(t.identifier(orderByTypeName)),
         ]),
       );
@@ -323,6 +326,15 @@ export function generateModelFile(
           t.optionalMemberExpression(
             t.identifier('args'),
             t.identifier('where'),
+            false,
+            true,
+          ),
+        ),
+        t.objectProperty(
+          t.identifier('condition'),
+          t.optionalMemberExpression(
+            t.identifier('args'),
+            t.identifier('condition'),
             false,
             true,
           ),
@@ -391,6 +403,7 @@ export function generateModelFile(
       t.stringLiteral(whereTypeName),
       t.stringLiteral(orderByTypeName),
       t.identifier('connectionFieldsMap'),
+      t.stringLiteral(conditionTypeName),
     ];
     classBody.push(
       createClassMethod(
@@ -417,6 +430,7 @@ export function generateModelFile(
         t.tsTypeParameterInstantiation([
           sel,
           t.tsTypeReference(t.identifier(whereTypeName)),
+          t.tsTypeReference(t.identifier(conditionTypeName)),
         ]),
       );
     const retType = (sel: t.TSType) =>
@@ -477,9 +491,19 @@ export function generateModelFile(
             true,
           ),
         ),
+        t.objectProperty(
+          t.identifier('condition'),
+          t.optionalMemberExpression(
+            t.identifier('args'),
+            t.identifier('condition'),
+            false,
+            true,
+          ),
+        ),
       ]),
       t.stringLiteral(whereTypeName),
       t.identifier('connectionFieldsMap'),
+      t.stringLiteral(conditionTypeName),
     ];
     classBody.push(
       createClassMethod(

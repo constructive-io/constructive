@@ -9,7 +9,7 @@ CRUD operations for AppLimitDefault records via csdk CLI
 ```bash
 csdk app-limit-default list
 csdk app-limit-default get --id <value>
-csdk app-limit-default create --name <value> --max <value>
+csdk app-limit-default create --name <value> [--max <value>]
 csdk app-limit-default update --id <value> [--name <value>] [--max <value>]
 csdk app-limit-default delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk app-limit-default list
 ### Create a appLimitDefault
 
 ```bash
-csdk app-limit-default create --name "value" --max "value"
+csdk app-limit-default create --name <value> [--max <value>]
 ```
 
 ### Get a appLimitDefault by id

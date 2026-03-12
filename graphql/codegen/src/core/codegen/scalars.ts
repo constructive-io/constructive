@@ -39,7 +39,7 @@ export const SCALAR_TS_MAP: Record<string, string> = {
   TsVector: 'string',
   TsQuery: 'string',
 
-  // Vector types (pgvector)
+  // Vector types (pgvector) — serialized as [Float] in GraphQL
   Vector: 'number[]',
 
   // File upload
@@ -61,6 +61,11 @@ export const SCALAR_FILTER_MAP: Record<string, string> = {
   BigFloat: 'BigFloatFilter',
   BitString: 'BitStringFilter',
   InternetAddress: 'InternetAddressFilter',
+  // VectorFilter provides equality/distinct operators (isNull, equalTo, etc.) for vector
+  // columns on Filter types. While similarity search is done via condition types
+  // (e.g., embeddingNearby on ContactCondition), postgraphile-plugin-connection-filter
+  // may still auto-generate a filter type for vector columns. Without this mapping,
+  // those fields would be silently omitted from the generated SDK.
   Vector: 'VectorFilter',
   FullText: 'FullTextFilter',
   Interval: 'StringFilter',

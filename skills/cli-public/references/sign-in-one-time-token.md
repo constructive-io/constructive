@@ -7,7 +7,7 @@ Execute the signInOneTimeToken mutation
 ## Usage
 
 ```bash
-csdk sign-in-one-time-token --input <value>
+csdk sign-in-one-time-token --input.clientMutationId <value> --input.token <value> --input.credentialKind <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk sign-in-one-time-token --input <value>
 ### Run signInOneTimeToken
 
 ```bash
-csdk sign-in-one-time-token --input <value>
+csdk sign-in-one-time-token --input.clientMutationId <value> --input.token <value> --input.credentialKind <value>
 ```

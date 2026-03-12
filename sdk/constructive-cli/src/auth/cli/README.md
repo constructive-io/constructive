@@ -100,7 +100,7 @@ CRUD operations for RoleType records.
 | `id` | Int |
 | `name` | String |
 
-**Create fields:** `name`
+**Required create fields:** `name`
 
 ### `crypto-address`
 
@@ -126,7 +126,8 @@ CRUD operations for CryptoAddress records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `address`, `isVerified`, `isPrimary`
+**Required create fields:** `address`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `phone-number`
 
@@ -153,7 +154,8 @@ CRUD operations for PhoneNumber records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `cc`, `number`, `isVerified`, `isPrimary`
+**Required create fields:** `cc`, `number`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `connected-account`
 
@@ -180,7 +182,8 @@ CRUD operations for ConnectedAccount records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `service`, `identifier`, `details`, `isVerified`
+**Required create fields:** `service`, `identifier`, `details`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`
 
 ### `audit-log`
 
@@ -201,13 +204,14 @@ CRUD operations for AuditLog records.
 | `id` | UUID |
 | `event` | String |
 | `actorId` | UUID |
-| `origin` | ConstructiveInternalTypeOrigin |
+| `origin` | Origin |
 | `userAgent` | String |
 | `ipAddress` | InternetAddress |
 | `success` | Boolean |
 | `createdAt` | Datetime |
 
-**Create fields:** `event`, `actorId`, `origin`, `userAgent`, `ipAddress`, `success`
+**Required create fields:** `event`, `success`
+**Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
 ### `email`
 
@@ -227,13 +231,14 @@ CRUD operations for Email records.
 |-------|------|
 | `id` | UUID |
 | `ownerId` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `isVerified` | Boolean |
 | `isPrimary` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `ownerId`, `email`, `isVerified`, `isPrimary`
+**Required create fields:** `email`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `user`
 
@@ -254,14 +259,15 @@ CRUD operations for User records.
 | `id` | UUID |
 | `username` | String |
 | `displayName` | String |
-| `profilePicture` | ConstructiveInternalTypeImage |
+| `profilePicture` | Image |
 | `searchTsv` | FullText |
 | `type` | Int |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `searchTsvRank` | Float |
 
-**Create fields:** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`, `searchTsvRank`
+**Required create fields:** `searchTsvRank`
+**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`
 
 ## Custom Operations
 
@@ -302,7 +308,7 @@ signOut
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignOutInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `send-account-deletion-email`
 
@@ -313,7 +319,7 @@ sendAccountDeletionEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendAccountDeletionEmailInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `check-password`
 
@@ -324,7 +330,8 @@ checkPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | CheckPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String |
 
 ### `confirm-delete-account`
 
@@ -335,7 +342,9 @@ confirmDeleteAccount
 
   | Argument | Type |
   |----------|------|
-  | `input` | ConfirmDeleteAccountInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.userId` | UUID |
+  | `--input.token` | String |
 
 ### `set-password`
 
@@ -346,7 +355,9 @@ setPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.currentPassword` | String |
+  | `--input.newPassword` | String |
 
 ### `verify-email`
 
@@ -357,7 +368,9 @@ verifyEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyEmailInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.emailId` | UUID |
+  | `--input.token` | String |
 
 ### `reset-password`
 
@@ -368,7 +381,10 @@ resetPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | ResetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.roleId` | UUID |
+  | `--input.resetToken` | String |
+  | `--input.newPassword` | String |
 
 ### `sign-in-one-time-token`
 
@@ -379,7 +395,9 @@ signInOneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
+  | `--input.credentialKind` | String |
 
 ### `sign-in`
 
@@ -390,7 +408,12 @@ signIn
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `sign-up`
 
@@ -401,7 +424,12 @@ signUp
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignUpInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `one-time-token`
 
@@ -412,7 +440,11 @@ oneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.origin` | Origin |
+  | `--input.rememberMe` | Boolean |
 
 ### `extend-token-expires`
 
@@ -423,7 +455,8 @@ extendTokenExpires
 
   | Argument | Type |
   |----------|------|
-  | `input` | ExtendTokenExpiresInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.amount` | IntervalInput |
 
 ### `forgot-password`
 
@@ -434,7 +467,8 @@ forgotPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | ForgotPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | Email |
 
 ### `send-verification-email`
 
@@ -445,7 +479,8 @@ sendVerificationEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendVerificationEmailInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | Email |
 
 ### `verify-password`
 
@@ -456,7 +491,8 @@ verifyPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String (required) |
 
 ### `verify-totp`
 
@@ -467,7 +503,8 @@ verifyTotp
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyTotpInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
 
 ## Output
 
@@ -476,6 +513,14 @@ All commands output JSON to stdout. Pipe to `jq` for formatting:
 ```bash
 csdk car list | jq '.[]'
 csdk car get --id <uuid> | jq '.'
+```
+
+## Non-Interactive Mode
+
+Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):
+
+```bash
+csdk --no-tty car create --name "Sedan" --year 2024
 ```
 
 ---

@@ -38,12 +38,12 @@ function buildConnectionSelections(nodeSelections: FieldNode[]): FieldNode[] {
 }
 
 function addVariable(
-  spec: { varName: string; argName?: string; typeName: string; value: unknown },
+  spec: { varName: string; argName?: string; typeName?: string; value: unknown },
   definitions: VariableDefinitionNode[],
   args: ArgumentNode[],
   variables: Record<string, unknown>,
 ): void {
-  if (spec.value === undefined) return;
+  if (spec.value === undefined || !spec.typeName) return;
   definitions.push(
     t.variableDefinition({
       variable: t.variable({ name: spec.varName }),
@@ -123,14 +123,15 @@ function buildSelections(
   return fields;
 }
 
-function buildFindManyDocument<TSelect, TWhere>(
+function buildFindManyDocument<TSelect, TWhere, TCondition>(
   operationName: string,
   queryField: string,
   select: TSelect,
-  args: { where?: TWhere; first?: number; orderBy?: string[] },
+  args: { where?: TWhere; condition?: TCondition; first?: number; orderBy?: string[] },
   filterTypeName: string,
   orderByTypeName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
+  conditionTypeName?: string,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(
@@ -143,6 +144,16 @@ function buildFindManyDocument<TSelect, TWhere>(
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
 
+  addVariable(
+    {
+      varName: 'condition',
+      typeName: conditionTypeName,
+      value: args.condition,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables,
+  );
   addVariable(
     {
       varName: 'where',
@@ -556,6 +567,52 @@ describe('query-builder', () => {
         first: 10,
         orderBy: ['NAME_ASC'],
       });
+    });
+
+    it('includes condition variable when conditionTypeName is provided', () => {
+      const { document, variables } = buildFindManyDocument(
+        'Contacts',
+        'contacts',
+        { id: true, name: true },
+        {
+          condition: { embeddingNearby: { vector: [0.1, 0.2], metric: 'COSINE' } },
+          where: { name: { equalTo: 'test' } },
+          first: 5,
+        },
+        'ContactFilter',
+        'ContactsOrderBy',
+        undefined,
+        'ContactCondition',
+      );
+
+      // condition variable should appear in the query
+      expect(document).toContain('$condition: ContactCondition');
+      expect(document).toContain('condition: $condition');
+      // filter should still work alongside condition
+      expect(document).toContain('$where: ContactFilter');
+      expect(document).toContain('filter: $where');
+      // variables should include both
+      expect(variables.condition).toEqual({
+        embeddingNearby: { vector: [0.1, 0.2], metric: 'COSINE' },
+      });
+      expect(variables.where).toEqual({ name: { equalTo: 'test' } });
+    });
+
+    it('omits condition variable when not provided', () => {
+      const { document } = buildFindManyDocument(
+        'Users',
+        'users',
+        { id: true },
+        { first: 10 },
+        'UserFilter',
+        'UsersOrderBy',
+        undefined,
+        'UserCondition',
+      );
+
+      // condition should NOT appear since no value was provided
+      expect(document).not.toContain('$condition');
+      expect(document).not.toContain('condition:');
     });
   });
 

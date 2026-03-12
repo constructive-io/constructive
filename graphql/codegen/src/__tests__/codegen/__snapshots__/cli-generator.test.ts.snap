@@ -295,7 +295,7 @@ CRUD operations for Car records.
 | \`isElectric\` | Boolean |
 | \`createdAt\` | Datetime |
 
-**Create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
+**Required create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
 
 ### \`driver\`
 
@@ -317,7 +317,7 @@ CRUD operations for Driver records.
 | \`name\` | String |
 | \`licenseNumber\` | String |
 
-**Create fields:** \`name\`, \`licenseNumber\`
+**Required create fields:** \`name\`, \`licenseNumber\`
 
 ## Custom Operations
 
@@ -337,8 +337,8 @@ Authenticate a user
 
   | Argument | Type |
   |----------|------|
-  | \`email\` | String (required) |
-  | \`password\` | String (required) |
+  | \`--email\` | String (required) |
+  | \`--password\` | String (required) |
 
 ## Output
 
@@ -347,6 +347,14 @@ All commands output JSON to stdout. Pipe to \`jq\` for formatting:
 \`\`\`bash
 myapp car list | jq '.[]'
 myapp car get --id <uuid> | jq '.'
+\`\`\`
+
+## Non-Interactive Mode
+
+Use \`--no-tty\` to skip all interactive prompts (useful for scripts and CI):
+
+\`\`\`bash
+myapp --no-tty car create --name "Sedan" --year 2024
 \`\`\`
 
 ---
@@ -454,7 +462,7 @@ myapp car list
 ### Create a car
 
 \`\`\`bash
-myapp car create --make "value" --model "value" --year "value" --isElectric "value"
+myapp car create --make <value> --model <value> --year <value> --isElectric <value>
 \`\`\`
 
 ### Get a car by id
@@ -493,7 +501,7 @@ myapp driver list
 ### Create a driver
 
 \`\`\`bash
-myapp driver create --name "value" --licenseNumber "value"
+myapp driver create --name <value> --licenseNumber <value>
 \`\`\`
 
 ### Get a driver by id
@@ -576,6 +584,9 @@ myapp auth set-token <token>
 myapp car list
 myapp car get --id <value>
 myapp car create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty car list
 \`\`\`
 
 ## Examples
@@ -587,6 +598,12 @@ myapp context create local --endpoint http://localhost:5000/graphql
 myapp context use local
 myapp auth set-token <token>
 myapp car list
+\`\`\`
+
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty car create --<field> <value>
 \`\`\`
 
 ## References
@@ -2895,7 +2912,7 @@ CRUD operations for User records.
 | \`email\` | String |
 | \`name\` | String |
 
-**Create fields:** \`email\`, \`name\`
+**Required create fields:** \`email\`, \`name\`
 
 ### \`auth:current-user\`
 
@@ -2913,8 +2930,8 @@ Authenticate a user
 
   | Argument | Type |
   |----------|------|
-  | \`email\` | String (required) |
-  | \`password\` | String (required) |
+  | \`--email\` | String (required) |
+  | \`--password\` | String (required) |
 - **Flags:** \`--save-token\` auto-saves returned token to credentials
 
 ## members Commands
@@ -2938,7 +2955,7 @@ CRUD operations for Member records.
 | \`id\` | UUID |
 | \`role\` | String |
 
-**Create fields:** \`role\`
+**Required create fields:** \`role\`
 
 ## app Commands
 
@@ -2965,7 +2982,7 @@ CRUD operations for Car records.
 | \`isElectric\` | Boolean |
 | \`createdAt\` | Datetime |
 
-**Create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
+**Required create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
 
 ## Output
 
@@ -2974,6 +2991,14 @@ All commands output JSON to stdout. Pipe to \`jq\` for formatting:
 \`\`\`bash
 myapp auth:user list | jq '.[]'
 myapp auth:user get --id <uuid> | jq '.'
+\`\`\`
+
+## Non-Interactive Mode
+
+Use \`--no-tty\` to skip all interactive prompts (useful for scripts and CI):
+
+\`\`\`bash
+myapp --no-tty auth:user create --name "Example"
 \`\`\`
 
 ---
@@ -3127,7 +3152,7 @@ myapp auth:user list
 ### Create a user
 
 \`\`\`bash
-myapp auth:user create --email "value" --name "value"
+myapp auth:user create --email <value> --name <value>
 \`\`\`
 ",
     "fileName": "cli-auth/references/user.md",
@@ -3198,6 +3223,9 @@ CLI commands for the auth API target — 1 tables and 2 custom operations via my
 myapp auth:user list
 myapp auth:user get --id <value>
 myapp auth:user create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty auth:user list
 \`\`\`
 
 ## Examples
@@ -3206,6 +3234,12 @@ myapp auth:user create --<field> <value>
 
 \`\`\`bash
 myapp auth:user list
+\`\`\`
+
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty auth:user create --<field> <value>
 \`\`\`
 
 ## References
@@ -3246,7 +3280,7 @@ myapp members:member list
 ### Create a member
 
 \`\`\`bash
-myapp members:member create --role "value"
+myapp members:member create --role <value>
 \`\`\`
 ",
     "fileName": "cli-members/references/member.md",
@@ -3270,6 +3304,9 @@ CLI commands for the members API target — 1 tables and 0 custom operations via
 myapp members:member list
 myapp members:member get --id <value>
 myapp members:member create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty members:member list
 \`\`\`
 
 ## Examples
@@ -3278,6 +3315,12 @@ myapp members:member create --<field> <value>
 
 \`\`\`bash
 myapp members:member list
+\`\`\`
+
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty members:member create --<field> <value>
 \`\`\`
 
 ## References
@@ -3316,7 +3359,7 @@ myapp app:car list
 ### Create a car
 
 \`\`\`bash
-myapp app:car create --make "value" --model "value" --year "value" --isElectric "value"
+myapp app:car create --make <value> --model <value> --year <value> --isElectric <value>
 \`\`\`
 ",
     "fileName": "cli-app/references/car.md",
@@ -3340,6 +3383,9 @@ CLI commands for the app API target — 1 tables and 0 custom operations via mya
 myapp app:car list
 myapp app:car get --id <value>
 myapp app:car create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty app:car list
 \`\`\`
 
 ## Examples
@@ -3348,6 +3394,12 @@ myapp app:car create --<field> <value>
 
 \`\`\`bash
 myapp app:car list
+\`\`\`
+
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty app:car create --<field> <value>
 \`\`\`
 
 ## References

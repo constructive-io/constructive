@@ -9,7 +9,7 @@ CRUD operations for Store records via csdk CLI
 ```bash
 csdk store list
 csdk store get --id <value>
-csdk store create --name <value> --databaseId <value> --hash <value>
+csdk store create --name <value> --databaseId <value> [--hash <value>]
 csdk store update --id <value> [--name <value>] [--databaseId <value>] [--hash <value>]
 csdk store delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk store list
 ### Create a store
 
 ```bash
-csdk store create --name "value" --databaseId "value" --hash "value"
+csdk store create --name <value> --databaseId <value> [--hash <value>]
 ```
 
 ### Get a store by id
