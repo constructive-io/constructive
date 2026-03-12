@@ -130,7 +130,7 @@ export function createVectorSearchPlugin(
   const {
     defaultMetric = 'COSINE',
     maxLimit = 100,
-    filterPrefix = options.conditionPrefix ?? 'vector',
+    filterPrefix = 'vector',
   } = options;
 
   return {

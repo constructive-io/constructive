@@ -35,9 +35,4 @@ export interface VectorSearchPluginOptions {
    * @default 'vector'
    */
   filterPrefix?: string;
-
-  /**
-   * @deprecated Use `filterPrefix` instead. Kept for backwards compatibility.
-   */
-  conditionPrefix?: string;
 }
