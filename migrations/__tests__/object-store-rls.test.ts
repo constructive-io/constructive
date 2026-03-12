@@ -174,6 +174,8 @@ describe('RLS-01: Tenant Isolation', () => {
     });
 
     const result = await pg.query('SELECT * FROM object_store_public.files');
+    // Must return rows (prevents vacuous pass on empty result from Array.every)
+    expect(result.rowCount).toBeGreaterThan(0);
     expect(result.rows.every((r: any) => r.database_id === 1)).toBe(true);
     expect(result.rows.find((r: any) => r.database_id === 2)).toBeUndefined();
   });
@@ -503,7 +505,7 @@ describe('RLS-06: service_role', () => {
     });
 
     const result = await pg.query('SELECT * FROM object_store_public.files');
-    expect(result.rowCount).toBeGreaterThanOrEqual(8);
+    expect(result.rowCount).toBe(8);
     expect(result.rows.every((r: any) => r.database_id === 1)).toBe(true);
   });
 
@@ -575,14 +577,15 @@ describe('RLS-08: Buckets Table Access', () => {
     await switchRole('authenticated', { 'app.database_id': '1' });
 
     const result = await pg.query('SELECT * FROM object_store_public.buckets');
-    expect(result.rowCount).toBeGreaterThan(0);
+    // Buckets has no RLS -- all 3 seeded buckets visible (2 tenant 1 + 1 tenant 2)
+    expect(result.rowCount).toBe(3);
   });
 
   it('RLS-08b: service_role can read buckets (GRANT added for policy subquery)', async () => {
     await switchRole('service_role', { 'app.database_id': '1' });
 
     const result = await pg.query('SELECT * FROM object_store_public.buckets');
-    expect(result.rowCount).toBeGreaterThan(0);
+    expect(result.rowCount).toBe(3);
   });
 });
 
