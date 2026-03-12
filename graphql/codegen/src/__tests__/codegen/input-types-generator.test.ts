@@ -455,6 +455,18 @@ describe('scalar filter types', () => {
     // Float filters
     expect(result.content).toContain('export interface FloatFilter {');
   });
+
+  it('includes VectorFilter for pgvector embedding fields', () => {
+    const result = generateInputTypesFile(new Map(), new Set(), [userTable]);
+
+    // VectorFilter should be generated as a scalar filter type
+    expect(result.content).toContain('export interface VectorFilter {');
+    expect(result.content).toContain('isNull?: boolean;');
+    expect(result.content).toContain('equalTo?: number[];');
+    expect(result.content).toContain('notEqualTo?: number[];');
+    expect(result.content).toContain('distinctFrom?: number[];');
+    expect(result.content).toContain('notDistinctFrom?: number[];');
+  });
 });
 
 // ============================================================================

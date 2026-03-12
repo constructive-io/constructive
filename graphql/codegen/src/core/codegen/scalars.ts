@@ -61,6 +61,7 @@ export const SCALAR_FILTER_MAP: Record<string, string> = {
   BigFloat: 'BigFloatFilter',
   BitString: 'BitStringFilter',
   InternetAddress: 'InternetAddressFilter',
+  Vector: 'VectorFilter',
   FullText: 'FullTextFilter',
   Interval: 'StringFilter',
 };

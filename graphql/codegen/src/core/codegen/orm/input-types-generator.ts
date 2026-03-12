@@ -322,6 +322,8 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
     operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
+  // Vector filter (for pgvector embedding fields)
+  { name: 'VectorFilter', tsType: 'number[]', operators: ['equality', 'distinct'] },
   // List filters (for array fields like string[], int[], uuid[])
   {
     name: 'StringListFilter',
