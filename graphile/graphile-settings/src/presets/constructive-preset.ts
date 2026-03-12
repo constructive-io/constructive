@@ -45,9 +45,10 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  * - pg_textsearch BM25 search (auto-discovers BM25 indexes: condition fields, score computed fields,
  *   orderBy score — zero config)
  *
- * DISABLED PLUGINS:
- * - PgConnectionArgFilterBackwardRelationsPlugin (relation filters bloat the API)
- * - PgConnectionArgFilterForwardRelationsPlugin (relation filters bloat the API)
+ * RELATION FILTERS:
+ * - Enabled via connectionFilterRelations: true
+ * - Forward: filter child by parent (e.g. allOrders(filter: { clientByClientId: { name: { startsWith: "Acme" } } }))
+ * - Backward: filter parent by children (e.g. allClients(filter: { ordersByClientId: { some: { total: { greaterThan: 1000 } } } }))
  *
  * USAGE:
  * ```typescript
@@ -72,7 +73,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     InflektPreset,
     InflectorLoggerPreset,
     NoUniqueLookupPreset,
-    ConnectionFilterPreset(),
+    ConnectionFilterPreset({ connectionFilterRelations: true }),
     EnableAllFilterColumnsPreset,
     ManyToManyOptInPreset,
     MetaSchemaPreset,
@@ -95,8 +96,8 @@ export const ConstructivePreset: GraphileConfig.Preset = {
    * Connection Filter Plugin Configuration
    *
    * These options control what fields appear in the `filter` argument on connections.
-   * Our v5-native graphile-connection-filter plugin does NOT include relation filter plugins,
-   * so no `disablePlugins` hack is needed (unlike the upstream postgraphile-plugin-connection-filter).
+   * Our v5-native graphile-connection-filter plugin controls relation filters via the
+   * `connectionFilterRelations` option passed to ConnectionFilterPreset().
    *
    * NOTE: By default, PostGraphile v5 only allows filtering on INDEXED columns.
    * We override this with EnableAllFilterColumnsPreset to allow filtering on ALL columns.
