@@ -25,7 +25,7 @@ csdk membership-type list
 ### Create a membershipType
 
 ```bash
-csdk membership-type create --name "value" --description "value" --prefix "value"
+csdk membership-type create --name <value> --description <value> --prefix <value>
 ```
 
 ### Get a membershipType by id

@@ -7,7 +7,7 @@ Execute the provisionDatabaseWithUser mutation
 ## Usage
 
 ```bash
-csdk provision-database-with-user --input <value>
+csdk provision-database-with-user --input.clientMutationId <value> --input.pDatabaseName <value> --input.pDomain <value> --input.pSubdomain <value> --input.pModules <value> --input.pOptions <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-database-with-user --input <value>
 ### Run provisionDatabaseWithUser
 
 ```bash
-csdk provision-database-with-user --input <value>
+csdk provision-database-with-user --input.clientMutationId <value> --input.pDatabaseName <value> --input.pDomain <value> --input.pSubdomain <value> --input.pModules <value> --input.pOptions <value>
 ```

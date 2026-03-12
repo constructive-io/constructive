@@ -7,7 +7,7 @@ Execute the setFieldOrder mutation
 ## Usage
 
 ```bash
-csdk set-field-order --input <value>
+csdk set-field-order --input.clientMutationId <value> --input.fieldIds <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk set-field-order --input <value>
 ### Run setFieldOrder
 
 ```bash
-csdk set-field-order --input <value>
+csdk set-field-order --input.clientMutationId <value> --input.fieldIds <value>
 ```

@@ -7,7 +7,7 @@ Execute the setPropsAndCommit mutation
 ## Usage
 
 ```bash
-csdk set-props-and-commit --input <value>
+csdk set-props-and-commit --input.clientMutationId <value> --input.dbId <value> --input.storeId <value> --input.refname <value> --input.path <value> --input.data <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk set-props-and-commit --input <value>
 ### Run setPropsAndCommit
 
 ```bash
-csdk set-props-and-commit --input <value>
+csdk set-props-and-commit --input.clientMutationId <value> --input.dbId <value> --input.storeId <value> --input.refname <value> --input.path <value> --input.data <value>
 ```

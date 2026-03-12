@@ -1,8 +1,10 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanTable, CleanOperation } from '../../../types/schema';
+import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
 import {
-  formatArgType,
+  flattenArgs,
+  flattenedArgsToFlags,
+  cleanTypeName,
   getEditableFields,
   getReadmeHeader,
   getReadmeFooter,
@@ -16,6 +18,7 @@ import {
   getTableNames,
   getPrimaryKeyInfo,
 } from '../utils';
+import { getFieldsWithDefaults } from './table-command-generator';
 
 export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile, McpTool } from '../docs-utils';
@@ -24,6 +27,7 @@ export function generateReadme(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
 
@@ -113,10 +117,21 @@ export function generateReadme(
       lines.push('| Field | Type |');
       lines.push('|-------|------|');
       for (const f of scalarFields) {
-        lines.push(`| \`${f.name}\` | ${f.type.gqlType} |`);
+        lines.push(`| \`${f.name}\` | ${cleanTypeName(f.type.gqlType)} |`);
       }
       lines.push('');
-      lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
+      const defaultFields = getFieldsWithDefaults(table, registry);
+      const requiredCreate = editableFields.filter((f) => !defaultFields.has(f.name));
+      const optionalCreate = editableFields.filter((f) => defaultFields.has(f.name));
+      if (requiredCreate.length > 0) {
+        lines.push(`**Required create fields:** ${requiredCreate.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
+      if (optionalCreate.length > 0) {
+        lines.push(`**Optional create fields (backend defaults):** ${optionalCreate.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
+      if (requiredCreate.length === 0 && optionalCreate.length === 0) {
+        lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
       lines.push('');
     }
   }
@@ -126,18 +141,20 @@ export function generateReadme(
     lines.push('');
     for (const op of customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
       lines.push(`### \`${kebab}\``);
       lines.push('');
       lines.push(op.description || op.name);
       lines.push('');
       lines.push(`- **Type:** ${op.kind}`);
-      if (op.args.length > 0) {
+      if (flat.length > 0) {
         lines.push('- **Arguments:**');
         lines.push('');
         lines.push('  | Argument | Type |');
         lines.push('  |----------|------|');
-        for (const arg of op.args) {
-          lines.push(`  | \`${arg.name}\` | ${formatArgType(arg)} |`);
+        for (const a of flat) {
+          const reqLabel = a.required ? ' (required)' : '';
+          lines.push(`  | \`--${a.flag}\` | ${a.type}${reqLabel} |`);
         }
       } else {
         lines.push('- **Arguments:** none');
@@ -155,6 +172,14 @@ export function generateReadme(
   lines.push(`${toolName} car get --id <uuid> | jq '.'`);
   lines.push('```');
   lines.push('');
+  lines.push('## Non-Interactive Mode');
+  lines.push('');
+  lines.push('Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):');
+  lines.push('');
+  lines.push('```bash');
+  lines.push(`${toolName} --no-tty car create --name "Sedan" --year 2024`);
+  lines.push('```');
+  lines.push('');
 
   lines.push(...getReadmeFooter());
 
@@ -168,6 +193,7 @@ export function generateAgentsDocs(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
 
@@ -247,6 +273,13 @@ export function generateAgentsDocs(
     const pk = getPrimaryKeyInfo(table)[0];
     const scalarFields = getScalarFields(table);
     const editableFields = getEditableFields(table);
+    const defaultFields = getFieldsWithDefaults(table, registry);
+    const requiredCreateFields = editableFields.filter((f) => !defaultFields.has(f.name));
+    const optionalCreateFields = editableFields.filter((f) => defaultFields.has(f.name));
+    const createFlags = [
+      ...requiredCreateFields.map((f) => `--${f.name} <value>`),
+      ...optionalCreateFields.map((f) => `[--${f.name} <value>]`),
+    ].join(' ');
 
     lines.push(`### TOOL: ${kebab}`);
     lines.push('');
@@ -256,19 +289,20 @@ export function generateAgentsDocs(
     lines.push('SUBCOMMANDS:');
     lines.push(`  ${toolName} ${kebab} list                               List all records`);
     lines.push(`  ${toolName} ${kebab} get --${pk.name} <value>              Get one record`);
-    lines.push(`  ${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} <value>`).join(' ')}`);
+    lines.push(`  ${toolName} ${kebab} create ${createFlags}`);
     lines.push(`  ${toolName} ${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`);
     lines.push(`  ${toolName} ${kebab} delete --${pk.name} <value>           Delete one record`);
     lines.push('');
     lines.push('INPUT FIELDS:');
     for (const f of scalarFields) {
       const isPk = f.name === pk.name;
-      lines.push(`  ${f.name}: ${f.type.gqlType}${isPk ? ' (primary key)' : ''}`);
+      lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${isPk ? ' (primary key)' : ''}`);
     }
     lines.push('');
     lines.push('EDITABLE FIELDS (for create/update):');
     for (const f of editableFields) {
-      lines.push(`  ${f.name}: ${f.type.gqlType}`);
+      const optLabel = defaultFields.has(f.name) ? ' (optional, has backend default)' : '';
+      lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${optLabel}`);
     }
     lines.push('');
     lines.push('OUTPUT: JSON');
@@ -283,6 +317,7 @@ export function generateAgentsDocs(
 
   for (const op of customOperations) {
     const kebab = toKebabCase(op.name);
+    const flat = flattenArgs(op.args, registry);
 
     lines.push(`### TOOL: ${kebab}`);
     lines.push('');
@@ -290,13 +325,14 @@ export function generateAgentsDocs(
     lines.push('');
     lines.push('```');
     lines.push(`TYPE: ${op.kind}`);
-    if (op.args.length > 0) {
-      const flags = op.args.map((a) => `--${a.name} <value>`).join(' ');
+    if (flat.length > 0) {
+      const flags = flattenedArgsToFlags(flat);
       lines.push(`USAGE: ${toolName} ${kebab} ${flags}`);
       lines.push('');
       lines.push('INPUT:');
-      for (const arg of op.args) {
-        lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
+      for (const a of flat) {
+        const reqLabel = a.required ? ' (required)' : '';
+        lines.push(`  ${a.flag}: ${a.type}${reqLabel}`);
       }
     } else {
       lines.push(`USAGE: ${toolName} ${kebab}`);
@@ -384,6 +420,7 @@ export function getCliMcpTools(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
+  registry?: TypeRegistry,
 ): McpTool[] {
   const tools: McpTool[] = [];
 
@@ -466,6 +503,10 @@ export function getCliMcpTools(
     const pk = getPrimaryKeyInfo(table)[0];
     const scalarFields = getScalarFields(table);
     const editableFields = getEditableFields(table);
+    const defaultFields = getFieldsWithDefaults(table, registry);
+    const requiredCreateFieldNames = editableFields
+      .filter((f) => !defaultFields.has(f.name))
+      .map((f) => f.name);
 
     tools.push({
       name: `${toolName}_${kebab}_list`,
@@ -491,7 +532,7 @@ export function getCliMcpTools(
     const createProps: Record<string, unknown> = {};
     for (const f of editableFields) {
       createProps[f.name] = {
-        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
         description: `${table.name} ${f.name}`,
       };
     }
@@ -501,7 +542,7 @@ export function getCliMcpTools(
       inputSchema: {
         type: 'object',
         properties: createProps,
-        required: editableFields.map((f) => f.name),
+        ...(requiredCreateFieldNames.length > 0 ? { required: requiredCreateFieldNames } : {}),
       },
     });
 
@@ -513,7 +554,7 @@ export function getCliMcpTools(
     };
     for (const f of editableFields) {
       updateProps[f.name] = {
-        type: gqlTypeToJsonSchemaType(f.type.gqlType),
+        type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
         description: `${table.name} ${f.name}`,
       };
     }
@@ -549,7 +590,7 @@ export function getCliMcpTools(
       _meta: {
         fields: scalarFields.map((f) => ({
           name: f.name,
-          type: f.type.gqlType,
+          type: cleanTypeName(f.type.gqlType),
           editable: editableFields.some((ef) => ef.name === f.name),
           primaryKey: f.name === pk.name,
         })),
@@ -559,18 +600,17 @@ export function getCliMcpTools(
 
   for (const op of customOperations) {
     const kebab = toKebabCase(op.name);
+    const flat = flattenArgs(op.args, registry);
     const props: Record<string, unknown> = {};
     const required: string[] = [];
 
-    for (const arg of op.args) {
-      const isRequired = arg.type.kind === 'NON_NULL';
-      const baseType = isRequired && arg.type.ofType ? arg.type.ofType : arg.type;
-      props[arg.name] = {
-        type: gqlTypeToJsonSchemaType(baseType.name ?? 'String'),
-        description: arg.description || arg.name,
+    for (const a of flat) {
+      props[a.flag] = {
+        type: gqlTypeToJsonSchemaType(a.type),
+        description: a.description || a.flag,
       };
-      if (isRequired) {
-        required.push(arg.name);
+      if (a.required) {
+        required.push(a.flag);
       }
     }
 
@@ -593,6 +633,7 @@ export function generateSkills(
   customOperations: CleanOperation[],
   toolName: string,
   targetName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
   const skillName = `cli-${targetName}`;
@@ -659,6 +700,11 @@ export function generateSkills(
     const kebab = toKebabCase(singularName);
     const pk = getPrimaryKeyInfo(table)[0];
     const editableFields = getEditableFields(table);
+    const defaultFields = getFieldsWithDefaults(table, registry);
+    const createFlags = [
+      ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <value>`),
+      ...editableFields.filter((f) => defaultFields.has(f.name)).map((f) => `[--${f.name} <value>]`),
+    ].join(' ');
 
     referenceNames.push(kebab);
 
@@ -670,7 +716,7 @@ export function generateSkills(
         usage: [
           `${toolName} ${kebab} list`,
           `${toolName} ${kebab} get --${pk.name} <value>`,
-          `${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} <value>`).join(' ')}`,
+          `${toolName} ${kebab} create ${createFlags}`,
           `${toolName} ${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`,
           `${toolName} ${kebab} delete --${pk.name} <value>`,
         ],
@@ -682,7 +728,7 @@ export function generateSkills(
           {
             description: `Create a ${singularName}`,
             code: [
-              `${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`,
+              `${toolName} ${kebab} create ${createFlags}`,
             ],
           },
           {
@@ -697,9 +743,10 @@ export function generateSkills(
   // Custom operation references
   for (const op of customOperations) {
     const kebab = toKebabCase(op.name);
+    const flat = flattenArgs(op.args, registry);
     const usage =
-      op.args.length > 0
-        ? `${toolName} ${kebab} ${op.args.map((a) => `--${a.name} <value>`).join(' ')}`
+      flat.length > 0
+        ? `${toolName} ${kebab} ${flattenedArgsToFlags(flat)}`
         : `${toolName} ${kebab}`;
 
     referenceNames.push(kebab);
@@ -740,6 +787,9 @@ export function generateSkills(
           `${toolName} ${tableKebabs[0] || 'model'} list`,
           `${toolName} ${tableKebabs[0] || 'model'} get --id <value>`,
           `${toolName} ${tableKebabs[0] || 'model'} create --<field> <value>`,
+          '',
+          `# Non-interactive mode (skip all prompts, use flags only)`,
+          `${toolName} --no-tty ${tableKebabs[0] || 'model'} list`,
         ],
         examples: [
           {
@@ -749,6 +799,12 @@ export function generateSkills(
               `${toolName} context use local`,
               `${toolName} auth set-token <token>`,
               `${toolName} ${tableKebabs[0] || 'model'} list`,
+            ],
+          },
+          {
+            description: 'Non-interactive mode (for scripts and CI)',
+            code: [
+              `${toolName} --no-tty ${tableKebabs[0] || 'model'} create --<field> <value>`,
             ],
           },
         ],
@@ -763,6 +819,7 @@ export function generateSkills(
 export interface MultiTargetDocsInput {
   toolName: string;
   builtinNames: { auth: string; context: string };
+  registry?: TypeRegistry;
   targets: Array<{
     name: string;
     endpoint: string;
@@ -775,7 +832,7 @@ export interface MultiTargetDocsInput {
 export function generateMultiTargetReadme(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const lines: string[] = [];
 
   lines.push(...getReadmeHeader(`${toolName} CLI`));
@@ -911,6 +968,7 @@ export function generateMultiTargetReadme(
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
       const editableFields = getEditableFields(table);
+      const defaultFields = getFieldsWithDefaults(table, registry);
 
       lines.push(`### \`${tgt.name}:${kebab}\``);
       lines.push('');
@@ -929,27 +987,39 @@ export function generateMultiTargetReadme(
       lines.push('| Field | Type |');
       lines.push('|-------|------|');
       for (const f of scalarFields) {
-        lines.push(`| \`${f.name}\` | ${f.type.gqlType} |`);
+        lines.push(`| \`${f.name}\` | ${cleanTypeName(f.type.gqlType)} |`);
       }
       lines.push('');
-      lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
+      const requiredCreate = editableFields.filter((f) => !defaultFields.has(f.name));
+      const optionalCreate = editableFields.filter((f) => defaultFields.has(f.name));
+      if (requiredCreate.length > 0) {
+        lines.push(`**Required create fields:** ${requiredCreate.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
+      if (optionalCreate.length > 0) {
+        lines.push(`**Optional create fields (backend defaults):** ${optionalCreate.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
+      if (requiredCreate.length === 0 && optionalCreate.length === 0) {
+        lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
       lines.push('');
     }
 
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
       lines.push(`### \`${tgt.name}:${kebab}\``);
       lines.push('');
       lines.push(op.description || op.name);
       lines.push('');
       lines.push(`- **Type:** ${op.kind}`);
-      if (op.args.length > 0) {
+      if (flat.length > 0) {
         lines.push('- **Arguments:**');
         lines.push('');
         lines.push('  | Argument | Type |');
         lines.push('  |----------|------|');
-        for (const arg of op.args) {
-          lines.push(`  | \`${arg.name}\` | ${formatArgType(arg)} |`);
+        for (const a of flat) {
+          const reqLabel = a.required ? ' (required)' : '';
+          lines.push(`  | \`--${a.flag}\` | ${a.type}${reqLabel} |`);
         }
       } else {
         lines.push('- **Arguments:** none');
@@ -974,6 +1044,18 @@ export function generateMultiTargetReadme(
   }
   lines.push('```');
   lines.push('');
+  lines.push('## Non-Interactive Mode');
+  lines.push('');
+  lines.push('Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):');
+  lines.push('');
+  lines.push('```bash');
+  if (targets.length > 0 && targets[0].tables.length > 0) {
+    const tgt = targets[0];
+    const kebab = toKebabCase(getTableNames(tgt.tables[0]).singularName);
+    lines.push(`${toolName} --no-tty ${tgt.name}:${kebab} create --name "Example"`);
+  }
+  lines.push('```');
+  lines.push('');
 
   lines.push(...getReadmeFooter());
 
@@ -986,7 +1068,7 @@ export function generateMultiTargetReadme(
 export function generateMultiTargetAgentsDocs(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const lines: string[] = [];
 
   lines.push(`# ${toolName} CLI - Agent Reference`);
@@ -1086,6 +1168,13 @@ export function generateMultiTargetAgentsDocs(
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
       const editableFields = getEditableFields(table);
+      const defaultFields = getFieldsWithDefaults(table, registry);
+      const requiredCreateFields = editableFields.filter((f) => !defaultFields.has(f.name));
+      const optionalCreateFields = editableFields.filter((f) => defaultFields.has(f.name));
+      const createFlags = [
+        ...requiredCreateFields.map((f) => `--${f.name} <value>`),
+        ...optionalCreateFields.map((f) => `[--${f.name} <value>]`),
+      ].join(' ');
 
       lines.push(`### TOOL: ${tgt.name}:${kebab}`);
       lines.push('');
@@ -1095,19 +1184,20 @@ export function generateMultiTargetAgentsDocs(
       lines.push('SUBCOMMANDS:');
       lines.push(`  ${toolName} ${tgt.name}:${kebab} list                               List all records`);
       lines.push(`  ${toolName} ${tgt.name}:${kebab} get --${pk.name} <value>              Get one record`);
-      lines.push(`  ${toolName} ${tgt.name}:${kebab} create ${editableFields.map((f) => `--${f.name} <value>`).join(' ')}`);
+      lines.push(`  ${toolName} ${tgt.name}:${kebab} create ${createFlags}`);
       lines.push(`  ${toolName} ${tgt.name}:${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`);
       lines.push(`  ${toolName} ${tgt.name}:${kebab} delete --${pk.name} <value>           Delete one record`);
       lines.push('');
       lines.push('INPUT FIELDS:');
       for (const f of scalarFields) {
         const isPk = f.name === pk.name;
-        lines.push(`  ${f.name}: ${f.type.gqlType}${isPk ? ' (primary key)' : ''}`);
+        lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${isPk ? ' (primary key)' : ''}`);
       }
       lines.push('');
       lines.push('EDITABLE FIELDS (for create/update):');
       for (const f of editableFields) {
-        lines.push(`  ${f.name}: ${f.type.gqlType}`);
+        const optLabel = defaultFields.has(f.name) ? ' (optional, has backend default)' : '';
+        lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${optLabel}`);
       }
       lines.push('');
       lines.push('OUTPUT: JSON');
@@ -1122,6 +1212,7 @@ export function generateMultiTargetAgentsDocs(
 
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
 
       lines.push(`### TOOL: ${tgt.name}:${kebab}`);
       lines.push('');
@@ -1129,13 +1220,14 @@ export function generateMultiTargetAgentsDocs(
       lines.push('');
       lines.push('```');
       lines.push(`TYPE: ${op.kind}`);
-      if (op.args.length > 0) {
-        const flags = op.args.map((a) => `--${a.name} <value>`).join(' ');
+      if (flat.length > 0) {
+        const flags = flattenedArgsToFlags(flat);
         lines.push(`USAGE: ${toolName} ${tgt.name}:${kebab} ${flags}`);
         lines.push('');
         lines.push('INPUT:');
-        for (const arg of op.args) {
-          lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
+        for (const a of flat) {
+          const reqLabel = a.required ? ' (required)' : '';
+          lines.push(`  ${a.flag}: ${a.type}${reqLabel}`);
         }
       } else {
         lines.push(`USAGE: ${toolName} ${tgt.name}:${kebab}`);
@@ -1233,7 +1325,7 @@ export function generateMultiTargetAgentsDocs(
 export function getMultiTargetCliMcpTools(
   input: MultiTargetDocsInput,
 ): McpTool[] {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const tools: McpTool[] = [];
 
   const contextEndpointProps: Record<string, unknown> = {
@@ -1322,6 +1414,10 @@ export function getMultiTargetCliMcpTools(
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
       const editableFields = getEditableFields(table);
+      const defaultFields = getFieldsWithDefaults(table, registry);
+      const requiredCreateFieldNames = editableFields
+        .filter((f) => !defaultFields.has(f.name))
+        .map((f) => f.name);
       const prefix = `${toolName}_${tgt.name}_${kebab}`;
 
       tools.push({
@@ -1348,7 +1444,7 @@ export function getMultiTargetCliMcpTools(
       const createProps: Record<string, unknown> = {};
       for (const f of editableFields) {
         createProps[f.name] = {
-          type: gqlTypeToJsonSchemaType(f.type.gqlType),
+          type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
           description: `${table.name} ${f.name}`,
         };
       }
@@ -1358,7 +1454,7 @@ export function getMultiTargetCliMcpTools(
         inputSchema: {
           type: 'object',
           properties: createProps,
-          required: editableFields.map((f) => f.name),
+          ...(requiredCreateFieldNames.length > 0 ? { required: requiredCreateFieldNames } : {}),
         },
       });
 
@@ -1370,7 +1466,7 @@ export function getMultiTargetCliMcpTools(
       };
       for (const f of editableFields) {
         updateProps[f.name] = {
-          type: gqlTypeToJsonSchemaType(f.type.gqlType),
+          type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
           description: `${table.name} ${f.name}`,
         };
       }
@@ -1406,7 +1502,7 @@ export function getMultiTargetCliMcpTools(
         _meta: {
           fields: scalarFields.map((f) => ({
             name: f.name,
-            type: f.type.gqlType,
+            type: cleanTypeName(f.type.gqlType),
             editable: editableFields.some((ef) => ef.name === f.name),
             primaryKey: f.name === pk.name,
           })),
@@ -1416,18 +1512,17 @@ export function getMultiTargetCliMcpTools(
 
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
+      const flat = flattenArgs(op.args, registry);
       const props: Record<string, unknown> = {};
       const required: string[] = [];
 
-      for (const arg of op.args) {
-        const isRequired = arg.type.kind === 'NON_NULL';
-        const baseType = isRequired && arg.type.ofType ? arg.type.ofType : arg.type;
-        props[arg.name] = {
-          type: gqlTypeToJsonSchemaType(baseType.name ?? 'String'),
-          description: arg.description || arg.name,
+      for (const a of flat) {
+        props[a.flag] = {
+          type: gqlTypeToJsonSchemaType(a.type),
+          description: a.description || a.flag,
         };
-        if (isRequired) {
-          required.push(arg.name);
+        if (a.required) {
+          required.push(a.flag);
         }
       }
 
@@ -1456,7 +1551,7 @@ export function getMultiTargetCliMcpTools(
 export function generateMultiTargetSkills(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile[] {
-  const { toolName, builtinNames, targets } = input;
+  const { toolName, builtinNames, targets, registry } = input;
   const files: GeneratedDocFile[] = [];
 
   // Generate one skill per target, plus a shared cli-common skill for context/auth
@@ -1566,6 +1661,11 @@ export function generateMultiTargetSkills(
       const kebab = toKebabCase(singularName);
       const pk = getPrimaryKeyInfo(table)[0];
       const editableFields = getEditableFields(table);
+      const defaultFields = getFieldsWithDefaults(table, registry);
+      const createFlags = [
+        ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <value>`),
+        ...editableFields.filter((f) => defaultFields.has(f.name)).map((f) => `[--${f.name} <value>]`),
+      ].join(' ');
       const cmd = `${tgt.name}:${kebab}`;
 
       tgtReferenceNames.push(kebab);
@@ -1578,7 +1678,7 @@ export function generateMultiTargetSkills(
           usage: [
             `${toolName} ${cmd} list`,
             `${toolName} ${cmd} get --${pk.name} <value>`,
-            `${toolName} ${cmd} create ${editableFields.map((f) => `--${f.name} <value>`).join(' ')}`,
+            `${toolName} ${cmd} create ${createFlags}`,
             `${toolName} ${cmd} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`,
             `${toolName} ${cmd} delete --${pk.name} <value>`,
           ],
@@ -1590,7 +1690,7 @@ export function generateMultiTargetSkills(
             {
               description: `Create a ${singularName}`,
               code: [
-                `${toolName} ${cmd} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`,
+                `${toolName} ${cmd} create ${createFlags}`,
               ],
             },
           ],
@@ -1601,9 +1701,10 @@ export function generateMultiTargetSkills(
     for (const op of tgt.customOperations) {
       const kebab = toKebabCase(op.name);
       const cmd = `${tgt.name}:${kebab}`;
+      const flat = flattenArgs(op.args, registry);
       const baseUsage =
-        op.args.length > 0
-          ? `${toolName} ${cmd} ${op.args.map((a) => `--${a.name} <value>`).join(' ')}`
+        flat.length > 0
+          ? `${toolName} ${cmd} ${flattenedArgsToFlags(flat)}`
           : `${toolName} ${cmd}`;
       const usageLines = [baseUsage];
       if (tgt.isAuthTarget && op.kind === 'mutation') {
@@ -1643,11 +1744,20 @@ export function generateMultiTargetSkills(
             `${toolName} ${tgt.name}:${firstKebab} list`,
             `${toolName} ${tgt.name}:${firstKebab} get --id <value>`,
             `${toolName} ${tgt.name}:${firstKebab} create --<field> <value>`,
+            '',
+            `# Non-interactive mode (skip all prompts, use flags only)`,
+            `${toolName} --no-tty ${tgt.name}:${firstKebab} list`,
           ],
           examples: [
             {
               description: `Query ${tgt.name} records`,
               code: [`${toolName} ${tgt.name}:${firstKebab} list`],
+            },
+            {
+              description: 'Non-interactive mode (for scripts and CI)',
+              code: [
+                `${toolName} --no-tty ${tgt.name}:${firstKebab} create --<field> <value>`,
+              ],
             },
           ],
         },

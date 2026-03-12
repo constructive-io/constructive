@@ -322,7 +322,10 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
     operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
-  // Vector filter (for pgvector embedding fields)
+  // VectorFilter: equality/distinct operators for vector columns on Filter types.
+  // Similarity search uses condition types (embeddingNearby), not filters, but
+  // connection-filter may still generate a filter for vector columns. This ensures
+  // the generated type uses number[] rather than being silently omitted.
   { name: 'VectorFilter', tsType: 'number[]', operators: ['equality', 'distinct'] },
   // List filters (for array fields like string[], int[], uuid[])
   {

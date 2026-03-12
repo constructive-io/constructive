@@ -7,7 +7,7 @@ Execute the forgotPassword mutation
 ## Usage
 
 ```bash
-csdk forgot-password --input <value>
+csdk forgot-password --input.clientMutationId <value> --input.email <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk forgot-password --input <value>
 ### Run forgotPassword
 
 ```bash
-csdk forgot-password --input <value>
+csdk forgot-password --input.clientMutationId <value> --input.email <value>
 ```

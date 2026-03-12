@@ -9,7 +9,7 @@ CRUD operations for OrgOwnerGrant records via csdk CLI
 ```bash
 csdk org-owner-grant list
 csdk org-owner-grant get --id <value>
-csdk org-owner-grant create --isGrant <value> --actorId <value> --entityId <value> --grantorId <value>
+csdk org-owner-grant create --actorId <value> --entityId <value> [--isGrant <value>] [--grantorId <value>]
 csdk org-owner-grant update --id <value> [--isGrant <value>] [--actorId <value>] [--entityId <value>] [--grantorId <value>]
 csdk org-owner-grant delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk org-owner-grant list
 ### Create a orgOwnerGrant
 
 ```bash
-csdk org-owner-grant create --isGrant "value" --actorId "value" --entityId "value" --grantorId "value"
+csdk org-owner-grant create --actorId <value> --entityId <value> [--isGrant <value>] [--grantorId <value>]
 ```
 
 ### Get a orgOwnerGrant by id

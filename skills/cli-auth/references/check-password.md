@@ -7,7 +7,7 @@ Execute the checkPassword mutation
 ## Usage
 
 ```bash
-csdk check-password --input <value>
+csdk check-password --input.clientMutationId <value> --input.password <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk check-password --input <value>
 ### Run checkPassword
 
 ```bash
-csdk check-password --input <value>
+csdk check-password --input.clientMutationId <value> --input.password <value>
 ```
