@@ -176,6 +176,7 @@ export function generateModelFile(
   const relationTypeName = `${typeName}WithRelations`;
   const whereTypeName = getFilterTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
+  const conditionTypeName = `${typeName}Condition`;
   const createInputTypeName = `Create${typeName}Input`;
   const updateInputTypeName = `Update${typeName}Input`;
   const deleteInputTypeName = `Delete${typeName}Input`;
@@ -232,6 +233,7 @@ export function generateModelFile(
         createInputTypeName,
         updateInputTypeName,
         patchTypeName,
+        conditionTypeName,
       ],
       true,
     ),
@@ -270,7 +272,8 @@ export function generateModelFile(
         t.tsTypeParameterInstantiation([
           sel,
           t.tsTypeReference(t.identifier(whereTypeName)),
-          t.tsTypeReference(t.identifier(orderByTypeName)),
+          t.tsTypeReference(t.identifier(`${typeName}Condition`)),
+              t.tsTypeReference(t.identifier(orderByTypeName)),
         ]),
       );
     const retType = (sel: t.TSType) =>
@@ -323,6 +326,15 @@ export function generateModelFile(
           t.optionalMemberExpression(
             t.identifier('args'),
             t.identifier('where'),
+            false,
+            true,
+          ),
+        ),
+        t.objectProperty(
+          t.identifier('condition'),
+          t.optionalMemberExpression(
+            t.identifier('args'),
+            t.identifier('condition'),
             false,
             true,
           ),
@@ -390,8 +402,9 @@ export function generateModelFile(
       ]),
       t.stringLiteral(whereTypeName),
       t.stringLiteral(orderByTypeName),
-      t.identifier('connectionFieldsMap'),
-    ];
+        t.identifier('connectionFieldsMap'),
+        t.stringLiteral(`${typeName}Condition`),
+      ];
     classBody.push(
       createClassMethod(
         'findMany',
@@ -417,6 +430,7 @@ export function generateModelFile(
         t.tsTypeParameterInstantiation([
           sel,
           t.tsTypeReference(t.identifier(whereTypeName)),
+          t.tsTypeReference(t.identifier(conditionTypeName)),
         ]),
       );
     const retType = (sel: t.TSType) =>
@@ -477,10 +491,20 @@ export function generateModelFile(
             true,
           ),
         ),
+        t.objectProperty(
+          t.identifier('condition'),
+          t.optionalMemberExpression(
+            t.identifier('args'),
+            t.identifier('condition'),
+            false,
+            true,
+          ),
+        ),
       ]),
       t.stringLiteral(whereTypeName),
-      t.identifier('connectionFieldsMap'),
-    ];
+        t.identifier('connectionFieldsMap'),
+        t.stringLiteral(`${typeName}Condition`),
+      ];
     classBody.push(
       createClassMethod(
         'findFirst',
@@ -599,6 +623,7 @@ export function generateModelFile(
         t.stringLiteral(whereTypeName),
         t.stringLiteral(orderByTypeName),
         t.identifier('connectionFieldsMap'),
+        t.stringLiteral(`${typeName}Condition`),
       ];
       const firstNodeExpr = t.optionalMemberExpression(
         t.optionalMemberExpression(

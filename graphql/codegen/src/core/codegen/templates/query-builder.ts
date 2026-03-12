@@ -201,12 +201,13 @@ export function buildSelections(
 // Document Builders
 // ============================================================================
 
-export function buildFindManyDocument<TSelect, TWhere>(
+export function buildFindManyDocument<TSelect, TWhere, TCondition>(
   operationName: string,
   queryField: string,
   select: TSelect,
   args: {
     where?: TWhere;
+    condition?: TCondition;
     orderBy?: string[];
     first?: number;
     last?: number;
@@ -217,6 +218,7 @@ export function buildFindManyDocument<TSelect, TWhere>(
   filterTypeName: string,
   orderByTypeName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
+  conditionTypeName?: string,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(
@@ -229,6 +231,18 @@ export function buildFindManyDocument<TSelect, TWhere>(
   const variableDefinitions: VariableDefinitionNode[] = [];
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
+
+  addVariable(
+    {
+      varName: 'condition',
+      argName: 'condition',
+      typeName: conditionTypeName,
+      value: args.condition,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables,
+  );
 
   addVariable(
     {
@@ -308,13 +322,14 @@ export function buildFindManyDocument<TSelect, TWhere>(
   return { document: print(document), variables };
 }
 
-export function buildFindFirstDocument<TSelect, TWhere>(
+export function buildFindFirstDocument<TSelect, TWhere, TCondition>(
   operationName: string,
   queryField: string,
   select: TSelect,
-  args: { where?: TWhere },
+  args: { where?: TWhere; condition?: TCondition },
   filterTypeName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
+  conditionTypeName?: string,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(
@@ -335,6 +350,19 @@ export function buildFindFirstDocument<TSelect, TWhere>(
     queryArgs,
     variables,
   );
+
+  addVariable(
+    {
+      varName: 'condition',
+      argName: 'condition',
+      typeName: conditionTypeName,
+      value: args.condition,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables,
+  );
+
   addVariable(
     {
       varName: 'where',

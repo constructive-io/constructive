@@ -201,9 +201,10 @@ export interface PageInfo {
 /**
  * Arguments for findMany operations
  */
-export interface FindManyArgs<TSelect, TWhere, TOrderBy> {
+export interface FindManyArgs<TSelect, TWhere, TCondition, TOrderBy> {
   select?: TSelect;
   where?: TWhere;
+  condition?: TCondition;
   orderBy?: TOrderBy[];
   first?: number;
   last?: number;
