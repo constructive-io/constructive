@@ -1,0 +1,613 @@
+import { join } from 'path';
+import { getConnections, seed } from 'graphile-test';
+import type { GraphQLResponse } from 'graphile-test';
+import type { PgTestClient } from 'pgsql-test';
+import { ConnectionFilterPreset } from 'graphile-connection-filter';
+import { Bm25CodecPlugin } from 'graphile-bm25';
+import { VectorCodecPlugin } from 'graphile-pgvector';
+import { createUnifiedSearchPlugin } from '../plugin';
+import { createTsvectorAdapter } from '../adapters/tsvector';
+import { createBm25Adapter } from '../adapters/bm25';
+import { createTrgmAdapter } from '../adapters/trgm';
+import { createPgvectorAdapter } from '../adapters/pgvector';
+
+// ─── Result types ────────────────────────────────────────────────────────────
+
+interface DocumentNode {
+  rowId: number;
+  title: string;
+  body: string;
+  // tsvector score (ts_rank)
+  tsvRank: number | null;
+  // BM25 score (negative, more negative = more relevant)
+  bodyBm25Score: number | null;
+  // pg_trgm similarity (0..1)
+  titleTrgmSimilarity: number | null;
+  // pgvector distance (cosine, lower = closer)
+  embeddingVectorDistance: number | null;
+  // Composite search score (0..1, higher = more relevant)
+  searchScore: number | null;
+}
+
+interface AllDocumentsResult {
+  allDocuments: {
+    nodes: DocumentNode[];
+  };
+}
+
+type QueryFn = <TResult = unknown>(
+  query: string,
+  variables?: Record<string, unknown>
+) => Promise<GraphQLResponse<TResult>>;
+
+// ─── Test Suite ──────────────────────────────────────────────────────────────
+
+describe('graphile-search (unified search plugin)', () => {
+  let db: PgTestClient;
+  let teardown: () => Promise<void>;
+  let query: QueryFn;
+
+  beforeAll(async () => {
+    // Build the unified search plugin with all 4 adapters
+    const unifiedPlugin = createUnifiedSearchPlugin({
+      adapters: [
+        createTsvectorAdapter({ filterPrefix: 'fullText' }),
+        createBm25Adapter({ filterPrefix: 'bm25' }),
+        createTrgmAdapter({ filterPrefix: 'trgm', defaultThreshold: 0.1 }),
+        createPgvectorAdapter({ filterPrefix: 'vector' }),
+      ],
+      enableSearchScore: true,
+    });
+
+    const testPreset = {
+      extends: [
+        ConnectionFilterPreset(),
+      ],
+      plugins: [
+        // Codec plugins must load first (gather phase discovers types & indexes)
+        Bm25CodecPlugin,
+        VectorCodecPlugin,
+        // The unified search plugin (wires all adapters into hooks)
+        unifiedPlugin,
+      ],
+    };
+
+    const connections = await getConnections({
+      schemas: ['unified_search_test'],
+      preset: testPreset,
+      useRoot: true,
+      authRole: 'postgres',
+    }, [
+      seed.sqlfile([join(__dirname, './setup.sql')])
+    ]);
+
+    db = connections.db;
+    teardown = connections.teardown;
+    query = connections.query;
+
+    await db.client.query('BEGIN');
+  });
+
+  afterAll(async () => {
+    if (db) {
+      try {
+        await db.client.query('ROLLBACK');
+      } catch {
+        // Ignore rollback errors
+      }
+    }
+    if (teardown) {
+      await teardown();
+    }
+  });
+
+  beforeEach(async () => {
+    await db.beforeEach();
+  });
+
+  afterEach(async () => {
+    await db.afterEach();
+  });
+
+  // ─── tsvector adapter ────────────────────────────────────────────────────
+
+  describe('tsvector adapter (fullTextTsv filter)', () => {
+    it('filters by full-text search and returns tsvRank score', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            fullTextTsv: "machine learning"
+          }) {
+            nodes {
+              title
+              tsvRank
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      // All returned rows should have a ts_rank score
+      for (const node of nodes!) {
+        expect(typeof node.tsvRank).toBe('number');
+        expect(node.tsvRank).toBeGreaterThan(0);
+      }
+    });
+
+    it('returns null tsvRank when no tsvector filter is active', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(first: 1) {
+            nodes {
+              title
+              tsvRank
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      for (const node of nodes!) {
+        expect(node.tsvRank).toBeNull();
+      }
+    });
+  });
+
+  // ─── BM25 adapter ───────────────────────────────────────────────────────
+
+  describe('BM25 adapter (bm25Body filter)', () => {
+    it('filters by BM25 search and returns bodyBm25Score', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            bm25Body: {
+              query: "machine learning intelligence"
+            }
+          }) {
+            nodes {
+              title
+              bodyBm25Score
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      // BM25 scores are negative (more negative = more relevant)
+      for (const node of nodes!) {
+        expect(typeof node.bodyBm25Score).toBe('number');
+        expect(node.bodyBm25Score).toBeLessThan(0);
+      }
+    });
+
+    it('applies BM25 threshold filter', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            bm25Body: {
+              query: "learning"
+              threshold: -0.1
+            }
+          }) {
+            nodes {
+              title
+              bodyBm25Score
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+
+      for (const node of nodes!) {
+        expect(node.bodyBm25Score).toBeLessThan(-0.1);
+      }
+    });
+  });
+
+  // ─── pg_trgm adapter ────────────────────────────────────────────────────
+
+  describe('pg_trgm adapter (trgmTitle filter)', () => {
+    it('filters by trigram similarity and returns titleTrgmSimilarity', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            trgmTitle: {
+              value: "Machine Learnng"
+            }
+          }) {
+            nodes {
+              title
+              titleTrgmSimilarity
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      // Similarity is 0..1, higher = more similar
+      for (const node of nodes!) {
+        expect(typeof node.titleTrgmSimilarity).toBe('number');
+        expect(node.titleTrgmSimilarity).toBeGreaterThan(0);
+        expect(node.titleTrgmSimilarity).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('handles typos gracefully (fuzzy matching)', async () => {
+      // "Machne Lerning" has typos but should still match "Machine Learning"
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            trgmTitle: {
+              value: "Machne Lerning"
+              threshold: 0.05
+            }
+          }) {
+            nodes {
+              title
+              titleTrgmSimilarity
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+    });
+  });
+
+  // ─── pgvector adapter ───────────────────────────────────────────────────
+
+  describe('pgvector adapter (vectorEmbedding filter)', () => {
+    it('filters by vector similarity and returns embeddingVectorDistance', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            vectorEmbedding: {
+              vector: [1, 0, 0]
+              metric: COSINE
+            }
+          }) {
+            nodes {
+              title
+              embeddingVectorDistance
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      // Distance >= 0 (lower = closer)
+      for (const node of nodes!) {
+        expect(typeof node.embeddingVectorDistance).toBe('number');
+        expect(node.embeddingVectorDistance).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('applies distance threshold filter', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            vectorEmbedding: {
+              vector: [1, 0, 0]
+              metric: COSINE
+              distance: 0.5
+            }
+          }) {
+            nodes {
+              title
+              embeddingVectorDistance
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+
+      // All returned rows should be within threshold
+      for (const node of nodes!) {
+        expect(node.embeddingVectorDistance).toBeLessThanOrEqual(0.5);
+      }
+    });
+  });
+
+  // ─── Composite searchScore ──────────────────────────────────────────────
+
+  describe('composite searchScore field', () => {
+    it('returns null searchScore when no filters are active', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(first: 1) {
+            nodes {
+              title
+              searchScore
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      for (const node of nodes!) {
+        expect(node.searchScore).toBeNull();
+      }
+    });
+
+    it('returns searchScore between 0 and 1 when a single filter is active', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            fullTextTsv: "machine learning"
+          }) {
+            nodes {
+              title
+              tsvRank
+              searchScore
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      for (const node of nodes!) {
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThanOrEqual(0);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
+      }
+    });
+  });
+
+  // ─── orderBy enums ──────────────────────────────────────────────────────
+
+  describe('orderBy enums', () => {
+    it('orders by BM25 score ascending (best matches first)', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            filter: {
+              bm25Body: { query: "learning" }
+            }
+            orderBy: BODY_BM25_SCORE_ASC
+          ) {
+            nodes {
+              title
+              bodyBm25Score
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(1);
+
+      // Ascending: most negative (most relevant) first
+      for (let i = 0; i < nodes!.length - 1; i++) {
+        expect(nodes![i].bodyBm25Score).toBeLessThanOrEqual(
+          nodes![i + 1].bodyBm25Score!
+        );
+      }
+    });
+
+    it('orders by trgm similarity descending (best matches first)', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            filter: {
+              trgmTitle: { value: "Learning", threshold: 0.05 }
+            }
+            orderBy: TITLE_TRGM_SIMILARITY_DESC
+          ) {
+            nodes {
+              title
+              titleTrgmSimilarity
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(1);
+
+      // Descending: highest similarity first
+      for (let i = 0; i < nodes!.length - 1; i++) {
+        expect(nodes![i].titleTrgmSimilarity).toBeGreaterThanOrEqual(
+          nodes![i + 1].titleTrgmSimilarity!
+        );
+      }
+    });
+
+    it('supports composite orderBy with multiple enums', async () => {
+      // Use array syntax: order by BM25 score first, then by trgm similarity
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            filter: {
+              bm25Body: { query: "learning" }
+              trgmTitle: { value: "Learning", threshold: 0.05 }
+            }
+            orderBy: [BODY_BM25_SCORE_ASC, TITLE_TRGM_SIMILARITY_DESC]
+          ) {
+            nodes {
+              title
+              bodyBm25Score
+              titleTrgmSimilarity
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      // All nodes should have both score fields populated
+      for (const node of nodes!) {
+        expect(typeof node.bodyBm25Score).toBe('number');
+        expect(typeof node.titleTrgmSimilarity).toBe('number');
+      }
+    });
+  });
+
+  // ─── Hybrid / multi-adapter queries ─────────────────────────────────────
+
+  describe('hybrid search (multiple adapters active simultaneously)', () => {
+    it('combines tsvector + BM25 + trgm filters with searchScore', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            filter: {
+              fullTextTsv: "learning"
+              bm25Body: { query: "learning" }
+              trgmTitle: { value: "Learning", threshold: 0.05 }
+            }
+          ) {
+            nodes {
+              title
+              tsvRank
+              bodyBm25Score
+              titleTrgmSimilarity
+              searchScore
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      for (const node of nodes!) {
+        // All three score fields should be populated
+        expect(typeof node.tsvRank).toBe('number');
+        expect(typeof node.bodyBm25Score).toBe('number');
+        expect(typeof node.titleTrgmSimilarity).toBe('number');
+
+        // Composite searchScore should be in [0, 1]
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThanOrEqual(0);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('combines all 4 adapters in a single mega query', async () => {
+      // This is the ultimate hybrid search: tsvector + BM25 + trgm + pgvector
+      const result = await query<AllDocumentsResult>(`
+        query MegaHybridSearch {
+          allDocuments(
+            filter: {
+              # tsvector: full-text search on tsv column
+              fullTextTsv: "learning"
+
+              # BM25: ranked text search on body column
+              bm25Body: { query: "learning" }
+
+              # pg_trgm: fuzzy match on title column
+              trgmTitle: { value: "Learning", threshold: 0.05 }
+
+              # pgvector: semantic similarity on embedding column
+              vectorEmbedding: { vector: [1, 0, 0], metric: COSINE }
+            }
+            orderBy: [BODY_BM25_SCORE_ASC, TITLE_TRGM_SIMILARITY_DESC]
+          ) {
+            nodes {
+              rowId
+              title
+              body
+
+              # Per-adapter scores
+              tsvRank
+              bodyBm25Score
+              titleTrgmSimilarity
+              embeddingVectorDistance
+
+              # Composite normalized score
+              searchScore
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      // Some documents should match all 4 filters simultaneously
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      for (const node of nodes!) {
+        // All 4 algorithm-specific scores should be populated
+        expect(typeof node.tsvRank).toBe('number');
+        expect(typeof node.bodyBm25Score).toBe('number');
+        expect(typeof node.titleTrgmSimilarity).toBe('number');
+        expect(typeof node.embeddingVectorDistance).toBe('number');
+
+        // Composite searchScore should combine all 4 signals
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThanOrEqual(0);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
+      }
+    });
+  });
+
+  // ─── Pagination ─────────────────────────────────────────────────────────
+
+  describe('pagination with search', () => {
+    it('works with first/offset alongside search filters', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            filter: {
+              bm25Body: { query: "learning" }
+            }
+            orderBy: BODY_BM25_SCORE_ASC
+            first: 2
+          ) {
+            nodes {
+              title
+              bodyBm25Score
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeLessThanOrEqual(2);
+    });
+  });
+});
