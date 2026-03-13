@@ -69,8 +69,6 @@ export interface ConnectionFilterOptions {
   connectionFilterLogicalOperators?: boolean;
   /** Allow null literals in filter input. Default: false */
   connectionFilterAllowNullInput?: boolean;
-  /** Allow empty objects in filter input. Default: false */
-  connectionFilterAllowEmptyObjectInput?: boolean;
   /** Restrict which field types can be filtered. Default: all types */
   connectionFilterAllowedFieldTypes?: string[];
   /** Restrict which operators are available. Default: all operators */

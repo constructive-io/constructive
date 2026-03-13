@@ -49,28 +49,28 @@ export function getComputedAttributeResources(build: any, source: any): any[] {
 }
 
 /**
- * Creates an assertion function that validates filter input values
- * based on the connectionFilterAllowNullInput and connectionFilterAllowEmptyObjectInput options.
+ * Creates an assertion function that validates filter input values.
+ *
+ * Rejects empty objects in nested contexts (logical operators, relation filters)
+ * and optionally rejects null literals based on the connectionFilterAllowNullInput option.
+ *
+ * Note: Top-level empty filter `{}` is handled in ConnectionFilterArgPlugin's
+ * applyPlan — it's treated as "no filter" and skipped, not rejected.
  */
 export function makeAssertAllowed(build: any): (value: unknown, mode: 'object' | 'list') => void {
   const { options, EXPORTABLE } = build;
   const {
     connectionFilterAllowNullInput,
-    connectionFilterAllowEmptyObjectInput,
   } = options;
 
   const assertAllowed = EXPORTABLE(
     (
-      connectionFilterAllowEmptyObjectInput: boolean,
       connectionFilterAllowNullInput: boolean,
       isEmpty: (o: unknown) => boolean
     ) =>
       function (value: unknown, mode: 'object' | 'list') {
-        if (
-          mode === 'object' &&
-          !connectionFilterAllowEmptyObjectInput &&
-          isEmpty(value)
-        ) {
+        // Reject empty objects in nested filter contexts (and/or/not, relation filters)
+        if (mode === 'object' && isEmpty(value)) {
           throw Object.assign(
             new Error(
               'Empty objects are forbidden in filter argument input.'
@@ -79,7 +79,7 @@ export function makeAssertAllowed(build: any): (value: unknown, mode: 'object' |
           );
         }
 
-        if (mode === 'list' && !connectionFilterAllowEmptyObjectInput) {
+        if (mode === 'list') {
           const arr = value as unknown[];
           if (arr) {
             const l = arr.length;
@@ -106,7 +106,7 @@ export function makeAssertAllowed(build: any): (value: unknown, mode: 'object' |
           );
         }
       },
-    [connectionFilterAllowEmptyObjectInput, connectionFilterAllowNullInput, isEmpty]
+    [connectionFilterAllowNullInput, isEmpty]
   );
 
   return assertAllowed;

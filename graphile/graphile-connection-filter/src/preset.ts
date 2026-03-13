@@ -44,7 +44,6 @@ const defaultSchemaOptions: ConnectionFilterOptions = {
   connectionFilterArrays: true,
   connectionFilterLogicalOperators: true,
   connectionFilterAllowNullInput: false,
-  connectionFilterAllowEmptyObjectInput: false,
   connectionFilterSetofFunctions: true,
   connectionFilterComputedColumns: true,
   connectionFilterRelations: false,
@@ -57,7 +56,6 @@ const defaultSchemaOptions: ConnectionFilterOptions = {
  * - `connectionFilterLogicalOperators: false` to exclude and/or/not
  * - `connectionFilterArrays: false` to exclude array type filters
  * - `connectionFilterAllowNullInput: true` to allow null literals
- * - `connectionFilterAllowEmptyObjectInput: true` to allow empty objects
  */
 export function ConnectionFilterPreset(
   options: ConnectionFilterOptions = {}

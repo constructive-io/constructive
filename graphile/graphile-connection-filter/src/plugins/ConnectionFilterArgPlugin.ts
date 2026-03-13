@@ -1,6 +1,6 @@
 import '../augmentations';
 import type { GraphileConfig } from 'graphile-config';
-import { makeAssertAllowed } from '../utils';
+import { isEmpty } from '../utils';
 
 const version = '1.0.0';
 
@@ -71,8 +71,6 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
         const FilterType = build.getTypeByName(filterTypeName);
         if (!FilterType) return args;
 
-        const assertAllowed = makeAssertAllowed(build);
-
         // For setof functions returning scalars, track the codec
         const attributeCodec =
           resource?.parameters && !resource?.codec.attributes
@@ -91,7 +89,7 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                     applyPlan: EXPORTABLE(
                       (
                         PgCondition: any,
-                        assertAllowed: any,
+                        isEmpty: any,
                         attributeCodec: any
                       ) =>
                         function (_: any, $connection: any, fieldArg: any) {
@@ -99,8 +97,8 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                           fieldArg.apply(
                             $pgSelect,
                             (queryBuilder: any, value: any) => {
-                              assertAllowed(value, 'object');
-                              if (value == null) return;
+                              // If filter is null/undefined or empty {}, treat as "no filter" — skip
+                              if (value == null || isEmpty(value)) return;
                               const condition = new PgCondition(queryBuilder);
                               if (attributeCodec) {
                                 condition.extensions.pgFilterAttribute = {
@@ -111,22 +109,22 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                             }
                           );
                         },
-                      [PgCondition, assertAllowed, attributeCodec]
+                      [PgCondition, isEmpty, attributeCodec]
                     ),
                   }
                 : {
                     applyPlan: EXPORTABLE(
                       (
                         PgCondition: any,
-                        assertAllowed: any,
+                        isEmpty: any,
                         attributeCodec: any
                       ) =>
                         function (_: any, $pgSelect: any, fieldArg: any) {
                           fieldArg.apply(
                             $pgSelect,
                             (queryBuilder: any, value: any) => {
-                              assertAllowed(value, 'object');
-                              if (value == null) return;
+                              // If filter is null/undefined or empty {}, treat as "no filter" — skip
+                              if (value == null || isEmpty(value)) return;
                               const condition = new PgCondition(queryBuilder);
                               if (attributeCodec) {
                                 condition.extensions.pgFilterAttribute = {
@@ -137,7 +135,7 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                             }
                           );
                         },
-                      [PgCondition, assertAllowed, attributeCodec]
+                      [PgCondition, isEmpty, attributeCodec]
                     ),
                   }),
             },

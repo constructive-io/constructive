@@ -68,7 +68,6 @@ export const ConnectionFilterAttributesPlugin: GraphileConfig.Plugin = {
           if (!OperatorsType) continue;
 
           const {
-            connectionFilterAllowEmptyObjectInput,
             connectionFilterAllowNullInput,
           } = build.options;
 
@@ -87,7 +86,6 @@ export const ConnectionFilterAttributesPlugin: GraphileConfig.Plugin = {
                     (
                       PgCondition: any,
                       colSpec: any,
-                      connectionFilterAllowEmptyObjectInput: boolean,
                       connectionFilterAllowNullInput: boolean,
                       isEmpty: (o: unknown) => boolean
                     ) =>
@@ -95,10 +93,7 @@ export const ConnectionFilterAttributesPlugin: GraphileConfig.Plugin = {
                         if (value === undefined) {
                           return;
                         }
-                        if (
-                          !connectionFilterAllowEmptyObjectInput &&
-                          isEmpty(value)
-                        ) {
+                        if (isEmpty(value)) {
                           throw Object.assign(
                             new Error(
                               'Empty objects are forbidden in filter argument input.'
@@ -124,7 +119,6 @@ export const ConnectionFilterAttributesPlugin: GraphileConfig.Plugin = {
                     [
                       PgCondition,
                       colSpec,
-                      connectionFilterAllowEmptyObjectInput,
                       connectionFilterAllowNullInput,
                       isEmpty,
                     ]

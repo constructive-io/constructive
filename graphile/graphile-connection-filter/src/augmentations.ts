@@ -82,7 +82,6 @@ declare global {
       connectionFilterArrays?: boolean;
       connectionFilterLogicalOperators?: boolean;
       connectionFilterAllowNullInput?: boolean;
-      connectionFilterAllowEmptyObjectInput?: boolean;
       connectionFilterAllowedFieldTypes?: string[];
       connectionFilterAllowedOperators?: string[];
       connectionFilterOperatorNames?: Record<string, string>;
