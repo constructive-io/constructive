@@ -1363,6 +1363,7 @@ type UserEdge {
   """The \`User\` at the end of the edge."""
   node: User
 }
+
 """Methods to use when ordering \`User\`."""
 enum UserOrderBy {
   NATURAL
