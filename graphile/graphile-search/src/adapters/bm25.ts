@@ -10,6 +10,7 @@
 
 import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
+import { bm25IndexStore as moduleBm25IndexStore } from 'graphile-bm25';
 
 /**
  * BM25 index info discovered during gather phase.
@@ -47,7 +48,12 @@ export function createBm25Adapter(
 
   function getIndexStore(build: any): Map<string, Bm25IndexInfo> | undefined {
     if (bm25IndexStore) return bm25IndexStore;
-    return build.pgBm25IndexStore as Map<string, Bm25IndexInfo> | undefined;
+    // Try build.pgBm25IndexStore (set by standalone Bm25SearchPlugin's build hook)
+    const buildStore = build.pgBm25IndexStore as Map<string, Bm25IndexInfo> | undefined;
+    if (buildStore && buildStore.size > 0) return buildStore;
+    // Fall back to module-level store populated by Bm25CodecPlugin's gather phase
+    if (moduleBm25IndexStore && moduleBm25IndexStore.size > 0) return moduleBm25IndexStore;
+    return undefined;
   }
 
   function getBm25IndexForAttribute(

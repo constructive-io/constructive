@@ -677,73 +677,6 @@ describe('graphile-search (unified search plugin)', () => {
     });
   });
 
-  // ─── fullTextSearch disabled ──────────────────────────────────────────────
-
-  describe('fullTextSearch can be disabled', () => {
-    let disabledQuery: QueryFn;
-    let disabledTeardown: (() => Promise<void>) | undefined;
-
-    beforeAll(async () => {
-      // Build a plugin with fullTextSearch DISABLED
-      const disabledPlugin = createUnifiedSearchPlugin({
-        adapters: [
-          createTsvectorAdapter(),
-          createBm25Adapter(),
-          createTrgmAdapter({ defaultThreshold: 0.1 }),
-        ],
-        enableSearchScore: true,
-        enableFullTextSearch: false,
-      });
-
-      const disabledPreset = {
-        extends: [
-          ConnectionFilterPreset(),
-        ],
-        plugins: [
-          TsvectorCodecPlugin,
-          Bm25CodecPlugin,
-          disabledPlugin,
-        ],
-      };
-
-      const connections = await getConnections({
-        schemas: ['unified_search_test'],
-        preset: disabledPreset,
-        useRoot: true,
-        authRole: 'postgres',
-      }, [
-        seed.sqlfile([join(__dirname, './setup.sql')])
-      ]);
-
-      disabledQuery = connections.query;
-      disabledTeardown = connections.teardown;
-    });
-
-    afterAll(async () => {
-      if (disabledTeardown) {
-        await disabledTeardown();
-      }
-    });
-
-    it('fullTextSearch field does NOT exist when disabled', async () => {
-      const result = await disabledQuery<AllDocumentsResult>(`
-        query {
-          allDocuments(filter: {
-            fullTextSearch: "learning"
-          }) {
-            nodes {
-              title
-            }
-          }
-        }
-      `);
-
-      // Should error — fullTextSearch field should not exist
-      expect(result.errors).toBeDefined();
-      expect(result.errors![0].message).toMatch(/fullTextSearch/);
-    });
-  });
-
   // ─── Pagination ─────────────────────────────────────────────────────────
 
   describe('pagination with search', () => {
@@ -770,5 +703,72 @@ describe('graphile-search (unified search plugin)', () => {
       expect(nodes).toBeDefined();
       expect(nodes!.length).toBeLessThanOrEqual(2);
     });
+  });
+});
+
+// ─── fullTextSearch disabled (separate suite — needs its own DB connection) ───
+
+describe('fullTextSearch can be disabled', () => {
+  let disabledQuery: QueryFn;
+  let disabledTeardown: (() => Promise<void>) | undefined;
+
+  beforeAll(async () => {
+    // Build a plugin with fullTextSearch DISABLED
+    const disabledPlugin = createUnifiedSearchPlugin({
+      adapters: [
+        createTsvectorAdapter(),
+        createBm25Adapter(),
+        createTrgmAdapter({ defaultThreshold: 0.1 }),
+      ],
+      enableSearchScore: true,
+      enableFullTextSearch: false,
+    });
+
+    const disabledPreset = {
+      extends: [
+        ConnectionFilterPreset(),
+      ],
+      plugins: [
+        TsvectorCodecPlugin,
+        Bm25CodecPlugin,
+        disabledPlugin,
+      ],
+    };
+
+    const connections = await getConnections({
+      schemas: ['unified_search_test'],
+      preset: disabledPreset,
+      useRoot: true,
+      authRole: 'postgres',
+    }, [
+      seed.sqlfile([join(__dirname, './setup.sql')])
+    ]);
+
+    disabledQuery = connections.query;
+    disabledTeardown = connections.teardown;
+  });
+
+  afterAll(async () => {
+    if (disabledTeardown) {
+      await disabledTeardown();
+    }
+  });
+
+  it('fullTextSearch field does NOT exist when disabled', async () => {
+    const result = await disabledQuery<AllDocumentsResult>(`
+      query {
+        allDocuments(filter: {
+          fullTextSearch: "learning"
+        }) {
+          nodes {
+            title
+          }
+        }
+      }
+    `);
+
+    // Should error — fullTextSearch field should not exist
+    expect(result.errors).toBeDefined();
+    expect(result.errors![0].message).toMatch(/fullTextSearch/);
   });
 });
