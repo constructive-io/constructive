@@ -109,6 +109,8 @@ jobs:
             env: {}
           - package: graphile/graphile-pgvector
             env: {}
+          - package: graphile/graphile-search
+            env: {}
           - package: graphile/graphile-settings
             env: {}
 
