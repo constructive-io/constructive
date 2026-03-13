@@ -150,15 +150,15 @@ describe('PgSearchPlugin filter (matches operator)', () => {
     }
   });
 
-  it('condition-based search populates fullTextRank', async () => {
-    // Rank features work with condition-based search.
+  it('filter-based search populates fullTextRank', async () => {
+    // Rank features work with filter-based search.
     // "fruit OR banana" — both rows match "fruit", one also matches "banana"
     // (websearch_to_tsquery uses the word "or" for OR, not "|")
     const result = await query<{ allJobs: { nodes: any[] } }>({
       query: `
         query {
           allJobs(
-            condition: { fullTextFullText: "fruit or banana" }
+            filter: { fullTextFullText: "fruit or banana" }
           ) {
             nodes {
               id
@@ -179,13 +179,13 @@ describe('PgSearchPlugin filter (matches operator)', () => {
   });
 
   it('sort by full text rank orderBy enums works', async () => {
-    // Use condition-based search so rank data is available.
+    // Use filter-based search so rank data is available.
     // "fruit or banana" matches both rows with different ranks.
     const ascResult = await query<{ allJobs: { nodes: any[] } }>({
       query: `
         query {
           allJobs(
-            condition: { fullTextFullText: "fruit or banana" }
+            filter: { fullTextFullText: "fruit or banana" }
             orderBy: [FULL_TEXT_RANK_ASC]
           ) {
             nodes {
@@ -209,7 +209,7 @@ describe('PgSearchPlugin filter (matches operator)', () => {
       query: `
         query {
           allJobs(
-            condition: { fullTextFullText: "fruit or banana" }
+            filter: { fullTextFullText: "fruit or banana" }
             orderBy: [FULL_TEXT_RANK_DESC]
           ) {
             nodes {
@@ -482,16 +482,17 @@ describe('PgSearchPlugin filter with connectionFilterRelations', () => {
   });
 });
 
-describe('PgSearchPlugin without connection-filter (graceful degradation)', () => {
+describe('PgSearchPlugin with connection-filter (simple schema)', () => {
   let teardown: () => Promise<void>;
   let query: QueryFn;
 
   beforeAll(async () => {
-    // Preset WITHOUT connection-filter
     const testPreset = {
       extends: [
+        ConnectionFilterPreset(),
         PgSearchPreset({ pgSearchPrefix: 'fullText' }),
       ],
+      plugins: [EnableAllFilterColumnsPlugin],
     };
 
     const connections = await getConnectionsObject(
@@ -513,11 +514,11 @@ describe('PgSearchPlugin without connection-filter (graceful degradation)', () =
     }
   });
 
-  it('condition-based search still works without connection-filter', async () => {
+  it('filter-based search works on simple schema', async () => {
     const result = await query<{ allSimpleJobs: { nodes: any[] } }>({
       query: `
         query {
-          allSimpleJobs(condition: { fullTextTsv: "apple" }) {
+          allSimpleJobs(filter: { fullTextTsv: "apple" }) {
             nodes {
               id
               name
@@ -531,7 +532,7 @@ describe('PgSearchPlugin without connection-filter (graceful degradation)', () =
     expect(result.data?.allSimpleJobs.nodes).toHaveLength(1);
   });
 
-  it('no errors when connection-filter not loaded', async () => {
+  it('no errors when querying without filter', async () => {
     const result = await query<{ allSimpleJobs: { nodes: any[] } }>({
       query: `
         query {

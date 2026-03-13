@@ -31,6 +31,7 @@
   "devDependencies": {
     "@types/node": "^22.19.11",
     "@types/pg": "^8.18.0",
+    "graphile-connection-filter": "workspace:^",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
     "pg": "^8.19.0",

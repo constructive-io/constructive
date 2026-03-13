@@ -553,12 +553,12 @@ export function createPgSearchPlugin(
             graphql: { GraphQLString },
           } = build;
           const {
-            scope: { isPgCondition, pgCodec },
+            scope: { isPgConnectionFilter, pgCodec } = {} as any,
             fieldWithHooks,
           } = context;
 
           if (
-            !isPgCondition ||
+            !isPgConnectionFilter ||
             !pgCodec ||
             !pgCodec.attributes ||
             pgCodec.isAnonymous
@@ -591,8 +591,8 @@ export function createPgSearchPlugin(
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
-                    isPgConnectionConditionInputField: true,
-                  },
+                    isPgConnectionFilterField: true,
+                  } as any,
                   {
                     description: build.wrapDescription(
                       `Full-text search on the \`${attributeName}\` tsvector column using \`websearch_to_tsquery\`.`,
@@ -643,7 +643,7 @@ export function createPgSearchPlugin(
                   }
                 ),
               },
-              `PgSearchPlugin adding condition field '${fieldName}' for tsvector column '${attributeName}' on '${pgCodec.name}'`
+              `PgSearchPlugin adding filter field '${fieldName}' for tsvector column '${attributeName}' on '${pgCodec.name}'`
             );
           }
 

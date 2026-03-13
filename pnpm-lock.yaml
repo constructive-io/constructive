@@ -311,6 +311,9 @@ importers:
       '@types/pg':
         specifier: ^8.18.0
         version: 8.18.0
+      graphile-connection-filter:
+        specifier: workspace:^
+        version: link:../graphile-connection-filter/dist
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist

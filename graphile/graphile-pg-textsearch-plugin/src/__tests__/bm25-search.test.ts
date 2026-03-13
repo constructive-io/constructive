@@ -2,6 +2,7 @@ import { join } from 'path';
 import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
+import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { Bm25CodecPlugin } from '../bm25-codec';
 import { createBm25SearchPlugin } from '../bm25-search';
 
@@ -30,6 +31,9 @@ describe('Bm25SearchPlugin', () => {
 
   beforeAll(async () => {
     const testPreset = {
+      extends: [
+        ConnectionFilterPreset(),
+      ],
       plugins: [
         Bm25CodecPlugin,
         createBm25SearchPlugin({ conditionPrefix: 'bm25' }),
@@ -75,11 +79,11 @@ describe('Bm25SearchPlugin', () => {
     await db.afterEach();
   });
 
-  describe('condition field (bm25Body)', () => {
+  describe('filter field (bm25Body)', () => {
     it('performs BM25 search with a query string', async () => {
       const result = await query<AllArticlesResult>(`
         query {
-          allArticles(condition: {
+          allArticles(filter: {
             bm25Body: {
               query: "database management system"
             }
@@ -101,10 +105,10 @@ describe('Bm25SearchPlugin', () => {
       expect(nodes!.length).toBeGreaterThan(0);
     });
 
-    it('returns bm25BodyScore computed field when condition is active', async () => {
+    it('returns bm25BodyScore computed field when filter is active', async () => {
       const result = await query<AllArticlesResult>(`
         query {
-          allArticles(condition: {
+          allArticles(filter: {
             bm25Body: {
               query: "database"
             }
@@ -121,7 +125,7 @@ describe('Bm25SearchPlugin', () => {
       const nodes = result.data?.allArticles?.nodes;
       expect(nodes).toBeDefined();
 
-      // All nodes should have a BM25 score since the condition is active
+      // All nodes should have a BM25 score since the filter is active
       for (const node of nodes!) {
         expect(node.bm25BodyScore).toBeDefined();
         expect(typeof node.bm25BodyScore).toBe('number');
@@ -130,7 +134,7 @@ describe('Bm25SearchPlugin', () => {
       }
     });
 
-    it('returns null for bm25BodyScore when no condition is active', async () => {
+    it('returns null for bm25BodyScore when no filter is active', async () => {
       const result = await query<AllArticlesResult>(`
         query {
           allArticles {
@@ -154,7 +158,7 @@ describe('Bm25SearchPlugin', () => {
     it('filters by score threshold', async () => {
       const result = await query<AllArticlesResult>(`
         query {
-          allArticles(condition: {
+          allArticles(filter: {
             bm25Body: {
               query: "database"
               threshold: -0.5
@@ -183,7 +187,7 @@ describe('Bm25SearchPlugin', () => {
     it('discovers BM25 indexes on both title and body columns', async () => {
       const result = await query<AllArticlesResult>(`
         query {
-          allArticles(condition: {
+          allArticles(filter: {
             bm25Title: {
               query: "PostgreSQL"
             }
@@ -215,7 +219,7 @@ describe('Bm25SearchPlugin', () => {
       const result = await query<AllArticlesResult>(`
         query {
           allArticles(
-            condition: {
+            filter: {
               bm25Body: {
                 query: "database"
               }
@@ -247,7 +251,7 @@ describe('Bm25SearchPlugin', () => {
       const result = await query<AllArticlesResult>(`
         query {
           allArticles(
-            condition: {
+            filter: {
               bm25Body: {
                 query: "database"
               }
@@ -281,7 +285,7 @@ describe('Bm25SearchPlugin', () => {
       const result = await query<AllArticlesResult>(`
         query {
           allArticles(
-            condition: {
+            filter: {
               bm25Body: {
                 query: "search ranking"
                 threshold: -0.1
@@ -320,7 +324,7 @@ describe('Bm25SearchPlugin', () => {
       const result = await query<AllArticlesResult>(`
         query {
           allArticles(
-            condition: {
+            filter: {
               bm25Body: {
                 query: "database"
               }

@@ -40,10 +40,14 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  * - Upload plugin (file upload to S3/MinIO for image, upload, attachment domain columns)
  * - SQL expression validator (validates @sqlExpression columns in mutations)
  * - PG type mappings (maps custom types like email, url to GraphQL scalars)
- * - pgvector search (auto-discovers vector columns: condition fields, distance computed fields,
+ * - pgvector search (auto-discovers vector columns: filter fields, distance computed fields,
  *   orderBy distance — zero config)
- * - pg_textsearch BM25 search (auto-discovers BM25 indexes: condition fields, score computed fields,
+ * - pg_textsearch BM25 search (auto-discovers BM25 indexes: filter fields, score computed fields,
  *   orderBy score — zero config)
+ *
+ * DEPRECATED:
+ * - The `condition` argument has been removed. All filtering lives under `filter`.
+ *   PgConditionArgumentPlugin and PgConditionCustomFieldsPlugin are disabled.
  *
  * RELATION FILTERS:
  * - Enabled via connectionFilterRelations: true
@@ -91,6 +95,16 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     }),
     SqlExpressionValidatorPreset(),
     PgTypeMappingsPreset,
+  ],
+  /**
+   * Disable PostGraphile core's condition argument entirely.
+   * All filtering now lives under the `filter` argument via our v5-native
+   * graphile-connection-filter plugin. Search, BM25, pgvector, and PostGIS
+   * filter fields all hook into `isPgConnectionFilter` instead of `isPgCondition`.
+   */
+  disablePlugins: [
+    'PgConditionArgumentPlugin',
+    'PgConditionCustomFieldsPlugin',
   ],
   /**
    * Connection Filter Plugin Configuration

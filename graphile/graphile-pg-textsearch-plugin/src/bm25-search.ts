@@ -35,6 +35,7 @@
 
 import 'graphile-build';
 import 'graphile-build-pg';
+import 'graphile-connection-filter';
 import { TYPES } from '@dataplan/pg';
 import type { PgCodecWithAttributes } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
@@ -155,10 +156,12 @@ export function createBm25SearchPlugin(
     name: 'Bm25SearchPlugin',
     version: '1.0.0',
     description:
-      'Auto-discovers text columns with BM25 indexes and adds search conditions, score fields, and orderBy',
+      'Auto-discovers text columns with BM25 indexes and adds search filter fields, score fields, and orderBy',
     after: [
       'Bm25CodecPlugin',
       'PgAttributesPlugin',
+      'PgConnectionArgFilterPlugin',
+      'PgConnectionArgFilterAttributesPlugin',
     ],
 
     // ─── Custom Inflection Methods ─────────────────────────────────────
@@ -457,18 +460,18 @@ export function createBm25SearchPlugin(
         },
 
         /**
-         * Add `bm25<Column>` condition fields on connection condition input types
+         * Add `bm25<Column>` filter fields on connection filter input types
          * for tables with BM25-indexed text columns.
          */
         GraphQLInputObjectType_fields(fields, build, context) {
           const { inflection, sql } = build;
           const {
-            scope: { isPgCondition, pgCodec },
+            scope: { isPgConnectionFilter, pgCodec } = {} as any,
             fieldWithHooks,
           } = context;
 
           if (
-            !isPgCondition ||
+            !isPgConnectionFilter ||
             !pgCodec ||
             !pgCodec.attributes ||
             pgCodec.isAnonymous
@@ -509,8 +512,8 @@ export function createBm25SearchPlugin(
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
-                    isPgConnectionConditionInputField: true,
-                  },
+                    isPgConnectionFilterField: true,
+                  } as any,
                   {
                     description: build.wrapDescription(
                       `BM25 ranked text search on the \`${attributeName}\` column using pg_textsearch. ` +
@@ -585,7 +588,7 @@ export function createBm25SearchPlugin(
                   }
                 ),
               },
-              `Bm25SearchPlugin adding condition field '${fieldName}' for BM25 column '${attributeName}' on '${pgCodec.name}'`
+              `Bm25SearchPlugin adding filter field '${fieldName}' for BM25 column '${attributeName}' on '${pgCodec.name}'`
             );
           }
 
