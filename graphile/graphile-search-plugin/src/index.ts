@@ -22,7 +22,7 @@
  */
 
 export { PgSearchPlugin, createPgSearchPlugin } from './plugin';
-export { PgSearchPreset } from './preset';
+export { PgSearchPreset, createMatchesOperatorFactory } from './preset';
 export {
   TsvectorCodecPlugin,
   TsvectorCodecPreset,

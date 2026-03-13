@@ -17,7 +17,7 @@ import { createTsvectorCodecPlugin } from './tsvector-codec';
  * `connectionFilterOperatorFactories` API — the declarative replacement
  * for the old imperative operator registration pattern.
  */
-function createMatchesOperatorFactory(
+export function createMatchesOperatorFactory(
   fullTextScalarName: string,
   tsConfig: string
 ): ConnectionFilterOperatorFactory {

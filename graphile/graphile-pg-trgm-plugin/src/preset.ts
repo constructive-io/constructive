@@ -15,7 +15,7 @@ import { createTrgmSearchPlugin } from './trgm-search';
  * for pg_trgm fuzzy text matching. Declared here in the preset so they're
  * registered via the declarative `connectionFilterOperatorFactories` API.
  */
-function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
+export function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
   return (build) => {
     const { sql } = build;
 

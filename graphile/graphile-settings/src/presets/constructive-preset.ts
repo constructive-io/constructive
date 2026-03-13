@@ -11,12 +11,12 @@ import {
   MetaSchemaPreset,
   PgTypeMappingsPreset,
 } from 'graphile-misc-plugins';
-import { PgSearchPreset } from 'graphile-search-plugin';
+import { PgSearchPreset, createMatchesOperatorFactory } from 'graphile-search-plugin';
 import { GraphilePostgisPreset } from 'graphile-postgis';
 import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
 import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
-import { TrgmSearchPreset } from 'graphile-pg-trgm-plugin';
-import { PostgisConnectionFilterPreset } from 'graphile-plugin-connection-filter-postgis';
+import { TrgmSearchPreset, createTrgmOperatorFactories } from 'graphile-pg-trgm-plugin';
+import { PostgisConnectionFilterPreset, createPostgisOperatorFactory } from 'graphile-plugin-connection-filter-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
@@ -151,6 +151,18 @@ export const ConstructivePreset: GraphileConfig.Preset = {
      * Example: filter: { tags: { contains: ["important"] } }
      */
     connectionFilterArrays: true,
+
+    /**
+     * connectionFilterOperatorFactories
+     * Aggregates all satellite plugin operator factories into a single array.
+     * graphile-config replaces (not concatenates) arrays when merging presets,
+     * so we must explicitly collect all factories here at the top level.
+     */
+    connectionFilterOperatorFactories: [
+      createMatchesOperatorFactory('FullText', 'english'),
+      createTrgmOperatorFactories(),
+      createPostgisOperatorFactory(),
+    ],
   },
 };
 

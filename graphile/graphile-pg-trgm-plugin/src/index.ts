@@ -24,5 +24,5 @@
  */
 
 export { TrgmSearchPlugin, createTrgmSearchPlugin } from './trgm-search';
-export { TrgmSearchPreset } from './preset';
+export { TrgmSearchPreset, createTrgmOperatorFactories } from './preset';
 export type { TrgmSearchPluginOptions } from './types';
