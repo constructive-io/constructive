@@ -18,7 +18,7 @@ import { createBm25SearchPlugin } from './bm25-search';
  *
  * const preset = {
  *   extends: [
- *     Bm25SearchPreset({ conditionPrefix: 'bm25' }),
+ *     Bm25SearchPreset({ filterPrefix: 'bm25' }),
  *   ],
  * };
  * ```

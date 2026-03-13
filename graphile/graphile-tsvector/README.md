@@ -63,7 +63,7 @@ const preset = {
 
 ```graphql
 query SearchGoals($search: String!) {
-  goals(condition: { fullTextTsv: $search }) {
+  goals(filter: { fullTextTsv: $search }) {
     nodes {
       id
       title

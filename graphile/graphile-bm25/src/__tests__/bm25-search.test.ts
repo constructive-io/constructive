@@ -36,7 +36,7 @@ describe('Bm25SearchPlugin', () => {
       ],
       plugins: [
         Bm25CodecPlugin,
-        createBm25SearchPlugin({ conditionPrefix: 'bm25' }),
+        createBm25SearchPlugin({ filterPrefix: 'bm25' }),
       ],
     };
 

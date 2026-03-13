@@ -27,7 +27,7 @@ npm install graphile-bm25
 ## Features
 
 - **Auto-discovery**: Finds all text columns with BM25 indexes automatically — zero configuration
-- **Condition fields**: `bm25<Column>` condition inputs accepting `{ query, threshold? }` for BM25 ranked search
+- **Filter fields**: `bm25<Column>` filter inputs accepting `{ query, threshold? }` for BM25 ranked search
 - **Score fields**: `bm25<Column>Score` computed fields returning BM25 relevance scores (negative values, more negative = more relevant)
 - **OrderBy**: `BM25_<COLUMN>_SCORE_ASC/DESC` enum values for sorting by relevance
 - Works with PostGraphile v5 preset/plugin pipeline
@@ -64,7 +64,7 @@ const preset = {
 
 ```graphql
 query SearchArticles($search: Bm25SearchInput!) {
-  articles(condition: { bm25Body: $search }) {
+  articles(filter: { bm25Body: $search }) {
     nodes {
       id
       title
@@ -91,7 +91,7 @@ Variables:
 ```graphql
 query SearchArticlesSorted($search: Bm25SearchInput!) {
   articles(
-    condition: { bm25Body: $search }
+    filter: { bm25Body: $search }
     orderBy: BM25_BODY_SCORE_ASC
   ) {
     nodes {

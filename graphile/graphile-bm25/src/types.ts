@@ -23,10 +23,10 @@ export interface Bm25IndexInfo {
  */
 export interface Bm25SearchPluginOptions {
   /**
-   * Prefix for BM25 condition fields.
+   * Prefix for BM25 filter fields.
    * For example, with prefix 'bm25' and a column named 'content',
-   * the generated condition field will be 'bm25Content'.
+   * the generated filter field will be 'bm25Content'.
    * @default 'bm25'
    */
-  conditionPrefix?: string;
+  filterPrefix?: string;
 }

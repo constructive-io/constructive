@@ -112,7 +112,7 @@ function isTextCodec(codec: any): boolean {
 export function createBm25SearchPlugin(
   options: Bm25SearchPluginOptions = {}
 ): GraphileConfig.Plugin {
-  const { conditionPrefix = 'bm25' } = options;
+  const { filterPrefix = 'bm25' } = options;
 
   return {
     name: 'Bm25SearchPlugin',
@@ -460,7 +460,7 @@ export function createBm25SearchPlugin(
 
           for (const [attributeName, _attribute, bm25Index] of bm25Attributes) {
             const fieldName = inflection.camelCase(
-              `${conditionPrefix}_${attributeName}`
+              `${filterPrefix}_${attributeName}`
             );
             const baseFieldName = inflection.attribute({
               codec: pgCodec as any,
