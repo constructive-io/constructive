@@ -50,7 +50,7 @@ describe('graphile-pgvector-plugin integration', () => {
     const testPreset = {
       extends: [
         VectorCodecPreset,
-        ConnectionFilterPreset(),
+        ConnectionFilterPreset({ connectionFilterAllowEmptyObjectInput: true }),
       ],
     };
 
