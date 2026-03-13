@@ -2,11 +2,9 @@ import { generateCli, generateMultiTargetCli, resolveBuiltinNames } from '../../
 import {
   generateReadme as generateCliReadme,
   generateAgentsDocs as generateCliAgentsDocs,
-  getCliMcpTools,
   generateSkills as generateCliSkills,
   generateMultiTargetReadme,
   generateMultiTargetAgentsDocs,
-  getMultiTargetCliMcpTools,
   generateMultiTargetSkills,
 } from '../../core/codegen/cli/docs-generator';
 import type { MultiTargetDocsInput } from '../../core/codegen/cli/docs-generator';
@@ -14,18 +12,15 @@ import { resolveDocsConfig } from '../../core/codegen/docs-utils';
 import {
   generateOrmReadme,
   generateOrmAgentsDocs,
-  getOrmMcpTools,
   generateOrmSkills,
 } from '../../core/codegen/orm/docs-generator';
 import {
   generateHooksReadme,
   generateHooksAgentsDocs,
-  getHooksMcpTools,
   generateHooksSkills,
 } from '../../core/codegen/hooks-docs-generator';
 import {
   generateTargetReadme,
-  generateCombinedMcpConfig,
   generateRootRootReadme,
 } from '../../core/codegen/target-docs-generator';
 import type {
@@ -274,16 +269,6 @@ describe('cli docs generator', () => {
     expect(agents.content).toMatchSnapshot();
   });
 
-  it('generates CLI MCP tools', () => {
-    const tools = getCliMcpTools([carTable, driverTable], allCustomOps, 'myapp');
-    expect(tools.length).toBeGreaterThan(0);
-    for (const tool of tools) {
-      expect(tool.name).toBeDefined();
-      expect(tool.description).toBeDefined();
-      expect(tool.inputSchema).toBeDefined();
-    }
-  });
-
   it('generates CLI skill files', () => {
     const skills = generateCliSkills([carTable, driverTable], allCustomOps, 'myapp', 'default');
     expect(skills.length).toBeGreaterThan(0);
@@ -306,16 +291,6 @@ describe('orm docs generator', () => {
     expect(agents.content).toMatchSnapshot();
   });
 
-  it('generates ORM MCP tools', () => {
-    const tools = getOrmMcpTools([carTable, driverTable], allCustomOps);
-    expect(tools.length).toBeGreaterThan(0);
-    for (const tool of tools) {
-      expect(tool.name).toBeDefined();
-      expect(tool.description).toBeDefined();
-      expect(tool.inputSchema).toBeDefined();
-    }
-  });
-
   it('generates ORM skill files', () => {
     const skills = generateOrmSkills([carTable, driverTable], allCustomOps, 'default');
     expect(skills.length).toBeGreaterThan(0);
@@ -336,16 +311,6 @@ describe('hooks docs generator', () => {
     const agents = generateHooksAgentsDocs([carTable, driverTable], allCustomOps);
     expect(agents.fileName).toBe('AGENTS.md');
     expect(agents.content).toMatchSnapshot();
-  });
-
-  it('generates hooks MCP tools', () => {
-    const tools = getHooksMcpTools([carTable, driverTable], allCustomOps);
-    expect(tools.length).toBeGreaterThan(0);
-    for (const tool of tools) {
-      expect(tool.name).toBeDefined();
-      expect(tool.description).toBeDefined();
-      expect(tool.inputSchema).toBeDefined();
-    }
   });
 
   it('generates hooks skill files', () => {
@@ -372,18 +337,6 @@ describe('target docs generator', () => {
     expect(readme.content).toMatchSnapshot();
   });
 
-  it('generates combined MCP config', () => {
-    const cliTools = getCliMcpTools([carTable, driverTable], allCustomOps, 'myapp');
-    const ormTools = getOrmMcpTools([carTable, driverTable], allCustomOps);
-    const allTools = [...cliTools, ...ormTools];
-    const mcp = generateCombinedMcpConfig(allTools, 'myapp');
-    expect(mcp.fileName).toBe('mcp.json');
-    const parsed = JSON.parse(mcp.content);
-    expect(parsed.name).toBe('myapp');
-    expect(parsed.tools.length).toBe(allTools.length);
-    expect(mcp.content).toMatchSnapshot();
-  });
-
   it('generates root-root README for multi-target', () => {
     const readme = generateRootRootReadme([
       { name: 'auth', output: './generated/auth', endpoint: 'http://auth.localhost/graphql', generators: ['ORM'] },
@@ -397,22 +350,22 @@ describe('target docs generator', () => {
 describe('resolveDocsConfig', () => {
   it('defaults to readme + agents', () => {
     const config = resolveDocsConfig(undefined);
-    expect(config).toEqual({ readme: true, agents: true, mcp: false, skills: false });
+    expect(config).toEqual({ readme: true, agents: true, skills: false });
   });
 
   it('docs: true enables all', () => {
     const config = resolveDocsConfig(true);
-    expect(config).toEqual({ readme: true, agents: true, mcp: true, skills: true });
+    expect(config).toEqual({ readme: true, agents: true, skills: true });
   });
 
   it('docs: false disables all', () => {
     const config = resolveDocsConfig(false);
-    expect(config).toEqual({ readme: false, agents: false, mcp: false, skills: false });
+    expect(config).toEqual({ readme: false, agents: false, skills: false });
   });
 
   it('partial config fills defaults', () => {
-    const config = resolveDocsConfig({ mcp: true });
-    expect(config).toEqual({ readme: true, agents: true, mcp: true, skills: false });
+    const config = resolveDocsConfig({ skills: true });
+    expect(config).toEqual({ readme: true, agents: true, skills: true });
   });
 });
 
@@ -742,18 +695,6 @@ describe('multi-target cli docs', () => {
     expect(agents.content).toContain('members:member');
     expect(agents.content).toContain('app:car');
     expect(agents.content).toMatchSnapshot();
-  });
-
-  it('generates multi-target MCP tools', () => {
-    const tools = getMultiTargetCliMcpTools(docsInput);
-    expect(tools.length).toBeGreaterThan(0);
-    const toolNames = tools.map((t) => t.name);
-    expect(toolNames).toContain('myapp_credentials_set_token');
-    expect(toolNames).toContain('myapp_context_create');
-    expect(toolNames.some((n) => n.includes('auth_user'))).toBe(true);
-    expect(toolNames.some((n) => n.includes('members_member'))).toBe(true);
-    expect(toolNames.some((n) => n.includes('app_car'))).toBe(true);
-    expect(tools).toMatchSnapshot();
   });
 
   it('generates multi-target skills', () => {

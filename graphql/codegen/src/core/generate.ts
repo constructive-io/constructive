@@ -23,33 +23,27 @@ import type { MultiTargetCliTarget } from './codegen/cli';
 import {
   generateReadme as generateCliReadme,
   generateAgentsDocs as generateCliAgentsDocs,
-  getCliMcpTools,
   generateSkills as generateCliSkills,
   generateMultiTargetReadme,
   generateMultiTargetAgentsDocs,
-  getMultiTargetCliMcpTools,
   generateMultiTargetSkills,
 } from './codegen/cli/docs-generator';
 import type { MultiTargetDocsInput } from './codegen/cli/docs-generator';
 import { resolveDocsConfig } from './codegen/docs-utils';
-import type { McpTool } from './codegen/docs-utils';
 import {
   generateHooksReadme,
   generateHooksAgentsDocs,
-  getHooksMcpTools,
   generateHooksSkills,
 } from './codegen/hooks-docs-generator';
 import { generateOrm as generateOrmFiles } from './codegen/orm';
 import {
   generateOrmReadme,
   generateOrmAgentsDocs,
-  getOrmMcpTools,
   generateOrmSkills,
 } from './codegen/orm/docs-generator';
 import { generateSharedTypes } from './codegen/shared';
 import {
   generateTargetReadme,
-  generateCombinedMcpConfig,
   generateRootRootReadme,
 } from './codegen/target-docs-generator';
 import type { RootRootReadmeTarget } from './codegen/target-docs-generator';
@@ -342,7 +336,6 @@ export async function generate(
     ...(customOperations.queries ?? []),
     ...(customOperations.mutations ?? []),
   ];
-  const allMcpTools: McpTool[] = [];
   const targetName = internalOptions?.targetName ?? 'default';
   const skillsToWrite: Array<{ path: string; content: string }> = [];
 
@@ -354,9 +347,6 @@ export async function generate(
     if (docsConfig.agents) {
       const agents = generateOrmAgentsDocs(tables, allCustomOps);
       filesToWrite.push({ path: path.posix.join('orm', agents.fileName), content: agents.content });
-    }
-    if (docsConfig.mcp) {
-      allMcpTools.push(...getOrmMcpTools(tables, allCustomOps));
     }
     if (docsConfig.skills) {
       for (const skill of generateOrmSkills(tables, allCustomOps, targetName)) {
@@ -373,9 +363,6 @@ export async function generate(
     if (docsConfig.agents) {
       const agents = generateHooksAgentsDocs(tables, allCustomOps);
       filesToWrite.push({ path: path.posix.join('hooks', agents.fileName), content: agents.content });
-    }
-    if (docsConfig.mcp) {
-      allMcpTools.push(...getHooksMcpTools(tables, allCustomOps));
     }
     if (docsConfig.skills) {
       for (const skill of generateHooksSkills(tables, allCustomOps, targetName)) {
@@ -397,24 +384,11 @@ export async function generate(
       const agents = generateCliAgentsDocs(tables, allCustomOps, toolName, customOperations.typeRegistry);
       filesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
     }
-    if (docsConfig.mcp) {
-      allMcpTools.push(...getCliMcpTools(tables, allCustomOps, toolName, customOperations.typeRegistry));
-    }
     if (docsConfig.skills) {
       for (const skill of generateCliSkills(tables, allCustomOps, toolName, targetName, customOperations.typeRegistry)) {
         skillsToWrite.push({ path: skill.fileName, content: skill.content });
       }
     }
-  }
-
-  // Generate combined mcp.json at output root
-  if (docsConfig.mcp && allMcpTools.length > 0) {
-    const mcpName =
-      typeof config.cli === 'object' && config.cli?.toolName
-        ? config.cli.toolName
-        : 'graphql-sdk';
-    const mcpFile = generateCombinedMcpConfig(allMcpTools, mcpName);
-    filesToWrite.push({ path: mcpFile.fileName, content: mcpFile.content });
   }
 
   // Generate per-target README at output root
@@ -785,8 +759,6 @@ export async function generateMulti(
       })),
     };
 
-    const allMcpTools: McpTool[] = [];
-
     if (docsConfig.readme) {
       const readme = generateMultiTargetReadme(docsInput);
       cliFilesToWrite.push({ path: path.posix.join('cli', readme.fileName), content: readme.content });
@@ -794,13 +766,6 @@ export async function generateMulti(
     if (docsConfig.agents) {
       const agents = generateMultiTargetAgentsDocs(docsInput);
       cliFilesToWrite.push({ path: path.posix.join('cli', agents.fileName), content: agents.content });
-    }
-    if (docsConfig.mcp) {
-      allMcpTools.push(...getMultiTargetCliMcpTools(docsInput));
-    }
-    if (docsConfig.mcp && allMcpTools.length > 0) {
-      const mcpFile = generateCombinedMcpConfig(allMcpTools, toolName);
-      cliFilesToWrite.push({ path: path.posix.join('cli', mcpFile.fileName), content: mcpFile.content });
     }
 
     const { writeGeneratedFiles: writeFiles } = await import('./output');

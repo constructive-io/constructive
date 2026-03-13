@@ -157,14 +157,6 @@ export interface DocsConfig {
   agents?: boolean;
 
   /**
-   * Generate mcp.json — MCP (Model Context Protocol) tool definitions
-   * Each CLI command becomes a tool with typed inputSchema (JSON Schema)
-   * Ready to plug into any MCP-compatible agent
-   * @default false
-   */
-  mcp?: boolean;
-
-  /**
    * Generate skills/ directory — per-entity SKILL.md files with YAML frontmatter.
    * Skills are written to the workspace root skills/ directory (not nested in output).
    * Uses composable naming: orm-{target}-{entity}, hooks-{target}-{entity}, cli-{target}-{entity}.

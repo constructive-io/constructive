@@ -7,13 +7,6 @@ export interface GeneratedDocFile {
   content: string;
 }
 
-export interface McpTool {
-  name: string;
-  description: string;
-  inputSchema: Record<string, unknown>;
-  _meta?: Record<string, unknown>;
-}
-
 export interface SkillDefinition {
   name: string;
   description: string;
@@ -67,18 +60,17 @@ export function resolveDocsConfig(
   docs: DocsConfig | boolean | undefined,
 ): DocsConfig {
   if (docs === true) {
-    return { readme: true, agents: true, mcp: true, skills: true };
+    return { readme: true, agents: true, skills: true };
   }
   if (docs === false) {
-    return { readme: false, agents: false, mcp: false, skills: false };
+    return { readme: false, agents: false, skills: false };
   }
   if (!docs) {
-    return { readme: true, agents: true, mcp: false, skills: false };
+    return { readme: true, agents: true, skills: false };
   }
   return {
     readme: docs.readme ?? true,
     agents: docs.agents ?? true,
-    mcp: docs.mcp ?? false,
     skills: docs.skills ?? false,
   };
 }
@@ -240,19 +232,6 @@ export function flattenArgs(args: CleanArgument[], registry?: TypeRegistry): Fla
  */
 export function flattenedArgsToFlags(flatArgs: FlattenedArg[]): string {
   return flatArgs.map((a) => `--${a.flag} <value>`).join(' ');
-}
-
-export function gqlTypeToJsonSchemaType(gqlType: string): string {
-  switch (gqlType) {
-    case 'Int':
-      return 'integer';
-    case 'Float':
-      return 'number';
-    case 'Boolean':
-      return 'boolean';
-    default:
-      return 'string';
-  }
 }
 
 export function buildSkillFile(
