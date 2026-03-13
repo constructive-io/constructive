@@ -65,6 +65,28 @@ OUTPUT: JSON
   logout:    { context, status: "logged out" }
 \`\`\`
 
+### TOOL: config
+
+Manage per-context key-value configuration variables.
+
+\`\`\`
+SUBCOMMANDS:
+  myapp config get <key>             Get a config value
+  myapp config set <key> <value>     Set a config value
+  myapp config list                  List all config values
+  myapp config delete <key>          Delete a config value
+
+INPUT:
+  key:   string (required for get/set/delete) - Variable name
+  value: string (required for set) - Variable value
+
+OUTPUT: JSON
+  get:    { key, value }
+  set:    { key, value }
+  list:   { vars: { key: value, ... } }
+  delete: { deleted: key }
+\`\`\`
+
 ### TOOL: car
 
 CRUD operations for Car records.
@@ -239,6 +261,7 @@ myapp auth set-token <your-token>
 |---------|-------------|
 | \`context\` | Manage API contexts (endpoints) |
 | \`auth\` | Manage authentication tokens |
+| \`config\` | Manage config key-value store (per-context) |
 | \`car\` | car CRUD operations |
 | \`driver\` | driver CRUD operations |
 | \`current-user\` | Get the currently authenticated user |
@@ -269,6 +292,19 @@ Manage authentication tokens per context.
 | \`set-token <token>\` | Store bearer token for current context |
 | \`status\` | Show auth status across all contexts |
 | \`logout\` | Remove credentials for current context |
+
+### \`config\`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| \`get <key>\` | Get a config value |
+| \`set <key> <value>\` | Set a config value |
+| \`list\` | List all config values |
+| \`delete <key>\` | Delete a config value |
+
+Variables are scoped to the active context and stored at \`~/.myapp/config/\`.
 
 ## Table Commands
 
@@ -435,6 +471,39 @@ myapp auth status
 `;
 
 exports[`cli docs generator generates CLI skill files 3`] = `
+"# Config Variables
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+Manage per-context key-value configuration variables for myapp
+
+## Usage
+
+\`\`\`bash
+myapp config get <key>
+myapp config set <key> <value>
+myapp config list
+myapp config delete <key>
+\`\`\`
+
+## Examples
+
+### Store and retrieve a config variable
+
+\`\`\`bash
+myapp config set orgId abc-123
+myapp config get orgId
+\`\`\`
+
+### List all config variables
+
+\`\`\`bash
+myapp config list
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 4`] = `
 "# car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -473,7 +542,7 @@ myapp car get --id <value>
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 4`] = `
+exports[`cli docs generator generates CLI skill files 5`] = `
 "# driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -512,7 +581,7 @@ myapp driver get --id <value>
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 5`] = `
+exports[`cli docs generator generates CLI skill files 6`] = `
 "# currentUser
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -535,7 +604,7 @@ myapp current-user
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 6`] = `
+exports[`cli docs generator generates CLI skill files 7`] = `
 "# login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -558,7 +627,7 @@ myapp login --email <value> --password <value>
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 7`] = `
+exports[`cli docs generator generates CLI skill files 8`] = `
 "---
 name: cli-default
 description: CLI tool (myapp) for the default API — provides CRUD commands for 2 tables and 2 custom operations
@@ -579,6 +648,10 @@ myapp context use <name>
 
 # Authentication
 myapp auth set-token <token>
+
+# Config variables
+myapp config set <key> <value>
+myapp config get <key>
 
 # CRUD for any table (e.g. car)
 myapp car list
@@ -612,6 +685,7 @@ See the \`references/\` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
+- [config](references/config.md)
 - [car](references/car.md)
 - [driver](references/driver.md)
 - [current-user](references/current-user.md)
@@ -2027,6 +2101,7 @@ COMMAND FORMAT:
   myapp <target>:<command> <subcommand> [flags]    Target-specific commands
   myapp context <subcommand> [flags]              Context management
   myapp credentials <subcommand> [flags]                 Authentication
+  myapp config <subcommand> [flags]               Config key-value store
 
 ## PREREQUISITES
 
@@ -2089,6 +2164,49 @@ OUTPUT: JSON
   set-token: { context, status: "authenticated" }
   status:    [{ context, authenticated: boolean }]
   logout:    { context, status: "logged out" }
+\`\`\`
+
+### TOOL: config
+
+Manage per-context key-value configuration variables.
+
+\`\`\`
+SUBCOMMANDS:
+  myapp config get <key>             Get a config value
+  myapp config set <key> <value>     Set a config value
+  myapp config list                  List all config values
+  myapp config delete <key>          Delete a config value
+
+INPUT:
+  key:   string (required for get/set/delete) - Variable name
+  value: string (required for set) - Variable value
+
+OUTPUT: JSON
+  get:    { key, value }
+  set:    { key, value }
+  list:   { vars: { key: value, ... } }
+  delete: { deleted: key }
+\`\`\`
+
+### TOOL: helpers (SDK)
+
+Typed client factories for use in scripts and services (generated helpers.ts).
+Resolves credentials via: appstash store -> env vars -> throw.
+
+\`\`\`
+FACTORIES:
+  createAuthClient(contextName?)   Create a configured auth ORM client
+  createMembersClient(contextName?)   Create a configured members ORM client
+  createAppClient(contextName?)   Create a configured app ORM client
+
+USAGE:
+  import { createAuthClient } from './helpers';
+  const client = createAuthClient();
+
+CREDENTIAL RESOLUTION:
+  1. appstash store (~/.myapp/config/)
+  2. env vars (MYAPP_TOKEN, MYAPP_<TARGET>_ENDPOINT)
+  3. throws with actionable error message
 \`\`\`
 
 ### TOOL: auth:user
@@ -2373,6 +2491,67 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
       "type": "object",
     },
     "name": "myapp_credentials_logout",
+  },
+  {
+    "description": "Get a config variable value for the current context",
+    "inputSchema": {
+      "properties": {
+        "key": {
+          "description": "Variable name",
+          "type": "string",
+        },
+      },
+      "required": [
+        "key",
+      ],
+      "type": "object",
+    },
+    "name": "myapp_config_get",
+  },
+  {
+    "description": "Set a config variable value for the current context",
+    "inputSchema": {
+      "properties": {
+        "key": {
+          "description": "Variable name",
+          "type": "string",
+        },
+        "value": {
+          "description": "Variable value",
+          "type": "string",
+        },
+      },
+      "required": [
+        "key",
+        "value",
+      ],
+      "type": "object",
+    },
+    "name": "myapp_config_set",
+  },
+  {
+    "description": "List all config variables for the current context",
+    "inputSchema": {
+      "properties": {},
+      "type": "object",
+    },
+    "name": "myapp_config_list",
+  },
+  {
+    "description": "Delete a config variable for the current context",
+    "inputSchema": {
+      "properties": {
+        "key": {
+          "description": "Variable name to delete",
+          "type": "string",
+        },
+      },
+      "required": [
+        "key",
+      ],
+      "type": "object",
+    },
+    "name": "myapp_config_delete",
   },
   {
     "description": "List all User records (auth target)",
@@ -2837,6 +3016,7 @@ myapp auth:login --email <value> --password <value> --save-token
 |---------|-------------|
 | \`context\` | Manage API contexts (per-target endpoints) |
 | \`credentials\` | Manage authentication tokens |
+| \`config\` | Manage config key-value store (per-context) |
 
 ### auth
 
@@ -2889,6 +3069,38 @@ Manage authentication tokens per context. One shared token is used across all ta
 | \`set-token <token>\` | Store bearer token for current context |
 | \`status\` | Show auth status across all contexts |
 | \`logout\` | Remove credentials for current context |
+
+### \`config\`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| \`get <key>\` | Get a config value |
+| \`set <key> <value>\` | Set a config value |
+| \`list\` | List all config values |
+| \`delete <key>\` | Delete a config value |
+
+Variables are scoped to the active context and stored at \`~/.myapp/config/\`.
+
+## SDK Helpers
+
+The generated \`helpers.ts\` provides typed client factories for use in scripts and services:
+
+\`\`\`typescript
+import { createAuthClient } from './helpers';
+import { createMembersClient } from './helpers';
+import { createAppClient } from './helpers';
+
+const auth = createAuthClient();
+const members = createMembersClient();
+const app = createAppClient();
+\`\`\`
+
+Credential resolution order:
+1. appstash store (\`~/.myapp/config/\`)
+2. Environment variables (\`MYAPP_TOKEN\`, \`MYAPP_<TARGET>_ENDPOINT\`)
+3. Throws with actionable error message
 
 ## auth Commands
 
@@ -3082,16 +3294,49 @@ myapp credentials status
     "fileName": "cli-common/references/auth.md",
   },
   {
+    "content": "# Config Variables
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+Manage per-context key-value configuration variables for myapp
+
+## Usage
+
+\`\`\`bash
+myapp config get <key>
+myapp config set <key> <value>
+myapp config list
+myapp config delete <key>
+\`\`\`
+
+## Examples
+
+### Store and retrieve a config variable
+
+\`\`\`bash
+myapp config set orgId abc-123
+myapp config get orgId
+\`\`\`
+
+### List all config variables
+
+\`\`\`bash
+myapp config list
+\`\`\`
+",
+    "fileName": "cli-common/references/config.md",
+  },
+  {
     "content": "---
 name: cli-common
-description: Shared CLI utilities for myapp — context management and authentication across targets: auth, members, app
+description: Shared CLI utilities for myapp — context management, authentication, and config across targets: auth, members, app
 ---
 
 # cli-common
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Shared CLI utilities for myapp — context management and authentication across targets: auth, members, app
+Shared CLI utilities for myapp — context management, authentication, and config across targets: auth, members, app
 
 ## Usage
 
@@ -3103,6 +3348,11 @@ myapp context use <name>
 # Authentication
 myapp credentials set-token <token>
 myapp credentials status
+
+# Config variables
+myapp config set <key> <value>
+myapp config get <key>
+myapp config list
 \`\`\`
 
 ## Examples
@@ -3115,12 +3365,19 @@ myapp context use local
 myapp credentials set-token <token>
 \`\`\`
 
+### Store a config variable
+
+\`\`\`bash
+myapp config set orgId abc-123
+\`\`\`
+
 ## References
 
 See the \`references/\` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
+- [config](references/config.md)
 ",
     "fileName": "cli-common/SKILL.md",
   },
@@ -5227,6 +5484,67 @@ exports[`target docs generator generates combined MCP config 1`] = `
       "inputSchema": {
         "type": "object",
         "properties": {}
+      }
+    },
+    {
+      "name": "myapp_config_get",
+      "description": "Get a config variable value for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      }
+    },
+    {
+      "name": "myapp_config_set",
+      "description": "Set a config variable value for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name"
+          },
+          "value": {
+            "type": "string",
+            "description": "Variable value"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "myapp_config_list",
+      "description": "List all config variables for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_config_delete",
+      "description": "Delete a config variable for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name to delete"
+          }
+        },
+        "required": [
+          "key"
+        ]
       }
     },
     {

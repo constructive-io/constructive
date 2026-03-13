@@ -699,7 +699,7 @@ describe('multi-target cli generator', () => {
 describe('multi-target cli docs', () => {
   const docsInput: MultiTargetDocsInput = {
     toolName: 'myapp',
-    builtinNames: { auth: 'credentials', context: 'context' },
+    builtinNames: { auth: 'credentials', context: 'context', config: 'config' },
     targets: [
       {
         name: 'auth',
@@ -770,7 +770,7 @@ describe('multi-target cli docs', () => {
   it('handles collision-renamed infra in docs', () => {
     const collisionInput: MultiTargetDocsInput = {
       toolName: 'myapp',
-      builtinNames: { auth: 'credentials', context: 'env' },
+      builtinNames: { auth: 'credentials', context: 'env', config: 'config' },
       targets: docsInput.targets,
     };
     const readme = generateMultiTargetReadme(collisionInput);

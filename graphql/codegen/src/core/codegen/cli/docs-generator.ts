@@ -52,6 +52,7 @@ export function generateReadme(
   lines.push('|---------|-------------|');
   lines.push('| `context` | Manage API contexts (endpoints) |');
   lines.push('| `auth` | Manage authentication tokens |');
+  lines.push('| `config` | Manage config key-value store (per-context) |');
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const kebab = toKebabCase(singularName);
@@ -88,6 +89,19 @@ export function generateReadme(
   lines.push('| `set-token <token>` | Store bearer token for current context |');
   lines.push('| `status` | Show auth status across all contexts |');
   lines.push('| `logout` | Remove credentials for current context |');
+  lines.push('');
+  lines.push('### `config`');
+  lines.push('');
+  lines.push('Manage per-context key-value configuration variables.');
+  lines.push('');
+  lines.push('| Subcommand | Description |');
+  lines.push('|------------|-------------|');
+  lines.push('| `get <key>` | Get a config value |');
+  lines.push('| `set <key> <value>` | Set a config value |');
+  lines.push('| `list` | List all config values |');
+  lines.push('| `delete <key>` | Delete a config value |');
+  lines.push('');
+  lines.push(`Variables are scoped to the active context and stored at \`~/.${toolName}/config/\`.`);
   lines.push('');
 
   if (tables.length > 0) {
@@ -264,6 +278,29 @@ export function generateAgentsDocs(
   lines.push('  set-token: { context, status: "authenticated" }');
   lines.push('  status:    [{ context, authenticated: boolean }]');
   lines.push('  logout:    { context, status: "logged out" }');
+  lines.push('```');
+  lines.push('');
+
+  lines.push('### TOOL: config');
+  lines.push('');
+  lines.push('Manage per-context key-value configuration variables.');
+  lines.push('');
+  lines.push('```');
+  lines.push('SUBCOMMANDS:');
+  lines.push(`  ${toolName} config get <key>             Get a config value`);
+  lines.push(`  ${toolName} config set <key> <value>     Set a config value`);
+  lines.push(`  ${toolName} config list                  List all config values`);
+  lines.push(`  ${toolName} config delete <key>          Delete a config value`);
+  lines.push('');
+  lines.push('INPUT:');
+  lines.push('  key:   string (required for get/set/delete) - Variable name');
+  lines.push('  value: string (required for set) - Variable value');
+  lines.push('');
+  lines.push('OUTPUT: JSON');
+  lines.push('  get:    { key, value }');
+  lines.push('  set:    { key, value }');
+  lines.push('  list:   { vars: { key: value, ... } }');
+  lines.push('  delete: { deleted: key }');
   lines.push('```');
   lines.push('');
 
@@ -497,6 +534,49 @@ export function getCliMcpTools(
     inputSchema: { type: 'object', properties: {} },
   });
 
+  tools.push({
+    name: `${toolName}_config_get`,
+    description: 'Get a config variable value for the current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Variable name' },
+      },
+      required: ['key'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_config_set`,
+    description: 'Set a config variable value for the current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Variable name' },
+        value: { type: 'string', description: 'Variable value' },
+      },
+      required: ['key', 'value'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_config_list`,
+    description: 'List all config variables for the current context',
+    inputSchema: { type: 'object', properties: {} },
+  });
+
+  tools.push({
+    name: `${toolName}_config_delete`,
+    description: 'Delete a config variable for the current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Variable name to delete' },
+      },
+      required: ['key'],
+    },
+  });
+
   for (const table of tables) {
     const { singularName } = getTableNames(table);
     const kebab = toKebabCase(singularName);
@@ -694,6 +774,35 @@ export function generateSkills(
     }),
   });
 
+  // Config reference
+  referenceNames.push('config');
+  files.push({
+    fileName: `${skillName}/references/config.md`,
+    content: buildSkillReference({
+      title: 'Config Variables',
+      description: `Manage per-context key-value configuration variables for ${toolName}`,
+      usage: [
+        `${toolName} config get <key>`,
+        `${toolName} config set <key> <value>`,
+        `${toolName} config list`,
+        `${toolName} config delete <key>`,
+      ],
+      examples: [
+        {
+          description: 'Store and retrieve a config variable',
+          code: [
+            `${toolName} config set orgId abc-123`,
+            `${toolName} config get orgId`,
+          ],
+        },
+        {
+          description: 'List all config variables',
+          code: [`${toolName} config list`],
+        },
+      ],
+    }),
+  });
+
   // Table references
   for (const table of tables) {
     const { singularName } = getTableNames(table);
@@ -783,6 +892,10 @@ export function generateSkills(
           `# Authentication`,
           `${toolName} auth set-token <token>`,
           '',
+          `# Config variables`,
+          `${toolName} config set <key> <value>`,
+          `${toolName} config get <key>`,
+          '',
           `# CRUD for any table (e.g. ${tableKebabs[0] || 'model'})`,
           `${toolName} ${tableKebabs[0] || 'model'} list`,
           `${toolName} ${tableKebabs[0] || 'model'} get --id <value>`,
@@ -818,7 +931,7 @@ export function generateSkills(
 
 export interface MultiTargetDocsInput {
   toolName: string;
-  builtinNames: { auth: string; context: string };
+  builtinNames: { auth: string; context: string; config: string };
   registry?: TypeRegistry;
   targets: Array<{
     name: string;
@@ -904,6 +1017,7 @@ export function generateMultiTargetReadme(
   lines.push('|---------|-------------|');
   lines.push(`| \`${builtinNames.context}\` | Manage API contexts (per-target endpoints) |`);
   lines.push(`| \`${builtinNames.auth}\` | Manage authentication tokens |`);
+  lines.push(`| \`${builtinNames.config}\` | Manage config key-value store (per-context) |`);
   lines.push('');
 
   for (const tgt of targets) {
@@ -955,6 +1069,42 @@ export function generateMultiTargetReadme(
   lines.push('| `set-token <token>` | Store bearer token for current context |');
   lines.push('| `status` | Show auth status across all contexts |');
   lines.push('| `logout` | Remove credentials for current context |');
+  lines.push('');
+
+  lines.push(`### \`${builtinNames.config}\``);
+  lines.push('');
+  lines.push('Manage per-context key-value configuration variables.');
+  lines.push('');
+  lines.push('| Subcommand | Description |');
+  lines.push('|------------|-------------|');
+  lines.push('| `get <key>` | Get a config value |');
+  lines.push('| `set <key> <value>` | Set a config value |');
+  lines.push('| `list` | List all config values |');
+  lines.push('| `delete <key>` | Delete a config value |');
+  lines.push('');
+  lines.push(`Variables are scoped to the active context and stored at \`~/.${toolName}/config/\`.`);
+  lines.push('');
+
+  lines.push('## SDK Helpers');
+  lines.push('');
+  lines.push('The generated `helpers.ts` provides typed client factories for use in scripts and services:');
+  lines.push('');
+  lines.push('```typescript');
+  for (const tgt of targets) {
+    const pascalName = tgt.name.charAt(0).toUpperCase() + tgt.name.slice(1);
+    lines.push(`import { create${pascalName}Client } from './helpers';`);
+  }
+  lines.push('');
+  for (const tgt of targets) {
+    const pascalName = tgt.name.charAt(0).toUpperCase() + tgt.name.slice(1);
+    lines.push(`const ${tgt.name} = create${pascalName}Client();`);
+  }
+  lines.push('```');
+  lines.push('');
+  lines.push('Credential resolution order:');
+  lines.push(`1. appstash store (\`~/.${toolName}/config/\`)`);
+  lines.push(`2. Environment variables (\`${toolName.toUpperCase().replace(/-/g, '_')}_TOKEN\`, \`${toolName.toUpperCase().replace(/-/g, '_')}_<TARGET>_ENDPOINT\`)`);
+  lines.push('3. Throws with actionable error message');
   lines.push('');
 
   for (const tgt of targets) {
@@ -1092,6 +1242,7 @@ export function generateMultiTargetAgentsDocs(
   lines.push(`  ${toolName} <target>:<command> <subcommand> [flags]    Target-specific commands`);
   lines.push(`  ${toolName} ${builtinNames.context} <subcommand> [flags]              Context management`);
   lines.push(`  ${toolName} ${builtinNames.auth} <subcommand> [flags]                 Authentication`);
+  lines.push(`  ${toolName} ${builtinNames.config} <subcommand> [flags]               Config key-value store`);
   lines.push('');
 
   lines.push('## PREREQUISITES');
@@ -1158,6 +1309,53 @@ export function generateMultiTargetAgentsDocs(
   lines.push('  set-token: { context, status: "authenticated" }');
   lines.push('  status:    [{ context, authenticated: boolean }]');
   lines.push('  logout:    { context, status: "logged out" }');
+  lines.push('```');
+  lines.push('');
+
+  lines.push(`### TOOL: ${builtinNames.config}`);
+  lines.push('');
+  lines.push('Manage per-context key-value configuration variables.');
+  lines.push('');
+  lines.push('```');
+  lines.push('SUBCOMMANDS:');
+  lines.push(`  ${toolName} ${builtinNames.config} get <key>             Get a config value`);
+  lines.push(`  ${toolName} ${builtinNames.config} set <key> <value>     Set a config value`);
+  lines.push(`  ${toolName} ${builtinNames.config} list                  List all config values`);
+  lines.push(`  ${toolName} ${builtinNames.config} delete <key>          Delete a config value`);
+  lines.push('');
+  lines.push('INPUT:');
+  lines.push('  key:   string (required for get/set/delete) - Variable name');
+  lines.push('  value: string (required for set) - Variable value');
+  lines.push('');
+  lines.push('OUTPUT: JSON');
+  lines.push('  get:    { key, value }');
+  lines.push('  set:    { key, value }');
+  lines.push('  list:   { vars: { key: value, ... } }');
+  lines.push('  delete: { deleted: key }');
+  lines.push('```');
+  lines.push('');
+
+  lines.push('### TOOL: helpers (SDK)');
+  lines.push('');
+  lines.push('Typed client factories for use in scripts and services (generated helpers.ts).');
+  lines.push('Resolves credentials via: appstash store -> env vars -> throw.');
+  lines.push('');
+  lines.push('```');
+  lines.push('FACTORIES:');
+  for (const tgt of targets) {
+    const pascalName = tgt.name.charAt(0).toUpperCase() + tgt.name.slice(1);
+    lines.push(`  create${pascalName}Client(contextName?)   Create a configured ${tgt.name} ORM client`);
+  }
+  lines.push('');
+  lines.push('USAGE:');
+  lines.push(`  import { create${targets[0] ? targets[0].name.charAt(0).toUpperCase() + targets[0].name.slice(1) : 'Target'}Client } from './helpers';`);
+  lines.push(`  const client = create${targets[0] ? targets[0].name.charAt(0).toUpperCase() + targets[0].name.slice(1) : 'Target'}Client();`);
+  lines.push('');
+  lines.push('CREDENTIAL RESOLUTION:');
+  lines.push(`  1. appstash store (~/.${toolName}/config/)`);
+  const envPrefix = toolName.toUpperCase().replace(/-/g, '_');
+  lines.push(`  2. env vars (${envPrefix}_TOKEN, ${envPrefix}_<TARGET>_ENDPOINT)`);
+  lines.push('  3. throws with actionable error message');
   lines.push('```');
   lines.push('');
 
@@ -1407,6 +1605,49 @@ export function getMultiTargetCliMcpTools(
     inputSchema: { type: 'object', properties: {} },
   });
 
+  tools.push({
+    name: `${toolName}_${builtinNames.config}_get`,
+    description: 'Get a config variable value for the current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Variable name' },
+      },
+      required: ['key'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_${builtinNames.config}_set`,
+    description: 'Set a config variable value for the current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Variable name' },
+        value: { type: 'string', description: 'Variable value' },
+      },
+      required: ['key', 'value'],
+    },
+  });
+
+  tools.push({
+    name: `${toolName}_${builtinNames.config}_list`,
+    description: 'List all config variables for the current context',
+    inputSchema: { type: 'object', properties: {} },
+  });
+
+  tools.push({
+    name: `${toolName}_${builtinNames.config}_delete`,
+    description: 'Delete a config variable for the current context',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Variable name to delete' },
+      },
+      required: ['key'],
+    },
+  });
+
   for (const tgt of targets) {
     for (const table of tgt.tables) {
       const { singularName } = getTableNames(table);
@@ -1620,13 +1861,42 @@ export function generateMultiTargetSkills(
     }),
   });
 
+  // Config reference
+  commonReferenceNames.push('config');
+  files.push({
+    fileName: `${commonSkillName}/references/config.md`,
+    content: buildSkillReference({
+      title: 'Config Variables',
+      description: `Manage per-context key-value configuration variables for ${toolName}`,
+      usage: [
+        `${toolName} ${builtinNames.config} get <key>`,
+        `${toolName} ${builtinNames.config} set <key> <value>`,
+        `${toolName} ${builtinNames.config} list`,
+        `${toolName} ${builtinNames.config} delete <key>`,
+      ],
+      examples: [
+        {
+          description: 'Store and retrieve a config variable',
+          code: [
+            `${toolName} ${builtinNames.config} set orgId abc-123`,
+            `${toolName} ${builtinNames.config} get orgId`,
+          ],
+        },
+        {
+          description: 'List all config variables',
+          code: [`${toolName} ${builtinNames.config} list`],
+        },
+      ],
+    }),
+  });
+
   // Common SKILL.md
   files.push({
     fileName: `${commonSkillName}/SKILL.md`,
     content: buildSkillFile(
       {
         name: commonSkillName,
-        description: `Shared CLI utilities for ${toolName} — context management and authentication across targets: ${targets.map((t) => t.name).join(', ')}`,
+        description: `Shared CLI utilities for ${toolName} — context management, authentication, and config across targets: ${targets.map((t) => t.name).join(', ')}`,
         usage: [
           `# Context management`,
           `${toolName} ${builtinNames.context} create <name>`,
@@ -1635,6 +1905,11 @@ export function generateMultiTargetSkills(
           `# Authentication`,
           `${toolName} ${builtinNames.auth} set-token <token>`,
           `${toolName} ${builtinNames.auth} status`,
+          '',
+          `# Config variables`,
+          `${toolName} ${builtinNames.config} set <key> <value>`,
+          `${toolName} ${builtinNames.config} get <key>`,
+          `${toolName} ${builtinNames.config} list`,
         ],
         examples: [
           {
@@ -1643,6 +1918,12 @@ export function generateMultiTargetSkills(
               `${toolName} ${builtinNames.context} create local`,
               `${toolName} ${builtinNames.context} use local`,
               `${toolName} ${builtinNames.auth} set-token <token>`,
+            ],
+          },
+          {
+            description: 'Store a config variable',
+            code: [
+              `${toolName} ${builtinNames.config} set orgId abc-123`,
             ],
           },
         ],
