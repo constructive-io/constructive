@@ -7,8 +7,9 @@
  * - pgvector (vector column, search function, distance ordering)
  * - tsvector search plugin (fullText matches, rank, orderBy)
  * - BM25 search (pg_textsearch body index, score, orderBy)
+ * - pg_trgm fuzzy matching (similarTo, wordSimilarTo, similarity score)
  *
- * Requires postgres-plus:18 image with postgis, vector, pg_textsearch extensions.
+ * Requires postgres-plus:18 image with postgis, vector, pg_textsearch, pg_trgm extensions.
  */
 import { join } from 'path';
 import { getConnectionsObject, seed } from 'graphile-test';
@@ -753,8 +754,8 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     expect(nodes[0].name).toBe('Brooklyn Bridge Park');
   });
 
-  it('mega query: BM25 + tsvector + pgvector + PostGIS + relation filter + scalar in ONE query', async () => {
-    // This is the ultimate integration test: all SIX plugin types combined in a single filter
+  it('mega query: BM25 + tsvector + pgvector + PostGIS + pg_trgm + relation filter + scalar in ONE query', async () => {
+    // This is the ultimate integration test: all SEVEN plugin types combined in a single filter
     // A bounding box covering NYC (approx -74.1 to -73.9 longitude, 40.6 to 40.8 latitude)
     const nycBbox = {
       type: 'Polygon',
@@ -768,6 +769,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
           name: string;
           bm25BodyScore: number;
           tsvRank: number;
+          nameSimilarity: number | null;
           embedding: number[];
           geom: { geojson: { type: string; coordinates: number[] } };
           category: { name: string };
@@ -780,6 +782,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
           locations(filter: {
             fullTextTsv: "park"
             bm25Body: { query: "park green" }
+            trgmName: { value: "park", threshold: 0.1 }
             category: { name: { equalTo: "Parks" } }
             isActive: { equalTo: true }
             vectorEmbedding: { nearby: { embedding: [0, 1, 0], distance: 2.0 } }
@@ -789,6 +792,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
               name
               bm25BodyScore
               tsvRank
+              nameSimilarity
               embedding
               geom { geojson }
               category { name }
@@ -802,7 +806,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
 
     expect(result.errors).toBeUndefined();
     const nodes = result.data?.locations.nodes ?? [];
-    // Should return parks that match all six criteria simultaneously
+    // Should return parks that match all seven criteria simultaneously
     expect(nodes.length).toBeGreaterThanOrEqual(2);
 
     for (const node of nodes) {
@@ -810,6 +814,9 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       expect(typeof node.bm25BodyScore).toBe('number');
       // tsvRank populated (tsvector search active)
       expect(typeof node.tsvRank).toBe('number');
+      // pg_trgm similarity score populated (trgm filter active)
+      expect(typeof node.nameSimilarity).toBe('number');
+      expect(node.nameSimilarity).toBeGreaterThan(0);
       // pgvector embedding present
       expect(Array.isArray(node.embedding)).toBe(true);
       expect(node.embedding).toHaveLength(3);

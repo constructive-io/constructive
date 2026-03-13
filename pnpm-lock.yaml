@@ -174,7 +174,7 @@ importers:
         version: 5.2.1
       grafserv:
         specifier: 1.0.0-rc.6
-        version: 1.0.0-rc.6(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
+        version: 1.0.0-rc.6(@types/node@25.3.3)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
       lru-cache:
         specifier: ^11.2.6
         version: 11.2.6
@@ -183,7 +183,7 @@ importers:
         version: link:../../postgres/pg-cache/dist
       postgraphile:
         specifier: 5.0.0-rc.7
-        version: 5.0.0-rc.7(853bfb5f6928535d2602be94c7020fe8)
+        version: 5.0.0-rc.7(56415cfaef0e792e7fc3250b8cf6023f)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -196,7 +196,7 @@ importers:
         version: 3.1.14
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-connection-filter:
@@ -292,6 +292,53 @@ importers:
       '@pgsql/quotes':
         specifier: ^17.1.0
         version: 17.1.0
+      graphile-build:
+        specifier: 5.0.0-rc.4
+        version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)
+      graphile-build-pg:
+        specifier: 5.0.0-rc.5
+        version: 5.0.0-rc.5(@dataplan/pg@1.0.0-rc.5(@dataplan/json@1.0.0-rc.5(grafast@1.0.0-rc.7(graphql@16.13.0)))(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(pg-sql2@5.0.0-rc.4)(pg@8.19.0))(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-build@5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(pg-sql2@5.0.0-rc.4)(pg@8.19.0)(tamedevil@0.1.0-rc.4)
+      graphile-config:
+        specifier: 1.0.0-rc.5
+        version: 1.0.0-rc.5
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
+      pg-sql2:
+        specifier: 5.0.0-rc.4
+        version: 5.0.0-rc.4
+      postgraphile:
+        specifier: 5.0.0-rc.7
+        version: 5.0.0-rc.7(853bfb5f6928535d2602be94c7020fe8)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.11
+      '@types/pg':
+        specifier: ^8.18.0
+        version: 8.18.0
+      graphile-connection-filter:
+        specifier: workspace:^
+        version: link:../graphile-connection-filter/dist
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
+      makage:
+        specifier: ^0.1.10
+        version: 0.1.12
+      pg:
+        specifier: ^8.19.0
+        version: 8.19.0
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+    publishDirectory: dist
+
+  graphile/graphile-pg-trgm-plugin:
+    dependencies:
+      '@dataplan/pg':
+        specifier: 1.0.0-rc.5
+        version: 1.0.0-rc.5(@dataplan/json@1.0.0-rc.5(grafast@1.0.0-rc.7(graphql@16.13.0)))(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(pg-sql2@5.0.0-rc.4)(pg@8.19.0)
       graphile-build:
         specifier: 5.0.0-rc.4
         version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)
@@ -527,7 +574,7 @@ importers:
         version: 0.1.12
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-search-plugin:
@@ -611,7 +658,7 @@ importers:
         version: 1.0.0-rc.7(graphql@16.13.0)
       grafserv:
         specifier: 1.0.0-rc.6
-        version: 1.0.0-rc.6(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
+        version: 1.0.0-rc.6(@types/node@25.3.3)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
       graphile-build:
         specifier: 5.0.0-rc.4
         version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)
@@ -630,6 +677,9 @@ importers:
       graphile-pg-textsearch-plugin:
         specifier: workspace:^
         version: link:../graphile-pg-textsearch-plugin/dist
+      graphile-pg-trgm-plugin:
+        specifier: workspace:^
+        version: link:../graphile-pg-trgm-plugin/dist
       graphile-pgvector-plugin:
         specifier: workspace:^
         version: link:../graphile-pgvector-plugin/dist
@@ -665,7 +715,7 @@ importers:
         version: 5.0.0-rc.4
       postgraphile:
         specifier: 5.0.0-rc.7
-        version: 5.0.0-rc.7(853bfb5f6928535d2602be94c7020fe8)
+        version: 5.0.0-rc.7(56415cfaef0e792e7fc3250b8cf6023f)
       request-ip:
         specifier: ^3.3.0
         version: 3.3.0
@@ -699,7 +749,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   graphile/graphile-sql-expression-validator:
@@ -950,7 +1000,7 @@ importers:
         version: 5.2.1
       grafserv:
         specifier: 1.0.0-rc.6
-        version: 1.0.0-rc.6(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
+        version: 1.0.0-rc.6(@types/node@25.3.3)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
       graphile-cache:
         specifier: workspace:^
         version: link:../../graphile/graphile-cache/dist
@@ -971,7 +1021,7 @@ importers:
         version: link:../../postgres/pg-env/dist
       postgraphile:
         specifier: 5.0.0-rc.7
-        version: 5.0.0-rc.7(853bfb5f6928535d2602be94c7020fe8)
+        version: 5.0.0-rc.7(56415cfaef0e792e7fc3250b8cf6023f)
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -984,7 +1034,7 @@ importers:
         version: 3.1.14
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   graphql/gql-ast:
@@ -1176,7 +1226,7 @@ importers:
         version: 1.0.0-rc.7(graphql@16.13.0)
       grafserv:
         specifier: 1.0.0-rc.6
-        version: 1.0.0-rc.6(@types/node@22.19.11)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
+        version: 1.0.0-rc.6(@types/node@25.3.3)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(ws@8.19.0)
       graphile-build:
         specifier: 5.0.0-rc.4
         version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)
@@ -1224,7 +1274,7 @@ importers:
         version: 5.0.0-rc.4
       postgraphile:
         specifier: 5.0.0-rc.7
-        version: 5.0.0-rc.7(853bfb5f6928535d2602be94c7020fe8)
+        version: 5.0.0-rc.7(56415cfaef0e792e7fc3250b8cf6023f)
       postgraphile-plugin-connection-filter:
         specifier: 3.0.0-rc.1
         version: 3.0.0-rc.1
@@ -1264,7 +1314,7 @@ importers:
         version: 3.1.14
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   graphql/server-test:
@@ -1656,7 +1706,7 @@ importers:
         version: 7.2.2
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   jobs/knative-job-worker:
@@ -1947,7 +1997,7 @@ importers:
         version: 0.1.12
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/smtppostmaster:
@@ -1976,7 +2026,7 @@ importers:
         version: 3.18.1
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
+        version: 10.9.2(@types/node@25.3.3)(typescript@5.9.3)
     publishDirectory: dist
 
   packages/url-domains:
@@ -11446,7 +11496,7 @@ snapshots:
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.7.3
+      semver: 7.7.4
 
   '@npmcli/git@5.0.8':
     dependencies:
@@ -11457,7 +11507,7 @@ snapshots:
       proc-log: 4.2.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.7.3
+      semver: 7.7.4
       which: 4.0.0
     transitivePeerDependencies:
       - bluebird
@@ -11480,7 +11530,7 @@ snapshots:
       json-parse-even-better-errors: 3.0.2
       pacote: 18.0.6
       proc-log: 4.2.0
-      semver: 7.7.3
+      semver: 7.7.4
     transitivePeerDependencies:
       - bluebird
       - supports-color
@@ -12855,7 +12905,6 @@ snapshots:
   '@types/node@25.3.3':
     dependencies:
       undici-types: 7.18.2
-    optional: true
 
   '@types/nodemailer@7.0.11':
     dependencies:
@@ -13677,7 +13726,7 @@ snapshots:
       handlebars: 4.7.8
       json-stringify-safe: 5.0.1
       meow: 8.1.2
-      semver: 7.7.3
+      semver: 7.7.4
       split: 1.0.1
 
   conventional-commits-filter@3.0.0:
@@ -14490,7 +14539,7 @@ snapshots:
   git-semver-tags@5.0.1:
     dependencies:
       meow: 8.1.2
-      semver: 7.7.3
+      semver: 7.7.4
 
   git-up@7.0.0:
     dependencies:
@@ -16376,7 +16425,7 @@ snapshots:
       make-fetch-happen: 13.0.1
       nopt: 7.2.1
       proc-log: 4.2.0
-      semver: 7.7.3
+      semver: 7.7.4
       tar: 6.2.1
       which: 4.0.0
     transitivePeerDependencies:
@@ -16431,13 +16480,13 @@ snapshots:
     dependencies:
       hosted-git-info: 4.1.0
       is-core-module: 2.16.1
-      semver: 7.7.3
+      semver: 7.7.4
       validate-npm-package-license: 3.0.4
 
   normalize-package-data@6.0.2:
     dependencies:
       hosted-git-info: 7.0.2
-      semver: 7.7.3
+      semver: 7.7.4
       validate-npm-package-license: 3.0.4
 
   normalize-path@3.0.0: {}
@@ -16448,7 +16497,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.7.3
+      semver: 7.7.4
 
   npm-normalize-package-bin@3.0.1: {}
 
@@ -16468,7 +16517,7 @@ snapshots:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 11.0.2
-      semver: 7.7.3
+      semver: 7.7.4
 
   npm-registry-fetch@17.1.0:
     dependencies:
@@ -17835,6 +17884,24 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
+  ts-node@10.9.2(@types/node@25.3.3)(typescript@5.9.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 25.3.3
+      acorn: 8.15.0
+      acorn-walk: 8.3.4
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.9.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+
   tsconfig-paths@4.2.0:
     dependencies:
       json5: 2.2.3
@@ -17905,8 +17972,7 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici-types@7.18.2:
-    optional: true
+  undici-types@7.18.2: {}
 
   undici@7.22.0: {}
 

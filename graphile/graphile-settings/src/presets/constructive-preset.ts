@@ -15,6 +15,7 @@ import { PgSearchPreset } from 'graphile-search-plugin';
 import { GraphilePostgisPreset } from 'graphile-postgis';
 import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
 import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
+import { TrgmSearchPreset } from 'graphile-pg-trgm-plugin';
 import { PostgisConnectionFilterPreset } from 'graphile-plugin-connection-filter-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
@@ -44,6 +45,8 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  *   orderBy distance — zero config)
  * - pg_textsearch BM25 search (auto-discovers BM25 indexes: filter fields, score computed fields,
  *   orderBy score — zero config)
+ * - pg_trgm fuzzy matching (similarTo/wordSimilarTo on text columns, similarity score fields,
+ *   orderBy similarity — zero config, typo-tolerant)
  *
  * DEPRECATED:
  * - The `condition` argument has been removed. All filtering lives under `filter`.
@@ -88,6 +91,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
       plugins: [createVectorSearchPlugin()],
     },
     Bm25SearchPreset(),
+    TrgmSearchPreset(),
     PostgisConnectionFilterPreset,
     UploadPreset({
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,

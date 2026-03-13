@@ -8,6 +8,7 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS pg_textsearch;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- Create test schema
 CREATE SCHEMA IF NOT EXISTS integration_test;
@@ -47,6 +48,9 @@ CREATE INDEX idx_locations_tsv ON integration_test.locations USING gin(tsv);
 
 -- BM25 index on body column (requires pg_textsearch)
 CREATE INDEX idx_locations_body_bm25 ON integration_test.locations USING bm25(body) WITH (text_config='english');
+
+-- Trigram index on name column (requires pg_trgm) — enables fast fuzzy matching
+CREATE INDEX idx_locations_name_trgm ON integration_test.locations USING gin(name gin_trgm_ops);
 
 -- ============================================================================
 -- TAGS (child table for backward relation filter tests)
