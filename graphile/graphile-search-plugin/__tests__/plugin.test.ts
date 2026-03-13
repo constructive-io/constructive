@@ -2,6 +2,7 @@ import { join } from 'path';
 import { getConnections, seed, snapshot } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
+import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { PgSearchPreset } from '../src';
 
 const SCHEMA = 'app_public';
@@ -30,6 +31,7 @@ describe('PgSearchPlugin', () => {
   beforeAll(async () => {
     const testPreset = {
       extends: [
+        ConnectionFilterPreset(),
         PgSearchPreset({ pgSearchPrefix: 'fullText' }),
       ],
     };
@@ -73,12 +75,12 @@ describe('PgSearchPlugin', () => {
     await db.afterEach();
   });
 
-  describe('condition-based search on tsv column', () => {
+  describe('filter-based search on tsv column', () => {
     it('returns matching rows with ts_rank as secondary sort', async () => {
       const result = await query<GoalsResult>(
         `
-        query GoalsSearchViaCondition($search: String!) {
-          allGoals(condition: { fullTextTsv: $search }) {
+        query GoalsSearchViaFilter($search: String!) {
+          allGoals(filter: { fullTextTsv: $search }) {
             nodes {
               rowId
               title
@@ -97,8 +99,8 @@ describe('PgSearchPlugin', () => {
     it('returns no rows when search term does not match', async () => {
       const result = await query<GoalsResult>(
         `
-        query GoalsSearchViaCondition($search: String!) {
-          allGoals(condition: { fullTextTsv: $search }) {
+        query GoalsSearchViaFilter($search: String!) {
+          allGoals(filter: { fullTextTsv: $search }) {
             nodes {
               rowId
               title
@@ -114,12 +116,12 @@ describe('PgSearchPlugin', () => {
     });
   });
 
-  describe('condition-based search on stsv column', () => {
-    it('returns only title-matched rows for fullTextStsv condition', async () => {
+  describe('filter-based search on stsv column', () => {
+    it('returns only title-matched rows for fullTextStsv filter', async () => {
       const result = await query<GoalsResult>(
         `
-        query GoalsSearchViaCondition2($search: String!) {
-          allGoals(condition: { fullTextStsv: $search }) {
+        query GoalsSearchViaFilter2($search: String!) {
+          allGoals(filter: { fullTextStsv: $search }) {
             nodes {
               rowId
               title
@@ -140,8 +142,8 @@ describe('PgSearchPlugin', () => {
     it('handles empty search string gracefully', async () => {
       const result = await query<GoalsResult>(
         `
-        query GoalsSearchViaCondition($search: String!) {
-          allGoals(condition: { fullTextTsv: $search }) {
+        query GoalsSearchViaFilter($search: String!) {
+          allGoals(filter: { fullTextTsv: $search }) {
             nodes {
               rowId
               title
@@ -160,8 +162,8 @@ describe('PgSearchPlugin', () => {
     it('works with multi-word search terms', async () => {
       const result = await query<GoalsResult>(
         `
-        query GoalsSearchViaCondition($search: String!) {
-          allGoals(condition: { fullTextTsv: $search }) {
+        query GoalsSearchViaFilter($search: String!) {
+          allGoals(filter: { fullTextTsv: $search }) {
             nodes {
               rowId
               title
