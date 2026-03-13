@@ -18,12 +18,22 @@
  * For satellite plugins that need to register custom operators:
  * ```typescript
  * // In your plugin's init hook:
- * const addConnectionFilterOperator = (build as any).addConnectionFilterOperator;
- * if (typeof addConnectionFilterOperator === 'function') {
- *   addConnectionFilterOperator('MyType', 'myOperator', {
+ * if (typeof build.addConnectionFilterOperator === 'function') {
+ *   build.addConnectionFilterOperator('MyType', 'myOperator', {
  *     description: 'My custom operator',
  *     resolve: (sqlIdentifier, sqlValue) => sql`${sqlIdentifier} OP ${sqlValue}`,
  *   });
+ * }
+ * ```
+ *
+ * For satellite plugins that need to access the query builder from a filter apply:
+ * ```typescript
+ * import { getQueryBuilder } from 'graphile-connection-filter';
+ * // In your filter field's apply callback:
+ * const qb = getQueryBuilder(build, $condition);
+ * if (qb) {
+ *   const idx = qb.selectAndReturnIndex(sql`...`);
+ *   qb.setMeta('key', { selectIndex: idx });
  * }
  * ```
  */
@@ -58,6 +68,7 @@ export { $$filters } from './types';
 export {
   isEmpty,
   makeAssertAllowed,
+  getQueryBuilder,
   isComputedScalarAttributeResource,
   getComputedAttributeResources,
 } from './utils';

@@ -38,6 +38,7 @@ import { TYPES } from '@dataplan/pg';
 import type { PgCodecWithAttributes, PgResource } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { SQL } from 'pg-sql2';
+import { getQueryBuilder } from 'graphile-connection-filter';
 import type { PgSearchPluginOptions } from './types';
 
 // ─── TypeScript Namespace Augmentations ──────────────────────────────────────
@@ -113,44 +114,6 @@ function isTsvectorCodec(codec: any): boolean {
     codec?.extensions?.pg?.schemaName === 'pg_catalog' &&
     codec?.extensions?.pg?.name === 'tsvector'
   );
-}
-
-/**
- * Walks from a PgCondition up to the PgSelectQueryBuilder.
- * Uses the .parent property on PgCondition to traverse up the chain,
- * following Benjie's pattern from postgraphile-plugin-fulltext-filter.
- *
- * Returns the query builder if found, or null if the traversal fails.
- */
-function getQueryBuilder(
-  build: any,
-  $condition: any
-): any | null {
-  const PgCondition = build.dataplanPg?.PgCondition;
-  if (!PgCondition) return null;
-
-  let current = $condition;
-  const { alias } = current;
-
-  // Walk up through nested PgConditions (e.g. and/or/not)
-  while (
-    current &&
-    current instanceof PgCondition &&
-    current.alias === alias
-  ) {
-    current = (current as any).parent;
-  }
-
-  // Verify we found a query builder with matching alias
-  if (
-    current &&
-    typeof current.selectAndReturnIndex === 'function' &&
-    current.alias === alias
-  ) {
-    return current;
-  }
-
-  return null;
 }
 
 /**
@@ -274,7 +237,7 @@ export function createPgSearchPlugin(
           // Register the `matches` filter operator for the FullText scalar.
           // Requires graphile-connection-filter; skip if not loaded.
           if (typeof build.addConnectionFilterOperator === 'function') {
-            const TYPES = (build as any).dataplanPg?.TYPES;
+            const TYPES = build.dataplanPg?.TYPES;
             build.addConnectionFilterOperator(fullTextScalarName, 'matches', {
               description: 'Performs a full text search on the field.',
               resolveType: () => GraphQLString,
@@ -310,8 +273,8 @@ export function createPgSearchPlugin(
           }
 
           const codec = rawPgCodec as PgCodecWithAttributes;
-          const behavior = (build as any).behavior;
-          const pgRegistry = (build as any).input?.pgRegistry;
+          const behavior = build.behavior;
+          const pgRegistry = build.input.pgRegistry;
 
           // Helper to add a rank field for a given base field name
           function addTsvField(
@@ -400,7 +363,7 @@ export function createPgSearchPlugin(
           if (pgRegistry) {
             const tsvProcs = Object.values(pgRegistry.pgResources).filter(
               (r: any): boolean => {
-                if (r.codec !== (build as any).dataplanPg?.TYPES?.tsvector) return false;
+                if (r.codec !== (build.dataplanPg?.TYPES as any)?.tsvector) return false;
                 if (!r.parameters) return false;
                 if (!r.parameters[0]) return false;
                 if (r.parameters[0].codec !== codec) return false;
@@ -447,8 +410,8 @@ export function createPgSearchPlugin(
           }
 
           const codec = rawPgCodec as PgCodecWithAttributes;
-          const behavior = (build as any).behavior;
-          const pgRegistry = (build as any).input?.pgRegistry;
+          const behavior = build.behavior;
+          const pgRegistry = build.input.pgRegistry;
 
           let newValues = values;
 
@@ -510,7 +473,7 @@ export function createPgSearchPlugin(
           if (pgRegistry) {
             const tsvProcs = Object.values(pgRegistry.pgResources).filter(
               (r: any): boolean => {
-                if (r.codec !== (build as any).dataplanPg?.TYPES?.tsvector) return false;
+                if (r.codec !== (build.dataplanPg?.TYPES as any)?.tsvector) return false;
                 if (!r.parameters) return false;
                 if (!r.parameters[0]) return false;
                 if (r.parameters[0].codec !== codec) return false;
@@ -553,7 +516,7 @@ export function createPgSearchPlugin(
             graphql: { GraphQLString },
           } = build;
           const {
-            scope: { isPgConnectionFilter, pgCodec } = {} as any,
+            scope: { isPgConnectionFilter, pgCodec } = {},
             fieldWithHooks,
           } = context;
 
@@ -633,7 +596,7 @@ export function createPgSearchPlugin(
                         const orderRequest = qb.getMetaRaw(orderMetaKey) as FtsOrderByRequest | undefined;
                         if (orderRequest) {
                           qb.orderBy({
-                            codec: (build as any).dataplanPg?.TYPES?.float,
+                            codec: build.dataplanPg?.TYPES?.float,
                             fragment: scoreFragment,
                             direction: orderRequest.direction,
                           });

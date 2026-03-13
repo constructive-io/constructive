@@ -53,6 +53,7 @@ declare global {
     interface ScopeInputObject {
       /** True if this is a table-level connection filter type (e.g. UserFilter) */
       isPgConnectionFilter?: boolean;
+      // pgCodec is already declared by graphile-build-pg on ScopeInputObject
       /** Operator type scope data (present on scalar filter types like StringFilter) */
       pgConnectionFilterOperators?: PgConnectionFilterOperatorsScope;
       /** Foreign table resource (used by many filter types) */

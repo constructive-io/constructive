@@ -39,6 +39,7 @@ import 'graphile-connection-filter';
 import { TYPES } from '@dataplan/pg';
 import type { PgCodecWithAttributes } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
+import { getQueryBuilder } from 'graphile-connection-filter';
 import type { Bm25SearchPluginOptions, Bm25IndexInfo } from './types';
 import { bm25IndexStore, bm25ExtensionDetected } from './bm25-codec';
 import { QuoteUtils } from '@pgsql/quotes';
@@ -103,45 +104,6 @@ function getBm25IndexForAttribute(
 function isTextCodec(codec: any): boolean {
   const name = codec?.name;
   return name === 'text' || name === 'varchar' || name === 'bpchar';
-}
-
-/**
- * Walks from a PgCondition up to the PgSelectQueryBuilder.
- * Uses the .parent property on PgCondition to traverse up the chain,
- * following Benjie's pattern from postgraphile-plugin-fulltext-filter.
- *
- * Returns the query builder if found, or null if the traversal fails.
- */
-function getQueryBuilder(
-  build: any,
-  $condition: any
-): any | null {
-  const PgCondition = build.dataplanPg?.PgCondition;
-  if (!PgCondition) return null;
-
-  let current = $condition;
-  const { alias } = current;
-
-  // Walk up through nested PgConditions (e.g. and/or/not)
-  while (
-    current &&
-    current instanceof PgCondition &&
-    current.alias === alias
-  ) {
-    current = (current as any).parent;
-  }
-
-  // Verify we found a query builder with matching alias
-  // Using duck-typing (isPgSelectQueryBuilder) per Benjie's pattern
-  if (
-    current &&
-    typeof current.selectAndReturnIndex === 'function' &&
-    current.alias === alias
-  ) {
-    return current;
-  }
-
-  return null;
 }
 
 /**
@@ -295,7 +257,7 @@ export function createBm25SearchPlugin(
           }
 
           const codec = rawPgCodec as PgCodecWithAttributes;
-          const behavior = (build as any).behavior;
+          const behavior = build.behavior;
 
           let newFields = fields;
 
@@ -395,7 +357,7 @@ export function createBm25SearchPlugin(
           }
 
           const codec = rawPgCodec as PgCodecWithAttributes;
-          const behavior = (build as any).behavior;
+          const behavior = build.behavior;
 
           let newValues = values;
 
@@ -466,7 +428,7 @@ export function createBm25SearchPlugin(
         GraphQLInputObjectType_fields(fields, build, context) {
           const { inflection, sql } = build;
           const {
-            scope: { isPgConnectionFilter, pgCodec } = {} as any,
+            scope: { isPgConnectionFilter, pgCodec } = {},
             fieldWithHooks,
           } = context;
 
