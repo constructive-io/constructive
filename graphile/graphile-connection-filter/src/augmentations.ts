@@ -89,6 +89,10 @@ declare global {
       connectionFilterSetofFunctions?: boolean;
       connectionFilterComputedColumns?: boolean;
       connectionFilterRelations?: boolean;
+      /** If true (default), relation filter fields are only added for FKs with supporting indexes.
+       * This prevents generating EXISTS subqueries that would cause sequential scans on large tables.
+       * Set to false to allow relation filters on all FKs regardless of index status. */
+      connectionFilterRelationsRequireIndex?: boolean;
     }
   }
 

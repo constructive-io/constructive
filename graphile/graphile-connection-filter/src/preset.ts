@@ -47,6 +47,7 @@ const defaultSchemaOptions: ConnectionFilterOptions = {
   connectionFilterSetofFunctions: true,
   connectionFilterComputedColumns: true,
   connectionFilterRelations: false,
+  connectionFilterRelationsRequireIndex: true,
 };
 
 /**

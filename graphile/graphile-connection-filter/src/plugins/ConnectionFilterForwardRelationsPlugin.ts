@@ -96,6 +96,8 @@ export const ConnectionFilterForwardRelationsPlugin: GraphileConfig.Plugin = {
           ([_relationName, relation]) => !relation.isReferencee
         );
 
+        const requireIndex = build.options.connectionFilterRelationsRequireIndex !== false;
+
         for (const [relationName, relation] of forwardRelations) {
           const foreignTable = relation.remoteResource;
 
@@ -105,6 +107,15 @@ export const ConnectionFilterForwardRelationsPlugin: GraphileConfig.Plugin = {
 
           // Skip function-based sources
           if (typeof foreignTable.from === 'function') {
+            continue;
+          }
+
+          // Skip unindexed relations when requireIndex is enabled.
+          // PgIndexBehaviorsPlugin sets relation.extensions.isIndexed = false
+          // on backward relations without supporting indexes. For forward
+          // relations this is less common (the referenced PK is always indexed)
+          // but we check it for consistency.
+          if (requireIndex && (relation as any).extensions?.isIndexed === false) {
             continue;
           }
 

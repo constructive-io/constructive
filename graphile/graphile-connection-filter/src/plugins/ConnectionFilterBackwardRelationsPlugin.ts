@@ -100,6 +100,8 @@ export const ConnectionFilterBackwardRelationsPlugin: GraphileConfig.Plugin = {
 
         // Register "many" filter types (e.g. ClientToManyOrderFilter)
         // These contain `some`, `every`, `none` fields.
+        const requireIndex = build.options.connectionFilterRelationsRequireIndex !== false;
+
         for (const source of Object.values(
           build.input.pgRegistry.pgResources
         ) as any[]) {
@@ -122,6 +124,13 @@ export const ConnectionFilterBackwardRelationsPlugin: GraphileConfig.Plugin = {
             if (typeof foreignTable.from === 'function') continue;
 
             if (!build.behavior.pgCodecRelationMatches(relation, 'filterBy')) {
+              continue;
+            }
+
+            // Skip unindexed relations when requireIndex is enabled.
+            // PgIndexBehaviorsPlugin sets relation.extensions.isIndexed = false
+            // on relations without supporting indexes on the FK columns.
+            if (requireIndex && (relation as any).extensions?.isIndexed === false) {
               continue;
             }
 
@@ -191,6 +200,8 @@ export const ConnectionFilterBackwardRelationsPlugin: GraphileConfig.Plugin = {
             | undefined);
 
         if (isPgConnectionFilter && pgCodec && pgCodec.attributes && source) {
+          const requireIndex = build.options.connectionFilterRelationsRequireIndex !== false;
+
           const backwardRelations = Object.entries(
             source.getRelations() as {
               [relationName: string]: PgCodecRelation;
@@ -209,6 +220,13 @@ export const ConnectionFilterBackwardRelationsPlugin: GraphileConfig.Plugin = {
             }
 
             if (typeof foreignTable.from === 'function') {
+              continue;
+            }
+
+            // Skip unindexed relations when requireIndex is enabled.
+            // PgIndexBehaviorsPlugin sets relation.extensions.isIndexed = false
+            // on backward relations without supporting indexes on the FK columns.
+            if (requireIndex && (relation as any).extensions?.isIndexed === false) {
               continue;
             }
 

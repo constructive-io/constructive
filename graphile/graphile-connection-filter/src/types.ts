@@ -81,6 +81,10 @@ export interface ConnectionFilterOptions {
   connectionFilterComputedColumns?: boolean;
   /** Allow filtering on related tables via FK relationships. Default: false */
   connectionFilterRelations?: boolean;
+  /** Only create relation filter fields for FKs with supporting indexes.
+   * Prevents EXISTS subqueries that would cause sequential scans on large tables.
+   * Default: true */
+  connectionFilterRelationsRequireIndex?: boolean;
 }
 
 /**
