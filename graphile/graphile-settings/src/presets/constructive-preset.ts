@@ -12,11 +12,10 @@ import {
   PgTypeMappingsPreset,
 } from 'graphile-misc-plugins';
 import { PgSearchPreset, createMatchesOperatorFactory } from 'graphile-search-plugin';
-import { GraphilePostgisPreset } from 'graphile-postgis';
+import { GraphilePostgisPreset, createPostgisOperatorFactory } from 'graphile-postgis';
 import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
 import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
 import { TrgmSearchPreset, createTrgmOperatorFactories } from 'graphile-pg-trgm-plugin';
-import { PostgisConnectionFilterPreset, createPostgisOperatorFactory } from 'graphile-plugin-connection-filter-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
@@ -92,7 +91,6 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     },
     Bm25SearchPreset(),
     TrgmSearchPreset(),
-    PostgisConnectionFilterPreset,
     UploadPreset({
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,
       maxFileSize: 10 * 1024 * 1024, // 10MB

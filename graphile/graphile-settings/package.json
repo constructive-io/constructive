@@ -50,7 +50,6 @@
     "graphile-pg-textsearch-plugin": "workspace:^",
     "graphile-pg-trgm-plugin": "workspace:^",
     "graphile-pgvector-plugin": "workspace:^",
-    "graphile-plugin-connection-filter-postgis": "workspace:^",
     "graphile-postgis": "workspace:^",
     "graphile-search-plugin": "workspace:^",
     "graphile-sql-expression-validator": "workspace:^",

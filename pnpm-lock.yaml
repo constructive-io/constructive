@@ -428,41 +428,6 @@ importers:
         version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
-  graphile/graphile-plugin-connection-filter-postgis:
-    dependencies:
-      graphile-build:
-        specifier: 5.0.0-rc.4
-        version: 5.0.0-rc.4(grafast@1.0.0-rc.7(graphql@16.13.0))(graphile-config@1.0.0-rc.5)(graphql@16.13.0)
-      graphile-config:
-        specifier: 1.0.0-rc.5
-        version: 1.0.0-rc.5
-      graphile-connection-filter:
-        specifier: workspace:^
-        version: link:../graphile-connection-filter/dist
-      graphql:
-        specifier: 16.13.0
-        version: 16.13.0
-      pg-sql2:
-        specifier: 5.0.0-rc.4
-        version: 5.0.0-rc.4
-      postgraphile:
-        specifier: 5.0.0-rc.7
-        version: 5.0.0-rc.7(853bfb5f6928535d2602be94c7020fe8)
-    devDependencies:
-      '@types/node':
-        specifier: ^22.19.11
-        version: 22.19.11
-      graphile-postgis:
-        specifier: workspace:^
-        version: link:../graphile-postgis/dist
-      graphile-test:
-        specifier: workspace:^
-        version: link:../graphile-test/dist
-      makage:
-        specifier: ^0.1.10
-        version: 0.1.12
-    publishDirectory: dist
-
   graphile/graphile-postgis:
     dependencies:
       '@dataplan/pg':
@@ -480,6 +445,9 @@ importers:
       graphile-config:
         specifier: 1.0.0-rc.5
         version: 1.0.0-rc.5
+      graphile-connection-filter:
+        specifier: workspace:^
+        version: link:../graphile-connection-filter/dist
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -683,9 +651,6 @@ importers:
       graphile-pgvector-plugin:
         specifier: workspace:^
         version: link:../graphile-pgvector-plugin/dist
-      graphile-plugin-connection-filter-postgis:
-        specifier: workspace:^
-        version: link:../graphile-plugin-connection-filter-postgis/dist
       graphile-postgis:
         specifier: workspace:^
         version: link:../graphile-postgis/dist

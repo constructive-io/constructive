@@ -1,7 +1,7 @@
 import sql from 'pg-sql2';
-import { CONCRETE_SUBTYPES } from 'graphile-postgis';
-import { createPostgisOperatorFactory } from '../src/plugin';
-import { PostgisConnectionFilterPreset } from '../src/preset';
+import { CONCRETE_SUBTYPES } from '../src/constants';
+import { createPostgisOperatorFactory } from '../src/plugins/connection-filter-operators';
+import { GraphilePostgisPreset } from '../src/preset';
 
 // Build a mock inflection that matches what graphile-postgis produces
 function createMockInflection() {
@@ -86,7 +86,7 @@ function runFactory(options: {
 describe('PostGIS operator factory (createPostgisOperatorFactory)', () => {
   describe('preset', () => {
     it('declares the factory in connectionFilterOperatorFactories', () => {
-      const factories = PostgisConnectionFilterPreset.schema?.connectionFilterOperatorFactories;
+      const factories = GraphilePostgisPreset.schema?.connectionFilterOperatorFactories;
       expect(factories).toBeDefined();
       expect(factories).toHaveLength(1);
       expect(typeof factories![0]).toBe('function');

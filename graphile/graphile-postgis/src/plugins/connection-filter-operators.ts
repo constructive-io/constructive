@@ -7,8 +7,8 @@ import type {
 } from 'graphile-connection-filter';
 import sql from 'pg-sql2';
 import type { SQL } from 'pg-sql2';
-import { CONCRETE_SUBTYPES } from 'graphile-postgis';
-import type { PostgisExtensionInfo } from 'graphile-postgis';
+import { CONCRETE_SUBTYPES } from '../constants';
+import type { PostgisExtensionInfo } from './detect-extension';
 
 const ALLOWED_SQL_OPERATORS = new Set([
   '=',
@@ -198,8 +198,8 @@ const OPERATOR_SPECS: [string, string[], string, string][] = [
  * all geometry/geography GQL type names and creates ST_ function-based
  * and SQL operator-based filter operators for each.
  *
- * Declared in the preset so it's registered via the declarative
- * `connectionFilterOperatorFactories` API.
+ * Registered via the declarative `connectionFilterOperatorFactories` API
+ * in the GraphilePostgisPreset.
  */
 export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory {
   return (build) => {
