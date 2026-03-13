@@ -754,9 +754,94 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     expect(nodes[0].name).toBe('Brooklyn Bridge Park');
   });
 
-  it('mega query: BM25 + tsvector + pgvector + PostGIS + pg_trgm + relation filter + scalar in ONE query', async () => {
-    // This is the ultimate integration test: all SEVEN plugin types combined in a single filter
-    // A bounding box covering NYC (approx -74.1 to -73.9 longitude, 40.6 to 40.8 latitude)
+  /**
+   * ═══════════════════════════════════════════════════════════════════════════
+   * MEGA QUERY: All 7 plugin types + multi-signal ORDER BY in ONE query
+   * ═══════════════════════════════════════════════════════════════════════════
+   *
+   * This is the ultimate integration test. It proves that every plugin in the
+   * ConstructivePreset composes correctly — filters AND ordering — within a
+   * single GraphQL request against a real PostgreSQL database.
+   *
+   * ── The 7 filter plugins exercised ──────────────────────────────────────
+   *
+   *  #  Plugin           Filter field              What it does
+   *  ─  ───────────────  ────────────────────────── ──────────────────────────
+   *  1  tsvector         fullTextTsv: "park"        Full-text search via
+   *     (SearchPlugin)                              websearch_to_tsquery on
+   *                                                 the `tsv` tsvector column.
+   *
+   *  2  BM25             bm25Body: {query: "..."}   BM25 relevance search via
+   *     (Bm25Plugin)                                pg_textsearch on the
+   *                                                 `body` text column.
+   *
+   *  3  pg_trgm          trgmName: {value, thresh}  Trigram fuzzy matching on
+   *     (TrgmPlugin)                                `name`. Tolerates typos.
+   *                                                 similarity(name, val) > th
+   *
+   *  4  Relation filter  category: {name: {eq: …}}  JOIN filter — only rows
+   *     (ConnFilter)                                whose FK-linked category
+   *                                                 row has name = "Parks".
+   *
+   *  5  Scalar filter    isActive: {equalTo: true}  Simple equality on the
+   *     (ConnFilter)                                boolean `is_active` col.
+   *
+   *  6  pgvector         vectorEmbedding: {nearby…}  Cosine distance filter —
+   *     (PgVectorPlugin)                            only rows within distance
+   *                                                 2.0 of embedding [0,1,0].
+   *
+   *  7  PostGIS          geom: {intersects: $bbox}  Spatial filter — geometry
+   *     (PostGISPlugin)                             must intersect a bounding
+   *                                                 box polygon over NYC.
+   *
+   * ── Multi-signal ORDER BY ───────────────────────────────────────────────
+   *
+   * PostGraphile's `orderBy` accepts an ARRAY of enum values, just like SQL
+   * supports comma-separated ORDER BY clauses:
+   *
+   *   orderBy: [BM25_BODY_SCORE_ASC, SIMILARITY_NAME_DESC]
+   *
+   * generates:
+   *
+   *   ORDER BY paradedb.score(id) ASC,
+   *            similarity(name, 'park') DESC
+   *
+   * Each scoring plugin (tsvector, BM25, pg_trgm) registers its own enum
+   * values on the LocationOrderBy enum so they can be freely combined with
+   * each other and with standard column sorts like NAME_ASC.
+   *
+   * How it works internally (2-phase meta system):
+   *   Phase 1 — orderBy enum apply (planning time):
+   *     Each enum's `apply` stores a direction flag in PgSelectStep._meta.
+   *     e.g. step.setMeta("trgm_order_name", "DESC")
+   *
+   *   Phase 2 — filter apply (execution time):
+   *     Each filter's `apply` reads back its direction flag and adds the
+   *     actual ORDER BY clause using the SQL expression it computed.
+   *     e.g. qb.orderBy({ fragment: similarity(...), direction: "DESC" })
+   *
+   * IMPORTANT — ORDER BY priority follows the SCHEMA FIELD processing order,
+   * not the orderBy array order. The orderBy array determines WHICH
+   * scoring signals are active and their directions (ASC/DESC), but the
+   * ORDER BY clause sequence in SQL is determined by the order each filter's
+   * `apply` function runs — which depends on the schema's internal field
+   * iteration order. In this test, BM25 is processed before pg_trgm in
+   * the schema, so BM25 score is always the primary sort and pg_trgm
+   * similarity is the tiebreaker.
+   *
+   * ── Score fields returned ───────────────────────────────────────────────
+   *
+   *   nameSimilarity  pg_trgm similarity(name, 'park')  → 0..1 (1 = exact)
+   *   bm25BodyScore   BM25 relevance via pg_textsearch   → negative (→0 = best)
+   *   tsvRank         ts_rank(tsv, tsquery)              → 0..~1 (higher = better)
+   *
+   * These computed fields are populated when their corresponding filter is
+   * active. They return null when the filter is not present in the query.
+   * ═══════════════════════════════════════════════════════════════════════════
+   */
+  it('mega query: BM25 + tsvector + pgvector + PostGIS + pg_trgm + relation filter + scalar in ONE query, with multi-signal orderBy', async () => {
+    // NYC bounding box polygon (approx -74.1 to -73.9 lon, 40.6 to 40.8 lat)
+    // Used for the PostGIS spatial filter (geom intersects bbox).
     const nycBbox = {
       type: 'Polygon',
       coordinates: [[[-74.1, 40.6], [-73.9, 40.6], [-73.9, 40.8], [-74.1, 40.8], [-74.1, 40.6]]],
@@ -779,24 +864,71 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     }>({
       query: `
         query MegaQuery($bbox: GeoJSON!) {
-          locations(filter: {
-            fullTextTsv: "park"
-            bm25Body: { query: "park green" }
-            trgmName: { value: "park", threshold: 0.1 }
-            category: { name: { equalTo: "Parks" } }
-            isActive: { equalTo: true }
-            vectorEmbedding: { nearby: { embedding: [0, 1, 0], distance: 2.0 } }
-            geom: { intersects: $bbox }
-          }) {
+          locations(
+            # ── FILTERS: all 7 plugin types applied simultaneously ──
+            filter: {
+              # 1. tsvector full-text search (PgSearchPlugin)
+              #    WHERE tsv @@ websearch_to_tsquery('park')
+              fullTextTsv: "park"
+
+              # 2. BM25 relevance search (Bm25SearchPlugin via pg_textsearch)
+              #    WHERE body @@@ paradedb.parse('park green')
+              #    (BM25 filter apply runs first in the schema → primary ORDER BY)
+              bm25Body: { query: "park green" }
+
+              # 3. pg_trgm fuzzy matching (TrgmSearchPlugin)
+              #    WHERE similarity(name, 'park') > 0.1
+              #    (trgm filter apply runs second → tiebreaker ORDER BY)
+              trgmName: { value: "park", threshold: 0.1 }
+
+              # 4. Relation filter (ConnectionFilterForwardRelationsPlugin)
+              #    WHERE EXISTS (SELECT 1 FROM categories WHERE id = category_id AND name = 'Parks')
+              category: { name: { equalTo: "Parks" } }
+
+              # 5. Scalar filter (ConnectionFilterOperatorsPlugin)
+              #    WHERE is_active = true
+              isActive: { equalTo: true }
+
+              # 6. pgvector similarity (PgVectorPlugin)
+              #    WHERE vector_embedding <=> '[0,1,0]' < 2.0
+              vectorEmbedding: { nearby: { embedding: [0, 1, 0], distance: 2.0 } }
+
+              # 7. PostGIS spatial (PostGISFilterPlugin)
+              #    WHERE ST_Intersects(geom, $bbox::geometry)
+              geom: { intersects: $bbox }
+            }
+
+            # ── ORDER BY: multi-signal relevance ranking ──
+            # Primary sort:   BM25 relevance score (most relevant text first)
+            # Tiebreaker:     pg_trgm similarity score (best fuzzy match first)
+            #
+            # Generates SQL:
+            #   ORDER BY paradedb.score(id) ASC,
+            #            similarity(name, 'park') DESC
+            #
+            # Each plugin registers its own enum values on LocationOrderBy:
+            #   - BM25:      BM25_BODY_SCORE_ASC / BM25_BODY_SCORE_DESC
+            #   - pg_trgm:   SIMILARITY_NAME_ASC / SIMILARITY_NAME_DESC
+            #   - tsvector:  FULL_TEXT_RANK_ASC / FULL_TEXT_RANK_DESC
+            # These compose freely — just like comma-separated ORDER BY in SQL.
+            # NOTE: the array order sets which signals are active + direction,
+            # but ORDER BY priority follows schema field processing order
+            # (see doc comment above for details).
+            orderBy: [BM25_BODY_SCORE_ASC, SIMILARITY_NAME_DESC]
+          ) {
             nodes {
               name
-              bm25BodyScore
-              tsvRank
-              nameSimilarity
-              embedding
-              geom { geojson }
-              category { name }
-              tags { nodes { label } }
+
+              # ── Computed score fields (populated when filter is active) ──
+              bm25BodyScore    # BM25 relevance (negative; closer to 0 = more relevant)
+              tsvRank          # ts_rank (0..~1; higher = more relevant)
+              nameSimilarity   # pg_trgm similarity (0..1; 1 = exact match)
+
+              # ── Standard fields ──
+              embedding        # pgvector column (float array)
+              geom { geojson } # PostGIS geometry as GeoJSON
+              category { name } # Relation (FK → categories)
+              tags { nodes { label } } # Many-to-many relation
             }
           }
         }
@@ -804,23 +936,49 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       variables: { bbox: nycBbox },
     });
 
+    // ── Assertions ──────────────────────────────────────────────────────
+
     expect(result.errors).toBeUndefined();
     const nodes = result.data?.locations.nodes ?? [];
-    // Should return parks that match all seven criteria simultaneously
+
+    // All three NYC parks ("Prospect Park", "High Line Park", "Brooklyn Bridge Park")
+    // should pass every filter simultaneously.
     expect(nodes.length).toBeGreaterThanOrEqual(2);
 
+    // ── Verify ordering: BM25_BODY_SCORE_ASC (primary sort) ──
+    // BM25 filter apply runs first in the schema, so BM25 score is the
+    // primary ORDER BY. ASC means most-negative (most relevant) first.
+    // Expected: Prospect Park (-0.810) < Brooklyn Bridge Park (-0.626) < High Line Park (-0.568)
+    for (let i = 0; i < nodes.length - 1; i++) {
+      const curr = nodes[i].bm25BodyScore;
+      const next = nodes[i + 1].bm25BodyScore;
+      expect(curr).toBeLessThanOrEqual(next);
+    }
+
     for (const node of nodes) {
-      // BM25 score populated (search active)
+      // ── BM25 score (plugin #2) ──
+      // Populated because bm25Body filter is active. Negative float where
+      // closer to 0 = more relevant.
       expect(typeof node.bm25BodyScore).toBe('number');
-      // tsvRank populated (tsvector search active)
+
+      // ── tsvector rank (plugin #1) ──
+      // Populated because fullTextTsv filter is active. Float 0..~1 where
+      // higher = better match.
       expect(typeof node.tsvRank).toBe('number');
-      // pg_trgm similarity score populated (trgm filter active)
+
+      // ── pg_trgm similarity (plugin #3) ──
+      // Populated because trgmName filter is active. Float 0..1 where
+      // 1 = exact match. Must be > 0 since we passed the threshold filter.
       expect(typeof node.nameSimilarity).toBe('number');
       expect(node.nameSimilarity).toBeGreaterThan(0);
-      // pgvector embedding present
+
+      // ── pgvector embedding (plugin #6) ──
+      // The raw embedding vector is returned as a float array.
       expect(Array.isArray(node.embedding)).toBe(true);
       expect(node.embedding).toHaveLength(3);
-      // PostGIS geom present as GeoJSON and within our bounding box
+
+      // ── PostGIS geometry (plugin #7) ──
+      // Returned as GeoJSON Point. Coordinates must fall within the NYC bbox.
       expect(node.geom.geojson).toBeDefined();
       expect(node.geom.geojson.type).toBe('Point');
       expect(node.geom.geojson.coordinates).toHaveLength(2);
@@ -829,9 +987,13 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       expect(lon).toBeLessThanOrEqual(-73.9);
       expect(lat).toBeGreaterThanOrEqual(40.6);
       expect(lat).toBeLessThanOrEqual(40.8);
-      // Relation filter: all should be Parks
+
+      // ── Relation filter (plugin #4) ──
+      // Every result's category must be "Parks" (FK join filter).
       expect(node.category.name).toBe('Parks');
-      // Tags exist on each result
+
+      // ── Tags (many-to-many) ──
+      // Each park has at least one tag in the seed data.
       expect(node.tags.nodes.length).toBeGreaterThan(0);
     }
   });
