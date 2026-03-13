@@ -680,7 +680,8 @@ describe('graphile-search (unified search plugin)', () => {
   // ─── fullTextSearch disabled ──────────────────────────────────────────────
 
   describe('fullTextSearch can be disabled', () => {
-    let disabledQuery: typeof query;
+    let disabledQuery: QueryFn;
+    let disabledTeardown: (() => Promise<void>) | undefined;
 
     beforeAll(async () => {
       // Build a plugin with fullTextSearch DISABLED
@@ -696,18 +697,36 @@ describe('graphile-search (unified search plugin)', () => {
 
       const disabledPreset = {
         extends: [
-          PostGraphileAmberPreset,
-          makePgService({ connectionString: process.env.TEST_DATABASE_URL || 'postgres:///graphile_search_test' }),
+          ConnectionFilterPreset(),
         ],
-        plugins: [TsvectorCodecPlugin, disabledPlugin],
+        plugins: [
+          TsvectorCodecPlugin,
+          Bm25CodecPlugin,
+          disabledPlugin,
+        ],
       };
 
-      const disabledConnections = await createTestConnections(disabledPreset);
-      disabledQuery = disabledConnections.query;
+      const connections = await getConnections({
+        schemas: ['unified_search_test'],
+        preset: disabledPreset,
+        useRoot: true,
+        authRole: 'postgres',
+      }, [
+        seed.sqlfile([join(__dirname, './setup.sql')])
+      ]);
+
+      disabledQuery = connections.query;
+      disabledTeardown = connections.teardown;
+    });
+
+    afterAll(async () => {
+      if (disabledTeardown) {
+        await disabledTeardown();
+      }
     });
 
     it('fullTextSearch field does NOT exist when disabled', async () => {
-      const result = await query<AllDocumentsResult>(`
+      const result = await disabledQuery<AllDocumentsResult>(`
         query {
           allDocuments(filter: {
             fullTextSearch: "learning"
