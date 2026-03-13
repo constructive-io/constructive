@@ -181,6 +181,7 @@ export interface DocsConfig {
 export interface BuiltinNames {
   auth?: string;
   context?: string;
+  config?: string;
 }
 
 /**
