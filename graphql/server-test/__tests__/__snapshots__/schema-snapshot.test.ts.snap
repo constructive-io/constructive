@@ -408,7 +408,7 @@ type Tag {
   """
   Trigram similarity score when filtering \`name\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  nameSimilarity: Float
+  nameTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`slug\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
@@ -1261,8 +1261,8 @@ enum TagOrderBy {
   NAME_DESC
   SLUG_ASC
   SLUG_DESC
-  SIMILARITY_NAME_ASC
-  SIMILARITY_NAME_DESC
+  NAME_TRGM_SIMILARITY_ASC
+  NAME_TRGM_SIMILARITY_DESC
   SIMILARITY_SLUG_ASC
   SIMILARITY_SLUG_DESC
 }
@@ -1344,7 +1344,7 @@ type User {
   """
   Trigram similarity score when filtering \`username\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  usernameSimilarity: Float
+  usernameTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`displayName\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
@@ -1562,8 +1562,8 @@ enum UserOrderBy {
   CREATED_AT_DESC
   SIMILARITY_EMAIL_ASC
   SIMILARITY_EMAIL_DESC
-  SIMILARITY_USERNAME_ASC
-  SIMILARITY_USERNAME_DESC
+  USERNAME_TRGM_SIMILARITY_ASC
+  USERNAME_TRGM_SIMILARITY_DESC
 }
 
 """Root meta schema type"""

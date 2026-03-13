@@ -136,7 +136,7 @@ describe('PgSearchPlugin filter (matches operator)', () => {
             nodes {
               id
               name
-              fullTextRank
+              fullTextTsvRank
             }
           }
         }
@@ -146,11 +146,11 @@ describe('PgSearchPlugin filter (matches operator)', () => {
     expect(result.errors).toBeUndefined();
     expect(result.data?.allJobs.nodes).toHaveLength(2);
     for (const node of result.data?.allJobs.nodes ?? []) {
-      expect(node.fullTextRank).toBeNull();
+      expect(node.fullTextTsvRank).toBeNull();
     }
   });
 
-  it('filter-based search populates fullTextRank', async () => {
+  it('filter-based search populates fullTextTsvRank', async () => {
     // Rank features work with filter-based search.
     // "fruit OR banana" — both rows match "fruit", one also matches "banana"
     // (websearch_to_tsquery uses the word "or" for OR, not "|")
@@ -163,7 +163,7 @@ describe('PgSearchPlugin filter (matches operator)', () => {
             nodes {
               id
               name
-              fullTextRank
+              fullTextTsvRank
             }
           }
         }
@@ -173,8 +173,8 @@ describe('PgSearchPlugin filter (matches operator)', () => {
     expect(result.errors).toBeUndefined();
     expect(result.data?.allJobs.nodes).toHaveLength(2);
     for (const node of result.data?.allJobs.nodes ?? []) {
-      expect(node.fullTextRank).not.toBeNull();
-      expect(typeof node.fullTextRank).toBe('number');
+      expect(node.fullTextTsvRank).not.toBeNull();
+      expect(typeof node.fullTextTsvRank).toBe('number');
     }
   });
 
@@ -186,12 +186,12 @@ describe('PgSearchPlugin filter (matches operator)', () => {
         query {
           allJobs(
             filter: { fullTextFullText: "fruit or banana" }
-            orderBy: [FULL_TEXT_RANK_ASC]
+            orderBy: [FULL_TEXT_TSV_RANK_ASC]
           ) {
             nodes {
               id
               name
-              fullTextRank
+              fullTextTsvRank
             }
           }
         }
@@ -201,8 +201,8 @@ describe('PgSearchPlugin filter (matches operator)', () => {
     expect(ascResult.errors).toBeUndefined();
     expect(ascResult.data?.allJobs.nodes).toHaveLength(2);
     for (const node of ascResult.data?.allJobs.nodes ?? []) {
-      expect(node.fullTextRank).not.toBeNull();
-      expect(typeof node.fullTextRank).toBe('number');
+      expect(node.fullTextTsvRank).not.toBeNull();
+      expect(typeof node.fullTextTsvRank).toBe('number');
     }
 
     const descResult = await query<{ allJobs: { nodes: any[] } }>({
@@ -210,12 +210,12 @@ describe('PgSearchPlugin filter (matches operator)', () => {
         query {
           allJobs(
             filter: { fullTextFullText: "fruit or banana" }
-            orderBy: [FULL_TEXT_RANK_DESC]
+            orderBy: [FULL_TEXT_TSV_RANK_DESC]
           ) {
             nodes {
               id
               name
-              fullTextRank
+              fullTextTsvRank
             }
           }
         }
@@ -225,7 +225,7 @@ describe('PgSearchPlugin filter (matches operator)', () => {
     expect(descResult.errors).toBeUndefined();
     expect(descResult.data?.allJobs.nodes).toHaveLength(2);
     for (const node of descResult.data?.allJobs.nodes ?? []) {
-      expect(node.fullTextRank).not.toBeNull();
+      expect(node.fullTextTsvRank).not.toBeNull();
     }
 
     // ASC and DESC should produce different ordering

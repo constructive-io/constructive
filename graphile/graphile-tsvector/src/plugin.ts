@@ -10,7 +10,7 @@
  *
  * Additionally provides:
  * - `matches` filter operator for postgraphile-plugin-connection-filter
- * - `fullTextRank` computed fields on output types (null when no search active)
+ * - `fullTextTsvRank` computed fields on output types (null when no search active)
  * - `FULL_TEXT_RANK_ASC/DESC` orderBy enum values
  *
  * Uses the graphile-build hooks API to extend condition input types with
