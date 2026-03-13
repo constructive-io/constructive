@@ -300,6 +300,26 @@ type Post {
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
+
+  """
+  Trigram similarity score when filtering \`title\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  titleSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`slug\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  slugSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`content\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  contentSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`excerpt\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  excerptSimilarity: Float
 }
 
 """A connection to a list of \`Tag\` values, with data from \`PostTag\`."""
@@ -384,6 +404,26 @@ type Tag {
     """The method to use when ordering \`PostTag\`."""
     orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostTagConnection!
+
+  """
+  Trigram similarity score when filtering \`name\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  nameSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`slug\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  slugSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`description\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  descriptionSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`color\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  colorSimilarity: Float
 }
 
 """A connection to a list of \`Post\` values, with data from \`PostTag\`."""
@@ -492,6 +532,30 @@ input PostFilter {
 
   """\`comments\` exist."""
   commentsExist: Boolean
+
+  """
+  Trigram fuzzy search on the \`title\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmTitle: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`slug\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmSlug: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`content\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmContent: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`excerpt\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmExcerpt: TrgmSearchInput
 }
 
 """
@@ -666,6 +730,29 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
+
+  """
+  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
+  """
+  similarTo: TrgmSearchInput
+
+  """
+  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
+  """
+  wordSimilarTo: TrgmSearchInput
+}
+
+"""
+Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
+"""
+input TrgmSearchInput {
+  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
+  value: String!
+
+  """
+  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3 (pg_trgm default). Example: 0.5 requires at least 50% trigram overlap.
+  """
+  threshold: Float
 }
 
 """
@@ -845,6 +932,36 @@ input UserFilter {
 
   """\`authoredComments\` exist."""
   authoredCommentsExist: Boolean
+
+  """
+  Trigram fuzzy search on the \`email\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmEmail: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`username\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmUsername: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`display_name\` column using pg_trgm. Provide a
+  search value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmDisplayName: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`bio\` column using pg_trgm. Provide a search value
+  and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmBio: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`role\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmRole: TrgmSearchInput
 }
 
 """
@@ -932,6 +1049,12 @@ input CommentFilter {
 
   """\`childComments\` exist."""
   childCommentsExist: Boolean
+
+  """
+  Trigram fuzzy search on the \`content\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmContent: TrgmSearchInput
 }
 
 """
@@ -1030,6 +1153,30 @@ input TagFilter {
 
   """\`postTags\` exist."""
   postTagsExist: Boolean
+
+  """
+  Trigram fuzzy search on the \`name\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmName: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`slug\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmSlug: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`description\` column using pg_trgm. Provide a
+  search value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmDescription: TrgmSearchInput
+
+  """
+  Trigram fuzzy search on the \`color\` column using pg_trgm. Provide a search
+  value and optional similarity threshold (0-1). Tolerates typos and misspellings.
+  """
+  trgmColor: TrgmSearchInput
 }
 
 """
@@ -1075,6 +1222,8 @@ enum PostOrderBy {
   PUBLISHED_AT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  SIMILARITY_SLUG_ASC
+  SIMILARITY_SLUG_DESC
 }
 
 """Methods to use when ordering \`PostTag\`."""
@@ -1112,6 +1261,10 @@ enum TagOrderBy {
   NAME_DESC
   SLUG_ASC
   SLUG_DESC
+  SIMILARITY_NAME_ASC
+  SIMILARITY_NAME_DESC
+  SIMILARITY_SLUG_ASC
+  SIMILARITY_SLUG_DESC
 }
 
 type User {
@@ -1182,6 +1335,31 @@ type User {
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
+
+  """
+  Trigram similarity score when filtering \`email\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  emailSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`username\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  usernameSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`displayName\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  displayNameSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`bio\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  bioSimilarity: Float
+
+  """
+  Trigram similarity score when filtering \`role\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  roleSimilarity: Float
 }
 
 """A connection to a list of \`Post\` values."""
@@ -1275,6 +1453,11 @@ type Comment {
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
+
+  """
+  Trigram similarity score when filtering \`content\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
+  """
+  contentSimilarity: Float
 }
 
 """Methods to use when ordering \`Comment\`."""
@@ -1377,6 +1560,10 @@ enum UserOrderBy {
   USERNAME_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  SIMILARITY_EMAIL_ASC
+  SIMILARITY_EMAIL_DESC
+  SIMILARITY_USERNAME_ASC
+  SIMILARITY_USERNAME_DESC
 }
 
 """Root meta schema type"""
