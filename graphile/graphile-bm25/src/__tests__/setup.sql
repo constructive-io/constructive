@@ -1,4 +1,4 @@
--- Test setup for graphile-pg-textsearch-plugin integration tests
+-- Test setup for graphile-bm25 integration tests
 -- Creates pg_textsearch extension, test schema, tables, and BM25 indexes
 
 -- Enable pg_textsearch extension

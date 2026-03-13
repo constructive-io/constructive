@@ -1,5 +1,5 @@
 {
-  "name": "graphile-pgvector-plugin",
+  "name": "graphile-pgvector",
   "version": "1.6.2",
   "description": "PostGraphile v5 codec plugin for pgvector — makes vector columns, mutations, and functions work automatically",
   "author": "Constructive <developers@constructive.io>",

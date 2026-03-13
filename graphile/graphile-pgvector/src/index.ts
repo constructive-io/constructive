@@ -1,5 +1,5 @@
 /**
- * graphile-pgvector-plugin
+ * graphile-pgvector
  *
  * PostGraphile v5 plugin suite for pgvector.
  *
@@ -18,7 +18,7 @@
  *
  * @example
  * ```typescript
- * import { VectorCodecPreset } from 'graphile-pgvector-plugin';
+ * import { VectorCodecPreset } from 'graphile-pgvector';
  *
  * // Just add to your preset — everything is auto-discovered, zero config
  * const preset = {

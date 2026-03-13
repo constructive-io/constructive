@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { TrgmSearchPreset } from 'graphile-pg-trgm-plugin';
+ * import { TrgmSearchPreset } from 'graphile-trgm';
  *
  * // Option 1: Use the preset (recommended)
  * const preset = {
@@ -16,7 +16,7 @@
  * };
  *
  * // Option 2: Use the plugin directly
- * import { createTrgmSearchPlugin } from 'graphile-pg-trgm-plugin';
+ * import { createTrgmSearchPlugin } from 'graphile-trgm';
  * const preset = {
  *   plugins: [createTrgmSearchPlugin()],
  * };

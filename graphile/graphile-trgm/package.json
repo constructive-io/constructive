@@ -1,5 +1,5 @@
 {
-  "name": "graphile-pg-trgm-plugin",
+  "name": "graphile-trgm",
   "version": "1.0.0",
   "description": "PostGraphile v5 plugin for pg_trgm fuzzy text matching — adds similarTo/wordSimilarTo filter operators, similarity score fields, and orderBy on any text column",
   "author": "Constructive <developers@constructive.io>",

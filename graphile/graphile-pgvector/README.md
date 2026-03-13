@@ -1,4 +1,4 @@
-# graphile-pgvector-plugin
+# graphile-pgvector
 
 PostGraphile v5 codec plugin for [pgvector](https://github.com/pgvector/pgvector) — makes `vector` columns, mutations, and SQL functions work automatically.
 
@@ -16,7 +16,7 @@ Once installed:
 ## Installation
 
 ```bash
-pnpm add graphile-pgvector-plugin
+pnpm add graphile-pgvector
 ```
 
 ## Prerequisites
@@ -27,7 +27,7 @@ pnpm add graphile-pgvector-plugin
 ## Usage
 
 ```typescript
-import { VectorCodecPreset } from 'graphile-pgvector-plugin';
+import { VectorCodecPreset } from 'graphile-pgvector';
 
 const preset = {
   extends: [

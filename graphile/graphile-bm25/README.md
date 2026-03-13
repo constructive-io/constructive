@@ -1,4 +1,4 @@
-# graphile-pg-textsearch-plugin
+# graphile-bm25
 
 <p align="center" width="100%">
   <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
@@ -11,17 +11,17 @@
   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE">
     <img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/>
   </a>
-  <a href="https://www.npmjs.com/package/graphile-pg-textsearch-plugin">
-    <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphile%2Fgraphile-pg-textsearch-plugin%2Fpackage.json"/>
+  <a href="https://www.npmjs.com/package/graphile-bm25">
+    <img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphile%2Fgraphile-bm25%2Fpackage.json"/>
   </a>
 </p>
 
-**`graphile-pg-textsearch-plugin`** enables auto-discovered BM25 ranked full-text search for PostGraphile v5 schemas using [pg_textsearch](https://github.com/timescale/pg_textsearch).
+**`graphile-bm25`** enables auto-discovered BM25 ranked full-text search for PostGraphile v5 schemas using [pg_textsearch](https://github.com/timescale/pg_textsearch).
 
 ## Installation
 
 ```sh
-npm install graphile-pg-textsearch-plugin
+npm install graphile-bm25
 ```
 
 ## Features
@@ -37,7 +37,7 @@ npm install graphile-pg-textsearch-plugin
 ### With Preset (Recommended)
 
 ```typescript
-import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
+import { Bm25SearchPreset } from 'graphile-bm25';
 
 const preset = {
   extends: [
@@ -50,7 +50,7 @@ const preset = {
 ### With Plugin Directly
 
 ```typescript
-import { Bm25CodecPlugin, Bm25SearchPlugin } from 'graphile-pg-textsearch-plugin';
+import { Bm25CodecPlugin, Bm25SearchPlugin } from 'graphile-bm25';
 
 const preset = {
   plugins: [
@@ -118,6 +118,6 @@ CREATE INDEX articles_body_idx ON articles USING bm25(body)
 
 ```sh
 # requires pyramation/postgres:17 Docker image with pg_textsearch pre-installed
-pnpm --filter graphile-pg-textsearch-plugin test
+pnpm --filter graphile-bm25 test
 ```
 

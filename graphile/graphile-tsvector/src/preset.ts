@@ -51,7 +51,7 @@ export function createMatchesOperatorFactory(
  *
  * @example
  * ```typescript
- * import { PgSearchPreset } from 'graphile-search-plugin';
+ * import { PgSearchPreset } from 'graphile-tsvector';
  *
  * const preset = {
  *   extends: [

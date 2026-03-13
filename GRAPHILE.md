@@ -55,10 +55,10 @@ All Graphile RC dependencies are pinned to **exact versions** (no `^` or `~` pre
 - **graphile-settings** -- Core settings/configuration for PostGraphile v5 (most deps, including the transitive peer deps `tamedevil`, `@dataplan/pg`, `@dataplan/json`, `grafserv`)
 - **graphile-schema** -- Builds GraphQL SDL from PostgreSQL using PostGraphile v5
 - **graphile-query** -- Executes GraphQL queries against PostGraphile v5 schemas
-- **graphile-search-plugin** -- Full-text search plugin for PostGraphile v5
+- **graphile-tsvector** -- Full-text search plugin for PostGraphile v5
 - **graphile-cache** -- LRU cache with PostGraphile v5 integration
 - **graphile-test** -- PostGraphile v5 testing utilities
-- **graphile-pgvector-plugin** -- pgvector codec + auto-discovered vector search plugin for PostGraphile v5
+- **graphile-pgvector** -- pgvector codec + auto-discovered vector search plugin for PostGraphile v5
 
 ### `graphql/` packages
 

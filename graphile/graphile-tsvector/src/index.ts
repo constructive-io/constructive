@@ -5,7 +5,7 @@
  *
  * @example
  * ```typescript
- * import { PgSearchPlugin, PgSearchPreset } from 'graphile-search-plugin';
+ * import { PgSearchPlugin, PgSearchPreset } from 'graphile-tsvector';
  *
  * // Option 1: Use the preset (recommended)
  * const preset = {

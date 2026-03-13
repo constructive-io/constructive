@@ -1,4 +1,4 @@
--- Test setup for graphile-pg-trgm-plugin integration tests
+-- Test setup for graphile-trgm integration tests
 -- Creates pg_trgm extension, test schema, tables, and trigram indexes
 
 -- Enable pg_trgm extension

@@ -37,18 +37,18 @@ export {
 export type { UniqueLookupOptions, TypeMapping, PublicKeyChallengeConfig } from 'graphile-misc-plugins';
 
 // pgvector — Vector scalar + codec + auto-discovered search/filter/orderBy
-export { VectorCodecPlugin, VectorCodecPreset, VectorSearchPlugin, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
-export type { VectorSearchPluginOptions, VectorMetric } from 'graphile-pgvector-plugin';
+export { VectorCodecPlugin, VectorCodecPreset, VectorSearchPlugin, createVectorSearchPlugin } from 'graphile-pgvector';
+export type { VectorSearchPluginOptions, VectorMetric } from 'graphile-pgvector';
 
-// Search plugin (stays in graphile-search-plugin, re-exported here for convenience)
+// Search plugin (stays in graphile-tsvector, re-exported here for convenience)
 export {
   PgSearchPlugin,
   PgSearchPreset,
   createPgSearchPlugin,
   TsvectorCodecPlugin,
   TsvectorCodecPreset,
-} from 'graphile-search-plugin';
-export type { PgSearchPluginOptions } from 'graphile-search-plugin';
+} from 'graphile-tsvector';
+export type { PgSearchPluginOptions } from 'graphile-tsvector';
 
 // pg_textsearch — BM25 ranked search (auto-discovers BM25 indexes)
 export {
@@ -57,5 +57,5 @@ export {
   Bm25SearchPlugin,
   createBm25SearchPlugin,
   Bm25SearchPreset,
-} from 'graphile-pg-textsearch-plugin';
-export type { Bm25SearchPluginOptions, Bm25IndexInfo } from 'graphile-pg-textsearch-plugin';
+} from 'graphile-bm25';
+export type { Bm25SearchPluginOptions, Bm25IndexInfo } from 'graphile-bm25';

@@ -1,5 +1,5 @@
 /**
- * graphile-pgvector-plugin Types
+ * graphile-pgvector Types
  *
  * Type definitions for the vector search plugin configuration.
  */

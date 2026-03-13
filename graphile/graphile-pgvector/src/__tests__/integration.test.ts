@@ -41,7 +41,7 @@ type QueryFn = <TResult = unknown>(
   variables?: Record<string, unknown>
 ) => Promise<GraphQLResponse<TResult>>;
 
-describe('graphile-pgvector-plugin integration', () => {
+describe('graphile-pgvector integration', () => {
   let db: PgTestClient;
   let teardown: () => Promise<void>;
   let query: QueryFn;

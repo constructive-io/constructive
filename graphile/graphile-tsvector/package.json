@@ -1,7 +1,7 @@
 {
-  "name": "graphile-pg-textsearch-plugin",
-  "version": "1.5.2",
-  "description": "PostGraphile v5 plugin for pg_textsearch BM25 ranked full-text search — auto-discovers BM25 indexes and adds search condition, score, orderBy, and filter fields",
+  "name": "graphile-tsvector",
+  "version": "3.6.2",
+  "description": "Generate search conditions for your tsvector columns (PostGraphile v5)",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
@@ -25,16 +25,25 @@
     "type": "git",
     "url": "https://github.com/constructive-io/constructive"
   },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "pgpm",
+    "plugin",
+    "postgres",
+    "graphql",
+    "search",
+    "tsvector",
+    "full-text-search"
+  ],
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "@types/pg": "^8.18.0",
-    "graphile-connection-filter": "workspace:^",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
-    "pg": "^8.19.0",
     "pgsql-test": "workspace:^"
   },
   "peerDependencies": {
@@ -44,22 +53,12 @@
     "graphile-config": "1.0.0-rc.5",
     "graphql": "^16.9.0",
     "pg-sql2": "5.0.0-rc.4",
-    "postgraphile": "5.0.0-rc.7"
+    "postgraphile": "5.0.0-rc.7",
+    "graphile-connection-filter": "workspace:^"
   },
-  "keywords": [
-    "postgraphile",
-    "graphile",
-    "constructive",
-    "plugin",
-    "postgres",
-    "graphql",
-    "pg_textsearch",
-    "bm25",
-    "full-text-search",
-    "text-search",
-    "ranking"
-  ],
-  "dependencies": {
-    "@pgsql/quotes": "^17.1.0"
+  "peerDependenciesMeta": {
+    "graphile-connection-filter": {
+      "optional": true
+    }
   }
 }

@@ -14,7 +14,7 @@ import { createBm25SearchPlugin } from './bm25-search';
  *
  * @example
  * ```typescript
- * import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
+ * import { Bm25SearchPreset } from 'graphile-bm25';
  *
  * const preset = {
  *   extends: [

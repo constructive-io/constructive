@@ -1,4 +1,4 @@
-# graphile-pg-trgm-plugin
+# graphile-trgm
 
 PostGraphile v5 plugin for **pg_trgm** fuzzy text matching.
 
@@ -16,7 +16,7 @@ Adds `similarTo` and `wordSimilarTo` filter operators to text columns, with simi
 ## Usage
 
 ```typescript
-import { TrgmSearchPreset } from 'graphile-pg-trgm-plugin';
+import { TrgmSearchPreset } from 'graphile-trgm';
 
 const preset = {
   extends: [TrgmSearchPreset()],

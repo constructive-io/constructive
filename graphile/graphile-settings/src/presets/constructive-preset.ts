@@ -11,11 +11,11 @@ import {
   MetaSchemaPreset,
   PgTypeMappingsPreset,
 } from 'graphile-misc-plugins';
-import { PgSearchPreset, createMatchesOperatorFactory } from 'graphile-search-plugin';
+import { PgSearchPreset, createMatchesOperatorFactory } from 'graphile-tsvector';
 import { GraphilePostgisPreset, createPostgisOperatorFactory } from 'graphile-postgis';
-import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector-plugin';
-import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
-import { TrgmSearchPreset, createTrgmOperatorFactories } from 'graphile-pg-trgm-plugin';
+import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector';
+import { Bm25SearchPreset } from 'graphile-bm25';
+import { TrgmSearchPreset, createTrgmOperatorFactories } from 'graphile-trgm';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';

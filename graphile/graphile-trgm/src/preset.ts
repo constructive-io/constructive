@@ -79,7 +79,7 @@ export function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
  *
  * @example
  * ```typescript
- * import { TrgmSearchPreset } from 'graphile-pg-trgm-plugin';
+ * import { TrgmSearchPreset } from 'graphile-trgm';
  *
  * const preset = {
  *   extends: [

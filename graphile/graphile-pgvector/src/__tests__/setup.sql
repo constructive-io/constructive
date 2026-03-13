@@ -1,4 +1,4 @@
--- Test setup for graphile-pgvector-plugin integration tests
+-- Test setup for graphile-pgvector integration tests
 -- Creates pgvector extension, test schema, tables, and functions
 
 -- Enable pgvector extension

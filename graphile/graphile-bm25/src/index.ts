@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { Bm25SearchPreset } from 'graphile-pg-textsearch-plugin';
+ * import { Bm25SearchPreset } from 'graphile-bm25';
  *
  * // Option 1: Use the preset (recommended)
  * const preset = {
@@ -16,7 +16,7 @@
  * };
  *
  * // Option 2: Use the plugins directly
- * import { Bm25CodecPlugin, createBm25SearchPlugin } from 'graphile-pg-textsearch-plugin';
+ * import { Bm25CodecPlugin, createBm25SearchPlugin } from 'graphile-bm25';
  * const preset = {
  *   plugins: [Bm25CodecPlugin, createBm25SearchPlugin()],
  * };
