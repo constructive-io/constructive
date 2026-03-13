@@ -753,8 +753,15 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     expect(nodes[0].name).toBe('Brooklyn Bridge Park');
   });
 
-  it('mega query: BM25 + tsvector + pgvector + relation filter + scalar in ONE query', async () => {
-    // This is the ultimate integration test: all five plugin types combined in a single filter
+  it('mega query: BM25 + tsvector + pgvector + PostGIS + relation filter + scalar in ONE query', async () => {
+    // This is the ultimate integration test: all SIX plugin types combined in a single filter
+    // A bounding box covering NYC (approx -74.1 to -73.9 longitude, 40.6 to 40.8 latitude)
+    const nycBbox = {
+      type: 'Polygon',
+      coordinates: [[[-74.1, 40.6], [-73.9, 40.6], [-73.9, 40.8], [-74.1, 40.8], [-74.1, 40.6]]],
+      crs: { type: 'name', properties: { name: 'EPSG:4326' } },
+    };
+
     const result = await query<{
       locations: {
         nodes: {
@@ -769,13 +776,14 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       };
     }>({
       query: `
-        query {
+        query MegaQuery($bbox: GeoJSON!) {
           locations(filter: {
             fullTextTsv: "park"
             bm25Body: { query: "park green" }
             category: { name: { equalTo: "Parks" } }
             isActive: { equalTo: true }
             vectorEmbedding: { nearby: { embedding: [0, 1, 0], distance: 2.0 } }
+            geom: { intersects: $bbox }
           }) {
             nodes {
               name
@@ -789,11 +797,12 @@ describe('Kitchen sink (multi-plugin queries)', () => {
           }
         }
       `,
+      variables: { bbox: nycBbox },
     });
 
     expect(result.errors).toBeUndefined();
     const nodes = result.data?.locations.nodes ?? [];
-    // Should return parks that match all five criteria simultaneously
+    // Should return parks that match all six criteria simultaneously
     expect(nodes.length).toBeGreaterThanOrEqual(2);
 
     for (const node of nodes) {
@@ -804,10 +813,15 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       // pgvector embedding present
       expect(Array.isArray(node.embedding)).toBe(true);
       expect(node.embedding).toHaveLength(3);
-      // PostGIS geom present as GeoJSON
+      // PostGIS geom present as GeoJSON and within our bounding box
       expect(node.geom.geojson).toBeDefined();
       expect(node.geom.geojson.type).toBe('Point');
       expect(node.geom.geojson.coordinates).toHaveLength(2);
+      const [lon, lat] = node.geom.geojson.coordinates;
+      expect(lon).toBeGreaterThanOrEqual(-74.1);
+      expect(lon).toBeLessThanOrEqual(-73.9);
+      expect(lat).toBeGreaterThanOrEqual(40.6);
+      expect(lat).toBeLessThanOrEqual(40.8);
       // Relation filter: all should be Parks
       expect(node.category.name).toBe('Parks');
       // Tags exist on each result
