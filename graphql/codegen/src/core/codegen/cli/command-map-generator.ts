@@ -420,7 +420,7 @@ export function generateCommandMap(
 
 export interface MultiTargetCommandMapInput {
   toolName: string;
-  builtinNames: { auth: string; context: string };
+  builtinNames: { auth: string; context: string; config: string };
   targets: Array<{
     name: string;
     tables: CleanTable[];
@@ -454,6 +454,12 @@ export function generateMultiTargetCommandMap(
   commandEntries.push({ kebab: builtinNames.auth, importName: authImportName });
   statements.push(
     createImportDeclaration(`./commands/${builtinNames.auth}`, authImportName),
+  );
+
+  const configImportName = `${builtinNames.config}Cmd`;
+  commandEntries.push({ kebab: builtinNames.config, importName: configImportName });
+  statements.push(
+    createImportDeclaration(`./commands/${builtinNames.config}`, configImportName),
   );
 
   for (const target of targets) {
@@ -526,6 +532,7 @@ export function generateMultiTargetCommandMap(
     'Commands:',
     `  ${builtinNames.context.padEnd(20)} Manage API contexts`,
     `  ${builtinNames.auth.padEnd(20)} Manage authentication`,
+    `  ${builtinNames.config.padEnd(20)} Manage config key-value store`,
   ];
 
   for (const target of targets) {

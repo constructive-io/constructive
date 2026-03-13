@@ -164,7 +164,9 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
 export function generateModelFile(
   table: CleanTable,
   _useSharedTypes: boolean,
+  options?: { condition?: boolean },
 ): GeneratedModelFile {
+  const conditionEnabled = options?.condition !== false;
   const { typeName, singularName, pluralName } = getTableNames(table);
   const modelName = `${typeName}Model`;
   const baseFileName = lcFirst(typeName);
@@ -175,7 +177,7 @@ export function generateModelFile(
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
   const whereTypeName = getFilterTypeName(table);
-  const conditionTypeName = `${typeName}Condition`;
+  const conditionTypeName = conditionEnabled ? `${typeName}Condition` : undefined;
   const orderByTypeName = getOrderByTypeName(table);
   const createInputTypeName = `Create${typeName}Input`;
   const updateInputTypeName = `Update${typeName}Input`;
@@ -221,20 +223,21 @@ export function generateModelFile(
       true,
     ),
   );
+  const inputTypeImports = [
+    typeName,
+    relationTypeName,
+    selectTypeName,
+    whereTypeName,
+    ...(conditionTypeName ? [conditionTypeName] : []),
+    orderByTypeName,
+    createInputTypeName,
+    updateInputTypeName,
+    patchTypeName,
+  ];
   statements.push(
     createImportDeclaration(
       '../input-types',
-      [
-        typeName,
-        relationTypeName,
-        selectTypeName,
-        whereTypeName,
-        conditionTypeName,
-        orderByTypeName,
-        createInputTypeName,
-        updateInputTypeName,
-        patchTypeName,
-      ],
+      inputTypeImports,
       true,
     ),
   );
@@ -266,15 +269,20 @@ export function generateModelFile(
 
   // ── findMany ───────────────────────────────────────────────────────────
   {
+    const findManyTypeArgs: Array<(sel: t.TSType) => t.TSType> = [
+      (sel: t.TSType) => sel,
+      () => t.tsTypeReference(t.identifier(whereTypeName)),
+      ...(conditionTypeName
+        ? [() => t.tsTypeReference(t.identifier(conditionTypeName))]
+        : []),
+      () => t.tsTypeReference(t.identifier(orderByTypeName)),
+    ];
     const argsType = (sel: t.TSType) =>
       t.tsTypeReference(
         t.identifier('FindManyArgs'),
-        t.tsTypeParameterInstantiation([
-          sel,
-          t.tsTypeReference(t.identifier(whereTypeName)),
-          t.tsTypeReference(t.identifier(conditionTypeName)),
-          t.tsTypeReference(t.identifier(orderByTypeName)),
-        ]),
+        t.tsTypeParameterInstantiation(
+          findManyTypeArgs.map(fn => fn(sel)),
+        ),
       );
     const retType = (sel: t.TSType) =>
       t.tsTypeAnnotation(
@@ -316,31 +324,31 @@ export function generateModelFile(
       t.identifier('args'),
       t.identifier('select'),
     );
-    const bodyArgs = [
-      t.stringLiteral(typeName),
-      t.stringLiteral(pluralQueryName),
-      selectExpr,
-      t.objectExpression([
-        t.objectProperty(
+    const findManyObjProps = [
+      t.objectProperty(
+        t.identifier('where'),
+        t.optionalMemberExpression(
+          t.identifier('args'),
           t.identifier('where'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('where'),
-            false,
-            true,
-          ),
+          false,
+          true,
         ),
-        t.objectProperty(
-          t.identifier('condition'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('condition'),
-            false,
-            true,
-          ),
-        ),
-        t.objectProperty(
-          t.identifier('orderBy'),
+      ),
+      ...(conditionTypeName
+        ? [
+            t.objectProperty(
+              t.identifier('condition'),
+              t.optionalMemberExpression(
+                t.identifier('args'),
+                t.identifier('condition'),
+                false,
+                true,
+              ),
+            ),
+          ]
+        : []),
+      t.objectProperty(
+        t.identifier('orderBy'),
           t.tsAsExpression(
             t.optionalMemberExpression(
               t.identifier('args'),
@@ -399,11 +407,18 @@ export function generateModelFile(
             true,
           ),
         ),
-      ]),
+    ];
+    const bodyArgs = [
+      t.stringLiteral(typeName),
+      t.stringLiteral(pluralQueryName),
+      selectExpr,
+      t.objectExpression(findManyObjProps),
       t.stringLiteral(whereTypeName),
       t.stringLiteral(orderByTypeName),
       t.identifier('connectionFieldsMap'),
-      t.stringLiteral(conditionTypeName),
+      ...(conditionTypeName
+        ? [t.stringLiteral(conditionTypeName)]
+        : []),
     ];
     classBody.push(
       createClassMethod(
@@ -424,14 +439,19 @@ export function generateModelFile(
 
   // ── findFirst ──────────────────────────────────────────────────────────
   {
+    const findFirstTypeArgs: Array<(sel: t.TSType) => t.TSType> = [
+      (sel: t.TSType) => sel,
+      () => t.tsTypeReference(t.identifier(whereTypeName)),
+      ...(conditionTypeName
+        ? [() => t.tsTypeReference(t.identifier(conditionTypeName))]
+        : []),
+    ];
     const argsType = (sel: t.TSType) =>
       t.tsTypeReference(
         t.identifier('FindFirstArgs'),
-        t.tsTypeParameterInstantiation([
-          sel,
-          t.tsTypeReference(t.identifier(whereTypeName)),
-          t.tsTypeReference(t.identifier(conditionTypeName)),
-        ]),
+        t.tsTypeParameterInstantiation(
+          findFirstTypeArgs.map(fn => fn(sel)),
+        ),
       );
     const retType = (sel: t.TSType) =>
       t.tsTypeAnnotation(
@@ -477,33 +497,40 @@ export function generateModelFile(
       t.identifier('args'),
       t.identifier('select'),
     );
+    const findFirstObjProps = [
+      t.objectProperty(
+        t.identifier('where'),
+        t.optionalMemberExpression(
+          t.identifier('args'),
+          t.identifier('where'),
+          false,
+          true,
+        ),
+      ),
+      ...(conditionTypeName
+        ? [
+            t.objectProperty(
+              t.identifier('condition'),
+              t.optionalMemberExpression(
+                t.identifier('args'),
+                t.identifier('condition'),
+                false,
+                true,
+              ),
+            ),
+          ]
+        : []),
+    ];
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(pluralQueryName),
       selectExpr,
-      t.objectExpression([
-        t.objectProperty(
-          t.identifier('where'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('where'),
-            false,
-            true,
-          ),
-        ),
-        t.objectProperty(
-          t.identifier('condition'),
-          t.optionalMemberExpression(
-            t.identifier('args'),
-            t.identifier('condition'),
-            false,
-            true,
-          ),
-        ),
-      ]),
+      t.objectExpression(findFirstObjProps),
       t.stringLiteral(whereTypeName),
       t.identifier('connectionFieldsMap'),
-      t.stringLiteral(conditionTypeName),
+      ...(conditionTypeName
+        ? [t.stringLiteral(conditionTypeName)]
+        : []),
     ];
     classBody.push(
       createClassMethod(
@@ -976,6 +1003,7 @@ export function generateModelFile(
 export function generateAllModelFiles(
   tables: CleanTable[],
   useSharedTypes: boolean,
+  options?: { condition?: boolean },
 ): GeneratedModelFile[] {
-  return tables.map((table) => generateModelFile(table, useSharedTypes));
+  return tables.map((table) => generateModelFile(table, useSharedTypes, options));
 }

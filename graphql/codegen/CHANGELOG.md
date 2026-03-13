@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.13.0...@constructive-io/graphql-codegen@4.13.1) (2026-03-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.12.2...@constructive-io/graphql-codegen@4.13.0) (2026-03-13)
+
+### Features
+
+- **codegen:** add config command, helpers.ts generation, and collision handling ([4273a61](https://github.com/constructive-io/constructive/commit/4273a618989f6eb55ae120221b97167074de04ff)), closes [constructive-io/dev-utils#70](https://github.com/constructive-io/dev-utils/issues/70)
+- **codegen:** add optional condition generation toggle ([abe0e3e](https://github.com/constructive-io/constructive/commit/abe0e3efd00119ee9fb4265c6480799b4a5f62d4))
+
 ## [4.12.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.12.1...@constructive-io/graphql-codegen@4.12.2) (2026-03-12)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

@@ -1759,8 +1759,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       appstash:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.6.0
+        version: 0.6.0
       find-and-require-package-json:
         specifier: ^0.9.1
         version: 0.9.1
@@ -2029,8 +2029,8 @@ importers:
         specifier: ^17.1.0
         version: 17.1.0
       appstash:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.6.0
+        version: 0.6.0
       find-and-require-package-json:
         specifier: ^0.9.1
         version: 0.9.1
@@ -5534,6 +5534,12 @@ packages:
 
   appstash@0.5.0:
     resolution: {integrity: sha512-f9CkbNq1UK2aRn7ErcZI4C1ojInalknp+GsjHnlGSM35sKDBYf6lDc3Z6hViH751hOI0tSrNcFunkaYvxWYgKQ==}
+
+  appstash@0.6.0:
+    resolution:
+      {
+        integrity: sha512-Ec91FPk/WkVgLOgiKBILgyp4s4Z7BJ/1zspvn+/vfmgBV/YNTNyaDa9nDQ9sJhVvXugLGjbfXhzmtwven/qX7Q==,
+      }
 
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
@@ -13201,6 +13207,8 @@ snapshots:
   append-field@1.0.0: {}
 
   appstash@0.5.0: {}
+
+  appstash@0.6.0: {}
 
   aproba@2.0.0: {}
 

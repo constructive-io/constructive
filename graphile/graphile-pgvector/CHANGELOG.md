@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/constructive-io/constructive/compare/graphile-pgvector-plugin@1.6.2...graphile-pgvector-plugin@1.7.0) (2026-03-13)
+
+### Features
+
+- **pgvector:** move vector search from condition to filter argument ([413171e](https://github.com/constructive-io/constructive/commit/413171ea5f86d5d0463c436f89cb4fc6f4fda47b))
+
 ## [1.6.2](https://github.com/constructive-io/constructive/compare/graphile-pgvector-plugin@1.6.1...graphile-pgvector-plugin@1.6.2) (2026-03-12)
 
 **Note:** Version bump only for package graphile-pgvector-plugin

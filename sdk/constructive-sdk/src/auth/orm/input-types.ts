@@ -163,6 +163,13 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];
@@ -524,70 +531,6 @@ export interface UserFilter {
   and?: UserFilter[];
   or?: UserFilter[];
   not?: UserFilter;
-}
-// ============ Table Condition Types ============
-export interface RoleTypeCondition {
-  id?: number | null;
-  name?: string | null;
-}
-export interface CryptoAddressCondition {
-  id?: string | null;
-  ownerId?: string | null;
-  address?: string | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-export interface PhoneNumberCondition {
-  id?: string | null;
-  ownerId?: string | null;
-  cc?: string | null;
-  number?: string | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-export interface ConnectedAccountCondition {
-  id?: string | null;
-  ownerId?: string | null;
-  service?: string | null;
-  identifier?: string | null;
-  details?: unknown | null;
-  isVerified?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-export interface AuditLogCondition {
-  id?: string | null;
-  event?: string | null;
-  actorId?: string | null;
-  origin?: unknown | null;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-  success?: boolean | null;
-  createdAt?: string | null;
-}
-export interface EmailCondition {
-  id?: string | null;
-  ownerId?: string | null;
-  email?: unknown | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-export interface UserCondition {
-  id?: string | null;
-  username?: string | null;
-  displayName?: string | null;
-  profilePicture?: unknown | null;
-  searchTsv?: string | null;
-  type?: number | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  searchTsvRank?: number | null;
 }
 // ============ OrderBy Types ============
 export type RoleTypeOrderBy =

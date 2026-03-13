@@ -117,7 +117,7 @@ CREATE INDEX articles_body_idx ON articles USING bm25(body)
 ## Testing
 
 ```sh
-# requires pyramation/postgres:17 Docker image with pg_textsearch pre-installed
+# requires constructiveio/postgres-plus:18 Docker image with pg_textsearch pre-installed
 pnpm --filter graphile-bm25 test
 ```
 
