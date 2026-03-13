@@ -1,6 +1,6 @@
 {
   "name": "graphile-pg-textsearch-plugin",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "PostGraphile v5 plugin for pg_textsearch BM25 ranked full-text search — auto-discovers BM25 indexes and adds search condition, score, orderBy, and filter fields",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
