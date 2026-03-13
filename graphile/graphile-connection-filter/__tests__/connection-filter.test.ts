@@ -1953,8 +1953,9 @@ describe('Edge cases', () => {
       `,
     });
     expect(result.errors).toBeUndefined();
-    // Widget B (19.99), Gadget Y (29.99) — Widget A (9.99) too low, Gadget X (49.99) equal not less
-    expect(result.data?.allItems.nodes).toHaveLength(2);
+    // Widget B (19.99), Gadget Y (29.99), Gadget X (49.99) — all > 10 and < 50
+    // Widget A (9.99) too low, Doohickey (99.99) too high
+    expect(result.data?.allItems.nodes).toHaveLength(3);
     for (const node of result.data?.allItems.nodes ?? []) {
       const price = parseFloat(node.price);
       expect(price).toBeGreaterThan(10);
