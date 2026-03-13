@@ -21,7 +21,7 @@ export const createRequestLogger = ({ observabilityEnabled }: RequestLoggerOptio
     req.requestId = reqId;
 
     const host = req.hostname || req.headers.host || 'unknown';
-    const ip = req.clientIp || req.ip;
+    const ip = req.clientIp ?? req.ip ?? 'unknown';
 
     log.debug(`[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`);
 

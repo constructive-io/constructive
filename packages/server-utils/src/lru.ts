@@ -7,10 +7,12 @@ const ONE_HOUR_IN_MS = 1000 * 60 * 60;
 const ONE_DAY = ONE_HOUR_IN_MS * 24;
 const ONE_YEAR = ONE_DAY * 366;
 
+export const SVC_CACHE_TTL_MS = ONE_YEAR;
+
 // --- Service Cache ---
 export const svcCache = new LRUCache<string, any>({
   max: 25,
-  ttl: ONE_YEAR,
+  ttl: SVC_CACHE_TTL_MS,
   updateAgeOnGet: true,
   dispose: (_, key) => {
     log.debug(`Disposing service[${key}]`);

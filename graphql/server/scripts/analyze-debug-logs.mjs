@@ -60,7 +60,8 @@ const readNdjson = async (filePath) => {
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((line) => JSON.parse(line));
+    .map((line) => { try { return JSON.parse(line); } catch { return null; } })
+    .filter(Boolean);
 };
 
 const getLastSessionEntries = (entries) => {

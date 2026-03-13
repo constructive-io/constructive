@@ -1,6 +1,6 @@
 import os from 'node:os';
 import v8 from 'node:v8';
-import { svcCache } from '@pgpmjs/server-utils';
+import { svcCache, SVC_CACHE_TTL_MS } from '@pgpmjs/server-utils';
 import { getCacheStats } from 'graphile-cache';
 import { getInFlightCount, getInFlightKeys } from '../middleware/graphile';
 import { getGraphileBuildStats } from '../middleware/observability/graphile-build-stats';
@@ -44,6 +44,8 @@ export interface DebugMemorySnapshot {
   svcCache: {
     size: number;
     max: number;
+    ttlMs: number;
+    oldestKeyAgeMs: number | null;
     keys: string[];
   };
   inFlight: {
@@ -96,7 +98,18 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
     svcCache: {
       size: svcCache.size,
       max: svcCache.max,
-      keys: [...svcCache.keys()],
+      ttlMs: SVC_CACHE_TTL_MS,
+      oldestKeyAgeMs: (() => {
+        let minRemaining = Infinity;
+        for (const key of svcCache.keys()) {
+          const remaining = svcCache.getRemainingTTL(key);
+          if (remaining < minRemaining) {
+            minRemaining = remaining;
+          }
+        }
+        return Number.isFinite(minRemaining) ? SVC_CACHE_TTL_MS - minRemaining : null;
+      })(),
+      keys: [...svcCache.keys()].slice(0, 200),
     },
     inFlight: {
       count: getInFlightCount(),

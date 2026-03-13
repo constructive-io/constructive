@@ -8,6 +8,8 @@ import { isGraphqlDebugSamplerEnabled } from './observability';
 
 const log = new Logger('debug-sampler');
 
+const MAX_TOTAL_BYTES = 1024 * 1024 * 1024; // 1 GB
+
 const getSamplerIntervalMs = (): number => {
   const raw = process.env.GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS;
   const parsed = raw ? Number.parseInt(raw, 10) : 10_000;
@@ -33,6 +35,57 @@ const createSessionLogDir = (): string => {
 const appendJsonLine = async (filePath: string, payload: unknown): Promise<void> => {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.appendFile(filePath, `${JSON.stringify(payload)}\n`, 'utf8');
+};
+
+const getDirSize = async (dirPath: string): Promise<number> => {
+  let total = 0;
+  const entries = await fs.readdir(dirPath, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      total += await getDirSize(fullPath);
+    } else {
+      const stat = await fs.stat(fullPath);
+      total += stat.size;
+    }
+  }
+  return total;
+};
+
+const enforceMaxSize = async (rootDir: string, currentSessionDir: string): Promise<void> => {
+  try {
+    const totalSize = await getDirSize(rootDir);
+    if (totalSize <= MAX_TOTAL_BYTES) {
+      return;
+    }
+
+    const entries = await fs.readdir(rootDir, { withFileTypes: true });
+    const sessionDirs = await Promise.all(
+      entries
+        .filter((e) => e.isDirectory())
+        .map(async (e) => {
+          const fullPath = path.join(rootDir, e.name);
+          const stat = await fs.stat(fullPath);
+          return { path: fullPath, mtimeMs: stat.mtimeMs };
+        }),
+    );
+
+    sessionDirs.sort((a, b) => a.mtimeMs - b.mtimeMs);
+
+    for (const dir of sessionDirs) {
+      if (dir.path === currentSessionDir) {
+        continue;
+      }
+      log.info(`Rolling cleanup: removing old session dir ${dir.path}`);
+      await fs.rm(dir.path, { recursive: true, force: true });
+      const newSize = await getDirSize(rootDir);
+      if (newSize <= MAX_TOTAL_BYTES) {
+        break;
+      }
+    }
+  } catch (error) {
+    log.error('Failed to enforce max log size', error);
+  }
 };
 
 export interface DebugSamplerHandle {
@@ -100,6 +153,8 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
       log.error('Failed to capture debug DB snapshot', error);
       await recordError('db', error);
     }
+
+    await enforceMaxSize(getSamplerRootDir(), logDir);
   };
 
   const tick = (): void => {
