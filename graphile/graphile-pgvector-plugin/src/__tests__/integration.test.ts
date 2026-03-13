@@ -3,6 +3,7 @@ import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 import { VectorCodecPreset } from '../vector-codec';
+import { ConnectionFilterPreset } from 'graphile-connection-filter';
 
 interface DocumentResult {
   allDocuments: {
@@ -49,6 +50,7 @@ describe('graphile-pgvector-plugin integration', () => {
     const testPreset = {
       extends: [
         VectorCodecPreset,
+        ConnectionFilterPreset(),
       ],
     };
 
@@ -119,7 +121,7 @@ describe('graphile-pgvector-plugin integration', () => {
     it('returns correct vector values', async () => {
       const result = await query<DocumentResult>(`
         query {
-          allDocuments(condition: { title: "Document A" }) {
+          allDocuments(filter: { title: { equalTo: "Document A" } }) {
             nodes {
               title
               embedding
@@ -263,7 +265,7 @@ describe('graphile-pgvector-plugin integration', () => {
       // Read it back
       const readResult = await query<DocumentResult>(`
         query($rowId: Int!) {
-          allDocuments(condition: { rowId: $rowId }) {
+          allDocuments(filter: { rowId: { equalTo: $rowId } }) {
             nodes {
               embedding
             }

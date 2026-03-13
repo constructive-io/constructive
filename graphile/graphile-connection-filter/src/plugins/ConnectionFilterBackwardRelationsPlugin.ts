@@ -76,6 +76,15 @@ export const ConnectionFilterBackwardRelationsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        filterBy: {
+          description: 'Whether a relation should be available as a filter field',
+          entities: ['pgCodecRelation'],
+        },
+      },
+    },
+
     entityBehavior: {
       pgCodecRelation: 'filterBy',
     },
