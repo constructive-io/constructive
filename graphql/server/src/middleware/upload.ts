@@ -270,7 +270,7 @@ export const createUploadAuthenticateMiddleware = (
  * 2. GraphQL mutation -> patch row with the returned metadata
  *
  * When UPLOAD_V2_ENABLED=true, passes databaseId and userId to streamToStorage
- * so it can use the new key format and INSERT into object_store_public.files.
+ * so it can use the new key format and INSERT into files_store_public.files.
  */
 export const uploadRoute: RequestHandler[] = [
   parseFileWithErrors,

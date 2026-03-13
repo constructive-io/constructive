@@ -9,7 +9,7 @@
  *
  * V2 mode (UPLOAD_V2_ENABLED=true):
  *   - Key format: {database_id}/{bucket_key}/{uuid}_origin
- *   - INSERT into object_store_public.files after S3 upload
+ *   - INSERT into files_store_public.files after S3 upload
  *   - Returns { key, url, mime, filename } for image/upload types
  *
  * Legacy mode (UPLOAD_V2_ENABLED=false, default):
@@ -144,7 +144,7 @@ function generateV2Key(databaseId: string, bucketKey: string): { key: string; fi
 }
 
 /**
- * INSERTs a row into object_store_public.files.
+ * INSERTs a row into files_store_public.files.
  * Fires the AFTER INSERT trigger which enqueues a process-image job.
  */
 async function insertFileRecord(
@@ -157,7 +157,7 @@ async function insertFileRecord(
 ): Promise<void> {
 	const pool = getPgPool();
 	await pool.query(
-		`INSERT INTO object_store_public.files
+		`INSERT INTO files_store_public.files
 		   (id, database_id, bucket_key, key, etag, created_by)
 		 VALUES ($1, $2, $3, $4, $5, $6)`,
 		[fileId, Number(databaseId), bucketKey, key, etag, createdBy],

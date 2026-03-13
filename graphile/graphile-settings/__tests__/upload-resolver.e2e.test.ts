@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 
 jest.setTimeout(60000);
 
-const SCHEMA = 'object_store_public';
+const SCHEMA = 'files_store_public';
 const TABLE = 'files';
 const BUCKET = 'test-bucket';
 const USER_ID = 'aaaaaaaa-0000-0000-0000-000000000001';
@@ -36,7 +36,7 @@ function makeStorage(): S3StorageProvider {
   });
 }
 
-async function setupObjectStoreSchema(pg: PgClient): Promise<void> {
+async function setupFilesStoreSchema(pg: PgClient): Promise<void> {
   await pg.query('CREATE EXTENSION IF NOT EXISTS pgcrypto');
   await pg.query(`CREATE SCHEMA IF NOT EXISTS ${SCHEMA}`);
   await pg.query(`
@@ -63,12 +63,12 @@ async function setupObjectStoreSchema(pg: PgClient): Promise<void> {
       created_by uuid,
       created_at timestamptz NOT NULL DEFAULT now(),
       updated_at timestamptz NOT NULL DEFAULT now(),
-      CONSTRAINT graphile_settings_object_store_files_pkey PRIMARY KEY (id, database_id)
+      CONSTRAINT graphile_settings_files_store_files_pkey PRIMARY KEY (id, database_id)
     )
   `);
 }
 
-async function cleanupObjectStoreRows(pg: PgClient): Promise<void> {
+async function cleanupFilesStoreRows(pg: PgClient): Promise<void> {
   await pg.query(`DELETE FROM ${SCHEMA}.${TABLE}`);
 }
 
@@ -117,7 +117,7 @@ describe('upload-resolver e2e', () => {
     pg = makePg();
     await pg.connect();
     storage = makeStorage();
-    await setupObjectStoreSchema(pg);
+    await setupFilesStoreSchema(pg);
   });
 
   afterEach(async () => {
@@ -135,7 +135,7 @@ describe('upload-resolver e2e', () => {
     }
     uploadedKeys.clear();
 
-    await cleanupObjectStoreRows(pg);
+    await cleanupFilesStoreRows(pg);
   });
 
   afterAll(async () => {

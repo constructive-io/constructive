@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 import { getConnections, PgTestClient, seed } from 'pgsql-test';
 
-const MIGRATION_PATH = resolve(__dirname, '../object_store.sql');
+const MIGRATION_PATH = resolve(__dirname, '../files_store.sql');
 
 const USER_A = 'aaaaaaaa-0000-0000-0000-000000000001';
 const USER_B = 'bbbbbbbb-0000-0000-0000-000000000002';
@@ -29,7 +29,7 @@ async function switchRole(
 
 async function insertBuckets() {
   await pg.query(`
-    INSERT INTO object_store_public.buckets (database_id, key, name, is_public, config)
+    INSERT INTO files_store_public.buckets (database_id, key, name, is_public, config)
     VALUES
       (1, 'default', 'Default Bucket', false, '{}'),
       (1, 'public-assets', 'Public Assets', true, '{}'),
@@ -39,7 +39,7 @@ async function insertBuckets() {
 
 async function insertFixtures() {
   await pg.query(`
-    INSERT INTO object_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
+    INSERT INTO files_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
     VALUES
       ('11111111-0000-0000-0000-000000000001', 1, 'default', '1/default/aaa_origin', 'ready', $1, 'etag1'),
       ('11111111-0000-0000-0000-000000000002', 1, 'default', '1/default/bbb_origin', 'pending', $1, 'etag2'),
@@ -48,21 +48,21 @@ async function insertFixtures() {
   `, [USER_A]);
 
   await pg.query(`
-    INSERT INTO object_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
+    INSERT INTO files_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
     VALUES
       ('22222222-0000-0000-0000-000000000001', 1, 'default', '1/default/eee_origin', 'ready', $1, 'etag5'),
       ('22222222-0000-0000-0000-000000000002', 1, 'default', '1/default/fff_origin', 'pending', $1, 'etag6')
   `, [USER_B]);
 
   await pg.query(`
-    INSERT INTO object_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
+    INSERT INTO files_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
     VALUES
       ('33333333-0000-0000-0000-000000000001', 1, 'public-assets', '1/public-assets/ggg_origin', 'ready', $1, 'etag7'),
       ('33333333-0000-0000-0000-000000000002', 1, 'public-assets', '1/public-assets/hhh_origin', 'pending', $1, 'etag8')
   `, [USER_A]);
 
   await pg.query(`
-    INSERT INTO object_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
+    INSERT INTO files_store_public.files (id, database_id, bucket_key, key, status, created_by, etag)
     VALUES
       ('44444444-0000-0000-0000-000000000001', 2, 'default', '2/default/iii_origin', 'ready', $1, 'etag9')
   `, [USER_C]);
@@ -87,18 +87,18 @@ beforeAll(async () => {
     END $$
   `);
 
-  // The migration assumes object_store_public schema USAGE is already granted
+  // The migration assumes files_store_public schema USAGE is already granted
   // (from the original object-store pgpm extension). In isolation, grant explicitly.
-  await pg.query('GRANT USAGE ON SCHEMA object_store_public TO authenticated');
-  await pg.query('GRANT USAGE ON SCHEMA object_store_public TO service_role');
-  await pg.query('GRANT USAGE ON SCHEMA object_store_public TO anonymous');
+  await pg.query('GRANT USAGE ON SCHEMA files_store_public TO authenticated');
+  await pg.query('GRANT USAGE ON SCHEMA files_store_public TO service_role');
+  await pg.query('GRANT USAGE ON SCHEMA files_store_public TO anonymous');
 
   // Grant SELECT on buckets to roles that need it for the public_bucket_read policy subquery.
   // Without this, the EXISTS subquery in files_public_bucket_read fails with
   // "permission denied for table buckets".
-  await pg.query('GRANT SELECT ON object_store_public.buckets TO authenticated');
-  await pg.query('GRANT SELECT ON object_store_public.buckets TO service_role');
-  await pg.query('GRANT SELECT ON object_store_public.buckets TO anonymous');
+  await pg.query('GRANT SELECT ON files_store_public.buckets TO authenticated');
+  await pg.query('GRANT SELECT ON files_store_public.buckets TO service_role');
+  await pg.query('GRANT SELECT ON files_store_public.buckets TO anonymous');
 });
 
 afterAll(async () => {
@@ -121,13 +121,13 @@ describe('RLS-07: Superuser Bypass', () => {
   });
 
   it('RLS-07a: superuser sees all tenants', async () => {
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     expect(result.rowCount).toBe(9);
   });
 
   it('RLS-07b: superuser can INSERT into any tenant', async () => {
     const result = await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
       VALUES (999, '999/default/su_origin', 'default', 'su-etag')
       RETURNING id
     `);
@@ -136,7 +136,7 @@ describe('RLS-07: Superuser Bypass', () => {
 
   it('RLS-07c: superuser can DELETE any row', async () => {
     const result = await pg.query(
-      'DELETE FROM object_store_public.files WHERE database_id = 2'
+      'DELETE FROM files_store_public.files WHERE database_id = 2'
     );
     expect(result.rowCount).toBeGreaterThan(0);
   });
@@ -163,7 +163,7 @@ describe('RLS-01: Tenant Isolation', () => {
     await switchRole('authenticated');
 
     await expect(
-      pg.query('SELECT * FROM object_store_public.files')
+      pg.query('SELECT * FROM files_store_public.files')
     ).rejects.toThrow(/app\.database_id|invalid input syntax for type integer/);
   });
 
@@ -173,7 +173,7 @@ describe('RLS-01: Tenant Isolation', () => {
       'app.user_id': USER_A,
     });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     // Must return rows (prevents vacuous pass on empty result from Array.every)
     expect(result.rowCount).toBeGreaterThan(0);
     expect(result.rows.every((r: any) => r.database_id === 1)).toBe(true);
@@ -188,7 +188,7 @@ describe('RLS-01: Tenant Isolation', () => {
 
     await expect(
       pg.query(`
-        INSERT INTO object_store_public.files (database_id, bucket_key, key, created_by, etag)
+        INSERT INTO files_store_public.files (database_id, bucket_key, key, created_by, etag)
         VALUES (2, 'default', '2/default/bad_origin', $1, 'bad-etag')
       `, [USER_A])
     ).rejects.toThrow(/row-level security/i);
@@ -201,7 +201,7 @@ describe('RLS-01: Tenant Isolation', () => {
     });
 
     const result = await pg.query(`
-      UPDATE object_store_public.files
+      UPDATE files_store_public.files
       SET status_reason = 'test'
       WHERE id = '44444444-0000-0000-0000-000000000001' AND database_id = 2
     `);
@@ -231,7 +231,7 @@ describe('RLS-02: Visibility', () => {
     });
 
     const result = await pg.query(
-      'SELECT * FROM object_store_public.files WHERE created_by = $1',
+      'SELECT * FROM files_store_public.files WHERE created_by = $1',
       [USER_A]
     );
     expect(result.rowCount).toBe(6);
@@ -244,7 +244,7 @@ describe('RLS-02: Visibility', () => {
     });
 
     const result = await pg.query(
-      'SELECT * FROM object_store_public.files WHERE created_by = $1',
+      'SELECT * FROM files_store_public.files WHERE created_by = $1',
       [USER_B]
     );
     expect(result.rowCount).toBe(1);
@@ -258,7 +258,7 @@ describe('RLS-02: Visibility', () => {
     });
 
     const result = await pg.query(
-      'SELECT * FROM object_store_public.files WHERE created_by = $1',
+      'SELECT * FROM files_store_public.files WHERE created_by = $1',
       [USER_B]
     );
     expect(result.rowCount).toBe(2);
@@ -271,7 +271,7 @@ describe('RLS-02: Visibility', () => {
     });
 
     const result = await pg.query(
-      `SELECT * FROM object_store_public.files
+      `SELECT * FROM files_store_public.files
        WHERE created_by = $1 AND status != 'ready'`,
       [USER_A]
     );
@@ -301,7 +301,7 @@ describe('RLS-03: INSERT/UPDATE Permissions', () => {
     });
 
     const result = await pg.query(`
-      INSERT INTO object_store_public.files (database_id, bucket_key, key, created_by, etag)
+      INSERT INTO files_store_public.files (database_id, bucket_key, key, created_by, etag)
       VALUES (1, 'default', '1/default/new_origin', $1, 'newtag')
       RETURNING *
     `, [USER_A]);
@@ -316,7 +316,7 @@ describe('RLS-03: INSERT/UPDATE Permissions', () => {
     });
 
     const result = await pg.query(`
-      UPDATE object_store_public.files
+      UPDATE files_store_public.files
       SET status_reason = 'user note'
       WHERE id = '11111111-0000-0000-0000-000000000001' AND database_id = 1
     `);
@@ -331,7 +331,7 @@ describe('RLS-03: INSERT/UPDATE Permissions', () => {
 
     await expect(
       pg.query(`
-        DELETE FROM object_store_public.files
+        DELETE FROM files_store_public.files
         WHERE id = '11111111-0000-0000-0000-000000000001' AND database_id = 1
       `)
     ).rejects.toThrow(/permission denied/i);
@@ -344,7 +344,7 @@ describe('RLS-03: INSERT/UPDATE Permissions', () => {
     });
 
     const result = await pg.query(`
-      UPDATE object_store_public.files
+      UPDATE files_store_public.files
       SET status_reason = 'hacked'
       WHERE id = '22222222-0000-0000-0000-000000000002' AND database_id = 1
     `);
@@ -371,7 +371,7 @@ describe('RLS-04: Anonymous -- No Access', () => {
     await switchRole('anonymous', { 'app.database_id': '1' });
 
     await expect(
-      pg.query('SELECT * FROM object_store_public.files')
+      pg.query('SELECT * FROM files_store_public.files')
     ).rejects.toThrow(/permission denied/i);
   });
 
@@ -380,7 +380,7 @@ describe('RLS-04: Anonymous -- No Access', () => {
 
     await expect(
       pg.query(`
-        INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+        INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
         VALUES (1, '1/default/anon_origin', 'default', 'x')
       `)
     ).rejects.toThrow(/permission denied/i);
@@ -388,11 +388,11 @@ describe('RLS-04: Anonymous -- No Access', () => {
 
   it('RLS-04c: public bucket policy works with temporary GRANT', async () => {
     // Temporarily grant SELECT to anonymous (rolled back in afterEach)
-    await pg.query('GRANT SELECT ON object_store_public.files TO anonymous');
+    await pg.query('GRANT SELECT ON files_store_public.files TO anonymous');
 
     await switchRole('anonymous', { 'app.database_id': '1' });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
 
     // Anonymous only has files_public_bucket_read (files_visibility is TO authenticated).
     // Should see only public-assets bucket + ready status.
@@ -424,7 +424,7 @@ describe('RLS-05: Administrator Override', () => {
       'app.role': 'administrator',
     });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     expect(result.rowCount).toBe(8);
     expect(result.rows.every((r: any) => r.database_id === 1)).toBe(true);
   });
@@ -436,7 +436,7 @@ describe('RLS-05: Administrator Override', () => {
     });
 
     const result = await pg.query(`
-      SELECT * FROM object_store_public.files
+      SELECT * FROM files_store_public.files
       WHERE status IN ('pending', 'error')
     `);
     expect(result.rowCount).toBe(4);
@@ -449,7 +449,7 @@ describe('RLS-05: Administrator Override', () => {
     });
 
     const result = await pg.query(`
-      UPDATE object_store_public.files
+      UPDATE files_store_public.files
       SET status_reason = 'admin override'
       WHERE id = '22222222-0000-0000-0000-000000000002' AND database_id = 1
     `);
@@ -463,7 +463,7 @@ describe('RLS-05: Administrator Override', () => {
     });
 
     const result = await pg.query(
-      'SELECT * FROM object_store_public.files WHERE database_id = 2'
+      'SELECT * FROM files_store_public.files WHERE database_id = 2'
     );
     expect(result.rowCount).toBe(0);
   });
@@ -476,7 +476,7 @@ describe('RLS-05: Administrator Override', () => {
 
     await expect(
       pg.query(`
-        DELETE FROM object_store_public.files
+        DELETE FROM files_store_public.files
         WHERE id = '11111111-0000-0000-0000-000000000001' AND database_id = 1
       `)
     ).rejects.toThrow(/permission denied/i);
@@ -504,7 +504,7 @@ describe('RLS-06: service_role', () => {
       'app.role': 'administrator',
     });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     expect(result.rowCount).toBe(8);
     expect(result.rows.every((r: any) => r.database_id === 1)).toBe(true);
   });
@@ -515,7 +515,7 @@ describe('RLS-06: service_role', () => {
       'app.role': 'administrator',
     });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     expect(result.rowCount).toBe(8);
   });
 
@@ -524,7 +524,7 @@ describe('RLS-06: service_role', () => {
       'app.database_id': '1',
     });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     // Without app.role and without app.user_id, visibility policy reduces to
     // status = 'ready' (NULLIF on empty user_id → NULL → created_by check is NULL).
     // Expect ready files in tenant 1: 111...01, 222...01, 333...01 = 3
@@ -539,7 +539,7 @@ describe('RLS-06: service_role', () => {
     });
 
     const result = await pg.query(`
-      DELETE FROM object_store_public.files
+      DELETE FROM files_store_public.files
       WHERE id = '11111111-0000-0000-0000-000000000001' AND database_id = 1
     `);
     expect(result.rowCount).toBe(1);
@@ -552,7 +552,7 @@ describe('RLS-06: service_role', () => {
     });
 
     const result = await pg.query(`
-      DELETE FROM object_store_public.files
+      DELETE FROM files_store_public.files
       WHERE id = '44444444-0000-0000-0000-000000000001' AND database_id = 2
     `);
     expect(result.rowCount).toBe(0);
@@ -576,7 +576,7 @@ describe('RLS-08: Buckets Table Access', () => {
   it('RLS-08a: authenticated role can read buckets (GRANT added for policy subquery)', async () => {
     await switchRole('authenticated', { 'app.database_id': '1' });
 
-    const result = await pg.query('SELECT * FROM object_store_public.buckets');
+    const result = await pg.query('SELECT * FROM files_store_public.buckets');
     // Buckets has no RLS -- all 3 seeded buckets visible (2 tenant 1 + 1 tenant 2)
     expect(result.rowCount).toBe(3);
   });
@@ -584,7 +584,7 @@ describe('RLS-08: Buckets Table Access', () => {
   it('RLS-08b: service_role can read buckets (GRANT added for policy subquery)', async () => {
     await switchRole('service_role', { 'app.database_id': '1' });
 
-    const result = await pg.query('SELECT * FROM object_store_public.buckets');
+    const result = await pg.query('SELECT * FROM files_store_public.buckets');
     expect(result.rowCount).toBe(3);
   });
 });
@@ -611,7 +611,7 @@ describe('RLS-09: Edge Cases', () => {
     });
 
     await expect(
-      pg.query('SELECT * FROM object_store_public.files')
+      pg.query('SELECT * FROM files_store_public.files')
     ).rejects.toThrow(/invalid input syntax for type integer/);
   });
 
@@ -622,7 +622,7 @@ describe('RLS-09: Edge Cases', () => {
     });
 
     await expect(
-      pg.query('SELECT * FROM object_store_public.files')
+      pg.query('SELECT * FROM files_store_public.files')
     ).rejects.toThrow(/invalid input syntax for type uuid/);
   });
 
@@ -632,7 +632,7 @@ describe('RLS-09: Edge Cases', () => {
       'app.user_id': USER_A,
     });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     expect(result.rowCount).toBe(0);
   });
 
@@ -646,7 +646,7 @@ describe('RLS-09: Edge Cases', () => {
     // Note: RETURNING * would fail here because SELECT policies block reading
     // the row back (created_by=USER_B != app.user_id=USER_A and status='pending').
     const result = await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, created_by, etag)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, created_by, etag)
       VALUES (1, '1/default/spoof_origin', 'default', $1, 'x')
     `, [USER_B]);
     expect(result.rowCount).toBe(1);
@@ -654,7 +654,7 @@ describe('RLS-09: Edge Cases', () => {
     // Verify the spoofed created_by was persisted by reading as superuser
     await pg.query('RESET ROLE');
     const verify = await pg.query(
-      `SELECT created_by FROM object_store_public.files WHERE key = '1/default/spoof_origin'`
+      `SELECT created_by FROM files_store_public.files WHERE key = '1/default/spoof_origin'`
     );
     expect(verify.rows[0].created_by).toBe(USER_B);
   });
@@ -666,7 +666,7 @@ describe('RLS-09: Edge Cases', () => {
       'app.role': 'authenticated',
     });
 
-    const result = await pg.query('SELECT * FROM object_store_public.files');
+    const result = await pg.query('SELECT * FROM files_store_public.files');
     // Policies: RESTRICTIVE(tenant_isolation) AND PERMISSIVE(visibility OR public_bucket_read OR admin_override)
     // User A sees: own files (all 6) + User B's ready file (1) = 7
     // (User B's pending file is invisible; admin_override is false)
@@ -696,7 +696,7 @@ describe('RLS-10: State Machine with RLS', () => {
     });
 
     const result = await pg.query(`
-      UPDATE object_store_public.files
+      UPDATE files_store_public.files
       SET status = 'processing'
       WHERE id = '11111111-0000-0000-0000-000000000002' AND database_id = 1
       RETURNING *
@@ -712,7 +712,7 @@ describe('RLS-10: State Machine with RLS', () => {
     });
 
     const result = await pg.query(`
-      UPDATE object_store_public.files
+      UPDATE files_store_public.files
       SET status = 'processing'
       WHERE id = '22222222-0000-0000-0000-000000000002' AND database_id = 1
     `);
@@ -727,7 +727,7 @@ describe('RLS-10: State Machine with RLS', () => {
 
     await expect(
       pg.query(`
-        UPDATE object_store_public.files
+        UPDATE files_store_public.files
         SET status = 'deleting'
         WHERE id = '11111111-0000-0000-0000-000000000002' AND database_id = 1
       `)

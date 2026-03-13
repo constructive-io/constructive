@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 import { getConnections, PgTestClient, seed } from 'pgsql-test';
 
-const MIGRATION_PATH = resolve(__dirname, '../object_store.sql');
+const MIGRATION_PATH = resolve(__dirname, '../files_store.sql');
 
 const USER_A = 'aaaaaaaa-0000-0000-0000-000000000001';
 
@@ -57,10 +57,10 @@ beforeAll(async () => {
   `);
 
   // Grants needed for isolated test (normally from pgpm extension deploy)
-  await pg.query('GRANT USAGE ON SCHEMA object_store_public TO authenticated');
-  await pg.query('GRANT USAGE ON SCHEMA object_store_public TO service_role');
-  await pg.query('GRANT SELECT ON object_store_public.buckets TO authenticated');
-  await pg.query('GRANT SELECT ON object_store_public.buckets TO service_role');
+  await pg.query('GRANT USAGE ON SCHEMA files_store_public TO authenticated');
+  await pg.query('GRANT USAGE ON SCHEMA files_store_public TO service_role');
+  await pg.query('GRANT SELECT ON files_store_public.buckets TO authenticated');
+  await pg.query('GRANT SELECT ON files_store_public.buckets TO service_role');
 
   // Replace the app_jobs.add_job stub with one that records calls
   await pg.query(`
@@ -98,7 +98,7 @@ beforeAll(async () => {
 
   // Seed a default bucket
   await pg.query(`
-    INSERT INTO object_store_public.buckets (database_id, key, name, is_public, config)
+    INSERT INTO files_store_public.buckets (database_id, key, name, is_public, config)
     VALUES (1, 'default', 'Default Bucket', false, '{}')
   `);
 });
@@ -134,13 +134,13 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
     });
 
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag)
       VALUES ($1, 1, $2, 'default', $3, 'etag-origin')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
 
     // Verify file exists with pending status
     const file = await pg.query(
-      'SELECT * FROM object_store_public.files WHERE id = $1',
+      'SELECT * FROM files_store_public.files WHERE id = $1',
       [ORIGIN_ID]
     );
     expect(file.rowCount).toBe(1);
@@ -164,7 +164,7 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
   it('step 2: service_role transitions pending → processing', async () => {
     // Insert as superuser first
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag-origin', 'pending')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
     await clearJobLog();
@@ -176,14 +176,14 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
     });
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'processing' WHERE id = $1 AND database_id = 1`,
+      `UPDATE files_store_public.files SET status = 'processing' WHERE id = $1 AND database_id = 1`,
       [ORIGIN_ID]
     );
 
     // Verify processing_started_at is set
     await pg.query('RESET ROLE');
     const file = await pg.query(
-      'SELECT status, processing_started_at FROM object_store_public.files WHERE id = $1',
+      'SELECT status, processing_started_at FROM files_store_public.files WHERE id = $1',
       [ORIGIN_ID]
     );
     expect(file.rows[0].status).toBe('processing');
@@ -193,7 +193,7 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
   it('step 3: service_role inserts version rows (status=ready, bypasses job trigger)', async () => {
     // Setup: origin in processing state
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag-origin', 'processing')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
     await clearJobLog();
@@ -205,7 +205,7 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
     });
 
     await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, created_by, etag, status)
       VALUES
         (1, $1, 'default', $2, 'etag-thumb', 'ready'),
         (1, $3, 'default', $2, 'etag-large', 'ready')
@@ -218,7 +218,7 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
 
     // Verify all three rows exist
     const files = await pg.query(
-      `SELECT key, status FROM object_store_public.files WHERE database_id = 1 ORDER BY key`
+      `SELECT key, status FROM files_store_public.files WHERE database_id = 1 ORDER BY key`
     );
     expect(files.rowCount).toBe(3);
     expect(files.rows.map((r: any) => ({ key: r.key, status: r.status }))).toEqual([
@@ -231,7 +231,7 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
   it('step 4: service_role transitions origin processing → ready', async () => {
     // Setup: origin in processing state
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag-origin', 'processing')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
 
@@ -241,14 +241,14 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
     });
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'ready' WHERE id = $1 AND database_id = 1`,
+      `UPDATE files_store_public.files SET status = 'ready' WHERE id = $1 AND database_id = 1`,
       [ORIGIN_ID]
     );
 
     // Verify status and processing_started_at cleared
     await pg.query('RESET ROLE');
     const file = await pg.query(
-      'SELECT status, processing_started_at, updated_at, created_at FROM object_store_public.files WHERE id = $1',
+      'SELECT status, processing_started_at, updated_at, created_at FROM files_store_public.files WHERE id = $1',
       [ORIGIN_ID]
     );
     expect(file.rows[0].status).toBe('ready');
@@ -261,7 +261,7 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
   it('step 5: user sees origin + versions after processing completes', async () => {
     // Setup: origin ready + 2 version rows ready
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES
         ($1, 1, $2, 'default', $4, 'etag-origin', 'ready'),
         (gen_random_uuid(), 1, $3, 'default', $4, 'etag-thumb', 'ready'),
@@ -275,7 +275,7 @@ describe('E2E-01: Upload Lifecycle -- happy path', () => {
     });
 
     const files = await pg.query(
-      `SELECT key, status FROM object_store_public.files WHERE key LIKE '1/default/abc123%' ORDER BY key`
+      `SELECT key, status FROM files_store_public.files WHERE key LIKE '1/default/abc123%' ORDER BY key`
     );
     expect(files.rowCount).toBe(3);
     expect(files.rows.every((r: any) => r.status === 'ready')).toBe(true);
@@ -301,7 +301,7 @@ describe('E2E-02: Error + Retry Path', () => {
 
   it('processing → error stores status_reason', async () => {
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag', 'processing')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
 
@@ -311,7 +311,7 @@ describe('E2E-02: Error + Retry Path', () => {
     });
 
     await pg.query(
-      `UPDATE object_store_public.files
+      `UPDATE files_store_public.files
        SET status = 'error', status_reason = 'sharp: unsupported image format'
        WHERE id = $1 AND database_id = 1`,
       [ORIGIN_ID]
@@ -319,7 +319,7 @@ describe('E2E-02: Error + Retry Path', () => {
 
     await pg.query('RESET ROLE');
     const file = await pg.query(
-      'SELECT status, status_reason, processing_started_at FROM object_store_public.files WHERE id = $1',
+      'SELECT status, status_reason, processing_started_at FROM files_store_public.files WHERE id = $1',
       [ORIGIN_ID]
     );
     expect(file.rows[0].status).toBe('error');
@@ -330,7 +330,7 @@ describe('E2E-02: Error + Retry Path', () => {
 
   it('error → pending (retry) re-queues process-image job', async () => {
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag', 'error')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
     await clearJobLog();
@@ -341,7 +341,7 @@ describe('E2E-02: Error + Retry Path', () => {
     });
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'pending' WHERE id = $1 AND database_id = 1`,
+      `UPDATE files_store_public.files SET status = 'pending' WHERE id = $1 AND database_id = 1`,
       [ORIGIN_ID]
     );
 
@@ -359,7 +359,7 @@ describe('E2E-02: Error + Retry Path', () => {
   it('full retry cycle: pending → processing → error → pending → processing → ready', async () => {
     // Step 1: upload (pending)
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag)
       VALUES ($1, 1, $2, 'default', $3, 'etag')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
 
@@ -367,25 +367,25 @@ describe('E2E-02: Error + Retry Path', () => {
 
     // Step 2: processing
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'processing' WHERE id = $1`,
+      `UPDATE files_store_public.files SET status = 'processing' WHERE id = $1`,
       [ORIGIN_ID]
     );
-    let file = await pg.query('SELECT * FROM object_store_public.files WHERE id = $1', [ORIGIN_ID]);
+    let file = await pg.query('SELECT * FROM files_store_public.files WHERE id = $1', [ORIGIN_ID]);
     expect(file.rows[0].status).toBe('processing');
     expect(file.rows[0].processing_started_at).not.toBeNull();
 
     // Step 3: error
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'error', status_reason = 'timeout' WHERE id = $1`,
+      `UPDATE files_store_public.files SET status = 'error', status_reason = 'timeout' WHERE id = $1`,
       [ORIGIN_ID]
     );
-    file = await pg.query('SELECT * FROM object_store_public.files WHERE id = $1', [ORIGIN_ID]);
+    file = await pg.query('SELECT * FROM files_store_public.files WHERE id = $1', [ORIGIN_ID]);
     expect(file.rows[0].status).toBe('error');
     expect(file.rows[0].processing_started_at).toBeNull();
 
     // Step 4: retry (error → pending) — should re-queue job
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'pending' WHERE id = $1`,
+      `UPDATE files_store_public.files SET status = 'pending' WHERE id = $1`,
       [ORIGIN_ID]
     );
     let jobs = await getJobLog();
@@ -395,16 +395,16 @@ describe('E2E-02: Error + Retry Path', () => {
     // Step 5: processing again
     await clearJobLog();
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'processing' WHERE id = $1`,
+      `UPDATE files_store_public.files SET status = 'processing' WHERE id = $1`,
       [ORIGIN_ID]
     );
 
     // Step 6: ready
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'ready' WHERE id = $1`,
+      `UPDATE files_store_public.files SET status = 'ready' WHERE id = $1`,
       [ORIGIN_ID]
     );
-    file = await pg.query('SELECT * FROM object_store_public.files WHERE id = $1', [ORIGIN_ID]);
+    file = await pg.query('SELECT * FROM files_store_public.files WHERE id = $1', [ORIGIN_ID]);
     expect(file.rows[0].status).toBe('ready');
     expect(file.rows[0].processing_started_at).toBeNull();
   });
@@ -430,13 +430,13 @@ describe('E2E-03: Deletion Flow', () => {
 
   it('ready → deleting queues delete_s3_object job', async () => {
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag', 'ready')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
     await clearJobLog();
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'deleting' WHERE id = $1`,
+      `UPDATE files_store_public.files SET status = 'deleting' WHERE id = $1`,
       [ORIGIN_ID]
     );
 
@@ -450,7 +450,7 @@ describe('E2E-03: Deletion Flow', () => {
   it('deleting origin + version rows each queue separate jobs', async () => {
     const VERSION_ID = '30000000-0000-0000-0000-000000000002';
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES
         ($1, 1, $2, 'default', $4, 'etag-origin', 'ready'),
         ($3, 1, $5, 'default', $4, 'etag-thumb', 'ready')
@@ -459,7 +459,7 @@ describe('E2E-03: Deletion Flow', () => {
 
     // Delete both
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'deleting'
+      `UPDATE files_store_public.files SET status = 'deleting'
        WHERE database_id = 1 AND key LIKE '1/default/del123%'`
     );
 
@@ -471,18 +471,18 @@ describe('E2E-03: Deletion Flow', () => {
 
   it('error → deleting is valid (skip processing on permanent failure)', async () => {
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag', 'error')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
     await clearJobLog();
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'deleting', status_reason = 'user cancelled'
+      `UPDATE files_store_public.files SET status = 'deleting', status_reason = 'user cancelled'
        WHERE id = $1`,
       [ORIGIN_ID]
     );
 
-    const file = await pg.query('SELECT status, status_reason FROM object_store_public.files WHERE id = $1', [ORIGIN_ID]);
+    const file = await pg.query('SELECT status, status_reason FROM files_store_public.files WHERE id = $1', [ORIGIN_ID]);
     expect(file.rows[0].status).toBe('deleting');
     expect(file.rows[0].status_reason).toBe('user cancelled');
 
@@ -493,7 +493,7 @@ describe('E2E-03: Deletion Flow', () => {
 
   it('service_role can hard-DELETE after marking as deleting', async () => {
     await pg.query(`
-      INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag', 'deleting')
     `, [ORIGIN_ID, ORIGIN_KEY, USER_A]);
 
@@ -503,7 +503,7 @@ describe('E2E-03: Deletion Flow', () => {
     });
 
     const result = await pg.query(
-      'DELETE FROM object_store_public.files WHERE id = $1 AND database_id = 1',
+      'DELETE FROM files_store_public.files WHERE id = $1 AND database_id = 1',
       [ORIGIN_ID]
     );
     expect(result.rowCount).toBe(1);
@@ -511,7 +511,7 @@ describe('E2E-03: Deletion Flow', () => {
     // Verify gone
     await pg.query('RESET ROLE');
     const check = await pg.query(
-      'SELECT * FROM object_store_public.files WHERE id = $1',
+      'SELECT * FROM files_store_public.files WHERE id = $1',
       [ORIGIN_ID]
     );
     expect(check.rowCount).toBe(0);
@@ -549,13 +549,13 @@ describe('E2E-04: State Machine Validation', () => {
     'rejects %s → %s',
     async (from, to) => {
       await pg.query(`
-        INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+        INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
         VALUES ($1, 1, $2, 'default', $3, 'etag', $4)
       `, [ORIGIN_ID, ORIGIN_KEY, USER_A, from]);
 
       await expect(
         pg.query(
-          `UPDATE object_store_public.files SET status = $1 WHERE id = $2`,
+          `UPDATE files_store_public.files SET status = $1 WHERE id = $2`,
           [to, ORIGIN_ID]
         )
       ).rejects.toThrow(/Invalid status transition/);
@@ -577,17 +577,17 @@ describe('E2E-04: State Machine Validation', () => {
     'allows %s → %s',
     async (from, to) => {
       await pg.query(`
-        INSERT INTO object_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
+        INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
         VALUES ($1, 1, $2, 'default', $3, 'etag', $4)
       `, [ORIGIN_ID, ORIGIN_KEY, USER_A, from]);
 
       await pg.query(
-        `UPDATE object_store_public.files SET status = $1 WHERE id = $2`,
+        `UPDATE files_store_public.files SET status = $1 WHERE id = $2`,
         [to, ORIGIN_ID]
       );
 
       const file = await pg.query(
-        'SELECT status FROM object_store_public.files WHERE id = $1',
+        'SELECT status FROM files_store_public.files WHERE id = $1',
         [ORIGIN_ID]
       );
       expect(file.rows[0].status).toBe(to);
@@ -611,7 +611,7 @@ describe('E2E-05: Constraints', () => {
   it('rejects empty key', async () => {
     await expect(
       pg.query(`
-        INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+        INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
         VALUES (1, '', 'default', 'x')
       `)
     ).rejects.toThrow(/files_key_not_empty/);
@@ -621,7 +621,7 @@ describe('E2E-05: Constraints', () => {
     const longKey = '1/default/' + 'a'.repeat(1020);
     await expect(
       pg.query(`
-        INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+        INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
         VALUES (1, $1, 'default', 'x')
       `, [longKey])
     ).rejects.toThrow(/files_key_max_length/);
@@ -630,7 +630,7 @@ describe('E2E-05: Constraints', () => {
   it('rejects invalid bucket_key format', async () => {
     await expect(
       pg.query(`
-        INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+        INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
         VALUES (1, '1/BAD/test_origin', 'BAD-BUCKET', 'x')
       `)
     ).rejects.toThrow(/files_bucket_key_format/);
@@ -639,7 +639,7 @@ describe('E2E-05: Constraints', () => {
   it('rejects partial source reference (source_table without source_column)', async () => {
     await expect(
       pg.query(`
-        INSERT INTO object_store_public.files (database_id, key, bucket_key, etag, source_table)
+        INSERT INTO files_store_public.files (database_id, key, bucket_key, etag, source_table)
         VALUES (1, '1/default/partial_origin', 'default', 'x', 'some_schema.some_table')
       `)
     ).rejects.toThrow(/files_source_complete/);
@@ -647,7 +647,7 @@ describe('E2E-05: Constraints', () => {
 
   it('accepts complete source reference', async () => {
     const result = await pg.query(`
-      INSERT INTO object_store_public.files
+      INSERT INTO files_store_public.files
         (database_id, key, bucket_key, etag, source_table, source_column, source_id)
       VALUES (1, '1/default/ref_origin', 'default', 'x',
               'some_schema.some_table', 'image', gen_random_uuid())
@@ -659,13 +659,13 @@ describe('E2E-05: Constraints', () => {
 
   it('enforces unique key per tenant', async () => {
     await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
       VALUES (1, '1/default/dup_origin', 'default', 'e1')
     `);
 
     await expect(
       pg.query(`
-        INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+        INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
         VALUES (1, '1/default/dup_origin', 'default', 'e2')
       `)
     ).rejects.toThrow(/files_key_unique/);
@@ -673,12 +673,12 @@ describe('E2E-05: Constraints', () => {
 
   it('allows same key in different tenants', async () => {
     await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
       VALUES (1, '1/default/shared_origin', 'default', 'e1')
     `);
 
     const result = await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, etag)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, etag)
       VALUES (2, '1/default/shared_origin', 'default', 'e2')
       RETURNING *
     `);
@@ -698,7 +698,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
   beforeEach(async () => {
     await pg.beforeEach();
     await pg.query(`
-      INSERT INTO object_store_public.buckets (database_id, key, name, is_public, config)
+      INSERT INTO files_store_public.buckets (database_id, key, name, is_public, config)
       VALUES (1, 'default', 'Default Bucket', false, '{}')
       ON CONFLICT DO NOTHING
     `);
@@ -719,13 +719,13 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     });
 
     await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, created_by, etag)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, created_by, etag)
       VALUES (1, $1, 'default', $2, 'etag-origin')
     `, [ORIGIN_KEY, USER_A]);
 
     // Verify: user sees their pending file
     let myFiles = await pg.query(
-      `SELECT key, status FROM object_store_public.files WHERE key = $1`,
+      `SELECT key, status FROM files_store_public.files WHERE key = $1`,
       [ORIGIN_KEY]
     );
     expect(myFiles.rowCount).toBe(1);
@@ -739,7 +739,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
 
     // Get the origin ID for later
     const originRow = await pg.query(
-      `SELECT id FROM object_store_public.files WHERE key = $1 AND database_id = 1`,
+      `SELECT id FROM files_store_public.files WHERE key = $1 AND database_id = 1`,
       [ORIGIN_KEY]
     );
     const originId = originRow.rows[0].id;
@@ -754,13 +754,13 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     });
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'processing' WHERE id = $1 AND database_id = 1`,
+      `UPDATE files_store_public.files SET status = 'processing' WHERE id = $1 AND database_id = 1`,
       [originId]
     );
 
     await pg.query('RESET ROLE');
     let origin = await pg.query(
-      'SELECT status, processing_started_at FROM object_store_public.files WHERE id = $1',
+      'SELECT status, processing_started_at FROM files_store_public.files WHERE id = $1',
       [originId]
     );
     expect(origin.rows[0].status).toBe('processing');
@@ -775,7 +775,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     });
 
     await pg.query(`
-      INSERT INTO object_store_public.files (database_id, key, bucket_key, created_by, etag, status)
+      INSERT INTO files_store_public.files (database_id, key, bucket_key, created_by, etag, status)
       VALUES
         (1, $1, 'default', $2, 'etag-thumb', 'ready'),
         (1, $3, 'default', $2, 'etag-large', 'ready')
@@ -795,13 +795,13 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     });
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'ready' WHERE id = $1 AND database_id = 1`,
+      `UPDATE files_store_public.files SET status = 'ready' WHERE id = $1 AND database_id = 1`,
       [originId]
     );
 
     await pg.query('RESET ROLE');
     origin = await pg.query(
-      'SELECT status, processing_started_at FROM object_store_public.files WHERE id = $1',
+      'SELECT status, processing_started_at FROM files_store_public.files WHERE id = $1',
       [originId]
     );
     expect(origin.rows[0].status).toBe('ready');
@@ -816,7 +816,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     });
 
     const allFiles = await pg.query(
-      `SELECT key, status FROM object_store_public.files
+      `SELECT key, status FROM files_store_public.files
        WHERE key LIKE '1/default/full_e2e%'
        ORDER BY key`
     );
@@ -839,7 +839,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     });
 
     await pg.query(
-      `UPDATE object_store_public.files SET status = 'deleting'
+      `UPDATE files_store_public.files SET status = 'deleting'
        WHERE key LIKE '1/default/full_e2e%' AND database_id = 1`
     );
 
@@ -860,7 +860,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     });
 
     const deleted = await pg.query(
-      `DELETE FROM object_store_public.files
+      `DELETE FROM files_store_public.files
        WHERE key LIKE '1/default/full_e2e%' AND database_id = 1`
     );
     expect(deleted.rowCount).toBe(3);
@@ -868,7 +868,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     // Verify: no files remain
     await pg.query('RESET ROLE');
     const remaining = await pg.query(
-      `SELECT * FROM object_store_public.files WHERE key LIKE '1/default/full_e2e%'`
+      `SELECT * FROM files_store_public.files WHERE key LIKE '1/default/full_e2e%'`
     );
     expect(remaining.rowCount).toBe(0);
   });
