@@ -41,7 +41,9 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.1.10"
+    "graphile-test": "workspace:^",
+    "makage": "^0.1.10",
+    "pgsql-test": "workspace:^"
   },
   "peerDependencies": {
     "@dataplan/pg": "1.0.0-rc.5",

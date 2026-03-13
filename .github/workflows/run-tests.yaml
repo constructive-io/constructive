@@ -75,6 +75,8 @@ jobs:
             env: {}
           - package: graphile/graphile-pgvector-plugin
             env: {}
+          - package: graphile/graphile-connection-filter
+            env: {}
           - package: graphql/server-test
             env: {}
           - package: graphql/env

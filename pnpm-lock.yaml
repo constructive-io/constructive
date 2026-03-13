@@ -226,9 +226,15 @@ importers:
       '@types/node':
         specifier: ^22.19.11
         version: 22.19.11
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
       makage:
         specifier: ^0.1.10
         version: 0.1.12
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
   graphile/graphile-misc-plugins:
