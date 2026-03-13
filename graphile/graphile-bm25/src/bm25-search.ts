@@ -49,7 +49,7 @@ import { QuoteUtils } from '@pgsql/quotes';
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      /** Name for the BM25 score field (e.g. "bm25BodyScore") */
+      /** Name for the BM25 score field (e.g. "bodyBm25Score") */
       pgBm25Score(this: Inflection, fieldName: string): string;
       /** Name for orderBy enum value for BM25 score */
       pgBm25OrderByScoreEnum(
@@ -130,7 +130,9 @@ export function createBm25SearchPlugin(
     inflection: {
       add: {
         pgBm25Score(_preset, fieldName) {
-          return this.camelCase(`bm25-${fieldName}-score`);
+          // Dedup: if fieldName already ends with 'Bm25', don't double it
+          const suffix = fieldName.toLowerCase().endsWith('bm25') ? 'score' : 'bm25-score';
+          return this.camelCase(`${fieldName}-${suffix}`);
         },
         pgBm25OrderByScoreEnum(_preset, codec, attributeName, ascending) {
           const columnName = this._attributeName({
@@ -138,8 +140,10 @@ export function createBm25SearchPlugin(
             attributeName,
             skipRowId: true,
           });
+          // Dedup: if columnName already ends with '_bm25', don't double it
+          const suffix = columnName.toLowerCase().endsWith('_bm25') ? 'score' : 'bm25_score';
           return this.constantCase(
-            `bm25_${columnName}_score_${ascending ? 'asc' : 'desc'}`,
+            `${columnName}_${suffix}_${ascending ? 'asc' : 'desc'}`,
           );
         },
       },

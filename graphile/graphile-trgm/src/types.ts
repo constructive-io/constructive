@@ -15,4 +15,12 @@ export interface TrgmSearchPluginOptions {
    * @default false
    */
   connectionFilterTrgmRequireIndex?: boolean;
+
+  /**
+   * Prefix used to generate filter field names on the connection filter input type.
+   * The field name is generated as: `{filterPrefix}{ColumnName}` (camelCase).
+   * For example, with filterPrefix 'trgm' and column 'name': `trgmName`.
+   * @default 'trgm'
+   */
+  filterPrefix?: string;
 }

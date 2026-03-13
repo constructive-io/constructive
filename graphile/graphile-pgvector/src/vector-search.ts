@@ -35,7 +35,7 @@ import type { VectorSearchPluginOptions } from './types';
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      /** Name for the distance field (e.g. "embeddingDistance") */
+      /** Name for the distance field (e.g. "embeddingVectorDistance") */
       pgVectorDistance(this: Inflection, fieldName: string): string;
       /** Name for orderBy enum value for vector distance */
       pgVectorOrderByDistanceEnum(
@@ -112,7 +112,9 @@ export function createVectorSearchPlugin(
     inflection: {
       add: {
         pgVectorDistance(_preset, fieldName) {
-          return this.camelCase(`${fieldName}-distance`);
+          // Dedup: if fieldName already ends with 'Vector', don't double it
+          const suffix = fieldName.toLowerCase().endsWith('vector') ? 'distance' : 'vector-distance';
+          return this.camelCase(`${fieldName}-${suffix}`);
         },
         pgVectorOrderByDistanceEnum(_preset, codec, attributeName, ascending) {
           const columnName = this._attributeName({
@@ -120,8 +122,10 @@ export function createVectorSearchPlugin(
             attributeName,
             skipRowId: true,
           });
+          // Dedup: if columnName already ends with '_vector', don't double it
+          const suffix = columnName.toLowerCase().endsWith('_vector') ? 'distance' : 'vector_distance';
           return this.constantCase(
-            `${columnName}_distance_${ascending ? 'asc' : 'desc'}`,
+            `${columnName}_${suffix}_${ascending ? 'asc' : 'desc'}`,
           );
         },
       },
@@ -534,7 +538,7 @@ export function createVectorSearchPlugin(
 
                       // ORDER BY distance: only add when the user
                       // explicitly requested distance ordering via
-                      // the EMBEDDING_DISTANCE_ASC/DESC enum values.
+                      // the EMBEDDING_VECTOR_DISTANCE_ASC/DESC enum values.
                       if (qb && typeof qb.getMetaRaw === 'function') {
                         const orderMetaKey = `vector_order_${baseFieldName}`;
                         const explicitDir = qb.getMetaRaw(orderMetaKey);

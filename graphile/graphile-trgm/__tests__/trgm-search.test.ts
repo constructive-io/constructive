@@ -12,8 +12,8 @@ interface AllProductsResult {
       name: string;
       description: string | null;
       category: string | null;
-      nameSimilarity: number | null;
-      descriptionSimilarity: number | null;
+      nameTrgmSimilarity: number | null;
+      descriptionTrgmSimilarity: number | null;
     }>;
   };
 }
@@ -122,7 +122,7 @@ describe('TrgmSearchPlugin', () => {
       expect(fieldNames).toContain('trgmDescription');
     });
 
-    it('exposes nameSimilarity computed field on Product type', async () => {
+    it('exposes nameTrgmSimilarity computed field on Product type', async () => {
       const result = await query<{ __type: { fields: { name: string }[] } | null }>(`
         query {
           __type(name: "Product") {
@@ -133,8 +133,8 @@ describe('TrgmSearchPlugin', () => {
 
       expect(result.errors).toBeUndefined();
       const fieldNames = result.data?.__type?.fields?.map((f) => f.name) ?? [];
-      expect(fieldNames).toContain('nameSimilarity');
-      expect(fieldNames).toContain('descriptionSimilarity');
+      expect(fieldNames).toContain('nameTrgmSimilarity');
+      expect(fieldNames).toContain('descriptionTrgmSimilarity');
     });
   });
 
@@ -218,7 +218,7 @@ describe('TrgmSearchPlugin', () => {
           }) {
             nodes {
               name
-              nameSimilarity
+              nameTrgmSimilarity
             }
           }
         }
@@ -230,7 +230,7 @@ describe('TrgmSearchPlugin', () => {
       expect(nodes[0].name).toBe('PostgreSQL Database');
     });
 
-    it('returns nameSimilarity score when trgm filter is active', async () => {
+    it('returns nameTrgmSimilarity score when trgm filter is active', async () => {
       const result = await query<AllProductsResult>(`
         query {
           allProducts(filter: {
@@ -238,7 +238,7 @@ describe('TrgmSearchPlugin', () => {
           }) {
             nodes {
               name
-              nameSimilarity
+              nameTrgmSimilarity
             }
           }
         }
@@ -249,19 +249,19 @@ describe('TrgmSearchPlugin', () => {
       expect(nodes.length).toBeGreaterThan(0);
 
       for (const node of nodes) {
-        expect(typeof node.nameSimilarity).toBe('number');
-        expect(node.nameSimilarity).toBeGreaterThan(0);
-        expect(node.nameSimilarity).toBeLessThanOrEqual(1);
+        expect(typeof node.nameTrgmSimilarity).toBe('number');
+        expect(node.nameTrgmSimilarity).toBeGreaterThan(0);
+        expect(node.nameTrgmSimilarity).toBeLessThanOrEqual(1);
       }
     });
 
-    it('returns null for nameSimilarity when no trgm filter is active', async () => {
+    it('returns null for nameTrgmSimilarity when no trgm filter is active', async () => {
       const result = await query<AllProductsResult>(`
         query {
           allProducts {
             nodes {
               name
-              nameSimilarity
+              nameTrgmSimilarity
             }
           }
         }
@@ -272,7 +272,7 @@ describe('TrgmSearchPlugin', () => {
       expect(nodes.length).toBeGreaterThan(0);
 
       for (const node of nodes) {
-        expect(node.nameSimilarity).toBeNull();
+        expect(node.nameTrgmSimilarity).toBeNull();
       }
     });
 
@@ -284,7 +284,7 @@ describe('TrgmSearchPlugin', () => {
           }) {
             nodes {
               name
-              nameSimilarity
+              nameTrgmSimilarity
             }
           }
         }
@@ -296,7 +296,7 @@ describe('TrgmSearchPlugin', () => {
       expect(nodes.length).toBeGreaterThan(0);
       // All returned should have similarity > 0.3
       for (const node of nodes) {
-        expect(node.nameSimilarity).toBeGreaterThan(0.3);
+        expect(node.nameTrgmSimilarity).toBeGreaterThan(0.3);
       }
     });
   });
@@ -315,7 +315,7 @@ describe('TrgmSearchPlugin', () => {
             nodes {
               name
               category
-              nameSimilarity
+              nameTrgmSimilarity
             }
           }
         }
@@ -326,7 +326,7 @@ describe('TrgmSearchPlugin', () => {
       expect(nodes.length).toBeGreaterThan(0);
       for (const node of nodes) {
         expect(node.category).toBe('database');
-        expect(node.nameSimilarity).toBeGreaterThan(0);
+        expect(node.nameTrgmSimilarity).toBeGreaterThan(0);
       }
     });
 
@@ -341,7 +341,7 @@ describe('TrgmSearchPlugin', () => {
           ) {
             nodes {
               name
-              nameSimilarity
+              nameTrgmSimilarity
             }
           }
         }

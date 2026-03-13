@@ -13,8 +13,8 @@ interface AllArticlesResult {
       title: string;
       body: string;
       category: string | null;
-      bm25BodyScore: number | null;
-      bm25TitleScore: number | null;
+      bodyBm25Score: number | null;
+      titleBm25Score: number | null;
     }>;
   };
 }
@@ -80,6 +80,7 @@ describe('Bm25SearchPlugin', () => {
   });
 
   describe('filter field (bm25Body)', () => {
+    // Note: filter fields keep {algo}{Column} pattern (algo first)
     it('performs BM25 search with a query string', async () => {
       const result = await query<AllArticlesResult>(`
         query {
@@ -91,7 +92,7 @@ describe('Bm25SearchPlugin', () => {
             nodes {
               title
               body
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -105,7 +106,7 @@ describe('Bm25SearchPlugin', () => {
       expect(nodes!.length).toBeGreaterThan(0);
     });
 
-    it('returns bm25BodyScore computed field when filter is active', async () => {
+    it('returns bodyBm25Score computed field when filter is active', async () => {
       const result = await query<AllArticlesResult>(`
         query {
           allArticles(filter: {
@@ -115,7 +116,7 @@ describe('Bm25SearchPlugin', () => {
           }) {
             nodes {
               title
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -127,20 +128,20 @@ describe('Bm25SearchPlugin', () => {
 
       // All nodes should have a BM25 score since the filter is active
       for (const node of nodes!) {
-        expect(node.bm25BodyScore).toBeDefined();
-        expect(typeof node.bm25BodyScore).toBe('number');
+        expect(node.bodyBm25Score).toBeDefined();
+        expect(typeof node.bodyBm25Score).toBe('number');
         // BM25 scores are negative
-        expect(node.bm25BodyScore).toBeLessThan(0);
+        expect(node.bodyBm25Score).toBeLessThan(0);
       }
     });
 
-    it('returns null for bm25BodyScore when no filter is active', async () => {
+    it('returns null for bodyBm25Score when no filter is active', async () => {
       const result = await query<AllArticlesResult>(`
         query {
           allArticles {
             nodes {
               title
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -151,7 +152,7 @@ describe('Bm25SearchPlugin', () => {
       expect(nodes).toBeDefined();
 
       for (const node of nodes!) {
-        expect(node.bm25BodyScore).toBeNull();
+        expect(node.bodyBm25Score).toBeNull();
       }
     });
 
@@ -166,7 +167,7 @@ describe('Bm25SearchPlugin', () => {
           }) {
             nodes {
               title
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -178,7 +179,7 @@ describe('Bm25SearchPlugin', () => {
 
       // All returned scores should be <= -0.5 (more relevant than threshold)
       for (const node of nodes!) {
-        expect(node.bm25BodyScore).toBeLessThan(-0.5);
+        expect(node.bodyBm25Score).toBeLessThan(-0.5);
       }
     });
   });
@@ -194,7 +195,7 @@ describe('Bm25SearchPlugin', () => {
           }) {
             nodes {
               title
-              bm25TitleScore
+              titleBm25Score
             }
           }
         }
@@ -207,14 +208,14 @@ describe('Bm25SearchPlugin', () => {
 
       // All nodes should have a title BM25 score
       for (const node of nodes!) {
-        expect(node.bm25TitleScore).toBeDefined();
-        expect(typeof node.bm25TitleScore).toBe('number');
-        expect(node.bm25TitleScore).toBeLessThan(0);
+        expect(node.titleBm25Score).toBeDefined();
+        expect(typeof node.titleBm25Score).toBe('number');
+        expect(node.titleBm25Score).toBeLessThan(0);
       }
     });
   });
 
-  describe('orderBy (BM25_BODY_SCORE_ASC/DESC)', () => {
+  describe('orderBy (BODY_BM25_SCORE_ASC/DESC)', () => {
     it('orders by BM25 score ascending (best matches first)', async () => {
       const result = await query<AllArticlesResult>(`
         query {
@@ -224,11 +225,11 @@ describe('Bm25SearchPlugin', () => {
                 query: "database"
               }
             }
-            orderBy: BM25_BODY_SCORE_ASC
+            orderBy: BODY_BM25_SCORE_ASC
           ) {
             nodes {
               title
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -241,8 +242,8 @@ describe('Bm25SearchPlugin', () => {
 
       // Should be ordered by score ascending (most negative first = best matches first)
       for (let i = 0; i < nodes!.length - 1; i++) {
-        expect(nodes![i].bm25BodyScore).toBeLessThanOrEqual(
-          nodes![i + 1].bm25BodyScore!
+        expect(nodes![i].bodyBm25Score).toBeLessThanOrEqual(
+          nodes![i + 1].bodyBm25Score!
         );
       }
     });
@@ -256,11 +257,11 @@ describe('Bm25SearchPlugin', () => {
                 query: "database"
               }
             }
-            orderBy: BM25_BODY_SCORE_DESC
+            orderBy: BODY_BM25_SCORE_DESC
           ) {
             nodes {
               title
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -273,8 +274,8 @@ describe('Bm25SearchPlugin', () => {
 
       // Should be ordered by score descending (least negative first = worst matches first)
       for (let i = 0; i < nodes!.length - 1; i++) {
-        expect(nodes![i].bm25BodyScore).toBeGreaterThanOrEqual(
-          nodes![i + 1].bm25BodyScore!
+        expect(nodes![i].bodyBm25Score).toBeGreaterThanOrEqual(
+          nodes![i + 1].bodyBm25Score!
         );
       }
     });
@@ -291,11 +292,11 @@ describe('Bm25SearchPlugin', () => {
                 threshold: -0.1
               }
             }
-            orderBy: BM25_BODY_SCORE_ASC
+            orderBy: BODY_BM25_SCORE_ASC
           ) {
             nodes {
               title
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -307,14 +308,14 @@ describe('Bm25SearchPlugin', () => {
 
       // All returned scores should be < threshold
       for (const node of nodes!) {
-        expect(node.bm25BodyScore).toBeLessThan(-0.1);
+        expect(node.bodyBm25Score).toBeLessThan(-0.1);
       }
 
       // Should be ordered
       if (nodes!.length > 1) {
         for (let i = 0; i < nodes!.length - 1; i++) {
-          expect(nodes![i].bm25BodyScore).toBeLessThanOrEqual(
-            nodes![i + 1].bm25BodyScore!
+          expect(nodes![i].bodyBm25Score).toBeLessThanOrEqual(
+            nodes![i + 1].bodyBm25Score!
           );
         }
       }
@@ -329,12 +330,12 @@ describe('Bm25SearchPlugin', () => {
                 query: "database"
               }
             }
-            orderBy: BM25_BODY_SCORE_ASC
+            orderBy: BODY_BM25_SCORE_ASC
             first: 2
           ) {
             nodes {
               title
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }

@@ -69,7 +69,7 @@ query SearchArticles($search: Bm25SearchInput!) {
       id
       title
       body
-      bm25BodyScore
+      bodyBm25Score
     }
   }
 }
@@ -92,12 +92,12 @@ Variables:
 query SearchArticlesSorted($search: Bm25SearchInput!) {
   articles(
     filter: { bm25Body: $search }
-    orderBy: BM25_BODY_SCORE_ASC
+    orderBy: BODY_BM25_SCORE_ASC
   ) {
     nodes {
       id
       title
-      bm25BodyScore
+      bodyBm25Score
     }
   }
 }

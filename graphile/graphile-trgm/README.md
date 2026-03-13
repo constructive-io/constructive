@@ -30,7 +30,7 @@ query {
   }) {
     nodes {
       name
-      nameSimilarity
+      nameTrgmSimilarity
     }
   }
 }

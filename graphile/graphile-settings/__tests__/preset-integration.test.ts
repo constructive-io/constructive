@@ -582,7 +582,7 @@ describe('BM25 search (pg_textsearch)', () => {
   });
 
   it('BM25 score field is populated when filter is active', async () => {
-    const result = await query<{ locations: { nodes: { name: string; bm25BodyScore: number | null }[] } }>({
+    const result = await query<{ locations: { nodes: { name: string; bodyBm25Score: number | null }[] } }>({
       query: `
         query {
           locations(filter: {
@@ -590,7 +590,7 @@ describe('BM25 search (pg_textsearch)', () => {
           }) {
             nodes {
               name
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -601,21 +601,21 @@ describe('BM25 search (pg_textsearch)', () => {
     const nodes = result.data?.locations?.nodes ?? [];
     expect(nodes.length).toBeGreaterThan(0);
     for (const node of nodes) {
-      expect(node.bm25BodyScore).toBeDefined();
-      expect(typeof node.bm25BodyScore).toBe('number');
+      expect(node.bodyBm25Score).toBeDefined();
+      expect(typeof node.bodyBm25Score).toBe('number');
       // BM25 scores are non-null numbers when filter is active
-      expect(node.bm25BodyScore).not.toBeNull();
+      expect(node.bodyBm25Score).not.toBeNull();
     }
   });
 
   it('BM25 score is null when no BM25 filter is active', async () => {
-    const result = await query<{ locations: { nodes: { name: string; bm25BodyScore: number | null }[] } }>({
+    const result = await query<{ locations: { nodes: { name: string; bodyBm25Score: number | null }[] } }>({
       query: `
         query {
           locations(first: 1) {
             nodes {
               name
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -624,20 +624,20 @@ describe('BM25 search (pg_textsearch)', () => {
 
     expect(result.errors).toBeUndefined();
     const node = result.data?.locations?.nodes?.[0];
-    expect(node?.bm25BodyScore).toBeNull();
+    expect(node?.bodyBm25Score).toBeNull();
   });
 
   it('BM25 orderBy sorts by relevance', async () => {
-    const result = await query<{ locations: { nodes: { name: string; bm25BodyScore: number }[] } }>({
+    const result = await query<{ locations: { nodes: { name: string; bodyBm25Score: number }[] } }>({
       query: `
         query {
           locations(
             filter: { bm25Body: { query: "park" } }
-            orderBy: BM25_BODY_SCORE_ASC
+            orderBy: BODY_BM25_SCORE_ASC
           ) {
             nodes {
               name
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -649,7 +649,7 @@ describe('BM25 search (pg_textsearch)', () => {
     expect(nodes.length).toBeGreaterThan(1);
     // ASC = most negative first (most relevant first)
     for (let i = 0; i < nodes.length - 1; i++) {
-      expect(nodes[i].bm25BodyScore).toBeLessThanOrEqual(nodes[i + 1].bm25BodyScore);
+      expect(nodes[i].bodyBm25Score).toBeLessThanOrEqual(nodes[i + 1].bodyBm25Score);
     }
   });
 });
@@ -683,7 +683,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
   });
 
   it('combines BM25 + scalar filter', async () => {
-    const result = await query<{ locations: { nodes: { name: string; bm25BodyScore: number }[] } }>({
+    const result = await query<{ locations: { nodes: { name: string; bodyBm25Score: number }[] } }>({
       query: `
         query {
           locations(filter: {
@@ -692,7 +692,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
           }) {
             nodes {
               name
-              bm25BodyScore
+              bodyBm25Score
             }
           }
         }
@@ -704,8 +704,8 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     expect(nodes.length).toBeGreaterThan(0);
     // All returned should be active and have BM25 scores
     for (const node of nodes) {
-      expect(node.bm25BodyScore).toBeDefined();
-      expect(typeof node.bm25BodyScore).toBe('number');
+      expect(node.bodyBm25Score).toBeDefined();
+      expect(typeof node.bodyBm25Score).toBe('number');
     }
   });
 
@@ -799,7 +799,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
    * PostGraphile's `orderBy` accepts an ARRAY of enum values, just like SQL
    * supports comma-separated ORDER BY clauses:
    *
-   *   orderBy: [BM25_BODY_SCORE_ASC, SIMILARITY_NAME_DESC]
+   *   orderBy: [BODY_BM25_SCORE_ASC, NAME_TRGM_SIMILARITY_DESC]
    *
    * generates:
    *
@@ -831,8 +831,8 @@ describe('Kitchen sink (multi-plugin queries)', () => {
    *
    * ── Score fields returned ───────────────────────────────────────────────
    *
-   *   nameSimilarity  pg_trgm similarity(name, 'park')  → 0..1 (1 = exact)
-   *   bm25BodyScore   BM25 relevance via pg_textsearch   → negative (→0 = best)
+   *   nameTrgmSimilarity  pg_trgm similarity(name, 'park')  → 0..1 (1 = exact)
+   *   bodyBm25Score   BM25 relevance via pg_textsearch   → negative (→0 = best)
    *   tsvRank         ts_rank(tsv, tsquery)              → 0..~1 (higher = better)
    *
    * These computed fields are populated when their corresponding filter is
@@ -852,9 +852,9 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       locations: {
         nodes: {
           name: string;
-          bm25BodyScore: number;
+          bodyBm25Score: number;
           tsvRank: number;
-          nameSimilarity: number | null;
+          nameTrgmSimilarity: number | null;
           embedding: number[];
           geom: { geojson: { type: string; coordinates: number[] } };
           category: { name: string };
@@ -907,22 +907,22 @@ describe('Kitchen sink (multi-plugin queries)', () => {
             #            similarity(name, 'park') DESC
             #
             # Each plugin registers its own enum values on LocationOrderBy:
-            #   - BM25:      BM25_BODY_SCORE_ASC / BM25_BODY_SCORE_DESC
-            #   - pg_trgm:   SIMILARITY_NAME_ASC / SIMILARITY_NAME_DESC
+            #   - BM25:      BODY_BM25_SCORE_ASC / BODY_BM25_SCORE_DESC
+            #   - pg_trgm:   NAME_TRGM_SIMILARITY_ASC / NAME_TRGM_SIMILARITY_DESC
             #   - tsvector:  FULL_TEXT_RANK_ASC / FULL_TEXT_RANK_DESC
             # These compose freely — just like comma-separated ORDER BY in SQL.
             # NOTE: the array order sets which signals are active + direction,
             # but ORDER BY priority follows schema field processing order
             # (see doc comment above for details).
-            orderBy: [BM25_BODY_SCORE_ASC, SIMILARITY_NAME_DESC]
+            orderBy: [BODY_BM25_SCORE_ASC, NAME_TRGM_SIMILARITY_DESC]
           ) {
             nodes {
               name
 
               # ── Computed score fields (populated when filter is active) ──
-              bm25BodyScore    # BM25 relevance (negative; closer to 0 = more relevant)
+              bodyBm25Score    # BM25 relevance (negative; closer to 0 = more relevant)
               tsvRank          # ts_rank (0..~1; higher = more relevant)
-              nameSimilarity   # pg_trgm similarity (0..1; 1 = exact match)
+              nameTrgmSimilarity   # pg_trgm similarity (0..1; 1 = exact match)
 
               # ── Standard fields ──
               embedding        # pgvector column (float array)
@@ -945,13 +945,13 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     // should pass every filter simultaneously.
     expect(nodes.length).toBeGreaterThanOrEqual(2);
 
-    // ── Verify ordering: BM25_BODY_SCORE_ASC (primary sort) ──
+    // ── Verify ordering: BODY_BM25_SCORE_ASC (primary sort) ──
     // BM25 filter apply runs first in the schema, so BM25 score is the
     // primary ORDER BY. ASC means most-negative (most relevant) first.
     // Expected: Prospect Park (-0.810) < Brooklyn Bridge Park (-0.626) < High Line Park (-0.568)
     for (let i = 0; i < nodes.length - 1; i++) {
-      const curr = nodes[i].bm25BodyScore;
-      const next = nodes[i + 1].bm25BodyScore;
+      const curr = nodes[i].bodyBm25Score;
+      const next = nodes[i + 1].bodyBm25Score;
       expect(curr).toBeLessThanOrEqual(next);
     }
 
@@ -959,7 +959,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       // ── BM25 score (plugin #2) ──
       // Populated because bm25Body filter is active. Negative float where
       // closer to 0 = more relevant.
-      expect(typeof node.bm25BodyScore).toBe('number');
+      expect(typeof node.bodyBm25Score).toBe('number');
 
       // ── tsvector rank (plugin #1) ──
       // Populated because fullTextTsv filter is active. Float 0..~1 where
@@ -969,8 +969,8 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       // ── pg_trgm similarity (plugin #3) ──
       // Populated because trgmName filter is active. Float 0..1 where
       // 1 = exact match. Must be > 0 since we passed the threshold filter.
-      expect(typeof node.nameSimilarity).toBe('number');
-      expect(node.nameSimilarity).toBeGreaterThan(0);
+      expect(typeof node.nameTrgmSimilarity).toBe('number');
+      expect(node.nameTrgmSimilarity).toBeGreaterThan(0);
 
       // ── pgvector embedding (plugin #6) ──
       // The raw embedding vector is returned as a float array.

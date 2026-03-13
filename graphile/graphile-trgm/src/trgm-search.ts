@@ -40,7 +40,7 @@ import type { TrgmSearchPluginOptions } from './types';
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      /** Name for the similarity score field (e.g. "nameSimilarity") */
+      /** Name for the similarity score field (e.g. "nameTrgmSimilarity") */
       pgTrgmSimilarity(this: Inflection, fieldName: string): string;
       /** Name for orderBy enum value for similarity score */
       pgTrgmOrderBySimilarityEnum(
@@ -87,7 +87,7 @@ function isTextCodec(codec: any): boolean {
 export function createTrgmSearchPlugin(
   options: TrgmSearchPluginOptions = {}
 ): GraphileConfig.Plugin {
-  const { connectionFilterTrgmRequireIndex = false } = options;
+  const { connectionFilterTrgmRequireIndex = false, filterPrefix = 'trgm' } = options;
 
   return {
     name: 'TrgmSearchPlugin',
@@ -106,7 +106,9 @@ export function createTrgmSearchPlugin(
     inflection: {
       add: {
         pgTrgmSimilarity(_preset, fieldName) {
-          return this.camelCase(`${fieldName}-similarity`);
+          // Dedup: if fieldName already ends with 'Trgm', don't double it
+          const suffix = fieldName.toLowerCase().endsWith('trgm') ? 'similarity' : 'trgm-similarity';
+          return this.camelCase(`${fieldName}-${suffix}`);
         },
         pgTrgmOrderBySimilarityEnum(_preset, codec, attributeName, ascending) {
           const columnName = this._attributeName({
@@ -114,8 +116,10 @@ export function createTrgmSearchPlugin(
             attributeName,
             skipRowId: true,
           });
+          // Dedup: if columnName already ends with '_trgm', don't double it
+          const suffix = columnName.toLowerCase().endsWith('_trgm') ? 'similarity' : 'trgm_similarity';
           return this.constantCase(
-            `similarity_${columnName}_${ascending ? 'asc' : 'desc'}`,
+            `${columnName}_${suffix}_${ascending ? 'asc' : 'desc'}`,
           );
         },
       },
@@ -411,7 +415,7 @@ export function createTrgmSearchPlugin(
               attributeName,
             });
             const fieldName = inflection.camelCase(
-              `trgm_${attributeName}`
+              `${filterPrefix}_${attributeName}`
             );
             const scoreMetaKey = `__trgm_score_${baseFieldName}`;
 

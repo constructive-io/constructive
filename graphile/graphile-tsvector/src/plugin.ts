@@ -49,7 +49,7 @@ declare global {
     interface Inflection {
       /** Name for the FullText scalar type */
       fullTextScalarTypeName(this: Inflection): string;
-      /** Name for the rank field (e.g. "bodyRank") */
+      /** Name for the rank field (e.g. "bodyTsvRank") */
       pgTsvRank(this: Inflection, fieldName: string): string;
       /** Name for orderBy enum value for column rank */
       pgTsvOrderByColumnRankEnum(
@@ -139,7 +139,9 @@ export function createPgSearchPlugin(
           return fullTextScalarName;
         },
         pgTsvRank(_preset, fieldName) {
-          return this.camelCase(`${fieldName}-rank`);
+          // Dedup: if fieldName already ends with 'Tsv', don't double it
+          const suffix = fieldName.toLowerCase().endsWith('tsv') ? 'rank' : 'tsv-rank';
+          return this.camelCase(`${fieldName}-${suffix}`);
         },
         pgTsvOrderByColumnRankEnum(_preset, codec, attributeName, ascending) {
           const columnName = this._attributeName({
@@ -147,16 +149,20 @@ export function createPgSearchPlugin(
             attributeName,
             skipRowId: true,
           });
+          // Dedup: if columnName already ends with '_tsv', don't double it
+          const suffix = columnName.toLowerCase().endsWith('_tsv') ? 'rank' : 'tsv_rank';
           return this.constantCase(
-            `${columnName}_rank_${ascending ? 'asc' : 'desc'}`,
+            `${columnName}_${suffix}_${ascending ? 'asc' : 'desc'}`,
           );
         },
         pgTsvOrderByComputedColumnRankEnum(_preset, _codec, resource, ascending) {
           const columnName = this.computedAttributeField({
             resource,
           });
+          // Dedup: if columnName already ends with 'Tsv', don't double it
+          const suffix = columnName.toLowerCase().endsWith('tsv') ? 'rank' : 'tsv_rank';
           return this.constantCase(
-            `${columnName}_rank_${ascending ? 'asc' : 'desc'}`,
+            `${columnName}_${suffix}_${ascending ? 'asc' : 'desc'}`,
           );
         },
       },

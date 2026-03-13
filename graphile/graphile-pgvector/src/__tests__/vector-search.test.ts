@@ -13,7 +13,7 @@ interface AllDocumentsResult {
       title: string;
       content: string | null;
       embedding: number[];
-      embeddingDistance: number | null;
+      embeddingVectorDistance: number | null;
     }>;
   };
 }
@@ -92,7 +92,7 @@ describe('VectorSearchPlugin', () => {
             nodes {
               rowId
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -109,7 +109,7 @@ describe('VectorSearchPlugin', () => {
       expect(titles).toContain('Document A');
     });
 
-    it('returns embeddingDistance computed field when filter is active', async () => {
+    it('returns embeddingVectorDistance computed field when filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(filter: {
@@ -120,7 +120,7 @@ describe('VectorSearchPlugin', () => {
           }) {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -132,23 +132,23 @@ describe('VectorSearchPlugin', () => {
 
       // All nodes should have a distance value since the condition is active
       for (const node of nodes!) {
-        expect(node.embeddingDistance).toBeDefined();
-        expect(typeof node.embeddingDistance).toBe('number');
+        expect(node.embeddingVectorDistance).toBeDefined();
+        expect(typeof node.embeddingVectorDistance).toBe('number');
       }
 
       // Document A [1,0,0] should have distance ~0 to query [1,0,0]
       const docA = nodes!.find(n => n.title === 'Document A');
       expect(docA).toBeDefined();
-      expect(docA!.embeddingDistance).toBeCloseTo(0, 2);
+      expect(docA!.embeddingVectorDistance).toBeCloseTo(0, 2);
     });
 
-    it('returns null for embeddingDistance when no filter is active', async () => {
+    it('returns null for embeddingVectorDistance when no filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -159,7 +159,7 @@ describe('VectorSearchPlugin', () => {
       expect(nodes).toBeDefined();
 
       for (const node of nodes!) {
-        expect(node.embeddingDistance).toBeNull();
+        expect(node.embeddingVectorDistance).toBeNull();
       }
     });
 
@@ -174,7 +174,7 @@ describe('VectorSearchPlugin', () => {
           }) {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -187,7 +187,7 @@ describe('VectorSearchPlugin', () => {
       // L2 distance of identical vectors is 0
       const docA = nodes!.find(n => n.title === 'Document A');
       expect(docA).toBeDefined();
-      expect(docA!.embeddingDistance).toBeCloseTo(0, 2);
+      expect(docA!.embeddingVectorDistance).toBeCloseTo(0, 2);
     });
 
     it('supports IP metric', async () => {
@@ -201,7 +201,7 @@ describe('VectorSearchPlugin', () => {
           }) {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -214,11 +214,11 @@ describe('VectorSearchPlugin', () => {
       // Inner product of [1,0,0] with itself is 1, pgvector returns negative: -1
       const docA = nodes!.find(n => n.title === 'Document A');
       expect(docA).toBeDefined();
-      expect(docA!.embeddingDistance).toBeCloseTo(-1, 2);
+      expect(docA!.embeddingVectorDistance).toBeCloseTo(-1, 2);
     });
   });
 
-  describe('orderBy (EMBEDDING_DISTANCE_ASC/DESC)', () => {
+  describe('orderBy (EMBEDDING_VECTOR_DISTANCE_ASC/DESC)', () => {
     it('orders by distance ascending when filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
@@ -229,11 +229,11 @@ describe('VectorSearchPlugin', () => {
                 metric: COSINE
               }
             }
-            orderBy: EMBEDDING_DISTANCE_ASC
+            orderBy: EMBEDDING_VECTOR_DISTANCE_ASC
           ) {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -250,8 +250,8 @@ describe('VectorSearchPlugin', () => {
 
       // Verify ordering: each distance should be <= next
       for (let i = 0; i < nodes!.length - 1; i++) {
-        expect(nodes![i].embeddingDistance).toBeLessThanOrEqual(
-          nodes![i + 1].embeddingDistance!
+        expect(nodes![i].embeddingVectorDistance).toBeLessThanOrEqual(
+          nodes![i + 1].embeddingVectorDistance!
         );
       }
     });
@@ -266,11 +266,11 @@ describe('VectorSearchPlugin', () => {
                 metric: COSINE
               }
             }
-            orderBy: EMBEDDING_DISTANCE_DESC
+            orderBy: EMBEDDING_VECTOR_DISTANCE_DESC
           ) {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -287,8 +287,8 @@ describe('VectorSearchPlugin', () => {
 
       // Verify ordering: each distance should be >= next
       for (let i = 0; i < nodes!.length - 1; i++) {
-        expect(nodes![i].embeddingDistance).toBeGreaterThanOrEqual(
-          nodes![i + 1].embeddingDistance!
+        expect(nodes![i].embeddingVectorDistance).toBeGreaterThanOrEqual(
+          nodes![i + 1].embeddingVectorDistance!
         );
       }
     });
@@ -307,11 +307,11 @@ describe('VectorSearchPlugin', () => {
                 distance: 0.5
               }
             }
-            orderBy: EMBEDDING_DISTANCE_ASC
+            orderBy: EMBEDDING_VECTOR_DISTANCE_ASC
           ) {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
@@ -334,7 +334,7 @@ describe('VectorSearchPlugin', () => {
 
       // All returned distances should be <= 0.5
       for (const node of nodes!) {
-        expect(node.embeddingDistance).toBeLessThanOrEqual(0.5);
+        expect(node.embeddingVectorDistance).toBeLessThanOrEqual(0.5);
       }
     });
 
@@ -348,12 +348,12 @@ describe('VectorSearchPlugin', () => {
                 metric: COSINE
               }
             }
-            orderBy: EMBEDDING_DISTANCE_ASC
+            orderBy: EMBEDDING_VECTOR_DISTANCE_ASC
             first: 2
           ) {
             nodes {
               title
-              embeddingDistance
+              embeddingVectorDistance
             }
           }
         }
