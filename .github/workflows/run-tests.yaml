@@ -107,6 +107,10 @@ jobs:
             env: {}
           - package: packages/postmaster
             env: {}
+          - package: graphile/graphile-pgvector-plugin
+            env: {}
+          - package: graphile/graphile-settings
+            env: {}
 
     env:
       PGHOST: localhost
@@ -120,7 +124,7 @@ jobs:
 
     services:
       pg_db:
-        image: pyramation/postgres:17
+        image: ghcr.io/constructive-io/docker/postgres-plus:18
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
@@ -145,73 +149,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
-    steps:
-      - name: Configure Git (for tests)
-        run: |
-          git config --global user.name "CI Test User"
-          git config --global user.email "ci@example.com"
-
-      - name: checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
-      - name: install
-        run: pnpm install
-
-      - name: build
-        run: pnpm run build
-
-      - name: seed app_user
-        run: |
-          pnpm --filter pgpm exec node dist/index.js admin-users bootstrap --yes
-          pnpm --filter pgpm exec node dist/index.js admin-users add --test --yes
-
-      - name: Test ${{ matrix.package }}
-        run: cd ./${{ matrix.package }} && pnpm test
-        env: ${{ matrix.env }}
-
-  # Tests that require postgres-plus:18 (PostGIS, pgvector, pg_textsearch extensions)
-  constructive-tests-postgres-plus:
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - package: graphile/graphile-pgvector-plugin
-            env: {}
-          - package: graphile/graphile-settings
-            env: {}
-
-    env:
-      PGHOST: localhost
-      PGPORT: 5432
-      PGUSER: postgres
-      PGPASSWORD: password
-
-    services:
-      pg_db:
-        image: ghcr.io/constructive-io/docker/postgres-plus:18
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
       - name: Configure Git (for tests)
