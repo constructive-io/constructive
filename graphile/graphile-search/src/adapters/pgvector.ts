@@ -52,6 +52,9 @@ export function createPgvectorAdapter(
 
     filterPrefix,
 
+    supportsTextSearch: false,
+    // pgvector requires a vector array, not plain text — no buildTextSearchInput
+
     detectColumns(codec: any, _build: any): SearchableColumn[] {
       if (!codec?.attributes) return [];
 

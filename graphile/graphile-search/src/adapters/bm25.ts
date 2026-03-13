@@ -76,6 +76,13 @@ export function createBm25Adapter(
 
     filterPrefix,
 
+    supportsTextSearch: true,
+
+    buildTextSearchInput(text: string): { query: string } {
+      // BM25 filter takes { query: string }
+      return { query: text };
+    },
+
     detectColumns(codec: any, build: any): SearchableColumn[] {
       if (!codec?.attributes) return [];
 

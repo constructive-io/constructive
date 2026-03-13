@@ -81,7 +81,7 @@ interface AdapterColumnCache {
 export function createUnifiedSearchPlugin(
   options: UnifiedSearchOptions
 ): GraphileConfig.Plugin {
-  const { adapters, enableSearchScore = true } = options;
+  const { adapters, enableSearchScore = true, enableFullTextSearch = true } = options;
 
   // Per-codec cache of discovered columns, keyed by codec name
   const codecCache = new Map<string, AdapterColumnCache[]>();
@@ -649,6 +649,110 @@ export function createUnifiedSearchPlugin(
                   ),
                 },
                 `UnifiedSearchPlugin adding ${adapter.name} filter field '${fieldName}' for '${column.attributeName}' on '${codec.name}'`
+              );
+            }
+          }
+
+          // ── fullTextSearch composite filter ──
+          // Adds a single `fullTextSearch: String` field that fans out the same
+          // text query to all adapters where supportsTextSearch is true.
+          // WHERE clauses are combined with OR (match ANY algorithm).
+          if (enableFullTextSearch) {
+            // Collect text-compatible adapters and their columns for this codec
+            const textAdapterColumns = adapterColumns.filter(
+              (ac) => ac.adapter.supportsTextSearch && ac.adapter.buildTextSearchInput
+            );
+
+            if (textAdapterColumns.length > 0) {
+              const fieldName = 'fullTextSearch';
+
+              newFields = build.extend(
+                newFields,
+                {
+                  [fieldName]: fieldWithHooks(
+                    {
+                      fieldName,
+                      isPgConnectionFilterField: true,
+                    } as any,
+                    {
+                      description: build.wrapDescription(
+                        'Composite full-text search. Provide a search string and it will be dispatched ' +
+                        'to all text-compatible search algorithms (tsvector, BM25, pg_trgm) simultaneously. ' +
+                        'Rows matching ANY algorithm are returned. All matching score fields are populated.',
+                        'field'
+                      ),
+                      type: build.graphql.GraphQLString as any,
+                      apply: function plan($condition: any, val: any) {
+                        if (val == null || (typeof val === 'string' && val.trim().length === 0)) return;
+
+                        const text = typeof val === 'string' ? val : String(val);
+                        const qb = getQueryBuilder(build, $condition);
+
+                        // Collect all WHERE clauses (combined with OR)
+                        const whereClauses: any[] = [];
+
+                        for (const { adapter, columns } of textAdapterColumns) {
+                          for (const column of columns) {
+                            // Convert text to adapter-specific filter input
+                            const filterInput = adapter.buildTextSearchInput!(text);
+
+                            const result = adapter.buildFilterApply(
+                              sql,
+                              $condition.alias,
+                              column,
+                              filterInput,
+                              build,
+                            );
+                            if (!result) continue;
+
+                            // Collect WHERE clause for OR combination
+                            if (result.whereClause) {
+                              whereClauses.push(result.whereClause);
+                            }
+
+                            // Still inject score into SELECT so score fields are populated
+                            if (qb && qb.mode === 'normal') {
+                              const baseFieldName = inflection.attribute({
+                                codec: pgCodec as any,
+                                attributeName: column.attributeName,
+                              });
+                              const scoreMetaKey = `__unified_search_${adapter.name}_${baseFieldName}`;
+                              const wrappedScoreSql = sql`${sql.parens(result.scoreExpression)}::text`;
+                              const scoreIndex = qb.selectAndReturnIndex(wrappedScoreSql);
+                              qb.setMeta(scoreMetaKey, {
+                                selectIndex: scoreIndex,
+                              } as SearchScoreDetails);
+
+                              // ORDER BY: only add when explicitly requested via orderBy enum
+                              if (typeof qb.getMetaRaw === 'function') {
+                                const orderMetaKey = `unified_order_${adapter.name}_${baseFieldName}`;
+                                const explicitDir = qb.getMetaRaw(orderMetaKey);
+                                if (explicitDir) {
+                                  qb.orderBy({
+                                    fragment: result.scoreExpression,
+                                    codec: TYPES.float,
+                                    direction: explicitDir,
+                                  });
+                                }
+                              }
+                            }
+                          }
+                        }
+
+                        // Apply combined WHERE with OR
+                        if (whereClauses.length > 0) {
+                          if (whereClauses.length === 1) {
+                            $condition.where(whereClauses[0]);
+                          } else {
+                            const combined = sql.fragment`(${sql.join(whereClauses, ' OR ')})`;
+                            $condition.where(combined);
+                          }
+                        }
+                      },
+                    }
+                  ),
+                },
+                `UnifiedSearchPlugin adding fullTextSearch composite filter on '${codec.name}'`
               );
             }
           }

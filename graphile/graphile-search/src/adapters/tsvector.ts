@@ -32,7 +32,7 @@ export interface TsvectorAdapterOptions {
 export function createTsvectorAdapter(
   options: TsvectorAdapterOptions = {}
 ): SearchAdapter {
-  const { filterPrefix = 'fullText', tsConfig = 'english' } = options;
+  const { filterPrefix = 'tsv', tsConfig = 'english' } = options;
 
   return {
     name: 'tsv',
@@ -44,6 +44,13 @@ export function createTsvectorAdapter(
     },
 
     filterPrefix,
+
+    supportsTextSearch: true,
+
+    buildTextSearchInput(text: string): string {
+      // tsvector filter takes a plain string
+      return text;
+    },
 
     detectColumns(codec: any, _build: any): SearchableColumn[] {
       if (!codec?.attributes) return [];

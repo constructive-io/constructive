@@ -52,12 +52,13 @@ describe('graphile-search (unified search plugin)', () => {
     // Build the unified search plugin with all 4 adapters
     const unifiedPlugin = createUnifiedSearchPlugin({
       adapters: [
-        createTsvectorAdapter({ filterPrefix: 'fullText' }),
-        createBm25Adapter({ filterPrefix: 'bm25' }),
-        createTrgmAdapter({ filterPrefix: 'trgm', defaultThreshold: 0.1 }),
-        createPgvectorAdapter({ filterPrefix: 'vector' }),
+        createTsvectorAdapter(),
+        createBm25Adapter(),
+        createTrgmAdapter({ defaultThreshold: 0.1 }),
+        createPgvectorAdapter(),
       ],
       enableSearchScore: true,
+      enableFullTextSearch: true,
     });
 
     const testPreset = {
@@ -113,12 +114,12 @@ describe('graphile-search (unified search plugin)', () => {
 
   // ─── tsvector adapter ────────────────────────────────────────────────────
 
-  describe('tsvector adapter (fullTextTsv filter)', () => {
+  describe('tsvector adapter (tsvTsv filter)', () => {
     it('filters by full-text search and returns tsvRank score', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(filter: {
-            fullTextTsv: "machine learning"
+            tsvTsv: "machine learning"
           }) {
             nodes {
               title
@@ -364,7 +365,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(filter: {
-            fullTextTsv: "machine learning"
+            tsvTsv: "machine learning"
           }) {
             nodes {
               title
@@ -492,7 +493,7 @@ describe('graphile-search (unified search plugin)', () => {
         query {
           allDocuments(
             filter: {
-              fullTextTsv: "learning"
+              tsvTsv: "learning"
               bm25Body: { query: "learning" }
               trgmTitle: { value: "Learning", threshold: 0.05 }
             }
@@ -533,7 +534,7 @@ describe('graphile-search (unified search plugin)', () => {
           allDocuments(
             filter: {
               # tsvector: full-text search on tsv column
-              fullTextTsv: "learning"
+              tsvTsv: "learning"
 
               # BM25: ranked text search on body column
               bm25Body: { query: "learning" }
@@ -582,6 +583,145 @@ describe('graphile-search (unified search plugin)', () => {
         expect(node.searchScore).toBeGreaterThanOrEqual(0);
         expect(node.searchScore).toBeLessThanOrEqual(1);
       }
+    });
+  });
+
+  // ─── fullTextSearch composite filter ────────────────────────────────────
+
+  describe('fullTextSearch composite filter', () => {
+    it('fullTextSearch field exists on the filter type', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            fullTextSearch: "learning"
+          }) {
+            nodes {
+              title
+            }
+          }
+        }
+      `);
+
+      // Should not error — field exists and is accepted
+      expect(result.errors).toBeUndefined();
+      expect(result.data?.allDocuments?.nodes).toBeDefined();
+    });
+
+    it('returns results matching any text-compatible algorithm', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            fullTextSearch: "machine learning"
+          }) {
+            nodes {
+              title
+              tsvRank
+              bodyBm25Score
+              titleTrgmSimilarity
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes ?? [];
+      // At least one row should match (via tsvector, BM25, or trgm)
+      expect(nodes.length).toBeGreaterThan(0);
+
+      // At least one score field should be populated on the first result
+      const first = nodes[0];
+      const hasAnyScore =
+        (first.tsvRank != null && first.tsvRank > 0) ||
+        (first.bodyBm25Score != null && first.bodyBm25Score > 0) ||
+        (first.titleTrgmSimilarity != null && first.titleTrgmSimilarity > 0);
+      expect(hasAnyScore).toBe(true);
+    });
+
+    it('coexists with algorithm-specific filters', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            fullTextSearch: "learning"
+            tsvTsv: "machine"
+          }) {
+            nodes {
+              title
+              tsvRank
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes ?? [];
+      // The algorithm-specific filter (tsvTsv) narrows further within the fullTextSearch results
+      expect(nodes).toBeDefined();
+    });
+
+    it('returns empty results for nonsense query', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            fullTextSearch: "xyzzy_nonexistent_term_12345"
+          }) {
+            nodes {
+              title
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes ?? [];
+      expect(nodes.length).toBe(0);
+    });
+  });
+
+  // ─── fullTextSearch disabled ──────────────────────────────────────────────
+
+  describe('fullTextSearch can be disabled', () => {
+    let disabledQuery: typeof query;
+
+    beforeAll(async () => {
+      // Build a plugin with fullTextSearch DISABLED
+      const disabledPlugin = createUnifiedSearchPlugin({
+        adapters: [
+          createTsvectorAdapter(),
+          createBm25Adapter(),
+          createTrgmAdapter({ defaultThreshold: 0.1 }),
+        ],
+        enableSearchScore: true,
+        enableFullTextSearch: false,
+      });
+
+      const disabledPreset = {
+        extends: [
+          PostGraphileAmberPreset,
+          makePgService({ connectionString: process.env.TEST_DATABASE_URL || 'postgres:///graphile_search_test' }),
+        ],
+        plugins: [TsvectorCodecPlugin, disabledPlugin],
+      };
+
+      const disabledConnections = await createTestConnections(disabledPreset);
+      disabledQuery = disabledConnections.query;
+    });
+
+    it('fullTextSearch field does NOT exist when disabled', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(filter: {
+            fullTextSearch: "learning"
+          }) {
+            nodes {
+              title
+            }
+          }
+        }
+      `);
+
+      // Should error — fullTextSearch field should not exist
+      expect(result.errors).toBeDefined();
+      expect(result.errors![0].message).toMatch(/fullTextSearch/);
     });
   });
 

@@ -83,6 +83,29 @@ export interface SearchAdapter {
   filterPrefix: string;
 
   /**
+   * Whether this adapter supports plain text search queries.
+   * If true, the adapter's columns will be included in the automatic
+   * `fullTextSearch` composite filter that fans out the same text query
+   * to all text-compatible adapters simultaneously.
+   *
+   * Adapters that require non-text input (e.g. pgvector needs a vector array)
+   * should set this to false.
+   *
+   * @default false
+   */
+  supportsTextSearch?: boolean;
+
+  /**
+   * Build the filter value for a text search query dispatched by fullTextSearch.
+   * Only called when supportsTextSearch is true.
+   * Converts a plain text string into the adapter-specific filter input format.
+   *
+   * @param text - The user's search text
+   * @returns The filter value to pass to buildFilterApply (e.g. string, { query: string }, { value: string })
+   */
+  buildTextSearchInput?(text: string): unknown;
+
+  /**
    * Discover which columns on a given codec are searchable by this adapter.
    *
    * Called once per table codec during schema build. Should inspect column
@@ -155,6 +178,16 @@ export interface UnifiedSearchOptions {
    * @default true
    */
   enableSearchScore?: boolean;
+
+  /**
+   * Whether to expose the `fullTextSearch` composite filter field.
+   * When enabled, every table with at least one text-compatible adapter gets a
+   * `fullTextSearch: String` field on its filter type. Providing a value fans
+   * out the same text query to all adapters where `supportsTextSearch: true`,
+   * combining their WHERE clauses with OR (match any algorithm).
+   * @default true
+   */
+  enableFullTextSearch?: boolean;
 
   /**
    * Custom weights for the composite searchScore. Keys are adapter names,

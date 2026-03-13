@@ -43,6 +43,13 @@ export function createTrgmAdapter(
 
     filterPrefix,
 
+    supportsTextSearch: true,
+
+    buildTextSearchInput(text: string): { value: string } {
+      // trgm filter takes { value: string } — threshold uses adapter default
+      return { value: text };
+    },
+
     detectColumns(codec: any, _build: any): SearchableColumn[] {
       if (!codec?.attributes) return [];
 
