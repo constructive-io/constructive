@@ -304,22 +304,22 @@ type Post {
   """
   Trigram similarity score when filtering \`title\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  titleSimilarity: Float
+  titleTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`slug\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  slugSimilarity: Float
+  slugTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`content\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  contentSimilarity: Float
+  contentTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`excerpt\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  excerptSimilarity: Float
+  excerptTrgmSimilarity: Float
 }
 
 """A connection to a list of \`Tag\` values, with data from \`PostTag\`."""
@@ -413,17 +413,17 @@ type Tag {
   """
   Trigram similarity score when filtering \`slug\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  slugSimilarity: Float
+  slugTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`description\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  descriptionSimilarity: Float
+  descriptionTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`color\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  colorSimilarity: Float
+  colorTrgmSimilarity: Float
 }
 
 """A connection to a list of \`Post\` values, with data from \`PostTag\`."""
@@ -1222,8 +1222,8 @@ enum PostOrderBy {
   PUBLISHED_AT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  SIMILARITY_SLUG_ASC
-  SIMILARITY_SLUG_DESC
+  SLUG_TRGM_SIMILARITY_ASC
+  SLUG_TRGM_SIMILARITY_DESC
 }
 
 """Methods to use when ordering \`PostTag\`."""
@@ -1263,8 +1263,8 @@ enum TagOrderBy {
   SLUG_DESC
   NAME_TRGM_SIMILARITY_ASC
   NAME_TRGM_SIMILARITY_DESC
-  SIMILARITY_SLUG_ASC
-  SIMILARITY_SLUG_DESC
+  SLUG_TRGM_SIMILARITY_ASC
+  SLUG_TRGM_SIMILARITY_DESC
 }
 
 type User {
@@ -1339,7 +1339,7 @@ type User {
   """
   Trigram similarity score when filtering \`email\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  emailSimilarity: Float
+  emailTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`username\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
@@ -1349,17 +1349,17 @@ type User {
   """
   Trigram similarity score when filtering \`displayName\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  displayNameSimilarity: Float
+  displayNameTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`bio\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  bioSimilarity: Float
+  bioTrgmSimilarity: Float
 
   """
   Trigram similarity score when filtering \`role\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  roleSimilarity: Float
+  roleTrgmSimilarity: Float
 }
 
 """A connection to a list of \`Post\` values."""
@@ -1457,7 +1457,7 @@ type Comment {
   """
   Trigram similarity score when filtering \`content\` with \`similarTo\`. Returns a value between 0 and 1 (1 = exact match). Returns null when no trigram filter is active.
   """
-  contentSimilarity: Float
+  contentTrgmSimilarity: Float
 }
 
 """Methods to use when ordering \`Comment\`."""
