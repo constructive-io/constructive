@@ -37,6 +37,11 @@ export const ConnectionFilterLogicalOperatorsPlugin: GraphileConfig.Plugin = {
 
         if (!isPgConnectionFilter) return fields;
 
+        // Check runtime option — allows toggling without removing the plugin
+        if (build.options.connectionFilterLogicalOperators === false) {
+          return fields;
+        }
+
         // Don't add logical operators if there are no other fields
         if (Object.keys(fields).length === 0) {
           return fields;

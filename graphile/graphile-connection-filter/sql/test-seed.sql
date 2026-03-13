@@ -1,6 +1,8 @@
 -- Test seed for graphile-connection-filter
 -- Creates tables covering all filter scenarios: scalars, relations, computed columns
 
+CREATE SCHEMA IF NOT EXISTS filter_test;
+
 -- ============================================================================
 -- SCALAR TYPES TABLE
 -- ============================================================================

@@ -72,10 +72,9 @@ export function ConnectionFilterPreset(
     ConnectionFilterCustomOperatorsPlugin,
   ];
 
-  // Logical operators are opt-out
-  if (mergedOptions.connectionFilterLogicalOperators !== false) {
-    plugins.push(ConnectionFilterLogicalOperatorsPlugin);
-  }
+  // Logical operators plugin always included — checks
+  // build.options.connectionFilterLogicalOperators at runtime
+  plugins.push(ConnectionFilterLogicalOperatorsPlugin);
 
   // Computed columns are opt-in (disabled by default)
   if (mergedOptions.connectionFilterComputedColumns) {
