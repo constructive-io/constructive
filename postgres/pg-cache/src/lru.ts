@@ -70,6 +70,10 @@ export class PgPoolCacheManager {
   }
 
   get(key: PgPoolKey): pg.Pool | undefined {
+    if (this.closed) {
+      log.warn(`Cache is closed, ignoring get(${key})`);
+      return undefined;
+    }
     return this.pgCache.get(key)?.pool;
   }
 

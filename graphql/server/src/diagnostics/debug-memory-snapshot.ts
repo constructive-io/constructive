@@ -99,6 +99,7 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
       size: svcCache.size,
       max: svcCache.max,
       ttlMs: SVC_CACHE_TTL_MS,
+      // Note: with updateAgeOnGet: true, this is "time since last access" not "time since creation"
       oldestKeyAgeMs: (() => {
         let minRemaining = Infinity;
         for (const key of svcCache.keys()) {
