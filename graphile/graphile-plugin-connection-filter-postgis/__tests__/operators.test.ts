@@ -1,6 +1,6 @@
 import sql from 'pg-sql2';
 import { CONCRETE_SUBTYPES } from 'graphile-postgis';
-import { PgConnectionArgFilterPostgisOperatorsPlugin } from '../src/plugin';
+import { createPostgisOperatorFactory } from '../src/plugin';
 import { PostgisConnectionFilterPreset } from '../src/preset';
 
 // Build a mock inflection that matches what graphile-postgis produces
@@ -43,25 +43,15 @@ function createMockInflection() {
   };
 }
 
-// Run the plugin init hook and capture all registered operators
-function runPlugin(options: {
+// Run the factory and capture all registered operators
+function runFactory(options: {
   schemaName?: string;
   hasPostgis?: boolean;
-  hasFilterPlugin?: boolean;
 } = {}) {
   const {
     schemaName = 'public',
-    hasPostgis = true,
-    hasFilterPlugin = true
+    hasPostgis = true
   } = options;
-
-  const registered: Array<{
-    typeName: string;
-    operatorName: string;
-    description: string;
-    resolveType: (t: any) => any;
-    resolve: (...args: any[]) => any;
-  }> = [];
 
   const inflection = createMockInflection();
 
@@ -73,75 +63,40 @@ function runPlugin(options: {
       }
     : undefined;
 
-  const addConnectionFilterOperator = hasFilterPlugin
-    ? (typeName: string, operatorName: string, opts: any) => {
-        registered.push({
-          typeName,
-          operatorName,
-          description: opts.description,
-          resolveType: opts.resolveType,
-          resolve: opts.resolve
-        });
-      }
-    : undefined;
-
   const build = {
     inflection,
-    pgGISExtensionInfo: postgisInfo,
-    addConnectionFilterOperator
+    pgGISExtensionInfo: postgisInfo
   };
 
-  const plugin = PgConnectionArgFilterPostgisOperatorsPlugin;
-  const initHook = (plugin.schema as any).hooks.init;
-  const result = initHook({}, build);
+  const factory = createPostgisOperatorFactory();
+  const registrations = factory(build as any);
 
-  return { registered, result };
+  // Flatten registrations into a simpler structure for test assertions
+  const registered = registrations.map(r => ({
+    typeName: r.typeNames as string,
+    operatorName: r.operatorName,
+    description: r.spec.description,
+    resolveType: r.spec.resolveType,
+    resolve: r.spec.resolve
+  }));
+
+  return { registered, registrations };
 }
 
-describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
-  describe('plugin metadata', () => {
-    it('has correct name and version', () => {
-      expect(PgConnectionArgFilterPostgisOperatorsPlugin.name).toBe(
-        'PgConnectionArgFilterPostgisOperatorsPlugin'
-      );
-      expect(PgConnectionArgFilterPostgisOperatorsPlugin.version).toBe('2.0.0');
-    });
-
-    it('declares correct after dependencies', () => {
-      expect(PgConnectionArgFilterPostgisOperatorsPlugin.after).toEqual([
-        'PostgisRegisterTypesPlugin',
-        'PostgisExtensionDetectionPlugin',
-        'PostgisInflectionPlugin',
-        'PgConnectionArgFilterPlugin'
-      ]);
-    });
-
-    it('has an init hook in schema.hooks', () => {
-      const hooks = (PgConnectionArgFilterPostgisOperatorsPlugin.schema as any)?.hooks;
-      expect(hooks).toBeDefined();
-      expect(typeof hooks.init).toBe('function');
-    });
-  });
-
+describe('PostGIS operator factory (createPostgisOperatorFactory)', () => {
   describe('preset', () => {
-    it('includes the plugin', () => {
-      expect(PostgisConnectionFilterPreset.plugins).toContain(
-        PgConnectionArgFilterPostgisOperatorsPlugin
-      );
+    it('declares the factory in connectionFilterOperatorFactories', () => {
+      const factories = PostgisConnectionFilterPreset.schema?.connectionFilterOperatorFactories;
+      expect(factories).toBeDefined();
+      expect(factories).toHaveLength(1);
+      expect(typeof factories![0]).toBe('function');
     });
   });
 
   describe('graceful degradation', () => {
-    it('returns early when PostGIS is not available', () => {
-      const { registered, result } = runPlugin({ hasPostgis: false });
+    it('returns empty array when PostGIS is not available', () => {
+      const { registered } = runFactory({ hasPostgis: false });
       expect(registered).toHaveLength(0);
-      expect(result).toEqual({});
-    });
-
-    it('returns early when connection filter plugin is not loaded', () => {
-      const { registered, result } = runPlugin({ hasFilterPlugin: false });
-      expect(registered).toHaveLength(0);
-      expect(result).toEqual({});
     });
   });
 
@@ -187,7 +142,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
     });
 
     it('registers all 26 unique operator names', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       const uniqueOperatorNames = [...new Set(registered.map(r => r.operatorName))];
       const allExpected = [
         ...FUNCTION_OPERATORS.map(o => o.name),
@@ -197,7 +152,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
     });
 
     it('registers operators sorted by name', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       const operatorNames = registered.map(r => r.operatorName);
       // Within each consecutive group of the same operator, order should be consistent
       // Globally, operators should be sorted alphabetically
@@ -219,21 +174,21 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
     const TYPES_PER_BASE = 1 + CONCRETE_SUBTYPES.length * 4; // 29
 
     it('generates correct number of type names per base type', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       // Pick a geometry-only operator (e.g., 'contains')
       const containsOps = registered.filter(r => r.operatorName === 'contains');
       expect(containsOps).toHaveLength(TYPES_PER_BASE);
     });
 
     it('doubles registrations for geometry+geography operators', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       // 'intersects' applies to both geometry and geography
       const intersectsOps = registered.filter(r => r.operatorName === 'intersects');
       expect(intersectsOps).toHaveLength(TYPES_PER_BASE * 2);
     });
 
     it('includes interface names in type names', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       const containsTypeNames = registered
         .filter(r => r.operatorName === 'contains')
         .map(r => r.typeName);
@@ -241,7 +196,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
     });
 
     it('includes concrete subtype names', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       const containsTypeNames = registered
         .filter(r => r.operatorName === 'contains')
         .map(r => r.typeName);
@@ -256,7 +211,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
     });
 
     it('includes Z/M dimension variants', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       const containsTypeNames = registered
         .filter(r => r.operatorName === 'contains')
         .map(r => r.typeName);
@@ -266,7 +221,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
     });
 
     it('includes geography types for dual-base operators', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       const intersectsTypeNames = registered
         .filter(r => r.operatorName === 'intersects')
         .map(r => r.typeName);
@@ -280,7 +235,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
   describe('SQL generation', () => {
     describe('function-based operators', () => {
       it('generates schema-qualified SQL for public schema', () => {
-        const { registered } = runPlugin({ schemaName: 'public' });
+        const { registered } = runFactory({ schemaName: 'public' });
         const containsOp = registered.find(r => r.operatorName === 'contains');
         expect(containsOp).toBeDefined();
 
@@ -295,7 +250,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
       });
 
       it('generates schema-qualified SQL for non-public schema', () => {
-        const { registered } = runPlugin({ schemaName: 'postgis' });
+        const { registered } = runFactory({ schemaName: 'postgis' });
         const containsOp = registered.find(r => r.operatorName === 'contains');
         expect(containsOp).toBeDefined();
 
@@ -310,7 +265,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
       });
 
       it('lowercases function names in SQL', () => {
-        const { registered } = runPlugin();
+        const { registered } = runFactory();
         const op3d = registered.find(r => r.operatorName === 'intersects3D');
         expect(op3d).toBeDefined();
 
@@ -327,7 +282,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
 
     describe('SQL operator-based operators', () => {
       it('generates correct SQL for = operator', () => {
-        const { registered } = runPlugin();
+        const { registered } = runFactory();
         const exactOp = registered.find(r => r.operatorName === 'exactlyEquals');
         expect(exactOp).toBeDefined();
 
@@ -342,7 +297,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
       });
 
       it('generates correct SQL for && operator', () => {
-        const { registered } = runPlugin();
+        const { registered } = runFactory();
         const bboxOp = registered.find(r => r.operatorName === 'bboxIntersects2D');
         expect(bboxOp).toBeDefined();
 
@@ -357,7 +312,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
       });
 
       it('generates correct SQL for ~ operator', () => {
-        const { registered } = runPlugin();
+        const { registered } = runFactory();
         const bboxContainsOp = registered.find(r => r.operatorName === 'bboxContains');
         expect(bboxContainsOp).toBeDefined();
 
@@ -372,7 +327,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
       });
 
       it('generates correct SQL for ~= operator', () => {
-        const { registered } = runPlugin();
+        const { registered } = runFactory();
         const bboxEqOp = registered.find(r => r.operatorName === 'bboxEquals');
         expect(bboxEqOp).toBeDefined();
 
@@ -387,7 +342,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
       });
 
       it('generates correct SQL for &&& operator', () => {
-        const { registered } = runPlugin();
+        const { registered } = runFactory();
         const ndOp = registered.find(r => r.operatorName === 'bboxIntersectsND');
         expect(ndOp).toBeDefined();
 
@@ -405,9 +360,9 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
 
   describe('resolveType', () => {
     it('returns fieldType unchanged (identity)', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       const op = registered[0];
-      const mockType = { name: 'GeometryInterface' };
+      const mockType = { name: 'GeometryInterface' } as any;
       expect(op.resolveType(mockType)).toBe(mockType);
     });
   });
@@ -461,7 +416,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
     };
 
     it('has correct descriptions for all 26 operators', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       for (const [opName, expectedDesc] of Object.entries(expectedDescriptions)) {
         const op = registered.find(r => r.operatorName === opName);
         expect(op).toBeDefined();
@@ -476,7 +431,7 @@ describe('PgConnectionArgFilterPostgisOperatorsPlugin', () => {
 
   describe('total registration count', () => {
     it('registers the correct total number of operator+type combinations', () => {
-      const { registered } = runPlugin();
+      const { registered } = runFactory();
       // geometry-only function ops: 10 ops * 29 types = 290
       // geometry+geography function ops: 3 ops * 29 * 2 = 174
       // geometry-only SQL ops: 11 ops * 29 types = 319

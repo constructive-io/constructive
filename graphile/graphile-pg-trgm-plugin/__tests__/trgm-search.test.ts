@@ -3,7 +3,7 @@ import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
-import { createTrgmSearchPlugin } from '../src/trgm-search';
+import { TrgmSearchPreset } from '../src/preset';
 
 interface AllProductsResult {
   allProducts: {
@@ -32,9 +32,7 @@ describe('TrgmSearchPlugin', () => {
     const testPreset = {
       extends: [
         ConnectionFilterPreset(),
-      ],
-      plugins: [
-        createTrgmSearchPlugin(),
+        TrgmSearchPreset(),
       ],
     };
 
@@ -141,7 +139,7 @@ describe('TrgmSearchPlugin', () => {
   });
 
   // ========================================================================
-  // similarTo OPERATOR (via addConnectionFilterOperator on StringFilter)
+  // similarTo OPERATOR (via connectionFilterOperatorFactories on StringFilter)
   // ========================================================================
   describe('similarTo operator on StringFilter', () => {
     it('fuzzy matches with typo in name', async () => {

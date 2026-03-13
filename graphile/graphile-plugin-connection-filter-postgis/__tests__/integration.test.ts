@@ -2,7 +2,7 @@ import sql from 'pg-sql2';
 import type { SQL } from 'pg-sql2';
 import { CONCRETE_SUBTYPES, GisSubtype } from 'graphile-postgis';
 import type { ConnectionFilterOperatorSpec as OperatorSpec } from 'graphile-connection-filter';
-import { PgConnectionArgFilterPostgisOperatorsPlugin } from '../src/plugin';
+import { createPostgisOperatorFactory } from '../src/plugin';
 
 /**
  * Integration tests verifying that:
@@ -51,14 +51,8 @@ function createMockInflection() {
   };
 }
 
-// Capture all registered operators by running the plugin init hook
-function runPlugin() {
-  const registered: Array<{
-    typeName: string;
-    operatorName: string;
-    spec: OperatorSpec;
-  }> = [];
-
+// Capture all registered operators by running the factory
+function runFactory() {
   const inflection = createMockInflection();
 
   const postgisInfo = {
@@ -67,30 +61,27 @@ function runPlugin() {
     geographyCodec: { name: 'geography' }
   };
 
-  const addConnectionFilterOperator = (
-    typeName: string,
-    operatorName: string,
-    spec: OperatorSpec
-  ) => {
-    registered.push({ typeName, operatorName, spec });
-  };
-
   const build = {
     inflection,
-    pgGISExtensionInfo: postgisInfo,
-    addConnectionFilterOperator
+    pgGISExtensionInfo: postgisInfo
   };
 
-  const plugin = PgConnectionArgFilterPostgisOperatorsPlugin;
-  const initHook = (plugin.schema as any).hooks.init;
-  initHook({}, build);
+  const factory = createPostgisOperatorFactory();
+  const registrations = factory(build as any);
+
+  // Map to the shape the tests expect
+  const registered = registrations.map(r => ({
+    typeName: r.typeNames as string,
+    operatorName: r.operatorName,
+    spec: r.spec
+  }));
 
   return { registered };
 }
 
 describe('Integration: connection-filter OperatorSpec compatibility', () => {
   it('every registered spec has a description string', () => {
-    const { registered } = runPlugin();
+    const { registered } = runFactory();
     expect(registered.length).toBeGreaterThan(0);
 
     for (const { spec, operatorName } of registered) {
@@ -100,7 +91,7 @@ describe('Integration: connection-filter OperatorSpec compatibility', () => {
   });
 
   it('every registered spec has a resolve function with correct arity', () => {
-    const { registered } = runPlugin();
+    const { registered } = runFactory();
 
     for (const { spec, operatorName } of registered) {
       expect(typeof spec.resolve).toBe('function');
@@ -111,7 +102,7 @@ describe('Integration: connection-filter OperatorSpec compatibility', () => {
   });
 
   it('every registered spec has a resolveType function', () => {
-    const { registered } = runPlugin();
+    const { registered } = runFactory();
 
     for (const { spec } of registered) {
       expect(typeof spec.resolveType).toBe('function');
@@ -119,7 +110,7 @@ describe('Integration: connection-filter OperatorSpec compatibility', () => {
   });
 
   it('resolveType returns the input type unchanged (identity)', () => {
-    const { registered } = runPlugin();
+    const { registered } = runFactory();
     const mockType = { name: 'GeometryInterface' } as any;
 
     for (const { spec } of registered) {
@@ -128,7 +119,7 @@ describe('Integration: connection-filter OperatorSpec compatibility', () => {
   });
 
   it('resolve returns valid SQL when called with connection-filter args', () => {
-    const { registered } = runPlugin();
+    const { registered } = runFactory();
     const sqlIdentifier = sql.identifier('geom_col');
     const sqlValue = sql.identifier('input_val');
     const details = { fieldName: 'geom', operatorName: 'contains' };
@@ -149,16 +140,14 @@ describe('Integration: connection-filter OperatorSpec compatibility', () => {
   });
 
   it('specs do not include unsupported OperatorSpec fields', () => {
-    const { registered } = runPlugin();
+    const { registered } = runFactory();
     const validKeys: (keyof OperatorSpec)[] = [
-      'name',
       'description',
-      'resolveSqlIdentifier',
+      'resolve',
       'resolveInput',
       'resolveInputCodec',
-      'resolveSql',
+      'resolveSqlIdentifier',
       'resolveSqlValue',
-      'resolve',
       'resolveType'
     ];
 
@@ -212,7 +201,7 @@ describe('Integration: type name generation matches graphile-postgis', () => {
   });
 
   it('registered operator type names match generated PostGIS type names', () => {
-    const { registered } = runPlugin();
+    const { registered } = runFactory();
 
     // Build expected type names using the same logic as the plugin
     const expectedGeoTypes: string[] = [inflection.gisInterfaceName('geometry')];

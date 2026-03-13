@@ -228,32 +228,7 @@ export function createPgSearchPlugin(
       },
 
       hooks: {
-        init(_, build) {
-          const {
-            sql,
-            graphql: { GraphQLString },
-          } = build;
-
-          // Register the `matches` filter operator for the FullText scalar.
-          // Requires graphile-connection-filter; skip if not loaded.
-          if (typeof build.addConnectionFilterOperator === 'function') {
-            const TYPES = build.dataplanPg?.TYPES;
-            build.addConnectionFilterOperator(fullTextScalarName, 'matches', {
-              description: 'Performs a full text search on the field.',
-              resolveType: () => GraphQLString,
-              resolveInputCodec: TYPES ? () => TYPES.text : undefined,
-              resolve(
-                sqlIdentifier: SQL,
-                sqlValue: SQL,
-                _input: unknown,
-                _$where: any,
-                _details: { fieldName: string | null; operatorName: string }
-              ) {
-                return sql`${sqlIdentifier} @@ websearch_to_tsquery(${sql.literal(tsConfig)}, ${sqlValue})`;
-              },
-            });
-          }
-
+        init(_, _build) {
           return _;
         },
 

@@ -15,15 +15,26 @@
  * };
  * ```
  *
- * For satellite plugins that need to register custom operators:
+ * For satellite plugins that need to register custom operators, declare them
+ * as factories in the preset's `connectionFilterOperatorFactories` option:
  * ```typescript
- * // In your plugin's init hook:
- * if (typeof build.addConnectionFilterOperator === 'function') {
- *   build.addConnectionFilterOperator('MyType', 'myOperator', {
+ * import type { ConnectionFilterOperatorFactory } from 'graphile-connection-filter';
+ *
+ * const myOperatorFactory: ConnectionFilterOperatorFactory = (build) => [{
+ *   typeNames: 'MyType',
+ *   operatorName: 'myOperator',
+ *   spec: {
  *     description: 'My custom operator',
- *     resolve: (sqlIdentifier, sqlValue) => sql`${sqlIdentifier} OP ${sqlValue}`,
- *   });
- * }
+ *     resolve: (sqlIdentifier, sqlValue) => build.sql`${sqlIdentifier} OP ${sqlValue}`,
+ *   },
+ * }];
+ *
+ * export const MyPreset = {
+ *   schema: {
+ *     connectionFilterOperatorFactories: [myOperatorFactory],
+ *   },
+ *   plugins: [MyPlugin],
+ * };
  * ```
  *
  * For satellite plugins that need to access the query builder from a filter apply:
@@ -58,6 +69,8 @@ export {
 // Re-export types
 export type {
   ConnectionFilterOperatorSpec,
+  ConnectionFilterOperatorRegistration,
+  ConnectionFilterOperatorFactory,
   ConnectionFilterOptions,
   ConnectionFilterOperatorsDigest,
   PgConnectionFilterOperatorsScope,

@@ -8,7 +8,7 @@
 
 import 'graphile-build';
 import 'graphile-build-pg';
-import type { ConnectionFilterOperatorSpec, ConnectionFilterOperatorsDigest, PgConnectionFilterOperatorsScope } from './types';
+import type { ConnectionFilterOperatorFactory, ConnectionFilterOperatorSpec, ConnectionFilterOperatorsDigest, PgConnectionFilterOperatorsScope } from './types';
 
 declare global {
   namespace GraphileBuild {
@@ -40,12 +40,6 @@ declare global {
       connectionFilterOperatorsDigest(codec: any): ConnectionFilterOperatorsDigest | null;
       /** Escapes LIKE wildcard characters (% and _) */
       escapeLikeWildcards(input: unknown): string;
-      /** Registers a custom filter operator (used by satellite plugins) */
-      addConnectionFilterOperator(
-        typeNameOrNames: string | string[],
-        filterName: string,
-        spec: ConnectionFilterOperatorSpec
-      ): void;
       /** Internal filter operator registry keyed by filter type name */
       [key: symbol]: any;
     }
@@ -93,6 +87,11 @@ declare global {
        * This prevents generating EXISTS subqueries that would cause sequential scans on large tables.
        * Set to false to allow relation filters on all FKs regardless of index status. */
       connectionFilterRelationsRequireIndex?: boolean;
+      /**
+       * Declarative operator factories. Each factory receives the build object
+       * and returns operator registrations. Replaces addConnectionFilterOperator.
+       */
+      connectionFilterOperatorFactories?: ConnectionFilterOperatorFactory[];
     }
   }
 

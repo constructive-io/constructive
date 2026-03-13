@@ -60,6 +60,45 @@ export interface ConnectionFilterOperatorSpec {
 }
 
 /**
+ * A single operator registration returned by a factory function.
+ * Declares which type(s) the operator applies to, its name, and its spec.
+ */
+export interface ConnectionFilterOperatorRegistration {
+  /** The GraphQL type name(s) this operator applies to (e.g. 'String', 'Int', or an array). */
+  typeNames: string | string[];
+  /** The operator field name (e.g. 'similarTo', 'matches', 'intersects'). */
+  operatorName: string;
+  /** The operator specification (resolve function, description, etc.). */
+  spec: ConnectionFilterOperatorSpec;
+}
+
+/**
+ * A factory function that receives the build object and returns operator registrations.
+ * This is the declarative replacement for `build.addConnectionFilterOperator()`.
+ *
+ * Satellite plugins declare these in their preset's `connectionFilterOperatorFactories`
+ * option. The connection filter plugin processes them during its own init hook,
+ * eliminating timing dependencies between plugins.
+ *
+ * @example
+ * ```typescript
+ * const myFactory: ConnectionFilterOperatorFactory = (build) => [
+ *   {
+ *     typeNames: 'String',
+ *     operatorName: 'similarTo',
+ *     spec: {
+ *       description: 'Fuzzy match',
+ *       resolve: (i, v) => build.sql`similarity(${i}, ${v}) > 0.3`,
+ *     },
+ *   },
+ * ];
+ * ```
+ */
+export type ConnectionFilterOperatorFactory = (
+  build: any
+) => ConnectionFilterOperatorRegistration[];
+
+/**
  * Configuration options for the connection filter preset.
  */
 export interface ConnectionFilterOptions {
@@ -85,6 +124,17 @@ export interface ConnectionFilterOptions {
    * Prevents EXISTS subqueries that would cause sequential scans on large tables.
    * Default: true */
   connectionFilterRelationsRequireIndex?: boolean;
+  /**
+   * Declarative operator factories. Each factory receives the build object and
+   * returns an array of operator registrations. This replaces the imperative
+   * `build.addConnectionFilterOperator()` API.
+   *
+   * Satellite plugins (PostGIS, search, pg_trgm, etc.) declare their operators
+   * here instead of calling `addConnectionFilterOperator` in an init hook.
+   * The connection filter plugin processes all factories during its own init,
+   * eliminating timing/ordering dependencies.
+   */
+  connectionFilterOperatorFactories?: ConnectionFilterOperatorFactory[];
 }
 
 /**

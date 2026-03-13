@@ -9,70 +9,92 @@ const version = '1.0.0';
 /**
  * ConnectionFilterCustomOperatorsPlugin
  *
- * Provides the `addConnectionFilterOperator` API on the build object.
- * Satellite plugins (PostGIS filter, search, pgvector, textsearch) call this
- * during the `init` hook to register custom filter operators.
+ * Processes declarative operator factories from the preset configuration.
+ * Satellite plugins (PostGIS filter, search, pg_trgm, etc.) declare their
+ * operators via `connectionFilterOperatorFactories` in their preset's schema
+ * options. This plugin processes all factories during its own init hook,
+ * populating the filter registry used at schema build time.
  *
- * API contract (must be preserved for compatibility):
- *   build.addConnectionFilterOperator(
- *     typeNameOrNames: string | string[],
- *     filterName: string,
- *     spec: ConnectionFilterOperatorSpec
- *   )
+ * This declarative approach replaces the previous imperative
+ * `build.addConnectionFilterOperator()` API, eliminating timing/ordering
+ * dependencies between plugins.
+ *
+ * @example
+ * ```typescript
+ * // In a satellite plugin's preset:
+ * const MyPreset = {
+ *   schema: {
+ *     connectionFilterOperatorFactories: [
+ *       (build) => [{
+ *         typeNames: 'String',
+ *         operatorName: 'myOp',
+ *         spec: {
+ *           description: 'My operator',
+ *           resolve: (i, v) => build.sql`${i} OP ${v}`,
+ *         },
+ *       }],
+ *     ],
+ *   },
+ * };
+ * ```
  */
 export const ConnectionFilterCustomOperatorsPlugin: GraphileConfig.Plugin = {
   name: 'ConnectionFilterCustomOperatorsPlugin',
   version,
   description:
-    'Provides the addConnectionFilterOperator API for custom operator registration',
+    'Processes declarative operator factories for custom filter operator registration',
 
   schema: {
     hooks: {
       build(build) {
-        const { inflection } = build;
-
         // Initialize the filter registry
         build[$$filters] = new Map<
           string,
           Map<string, ConnectionFilterOperatorSpec>
         >();
 
-        // The public API that satellite plugins call
-        build.addConnectionFilterOperator = (
-          typeNameOrNames: string | string[],
-          filterName: string,
-          spec: ConnectionFilterOperatorSpec
-        ) => {
-          if (
-            !build.status.isBuildPhaseComplete ||
-            build.status.isInitPhaseComplete
-          ) {
-            throw new Error(
-              "addConnectionFilterOperator may only be called during the 'init' phase"
-            );
-          }
-
-          const typeNames = Array.isArray(typeNameOrNames)
-            ? typeNameOrNames
-            : [typeNameOrNames];
-
-          for (const typeName of typeNames) {
-            const filterTypeName = inflection.filterFieldType(typeName);
-            let operatorSpecByFilterName = build[$$filters].get(filterTypeName);
-            if (!operatorSpecByFilterName) {
-              operatorSpecByFilterName = new Map();
-              build[$$filters].set(filterTypeName, operatorSpecByFilterName);
-            }
-            if (operatorSpecByFilterName.has(filterName)) {
-              throw new Error(
-                `Filter '${filterName}' already registered on '${filterTypeName}'`
-              );
-            }
-            operatorSpecByFilterName.set(filterName, spec);
-          }
-        };
-
         return build;
+      },
+
+      init(_, build) {
+        const { inflection } = build;
+        const factories = build.options.connectionFilterOperatorFactories;
+
+        if (!factories || !Array.isArray(factories) || factories.length === 0) {
+          return _;
+        }
+
+        // Process each factory: call it with build, register all returned operators
+        for (const factory of factories) {
+          const registrations = factory(build);
+          if (!registrations || !Array.isArray(registrations)) {
+            continue;
+          }
+
+          for (const registration of registrations) {
+            const { typeNames: typeNameOrNames, operatorName, spec } = registration;
+            const typeNames = Array.isArray(typeNameOrNames)
+              ? typeNameOrNames
+              : [typeNameOrNames];
+
+            for (const typeName of typeNames) {
+              const filterTypeName = inflection.filterFieldType(typeName);
+              let operatorSpecByFilterName = build[$$filters].get(filterTypeName);
+              if (!operatorSpecByFilterName) {
+                operatorSpecByFilterName = new Map();
+                build[$$filters].set(filterTypeName, operatorSpecByFilterName);
+              }
+              if (operatorSpecByFilterName.has(operatorName)) {
+                throw new Error(
+                  `Filter '${operatorName}' already registered on '${filterTypeName}'`
+                );
+              }
+              operatorSpecByFilterName.set(operatorName, spec);
+            }
+          }
+        }
+
+        return _;
       },
 
       /**

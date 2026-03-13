@@ -2,7 +2,7 @@
  * PostGIS Connection Filter Plugin for PostGraphile v5
  *
  * Adds PostGIS spatial filter operators (ST_Contains, ST_Intersects, etc.)
- * to postgraphile-plugin-connection-filter.
+ * to graphile-connection-filter via the declarative operator factory API.
  *
  * @example
  * ```typescript
@@ -17,8 +17,8 @@
 // Preset (recommended entry point)
 export { PostgisConnectionFilterPreset } from './preset';
 
-// Plugin
-export { PgConnectionArgFilterPostgisOperatorsPlugin } from './plugin';
+// Factory function (for advanced use — the preset is the recommended entry point)
+export { createPostgisOperatorFactory } from './plugin';
 
 // Types
 export type { PostgisFilterOperatorSpec, ResolvedFilterSpec } from './types';

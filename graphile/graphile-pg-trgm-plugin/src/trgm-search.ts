@@ -7,7 +7,7 @@
  * trigram indexes), this plugin adds:
  *
  * 1. **`similarTo` / `wordSimilarTo` filter operators** on StringFilter
- *    via `addConnectionFilterOperator`
+ *    via `connectionFilterOperatorFactories` (declared in the preset)
  *    - `similarTo: { value: "cenral prk", threshold: 0.3 }`
  *      → `WHERE similarity(col, $1) > $2`
  *    - `wordSimilarTo: { value: "cenral prk", threshold: 0.3 }`
@@ -187,54 +187,6 @@ export function createTrgmSearchPlugin(
             }),
             'TrgmSearchPlugin registering TrgmSearchInput type'
           );
-
-          // Register `similarTo` operator on all String filter types
-          if (typeof build.addConnectionFilterOperator === 'function') {
-            build.addConnectionFilterOperator('String', 'similarTo', {
-              description:
-                'Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.',
-              resolveType: () =>
-                build.getTypeByName('TrgmSearchInput') as any,
-              resolve(
-                sqlIdentifier: SQL,
-                _sqlValue: SQL,
-                input: any,
-                $where: any,
-                _details: { fieldName: string | null; operatorName: string }
-              ) {
-                if (input == null) return null;
-                const { value, threshold } = input;
-                if (!value || typeof value !== 'string' || value.trim().length === 0) {
-                  return null;
-                }
-                const th = threshold != null ? threshold : 0.3;
-                return sql`similarity(${sqlIdentifier}, ${sql.value(value)}) > ${sql.value(th)}`;
-              },
-            });
-
-            // Register `wordSimilarTo` operator on all String filter types
-            build.addConnectionFilterOperator('String', 'wordSimilarTo', {
-              description:
-                'Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.',
-              resolveType: () =>
-                build.getTypeByName('TrgmSearchInput') as any,
-              resolve(
-                sqlIdentifier: SQL,
-                _sqlValue: SQL,
-                input: any,
-                $where: any,
-                _details: { fieldName: string | null; operatorName: string }
-              ) {
-                if (input == null) return null;
-                const { value, threshold } = input;
-                if (!value || typeof value !== 'string' || value.trim().length === 0) {
-                  return null;
-                }
-                const th = threshold != null ? threshold : 0.3;
-                return sql`word_similarity(${sql.value(value)}, ${sqlIdentifier}) > ${sql.value(th)}`;
-              },
-            });
-          }
 
           return _;
         },

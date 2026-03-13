@@ -11,7 +11,7 @@ Adds advanced filtering capabilities to connection and list fields, including:
 - Pattern matching: `includes`, `startsWith`, `endsWith`, `like` + case-insensitive variants
 - Type-specific operators: JSONB, hstore, inet, array, range
 - Logical operators: `and`, `or`, `not`
-- Custom operator API: `addConnectionFilterOperator` for satellite plugins
+- Declarative custom operator API: `connectionFilterOperatorFactories` for satellite plugins
 
 ## Usage
 
@@ -27,14 +27,23 @@ const preset: GraphileConfig.Preset = {
 
 ## Custom Operators
 
-Satellite plugins can register custom operators during the `init` hook:
+Satellite plugins declare custom operators via `connectionFilterOperatorFactories` in their preset's schema options. Each factory is a function that receives the `build` object and returns an array of operator registrations:
 
 ```typescript
-const addConnectionFilterOperator = (build as any).addConnectionFilterOperator;
-if (typeof addConnectionFilterOperator === 'function') {
-  addConnectionFilterOperator('MyType', 'myOperator', {
+import type { ConnectionFilterOperatorFactory } from 'graphile-connection-filter';
+
+const myOperatorFactory: ConnectionFilterOperatorFactory = (build) => [{
+  typeNames: 'MyType',
+  operatorName: 'myOperator',
+  spec: {
     description: 'My custom operator',
-    resolve: (sqlIdentifier, sqlValue) => sql`${sqlIdentifier} OP ${sqlValue}`,
-  });
-}
+    resolve: (sqlIdentifier, sqlValue) => build.sql`${sqlIdentifier} OP ${sqlValue}`,
+  },
+}];
+
+const MyPreset: GraphileConfig.Preset = {
+  schema: {
+    connectionFilterOperatorFactories: [myOperatorFactory],
+  },
+};
 ```
