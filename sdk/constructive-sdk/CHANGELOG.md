@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.5.2...@constructive-io/sdk@0.6.0) (2026-03-13)
+
+### Features
+
+- **codegen:** add optional condition generation toggle ([abe0e3e](https://github.com/constructive-io/constructive/commit/abe0e3efd00119ee9fb4265c6480799b4a5f62d4))
+
 ## [0.5.2](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.5.1...@constructive-io/sdk@0.5.2) (2026-03-12)
 
 **Note:** Version bump only for package @constructive-io/sdk

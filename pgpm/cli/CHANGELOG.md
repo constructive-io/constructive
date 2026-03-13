@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/constructive-io/constructive/compare/pgpm@4.6.2...pgpm@4.7.0) (2026-03-13)
+
+### Features
+
+- **codegen:** add config command, helpers.ts generation, and collision handling ([4273a61](https://github.com/constructive-io/constructive/commit/4273a618989f6eb55ae120221b97167074de04ff)), closes [constructive-io/dev-utils#70](https://github.com/constructive-io/dev-utils/issues/70)
+
 ## [4.6.2](https://github.com/constructive-io/constructive/compare/pgpm@4.6.1...pgpm@4.6.2) (2026-03-12)
 
 **Note:** Version bump only for package pgpm
