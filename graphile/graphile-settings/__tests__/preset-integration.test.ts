@@ -753,6 +753,68 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     expect(nodes[0].name).toBe('Brooklyn Bridge Park');
   });
 
+  it('mega query: BM25 + tsvector + pgvector + relation filter + scalar in ONE query', async () => {
+    // This is the ultimate integration test: all five plugin types combined in a single filter
+    const result = await query<{
+      locations: {
+        nodes: {
+          name: string;
+          bm25BodyScore: number;
+          tsvRank: number;
+          embedding: number[];
+          geom: { geojson: { type: string; coordinates: number[] } };
+          category: { name: string };
+          tags: { nodes: { label: string }[] };
+        }[];
+      };
+    }>({
+      query: `
+        query {
+          locations(filter: {
+            fullTextTsv: "park"
+            bm25Body: { query: "park green" }
+            category: { name: { equalTo: "Parks" } }
+            isActive: { equalTo: true }
+            vectorEmbedding: { nearby: { embedding: [0, 1, 0], distance: 2.0 } }
+          }) {
+            nodes {
+              name
+              bm25BodyScore
+              tsvRank
+              embedding
+              geom { geojson }
+              category { name }
+              tags { nodes { label } }
+            }
+          }
+        }
+      `,
+    });
+
+    expect(result.errors).toBeUndefined();
+    const nodes = result.data?.locations.nodes ?? [];
+    // Should return parks that match all five criteria simultaneously
+    expect(nodes.length).toBeGreaterThanOrEqual(2);
+
+    for (const node of nodes) {
+      // BM25 score populated (search active)
+      expect(typeof node.bm25BodyScore).toBe('number');
+      // tsvRank populated (tsvector search active)
+      expect(typeof node.tsvRank).toBe('number');
+      // pgvector embedding present
+      expect(Array.isArray(node.embedding)).toBe(true);
+      expect(node.embedding).toHaveLength(3);
+      // PostGIS geom present as GeoJSON
+      expect(node.geom.geojson).toBeDefined();
+      expect(node.geom.geojson.type).toBe('Point');
+      expect(node.geom.geojson.coordinates).toHaveLength(2);
+      // Relation filter: all should be Parks
+      expect(node.category.name).toBe('Parks');
+      // Tags exist on each result
+      expect(node.tags.nodes.length).toBeGreaterThan(0);
+    }
+  });
+
   it('pagination works with filters', async () => {
     const firstPage = await query<{ locations: { nodes: { name: string }[]; pageInfo: { hasNextPage: boolean } } }>({
       query: `
