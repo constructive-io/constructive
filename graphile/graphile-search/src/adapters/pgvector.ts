@@ -71,8 +71,11 @@ export function createPgvectorAdapter(
         graphql: { GraphQLList, GraphQLNonNull, GraphQLFloat },
       } = build;
 
-      // Only register if not already registered (in case graphile-pgvector is also loaded)
-      if (!build.getTypeByName('VectorMetric')) {
+      // Register types for vector search.
+      // Wrapped in try/catch because the standalone graphile-pgvector plugin may
+      // have already registered these types in its own init hook.
+      // Graphile throws on duplicate registrations, so we catch and ignore.
+      try {
         build.registerEnumType(
           'VectorMetric',
           {},
@@ -95,9 +98,11 @@ export function createPgvectorAdapter(
           }),
           'UnifiedSearchPlugin (pgvector adapter) registering VectorMetric enum'
         );
+      } catch {
+        // Already registered by standalone graphile-pgvector plugin — safe to ignore
       }
 
-      if (!build.getTypeByName('VectorNearbyInput')) {
+      try {
         build.registerInputObjectType(
           'VectorNearbyInput',
           {},
@@ -105,6 +110,7 @@ export function createPgvectorAdapter(
             description:
               'Input for vector similarity search. Provide a query vector, optional metric, and optional max distance threshold.',
             fields: () => {
+              // getTypeByName is safe inside a thunk (fields callback) — called after init is complete
               const VectorMetricEnum = build.getTypeByName('VectorMetric') as any;
               return {
                 vector: {
@@ -126,6 +132,8 @@ export function createPgvectorAdapter(
           }),
           'UnifiedSearchPlugin (pgvector adapter) registering VectorNearbyInput type'
         );
+      } catch {
+        // Already registered by standalone graphile-pgvector plugin — safe to ignore
       }
     },
 

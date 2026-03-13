@@ -62,8 +62,11 @@ export function createTrgmAdapter(
         graphql: { GraphQLString, GraphQLFloat, GraphQLNonNull },
       } = build;
 
-      // Only register if not already registered (in case graphile-trgm is also loaded)
-      if (!build.getTypeByName('TrgmSearchInput')) {
+      // Register input type for trgm search.
+      // Wrapped in try/catch because the standalone graphile-trgm plugin may
+      // have already registered 'TrgmSearchInput' in its own init hook.
+      // Graphile throws on duplicate registrations, so we catch and ignore.
+      try {
         build.registerInputObjectType(
           'TrgmSearchInput',
           {},
@@ -84,6 +87,8 @@ export function createTrgmAdapter(
           }),
           'UnifiedSearchPlugin (trgm adapter) registering TrgmSearchInput type'
         );
+      } catch {
+        // Already registered by standalone graphile-trgm plugin — safe to ignore
       }
     },
 

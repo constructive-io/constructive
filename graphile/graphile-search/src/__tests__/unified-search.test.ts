@@ -5,6 +5,7 @@ import type { PgTestClient } from 'pgsql-test';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
 import { Bm25CodecPlugin } from 'graphile-bm25';
 import { VectorCodecPlugin } from 'graphile-pgvector';
+import { TsvectorCodecPlugin } from 'graphile-tsvector';
 import { createUnifiedSearchPlugin } from '../plugin';
 import { createTsvectorAdapter } from '../adapters/tsvector';
 import { createBm25Adapter } from '../adapters/bm25';
@@ -65,6 +66,7 @@ describe('graphile-search (unified search plugin)', () => {
       ],
       plugins: [
         // Codec plugins must load first (gather phase discovers types & indexes)
+        TsvectorCodecPlugin,
         Bm25CodecPlugin,
         VectorCodecPlugin,
         // The unified search plugin (wires all adapters into hooks)

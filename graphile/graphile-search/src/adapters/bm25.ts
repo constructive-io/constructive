@@ -96,8 +96,11 @@ export function createBm25Adapter(
         graphql: { GraphQLString, GraphQLFloat, GraphQLNonNull },
       } = build;
 
-      // Only register if not already registered (in case graphile-bm25 is also loaded)
-      if (!build.getTypeByName('Bm25SearchInput')) {
+      // Register input type for BM25 search.
+      // Wrapped in try/catch because the standalone graphile-bm25 plugin may
+      // have already registered 'Bm25SearchInput' in its own init hook.
+      // Graphile throws on duplicate registrations, so we catch and ignore.
+      try {
         build.registerInputObjectType(
           'Bm25SearchInput',
           {},
@@ -118,6 +121,8 @@ export function createBm25Adapter(
           }),
           'UnifiedSearchPlugin (bm25 adapter) registering Bm25SearchInput type'
         );
+      } catch {
+        // Already registered by standalone graphile-bm25 plugin — safe to ignore
       }
     },
 

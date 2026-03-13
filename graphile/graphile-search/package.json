@@ -35,6 +35,7 @@
     "graphile-test": "workspace:^",
     "graphile-bm25": "workspace:^",
     "graphile-pgvector": "workspace:^",
+    "graphile-tsvector": "workspace:^",
     "makage": "^0.1.10",
     "pg": "^8.19.0",
     "pgsql-test": "workspace:^"
