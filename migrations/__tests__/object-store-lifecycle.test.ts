@@ -4,6 +4,7 @@ import { resolve } from 'path';
 
 import { getConnections, PgTestClient, seed } from 'pgsql-test';
 
+const APP_JOBS_STUB_PATH = resolve(__dirname, 'app-jobs-stub.sql');
 const MIGRATION_PATH = resolve(__dirname, '../files_store.sql');
 
 const USER_A = 'aaaaaaaa-0000-0000-0000-000000000001';
@@ -44,7 +45,7 @@ async function clearJobLog() {
 beforeAll(async () => {
   ({ pg, teardown } = await getConnections(
     {},
-    [seed.sqlfile([MIGRATION_PATH])]
+    [seed.sqlfile([APP_JOBS_STUB_PATH, MIGRATION_PATH])]
   ));
 
   // Ensure anonymous role exists

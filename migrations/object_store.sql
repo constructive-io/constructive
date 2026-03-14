@@ -16,27 +16,21 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- Ensure app_jobs schema + stub add_job exist (required by trigger functions).
--- In production, app_jobs is deployed by the database-jobs pgpm module.
--- This stub is a no-op that prevents trigger creation from failing in dev.
+-- Require app_jobs.add_job to exist (provided by pgpm-database-jobs).
+-- Deploy pgpm-database-jobs BEFORE running this migration.
+-- DO NOT stub this function here -- CREATE OR REPLACE would silently overwrite
+-- the production implementation, causing all trigger-enqueued jobs to be lost.
 CREATE SCHEMA IF NOT EXISTS app_jobs;
 
-CREATE OR REPLACE FUNCTION app_jobs.add_job(
-  identifier text,
-  payload json DEFAULT '{}'::json,
-  queue_name text DEFAULT NULL,
-  run_at timestamptz DEFAULT NULL,
-  max_attempts integer DEFAULT NULL,
-  job_key text DEFAULT NULL,
-  priority integer DEFAULT NULL,
-  flags text[] DEFAULT NULL
-) RETURNS void AS $$
-BEGIN
-  -- Stub: in production this is provided by database-jobs pgpm module.
-  -- In dev, jobs are enqueued but not processed unless the job worker is running.
-  RAISE NOTICE 'app_jobs.add_job stub called: % %', identifier, payload;
-END;
-$$ LANGUAGE plpgsql;
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON p.pronamespace = n.oid
+    WHERE n.nspname = 'app_jobs' AND p.proname = 'add_job'
+  ) THEN
+    RAISE EXCEPTION 'app_jobs.add_job not found. Deploy pgpm-database-jobs before running this migration.';
+  END IF;
+END $$;
 
 -- Ensure schema exists
 CREATE SCHEMA IF NOT EXISTS files_store_public;
