@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.5.4...@constructive-io/knative-job-service@2.6.0) (2026-03-14)
+
+### Bug Fixes
+
+- migrate remaining condition queries to filter, register filterBy behavior for pgCodecRelation, update schema snapshot with relation filter types ([5207254](https://github.com/constructive-io/jobs/commit/5207254ad96ec30100e93f6268137eaede1e4387))
+- update knative-job-service test query filter→where argument ([8f8c3fe](https://github.com/constructive-io/jobs/commit/8f8c3fe6e326ce95cccb847ed9ab7a5eadabd88e))
+
 ## [2.5.4](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.5.3...@constructive-io/knative-job-service@2.5.4) (2026-03-13)
 
 **Note:** Version bump only for package @constructive-io/knative-job-service

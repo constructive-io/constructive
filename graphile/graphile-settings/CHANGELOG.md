@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.9.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.8.4...graphile-settings@4.9.0) (2026-03-14)
+
+### Bug Fixes
+
+- aggregate connectionFilterOperatorFactories in ConstructivePreset to fix array merging ([86ab1f6](https://github.com/constructive-io/constructive/commit/86ab1f635dd6c886c567245e747753c88a9f9402))
+- update snapshots and test assertions for filter→where argument rename ([c3b4990](https://github.com/constructive-io/constructive/commit/c3b4990a02e7462e0421ca8635f6cfcd1e350670))
+- update test references for unified search consolidation ([8fc3314](https://github.com/constructive-io/constructive/commit/8fc33147a5e803e366c4b3a513ea31918d072733))
+
+### Features
+
+- add graphile-pg-trgm-plugin for pg_trgm fuzzy text matching ([592a423](https://github.com/constructive-io/constructive/commit/592a42349c7b8c2243a091078740d8160d3d6c8a))
+- add integration test suite for ConstructivePreset ([9a1ac81](https://github.com/constructive-io/constructive/commit/9a1ac8108020b35967fbd07bec3d094a042d240c))
+- add mega-query test combining BM25 + tsvector + pgvector + relation filter + scalar in one query ([e14bd15](https://github.com/constructive-io/constructive/commit/e14bd15cf409ad8643cbc5a8054abbfd03184f0a))
+- add PostGIS spatial filter (geom intersects bbox) to mega query test ([4093017](https://github.com/constructive-io/constructive/commit/4093017392adc285c94179dd9e9b3dd839bb9c60))
+- add v5-native graphile-connection-filter plugin ([616dee9](https://github.com/constructive-io/constructive/commit/616dee9a42ac4730e3f9f59ad9612bc223770819))
+- consolidate 4 search packages into unified graphile-search ([dafe915](https://github.com/constructive-io/constructive/commit/dafe915653309f4265d19c4bb90b841127e27f2c))
+- consolidate graphile-plugin-connection-filter-postgis into graphile-postgis ([b59919a](https://github.com/constructive-io/constructive/commit/b59919a14b0330c3fdf0fbde10bad9e912e8ec8f))
+- deprecate condition argument, move search + BM25 plugins to filter ([76f35f5](https://github.com/constructive-io/constructive/commit/76f35f53dfc3821ab81dcb6b3ef1fe944a2e8983))
+- enable connectionFilterRelations in constructive preset ([28b23c4](https://github.com/constructive-io/constructive/commit/28b23c48dc3e7c9613fc1b38282256ac6e54f654))
+- rename filter argument to where (configurable via connectionFilterArgumentName) ([10b4fc6](https://github.com/constructive-io/constructive/commit/10b4fc6360774cd79fa936d442dfef4fa9e5f252))
+- rename generated fields to {column}{Algorithm}{Metric} with deduplication ([0f10c04](https://github.com/constructive-io/constructive/commit/0f10c04fe58b0e1f2627ff6e60b10092d462cfd0))
+
+### BREAKING CHANGES
+
+- The condition argument has been removed entirely.
+  All filtering now uses the filter argument exclusively.
+
 ## [4.8.4](https://github.com/constructive-io/constructive/compare/graphile-settings@4.8.3...graphile-settings@4.8.4) (2026-03-13)
 
 **Note:** Version bump only for package graphile-settings

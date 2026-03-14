@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.5.2...graphile-postgis@2.6.0) (2026-03-14)
+
+### Features
+
+- consolidate graphile-plugin-connection-filter-postgis into graphile-postgis ([b59919a](https://github.com/constructive-io/constructive/commit/b59919a14b0330c3fdf0fbde10bad9e912e8ec8f))
+
 ## [2.5.2](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.5.1...graphile-postgis@2.5.2) (2026-03-12)
 
 **Note:** Version bump only for package graphile-postgis

@@ -1,0 +1,21 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 1.1.0 (2026-03-14)
+
+### Bug Fixes
+
+- add --forceExit and testTimeout to graphile-search jest config to prevent CI hang ([11ca5ba](https://github.com/constructive-io/constructive/commit/11ca5ba8bbff1024db494e7bc1ce6870bb8071cd))
+- BM25 adapter falls back to module-level index store, move disabled test to separate suite ([2e1056b](https://github.com/constructive-io/constructive/commit/2e1056b42905c17a1e6aadaaf7ffaef9603415a4))
+- resolve CI failures in graphile-search tests ([8155fa8](https://github.com/constructive-io/constructive/commit/8155fa8b99765e4208cfbce26f6d62d4b82401ca))
+- use correct imports in fullTextSearch disabled test (getConnections, ConnectionFilterPreset) ([b10082e](https://github.com/constructive-io/constructive/commit/b10082e9576a2e9b18d360b1e46f5f8ce099d136))
+- use introspection to verify fullTextSearch disabled (Grafast ignores unknown input fields) ([9f7dcbc](https://github.com/constructive-io/constructive/commit/9f7dcbc9faa82a4a058197120d50c4b89076b63d))
+
+### Features
+
+- add unified graphile-search plugin with adapter pattern ([cef6a12](https://github.com/constructive-io/constructive/commit/cef6a123d245d9d8b5d8b60b385999462678108f))
+- consolidate 4 search packages into unified graphile-search ([dafe915](https://github.com/constructive-io/constructive/commit/dafe915653309f4265d19c4bb90b841127e27f2c))
+- rename filter argument to where (configurable via connectionFilterArgumentName) ([10b4fc6](https://github.com/constructive-io/constructive/commit/10b4fc6360774cd79fa936d442dfef4fa9e5f252))
+- rename tsvector filterPrefix to 'tsv', add fullTextSearch composite filter ([97d9290](https://github.com/constructive-io/constructive/commit/97d929037a28e5e3c6944af565fa4f3b0d772a84))

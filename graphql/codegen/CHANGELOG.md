@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.13.1...@constructive-io/graphql-codegen@4.14.0) (2026-03-14)
+
+### Bug Fixes
+
+- update snapshots and test assertions for filter→where argument rename ([c3b4990](https://github.com/constructive-io/constructive/commit/c3b4990a02e7462e0421ca8635f6cfcd1e350670))
+
+### Features
+
+- rename filter argument to where (configurable via connectionFilterArgumentName) ([10b4fc6](https://github.com/constructive-io/constructive/commit/10b4fc6360774cd79fa936d442dfef4fa9e5f252))
+
 ## [4.13.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.13.0...@constructive-io/graphql-codegen@4.13.1) (2026-03-13)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

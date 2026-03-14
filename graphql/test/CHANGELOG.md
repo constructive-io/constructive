@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.5.4...@constructive-io/graphql-test@4.6.0) (2026-03-14)
+
+### Bug Fixes
+
+- provide correct snapshot content for CI (no condition fields) ([eb9e5b8](https://github.com/constructive-io/constructive/commit/eb9e5b83954a79194e27f49bd1e612402d0251d4))
+- update schema snapshots for pg_trgm plugin additions ([df3d6ce](https://github.com/constructive-io/constructive/commit/df3d6ceaee6a551fe7a3966f5f477ec18f28cc4d))
+- update snapshots and test assertions for filter→where argument rename ([c3b4990](https://github.com/constructive-io/constructive/commit/c3b4990a02e7462e0421ca8635f6cfcd1e350670))
+- update snapshots for unified search consolidation ([82d92a8](https://github.com/constructive-io/constructive/commit/82d92a86fa07bf25fad1e7363171dc0230594b82))
+- update test references for unified search consolidation ([8fc3314](https://github.com/constructive-io/constructive/commit/8fc33147a5e803e366c4b3a513ea31918d072733))
+- update tests and snapshots for condition deprecation ([10ed4c4](https://github.com/constructive-io/constructive/commit/10ed4c485e01cf7e8e964498b996494ea4345dcf))
+
+### Features
+
+- rename filter argument to where (configurable via connectionFilterArgumentName) ([10b4fc6](https://github.com/constructive-io/constructive/commit/10b4fc6360774cd79fa936d442dfef4fa9e5f252))
+
 ## [4.5.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.5.3...@constructive-io/graphql-test@4.5.4) (2026-03-13)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

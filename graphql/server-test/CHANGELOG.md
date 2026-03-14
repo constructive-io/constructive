@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.5.4...graphql-server-test@2.6.0) (2026-03-14)
+
+### Bug Fixes
+
+- add missing blank line between UsersEdge and UserOrderBy in snapshot ([48c8332](https://github.com/constructive-io/constructive/commit/48c8332423e3a91976fc9aecb60053f887108c7b))
+- add missing TagOrderBy enums to server-test snapshot ([1056255](https://github.com/constructive-io/constructive/commit/105625574982326c2098062dec4feb88fda8e038))
+- allow empty filter objects in pgvector test, add relation filter types to schema snapshot ([8191c00](https://github.com/constructive-io/constructive/commit/8191c00846d1641d984d37514b46841a6755ce51))
+- correct schema snapshot with relation filter types, smart quotes, and proper type ordering ([11f8873](https://github.com/constructive-io/constructive/commit/11f887330f975213d5e9d8f096813ef904197bdc))
+- delete snapshot to let Jest regenerate with correct relation filter types ([e6bc127](https://github.com/constructive-io/constructive/commit/e6bc1272b480144ef5b472e3848ea73882426252))
+- migrate remaining condition queries to filter, register filterBy behavior for pgCodecRelation, update schema snapshot with relation filter types ([5207254](https://github.com/constructive-io/constructive/commit/5207254ad96ec30100e93f6268137eaede1e4387))
+- provide correct snapshot content for CI (no condition fields) ([eb9e5b8](https://github.com/constructive-io/constructive/commit/eb9e5b83954a79194e27f49bd1e612402d0251d4))
+- update schema snapshot for {column}TrgmSimilarity naming convention ([a21fe61](https://github.com/constructive-io/constructive/commit/a21fe61a6a7896e011cad557211b33c53557b73f))
+- update schema snapshots for pg_trgm plugin additions ([df3d6ce](https://github.com/constructive-io/constructive/commit/df3d6ceaee6a551fe7a3966f5f477ec18f28cc4d))
+- update SIMILARITY_EMAIL orderBy enums in schema snapshot ([6789edd](https://github.com/constructive-io/constructive/commit/6789edd1ee793f3b26703ca9520dee02f0045081))
+- update snapshots and test assertions for filter→where argument rename ([c3b4990](https://github.com/constructive-io/constructive/commit/c3b4990a02e7462e0421ca8635f6cfcd1e350670))
+- update snapshots for unified search consolidation ([82d92a8](https://github.com/constructive-io/constructive/commit/82d92a86fa07bf25fad1e7363171dc0230594b82))
+- update test references for unified search consolidation ([8fc3314](https://github.com/constructive-io/constructive/commit/8fc33147a5e803e366c4b3a513ea31918d072733))
+- update tests and snapshots for condition deprecation ([10ed4c4](https://github.com/constructive-io/constructive/commit/10ed4c485e01cf7e8e964498b996494ea4345dcf))
+- update tsvector filter test and server-test snapshot for new naming convention ([f9cd669](https://github.com/constructive-io/constructive/commit/f9cd669e27a0fe4baa08463725ad6773d514cf9b))
+
+### Features
+
+- rename filter argument to where (configurable via connectionFilterArgumentName) ([10b4fc6](https://github.com/constructive-io/constructive/commit/10b4fc6360774cd79fa936d442dfef4fa9e5f252))
+
 ## [2.5.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.5.3...graphql-server-test@2.5.4) (2026-03-13)
 
 **Note:** Version bump only for package graphql-server-test
