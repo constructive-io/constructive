@@ -6,7 +6,10 @@ import {
   getGeneratedFileHeader,
   getPrimaryKeyInfo,
   getScalarFields,
+  getSelectableScalarFields,
   getTableNames,
+  getWritableFieldNames,
+  resolveInnerInputType,
   ucFirst,
   lcFirst,
   getCreateInputTypeName,
@@ -150,8 +153,8 @@ function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
   );
 }
 
-function buildSelectObject(table: CleanTable): t.ObjectExpression {
-  const fields = getScalarFields(table);
+function buildSelectObject(table: CleanTable, typeRegistry?: TypeRegistry): t.ObjectExpression {
+  const fields = getSelectableScalarFields(table, typeRegistry);
   return t.objectExpression(
     fields.map((f) =>
       t.objectProperty(t.identifier(f.name), t.booleanLiteral(true)),
@@ -305,9 +308,9 @@ function buildSubcommandSwitch(
   return t.switchStatement(t.identifier('subcommand'), cases);
 }
 
-function buildListHandler(table: CleanTable, targetName?: string): t.FunctionDeclaration {
+function buildListHandler(table: CleanTable, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
-  const selectObj = buildSelectObject(table);
+  const selectObj = buildSelectObject(table, typeRegistry);
 
   const tryBody: t.Statement[] = [
     buildGetClientStatement(targetName),
@@ -349,11 +352,11 @@ function buildListHandler(table: CleanTable, targetName?: string): t.FunctionDec
   );
 }
 
-function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDeclaration {
+function buildGetHandler(table: CleanTable, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
   const pk = pkFields[0];
-  const selectObj = buildSelectObject(table);
+  const selectObj = buildSelectObject(table, typeRegistry);
 
   const promptQuestion = t.objectExpression([
     t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
@@ -423,38 +426,6 @@ function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDecl
   );
 }
 
-/**
- * Get the set of field names that have defaults in the create input type.
- * Looks up the CreateXInput -> inner input type (e.g. DatabaseInput) in the
- * TypeRegistry and checks each field's defaultValue from introspection.
- */
-/**
- * Resolve the inner input type from a CreateXInput or UpdateXInput type.
- * The CreateXInput has an inner field (e.g. "database" of type DatabaseInput)
- * that contains the actual field definitions.
- */
-export function resolveInnerInputType(
-  inputTypeName: string,
-  typeRegistry: TypeRegistry,
-): { name: string; fields: Set<string> } | null {
-  const inputType = typeRegistry.get(inputTypeName);
-  if (!inputType?.inputFields) return null;
-
-  for (const inputField of inputType.inputFields) {
-    const innerTypeName = inputField.type.name
-      || inputField.type.ofType?.name
-      || inputField.type.ofType?.ofType?.name;
-    if (!innerTypeName) continue;
-
-    const innerType = typeRegistry.get(innerTypeName);
-    if (!innerType?.inputFields) continue;
-
-    const fields = new Set(innerType.inputFields.map((f) => f.name));
-    return { name: innerTypeName, fields };
-  }
-  return null;
-}
-
 export function getFieldsWithDefaults(
   table: CleanTable,
   typeRegistry?: TypeRegistry,
@@ -479,22 +450,6 @@ export function getFieldsWithDefaults(
   }
 
   return fieldsWithDefaults;
-}
-
-/**
- * Get the set of field names that actually exist in the create/update input type.
- * Fields not in this set (e.g. computed fields like searchTsvRank, hashUuid)
- * should be excluded from the data object in create/update handlers.
- */
-function getWritableFieldNames(
-  table: CleanTable,
-  typeRegistry?: TypeRegistry,
-): Set<string> | null {
-  if (!typeRegistry) return null;
-
-  const createInputTypeName = getCreateInputTypeName(table);
-  const resolved = resolveInnerInputType(createInputTypeName, typeRegistry);
-  return resolved?.fields ?? null;
 }
 
 function buildMutationHandler(
@@ -589,7 +544,7 @@ function buildMutationHandler(
       ? t.objectExpression([
           t.objectProperty(t.identifier(pk.name), t.booleanLiteral(true)),
         ])
-      : buildSelectObject(table);
+      : buildSelectObject(table, typeRegistry);
 
   let ormArgs: t.ObjectExpression;
 
@@ -1013,8 +968,8 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
 
   const tn = options?.targetName;
   const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
-  statements.push(buildListHandler(table, tn));
-  if (hasGet) statements.push(buildGetHandler(table, tn));
+  statements.push(buildListHandler(table, tn, options?.typeRegistry));
+  if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
   statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));
   if (hasDelete) statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry, ormTypes));
