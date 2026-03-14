@@ -6,7 +6,10 @@ import {
   getGeneratedFileHeader,
   getPrimaryKeyInfo,
   getScalarFields,
+  getSelectableScalarFields,
   getTableNames,
+  getWritableFieldNames,
+  resolveInnerInputType,
   ucFirst,
   lcFirst,
   getCreateInputTypeName,
@@ -151,10 +154,7 @@ function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
 }
 
 function buildSelectObject(table: CleanTable, typeRegistry?: TypeRegistry): t.ObjectExpression {
-  const writableFields = getWritableFieldNames(table, typeRegistry);
-  const fields = getScalarFields(table).filter(
-    (f) => writableFields === null || writableFields.has(f.name),
-  );
+  const fields = getSelectableScalarFields(table, typeRegistry);
   return t.objectExpression(
     fields.map((f) =>
       t.objectProperty(t.identifier(f.name), t.booleanLiteral(true)),
@@ -426,38 +426,6 @@ function buildGetHandler(table: CleanTable, targetName?: string, typeRegistry?: 
   );
 }
 
-/**
- * Get the set of field names that have defaults in the create input type.
- * Looks up the CreateXInput -> inner input type (e.g. DatabaseInput) in the
- * TypeRegistry and checks each field's defaultValue from introspection.
- */
-/**
- * Resolve the inner input type from a CreateXInput or UpdateXInput type.
- * The CreateXInput has an inner field (e.g. "database" of type DatabaseInput)
- * that contains the actual field definitions.
- */
-export function resolveInnerInputType(
-  inputTypeName: string,
-  typeRegistry: TypeRegistry,
-): { name: string; fields: Set<string> } | null {
-  const inputType = typeRegistry.get(inputTypeName);
-  if (!inputType?.inputFields) return null;
-
-  for (const inputField of inputType.inputFields) {
-    const innerTypeName = inputField.type.name
-      || inputField.type.ofType?.name
-      || inputField.type.ofType?.ofType?.name;
-    if (!innerTypeName) continue;
-
-    const innerType = typeRegistry.get(innerTypeName);
-    if (!innerType?.inputFields) continue;
-
-    const fields = new Set(innerType.inputFields.map((f) => f.name));
-    return { name: innerTypeName, fields };
-  }
-  return null;
-}
-
 export function getFieldsWithDefaults(
   table: CleanTable,
   typeRegistry?: TypeRegistry,
@@ -482,22 +450,6 @@ export function getFieldsWithDefaults(
   }
 
   return fieldsWithDefaults;
-}
-
-/**
- * Get the set of field names that actually exist in the create/update input type.
- * Fields not in this set (e.g. computed fields like searchTsvRank, hashUuid)
- * should be excluded from the data object in create/update handlers.
- */
-function getWritableFieldNames(
-  table: CleanTable,
-  typeRegistry?: TypeRegistry,
-): Set<string> | null {
-  if (!typeRegistry) return null;
-
-  const createInputTypeName = getCreateInputTypeName(table);
-  const resolved = resolveInnerInputType(createInputTypeName, typeRegistry);
-  return resolved?.fields ?? null;
 }
 
 function buildMutationHandler(
