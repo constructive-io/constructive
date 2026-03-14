@@ -151,6 +151,15 @@ const buildPreset = (
       const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
       const context: Record<string, string> = {};
 
+      // Schema naming strategy settings (for local development).
+      // See constructive-db: get_available_schema_hash / create_schema_trigger.
+      if (process.env.CONSTRUCTIVE_SIMPLE_SCHEMA_NAMES) {
+        context['constructive.simple_schema_names'] = process.env.CONSTRUCTIVE_SIMPLE_SCHEMA_NAMES;
+      }
+      if (process.env.CONSTRUCTIVE_SCHEMA_USE_UNDERSCORES) {
+        context['constructive.schema_use_underscores'] = process.env.CONSTRUCTIVE_SCHEMA_USE_UNDERSCORES;
+      }
+
       if (req) {
         if (req.databaseId) {
           context['jwt.claims.database_id'] = req.databaseId;
