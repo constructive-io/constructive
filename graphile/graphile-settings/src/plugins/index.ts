@@ -36,26 +36,38 @@ export {
 } from 'graphile-misc-plugins';
 export type { UniqueLookupOptions, TypeMapping, PublicKeyChallengeConfig } from 'graphile-misc-plugins';
 
-// pgvector — Vector scalar + codec + auto-discovered search/filter/orderBy
-export { VectorCodecPlugin, VectorCodecPreset, VectorSearchPlugin, createVectorSearchPlugin } from 'graphile-pgvector';
-export type { VectorSearchPluginOptions, VectorMetric } from 'graphile-pgvector';
-
-// Search plugin (stays in graphile-tsvector, re-exported here for convenience)
+// Unified search — tsvector + BM25 + pg_trgm + pgvector behind a single adapter architecture
 export {
-  PgSearchPlugin,
-  PgSearchPreset,
-  createPgSearchPlugin,
+  // Core plugin + preset
+  createUnifiedSearchPlugin,
+  UnifiedSearchPreset,
+  // Codec plugins (tree-shakable)
   TsvectorCodecPlugin,
   TsvectorCodecPreset,
-} from 'graphile-tsvector';
-export type { PgSearchPluginOptions } from 'graphile-tsvector';
-
-// pg_textsearch — BM25 ranked search (auto-discovers BM25 indexes)
-export {
+  createTsvectorCodecPlugin,
   Bm25CodecPlugin,
   Bm25CodecPreset,
-  Bm25SearchPlugin,
-  createBm25SearchPlugin,
-  Bm25SearchPreset,
-} from 'graphile-bm25';
-export type { Bm25SearchPluginOptions, Bm25IndexInfo } from 'graphile-bm25';
+  bm25IndexStore,
+  VectorCodecPlugin,
+  VectorCodecPreset,
+  // Adapters
+  createTsvectorAdapter,
+  createBm25Adapter,
+  createTrgmAdapter,
+  createPgvectorAdapter,
+  // Operator factories for connection filter integration
+  createMatchesOperatorFactory,
+  createTrgmOperatorFactories,
+} from 'graphile-search';
+export type {
+  SearchAdapter,
+  SearchableColumn,
+  UnifiedSearchOptions,
+  UnifiedSearchPresetOptions,
+  TsvectorCodecPluginOptions,
+  Bm25IndexInfo,
+  TsvectorAdapterOptions,
+  Bm25AdapterOptions,
+  TrgmAdapterOptions,
+  PgvectorAdapterOptions,
+} from 'graphile-search';

@@ -3,9 +3,9 @@ import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 import { ConnectionFilterPreset } from 'graphile-connection-filter';
-import { Bm25CodecPlugin } from 'graphile-bm25';
-import { VectorCodecPlugin } from 'graphile-pgvector';
-import { TsvectorCodecPlugin } from 'graphile-tsvector';
+import { Bm25CodecPlugin } from '../codecs/bm25-codec';
+import { VectorCodecPlugin } from '../codecs/vector-codec';
+import { TsvectorCodecPlugin } from '../codecs/tsvector-codec';
 import { createUnifiedSearchPlugin } from '../plugin';
 import { createTsvectorAdapter } from '../adapters/tsvector';
 import { createBm25Adapter } from '../adapters/bm25';
@@ -527,38 +527,44 @@ describe('graphile-search (unified search plugin)', () => {
       }
     });
 
-    it('combines all 4 adapters in a single mega query', async () => {
-      // This is the ultimate hybrid search: tsvector + BM25 + trgm + pgvector
+    it('mega query v1: per-algorithm filters with manual orderBy', async () => {
+      // Mega Query v1 — Old-style: each algorithm's filter specified individually,
+      // with a composite orderBy array mixing different algorithm scores.
+      // This gives maximum control over which algorithms are active and how
+      // results are ranked.
       const result = await query<AllDocumentsResult>(`
-        query MegaHybridSearch {
+        query MegaQueryV1_PerAlgorithmFilters {
           allDocuments(
             filter: {
-              # tsvector: full-text search on tsv column
+              # tsvector: full-text search on the tsv column
               tsvTsv: "learning"
 
-              # BM25: ranked text search on body column
+              # BM25: ranked text search on the body column (requires BM25 index)
               bm25Body: { query: "learning" }
 
-              # pg_trgm: fuzzy match on title column
+              # pg_trgm: fuzzy trigram match on the title column (typo-tolerant)
               trgmTitle: { value: "Learning", threshold: 0.05 }
 
-              # pgvector: semantic similarity on embedding column
+              # pgvector: cosine similarity on the embedding column
               vectorEmbedding: { vector: [1, 0, 0], metric: COSINE }
             }
-            orderBy: [BODY_BM25_SCORE_ASC, TITLE_TRGM_SIMILARITY_DESC]
+            # Composite orderBy: BM25 relevance first (ASC because lower = more relevant),
+            # then trgm similarity as tiebreaker (DESC because higher = more similar),
+            # then vector distance (ASC because lower = closer)
+            orderBy: [BODY_BM25_SCORE_ASC, TITLE_TRGM_SIMILARITY_DESC, EMBEDDING_VECTOR_DISTANCE_ASC]
           ) {
             nodes {
               rowId
               title
               body
 
-              # Per-adapter scores
-              tsvRank
-              bodyBm25Score
-              titleTrgmSimilarity
-              embeddingVectorDistance
+              # Per-adapter scores — each populated only when its filter is active
+              tsvRank                    # ts_rank(tsv, query) — higher = more relevant
+              bodyBm25Score              # BM25 score — more negative = more relevant
+              titleTrgmSimilarity        # similarity(title, value) — 0..1, higher = closer
+              embeddingVectorDistance     # cosine distance — lower = closer
 
-              # Composite normalized score
+              # Composite normalized score — weighted blend of all active algorithms
               searchScore
             }
           }
@@ -582,6 +588,61 @@ describe('graphile-search (unified search plugin)', () => {
         expect(typeof node.searchScore).toBe('number');
         expect(node.searchScore).toBeGreaterThanOrEqual(0);
         expect(node.searchScore).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('mega query v2: fullTextSearch + searchScore with composite ordering', async () => {
+      // Mega Query v2 — New-style: uses the unified `fullTextSearch` composite
+      // filter that fans out to all text-compatible algorithms (tsvector, BM25, trgm)
+      // with a single string, plus a manual pgvector filter for semantic search.
+      // Orders by composite searchScore (highest overall relevance first).
+      const result = await query<AllDocumentsResult>(`
+        query MegaQueryV2_UnifiedSearch {
+          allDocuments(
+            filter: {
+              # fullTextSearch: single string fans out to tsvector + BM25 + trgm
+              # automatically — no need to specify each algorithm separately
+              fullTextSearch: "machine learning"
+
+              # pgvector still needs its own filter (vectors aren't text)
+              vectorEmbedding: { vector: [1, 0, 0], metric: COSINE }
+            }
+            # Order by composite searchScore (higher = more relevant across all algorithms),
+            # then by vector distance as tiebreaker (lower = semantically closer)
+            orderBy: [SEARCH_SCORE_DESC, EMBEDDING_VECTOR_DISTANCE_ASC]
+          ) {
+            nodes {
+              rowId
+              title
+              body
+
+              # Per-adapter scores — populated by fullTextSearch for text algorithms
+              tsvRank
+              bodyBm25Score
+              titleTrgmSimilarity
+              embeddingVectorDistance
+
+              # Composite normalized score — the single number that blends everything
+              searchScore
+            }
+          }
+        }
+      `);
+
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data?.allDocuments?.nodes;
+      expect(nodes).toBeDefined();
+      expect(nodes!.length).toBeGreaterThan(0);
+
+      for (const node of nodes!) {
+        // searchScore should be populated (composite of active algorithms)
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThanOrEqual(0);
+        expect(node.searchScore).toBeLessThanOrEqual(1);
+
+        // Vector distance should be populated (manual filter)
+        expect(typeof node.embeddingVectorDistance).toBe('number');
+        expect(node.embeddingVectorDistance).toBeGreaterThanOrEqual(0);
       }
     });
   });

@@ -56,7 +56,28 @@ export {
 export type {
   TsvectorAdapterOptions,
   Bm25AdapterOptions,
-  Bm25IndexInfo,
   TrgmAdapterOptions,
   PgvectorAdapterOptions,
 } from './adapters';
+
+// Codec plugins (tree-shakable — import only the codecs you need)
+export {
+  TsvectorCodecPlugin,
+  TsvectorCodecPreset,
+  createTsvectorCodecPlugin,
+  Bm25CodecPlugin,
+  Bm25CodecPreset,
+  bm25IndexStore,
+  VectorCodecPlugin,
+  VectorCodecPreset,
+} from './codecs';
+export type {
+  TsvectorCodecPluginOptions,
+  Bm25IndexInfo,
+} from './codecs';
+
+// Operator factories for connection filter integration
+export {
+  createMatchesOperatorFactory,
+  createTrgmOperatorFactories,
+} from './codecs/operator-factories';

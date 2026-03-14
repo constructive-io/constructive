@@ -125,6 +125,3 @@ export const VectorCodecPlugin: GraphileConfig.Plugin = {
 export const VectorCodecPreset: GraphileConfig.Preset = {
   plugins: [VectorCodecPlugin],
 };
-
-// Note: The full preset including VectorSearchPlugin is created
-// by importing both plugins together. See vector-search.ts.

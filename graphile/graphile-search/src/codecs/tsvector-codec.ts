@@ -16,7 +16,35 @@
 import type { GraphileConfig } from 'graphile-config';
 import { GraphQLString } from 'graphql';
 import sql from 'pg-sql2';
-import type { PgSearchPluginOptions } from './types';
+
+/**
+ * Options for the TsvectorCodecPlugin.
+ */
+export interface TsvectorCodecPluginOptions {
+  /**
+   * Prefix for tsvector condition fields.
+   * @default 'tsv'
+   */
+  pgSearchPrefix?: string;
+
+  /**
+   * Whether to hide tsvector columns from output types.
+   * @default false
+   */
+  hideTsvectorColumns?: boolean;
+
+  /**
+   * Name of the custom GraphQL scalar for tsvector columns.
+   * @default 'FullText'
+   */
+  fullTextScalarName?: string;
+
+  /**
+   * PostgreSQL text search configuration used with `websearch_to_tsquery`.
+   * @default 'english'
+   */
+  tsConfig?: string;
+}
 
 /**
  * Creates a TsvectorCodecPlugin with the given options.
@@ -25,7 +53,7 @@ import type { PgSearchPluginOptions } from './types';
  * @returns GraphileConfig.Plugin
  */
 export function createTsvectorCodecPlugin(
-  options: PgSearchPluginOptions = {}
+  options: TsvectorCodecPluginOptions = {}
 ): GraphileConfig.Plugin {
   const {
     fullTextScalarName = 'FullText',

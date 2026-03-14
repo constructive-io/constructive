@@ -10,7 +10,7 @@
 
 import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../types';
 import type { SQL } from 'pg-sql2';
-import { bm25IndexStore as moduleBm25IndexStore } from 'graphile-bm25';
+import { bm25IndexStore as moduleBm25IndexStore } from '../codecs/bm25-codec';
 
 /**
  * BM25 index info discovered during gather phase.
@@ -110,9 +110,9 @@ export function createBm25Adapter(
       } = build;
 
       // Register input type for BM25 search.
-      // Wrapped in try/catch because the standalone graphile-bm25 plugin may
-      // have already registered 'Bm25SearchInput' in its own init hook.
-      // Graphile throws on duplicate registrations, so we catch and ignore.
+      // Wrapped in try/catch because another plugin may have already
+      // registered 'Bm25SearchInput'. Graphile throws on duplicate
+      // registrations, so we catch and ignore.
       try {
         build.registerInputObjectType(
           'Bm25SearchInput',
@@ -135,7 +135,7 @@ export function createBm25Adapter(
           'UnifiedSearchPlugin (bm25 adapter) registering Bm25SearchInput type'
         );
       } catch {
-        // Already registered by standalone graphile-bm25 plugin — safe to ignore
+        // Already registered — safe to ignore
       }
     },
 

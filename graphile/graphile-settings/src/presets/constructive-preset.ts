@@ -11,11 +11,8 @@ import {
   MetaSchemaPreset,
   PgTypeMappingsPreset,
 } from 'graphile-misc-plugins';
-import { PgSearchPreset, createMatchesOperatorFactory } from 'graphile-tsvector';
+import { UnifiedSearchPreset, createMatchesOperatorFactory, createTrgmOperatorFactories } from 'graphile-search';
 import { GraphilePostgisPreset, createPostgisOperatorFactory } from 'graphile-postgis';
-import { VectorCodecPreset, createVectorSearchPlugin } from 'graphile-pgvector';
-import { Bm25SearchPreset } from 'graphile-bm25';
-import { TrgmSearchPreset, createTrgmOperatorFactories } from 'graphile-trgm';
 import { UploadPreset } from 'graphile-upload-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
@@ -83,14 +80,8 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     EnableAllFilterColumnsPreset,
     ManyToManyOptInPreset,
     MetaSchemaPreset,
-    PgSearchPreset({ pgSearchPrefix: 'fullText' }),
+    UnifiedSearchPreset({ fullTextScalarName: 'FullText', tsConfig: 'english' }),
     GraphilePostgisPreset,
-    VectorCodecPreset,
-    {
-      plugins: [createVectorSearchPlugin()],
-    },
-    Bm25SearchPreset(),
-    TrgmSearchPreset(),
     UploadPreset({
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,
       maxFileSize: 10 * 1024 * 1024, // 10MB
@@ -161,6 +152,9 @@ export const ConstructivePreset: GraphileConfig.Preset = {
       createTrgmOperatorFactories(),
       createPostgisOperatorFactory(),
     ],
+    // NOTE: The UnifiedSearchPreset also registers matches + trgm operator factories.
+    // graphile-config merges arrays from presets, so having them here as well is fine
+    // and ensures they're present even if the preset order changes.
   },
 };
 

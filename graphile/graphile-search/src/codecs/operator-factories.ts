@@ -1,19 +1,54 @@
 /**
- * PostGraphile v5 pg_trgm (Trigram Fuzzy Matching) Preset
+ * Connection Filter Operator Factories for Search
  *
- * Provides a convenient preset for including trigram fuzzy search in PostGraphile.
+ * These factories register filter operators on the connection filter system
+ * for tsvector (matches) and pg_trgm (similarTo, wordSimilarTo).
+ *
+ * They are used in the ConstructivePreset's connectionFilterOperatorFactories
+ * array to wire search operators into the declarative filter system.
  */
 
-import type { GraphileConfig } from 'graphile-config';
 import type { ConnectionFilterOperatorFactory } from 'graphile-connection-filter';
 import type { SQL } from 'pg-sql2';
-import type { TrgmSearchPluginOptions } from './types';
-import { createTrgmSearchPlugin } from './trgm-search';
+
+/**
+ * Creates the `matches` filter operator factory for full-text search.
+ * Declared here so it's registered via the declarative
+ * `connectionFilterOperatorFactories` API.
+ */
+export function createMatchesOperatorFactory(
+  fullTextScalarName: string,
+  tsConfig: string
+): ConnectionFilterOperatorFactory {
+  return (build) => {
+    const { sql, graphql: { GraphQLString } } = build;
+    const TYPES = build.dataplanPg?.TYPES;
+
+    return [{
+      typeNames: fullTextScalarName,
+      operatorName: 'matches',
+      spec: {
+        description: 'Performs a full text search on the field.',
+        resolveType: () => GraphQLString,
+        resolveInputCodec: TYPES ? () => TYPES.text : undefined,
+        resolve(
+          sqlIdentifier: SQL,
+          sqlValue: SQL,
+          _input: unknown,
+          _$where: any,
+          _details: { fieldName: string | null; operatorName: string }
+        ) {
+          return sql`${sqlIdentifier} @@ websearch_to_tsquery(${sql.literal(tsConfig)}, ${sqlValue})`;
+        },
+      },
+    }];
+  };
+}
 
 /**
  * Creates the `similarTo` and `wordSimilarTo` filter operator factories
- * for pg_trgm fuzzy text matching. Declared here in the preset so they're
- * registered via the declarative `connectionFilterOperatorFactories` API.
+ * for pg_trgm fuzzy text matching. Declared here so they're registered
+ * via the declarative `connectionFilterOperatorFactories` API.
  */
 export function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
   return (build) => {
@@ -73,32 +108,3 @@ export function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
     ];
   };
 }
-
-/**
- * Creates a preset that includes the pg_trgm search plugin with the given options.
- *
- * @example
- * ```typescript
- * import { TrgmSearchPreset } from 'graphile-trgm';
- *
- * const preset = {
- *   extends: [
- *     TrgmSearchPreset(),
- *   ],
- * };
- * ```
- */
-export function TrgmSearchPreset(
-  options: TrgmSearchPluginOptions = {}
-): GraphileConfig.Preset {
-  return {
-    plugins: [createTrgmSearchPlugin(options)],
-    schema: {
-      connectionFilterOperatorFactories: [
-        createTrgmOperatorFactories(),
-      ],
-    },
-  };
-}
-
-export default TrgmSearchPreset;

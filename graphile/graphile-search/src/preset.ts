@@ -1,9 +1,9 @@
 /**
  * Unified Search Plugin Preset
  *
- * Convenience preset that bundles the unified search plugin with all 4 adapters.
- * This is NOT added to ConstructivePreset yet — it's a standalone package
- * for testing and evaluation.
+ * Convenience preset that bundles the unified search plugin with all 4 adapters
+ * plus the codec plugins that teach PostGraphile about tsvector, bm25query,
+ * and vector types.
  *
  * @example
  * ```typescript
@@ -23,6 +23,10 @@ import { createTsvectorAdapter } from './adapters/tsvector';
 import { createBm25Adapter } from './adapters/bm25';
 import { createTrgmAdapter } from './adapters/trgm';
 import { createPgvectorAdapter } from './adapters/pgvector';
+import { TsvectorCodecPlugin } from './codecs/tsvector-codec';
+import { Bm25CodecPlugin } from './codecs/bm25-codec';
+import { VectorCodecPlugin } from './codecs/vector-codec';
+import { createMatchesOperatorFactory, createTrgmOperatorFactories } from './codecs/operator-factories';
 import type { UnifiedSearchOptions } from './types';
 import type { TsvectorAdapterOptions } from './adapters/tsvector';
 import type { Bm25AdapterOptions } from './adapters/bm25';
@@ -64,11 +68,29 @@ export interface UnifiedSearchPresetOptions {
   enableSearchScore?: boolean;
 
   /**
+   * Whether to expose the composite `fullTextSearch` filter field.
+   * @default true
+   */
+  enableFullTextSearch?: boolean;
+
+  /**
    * Custom weights for the composite searchScore.
    * Keys are adapter names ('tsv', 'bm25', 'trgm', 'vector'),
    * values are relative weights.
    */
   searchScoreWeights?: Record<string, number>;
+
+  /**
+   * Name of the custom GraphQL scalar for tsvector columns.
+   * @default 'FullText'
+   */
+  fullTextScalarName?: string;
+
+  /**
+   * PostgreSQL text search configuration.
+   * @default 'english'
+   */
+  tsConfig?: string;
 }
 
 /**
@@ -83,7 +105,10 @@ export function UnifiedSearchPreset(
     trgm = true,
     pgvector = true,
     enableSearchScore = true,
+    enableFullTextSearch = true,
     searchScoreWeights,
+    fullTextScalarName = 'FullText',
+    tsConfig = 'english',
   } = options;
 
   const adapters = [];
@@ -111,11 +136,31 @@ export function UnifiedSearchPreset(
   const pluginOptions: UnifiedSearchOptions = {
     adapters,
     enableSearchScore,
+    enableFullTextSearch,
     searchScoreWeights,
   };
 
+  // Collect codec plugins based on which adapters are enabled
+  const codecPlugins: GraphileConfig.Plugin[] = [];
+  if (tsvector) codecPlugins.push(TsvectorCodecPlugin);
+  if (bm25) codecPlugins.push(Bm25CodecPlugin);
+  if (pgvector) codecPlugins.push(VectorCodecPlugin);
+
+  // Collect operator factories for connection filter integration
+  const operatorFactories = [];
+  if (tsvector) operatorFactories.push(createMatchesOperatorFactory(fullTextScalarName, tsConfig));
+  if (trgm) operatorFactories.push(createTrgmOperatorFactories());
+
   return {
-    plugins: [createUnifiedSearchPlugin(pluginOptions)],
+    plugins: [
+      ...codecPlugins,
+      createUnifiedSearchPlugin(pluginOptions),
+    ],
+    ...(operatorFactories.length > 0 ? {
+      schema: {
+        connectionFilterOperatorFactories: operatorFactories,
+      },
+    } : {}),
   };
 }
 

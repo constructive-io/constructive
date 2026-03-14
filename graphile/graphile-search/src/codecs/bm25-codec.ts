@@ -9,13 +9,26 @@
  * 2. Discovers all BM25 indexes via gather.hooks.pgIntrospection_introspection
  *    by querying pg_index + pg_am + pg_class + pg_attribute
  * 3. Stores discovered BM25 index info in a module-level Map for use by
- *    Bm25SearchPlugin during the schema build phase
+ *    the BM25 adapter during the schema build phase
  */
 
 import 'graphile-build-pg';
 import type { GraphileConfig } from 'graphile-config';
 import sql from 'pg-sql2';
-import type { Bm25IndexInfo } from './types';
+
+/**
+ * Represents a discovered BM25 index in the database.
+ */
+export interface Bm25IndexInfo {
+  /** Schema name (e.g. 'public') */
+  schemaName: string;
+  /** Table name (e.g. 'documents') */
+  tableName: string;
+  /** Column name (e.g. 'content') */
+  columnName: string;
+  /** Index name (e.g. 'docs_idx') — needed for to_bm25query() */
+  indexName: string;
+}
 
 /**
  * Module-level store for discovered BM25 indexes.
