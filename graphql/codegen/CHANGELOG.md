@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.14.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.0...@constructive-io/graphql-codegen@4.14.1) (2026-03-14)
+
+### Bug Fixes
+
+- **codegen:** exclude computed fields from default CLI select objects ([d96c8c1](https://github.com/constructive-io/constructive/commit/d96c8c1aef35853bb1027536faf07504c016b94a))
+
 # [4.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.13.1...@constructive-io/graphql-codegen@4.14.0) (2026-03-14)
 
 ### Bug Fixes
