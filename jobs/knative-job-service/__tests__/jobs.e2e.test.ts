@@ -75,7 +75,7 @@ const addJobMutation = `
 
 const jobByIdQuery = `
   query JobById($id: BigInt!) {
-    jobs(filter: { id: { equalTo: $id } }, first: 1) {
+    jobs(where: { id: { equalTo: $id } }, first: 1) {
       nodes {
         id
         lastError
