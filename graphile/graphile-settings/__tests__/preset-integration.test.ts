@@ -149,7 +149,7 @@ describe('Schema introspection', () => {
     const locations = result.data?.__type?.fields?.find((f) => f.name === 'locations');
     expect(locations).toBeDefined();
     const argNames = locations?.args?.map((a) => a.name) ?? [];
-    expect(argNames).toContain('filter');
+    expect(argNames).toContain('where');
     // condition should NOT be present (we disabled it)
     expect(argNames).not.toContain('condition');
   });
