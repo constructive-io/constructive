@@ -101,7 +101,6 @@ describe('upload-resolver e2e', () => {
   const uploadedKeys = new Set<string>();
 
   beforeAll(async () => {
-    process.env.UPLOAD_V2_ENABLED = 'true';
     process.env.BUCKET_PROVIDER = 'minio';
     process.env.BUCKET_NAME = BUCKET;
     process.env.AWS_REGION = 'us-east-1';
