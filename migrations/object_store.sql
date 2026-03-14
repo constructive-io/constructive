@@ -630,4 +630,79 @@ BEGIN
 END
 $domain_triggers$;
 
+-- ---------------------------------------------------------------------------
+-- 8. Scheduled cleanup jobs (requires pgpm-database-jobs with scheduling)
+-- ---------------------------------------------------------------------------
+-- Register recurring file-cleanup jobs via app_jobs.add_scheduled_job.
+-- The scheduler (knative-job-service) picks these up and spawns one-shot jobs
+-- on the configured schedule. Each job calls the file-cleanup function with
+-- the appropriate cleanup type.
+--
+-- Schedules:
+--   pending_reaper:     every hour          (clear stale pending uploads)
+--   error_cleanup:      daily at 03:00 UTC  (expire old error files)
+--   unattached_cleanup: daily at 04:00 UTC  (clean unattached ready files)
+-- ---------------------------------------------------------------------------
+
+DO $cron$
+DECLARE
+  v_db_id uuid;
+BEGIN
+  -- Look up the database ID for the current database.
+  -- If metaschema_public.database is not deployed yet, skip silently.
+  BEGIN
+    SELECT id INTO v_db_id
+    FROM metaschema_public.database
+    ORDER BY created_at
+    LIMIT 1;
+  EXCEPTION WHEN undefined_table THEN
+    RAISE NOTICE 'metaschema_public.database not found, skipping scheduled job registration.';
+    RETURN;
+  END;
+
+  IF v_db_id IS NULL THEN
+    RAISE NOTICE 'No database row found, skipping scheduled job registration.';
+    RETURN;
+  END IF;
+
+  -- pending_reaper: every hour (minute 0)
+  PERFORM app_jobs.add_scheduled_job(
+    db_id        := v_db_id,
+    identifier   := 'file-cleanup',
+    payload      := '{"type":"pending_reaper"}'::json,
+    schedule_info := '{"minute": 0}'::json,
+    job_key      := 'file-cleanup:pending_reaper',
+    queue_name   := 'maintenance',
+    max_attempts := 3,
+    priority     := 100
+  );
+
+  -- error_cleanup: daily at 03:00 UTC
+  PERFORM app_jobs.add_scheduled_job(
+    db_id        := v_db_id,
+    identifier   := 'file-cleanup',
+    payload      := '{"type":"error_cleanup"}'::json,
+    schedule_info := '{"hour": 3, "minute": 0}'::json,
+    job_key      := 'file-cleanup:error_cleanup',
+    queue_name   := 'maintenance',
+    max_attempts := 3,
+    priority     := 100
+  );
+
+  -- unattached_cleanup: daily at 04:00 UTC
+  PERFORM app_jobs.add_scheduled_job(
+    db_id        := v_db_id,
+    identifier   := 'file-cleanup',
+    payload      := '{"type":"unattached_cleanup"}'::json,
+    schedule_info := '{"hour": 4, "minute": 0}'::json,
+    job_key      := 'file-cleanup:unattached_cleanup',
+    queue_name   := 'maintenance',
+    max_attempts := 3,
+    priority     := 100
+  );
+
+  RAISE NOTICE 'Registered 3 file-cleanup scheduled jobs for database %', v_db_id;
+END
+$cron$;
+
 COMMIT;
