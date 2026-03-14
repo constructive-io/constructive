@@ -70,7 +70,7 @@ describe('graphql-server-test', () => {
         { username: string }
       >(
         `query GetUser($username: String!) {
-          users(condition: { username: $username }) {
+          users(where: { username: { equalTo: $username } }) {
             nodes {
               username
               email

@@ -141,14 +141,14 @@ export const getCount = ({
       type: t.namedType({ type: Condition }),
     }),
     t.variableDefinition({
-      variable: t.variable({ name: 'filter' }),
+      variable: t.variable({ name: 'where' }),
       type: t.namedType({ type: Filter }),
     }),
   ];
 
   const args: ArgumentNode[] = [
     t.argument({ name: 'condition', value: t.variable({ name: 'condition' }) }),
-    t.argument({ name: 'filter', value: t.variable({ name: 'filter' }) }),
+    t.argument({ name: 'where', value: t.variable({ name: 'where' }) }),
   ];
 
   // PostGraphile supports totalCount through connections
@@ -220,7 +220,7 @@ export const getMany = ({
       type: t.namedType({ type: Condition }),
     }),
     t.variableDefinition({
-      variable: t.variable({ name: 'filter' }),
+      variable: t.variable({ name: 'where' }),
       type: t.namedType({ type: Filter }),
     }),
     t.variableDefinition({
@@ -241,7 +241,7 @@ export const getMany = ({
       name: 'condition',
       value: t.variable({ name: 'condition' }),
     }),
-    t.argument({ name: 'filter', value: t.variable({ name: 'filter' }) }),
+    t.argument({ name: 'where', value: t.variable({ name: 'where' }) }),
     t.argument({ name: 'orderBy', value: t.variable({ name: 'orderBy' }) }),
   ];
 

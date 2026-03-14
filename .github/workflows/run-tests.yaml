@@ -71,9 +71,7 @@ jobs:
             env: {}
           - package: graphile/graphile-test
             env: {}
-          - package: graphile/graphile-search-plugin
-            env: {}
-          - package: graphile/graphile-pgvector-plugin
+          - package: graphile/graphile-connection-filter
             env: {}
           - package: graphql/server-test
             env: {}
@@ -106,6 +104,10 @@ jobs:
           - package: packages/12factor-env
             env: {}
           - package: packages/postmaster
+            env: {}
+          - package: graphile/graphile-search
+            env: {}
+          - package: graphile/graphile-settings
             env: {}
 
     env:

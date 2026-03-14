@@ -436,14 +436,14 @@ function generateSelectQueryAST(
   if (options.where) {
     variableDefinitions.push(
       t.variableDefinition({
-        variable: t.variable({ name: 'filter' }),
+        variable: t.variable({ name: 'where' }),
         type: t.namedType({ type: toFilterTypeName(table.name, table) }),
       }),
     );
     queryArgs.push(
       t.argument({
-        name: 'filter',
-        value: t.variable({ name: 'filter' }),
+        name: 'where',
+        value: t.variable({ name: 'where' }),
       }),
     );
   }
@@ -859,7 +859,7 @@ function generateCountQueryAST(table: CleanTable): string {
         name: `${pluralName}CountQuery`,
         variableDefinitions: [
           t.variableDefinition({
-            variable: t.variable({ name: 'filter' }),
+            variable: t.variable({ name: 'where' }),
             type: t.namedType({ type: toFilterTypeName(table.name, table) }),
           }),
         ],
@@ -869,8 +869,8 @@ function generateCountQueryAST(table: CleanTable): string {
               name: pluralName,
               args: [
                 t.argument({
-                  name: 'filter',
-                  value: t.variable({ name: 'filter' }),
+                  name: 'where',
+                  value: t.variable({ name: 'where' }),
                 }),
               ],
               selectionSet: t.selectionSet({

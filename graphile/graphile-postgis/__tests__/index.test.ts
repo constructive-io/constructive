@@ -44,7 +44,9 @@ describe('graphile-postgis exports', () => {
       // Utils
       'getGISTypeDetails',
       'getGISTypeModifier',
-      'getGISTypeName'
+      'getGISTypeName',
+      // Connection filter operator factory
+      'createPostgisOperatorFactory'
     ];
 
     const actualExports = Object.keys(postgisExports);
