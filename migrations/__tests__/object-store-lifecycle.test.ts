@@ -429,7 +429,7 @@ describe('E2E-03: Deletion Flow', () => {
     await pg.afterEach();
   });
 
-  it('ready → deleting queues delete_s3_object job', async () => {
+  it('ready → deleting queues delete-s3-object job', async () => {
     await pg.query(`
       INSERT INTO files_store_public.files (id, database_id, key, bucket_key, created_by, etag, status)
       VALUES ($1, 1, $2, 'default', $3, 'etag', 'ready')
@@ -443,7 +443,7 @@ describe('E2E-03: Deletion Flow', () => {
 
     const jobs = await getJobLog();
     expect(jobs).toHaveLength(1);
-    expect(jobs[0].identifier).toBe('delete_s3_object');
+    expect(jobs[0].identifier).toBe('delete-s3-object');
     expect(jobs[0].job_key).toBe(`delete:${ORIGIN_ID}`);
     expect(jobs[0].payload.key).toBe(ORIGIN_KEY);
   });
@@ -489,7 +489,7 @@ describe('E2E-03: Deletion Flow', () => {
 
     const jobs = await getJobLog();
     expect(jobs).toHaveLength(1);
-    expect(jobs[0].identifier).toBe('delete_s3_object');
+    expect(jobs[0].identifier).toBe('delete-s3-object');
   });
 
   it('service_role can hard-DELETE after marking as deleting', async () => {
@@ -848,7 +848,7 @@ describe('E2E-06: Full lifecycle under RLS', () => {
     await pg.query('RESET ROLE');
     jobs = await getJobLog();
     expect(jobs).toHaveLength(3);
-    expect(jobs.every((j: any) => j.identifier === 'delete_s3_object')).toBe(true);
+    expect(jobs.every((j: any) => j.identifier === 'delete-s3-object')).toBe(true);
     const deletedKeys = jobs.map((j: any) => j.payload.key).sort();
     expect(deletedKeys).toEqual([LARGE_KEY, ORIGIN_KEY, THUMB_KEY]);
 

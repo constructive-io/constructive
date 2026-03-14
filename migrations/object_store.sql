@@ -236,13 +236,13 @@ CREATE TRIGGER files_before_update_timestamp
 COMMENT ON TRIGGER files_before_update_timestamp ON files_store_public.files IS
   'Enforces status transition rules and maintains updated_at / processing_started_at timestamps.';
 
--- 5c. AFTER UPDATE -- enqueue delete_s3_object job
+-- 5c. AFTER UPDATE -- enqueue delete-s3-object job
 
 CREATE OR REPLACE FUNCTION files_store_public.files_after_update_queue_deletion()
 RETURNS trigger AS $$
 BEGIN
   PERFORM app_jobs.add_job(
-    'delete_s3_object',
+    'delete-s3-object',
     json_build_object(
       'file_id', NEW.id,
       'database_id', NEW.database_id,
@@ -261,7 +261,7 @@ CREATE TRIGGER files_after_update_queue_deletion
   EXECUTE FUNCTION files_store_public.files_after_update_queue_deletion();
 
 COMMENT ON TRIGGER files_after_update_queue_deletion ON files_store_public.files IS
-  'Enqueues delete_s3_object job when a file transitions to deleting status. Each version row gets its own deletion job.';
+  'Enqueues delete-s3-object job when a file transitions to deleting status. Each version row gets its own deletion job.';
 
 -- 5d. AFTER UPDATE -- re-enqueue process-image on error->pending retry
 
