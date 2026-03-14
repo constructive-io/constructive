@@ -755,7 +755,9 @@ describe('fullTextSearch can be disabled', () => {
   });
 
   it('fullTextSearch field does NOT exist when disabled', async () => {
-    // First, introspect the filter type to see what fields exist
+    // Introspect the filter type to verify fullTextSearch is NOT present.
+    // NOTE: Grafast silently ignores unknown input fields rather than
+    // returning a GraphQL validation error, so we verify via introspection.
     const introspection = await disabledQuery<any>(`
       query {
         __type(name: "DocumentFilter") {
@@ -765,26 +767,16 @@ describe('fullTextSearch can be disabled', () => {
         }
       }
     `);
+
+    expect(introspection.errors).toBeUndefined();
     const filterFields = introspection.data?.__type?.inputFields?.map((f: any) => f.name) ?? [];
-    console.log('[DEBUG] DocumentFilter fields in disabled schema:', JSON.stringify(filterFields));
-    console.log('[DEBUG] fullTextSearch exists?', filterFields.includes('fullTextSearch'));
 
-    const result = await disabledQuery<AllDocumentsResult>(`
-      query {
-        allDocuments(filter: {
-          fullTextSearch: "learning"
-        }) {
-          nodes {
-            title
-          }
-        }
-      }
-    `);
+    // fullTextSearch should NOT be in the filter fields
+    expect(filterFields).not.toContain('fullTextSearch');
 
-    console.log('[DEBUG] disabled query result:', JSON.stringify(result, null, 2));
-
-    // Should error — fullTextSearch field should not exist
-    expect(result.errors).toBeDefined();
-    expect(result.errors![0].message).toMatch(/fullTextSearch/);
+    // The per-algorithm fields should still exist (only fullTextSearch is disabled)
+    expect(filterFields).toContain('tsvTsv');
+    expect(filterFields).toContain('bm25Body');
+    expect(filterFields).toContain('trgmTitle');
   });
 });
