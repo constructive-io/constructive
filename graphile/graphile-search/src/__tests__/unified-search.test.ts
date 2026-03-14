@@ -755,6 +755,20 @@ describe('fullTextSearch can be disabled', () => {
   });
 
   it('fullTextSearch field does NOT exist when disabled', async () => {
+    // First, introspect the filter type to see what fields exist
+    const introspection = await disabledQuery<any>(`
+      query {
+        __type(name: "DocumentFilter") {
+          inputFields {
+            name
+          }
+        }
+      }
+    `);
+    const filterFields = introspection.data?.__type?.inputFields?.map((f: any) => f.name) ?? [];
+    console.log('[DEBUG] DocumentFilter fields in disabled schema:', JSON.stringify(filterFields));
+    console.log('[DEBUG] fullTextSearch exists?', filterFields.includes('fullTextSearch'));
+
     const result = await disabledQuery<AllDocumentsResult>(`
       query {
         allDocuments(filter: {
@@ -766,6 +780,8 @@ describe('fullTextSearch can be disabled', () => {
         }
       }
     `);
+
+    console.log('[DEBUG] disabled query result:', JSON.stringify(result, null, 2));
 
     // Should error — fullTextSearch field should not exist
     expect(result.errors).toBeDefined();
