@@ -14,7 +14,7 @@ const app = createJobApp();
 
 const GetUser = gql`
   query GetUser($userId: UUID!) {
-    users(filter: { id: { equalTo: $userId } }, first: 1) {
+    users(where: { id: { equalTo: $userId } }, first: 1) {
       nodes {
         username
         displayName
@@ -26,7 +26,7 @@ const GetUser = gql`
 
 const GetDatabaseInfo = gql`
   query GetDatabaseInfo($databaseId: UUID!) {
-    databases(filter: { id: { equalTo: $databaseId } }, first: 1) {
+    databases(where: { id: { equalTo: $databaseId } }, first: 1) {
       nodes {
         sites {
           nodes {
@@ -43,7 +43,7 @@ const GetDatabaseInfo = gql`
                 theme
               }
             }
-            siteModules(filter: { name: { equalTo: "legal_terms_module" } }) {
+            siteModules(where: { name: { equalTo: "legal_terms_module" } }) {
               nodes {
                 data
               }
