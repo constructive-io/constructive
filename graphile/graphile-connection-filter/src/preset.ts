@@ -41,6 +41,7 @@ import {
  * Default schema options for the connection filter.
  */
 const defaultSchemaOptions: ConnectionFilterOptions = {
+  connectionFilterArgumentName: 'where',
   connectionFilterArrays: true,
   connectionFilterLogicalOperators: true,
   connectionFilterAllowNullInput: false,

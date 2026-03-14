@@ -65,7 +65,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { equalTo: "Widget A" } }) {
+          allItems(where: { name: { equalTo: "Widget A" } }) {
             nodes { id name }
           }
         }
@@ -80,7 +80,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notEqualTo: "Widget A" } }) {
+          allItems(where: { name: { notEqualTo: "Widget A" } }) {
             nodes { id name }
           }
         }
@@ -96,7 +96,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { description: { distinctFrom: "A basic widget" } }) {
+          allItems(where: { description: { distinctFrom: "A basic widget" } }) {
             nodes { id name description }
           }
         }
@@ -111,7 +111,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { description: { notDistinctFrom: "A basic widget" } }) {
+          allItems(where: { description: { notDistinctFrom: "A basic widget" } }) {
             nodes { id name }
           }
         }
@@ -128,7 +128,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { description: { isNull: true } }) {
+          allItems(where: { description: { isNull: true } }) {
             nodes { id name }
           }
         }
@@ -143,7 +143,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { description: { isNull: false } }) {
+          allItems(where: { description: { isNull: false } }) {
             nodes { id name }
           }
         }
@@ -159,7 +159,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { in: ["Widget A", "Gadget X"] } }) {
+          allItems(where: { name: { in: ["Widget A", "Gadget X"] } }) {
             nodes { id name }
           }
         }
@@ -175,7 +175,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notIn: ["Widget A", "Widget B"] } }) {
+          allItems(where: { name: { notIn: ["Widget A", "Widget B"] } }) {
             nodes { id name }
           }
         }
@@ -191,7 +191,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { price: { lessThan: "20" } }) {
+          allItems(where: { price: { lessThan: "20" } }) {
             nodes { id name price }
           }
         }
@@ -208,7 +208,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { price: { greaterThanOrEqualTo: "49.99" } }) {
+          allItems(where: { price: { greaterThanOrEqualTo: "49.99" } }) {
             nodes { id name price }
           }
         }
@@ -225,7 +225,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { quantity: { lessThanOrEqualTo: 25 } }) {
+          allItems(where: { quantity: { lessThanOrEqualTo: 25 } }) {
             nodes { id name quantity }
           }
         }
@@ -241,7 +241,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { quantity: { greaterThan: 25 } }) {
+          allItems(where: { quantity: { greaterThan: 25 } }) {
             nodes { id name quantity }
           }
         }
@@ -260,7 +260,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { like: "Widget%" } }) {
+          allItems(where: { name: { like: "Widget%" } }) {
             nodes { id name }
           }
         }
@@ -277,7 +277,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { likeInsensitive: "widget%" } }) {
+          allItems(where: { name: { likeInsensitive: "widget%" } }) {
             nodes { id name }
           }
         }
@@ -291,7 +291,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notLike: "Widget%" } }) {
+          allItems(where: { name: { notLike: "Widget%" } }) {
             nodes { id name }
           }
         }
@@ -305,7 +305,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { includes: "adget" } }) {
+          allItems(where: { name: { includes: "adget" } }) {
             nodes { id name }
           }
         }
@@ -322,7 +322,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { includesInsensitive: "WIDGET" } }) {
+          allItems(where: { name: { includesInsensitive: "WIDGET" } }) {
             nodes { id name }
           }
         }
@@ -336,7 +336,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { startsWith: "Gadget" } }) {
+          allItems(where: { name: { startsWith: "Gadget" } }) {
             nodes { id name }
           }
         }
@@ -350,7 +350,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { endsWith: "B" } }) {
+          allItems(where: { name: { endsWith: "B" } }) {
             nodes { id name }
           }
         }
@@ -367,7 +367,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { isActive: { equalTo: false } }) {
+          allItems(where: { isActive: { equalTo: false } }) {
             nodes { id name isActive }
           }
         }
@@ -386,7 +386,7 @@ describe('Scalar operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             isActive: { equalTo: true },
             price: { lessThan: "30" }
           }) {
@@ -455,7 +455,7 @@ describe('Logical operators (and/or/not)', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             or: [
               { name: { equalTo: "Widget A" } },
               { name: { equalTo: "Doohickey" } }
@@ -476,7 +476,7 @@ describe('Logical operators (and/or/not)', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             and: [
               { isActive: { equalTo: true } },
               { price: { greaterThan: "15" } }
@@ -496,7 +496,7 @@ describe('Logical operators (and/or/not)', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             not: { isActive: { equalTo: true } }
           }) {
             nodes { id name isActive }
@@ -516,7 +516,7 @@ describe('Logical operators (and/or/not)', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             or: [
               {
                 and: [
@@ -544,7 +544,7 @@ describe('Logical operators (and/or/not)', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             not: {
               or: [
                 { name: { equalTo: "Widget A" } },
@@ -604,7 +604,7 @@ describe('Relation filters', () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
-          allProducts(filter: {
+          allProducts(where: {
             categoryByCategoryId: { name: { equalTo: "Electronics" } }
           }) {
             nodes { id name }
@@ -622,7 +622,7 @@ describe('Relation filters', () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
-          allProducts(filter: {
+          allProducts(where: {
             categoryByCategoryId: { name: { startsWith: "Cloth" } }
           }) {
             nodes { id name }
@@ -642,7 +642,7 @@ describe('Relation filters', () => {
     const result = await query<{ allCategories: { nodes: any[] } }>({
       query: `
         query {
-          allCategories(filter: {
+          allCategories(where: {
             productsByCategoryId: {
               some: { isAvailable: { equalTo: true } }
             }
@@ -661,7 +661,7 @@ describe('Relation filters', () => {
     const result = await query<{ allCategories: { nodes: any[] } }>({
       query: `
         query {
-          allCategories(filter: {
+          allCategories(where: {
             productsByCategoryId: {
               every: { isAvailable: { equalTo: true } }
             }
@@ -682,7 +682,7 @@ describe('Relation filters', () => {
     const result = await query<{ allCategories: { nodes: any[] } }>({
       query: `
         query {
-          allCategories(filter: {
+          allCategories(where: {
             productsByCategoryId: {
               none: { price: { greaterThan: "500" } }
             }
@@ -706,7 +706,7 @@ describe('Relation filters', () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
-          allProducts(filter: {
+          allProducts(where: {
             productDetailByProductId: { sku: { equalTo: "LAP-001" } }
           }) {
             nodes { id name }
@@ -725,7 +725,7 @@ describe('Relation filters', () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
-          allProducts(filter: {
+          allProducts(where: {
             categoryByCategoryIdExists: true
           }) {
             nodes { id name }
@@ -742,7 +742,7 @@ describe('Relation filters', () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
-          allProducts(filter: {
+          allProducts(where: {
             reviewsByProductIdExist: true
           }) {
             nodes { id name }
@@ -759,7 +759,7 @@ describe('Relation filters', () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
-          allProducts(filter: {
+          allProducts(where: {
             reviewsByProductIdExist: false
           }) {
             nodes { id name }
@@ -780,7 +780,7 @@ describe('Relation filters', () => {
     const result = await query<{ allProducts: { nodes: any[] } }>({
       query: `
         query {
-          allProducts(filter: {
+          allProducts(where: {
             isAvailable: { equalTo: true },
             categoryByCategoryId: { name: { equalTo: "Electronics" } }
           }) {
@@ -847,7 +847,7 @@ describe('Computed column filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             fullLabel: { includes: "basic" }
           }) {
             nodes { id name }
@@ -1278,7 +1278,7 @@ describe('Array filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { tags: { contains: ["popular"] } }) {
+          allItems(where: { tags: { contains: ["popular"] } }) {
             nodes { id name tags }
           }
         }
@@ -1295,7 +1295,7 @@ describe('Array filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { tags: { containedBy: ["popular", "sale", "new", "premium", "clearance"] } }) {
+          allItems(where: { tags: { containedBy: ["popular", "sale", "new", "premium", "clearance"] } }) {
             nodes { id name tags }
           }
         }
@@ -1311,7 +1311,7 @@ describe('Array filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { tags: { overlaps: ["sale", "clearance"] } }) {
+          allItems(where: { tags: { overlaps: ["sale", "clearance"] } }) {
             nodes { id name tags }
           }
         }
@@ -1328,7 +1328,7 @@ describe('Array filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { tags: { anyEqualTo: "new" } }) {
+          allItems(where: { tags: { anyEqualTo: "new" } }) {
             nodes { id name tags }
           }
         }
@@ -1344,7 +1344,7 @@ describe('Array filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { tags: { anyNotEqualTo: "popular" } }) {
+          allItems(where: { tags: { anyNotEqualTo: "popular" } }) {
             nodes { id name tags }
           }
         }
@@ -1363,7 +1363,7 @@ describe('Array filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { tags: { isNull: true } }) {
+          allItems(where: { tags: { isNull: true } }) {
             nodes { id name }
           }
         }
@@ -1379,7 +1379,7 @@ describe('Array filters', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { tags: { equalTo: ["new"] } }) {
+          allItems(where: { tags: { equalTo: ["new"] } }) {
             nodes { id name tags }
           }
         }
@@ -1484,7 +1484,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notIncludes: "Widget" } }) {
+          allItems(where: { name: { notIncludes: "Widget" } }) {
             nodes { id name }
           }
         }
@@ -1501,7 +1501,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notIncludesInsensitive: "widget" } }) {
+          allItems(where: { name: { notIncludesInsensitive: "widget" } }) {
             nodes { id name }
           }
         }
@@ -1515,7 +1515,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notStartsWith: "Gadget" } }) {
+          allItems(where: { name: { notStartsWith: "Gadget" } }) {
             nodes { id name }
           }
         }
@@ -1532,7 +1532,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notStartsWithInsensitive: "gadget" } }) {
+          allItems(where: { name: { notStartsWithInsensitive: "gadget" } }) {
             nodes { id name }
           }
         }
@@ -1546,7 +1546,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notEndsWith: "B" } }) {
+          allItems(where: { name: { notEndsWith: "B" } }) {
             nodes { id name }
           }
         }
@@ -1563,7 +1563,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notEndsWithInsensitive: "b" } }) {
+          allItems(where: { name: { notEndsWithInsensitive: "b" } }) {
             nodes { id name }
           }
         }
@@ -1577,7 +1577,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notLikeInsensitive: "widget%" } }) {
+          allItems(where: { name: { notLikeInsensitive: "widget%" } }) {
             nodes { id name }
           }
         }
@@ -1594,7 +1594,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { startsWithInsensitive: "widget" } }) {
+          allItems(where: { name: { startsWithInsensitive: "widget" } }) {
             nodes { id name }
           }
         }
@@ -1608,7 +1608,7 @@ describe('Negation string operators', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { endsWithInsensitive: "key" } }) {
+          allItems(where: { name: { endsWithInsensitive: "key" } }) {
             nodes { id name }
           }
         }
@@ -1714,7 +1714,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { isLongerThan: 8 } }) {
+          allItems(where: { name: { isLongerThan: 8 } }) {
             nodes { id name }
           }
         }
@@ -1731,7 +1731,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { quantity: { isPositive: true } }) {
+          allItems(where: { quantity: { isPositive: true } }) {
             nodes { id name quantity }
           }
         }
@@ -1749,7 +1749,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { quantity: { isPositive: false } }) {
+          allItems(where: { quantity: { isPositive: false } }) {
             nodes { id name quantity }
           }
         }
@@ -1765,7 +1765,7 @@ describe('Declarative operator factory (connectionFilterOperatorFactories)', () 
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             name: { isLongerThan: 7 },
             quantity: { isPositive: true }
           }) {
@@ -1815,7 +1815,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {}) {
+          allItems(where: {}) {
             nodes { id }
           }
         }
@@ -1830,7 +1830,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             not: {
               or: [
                 {
@@ -1864,7 +1864,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { in: ["Doohickey"] } }) {
+          allItems(where: { name: { in: ["Doohickey"] } }) {
             nodes { id name }
           }
         }
@@ -1879,7 +1879,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { notIn: [] } }) {
+          allItems(where: { name: { notIn: [] } }) {
             nodes { id }
           }
         }
@@ -1893,7 +1893,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { name: { in: [] } }) {
+          allItems(where: { name: { in: [] } }) {
             nodes { id }
           }
         }
@@ -1908,7 +1908,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { rating: { isNull: true } }) {
+          allItems(where: { rating: { isNull: true } }) {
             nodes { id name }
           }
         }
@@ -1924,7 +1924,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             or: [
               { rating: { isNull: true } },
               { rating: { greaterThan: 4.0 } }
@@ -1944,7 +1944,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: {
+          allItems(where: {
             price: { greaterThan: "10", lessThan: "50" }
           }) {
             nodes { id name price }
@@ -1968,7 +1968,7 @@ describe('Edge cases', () => {
     const result = await query<{ allItems: { nodes: any[] } }>({
       query: `
         query {
-          allItems(filter: { price: { equalTo: "99.99" } }) {
+          allItems(where: { price: { equalTo: "99.99" } }) {
             nodes { id name price }
           }
         }

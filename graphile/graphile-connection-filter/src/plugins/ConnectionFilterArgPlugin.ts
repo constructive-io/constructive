@@ -7,9 +7,9 @@ const version = '1.0.0';
 /**
  * ConnectionFilterArgPlugin
  *
- * Adds the `filter` argument to connection and simple collection fields.
- * Uses `applyPlan` to create a PgCondition that child filter fields can
- * add WHERE clauses to.
+ * Adds the filter argument (configurable name, default 'where') to connection
+ * and simple collection fields. Uses `applyPlan` to create a PgCondition that
+ * child filter fields can add WHERE clauses to.
  *
  * This runs before PgConnectionArgOrderByPlugin so that filters are applied
  * before ordering (important for e.g. full-text search rank ordering).
@@ -77,10 +77,13 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
             ? resource.codec
             : null;
 
+        const argName =
+          (build.options.connectionFilterArgumentName as string) || 'where';
+
         return extend(
           args,
           {
-            filter: {
+            [argName]: {
               description:
                 'A filter to be used in determining which values should be returned by the collection.',
               type: FilterType,
@@ -140,7 +143,7 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                   }),
             },
           },
-          `Adding connection filter arg to field '${fieldName}' of '${Self.name}'`
+          `Adding connection filter '${argName}' arg to field '${fieldName}' of '${Self.name}'`
         );
       },
     },

@@ -98,7 +98,7 @@ describe('Unified Search — server integration', () => {
     it('should filter articles by tsvector search (tsvTsv)', async () => {
       const res = await postGraphQL({
         query: `{
-          articles(filter: { tsvTsv: "machine learning" }) {
+          articles(where: { tsvTsv: "machine learning" }) {
             nodes { title tsvRank }
           }
         }`,
@@ -139,7 +139,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: { tsvTsv: "PostgreSQL search" }
+            where: { tsvTsv: "PostgreSQL search" }
             orderBy: TSV_RANK_DESC
           ) {
             nodes { title tsvRank }
@@ -168,7 +168,7 @@ describe('Unified Search — server integration', () => {
     it('should filter articles by trgm similarity on title (trgmTitle)', async () => {
       const res = await postGraphQL({
         query: `{
-          articles(filter: { trgmTitle: { value: "machin lerning", threshold: 0.1 } }) {
+          articles(where: { trgmTitle: { value: "machin lerning", threshold: 0.1 } }) {
             nodes { title titleTrgmSimilarity }
           }
         }`,
@@ -191,7 +191,7 @@ describe('Unified Search — server integration', () => {
     it('should filter by trgm on body (trgmBody)', async () => {
       const res = await postGraphQL({
         query: `{
-          articles(filter: { trgmBody: { value: "neural networks", threshold: 0.1 } }) {
+          articles(where: { trgmBody: { value: "neural networks", threshold: 0.1 } }) {
             nodes { title bodyTrgmSimilarity }
           }
         }`,
@@ -213,7 +213,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: { trgmTitle: { value: "PostgreSQL", threshold: 0.05 } }
+            where: { trgmTitle: { value: "PostgreSQL", threshold: 0.05 } }
             orderBy: TITLE_TRGM_SIMILARITY_DESC
           ) {
             nodes { title titleTrgmSimilarity }
@@ -247,7 +247,7 @@ describe('Unified Search — server integration', () => {
 
       const res = await postGraphQL({
         query: `{
-          articles(filter: { vectorEmbedding: { vector: [0.1, 0.9, 0.3], distance: 1.0 } }) {
+          articles(where: { vectorEmbedding: { vector: [0.1, 0.9, 0.3], distance: 1.0 } }) {
             nodes { title embeddingVectorDistance }
           }
         }`,
@@ -276,7 +276,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: { vectorEmbedding: { vector: [0.5, 0.5, 0.5] } }
+            where: { vectorEmbedding: { vector: [0.5, 0.5, 0.5] } }
             orderBy: EMBEDDING_VECTOR_DISTANCE_ASC
           ) {
             nodes { title embeddingVectorDistance }
@@ -305,7 +305,7 @@ describe('Unified Search — server integration', () => {
     it('should expose searchScore when any search filter is active', async () => {
       const res = await postGraphQL({
         query: `{
-          articles(filter: { tsvTsv: "machine learning" }) {
+          articles(where: { tsvTsv: "machine learning" }) {
             nodes { title searchScore }
           }
         }`,
@@ -341,7 +341,7 @@ describe('Unified Search — server integration', () => {
     it('should filter via fullTextSearch composite filter', async () => {
       const res = await postGraphQL({
         query: `{
-          articles(filter: { fullTextSearch: "vector databases" }) {
+          articles(where: { fullTextSearch: "vector databases" }) {
             nodes { title tsvRank searchScore }
           }
         }`,
@@ -362,7 +362,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: { fullTextSearch: "PostgreSQL search" }
+            where: { fullTextSearch: "PostgreSQL search" }
             orderBy: SEARCH_SCORE_DESC
           ) {
             nodes { title searchScore }
@@ -394,7 +394,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: {
+            where: {
               tsvTsv: "search"
               trgmTitle: { value: "PostgreSQL", threshold: 0.05 }
             }
@@ -434,7 +434,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: {
+            where: {
               tsvTsv: "search"
               trgmTitle: { value: "PostgreSQL", threshold: 0.05 }
               vectorEmbedding: { vector: [0.8, 0.2, 0.5] }
@@ -477,7 +477,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: { fullTextSearch: "machine learning" }
+            where: { fullTextSearch: "machine learning" }
             orderBy: SEARCH_SCORE_DESC
           ) {
             nodes {
@@ -524,7 +524,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            filter: {
+            where: {
               fullTextSearch: "machine learning"
               vectorEmbedding: { vector: [0.1, 0.9, 0.3] }
             }

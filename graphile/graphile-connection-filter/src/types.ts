@@ -102,6 +102,8 @@ export type ConnectionFilterOperatorFactory = (
  * Configuration options for the connection filter preset.
  */
 export interface ConnectionFilterOptions {
+  /** The GraphQL argument name for the filter. Default: 'where' */
+  connectionFilterArgumentName?: string;
   /** Allow filtering on array columns. Default: true */
   connectionFilterArrays?: boolean;
   /** Include logical operators (and/or/not). Default: true */

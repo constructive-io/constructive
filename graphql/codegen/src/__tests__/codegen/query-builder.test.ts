@@ -157,7 +157,6 @@ function buildFindManyDocument<TSelect, TWhere, TCondition>(
   addVariable(
     {
       varName: 'where',
-      argName: 'filter',
       typeName: filterTypeName,
       value: args.where,
     },
@@ -558,7 +557,7 @@ describe('query-builder', () => {
       expect(document).toContain('$where: UserFilter');
       expect(document).toContain('$first: Int');
       expect(document).toContain('$orderBy: [UsersOrderBy!]');
-      expect(document).toContain('filter: $where');
+      expect(document).toContain('where: $where');
       expect(document).toContain('nodes {');
       expect(document).toContain('totalCount');
       expect(document).toContain('pageInfo');
@@ -588,9 +587,9 @@ describe('query-builder', () => {
       // condition variable should appear in the query
       expect(document).toContain('$condition: ContactCondition');
       expect(document).toContain('condition: $condition');
-      // filter should still work alongside condition
+      // where should still work alongside condition
       expect(document).toContain('$where: ContactFilter');
-      expect(document).toContain('filter: $where');
+      expect(document).toContain('where: $where');
       // variables should include both
       expect(variables.condition).toEqual({
         embeddingNearby: { vector: [0.1, 0.2], metric: 'COSINE' },

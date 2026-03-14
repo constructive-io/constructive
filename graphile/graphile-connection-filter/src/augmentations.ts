@@ -74,6 +74,7 @@ declare global {
     }
 
     interface SchemaOptions {
+      connectionFilterArgumentName?: string;
       connectionFilterArrays?: boolean;
       connectionFilterLogicalOperators?: boolean;
       connectionFilterAllowNullInput?: boolean;

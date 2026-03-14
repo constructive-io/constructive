@@ -163,7 +163,7 @@ describe('Scalar and logical filters', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: { name: { equalTo: "MoMA" } }) {
+          locations(where: { name: { equalTo: "MoMA" } }) {
             nodes { name }
           }
         }
@@ -179,7 +179,7 @@ describe('Scalar and logical filters', () => {
     const result = await query<{ locations: { nodes: { name: string; isActive: boolean }[] } }>({
       query: `
         query {
-          locations(filter: { isActive: { equalTo: false } }) {
+          locations(where: { isActive: { equalTo: false } }) {
             nodes { name isActive }
           }
         }
@@ -196,7 +196,7 @@ describe('Scalar and logical filters', () => {
     const result = await query<{ locations: { nodes: { name: string; rating: number }[] } }>({
       query: `
         query {
-          locations(filter: { rating: { greaterThanOrEqualTo: "4.7" } }) {
+          locations(where: { rating: { greaterThanOrEqualTo: "4.7" } }) {
             nodes { name rating }
           }
         }
@@ -216,7 +216,7 @@ describe('Scalar and logical filters', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: { rating: { isNull: true } }) {
+          locations(where: { rating: { isNull: true } }) {
             nodes { name }
           }
         }
@@ -233,7 +233,7 @@ describe('Scalar and logical filters', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             or: [
               { name: { equalTo: "MoMA" } },
               { name: { equalTo: "Met Museum" } }
@@ -255,7 +255,7 @@ describe('Scalar and logical filters', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             not: { isActive: { equalTo: false } }
           }) {
             nodes { name }
@@ -293,7 +293,7 @@ describe('tsvector search (PgSearchPlugin)', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: { tsvTsv: "coffee" }) {
+          locations(where: { tsvTsv: "coffee" }) {
             nodes { name }
           }
         }
@@ -310,7 +310,7 @@ describe('tsvector search (PgSearchPlugin)', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: { tsvTsv: "park" }) {
+          locations(where: { tsvTsv: "park" }) {
             nodes { name }
           }
         }
@@ -329,7 +329,7 @@ describe('tsvector search (PgSearchPlugin)', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             tsvTsv: "park",
             isActive: { equalTo: true }
           }) {
@@ -356,7 +356,7 @@ describe('pgvector', () => {
     const result = await query<{ locations: { nodes: { name: string; embedding: number[] }[] } }>({
       query: `
         query {
-          locations(filter: { name: { equalTo: "Central Park Cafe" } }) {
+          locations(where: { name: { equalTo: "Central Park Cafe" } }) {
             nodes {
               name
               embedding
@@ -417,7 +417,7 @@ describe('PostGIS spatial filters', () => {
     const result = await query<{ locations: { nodes: { name: string; geom: unknown }[] } }>({
       query: `
         query {
-          locations(filter: { name: { equalTo: "Central Park Cafe" } }) {
+          locations(where: { name: { equalTo: "Central Park Cafe" } }) {
             nodes {
               name
               geom { geojson }
@@ -442,7 +442,7 @@ describe('Relation filters', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             category: { name: { equalTo: "Parks" } }
           }) {
             nodes { name }
@@ -462,7 +462,7 @@ describe('Relation filters', () => {
     const result = await query<{ categories: { nodes: { name: string }[] } }>({
       query: `
         query {
-          categories(filter: {
+          categories(where: {
             locations: {
               some: { isActive: { equalTo: true } }
             }
@@ -482,7 +482,7 @@ describe('Relation filters', () => {
     const result = await query<{ categories: { nodes: { name: string }[] } }>({
       query: `
         query {
-          categories(filter: {
+          categories(where: {
             locations: {
               none: { isActive: { equalTo: false } }
             }
@@ -504,7 +504,7 @@ describe('Relation filters', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             tagsExist: true
           }) {
             nodes { name }
@@ -522,7 +522,7 @@ describe('Relation filters', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             category: { name: { equalTo: "Restaurants" } },
             isActive: { equalTo: true }
           }) {
@@ -564,7 +564,7 @@ describe('BM25 search (pg_textsearch)', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             bm25Body: { query: "museum art" }
           }) {
             nodes { name }
@@ -585,7 +585,7 @@ describe('BM25 search (pg_textsearch)', () => {
     const result = await query<{ locations: { nodes: { name: string; bodyBm25Score: number | null }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             bm25Body: { query: "park" }
           }) {
             nodes {
@@ -632,7 +632,7 @@ describe('BM25 search (pg_textsearch)', () => {
       query: `
         query {
           locations(
-            filter: { bm25Body: { query: "park" } }
+            where: { bm25Body: { query: "park" } }
             orderBy: BODY_BM25_SCORE_ASC
           ) {
             nodes {
@@ -662,7 +662,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             tsvTsv: "park",
             isActive: { equalTo: true },
             category: { name: { equalTo: "Parks" } }
@@ -686,7 +686,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     const result = await query<{ locations: { nodes: { name: string; bodyBm25Score: number }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             bm25Body: { query: "museum" },
             isActive: { equalTo: true }
           }) {
@@ -713,7 +713,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: {
+          locations(where: {
             or: [
               { tsvTsv: "coffee" },
               { name: { equalTo: "MoMA" } }
@@ -866,7 +866,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
         query MegaQuery($bbox: GeoJSON!) {
           locations(
             # ── FILTERS: all 7 plugin types applied simultaneously ──
-            filter: {
+            where: {
               # 1. tsvector full-text search (PgSearchPlugin)
               #    WHERE tsv @@ websearch_to_tsquery('park')
               tsvTsv: "park"
@@ -1003,7 +1003,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       query: `
         query {
           locations(
-            filter: { isActive: { equalTo: true } }
+            where: { isActive: { equalTo: true } }
             first: 3
           ) {
             nodes { name }

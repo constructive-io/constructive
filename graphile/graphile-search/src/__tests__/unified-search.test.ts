@@ -118,7 +118,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('filters by full-text search and returns tsvRank score', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             tsvTsv: "machine learning"
           }) {
             nodes {
@@ -168,7 +168,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('filters by BM25 search and returns bodyBm25Score', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             bm25Body: {
               query: "machine learning intelligence"
             }
@@ -196,7 +196,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('applies BM25 threshold filter', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             bm25Body: {
               query: "learning"
               threshold: -0.1
@@ -226,7 +226,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('filters by trigram similarity and returns titleTrgmSimilarity', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             trgmTitle: {
               value: "Machine Learnng"
             }
@@ -256,7 +256,7 @@ describe('graphile-search (unified search plugin)', () => {
       // "Machne Lerning" has typos but should still match "Machine Learning"
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             trgmTitle: {
               value: "Machne Lerning"
               threshold: 0.05
@@ -283,7 +283,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('filters by vector similarity and returns embeddingVectorDistance', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             vectorEmbedding: {
               vector: [1, 0, 0]
               metric: COSINE
@@ -312,7 +312,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('applies distance threshold filter', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             vectorEmbedding: {
               vector: [1, 0, 0]
               metric: COSINE
@@ -364,7 +364,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('returns searchScore between 0 and 1 when a single filter is active', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             tsvTsv: "machine learning"
           }) {
             nodes {
@@ -396,7 +396,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            filter: {
+            where: {
               bm25Body: { query: "learning" }
             }
             orderBy: BODY_BM25_SCORE_ASC
@@ -426,7 +426,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            filter: {
+            where: {
               trgmTitle: { value: "Learning", threshold: 0.05 }
             }
             orderBy: TITLE_TRGM_SIMILARITY_DESC
@@ -457,7 +457,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            filter: {
+            where: {
               bm25Body: { query: "learning" }
               trgmTitle: { value: "Learning", threshold: 0.05 }
             }
@@ -492,7 +492,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            filter: {
+            where: {
               tsvTsv: "learning"
               bm25Body: { query: "learning" }
               trgmTitle: { value: "Learning", threshold: 0.05 }
@@ -535,7 +535,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query MegaQueryV1_PerAlgorithmFilters {
           allDocuments(
-            filter: {
+            where: {
               # tsvector: full-text search on the tsv column
               tsvTsv: "learning"
 
@@ -599,7 +599,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query MegaQueryV2_UnifiedSearch {
           allDocuments(
-            filter: {
+            where: {
               # fullTextSearch: single string fans out to tsvector + BM25 + trgm
               # automatically — no need to specify each algorithm separately
               fullTextSearch: "machine learning"
@@ -653,7 +653,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('fullTextSearch field exists on the filter type', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             fullTextSearch: "learning"
           }) {
             nodes {
@@ -671,7 +671,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('returns results matching any text-compatible algorithm', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             fullTextSearch: "machine learning"
           }) {
             nodes {
@@ -701,7 +701,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('coexists with algorithm-specific filters', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             fullTextSearch: "learning"
             tsvTsv: "machine"
           }) {
@@ -722,7 +722,7 @@ describe('graphile-search (unified search plugin)', () => {
     it('returns empty results for nonsense query', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
-          allDocuments(filter: {
+          allDocuments(where: {
             fullTextSearch: "xyzzy_nonexistent_term_12345"
           }) {
             nodes {
@@ -745,7 +745,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            filter: {
+            where: {
               bm25Body: { query: "learning" }
             }
             orderBy: BODY_BM25_SCORE_ASC
