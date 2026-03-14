@@ -112,7 +112,7 @@ describe('Schema introspection', () => {
     expect(result.errors).toBeUndefined();
     const fieldNames = result.data?.__type?.inputFields?.map((f) => f.name) ?? [];
     // tsvector search via PgSearchPlugin (prefix: fullText)
-    expect(fieldNames).toContain('fullTextTsv');
+    expect(fieldNames).toContain('tsvTsv');
   });
 
   it('Location type has vector embedding field', async () => {
@@ -289,11 +289,11 @@ describe('Scalar and logical filters', () => {
 // TSVECTOR SEARCH (PgSearchPlugin)
 // ============================================================================
 describe('tsvector search (PgSearchPlugin)', () => {
-  it('fullTextTsv matches filters by text search', async () => {
+  it('tsvTsv matches filters by text search', async () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: { fullTextTsv: "coffee" }) {
+          locations(filter: { tsvTsv: "coffee" }) {
             nodes { name }
           }
         }
@@ -306,11 +306,11 @@ describe('tsvector search (PgSearchPlugin)', () => {
     expect(result.data?.locations.nodes[0].name).toBe('Central Park Cafe');
   });
 
-  it('fullTextTsv with broad term matches multiple rows', async () => {
+  it('tsvTsv with broad term matches multiple rows', async () => {
     const result = await query<{ locations: { nodes: { name: string }[] } }>({
       query: `
         query {
-          locations(filter: { fullTextTsv: "park" }) {
+          locations(filter: { tsvTsv: "park" }) {
             nodes { name }
           }
         }
@@ -330,7 +330,7 @@ describe('tsvector search (PgSearchPlugin)', () => {
       query: `
         query {
           locations(filter: {
-            fullTextTsv: "park",
+            tsvTsv: "park",
             isActive: { equalTo: true }
           }) {
             nodes { name }
@@ -663,7 +663,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       query: `
         query {
           locations(filter: {
-            fullTextTsv: "park",
+            tsvTsv: "park",
             isActive: { equalTo: true },
             category: { name: { equalTo: "Parks" } }
           }) {
@@ -715,7 +715,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
         query {
           locations(filter: {
             or: [
-              { fullTextTsv: "coffee" },
+              { tsvTsv: "coffee" },
               { name: { equalTo: "MoMA" } }
             ]
           }) {
@@ -767,7 +767,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
    *
    *  #  Plugin           Filter field              What it does
    *  ─  ───────────────  ────────────────────────── ──────────────────────────
-   *  1  tsvector         fullTextTsv: "park"        Full-text search via
+   *  1  tsvector         tsvTsv: "park"        Full-text search via
    *     (SearchPlugin)                              websearch_to_tsquery on
    *                                                 the `tsv` tsvector column.
    *
@@ -869,7 +869,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
             filter: {
               # 1. tsvector full-text search (PgSearchPlugin)
               #    WHERE tsv @@ websearch_to_tsquery('park')
-              fullTextTsv: "park"
+              tsvTsv: "park"
 
               # 2. BM25 relevance search (Bm25SearchPlugin via pg_textsearch)
               #    WHERE body @@@ paradedb.parse('park green')
@@ -962,7 +962,7 @@ describe('Kitchen sink (multi-plugin queries)', () => {
       expect(typeof node.bodyBm25Score).toBe('number');
 
       // ── tsvector rank (plugin #1) ──
-      // Populated because fullTextTsv filter is active. Float 0..~1 where
+      // Populated because tsvTsv filter is active. Float 0..~1 where
       // higher = better match.
       expect(typeof node.tsvRank).toBe('number');
 
