@@ -150,8 +150,11 @@ function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
   );
 }
 
-function buildSelectObject(table: CleanTable): t.ObjectExpression {
-  const fields = getScalarFields(table);
+function buildSelectObject(table: CleanTable, typeRegistry?: TypeRegistry): t.ObjectExpression {
+  const writableFields = getWritableFieldNames(table, typeRegistry);
+  const fields = getScalarFields(table).filter(
+    (f) => writableFields === null || writableFields.has(f.name),
+  );
   return t.objectExpression(
     fields.map((f) =>
       t.objectProperty(t.identifier(f.name), t.booleanLiteral(true)),
@@ -305,9 +308,9 @@ function buildSubcommandSwitch(
   return t.switchStatement(t.identifier('subcommand'), cases);
 }
 
-function buildListHandler(table: CleanTable, targetName?: string): t.FunctionDeclaration {
+function buildListHandler(table: CleanTable, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
-  const selectObj = buildSelectObject(table);
+  const selectObj = buildSelectObject(table, typeRegistry);
 
   const tryBody: t.Statement[] = [
     buildGetClientStatement(targetName),
@@ -349,11 +352,11 @@ function buildListHandler(table: CleanTable, targetName?: string): t.FunctionDec
   );
 }
 
-function buildGetHandler(table: CleanTable, targetName?: string): t.FunctionDeclaration {
+function buildGetHandler(table: CleanTable, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
   const pk = pkFields[0];
-  const selectObj = buildSelectObject(table);
+  const selectObj = buildSelectObject(table, typeRegistry);
 
   const promptQuestion = t.objectExpression([
     t.objectProperty(t.identifier('type'), t.stringLiteral('text')),
@@ -589,7 +592,7 @@ function buildMutationHandler(
       ? t.objectExpression([
           t.objectProperty(t.identifier(pk.name), t.booleanLiteral(true)),
         ])
-      : buildSelectObject(table);
+      : buildSelectObject(table, typeRegistry);
 
   let ormArgs: t.ObjectExpression;
 
@@ -1013,8 +1016,8 @@ export function generateTableCommand(table: CleanTable, options?: TableCommandOp
 
   const tn = options?.targetName;
   const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
-  statements.push(buildListHandler(table, tn));
-  if (hasGet) statements.push(buildGetHandler(table, tn));
+  statements.push(buildListHandler(table, tn, options?.typeRegistry));
+  if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
   statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));
   if (hasDelete) statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry, ormTypes));
