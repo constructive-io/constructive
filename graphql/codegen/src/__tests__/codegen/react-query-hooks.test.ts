@@ -375,9 +375,9 @@ describe('Regression: FindManyArgs TCondition type arg', () => {
       useCentralizedKeys: false,
       condition: false,
     });
-    // FindManyArgs should have 3 type args: unknown, UserFilter, UsersOrderBy
+    // FindManyArgs should have 4 type args with never for TCondition: unknown, UserFilter, never, UsersOrderBy
     expect(result.content).toMatch(
-      /FindManyArgs<unknown, UserFilter, UsersOrderBy>/,
+      /FindManyArgs<unknown, UserFilter, never, UsersOrderBy>/,
     );
     expect(result.content).not.toContain('UserCondition');
   });

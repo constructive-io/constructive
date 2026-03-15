@@ -272,9 +272,9 @@ export function generateModelFile(
     const findManyTypeArgs: Array<(sel: t.TSType) => t.TSType> = [
       (sel: t.TSType) => sel,
       () => t.tsTypeReference(t.identifier(whereTypeName)),
-      ...(conditionTypeName
-        ? [() => t.tsTypeReference(t.identifier(conditionTypeName))]
-        : []),
+      conditionTypeName
+        ? () => t.tsTypeReference(t.identifier(conditionTypeName))
+        : () => t.tsNeverKeyword(),
       () => t.tsTypeReference(t.identifier(orderByTypeName)),
     ];
     const argsType = (sel: t.TSType) =>
