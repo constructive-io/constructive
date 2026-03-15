@@ -88,6 +88,11 @@ export function createUnifiedSearchPlugin(
 
   /**
    * Get (or compute) the adapter columns for a given codec.
+   *
+   * Runs non-supplementary adapters first (e.g. tsvector, BM25, pgvector).
+   * Supplementary adapters (e.g. trgm with requireIntentionalSearch) are only
+   * run if at least one non-supplementary adapter found columns — this prevents
+   * trgm from adding similarity fields to every table with text columns.
    */
   function getAdapterColumns(codec: PgCodecWithAttributes, build: any): AdapterColumnCache[] {
     const cacheKey = codec.name;
@@ -95,13 +100,29 @@ export function createUnifiedSearchPlugin(
       return codecCache.get(cacheKey)!;
     }
 
+    const primaryAdapters = adapters.filter((a) => !a.isSupplementary);
+    const supplementaryAdapters = adapters.filter((a) => a.isSupplementary);
+
+    // Phase 1: Run non-supplementary (intentional search) adapters
     const results: AdapterColumnCache[] = [];
-    for (const adapter of adapters) {
+    for (const adapter of primaryAdapters) {
       const columns = adapter.detectColumns(codec, build);
       if (columns.length > 0) {
         results.push({ adapter, columns });
       }
     }
+
+    // Phase 2: Only run supplementary adapters if at least one primary
+    // adapter found columns on this codec (i.e. intentional search exists)
+    if (results.length > 0) {
+      for (const adapter of supplementaryAdapters) {
+        const columns = adapter.detectColumns(codec, build);
+        if (columns.length > 0) {
+          results.push({ adapter, columns });
+        }
+      }
+    }
+
     codecCache.set(cacheKey, results);
     return results;
   }
@@ -170,9 +191,11 @@ export function createUnifiedSearchPlugin(
             provides: ['default'],
             before: ['inferred', 'override', 'PgAttributesPlugin'],
             callback(behavior, [codec, attributeName], build) {
-              // Check if any adapter claims this column
-              for (const adapter of adapters) {
-                const columns = adapter.detectColumns(codec, build);
+              // Use getAdapterColumns which respects isSupplementary logic,
+              // so trgm columns only appear when intentional search exists
+              if (!codec?.attributes) return behavior;
+              const adapterColumns = getAdapterColumns(codec as PgCodecWithAttributes, build);
+              for (const { columns } of adapterColumns) {
                 if (columns.some((c) => c.attributeName === attributeName)) {
                   return [
                     'unifiedSearch:orderBy',

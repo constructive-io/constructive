@@ -1,6 +1,6 @@
 import type { DocsConfig } from '../../types/config';
 import type { CleanArgument, CleanField, CleanOperation, CleanTable, CleanTypeRef, TypeRegistry } from '../../types/schema';
-import { getScalarFields, getPrimaryKeyInfo } from './utils';
+import { getScalarFields, getPrimaryKeyInfo, getWritableFieldNames } from './utils';
 
 export interface GeneratedDocFile {
   fileName: string;
@@ -103,14 +103,37 @@ export function formatTypeRef(
   return t.name ?? 'unknown';
 }
 
-export function getEditableFields(table: CleanTable): CleanField[] {
+export function getEditableFields(table: CleanTable, typeRegistry?: TypeRegistry): CleanField[] {
+  const pk = getPrimaryKeyInfo(table)[0];
+  const writableFields = getWritableFieldNames(table, typeRegistry);
+  return getScalarFields(table).filter(
+    (f) =>
+      f.name !== pk.name &&
+      f.name !== 'nodeId' &&
+      f.name !== 'createdAt' &&
+      f.name !== 'updatedAt' &&
+      // When a TypeRegistry is available, filter out computed/plugin-added
+      // fields (e.g. search scores, trgm similarity) that aren't real columns
+      (writableFields === null || writableFields.has(f.name)),
+  );
+}
+
+/**
+ * Identify search/computed fields on a table — fields present in the GraphQL
+ * type but NOT in the create input type. These are plugin-added fields like
+ * trgm similarity scores, tsvector ranks, searchScore, etc.
+ */
+export function getSearchFields(table: CleanTable, typeRegistry?: TypeRegistry): CleanField[] {
+  const writableFields = getWritableFieldNames(table, typeRegistry);
+  if (writableFields === null) return [];
   const pk = getPrimaryKeyInfo(table)[0];
   return getScalarFields(table).filter(
     (f) =>
       f.name !== pk.name &&
       f.name !== 'nodeId' &&
       f.name !== 'createdAt' &&
-      f.name !== 'updatedAt',
+      f.name !== 'updatedAt' &&
+      !writableFields.has(f.name),
   );
 }
 

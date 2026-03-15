@@ -6,6 +6,7 @@ import {
   flattenedArgsToFlags,
   cleanTypeName,
   getEditableFields,
+  getSearchFields,
   getReadmeHeader,
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
@@ -112,7 +113,7 @@ export function generateReadme(
       const kebab = toKebabCase(singularName);
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
-      const editableFields = getEditableFields(table);
+      const editableFields = getEditableFields(table, registry);
 
       lines.push(`### \`${kebab}\``);
       lines.push('');
@@ -145,6 +146,10 @@ export function generateReadme(
       }
       if (requiredCreate.length === 0 && optionalCreate.length === 0) {
         lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
+      const searchFields = getSearchFields(table, registry);
+      if (searchFields.length > 0) {
+        lines.push(`**Search API fields (computed, read-only):** ${searchFields.map((f) => `\`${f.name}\``).join(', ')}`);
       }
       lines.push('');
     }
@@ -309,7 +314,7 @@ export function generateAgentsDocs(
     const kebab = toKebabCase(singularName);
     const pk = getPrimaryKeyInfo(table)[0];
     const scalarFields = getScalarFields(table);
-    const editableFields = getEditableFields(table);
+    const editableFields = getEditableFields(table, registry);
     const defaultFields = getFieldsWithDefaults(table, registry);
     const requiredCreateFields = editableFields.filter((f) => !defaultFields.has(f.name));
     const optionalCreateFields = editableFields.filter((f) => defaultFields.has(f.name));
@@ -397,7 +402,7 @@ export function generateAgentsDocs(
     const firstTable = tables[0];
     const { singularName } = getTableNames(firstTable);
     const kebab = toKebabCase(singularName);
-    const editableFields = getEditableFields(firstTable);
+    const editableFields = getEditableFields(firstTable, registry);
     const pk = getPrimaryKeyInfo(firstTable)[0];
 
     lines.push(`### CRUD workflow (${kebab})`);
@@ -582,7 +587,7 @@ export function getCliMcpTools(
     const kebab = toKebabCase(singularName);
     const pk = getPrimaryKeyInfo(table)[0];
     const scalarFields = getScalarFields(table);
-    const editableFields = getEditableFields(table);
+    const editableFields = getEditableFields(table, registry);
     const defaultFields = getFieldsWithDefaults(table, registry);
     const requiredCreateFieldNames = editableFields
       .filter((f) => !defaultFields.has(f.name))
@@ -808,7 +813,7 @@ export function generateSkills(
     const { singularName } = getTableNames(table);
     const kebab = toKebabCase(singularName);
     const pk = getPrimaryKeyInfo(table)[0];
-    const editableFields = getEditableFields(table);
+    const editableFields = getEditableFields(table, registry);
     const defaultFields = getFieldsWithDefaults(table, registry);
     const createFlags = [
       ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <value>`),
@@ -1117,7 +1122,7 @@ export function generateMultiTargetReadme(
       const kebab = toKebabCase(singularName);
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
-      const editableFields = getEditableFields(table);
+      const editableFields = getEditableFields(table, registry);
       const defaultFields = getFieldsWithDefaults(table, registry);
 
       lines.push(`### \`${tgt.name}:${kebab}\``);
@@ -1150,6 +1155,10 @@ export function generateMultiTargetReadme(
       }
       if (requiredCreate.length === 0 && optionalCreate.length === 0) {
         lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
+      }
+      const searchFields = getSearchFields(table, registry);
+      if (searchFields.length > 0) {
+        lines.push(`**Search API fields (computed, read-only):** ${searchFields.map((f) => `\`${f.name}\``).join(', ')}`);
       }
       lines.push('');
     }
@@ -1365,7 +1374,7 @@ export function generateMultiTargetAgentsDocs(
       const kebab = toKebabCase(singularName);
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
-      const editableFields = getEditableFields(table);
+      const editableFields = getEditableFields(table, registry);
       const defaultFields = getFieldsWithDefaults(table, registry);
       const requiredCreateFields = editableFields.filter((f) => !defaultFields.has(f.name));
       const optionalCreateFields = editableFields.filter((f) => defaultFields.has(f.name));
@@ -1473,7 +1482,7 @@ export function generateMultiTargetAgentsDocs(
     const table = tgt.tables[0];
     const { singularName } = getTableNames(table);
     const kebab = toKebabCase(singularName);
-    const editableFields = getEditableFields(table);
+    const editableFields = getEditableFields(table, registry);
     const pk = getPrimaryKeyInfo(table)[0];
 
     lines.push(`### CRUD workflow (${tgt.name}:${kebab})`);
@@ -1654,7 +1663,7 @@ export function getMultiTargetCliMcpTools(
       const kebab = toKebabCase(singularName);
       const pk = getPrimaryKeyInfo(table)[0];
       const scalarFields = getScalarFields(table);
-      const editableFields = getEditableFields(table);
+      const editableFields = getEditableFields(table, registry);
       const defaultFields = getFieldsWithDefaults(table, registry);
       const requiredCreateFieldNames = editableFields
         .filter((f) => !defaultFields.has(f.name))
@@ -1941,7 +1950,7 @@ export function generateMultiTargetSkills(
       const { singularName } = getTableNames(table);
       const kebab = toKebabCase(singularName);
       const pk = getPrimaryKeyInfo(table)[0];
-      const editableFields = getEditableFields(table);
+      const editableFields = getEditableFields(table, registry);
       const defaultFields = getFieldsWithDefaults(table, registry);
       const createFlags = [
         ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <value>`),

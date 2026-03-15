@@ -25,15 +25,39 @@ export interface TrgmAdapterOptions {
    * @default 0.3
    */
   defaultThreshold?: number;
+
+  /**
+   * When true, trgm only activates on tables that have an "intentional"
+   * search column detected by another adapter (e.g. a tsvector column or
+   * a BM25 index). This prevents trgm similarity fields from being added
+   * to every table with text columns.
+   *
+   * The plugin's `getAdapterColumns` orchestrates this by running
+   * non-supplementary adapters first, then only running supplementary
+   * adapters on codecs that already have search columns.
+   *
+   * @default true
+   */
+  requireIntentionalSearch?: boolean;
 }
 
 export function createTrgmAdapter(
   options: TrgmAdapterOptions = {}
 ): SearchAdapter {
-  const { filterPrefix = 'trgm', defaultThreshold = 0.3 } = options;
+  const {
+    filterPrefix = 'trgm',
+    defaultThreshold = 0.3,
+    requireIntentionalSearch = true,
+  } = options;
 
   return {
     name: 'trgm',
+
+    /**
+     * When true, this adapter is "supplementary" — it only activates on
+     * tables that already have columns detected by a non-supplementary adapter.
+     */
+    isSupplementary: requireIntentionalSearch,
 
     scoreSemantics: {
       metric: 'similarity',

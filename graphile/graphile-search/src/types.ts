@@ -76,6 +76,18 @@ export interface SearchAdapter {
   scoreSemantics: ScoreSemantics;
 
   /**
+   * When true, this adapter is "supplementary" — it only activates on
+   * tables that already have at least one column detected by a
+   * non-supplementary adapter (e.g. tsvector or BM25).
+   *
+   * This prevents adapters like pg_trgm from adding similarity fields
+   * to every table with text columns when there is no intentional search setup.
+   *
+   * @default false
+   */
+  isSupplementary?: boolean;
+
+  /**
    * The filter prefix used for filter field names on the connection filter input.
    * The field name is: `{filterPrefix}{ColumnName}` (camelCase).
    * E.g. 'bm25' → `bm25Body`, 'trgm' → `trgmName`, 'vector' → `vectorEmbedding`.
