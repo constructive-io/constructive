@@ -52,6 +52,10 @@ export function createPgvectorAdapter(
 
     filterPrefix,
 
+    // pgvector operates on embedding vectors, not text search — its presence
+    // alone should NOT trigger supplementary adapters like trgm.
+    isIntentionalSearch: false,
+
     supportsTextSearch: false,
     // pgvector requires a vector array, not plain text — no buildTextSearchInput
 

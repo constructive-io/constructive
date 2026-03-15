@@ -91,8 +91,12 @@ export function createUnifiedSearchPlugin(
    *
    * Runs non-supplementary adapters first (e.g. tsvector, BM25, pgvector).
    * Supplementary adapters (e.g. trgm with requireIntentionalSearch) are only
-   * run if at least one non-supplementary adapter found columns — this prevents
-   * trgm from adding similarity fields to every table with text columns.
+   * run if at least one adapter with `isIntentionalSearch: true` found columns.
+   *
+   * This distinction matters because pgvector (embeddings) is NOT intentional
+   * text search — its presence alone should not trigger trgm similarity fields.
+   * Only tsvector and BM25, which represent explicit search infrastructure,
+   * count as intentional search.
    */
   function getAdapterColumns(codec: PgCodecWithAttributes, build: any): AdapterColumnCache[] {
     const cacheKey = codec.name;
@@ -103,18 +107,25 @@ export function createUnifiedSearchPlugin(
     const primaryAdapters = adapters.filter((a) => !a.isSupplementary);
     const supplementaryAdapters = adapters.filter((a) => a.isSupplementary);
 
-    // Phase 1: Run non-supplementary (intentional search) adapters
+    // Phase 1: Run non-supplementary adapters (tsvector, BM25, pgvector, etc.)
     const results: AdapterColumnCache[] = [];
+    let hasIntentionalSearch = false;
     for (const adapter of primaryAdapters) {
       const columns = adapter.detectColumns(codec, build);
       if (columns.length > 0) {
         results.push({ adapter, columns });
+        // Track whether any "intentional search" adapter found columns.
+        // isIntentionalSearch defaults to true when not explicitly set.
+        if (adapter.isIntentionalSearch !== false) {
+          hasIntentionalSearch = true;
+        }
       }
     }
 
     // Phase 2: Only run supplementary adapters if at least one primary
-    // adapter found columns on this codec (i.e. intentional search exists)
-    if (results.length > 0) {
+    // adapter with isIntentionalSearch found columns on this codec.
+    // pgvector (isIntentionalSearch: false) alone won't trigger trgm.
+    if (hasIntentionalSearch) {
       for (const adapter of supplementaryAdapters) {
         const columns = adapter.detectColumns(codec, build);
         if (columns.length > 0) {

@@ -77,15 +77,32 @@ export interface SearchAdapter {
 
   /**
    * When true, this adapter is "supplementary" — it only activates on
-   * tables that already have at least one column detected by a
-   * non-supplementary adapter (e.g. tsvector or BM25).
+   * tables that already have at least one column detected by an adapter
+   * whose `isIntentionalSearch` is true (e.g. tsvector or BM25).
    *
    * This prevents adapters like pg_trgm from adding similarity fields
    * to every table with text columns when there is no intentional search setup.
    *
+   * pgvector (embeddings) does NOT count as intentional search because it
+   * operates on vector columns, not text search — so its presence alone
+   * won't trigger supplementary adapters.
+   *
    * @default false
    */
   isSupplementary?: boolean;
+
+  /**
+   * When true, this adapter represents "intentional search" — its presence
+   * on a table signals that the table was explicitly set up for search and
+   * should trigger supplementary adapters (e.g. trgm).
+   *
+   * Adapters that check for real infrastructure (tsvector columns, BM25
+   * indexes) should set this to true. Adapters that operate on a different
+   * domain (pgvector embeddings) should set this to false.
+   *
+   * @default true
+   */
+  isIntentionalSearch?: boolean;
 
   /**
    * The filter prefix used for filter field names on the connection filter input.
