@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "graphql": "^16.13.0"
+    "graphql": "16.13.0"
   },
   "keywords": [
     "graphql",

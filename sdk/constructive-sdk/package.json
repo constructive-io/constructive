@@ -41,7 +41,7 @@
     "@0no-co/graphql.web": "^1.1.2",
     "@constructive-io/graphql-types": "workspace:^",
     "gql-ast": "workspace:^",
-    "graphql": "^16.13.0"
+    "graphql": "16.13.0"
   },
   "devDependencies": {
     "@constructive-io/graphql-codegen": "workspace:^",

@@ -48,7 +48,7 @@
   "dependencies": {
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/env": "workspace:^",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-env": "workspace:^",
     "pg-seed": "workspace:^"
   }

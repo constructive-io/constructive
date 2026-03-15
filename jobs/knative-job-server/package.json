@@ -43,6 +43,6 @@
     "@constructive-io/job-utils": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "express": "5.2.1",
-    "pg": "8.19.0"
+    "pg": "8.20.0"
   }
 }

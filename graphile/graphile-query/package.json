@@ -29,13 +29,13 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "grafast": "1.0.0-rc.7",
+    "grafast": "1.0.0-rc.9",
     "graphile-build": "5.0.0-rc.4",
     "graphile-build-pg": "5.0.0-rc.5",
-    "graphile-config": "1.0.0-rc.5",
+    "graphile-config": "1.0.0-rc.6",
     "graphile-settings": "workspace:^",
-    "graphql": "^16.13.0",
-    "pg": "^8.19.0",
+    "graphql": "16.13.0",
+    "pg": "^8.20.0",
     "postgraphile": "5.0.0-rc.7"
   },
   "devDependencies": {

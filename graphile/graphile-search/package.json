@@ -34,7 +34,7 @@
     "graphile-connection-filter": "workspace:^",
     "graphile-test": "workspace:^",
     "makage": "^0.1.10",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pgsql-test": "workspace:^"
   },
   "peerDependencies": {
@@ -42,7 +42,7 @@
     "graphile-build": "5.0.0-rc.4",
     "graphile-build-pg": "5.0.0-rc.5",
     "graphile-config": "1.0.0-rc.5",
-    "graphql": "^16.9.0",
+    "graphql": "16.13.0",
     "pg-sql2": "5.0.0-rc.4",
     "postgraphile": "5.0.0-rc.7"
   },

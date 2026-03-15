@@ -42,15 +42,15 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "pgsql-deparser": "^17.18.0",
-    "pgsql-parser": "^17.9.12"
+    "pgsql-deparser": "^17.18.1",
+    "pgsql-parser": "^17.9.13"
   },
   "peerDependencies": {
     "grafast": "1.0.0-rc.7",
     "graphile-build": "5.0.0-rc.4",
     "graphile-build-pg": "5.0.0-rc.5",
     "graphile-config": "1.0.0-rc.5",
-    "graphql": "^16.9.0"
+    "graphql": "16.13.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",

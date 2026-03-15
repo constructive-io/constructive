@@ -33,7 +33,7 @@
     "@pgsql/quotes": "^17.1.0",
     "graphile-utils": "5.0.0-rc.5",
     "inflekt": "^0.3.3",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-query-context": "workspace:^"
   },
   "peerDependencies": {
@@ -41,7 +41,7 @@
     "graphile-build": "5.0.0-rc.4",
     "graphile-build-pg": "5.0.0-rc.5",
     "graphile-config": "1.0.0-rc.5",
-    "graphql": "^16.9.0",
+    "graphql": "16.13.0",
     "pg-sql2": "5.0.0-rc.4"
   },
   "devDependencies": {
