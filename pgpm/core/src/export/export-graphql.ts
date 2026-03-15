@@ -13,7 +13,7 @@ import { sync as glob } from 'glob';
 import path from 'path';
 
 import { Inquirerer } from 'inquirerer';
-import { createClient as createMigrateClient } from '@constructive-db/migrate-client';
+import { createClient as createMigrateClient } from '@pgpmjs/migrate-client';
 
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';

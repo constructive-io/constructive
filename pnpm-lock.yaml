@@ -2043,6 +2043,9 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
+      '@pgpmjs/migrate-client':
+        specifier: workspace:^
+        version: link:../migrate-client/dist
       '@pgpmjs/server-utils':
         specifier: workspace:^
         version: link:../../packages/server-utils/dist
@@ -2129,6 +2132,38 @@ importers:
       makage:
         specifier: ^0.1.12
         version: 0.1.12
+    publishDirectory: dist
+
+  pgpm/migrate-client:
+    dependencies:
+      '@0no-co/graphql.web':
+        specifier: ^1.1.2
+        version: 1.2.0(graphql@16.13.0)
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../../graphql/types/dist
+      gql-ast:
+        specifier: workspace:^
+        version: link:../../graphql/gql-ast/dist
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
+    devDependencies:
+      '@constructive-io/graphql-codegen':
+        specifier: workspace:^
+        version: link:../../graphql/codegen/dist
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.11
+      makage:
+        specifier: ^0.1.12
+        version: 0.1.12
+      tsx:
+        specifier: ^4.19.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
     publishDirectory: dist
 
   pgpm/types:
