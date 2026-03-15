@@ -48,6 +48,8 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): OrgGetSubordinatesConnection
+  appPermissionsGetMask(ids: [UUID]): BitString
+  orgPermissionsGetMask(ids: [UUID]): BitString
 
   """Reads and enables pagination through a set of `GetAllRecord`."""
   getAll(
@@ -66,44 +68,8 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): GetAllConnection
-  appPermissionsGetMask(ids: [UUID]): BitString
-  orgPermissionsGetMask(ids: [UUID]): BitString
   appPermissionsGetMaskByNames(names: [String]): BitString
   orgPermissionsGetMaskByNames(names: [String]): BitString
-
-  """Reads and enables pagination through a set of `AppPermission`."""
-  appPermissionsGetByMask(
-    mask: BitString
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): AppPermissionConnection
-
-  """Reads and enables pagination through a set of `OrgPermission`."""
-  orgPermissionsGetByMask(
-    mask: BitString
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): OrgPermissionConnection
 
   """Reads and enables pagination through a set of `Object`."""
   getAllObjectsFromRoot(
@@ -143,6 +109,40 @@ type Query {
     after: Cursor
   ): ObjectConnection
   getObjectAtPath(dbId: UUID, storeId: UUID, path: [String], refname: String): Object
+
+  """Reads and enables pagination through a set of `AppPermission`."""
+  appPermissionsGetByMask(
+    mask: BitString
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): AppPermissionConnection
+
+  """Reads and enables pagination through a set of `OrgPermission`."""
+  orgPermissionsGetByMask(
+    mask: BitString
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): OrgPermissionConnection
 
   """Reads and enables pagination through a set of `AppLevelRequirement`."""
   stepsRequired(
@@ -1240,6 +1240,35 @@ type Query {
     orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
   ): ConnectedAccountConnection
 
+  """Reads and enables pagination through a set of `TableGrant`."""
+  tableGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: TableGrantFilter
+
+    """The method to use when ordering `TableGrant`."""
+    orderBy: [TableGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TableGrantConnection
+
   """Reads and enables pagination through a set of `FieldModule`."""
   fieldModules(
     """Only read the first `n` values of the set."""
@@ -1385,8 +1414,8 @@ type Query {
     orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
   ): MembershipTypeConnection
 
-  """Reads and enables pagination through a set of `TableGrant`."""
-  tableGrants(
+  """Reads and enables pagination through a set of `Object`."""
+  objects(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1408,11 +1437,69 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: TableGrantFilter
+    where: ObjectFilter
 
-    """The method to use when ordering `TableGrant`."""
-    orderBy: [TableGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TableGrantConnection
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ObjectConnection
+
+  """Reads and enables pagination through a set of `FullTextSearch`."""
+  fullTextSearches(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: FullTextSearchFilter
+
+    """The method to use when ordering `FullTextSearch`."""
+    orderBy: [FullTextSearchOrderBy!] = [PRIMARY_KEY_ASC]
+  ): FullTextSearchConnection
+
+  """Reads and enables pagination through a set of `Commit`."""
+  commits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CommitFilter
+
+    """The method to use when ordering `Commit`."""
+    orderBy: [CommitOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CommitConnection
 
   """Reads and enables pagination through a set of `AppPermission`."""
   appPermissions(
@@ -1704,93 +1791,6 @@ type Query {
     orderBy: [SessionsModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): SessionsModuleConnection
 
-  """Reads and enables pagination through a set of `Object`."""
-  objects(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ObjectFilter
-
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ObjectConnection
-
-  """Reads and enables pagination through a set of `FullTextSearch`."""
-  fullTextSearches(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: FullTextSearchFilter
-
-    """The method to use when ordering `FullTextSearch`."""
-    orderBy: [FullTextSearchOrderBy!] = [PRIMARY_KEY_ASC]
-  ): FullTextSearchConnection
-
-  """Reads and enables pagination through a set of `Commit`."""
-  commits(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CommitFilter
-
-    """The method to use when ordering `Commit`."""
-    orderBy: [CommitOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CommitConnection
-
   """Reads and enables pagination through a set of `OrgLimit`."""
   orgLimits(
     """Only read the first `n` values of the set."""
@@ -1964,6 +1964,37 @@ type Query {
     """The method to use when ordering `OrgGrant`."""
     orderBy: [OrgGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgGrantConnection
+
+  """
+  Reads and enables pagination through a set of `DenormalizedTableField`.
+  """
+  denormalizedTableFields(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DenormalizedTableFieldFilter
+
+    """The method to use when ordering `DenormalizedTableField`."""
+    orderBy: [DenormalizedTableFieldOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DenormalizedTableFieldConnection
 
   """Reads and enables pagination through a set of `OrgMembershipDefault`."""
   orgMembershipDefaults(
@@ -2199,37 +2230,6 @@ type Query {
     orderBy: [InvitesModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): InvitesModuleConnection
 
-  """
-  Reads and enables pagination through a set of `DenormalizedTableField`.
-  """
-  denormalizedTableFields(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: DenormalizedTableFieldFilter
-
-    """The method to use when ordering `DenormalizedTableField`."""
-    orderBy: [DenormalizedTableFieldOrderBy!] = [PRIMARY_KEY_ASC]
-  ): DenormalizedTableFieldConnection
-
   """Reads and enables pagination through a set of `Email`."""
   emails(
     """Only read the first `n` values of the set."""
@@ -2404,8 +2404,8 @@ type Query {
     orderBy: [SecureTableProvisionOrderBy!] = [PRIMARY_KEY_ASC]
   ): SecureTableProvisionConnection
 
-  """Reads and enables pagination through a set of `Trigger`."""
-  triggers(
+  """Reads and enables pagination through a set of `User`."""
+  users(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -2427,40 +2427,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: TriggerFilter
+    where: UserFilter
 
-    """The method to use when ordering `Trigger`."""
-    orderBy: [TriggerOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TriggerConnection
-
-  """Reads and enables pagination through a set of `UniqueConstraint`."""
-  uniqueConstraints(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: UniqueConstraintFilter
-
-    """The method to use when ordering `UniqueConstraint`."""
-    orderBy: [UniqueConstraintOrderBy!] = [PRIMARY_KEY_ASC]
-  ): UniqueConstraintConnection
+    """The method to use when ordering `User`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UserConnection
 
   """Reads and enables pagination through a set of `PrimaryKeyConstraint`."""
   primaryKeyConstraints(
@@ -2491,6 +2462,35 @@ type Query {
     orderBy: [PrimaryKeyConstraintOrderBy!] = [PRIMARY_KEY_ASC]
   ): PrimaryKeyConstraintConnection
 
+  """Reads and enables pagination through a set of `Trigger`."""
+  triggers(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: TriggerFilter
+
+    """The method to use when ordering `Trigger`."""
+    orderBy: [TriggerOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TriggerConnection
+
   """Reads and enables pagination through a set of `CheckConstraint`."""
   checkConstraints(
     """Only read the first `n` values of the set."""
@@ -2519,6 +2519,35 @@ type Query {
     """The method to use when ordering `CheckConstraint`."""
     orderBy: [CheckConstraintOrderBy!] = [PRIMARY_KEY_ASC]
   ): CheckConstraintConnection
+
+  """Reads and enables pagination through a set of `UniqueConstraint`."""
+  uniqueConstraints(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UniqueConstraintFilter
+
+    """The method to use when ordering `UniqueConstraint`."""
+    orderBy: [UniqueConstraintOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UniqueConstraintConnection
 
   """Reads and enables pagination through a set of `Policy`."""
   policies(
@@ -2577,6 +2606,35 @@ type Query {
     """The method to use when ordering `AstMigration`."""
     orderBy: [AstMigrationOrderBy!] = [NATURAL]
   ): AstMigrationConnection
+
+  """Reads and enables pagination through a set of `Index`."""
+  indices(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: IndexFilter
+
+    """The method to use when ordering `Index`."""
+    orderBy: [IndexOrderBy!] = [PRIMARY_KEY_ASC]
+  ): IndexConnection
 
   """Reads and enables pagination through a set of `AppMembership`."""
   appMemberships(
@@ -2723,35 +2781,6 @@ type Query {
     orderBy: [SiteOrderBy!] = [PRIMARY_KEY_ASC]
   ): SiteConnection
 
-  """Reads and enables pagination through a set of `User`."""
-  users(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: UserFilter
-
-    """The method to use when ordering `User`."""
-    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
-  ): UserConnection
-
   """Reads and enables pagination through a set of `HierarchyModule`."""
   hierarchyModules(
     """Only read the first `n` values of the set."""
@@ -2809,35 +2838,6 @@ type Query {
     """The method to use when ordering `Invite`."""
     orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
   ): InviteConnection
-
-  """Reads and enables pagination through a set of `Index`."""
-  indices(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: IndexFilter
-
-    """The method to use when ordering `Index`."""
-    orderBy: [IndexOrderBy!] = [PRIMARY_KEY_ASC]
-  ): IndexConnection
 
   """Reads and enables pagination through a set of `ForeignKeyConstraint`."""
   foreignKeyConstraints(
@@ -3208,6 +3208,52 @@ type GetAllEdge {
   node: GetAllRecord
 }
 
+"""A connection to a list of `Object` values."""
+type ObjectConnection {
+  """A list of `Object` objects."""
+  nodes: [Object]!
+
+  """
+  A list of edges which contains the `Object` and cursor to aid in pagination.
+  """
+  edges: [ObjectEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Object` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Object {
+  hashUuid: UUID
+  id: UUID!
+  databaseId: UUID!
+  kids: [UUID]
+  ktree: [String]
+  data: JSON
+  frzn: Boolean
+  createdAt: Datetime
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""A `Object` edge in the connection."""
+type ObjectEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Object` at the end of the edge."""
+  node: Object
+}
+
 """A connection to a list of `AppPermission` values."""
 type AppPermissionConnection {
   """A list of `AppPermission` objects."""
@@ -3324,52 +3370,6 @@ type OrgPermissionEdge {
 
   """The `OrgPermission` at the end of the edge."""
   node: OrgPermission
-}
-
-"""A connection to a list of `Object` values."""
-type ObjectConnection {
-  """A list of `Object` objects."""
-  nodes: [Object]!
-
-  """
-  A list of edges which contains the `Object` and cursor to aid in pagination.
-  """
-  edges: [ObjectEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Object` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Object {
-  hashUuid: UUID
-  id: UUID!
-  databaseId: UUID!
-  kids: [UUID]
-  ktree: [String]
-  data: JSON
-  frzn: Boolean
-  createdAt: Datetime
-}
-
-"""
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
-3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
-that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
-to unexpected results.
-"""
-scalar Datetime
-
-"""A `Object` edge in the connection."""
-type ObjectEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Object` at the end of the edge."""
-  node: Object
 }
 
 """A connection to a list of `AppLevelRequirement` values."""
@@ -24539,6 +24539,183 @@ enum MembershipTypeOrderBy {
 }
 
 """
+A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’
+"""
+input ObjectFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `kids` field."""
+  kids: UUIDListFilter
+
+  """Filter by the object’s `ktree` field."""
+  ktree: StringListFilter
+
+  """Filter by the object’s `data` field."""
+  data: JSONFilter
+
+  """Filter by the object’s `frzn` field."""
+  frzn: BooleanFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [ObjectFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [ObjectFilter!]
+
+  """Negates the expression."""
+  not: ObjectFilter
+}
+
+"""Methods to use when ordering `Object`."""
+enum ObjectOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  FRZN_ASC
+  FRZN_DESC
+}
+
+"""A connection to a list of `Commit` values."""
+type CommitConnection {
+  """A list of `Commit` objects."""
+  nodes: [Commit]!
+
+  """
+  A list of edges which contains the `Commit` and cursor to aid in pagination.
+  """
+  edges: [CommitEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Commit` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A commit records changes to the repository."""
+type Commit {
+  """The primary unique identifier for the commit."""
+  id: UUID!
+
+  """The commit message"""
+  message: String
+
+  """The repository identifier"""
+  databaseId: UUID!
+  storeId: UUID!
+
+  """Parent commits"""
+  parentIds: [UUID]
+
+  """The author of the commit"""
+  authorId: UUID
+
+  """The committer of the commit"""
+  committerId: UUID
+
+  """The root of the tree"""
+  treeId: UUID
+  date: Datetime!
+
+  """
+  TRGM similarity when searching `message`. Returns null when no trgm search filter is active.
+  """
+  messageTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
+}
+
+"""A `Commit` edge in the connection."""
+type CommitEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Commit` at the end of the edge."""
+  node: Commit
+}
+
+"""
+A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’
+"""
+input CommitFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `message` field."""
+  message: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `storeId` field."""
+  storeId: UUIDFilter
+
+  """Filter by the object’s `parentIds` field."""
+  parentIds: UUIDListFilter
+
+  """Filter by the object’s `authorId` field."""
+  authorId: UUIDFilter
+
+  """Filter by the object’s `committerId` field."""
+  committerId: UUIDFilter
+
+  """Filter by the object’s `treeId` field."""
+  treeId: UUIDFilter
+
+  """Filter by the object’s `date` field."""
+  date: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [CommitFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [CommitFilter!]
+
+  """Negates the expression."""
+  not: CommitFilter
+
+  """TRGM search on the `message` column."""
+  trgmMessage: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
+}
+
+"""Methods to use when ordering `Commit`."""
+enum CommitOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  MESSAGE_TRGM_SIMILARITY_ASC
+  MESSAGE_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+}
+
+"""
 A filter to be used against `AppPermission` object types. All fields are combined with a logical ‘and.’
 """
 input AppPermissionFilter {
@@ -24792,183 +24969,6 @@ enum RlsModuleOrderBy {
   CURRENT_ROLE_TRGM_SIMILARITY_DESC
   CURRENT_ROLE_ID_TRGM_SIMILARITY_ASC
   CURRENT_ROLE_ID_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
-}
-
-"""
-A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’
-"""
-input ObjectFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `kids` field."""
-  kids: UUIDListFilter
-
-  """Filter by the object’s `ktree` field."""
-  ktree: StringListFilter
-
-  """Filter by the object’s `data` field."""
-  data: JSONFilter
-
-  """Filter by the object’s `frzn` field."""
-  frzn: BooleanFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [ObjectFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [ObjectFilter!]
-
-  """Negates the expression."""
-  not: ObjectFilter
-}
-
-"""Methods to use when ordering `Object`."""
-enum ObjectOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  FRZN_ASC
-  FRZN_DESC
-}
-
-"""A connection to a list of `Commit` values."""
-type CommitConnection {
-  """A list of `Commit` objects."""
-  nodes: [Commit]!
-
-  """
-  A list of edges which contains the `Commit` and cursor to aid in pagination.
-  """
-  edges: [CommitEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Commit` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A commit records changes to the repository."""
-type Commit {
-  """The primary unique identifier for the commit."""
-  id: UUID!
-
-  """The commit message"""
-  message: String
-
-  """The repository identifier"""
-  databaseId: UUID!
-  storeId: UUID!
-
-  """Parent commits"""
-  parentIds: [UUID]
-
-  """The author of the commit"""
-  authorId: UUID
-
-  """The committer of the commit"""
-  committerId: UUID
-
-  """The root of the tree"""
-  treeId: UUID
-  date: Datetime!
-
-  """
-  TRGM similarity when searching `message`. Returns null when no trgm search filter is active.
-  """
-  messageTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
-}
-
-"""A `Commit` edge in the connection."""
-type CommitEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Commit` at the end of the edge."""
-  node: Commit
-}
-
-"""
-A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’
-"""
-input CommitFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `message` field."""
-  message: StringFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `storeId` field."""
-  storeId: UUIDFilter
-
-  """Filter by the object’s `parentIds` field."""
-  parentIds: UUIDListFilter
-
-  """Filter by the object’s `authorId` field."""
-  authorId: UUIDFilter
-
-  """Filter by the object’s `committerId` field."""
-  committerId: UUIDFilter
-
-  """Filter by the object’s `treeId` field."""
-  treeId: UUIDFilter
-
-  """Filter by the object’s `date` field."""
-  date: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [CommitFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [CommitFilter!]
-
-  """Negates the expression."""
-  not: CommitFilter
-
-  """TRGM search on the `message` column."""
-  trgmMessage: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
-}
-
-"""Methods to use when ordering `Commit`."""
-enum CommitOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  MESSAGE_TRGM_SIMILARITY_ASC
-  MESSAGE_TRGM_SIMILARITY_DESC
   SEARCH_SCORE_ASC
   SEARCH_SCORE_DESC
 }
@@ -25843,6 +25843,53 @@ enum EmailOrderBy {
   UPDATED_AT_DESC
 }
 
+"""A connection to a list of `User` values."""
+type UserConnection {
+  """A list of `User` objects."""
+  nodes: [User]!
+
+  """
+  A list of edges which contains the `User` and cursor to aid in pagination.
+  """
+  edges: [UserEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `User` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `User` edge in the connection."""
+type UserEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `User` at the end of the edge."""
+  node: User
+}
+
+"""Methods to use when ordering `User`."""
+enum UserOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  USERNAME_ASC
+  USERNAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  SEARCH_TSV_RANK_ASC
+  SEARCH_TSV_RANK_DESC
+  DISPLAY_NAME_TRGM_SIMILARITY_ASC
+  DISPLAY_NAME_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+}
+
 """A connection to a list of `AstMigration` values."""
 type AstMigrationConnection {
   """A list of `AstMigration` objects."""
@@ -26033,55 +26080,6 @@ enum AppMembershipOrderBy {
   ACTOR_ID_DESC
   PROFILE_ID_ASC
   PROFILE_ID_DESC
-}
-
-"""A connection to a list of `User` values."""
-type UserConnection {
-  """A list of `User` objects."""
-  nodes: [User]!
-
-  """
-  A list of edges which contains the `User` and cursor to aid in pagination.
-  """
-  edges: [UserEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `User` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `User` edge in the connection."""
-type UserEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `User` at the end of the edge."""
-  node: User
-}
-
-"""Methods to use when ordering `User`."""
-enum UserOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  USERNAME_ASC
-  USERNAME_DESC
-  SEARCH_TSV_ASC
-  SEARCH_TSV_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  SEARCH_TSV_RANK_ASC
-  SEARCH_TSV_RANK_DESC
-  DISPLAY_NAME_TRGM_SIMILARITY_ASC
-  DISPLAY_NAME_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `HierarchyModule` values."""
@@ -26355,6 +26353,12 @@ type Mutation {
     """
     input: VerifyEmailInput!
   ): VerifyEmailPayload
+  removeNodeAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RemoveNodeAtPathInput!
+  ): RemoveNodeAtPathPayload
   resetPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26367,12 +26371,12 @@ type Mutation {
     """
     input: BootstrapUserInput!
   ): BootstrapUserPayload
-  removeNodeAtPath(
+  setFieldOrder(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: RemoveNodeAtPathInput!
-  ): RemoveNodeAtPathPayload
+    input: SetFieldOrderInput!
+  ): SetFieldOrderPayload
   setDataAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26391,6 +26395,30 @@ type Mutation {
     """
     input: ProvisionDatabaseWithUserInput!
   ): ProvisionDatabaseWithUserPayload
+  insertNodeAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: InsertNodeAtPathInput!
+  ): InsertNodeAtPathPayload
+  updateNodeAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNodeAtPathInput!
+  ): UpdateNodeAtPathPayload
+  setAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetAndCommitInput!
+  ): SetAndCommitPayload
+  applyRls(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ApplyRlsInput!
+  ): ApplyRlsPayload
   signInOneTimeToken(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26423,42 +26451,12 @@ type Mutation {
     """
     input: SignUpInput!
   ): SignUpPayload
-  setFieldOrder(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SetFieldOrderInput!
-  ): SetFieldOrderPayload
   oneTimeToken(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: OneTimeTokenInput!
   ): OneTimeTokenPayload
-  insertNodeAtPath(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: InsertNodeAtPathInput!
-  ): InsertNodeAtPathPayload
-  updateNodeAtPath(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateNodeAtPathInput!
-  ): UpdateNodeAtPathPayload
-  setAndCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SetAndCommitInput!
-  ): SetAndCommitPayload
-  applyRls(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ApplyRlsInput!
-  ): ApplyRlsPayload
   forgotPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26780,6 +26778,14 @@ type Mutation {
     input: CreateConnectedAccountInput!
   ): CreateConnectedAccountPayload
 
+  """Creates a single `TableGrant`."""
+  createTableGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTableGrantInput!
+  ): CreateTableGrantPayload
+
   """Creates a single `FieldModule`."""
   createFieldModule(
     """
@@ -26820,13 +26826,29 @@ type Mutation {
     input: CreateMembershipTypeInput!
   ): CreateMembershipTypePayload
 
-  """Creates a single `TableGrant`."""
-  createTableGrant(
+  """Creates a single `Object`."""
+  createObject(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateTableGrantInput!
-  ): CreateTableGrantPayload
+    input: CreateObjectInput!
+  ): CreateObjectPayload
+
+  """Creates a single `FullTextSearch`."""
+  createFullTextSearch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateFullTextSearchInput!
+  ): CreateFullTextSearchPayload
+
+  """Creates a single `Commit`."""
+  createCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCommitInput!
+  ): CreateCommitPayload
 
   """Creates a single `AppPermission`."""
   createAppPermission(
@@ -26908,30 +26930,6 @@ type Mutation {
     input: CreateSessionsModuleInput!
   ): CreateSessionsModulePayload
 
-  """Creates a single `Object`."""
-  createObject(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateObjectInput!
-  ): CreateObjectPayload
-
-  """Creates a single `FullTextSearch`."""
-  createFullTextSearch(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateFullTextSearchInput!
-  ): CreateFullTextSearchPayload
-
-  """Creates a single `Commit`."""
-  createCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateCommitInput!
-  ): CreateCommitPayload
-
   """Creates a single `OrgLimit`."""
   createOrgLimit(
     """
@@ -26979,6 +26977,14 @@ type Mutation {
     """
     input: CreateOrgGrantInput!
   ): CreateOrgGrantPayload
+
+  """Creates a single `DenormalizedTableField`."""
+  createDenormalizedTableField(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDenormalizedTableFieldInput!
+  ): CreateDenormalizedTableFieldPayload
 
   """Creates a single `OrgMembershipDefault`."""
   createOrgMembershipDefault(
@@ -27044,14 +27050,6 @@ type Mutation {
     input: CreateInvitesModuleInput!
   ): CreateInvitesModulePayload
 
-  """Creates a single `DenormalizedTableField`."""
-  createDenormalizedTableField(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateDenormalizedTableFieldInput!
-  ): CreateDenormalizedTableFieldPayload
-
   """Creates a single `Email`."""
   createEmail(
     """
@@ -27100,21 +27098,13 @@ type Mutation {
     input: CreateSecureTableProvisionInput!
   ): CreateSecureTableProvisionPayload
 
-  """Creates a single `Trigger`."""
-  createTrigger(
+  """Creates a single `User`."""
+  createUser(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateTriggerInput!
-  ): CreateTriggerPayload
-
-  """Creates a single `UniqueConstraint`."""
-  createUniqueConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateUniqueConstraintInput!
-  ): CreateUniqueConstraintPayload
+    input: CreateUserInput!
+  ): CreateUserPayload
 
   """Creates a single `PrimaryKeyConstraint`."""
   createPrimaryKeyConstraint(
@@ -27124,6 +27114,14 @@ type Mutation {
     input: CreatePrimaryKeyConstraintInput!
   ): CreatePrimaryKeyConstraintPayload
 
+  """Creates a single `Trigger`."""
+  createTrigger(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTriggerInput!
+  ): CreateTriggerPayload
+
   """Creates a single `CheckConstraint`."""
   createCheckConstraint(
     """
@@ -27131,6 +27129,14 @@ type Mutation {
     """
     input: CreateCheckConstraintInput!
   ): CreateCheckConstraintPayload
+
+  """Creates a single `UniqueConstraint`."""
+  createUniqueConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUniqueConstraintInput!
+  ): CreateUniqueConstraintPayload
 
   """Creates a single `Policy`."""
   createPolicy(
@@ -27147,6 +27153,14 @@ type Mutation {
     """
     input: CreateAstMigrationInput!
   ): CreateAstMigrationPayload
+
+  """Creates a single `Index`."""
+  createIndex(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateIndexInput!
+  ): CreateIndexPayload
 
   """Creates a single `AppMembership`."""
   createAppMembership(
@@ -27188,14 +27202,6 @@ type Mutation {
     input: CreateSiteInput!
   ): CreateSitePayload
 
-  """Creates a single `User`."""
-  createUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateUserInput!
-  ): CreateUserPayload
-
   """Creates a single `HierarchyModule`."""
   createHierarchyModule(
     """
@@ -27211,14 +27217,6 @@ type Mutation {
     """
     input: CreateInviteInput!
   ): CreateInvitePayload
-
-  """Creates a single `Index`."""
-  createIndex(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateIndexInput!
-  ): CreateIndexPayload
 
   """Creates a single `ForeignKeyConstraint`."""
   createForeignKeyConstraint(
@@ -27592,6 +27590,14 @@ type Mutation {
     input: UpdateConnectedAccountInput!
   ): UpdateConnectedAccountPayload
 
+  """Updates a single `TableGrant` using a unique key and a patch."""
+  updateTableGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTableGrantInput!
+  ): UpdateTableGrantPayload
+
   """Updates a single `FieldModule` using a unique key and a patch."""
   updateFieldModule(
     """
@@ -27632,13 +27638,29 @@ type Mutation {
     input: UpdateMembershipTypeInput!
   ): UpdateMembershipTypePayload
 
-  """Updates a single `TableGrant` using a unique key and a patch."""
-  updateTableGrant(
+  """Updates a single `Object` using a unique key and a patch."""
+  updateObject(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateTableGrantInput!
-  ): UpdateTableGrantPayload
+    input: UpdateObjectInput!
+  ): UpdateObjectPayload
+
+  """Updates a single `FullTextSearch` using a unique key and a patch."""
+  updateFullTextSearch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateFullTextSearchInput!
+  ): UpdateFullTextSearchPayload
+
+  """Updates a single `Commit` using a unique key and a patch."""
+  updateCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCommitInput!
+  ): UpdateCommitPayload
 
   """Updates a single `AppPermission` using a unique key and a patch."""
   updateAppPermission(
@@ -27722,30 +27744,6 @@ type Mutation {
     input: UpdateSessionsModuleInput!
   ): UpdateSessionsModulePayload
 
-  """Updates a single `Object` using a unique key and a patch."""
-  updateObject(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateObjectInput!
-  ): UpdateObjectPayload
-
-  """Updates a single `FullTextSearch` using a unique key and a patch."""
-  updateFullTextSearch(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateFullTextSearchInput!
-  ): UpdateFullTextSearchPayload
-
-  """Updates a single `Commit` using a unique key and a patch."""
-  updateCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateCommitInput!
-  ): UpdateCommitPayload
-
   """Updates a single `OrgLimit` using a unique key and a patch."""
   updateOrgLimit(
     """
@@ -27793,6 +27791,16 @@ type Mutation {
     """
     input: UpdateOrgGrantInput!
   ): UpdateOrgGrantPayload
+
+  """
+  Updates a single `DenormalizedTableField` using a unique key and a patch.
+  """
+  updateDenormalizedTableField(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDenormalizedTableFieldInput!
+  ): UpdateDenormalizedTableFieldPayload
 
   """
   Updates a single `OrgMembershipDefault` using a unique key and a patch.
@@ -27854,16 +27862,6 @@ type Mutation {
     input: UpdateInvitesModuleInput!
   ): UpdateInvitesModulePayload
 
-  """
-  Updates a single `DenormalizedTableField` using a unique key and a patch.
-  """
-  updateDenormalizedTableField(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateDenormalizedTableFieldInput!
-  ): UpdateDenormalizedTableFieldPayload
-
   """Updates a single `Email` using a unique key and a patch."""
   updateEmail(
     """
@@ -27914,21 +27912,13 @@ type Mutation {
     input: UpdateSecureTableProvisionInput!
   ): UpdateSecureTableProvisionPayload
 
-  """Updates a single `Trigger` using a unique key and a patch."""
-  updateTrigger(
+  """Updates a single `User` using a unique key and a patch."""
+  updateUser(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateTriggerInput!
-  ): UpdateTriggerPayload
-
-  """Updates a single `UniqueConstraint` using a unique key and a patch."""
-  updateUniqueConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateUniqueConstraintInput!
-  ): UpdateUniqueConstraintPayload
+    input: UpdateUserInput!
+  ): UpdateUserPayload
 
   """
   Updates a single `PrimaryKeyConstraint` using a unique key and a patch.
@@ -27940,6 +27930,14 @@ type Mutation {
     input: UpdatePrimaryKeyConstraintInput!
   ): UpdatePrimaryKeyConstraintPayload
 
+  """Updates a single `Trigger` using a unique key and a patch."""
+  updateTrigger(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTriggerInput!
+  ): UpdateTriggerPayload
+
   """Updates a single `CheckConstraint` using a unique key and a patch."""
   updateCheckConstraint(
     """
@@ -27948,6 +27946,14 @@ type Mutation {
     input: UpdateCheckConstraintInput!
   ): UpdateCheckConstraintPayload
 
+  """Updates a single `UniqueConstraint` using a unique key and a patch."""
+  updateUniqueConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUniqueConstraintInput!
+  ): UpdateUniqueConstraintPayload
+
   """Updates a single `Policy` using a unique key and a patch."""
   updatePolicy(
     """
@@ -27955,6 +27961,14 @@ type Mutation {
     """
     input: UpdatePolicyInput!
   ): UpdatePolicyPayload
+
+  """Updates a single `Index` using a unique key and a patch."""
+  updateIndex(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateIndexInput!
+  ): UpdateIndexPayload
 
   """Updates a single `AppMembership` using a unique key and a patch."""
   updateAppMembership(
@@ -27996,14 +28010,6 @@ type Mutation {
     input: UpdateSiteInput!
   ): UpdateSitePayload
 
-  """Updates a single `User` using a unique key and a patch."""
-  updateUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateUserInput!
-  ): UpdateUserPayload
-
   """Updates a single `HierarchyModule` using a unique key and a patch."""
   updateHierarchyModule(
     """
@@ -28019,14 +28025,6 @@ type Mutation {
     """
     input: UpdateInviteInput!
   ): UpdateInvitePayload
-
-  """Updates a single `Index` using a unique key and a patch."""
-  updateIndex(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateIndexInput!
-  ): UpdateIndexPayload
 
   """
   Updates a single `ForeignKeyConstraint` using a unique key and a patch.
@@ -28390,6 +28388,14 @@ type Mutation {
     input: DeleteConnectedAccountInput!
   ): DeleteConnectedAccountPayload
 
+  """Deletes a single `TableGrant` using a unique key."""
+  deleteTableGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTableGrantInput!
+  ): DeleteTableGrantPayload
+
   """Deletes a single `FieldModule` using a unique key."""
   deleteFieldModule(
     """
@@ -28430,13 +28436,29 @@ type Mutation {
     input: DeleteMembershipTypeInput!
   ): DeleteMembershipTypePayload
 
-  """Deletes a single `TableGrant` using a unique key."""
-  deleteTableGrant(
+  """Deletes a single `Object` using a unique key."""
+  deleteObject(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteTableGrantInput!
-  ): DeleteTableGrantPayload
+    input: DeleteObjectInput!
+  ): DeleteObjectPayload
+
+  """Deletes a single `FullTextSearch` using a unique key."""
+  deleteFullTextSearch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteFullTextSearchInput!
+  ): DeleteFullTextSearchPayload
+
+  """Deletes a single `Commit` using a unique key."""
+  deleteCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCommitInput!
+  ): DeleteCommitPayload
 
   """Deletes a single `AppPermission` using a unique key."""
   deleteAppPermission(
@@ -28518,30 +28540,6 @@ type Mutation {
     input: DeleteSessionsModuleInput!
   ): DeleteSessionsModulePayload
 
-  """Deletes a single `Object` using a unique key."""
-  deleteObject(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteObjectInput!
-  ): DeleteObjectPayload
-
-  """Deletes a single `FullTextSearch` using a unique key."""
-  deleteFullTextSearch(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteFullTextSearchInput!
-  ): DeleteFullTextSearchPayload
-
-  """Deletes a single `Commit` using a unique key."""
-  deleteCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteCommitInput!
-  ): DeleteCommitPayload
-
   """Deletes a single `OrgLimit` using a unique key."""
   deleteOrgLimit(
     """
@@ -28589,6 +28587,14 @@ type Mutation {
     """
     input: DeleteOrgGrantInput!
   ): DeleteOrgGrantPayload
+
+  """Deletes a single `DenormalizedTableField` using a unique key."""
+  deleteDenormalizedTableField(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDenormalizedTableFieldInput!
+  ): DeleteDenormalizedTableFieldPayload
 
   """Deletes a single `OrgMembershipDefault` using a unique key."""
   deleteOrgMembershipDefault(
@@ -28646,14 +28652,6 @@ type Mutation {
     input: DeleteInvitesModuleInput!
   ): DeleteInvitesModulePayload
 
-  """Deletes a single `DenormalizedTableField` using a unique key."""
-  deleteDenormalizedTableField(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteDenormalizedTableFieldInput!
-  ): DeleteDenormalizedTableFieldPayload
-
   """Deletes a single `Email` using a unique key."""
   deleteEmail(
     """
@@ -28702,21 +28700,13 @@ type Mutation {
     input: DeleteSecureTableProvisionInput!
   ): DeleteSecureTableProvisionPayload
 
-  """Deletes a single `Trigger` using a unique key."""
-  deleteTrigger(
+  """Deletes a single `User` using a unique key."""
+  deleteUser(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteTriggerInput!
-  ): DeleteTriggerPayload
-
-  """Deletes a single `UniqueConstraint` using a unique key."""
-  deleteUniqueConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteUniqueConstraintInput!
-  ): DeleteUniqueConstraintPayload
+    input: DeleteUserInput!
+  ): DeleteUserPayload
 
   """Deletes a single `PrimaryKeyConstraint` using a unique key."""
   deletePrimaryKeyConstraint(
@@ -28726,6 +28716,14 @@ type Mutation {
     input: DeletePrimaryKeyConstraintInput!
   ): DeletePrimaryKeyConstraintPayload
 
+  """Deletes a single `Trigger` using a unique key."""
+  deleteTrigger(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTriggerInput!
+  ): DeleteTriggerPayload
+
   """Deletes a single `CheckConstraint` using a unique key."""
   deleteCheckConstraint(
     """
@@ -28734,6 +28732,14 @@ type Mutation {
     input: DeleteCheckConstraintInput!
   ): DeleteCheckConstraintPayload
 
+  """Deletes a single `UniqueConstraint` using a unique key."""
+  deleteUniqueConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUniqueConstraintInput!
+  ): DeleteUniqueConstraintPayload
+
   """Deletes a single `Policy` using a unique key."""
   deletePolicy(
     """
@@ -28741,6 +28747,14 @@ type Mutation {
     """
     input: DeletePolicyInput!
   ): DeletePolicyPayload
+
+  """Deletes a single `Index` using a unique key."""
+  deleteIndex(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteIndexInput!
+  ): DeleteIndexPayload
 
   """Deletes a single `AppMembership` using a unique key."""
   deleteAppMembership(
@@ -28782,14 +28796,6 @@ type Mutation {
     input: DeleteSiteInput!
   ): DeleteSitePayload
 
-  """Deletes a single `User` using a unique key."""
-  deleteUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteUserInput!
-  ): DeleteUserPayload
-
   """Deletes a single `HierarchyModule` using a unique key."""
   deleteHierarchyModule(
     """
@@ -28805,14 +28811,6 @@ type Mutation {
     """
     input: DeleteInviteInput!
   ): DeleteInvitePayload
-
-  """Deletes a single `Index` using a unique key."""
-  deleteIndex(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteIndexInput!
-  ): DeleteIndexPayload
 
   """Deletes a single `ForeignKeyConstraint` using a unique key."""
   deleteForeignKeyConstraint(
@@ -29128,6 +29126,33 @@ input VerifyEmailInput {
   token: String
 }
 
+"""The output of our `removeNodeAtPath` mutation."""
+type RemoveNodeAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `removeNodeAtPath` mutation."""
+input RemoveNodeAtPathInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  dbId: UUID
+  root: UUID
+  path: [String]
+}
+
 """The output of our `resetPassword` mutation."""
 type ResetPasswordPayload {
   """
@@ -29222,14 +29247,13 @@ input BootstrapUserInput {
   returnApiKey: Boolean
 }
 
-"""The output of our `removeNodeAtPath` mutation."""
-type RemoveNodeAtPathPayload {
+"""The output of our `setFieldOrder` mutation."""
+type SetFieldOrderPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: UUID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -29237,16 +29261,14 @@ type RemoveNodeAtPathPayload {
   query: Query
 }
 
-"""All input for the `removeNodeAtPath` mutation."""
-input RemoveNodeAtPathInput {
+"""All input for the `setFieldOrder` mutation."""
+input SetFieldOrderInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  dbId: UUID
-  root: UUID
-  path: [String]
+  fieldIds: [UUID]
 }
 
 """The output of our `setDataAtPath` mutation."""
@@ -29348,6 +29370,127 @@ input ProvisionDatabaseWithUserInput {
   pSubdomain: String
   pModules: [String]
   pOptions: JSON
+}
+
+"""The output of our `insertNodeAtPath` mutation."""
+type InsertNodeAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `insertNodeAtPath` mutation."""
+input InsertNodeAtPathInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  dbId: UUID
+  root: UUID
+  path: [String]
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+}
+
+"""The output of our `updateNodeAtPath` mutation."""
+type UpdateNodeAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateNodeAtPath` mutation."""
+input UpdateNodeAtPathInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  dbId: UUID
+  root: UUID
+  path: [String]
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+}
+
+"""The output of our `setAndCommit` mutation."""
+type SetAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `setAndCommit` mutation."""
+input SetAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  dbId: UUID
+  storeId: UUID
+  refname: String
+  path: [String]
+  data: JSON
+  kids: [UUID]
+  ktree: [String]
+}
+
+"""The output of our `applyRls` mutation."""
+type ApplyRlsPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `applyRls` mutation."""
+input ApplyRlsInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  tableId: UUID
+  grants: JSON
+  policyType: String
+  vars: JSON
+  fieldIds: [UUID]
+  permissive: Boolean
+  name: String
 }
 
 """The output of our `signInOneTimeToken` mutation."""
@@ -29553,30 +29696,6 @@ input SignUpInput {
   csrfToken: String
 }
 
-"""The output of our `setFieldOrder` mutation."""
-type SetFieldOrderPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `setFieldOrder` mutation."""
-input SetFieldOrderInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  fieldIds: [UUID]
-}
-
 """The output of our `oneTimeToken` mutation."""
 type OneTimeTokenPayload {
   """
@@ -29603,127 +29722,6 @@ input OneTimeTokenInput {
   password: String
   origin: ConstructiveInternalTypeOrigin
   rememberMe: Boolean
-}
-
-"""The output of our `insertNodeAtPath` mutation."""
-type InsertNodeAtPathPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `insertNodeAtPath` mutation."""
-input InsertNodeAtPathInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  dbId: UUID
-  root: UUID
-  path: [String]
-  data: JSON
-  kids: [UUID]
-  ktree: [String]
-}
-
-"""The output of our `updateNodeAtPath` mutation."""
-type UpdateNodeAtPathPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updateNodeAtPath` mutation."""
-input UpdateNodeAtPathInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  dbId: UUID
-  root: UUID
-  path: [String]
-  data: JSON
-  kids: [UUID]
-  ktree: [String]
-}
-
-"""The output of our `setAndCommit` mutation."""
-type SetAndCommitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `setAndCommit` mutation."""
-input SetAndCommitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  dbId: UUID
-  storeId: UUID
-  refname: String
-  path: [String]
-  data: JSON
-  kids: [UUID]
-  ktree: [String]
-}
-
-"""The output of our `applyRls` mutation."""
-type ApplyRlsPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `applyRls` mutation."""
-input ApplyRlsInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  tableId: UUID
-  grants: JSON
-  policyType: String
-  vars: JSON
-  fieldIds: [UUID]
-  permissive: Boolean
-  name: String
 }
 
 """The output of our `forgotPassword` mutation."""
@@ -31670,6 +31668,54 @@ input ConnectedAccountInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `TableGrant` mutation."""
+type CreateTableGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `TableGrant` that was created by this mutation."""
+  tableGrant: TableGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `TableGrant`. May be used by Relay 1."""
+  tableGrantEdge(
+    """The method to use when ordering `TableGrant`."""
+    orderBy: [TableGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TableGrantEdge
+}
+
+"""All input for the create `TableGrant` mutation."""
+input CreateTableGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `TableGrant` to be created by this mutation."""
+  tableGrant: TableGrantInput!
+}
+
+"""An input for mutations affecting `TableGrant`"""
+input TableGrantInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  privilege: String!
+  granteeName: String!
+  fieldIds: [UUID]
+  isGrant: Boolean
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our create `FieldModule` mutation."""
 type CreateFieldModulePayload {
   """
@@ -31953,52 +31999,159 @@ input MembershipTypeInput {
   prefix: String!
 }
 
-"""The output of our create `TableGrant` mutation."""
-type CreateTableGrantPayload {
+"""The output of our create `Object` mutation."""
+type CreateObjectPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `TableGrant` that was created by this mutation."""
-  tableGrant: TableGrant
+  """The `Object` that was created by this mutation."""
+  object: Object
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `TableGrant`. May be used by Relay 1."""
-  tableGrantEdge(
-    """The method to use when ordering `TableGrant`."""
-    orderBy: [TableGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TableGrantEdge
+  """An edge for our `Object`. May be used by Relay 1."""
+  objectEdge(
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ObjectEdge
 }
 
-"""All input for the create `TableGrant` mutation."""
-input CreateTableGrantInput {
+"""All input for the create `Object` mutation."""
+input CreateObjectInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `TableGrant` to be created by this mutation."""
-  tableGrant: TableGrantInput!
+  """The `Object` to be created by this mutation."""
+  object: ObjectInput!
 }
 
-"""An input for mutations affecting `TableGrant`"""
-input TableGrantInput {
+"""An input for mutations affecting `Object`"""
+input ObjectInput {
+  id: UUID!
+  databaseId: UUID!
+  kids: [UUID]
+  ktree: [String]
+  data: JSON
+  frzn: Boolean
+  createdAt: Datetime
+}
+
+"""The output of our create `FullTextSearch` mutation."""
+type CreateFullTextSearchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FullTextSearch` that was created by this mutation."""
+  fullTextSearch: FullTextSearch
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FullTextSearch`. May be used by Relay 1."""
+  fullTextSearchEdge(
+    """The method to use when ordering `FullTextSearch`."""
+    orderBy: [FullTextSearchOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FullTextSearchEdge
+}
+
+"""All input for the create `FullTextSearch` mutation."""
+input CreateFullTextSearchInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `FullTextSearch` to be created by this mutation."""
+  fullTextSearch: FullTextSearchInput!
+}
+
+"""An input for mutations affecting `FullTextSearch`"""
+input FullTextSearchInput {
   id: UUID
   databaseId: UUID
   tableId: UUID!
-  privilege: String!
-  granteeName: String!
-  fieldIds: [UUID]
-  isGrant: Boolean
+  fieldId: UUID!
+  fieldIds: [UUID]!
+  weights: [String]!
+  langs: [String]!
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our create `Commit` mutation."""
+type CreateCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Commit` that was created by this mutation."""
+  commit: Commit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Commit`. May be used by Relay 1."""
+  commitEdge(
+    """The method to use when ordering `Commit`."""
+    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CommitEdge
+}
+
+"""All input for the create `Commit` mutation."""
+input CreateCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Commit` to be created by this mutation."""
+  commit: CommitInput!
+}
+
+"""An input for mutations affecting `Commit`"""
+input CommitInput {
+  """The primary unique identifier for the commit."""
+  id: UUID
+
+  """The commit message"""
+  message: String
+
+  """The repository identifier"""
+  databaseId: UUID!
+  storeId: UUID!
+
+  """Parent commits"""
+  parentIds: [UUID]
+
+  """The author of the commit"""
+  authorId: UUID
+
+  """The committer of the commit"""
+  committerId: UUID
+
+  """The root of the tree"""
+  treeId: UUID
+  date: Datetime
 }
 
 """The output of our create `AppPermission` mutation."""
@@ -32520,161 +32673,6 @@ input SessionsModuleInput {
   authSettingsTable: String
 }
 
-"""The output of our create `Object` mutation."""
-type CreateObjectPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Object` that was created by this mutation."""
-  object: Object
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Object`. May be used by Relay 1."""
-  objectEdge(
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ObjectEdge
-}
-
-"""All input for the create `Object` mutation."""
-input CreateObjectInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Object` to be created by this mutation."""
-  object: ObjectInput!
-}
-
-"""An input for mutations affecting `Object`"""
-input ObjectInput {
-  id: UUID!
-  databaseId: UUID!
-  kids: [UUID]
-  ktree: [String]
-  data: JSON
-  frzn: Boolean
-  createdAt: Datetime
-}
-
-"""The output of our create `FullTextSearch` mutation."""
-type CreateFullTextSearchPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `FullTextSearch` that was created by this mutation."""
-  fullTextSearch: FullTextSearch
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `FullTextSearch`. May be used by Relay 1."""
-  fullTextSearchEdge(
-    """The method to use when ordering `FullTextSearch`."""
-    orderBy: [FullTextSearchOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): FullTextSearchEdge
-}
-
-"""All input for the create `FullTextSearch` mutation."""
-input CreateFullTextSearchInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `FullTextSearch` to be created by this mutation."""
-  fullTextSearch: FullTextSearchInput!
-}
-
-"""An input for mutations affecting `FullTextSearch`"""
-input FullTextSearchInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  fieldId: UUID!
-  fieldIds: [UUID]!
-  weights: [String]!
-  langs: [String]!
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `Commit` mutation."""
-type CreateCommitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Commit` that was created by this mutation."""
-  commit: Commit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Commit`. May be used by Relay 1."""
-  commitEdge(
-    """The method to use when ordering `Commit`."""
-    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CommitEdge
-}
-
-"""All input for the create `Commit` mutation."""
-input CreateCommitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Commit` to be created by this mutation."""
-  commit: CommitInput!
-}
-
-"""An input for mutations affecting `Commit`"""
-input CommitInput {
-  """The primary unique identifier for the commit."""
-  id: UUID
-
-  """The commit message"""
-  message: String
-
-  """The repository identifier"""
-  databaseId: UUID!
-  storeId: UUID!
-
-  """Parent commits"""
-  parentIds: [UUID]
-
-  """The author of the commit"""
-  authorId: UUID
-
-  """The committer of the commit"""
-  committerId: UUID
-
-  """The root of the tree"""
-  treeId: UUID
-  date: Datetime
-}
-
 """The output of our create `OrgLimit` mutation."""
 type CreateOrgLimitPayload {
   """
@@ -33000,6 +32998,57 @@ input OrgGrantInput {
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our create `DenormalizedTableField` mutation."""
+type CreateDenormalizedTableFieldPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DenormalizedTableField` that was created by this mutation."""
+  denormalizedTableField: DenormalizedTableField
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DenormalizedTableField`. May be used by Relay 1."""
+  denormalizedTableFieldEdge(
+    """The method to use when ordering `DenormalizedTableField`."""
+    orderBy: [DenormalizedTableFieldOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DenormalizedTableFieldEdge
+}
+
+"""All input for the create `DenormalizedTableField` mutation."""
+input CreateDenormalizedTableFieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DenormalizedTableField` to be created by this mutation."""
+  denormalizedTableField: DenormalizedTableFieldInput!
+}
+
+"""An input for mutations affecting `DenormalizedTableField`"""
+input DenormalizedTableFieldInput {
+  id: UUID
+  databaseId: UUID!
+  tableId: UUID!
+  fieldId: UUID!
+  setIds: [UUID]
+  refTableId: UUID!
+  refFieldId: UUID!
+  refIds: [UUID]
+  useUpdates: Boolean
+  updateDefaults: Boolean
+  funcName: String
+  funcOrder: Int
 }
 
 """The output of our create `OrgMembershipDefault` mutation."""
@@ -33463,57 +33512,6 @@ input InvitesModuleInput {
   entityTableId: UUID
 }
 
-"""The output of our create `DenormalizedTableField` mutation."""
-type CreateDenormalizedTableFieldPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `DenormalizedTableField` that was created by this mutation."""
-  denormalizedTableField: DenormalizedTableField
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `DenormalizedTableField`. May be used by Relay 1."""
-  denormalizedTableFieldEdge(
-    """The method to use when ordering `DenormalizedTableField`."""
-    orderBy: [DenormalizedTableFieldOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DenormalizedTableFieldEdge
-}
-
-"""All input for the create `DenormalizedTableField` mutation."""
-input CreateDenormalizedTableFieldInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `DenormalizedTableField` to be created by this mutation."""
-  denormalizedTableField: DenormalizedTableFieldInput!
-}
-
-"""An input for mutations affecting `DenormalizedTableField`"""
-input DenormalizedTableFieldInput {
-  id: UUID
-  databaseId: UUID!
-  tableId: UUID!
-  fieldId: UUID!
-  setIds: [UUID]
-  refTableId: UUID!
-  refFieldId: UUID!
-  refIds: [UUID]
-  useUpdates: Boolean
-  updateDefaults: Boolean
-  funcName: String
-  funcOrder: Int
-}
-
 """The output of our create `Email` mutation."""
 type CreateEmailPayload {
   """
@@ -33915,107 +33913,48 @@ input SecureTableProvisionInput {
   outFields: [UUID]
 }
 
-"""The output of our create `Trigger` mutation."""
-type CreateTriggerPayload {
+"""The output of our create `User` mutation."""
+type CreateUserPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Trigger` that was created by this mutation."""
-  trigger: Trigger
+  """The `User` that was created by this mutation."""
+  user: User
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Trigger`. May be used by Relay 1."""
-  triggerEdge(
-    """The method to use when ordering `Trigger`."""
-    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TriggerEdge
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
 }
 
-"""All input for the create `Trigger` mutation."""
-input CreateTriggerInput {
+"""All input for the create `User` mutation."""
+input CreateUserInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `Trigger` to be created by this mutation."""
-  trigger: TriggerInput!
+  """The `User` to be created by this mutation."""
+  user: UserInput!
 }
 
-"""An input for mutations affecting `Trigger`"""
-input TriggerInput {
+"""An input for mutations affecting `User`"""
+input UserInput {
   id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  name: String!
-  event: String
-  functionName: String
-  smartTags: JSON
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `UniqueConstraint` mutation."""
-type CreateUniqueConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `UniqueConstraint` that was created by this mutation."""
-  uniqueConstraint: UniqueConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
-  uniqueConstraintEdge(
-    """The method to use when ordering `UniqueConstraint`."""
-    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UniqueConstraintEdge
-}
-
-"""All input for the create `UniqueConstraint` mutation."""
-input CreateUniqueConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `UniqueConstraint` to be created by this mutation."""
-  uniqueConstraint: UniqueConstraintInput!
-}
-
-"""An input for mutations affecting `UniqueConstraint`"""
-input UniqueConstraintInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  name: String
-  description: String
-  smartTags: JSON
-  type: String
-  fieldIds: [UUID]!
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
+  username: String
+  displayName: String
+  profilePicture: ConstructiveInternalTypeImage
+  type: Int
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -34072,6 +34011,58 @@ input PrimaryKeyConstraintInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `Trigger` mutation."""
+type CreateTriggerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Trigger` that was created by this mutation."""
+  trigger: Trigger
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Trigger`. May be used by Relay 1."""
+  triggerEdge(
+    """The method to use when ordering `Trigger`."""
+    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TriggerEdge
+}
+
+"""All input for the create `Trigger` mutation."""
+input CreateTriggerInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Trigger` to be created by this mutation."""
+  trigger: TriggerInput!
+}
+
+"""An input for mutations affecting `Trigger`"""
+input TriggerInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String!
+  event: String
+  functionName: String
+  smartTags: JSON
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our create `CheckConstraint` mutation."""
 type CreateCheckConstraintPayload {
   """
@@ -34117,6 +34108,59 @@ input CheckConstraintInput {
   fieldIds: [UUID]!
   expr: JSON
   smartTags: JSON
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `UniqueConstraint` mutation."""
+type CreateUniqueConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `UniqueConstraint` that was created by this mutation."""
+  uniqueConstraint: UniqueConstraint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
+  uniqueConstraintEdge(
+    """The method to use when ordering `UniqueConstraint`."""
+    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UniqueConstraintEdge
+}
+
+"""All input for the create `UniqueConstraint` mutation."""
+input CreateUniqueConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `UniqueConstraint` to be created by this mutation."""
+  uniqueConstraint: UniqueConstraintInput!
+}
+
+"""An input for mutations affecting `UniqueConstraint`"""
+input UniqueConstraintInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String
+  description: String
+  smartTags: JSON
+  type: String
+  fieldIds: [UUID]!
   category: ObjectCategory
   module: String
   scope: Int
@@ -34225,6 +34269,64 @@ input AstMigrationInput {
   action: String
   actionId: UUID
   actorId: UUID
+}
+
+"""The output of our create `Index` mutation."""
+type CreateIndexPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Index` that was created by this mutation."""
+  index: Index
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Index`. May be used by Relay 1."""
+  indexEdge(
+    """The method to use when ordering `Index`."""
+    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IndexEdge
+}
+
+"""All input for the create `Index` mutation."""
+input CreateIndexInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Index` to be created by this mutation."""
+  index: IndexInput!
+}
+
+"""An input for mutations affecting `Index`"""
+input IndexInput {
+  id: UUID
+  databaseId: UUID!
+  tableId: UUID!
+  name: String
+  fieldIds: [UUID]
+  includeFieldIds: [UUID]
+  accessMethod: String
+  indexParams: JSON
+  whereClause: JSON
+  isUnique: Boolean
+  options: JSON
+  opClasses: [String]
+  smartTags: JSON
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our create `AppMembership` mutation."""
@@ -34574,53 +34676,6 @@ input SiteInput {
   dbname: String
 }
 
-"""The output of our create `User` mutation."""
-type CreateUserPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `User` that was created by this mutation."""
-  user: User
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `User`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering `User`."""
-    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UserEdge
-}
-
-"""All input for the create `User` mutation."""
-input CreateUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `User` to be created by this mutation."""
-  user: UserInput!
-}
-
-"""An input for mutations affecting `User`"""
-input UserInput {
-  id: UUID
-  username: String
-  displayName: String
-  profilePicture: ConstructiveInternalTypeImage
-  searchTsv: FullText
-  type: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `HierarchyModule` mutation."""
 type CreateHierarchyModulePayload {
   """
@@ -34745,64 +34800,6 @@ input InviteInput {
 
   """Timestamp after which this invitation can no longer be redeemed"""
   expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `Index` mutation."""
-type CreateIndexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Index` that was created by this mutation."""
-  index: Index
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Index`. May be used by Relay 1."""
-  indexEdge(
-    """The method to use when ordering `Index`."""
-    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): IndexEdge
-}
-
-"""All input for the create `Index` mutation."""
-input CreateIndexInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Index` to be created by this mutation."""
-  index: IndexInput!
-}
-
-"""An input for mutations affecting `Index`"""
-input IndexInput {
-  id: UUID
-  databaseId: UUID!
-  tableId: UUID!
-  name: String
-  fieldIds: [UUID]
-  includeFieldIds: [UUID]
-  accessMethod: String
-  indexParams: JSON
-  whereClause: JSON
-  isUnique: Boolean
-  options: JSON
-  opClasses: [String]
-  smartTags: JSON
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -37446,6 +37443,59 @@ input ConnectedAccountPatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `TableGrant` mutation."""
+type UpdateTableGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `TableGrant` that was updated by this mutation."""
+  tableGrant: TableGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `TableGrant`. May be used by Relay 1."""
+  tableGrantEdge(
+    """The method to use when ordering `TableGrant`."""
+    orderBy: [TableGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TableGrantEdge
+}
+
+"""All input for the `updateTableGrant` mutation."""
+input UpdateTableGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `TableGrant` being updated.
+  """
+  tableGrantPatch: TableGrantPatch!
+}
+
+"""
+Represents an update to a `TableGrant`. Fields that are set will be updated.
+"""
+input TableGrantPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  privilege: String
+  granteeName: String
+  fieldIds: [UUID]
+  isGrant: Boolean
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our update `FieldModule` mutation."""
 type UpdateFieldModulePayload {
   """
@@ -37762,31 +37812,83 @@ input MembershipTypePatch {
   prefix: String
 }
 
-"""The output of our update `TableGrant` mutation."""
-type UpdateTableGrantPayload {
+"""The output of our update `Object` mutation."""
+type UpdateObjectPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `TableGrant` that was updated by this mutation."""
-  tableGrant: TableGrant
+  """The `Object` that was updated by this mutation."""
+  object: Object
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `TableGrant`. May be used by Relay 1."""
-  tableGrantEdge(
-    """The method to use when ordering `TableGrant`."""
-    orderBy: [TableGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TableGrantEdge
+  """An edge for our `Object`. May be used by Relay 1."""
+  objectEdge(
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ObjectEdge
 }
 
-"""All input for the `updateTableGrant` mutation."""
-input UpdateTableGrantInput {
+"""All input for the `updateObject` mutation."""
+input UpdateObjectInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+  databaseId: UUID!
+
+  """
+  An object where the defined keys will be set on the `Object` being updated.
+  """
+  objectPatch: ObjectPatch!
+}
+
+"""
+Represents an update to a `Object`. Fields that are set will be updated.
+"""
+input ObjectPatch {
+  id: UUID
+  databaseId: UUID
+  kids: [UUID]
+  ktree: [String]
+  data: JSON
+  frzn: Boolean
+  createdAt: Datetime
+}
+
+"""The output of our update `FullTextSearch` mutation."""
+type UpdateFullTextSearchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FullTextSearch` that was updated by this mutation."""
+  fullTextSearch: FullTextSearch
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FullTextSearch`. May be used by Relay 1."""
+  fullTextSearchEdge(
+    """The method to use when ordering `FullTextSearch`."""
+    orderBy: [FullTextSearchOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FullTextSearchEdge
+}
+
+"""All input for the `updateFullTextSearch` mutation."""
+input UpdateFullTextSearchInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -37795,24 +37897,95 @@ input UpdateTableGrantInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `TableGrant` being updated.
+  An object where the defined keys will be set on the `FullTextSearch` being updated.
   """
-  tableGrantPatch: TableGrantPatch!
+  fullTextSearchPatch: FullTextSearchPatch!
 }
 
 """
-Represents an update to a `TableGrant`. Fields that are set will be updated.
+Represents an update to a `FullTextSearch`. Fields that are set will be updated.
 """
-input TableGrantPatch {
+input FullTextSearchPatch {
   id: UUID
   databaseId: UUID
   tableId: UUID
-  privilege: String
-  granteeName: String
+  fieldId: UUID
   fieldIds: [UUID]
-  isGrant: Boolean
+  weights: [String]
+  langs: [String]
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our update `Commit` mutation."""
+type UpdateCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Commit` that was updated by this mutation."""
+  commit: Commit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Commit`. May be used by Relay 1."""
+  commitEdge(
+    """The method to use when ordering `Commit`."""
+    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CommitEdge
+}
+
+"""All input for the `updateCommit` mutation."""
+input UpdateCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The primary unique identifier for the commit."""
+  id: UUID!
+
+  """The repository identifier"""
+  databaseId: UUID!
+
+  """
+  An object where the defined keys will be set on the `Commit` being updated.
+  """
+  commitPatch: CommitPatch!
+}
+
+"""
+Represents an update to a `Commit`. Fields that are set will be updated.
+"""
+input CommitPatch {
+  """The primary unique identifier for the commit."""
+  id: UUID
+
+  """The commit message"""
+  message: String
+
+  """The repository identifier"""
+  databaseId: UUID
+  storeId: UUID
+
+  """Parent commits"""
+  parentIds: [UUID]
+
+  """The author of the commit"""
+  authorId: UUID
+
+  """The committer of the commit"""
+  committerId: UUID
+
+  """The root of the tree"""
+  treeId: UUID
+  date: Datetime
 }
 
 """The output of our update `AppPermission` mutation."""
@@ -38392,182 +38565,6 @@ input SessionsModulePatch {
   authSettingsTable: String
 }
 
-"""The output of our update `Object` mutation."""
-type UpdateObjectPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Object` that was updated by this mutation."""
-  object: Object
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Object`. May be used by Relay 1."""
-  objectEdge(
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ObjectEdge
-}
-
-"""All input for the `updateObject` mutation."""
-input UpdateObjectInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-  databaseId: UUID!
-
-  """
-  An object where the defined keys will be set on the `Object` being updated.
-  """
-  objectPatch: ObjectPatch!
-}
-
-"""
-Represents an update to a `Object`. Fields that are set will be updated.
-"""
-input ObjectPatch {
-  id: UUID
-  databaseId: UUID
-  kids: [UUID]
-  ktree: [String]
-  data: JSON
-  frzn: Boolean
-  createdAt: Datetime
-}
-
-"""The output of our update `FullTextSearch` mutation."""
-type UpdateFullTextSearchPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `FullTextSearch` that was updated by this mutation."""
-  fullTextSearch: FullTextSearch
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `FullTextSearch`. May be used by Relay 1."""
-  fullTextSearchEdge(
-    """The method to use when ordering `FullTextSearch`."""
-    orderBy: [FullTextSearchOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): FullTextSearchEdge
-}
-
-"""All input for the `updateFullTextSearch` mutation."""
-input UpdateFullTextSearchInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `FullTextSearch` being updated.
-  """
-  fullTextSearchPatch: FullTextSearchPatch!
-}
-
-"""
-Represents an update to a `FullTextSearch`. Fields that are set will be updated.
-"""
-input FullTextSearchPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  fieldId: UUID
-  fieldIds: [UUID]
-  weights: [String]
-  langs: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `Commit` mutation."""
-type UpdateCommitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Commit` that was updated by this mutation."""
-  commit: Commit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Commit`. May be used by Relay 1."""
-  commitEdge(
-    """The method to use when ordering `Commit`."""
-    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CommitEdge
-}
-
-"""All input for the `updateCommit` mutation."""
-input UpdateCommitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The primary unique identifier for the commit."""
-  id: UUID!
-
-  """The repository identifier"""
-  databaseId: UUID!
-
-  """
-  An object where the defined keys will be set on the `Commit` being updated.
-  """
-  commitPatch: CommitPatch!
-}
-
-"""
-Represents an update to a `Commit`. Fields that are set will be updated.
-"""
-input CommitPatch {
-  """The primary unique identifier for the commit."""
-  id: UUID
-
-  """The commit message"""
-  message: String
-
-  """The repository identifier"""
-  databaseId: UUID
-  storeId: UUID
-
-  """Parent commits"""
-  parentIds: [UUID]
-
-  """The author of the commit"""
-  authorId: UUID
-
-  """The committer of the commit"""
-  committerId: UUID
-
-  """The root of the tree"""
-  treeId: UUID
-  date: Datetime
-}
-
 """The output of our update `OrgLimit` mutation."""
 type UpdateOrgLimitPayload {
   """
@@ -38925,6 +38922,62 @@ input OrgGrantPatch {
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our update `DenormalizedTableField` mutation."""
+type UpdateDenormalizedTableFieldPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DenormalizedTableField` that was updated by this mutation."""
+  denormalizedTableField: DenormalizedTableField
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DenormalizedTableField`. May be used by Relay 1."""
+  denormalizedTableFieldEdge(
+    """The method to use when ordering `DenormalizedTableField`."""
+    orderBy: [DenormalizedTableFieldOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DenormalizedTableFieldEdge
+}
+
+"""All input for the `updateDenormalizedTableField` mutation."""
+input UpdateDenormalizedTableFieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `DenormalizedTableField` being updated.
+  """
+  denormalizedTableFieldPatch: DenormalizedTableFieldPatch!
+}
+
+"""
+Represents an update to a `DenormalizedTableField`. Fields that are set will be updated.
+"""
+input DenormalizedTableFieldPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  fieldId: UUID
+  setIds: [UUID]
+  refTableId: UUID
+  refFieldId: UUID
+  refIds: [UUID]
+  useUpdates: Boolean
+  updateDefaults: Boolean
+  funcName: String
+  funcOrder: Int
 }
 
 """The output of our update `OrgMembershipDefault` mutation."""
@@ -39380,62 +39433,6 @@ input InvitesModulePatch {
   entityTableId: UUID
 }
 
-"""The output of our update `DenormalizedTableField` mutation."""
-type UpdateDenormalizedTableFieldPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `DenormalizedTableField` that was updated by this mutation."""
-  denormalizedTableField: DenormalizedTableField
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `DenormalizedTableField`. May be used by Relay 1."""
-  denormalizedTableFieldEdge(
-    """The method to use when ordering `DenormalizedTableField`."""
-    orderBy: [DenormalizedTableFieldOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DenormalizedTableFieldEdge
-}
-
-"""All input for the `updateDenormalizedTableField` mutation."""
-input UpdateDenormalizedTableFieldInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `DenormalizedTableField` being updated.
-  """
-  denormalizedTableFieldPatch: DenormalizedTableFieldPatch!
-}
-
-"""
-Represents an update to a `DenormalizedTableField`. Fields that are set will be updated.
-"""
-input DenormalizedTableFieldPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  fieldId: UUID
-  setIds: [UUID]
-  refTableId: UUID
-  refFieldId: UUID
-  refIds: [UUID]
-  useUpdates: Boolean
-  updateDefaults: Boolean
-  funcName: String
-  funcOrder: Int
-}
-
 """The output of our update `Email` mutation."""
 type UpdateEmailPayload {
   """
@@ -39867,31 +39864,31 @@ input SecureTableProvisionPatch {
   outFields: [UUID]
 }
 
-"""The output of our update `Trigger` mutation."""
-type UpdateTriggerPayload {
+"""The output of our update `User` mutation."""
+type UpdateUserPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Trigger` that was updated by this mutation."""
-  trigger: Trigger
+  """The `User` that was updated by this mutation."""
+  user: User
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Trigger`. May be used by Relay 1."""
-  triggerEdge(
-    """The method to use when ordering `Trigger`."""
-    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TriggerEdge
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
 }
 
-"""All input for the `updateTrigger` mutation."""
-input UpdateTriggerInput {
+"""All input for the `updateUser` mutation."""
+input UpdateUserInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -39900,86 +39897,23 @@ input UpdateTriggerInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `Trigger` being updated.
+  An object where the defined keys will be set on the `User` being updated.
   """
-  triggerPatch: TriggerPatch!
+  userPatch: UserPatch!
 }
 
-"""
-Represents an update to a `Trigger`. Fields that are set will be updated.
-"""
-input TriggerPatch {
+"""Represents an update to a `User`. Fields that are set will be updated."""
+input UserPatch {
   id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  event: String
-  functionName: String
-  smartTags: JSON
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
+  username: String
+  displayName: String
+  profilePicture: ConstructiveInternalTypeImage
+  type: Int
   createdAt: Datetime
   updatedAt: Datetime
-}
 
-"""The output of our update `UniqueConstraint` mutation."""
-type UpdateUniqueConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `UniqueConstraint` that was updated by this mutation."""
-  uniqueConstraint: UniqueConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
-  uniqueConstraintEdge(
-    """The method to use when ordering `UniqueConstraint`."""
-    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UniqueConstraintEdge
-}
-
-"""All input for the `updateUniqueConstraint` mutation."""
-input UpdateUniqueConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `UniqueConstraint` being updated.
-  """
-  uniqueConstraintPatch: UniqueConstraintPatch!
-}
-
-"""
-Represents an update to a `UniqueConstraint`. Fields that are set will be updated.
-"""
-input UniqueConstraintPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  description: String
-  smartTags: JSON
-  type: String
-  fieldIds: [UUID]
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
+  """File upload for the `profilePicture` field."""
+  profilePictureUpload: Upload
 }
 
 """The output of our update `PrimaryKeyConstraint` mutation."""
@@ -40030,6 +39964,63 @@ input PrimaryKeyConstraintPatch {
   name: String
   type: String
   fieldIds: [UUID]
+  smartTags: JSON
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `Trigger` mutation."""
+type UpdateTriggerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Trigger` that was updated by this mutation."""
+  trigger: Trigger
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Trigger`. May be used by Relay 1."""
+  triggerEdge(
+    """The method to use when ordering `Trigger`."""
+    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TriggerEdge
+}
+
+"""All input for the `updateTrigger` mutation."""
+input UpdateTriggerInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Trigger` being updated.
+  """
+  triggerPatch: TriggerPatch!
+}
+
+"""
+Represents an update to a `Trigger`. Fields that are set will be updated.
+"""
+input TriggerPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  event: String
+  functionName: String
   smartTags: JSON
   category: ObjectCategory
   module: String
@@ -40097,6 +40088,64 @@ input CheckConstraintPatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `UniqueConstraint` mutation."""
+type UpdateUniqueConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `UniqueConstraint` that was updated by this mutation."""
+  uniqueConstraint: UniqueConstraint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
+  uniqueConstraintEdge(
+    """The method to use when ordering `UniqueConstraint`."""
+    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UniqueConstraintEdge
+}
+
+"""All input for the `updateUniqueConstraint` mutation."""
+input UpdateUniqueConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `UniqueConstraint` being updated.
+  """
+  uniqueConstraintPatch: UniqueConstraintPatch!
+}
+
+"""
+Represents an update to a `UniqueConstraint`. Fields that are set will be updated.
+"""
+input UniqueConstraintPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  description: String
+  smartTags: JSON
+  type: String
+  fieldIds: [UUID]
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our update `Policy` mutation."""
 type UpdatePolicyPayload {
   """
@@ -40149,6 +40198,69 @@ input PolicyPatch {
   disabled: Boolean
   policyType: String
   data: JSON
+  smartTags: JSON
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `Index` mutation."""
+type UpdateIndexPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Index` that was updated by this mutation."""
+  index: Index
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Index`. May be used by Relay 1."""
+  indexEdge(
+    """The method to use when ordering `Index`."""
+    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IndexEdge
+}
+
+"""All input for the `updateIndex` mutation."""
+input UpdateIndexInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Index` being updated.
+  """
+  indexPatch: IndexPatch!
+}
+
+"""
+Represents an update to a `Index`. Fields that are set will be updated.
+"""
+input IndexPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  fieldIds: [UUID]
+  includeFieldIds: [UUID]
+  accessMethod: String
+  indexParams: JSON
+  whereClause: JSON
+  isUnique: Boolean
+  options: JSON
+  opClasses: [String]
   smartTags: JSON
   category: ObjectCategory
   module: String
@@ -40545,59 +40657,6 @@ input SitePatch {
   logoUpload: Upload
 }
 
-"""The output of our update `User` mutation."""
-type UpdateUserPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `User` that was updated by this mutation."""
-  user: User
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `User`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering `User`."""
-    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UserEdge
-}
-
-"""All input for the `updateUser` mutation."""
-input UpdateUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `User` being updated.
-  """
-  userPatch: UserPatch!
-}
-
-"""Represents an update to a `User`. Fields that are set will be updated."""
-input UserPatch {
-  id: UUID
-  username: String
-  displayName: String
-  profilePicture: ConstructiveInternalTypeImage
-  searchTsv: FullText
-  type: Int
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """File upload for the `profilePicture` field."""
-  profilePictureUpload: Upload
-}
-
 """The output of our update `HierarchyModule` mutation."""
 type UpdateHierarchyModulePayload {
   """
@@ -40732,69 +40791,6 @@ input InvitePatch {
 
   """Timestamp after which this invitation can no longer be redeemed"""
   expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `Index` mutation."""
-type UpdateIndexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Index` that was updated by this mutation."""
-  index: Index
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Index`. May be used by Relay 1."""
-  indexEdge(
-    """The method to use when ordering `Index`."""
-    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): IndexEdge
-}
-
-"""All input for the `updateIndex` mutation."""
-input UpdateIndexInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Index` being updated.
-  """
-  indexPatch: IndexPatch!
-}
-
-"""
-Represents an update to a `Index`. Fields that are set will be updated.
-"""
-input IndexPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  fieldIds: [UUID]
-  includeFieldIds: [UUID]
-  accessMethod: String
-  indexParams: JSON
-  whereClause: JSON
-  isUnique: Boolean
-  options: JSON
-  opClasses: [String]
-  smartTags: JSON
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -42749,6 +42745,39 @@ input DeleteConnectedAccountInput {
   id: UUID!
 }
 
+"""The output of our delete `TableGrant` mutation."""
+type DeleteTableGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `TableGrant` that was deleted by this mutation."""
+  tableGrant: TableGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `TableGrant`. May be used by Relay 1."""
+  tableGrantEdge(
+    """The method to use when ordering `TableGrant`."""
+    orderBy: [TableGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TableGrantEdge
+}
+
+"""All input for the `deleteTableGrant` mutation."""
+input DeleteTableGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `FieldModule` mutation."""
 type DeleteFieldModulePayload {
   """
@@ -42922,37 +42951,109 @@ input DeleteMembershipTypeInput {
   id: Int!
 }
 
-"""The output of our delete `TableGrant` mutation."""
-type DeleteTableGrantPayload {
+"""The output of our delete `Object` mutation."""
+type DeleteObjectPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `TableGrant` that was deleted by this mutation."""
-  tableGrant: TableGrant
+  """The `Object` that was deleted by this mutation."""
+  object: Object
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `TableGrant`. May be used by Relay 1."""
-  tableGrantEdge(
-    """The method to use when ordering `TableGrant`."""
-    orderBy: [TableGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TableGrantEdge
+  """An edge for our `Object`. May be used by Relay 1."""
+  objectEdge(
+    """The method to use when ordering `Object`."""
+    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ObjectEdge
 }
 
-"""All input for the `deleteTableGrant` mutation."""
-input DeleteTableGrantInput {
+"""All input for the `deleteObject` mutation."""
+input DeleteObjectInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   id: UUID!
+  databaseId: UUID!
+}
+
+"""The output of our delete `FullTextSearch` mutation."""
+type DeleteFullTextSearchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `FullTextSearch` that was deleted by this mutation."""
+  fullTextSearch: FullTextSearch
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `FullTextSearch`. May be used by Relay 1."""
+  fullTextSearchEdge(
+    """The method to use when ordering `FullTextSearch`."""
+    orderBy: [FullTextSearchOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): FullTextSearchEdge
+}
+
+"""All input for the `deleteFullTextSearch` mutation."""
+input DeleteFullTextSearchInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Commit` mutation."""
+type DeleteCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Commit` that was deleted by this mutation."""
+  commit: Commit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Commit`. May be used by Relay 1."""
+  commitEdge(
+    """The method to use when ordering `Commit`."""
+    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CommitEdge
+}
+
+"""All input for the `deleteCommit` mutation."""
+input DeleteCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The primary unique identifier for the commit."""
+  id: UUID!
+
+  """The repository identifier"""
+  databaseId: UUID!
 }
 
 """The output of our delete `AppPermission` mutation."""
@@ -43287,111 +43388,6 @@ input DeleteSessionsModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `Object` mutation."""
-type DeleteObjectPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Object` that was deleted by this mutation."""
-  object: Object
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Object`. May be used by Relay 1."""
-  objectEdge(
-    """The method to use when ordering `Object`."""
-    orderBy: [ObjectOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ObjectEdge
-}
-
-"""All input for the `deleteObject` mutation."""
-input DeleteObjectInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-  databaseId: UUID!
-}
-
-"""The output of our delete `FullTextSearch` mutation."""
-type DeleteFullTextSearchPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `FullTextSearch` that was deleted by this mutation."""
-  fullTextSearch: FullTextSearch
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `FullTextSearch`. May be used by Relay 1."""
-  fullTextSearchEdge(
-    """The method to use when ordering `FullTextSearch`."""
-    orderBy: [FullTextSearchOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): FullTextSearchEdge
-}
-
-"""All input for the `deleteFullTextSearch` mutation."""
-input DeleteFullTextSearchInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `Commit` mutation."""
-type DeleteCommitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Commit` that was deleted by this mutation."""
-  commit: Commit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Commit`. May be used by Relay 1."""
-  commitEdge(
-    """The method to use when ordering `Commit`."""
-    orderBy: [CommitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CommitEdge
-}
-
-"""All input for the `deleteCommit` mutation."""
-input DeleteCommitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The primary unique identifier for the commit."""
-  id: UUID!
-
-  """The repository identifier"""
-  databaseId: UUID!
-}
-
 """The output of our delete `OrgLimit` mutation."""
 type DeleteOrgLimitPayload {
   """
@@ -43584,6 +43580,39 @@ type DeleteOrgGrantPayload {
 
 """All input for the `deleteOrgGrant` mutation."""
 input DeleteOrgGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `DenormalizedTableField` mutation."""
+type DeleteDenormalizedTableFieldPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DenormalizedTableField` that was deleted by this mutation."""
+  denormalizedTableField: DenormalizedTableField
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DenormalizedTableField`. May be used by Relay 1."""
+  denormalizedTableFieldEdge(
+    """The method to use when ordering `DenormalizedTableField`."""
+    orderBy: [DenormalizedTableFieldOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DenormalizedTableFieldEdge
+}
+
+"""All input for the `deleteDenormalizedTableField` mutation."""
+input DeleteDenormalizedTableFieldInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -43823,39 +43852,6 @@ input DeleteInvitesModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `DenormalizedTableField` mutation."""
-type DeleteDenormalizedTableFieldPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `DenormalizedTableField` that was deleted by this mutation."""
-  denormalizedTableField: DenormalizedTableField
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `DenormalizedTableField`. May be used by Relay 1."""
-  denormalizedTableFieldEdge(
-    """The method to use when ordering `DenormalizedTableField`."""
-    orderBy: [DenormalizedTableFieldOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): DenormalizedTableFieldEdge
-}
-
-"""All input for the `deleteDenormalizedTableField` mutation."""
-input DeleteDenormalizedTableFieldInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `Email` mutation."""
 type DeleteEmailPayload {
   """
@@ -44056,64 +44052,31 @@ input DeleteSecureTableProvisionInput {
   id: UUID!
 }
 
-"""The output of our delete `Trigger` mutation."""
-type DeleteTriggerPayload {
+"""The output of our delete `User` mutation."""
+type DeleteUserPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Trigger` that was deleted by this mutation."""
-  trigger: Trigger
+  """The `User` that was deleted by this mutation."""
+  user: User
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Trigger`. May be used by Relay 1."""
-  triggerEdge(
-    """The method to use when ordering `Trigger`."""
-    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TriggerEdge
+  """An edge for our `User`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering `User`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
 }
 
-"""All input for the `deleteTrigger` mutation."""
-input DeleteTriggerInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `UniqueConstraint` mutation."""
-type DeleteUniqueConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `UniqueConstraint` that was deleted by this mutation."""
-  uniqueConstraint: UniqueConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
-  uniqueConstraintEdge(
-    """The method to use when ordering `UniqueConstraint`."""
-    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UniqueConstraintEdge
-}
-
-"""All input for the `deleteUniqueConstraint` mutation."""
-input DeleteUniqueConstraintInput {
+"""All input for the `deleteUser` mutation."""
+input DeleteUserInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -44155,6 +44118,39 @@ input DeletePrimaryKeyConstraintInput {
   id: UUID!
 }
 
+"""The output of our delete `Trigger` mutation."""
+type DeleteTriggerPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Trigger` that was deleted by this mutation."""
+  trigger: Trigger
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Trigger`. May be used by Relay 1."""
+  triggerEdge(
+    """The method to use when ordering `Trigger`."""
+    orderBy: [TriggerOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TriggerEdge
+}
+
+"""All input for the `deleteTrigger` mutation."""
+input DeleteTriggerInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `CheckConstraint` mutation."""
 type DeleteCheckConstraintPayload {
   """
@@ -44188,6 +44184,39 @@ input DeleteCheckConstraintInput {
   id: UUID!
 }
 
+"""The output of our delete `UniqueConstraint` mutation."""
+type DeleteUniqueConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `UniqueConstraint` that was deleted by this mutation."""
+  uniqueConstraint: UniqueConstraint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `UniqueConstraint`. May be used by Relay 1."""
+  uniqueConstraintEdge(
+    """The method to use when ordering `UniqueConstraint`."""
+    orderBy: [UniqueConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UniqueConstraintEdge
+}
+
+"""All input for the `deleteUniqueConstraint` mutation."""
+input DeleteUniqueConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `Policy` mutation."""
 type DeletePolicyPayload {
   """
@@ -44213,6 +44242,39 @@ type DeletePolicyPayload {
 
 """All input for the `deletePolicy` mutation."""
 input DeletePolicyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Index` mutation."""
+type DeleteIndexPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Index` that was deleted by this mutation."""
+  index: Index
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Index`. May be used by Relay 1."""
+  indexEdge(
+    """The method to use when ordering `Index`."""
+    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): IndexEdge
+}
+
+"""All input for the `deleteIndex` mutation."""
+input DeleteIndexInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -44390,39 +44452,6 @@ input DeleteSiteInput {
   id: UUID!
 }
 
-"""The output of our delete `User` mutation."""
-type DeleteUserPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `User` that was deleted by this mutation."""
-  user: User
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `User`. May be used by Relay 1."""
-  userEdge(
-    """The method to use when ordering `User`."""
-    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): UserEdge
-}
-
-"""All input for the `deleteUser` mutation."""
-input DeleteUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `HierarchyModule` mutation."""
 type DeleteHierarchyModulePayload {
   """
@@ -44481,39 +44510,6 @@ type DeleteInvitePayload {
 
 """All input for the `deleteInvite` mutation."""
 input DeleteInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `Index` mutation."""
-type DeleteIndexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Index` that was deleted by this mutation."""
-  index: Index
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Index`. May be used by Relay 1."""
-  indexEdge(
-    """The method to use when ordering `Index`."""
-    orderBy: [IndexOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): IndexEdge
-}
-
-"""All input for the `deleteIndex` mutation."""
-input DeleteIndexInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
