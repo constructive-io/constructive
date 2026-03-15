@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.4](https://github.com/constructive-io/constructive/compare/pg-cache@3.3.3...pg-cache@3.3.4) (2026-03-15)
+
+**Note:** Version bump only for package pg-cache
+
 ## [3.3.3](https://github.com/constructive-io/constructive/compare/pg-cache@3.3.2...pg-cache@3.3.3) (2026-03-15)
 
 **Note:** Version bump only for package pg-cache

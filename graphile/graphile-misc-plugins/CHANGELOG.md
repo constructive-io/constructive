@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.4](https://github.com/constructive-io/constructive/compare/graphile-misc-plugins@1.4.3...graphile-misc-plugins@1.4.4) (2026-03-15)
+
+**Note:** Version bump only for package graphile-misc-plugins
+
 ## [1.4.3](https://github.com/constructive-io/constructive/compare/graphile-misc-plugins@1.4.2...graphile-misc-plugins@1.4.3) (2026-03-15)
 
 ### Bug Fixes

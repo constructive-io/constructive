@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/constructive-io/constructive/compare/graphile-search@1.1.1...graphile-search@1.1.2) (2026-03-15)
+
+### Bug Fixes
+
+- make trgm adapter supplementary and filter search fields from codegen docs ([4393bf8](https://github.com/constructive-io/constructive/commit/4393bf8e93f8bde912250d95ab5c95b4e91716d4))
+- pgvector should not trigger supplementary adapters like trgm ([c749764](https://github.com/constructive-io/constructive/commit/c74976461d70b7a40c37618e9625756892738fe7))
+
 ## [1.1.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.1.0...graphile-search@1.1.1) (2026-03-15)
 
 ### Bug Fixes

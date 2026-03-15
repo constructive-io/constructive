@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.4...@constructive-io/graphql-codegen@4.15.0) (2026-03-15)
+
+### Bug Fixes
+
+- make trgm adapter supplementary and filter search fields from codegen docs ([4393bf8](https://github.com/constructive-io/constructive/commit/4393bf8e93f8bde912250d95ab5c95b4e91716d4))
+
+### Features
+
+- add PostGIS, pgvector, and Unified Search field sections to all generated docs ([e8c5508](https://github.com/constructive-io/constructive/commit/e8c5508479890bd1a8212d013c3ff6ed0cfef7f1))
+
 ## [4.14.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.3...@constructive-io/graphql-codegen@4.14.4) (2026-03-15)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
