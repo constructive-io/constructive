@@ -22,6 +22,16 @@ export interface GetAllRecord {
   path: string[] | null;
   data: unknown | null;
 }
+export interface Object {
+  hashUuid: string | null;
+  id: string | null;
+  databaseId: string | null;
+  kids: string[] | null;
+  ktree: string[] | null;
+  data: unknown | null;
+  frzn: boolean | null;
+  createdAt: string | null;
+}
 export interface AppPermission {
   id: string | null;
   name: string | null;
@@ -39,16 +49,6 @@ export interface OrgPermission {
   description: string | null;
   descriptionTrgmSimilarity: number | null;
   searchScore: number | null;
-}
-export interface Object {
-  hashUuid: string | null;
-  id: string | null;
-  databaseId: string | null;
-  kids: string[] | null;
-  ktree: string[] | null;
-  data: unknown | null;
-  frzn: boolean | null;
-  createdAt: string | null;
 }
 export interface AppLevelRequirement {
   id: string | null;
@@ -1319,6 +1319,19 @@ export interface MembershipType {
   prefixTrgmSimilarity: number | null;
   searchScore: number | null;
 }
+export interface Commit {
+  id: string | null;
+  message: string | null;
+  databaseId: string | null;
+  storeId: string | null;
+  parentIds: string[] | null;
+  authorId: string | null;
+  committerId: string | null;
+  treeId: string | null;
+  date: string | null;
+  messageTrgmSimilarity: number | null;
+  searchScore: number | null;
+}
 export interface AppMembershipDefault {
   id: string | null;
   createdAt: string | null;
@@ -1344,19 +1357,6 @@ export interface RlsModule {
   authenticateStrictTrgmSimilarity: number | null;
   currentRoleTrgmSimilarity: number | null;
   currentRoleIdTrgmSimilarity: number | null;
-  searchScore: number | null;
-}
-export interface Commit {
-  id: string | null;
-  message: string | null;
-  databaseId: string | null;
-  storeId: string | null;
-  parentIds: string[] | null;
-  authorId: string | null;
-  committerId: string | null;
-  treeId: string | null;
-  date: string | null;
-  messageTrgmSimilarity: number | null;
   searchScore: number | null;
 }
 export interface OrgMembershipDefault {
@@ -1424,6 +1424,19 @@ export interface Email {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface User {
+  id: string | null;
+  username: string | null;
+  displayName: string | null;
+  profilePicture: ConstructiveInternalTypeImage | null;
+  searchTsv: string | null;
+  type: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  searchTsvRank: number | null;
+  displayNameTrgmSimilarity: number | null;
+  searchScore: number | null;
+}
 export interface AstMigration {
   id: number | null;
   databaseId: string | null;
@@ -1458,19 +1471,6 @@ export interface AppMembership {
   granted: string | null;
   actorId: string | null;
   profileId: string | null;
-}
-export interface User {
-  id: string | null;
-  username: string | null;
-  displayName: string | null;
-  profilePicture: ConstructiveInternalTypeImage | null;
-  searchTsv: string | null;
-  type: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  searchTsvRank: number | null;
-  displayNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface HierarchyModule {
   id: string | null;

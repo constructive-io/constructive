@@ -8,9 +8,9 @@ import type { OrmClientConfig } from './client';
 import { OrgGetManagersRecordModel } from './models/orgGetManagersRecord';
 import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord';
 import { GetAllRecordModel } from './models/getAllRecord';
+import { ObjectModel } from './models/object';
 import { AppPermissionModel } from './models/appPermission';
 import { OrgPermissionModel } from './models/orgPermission';
-import { ObjectModel } from './models/object';
 import { AppLevelRequirementModel } from './models/appLevelRequirement';
 import { DatabaseModel } from './models/database';
 import { SchemaModel } from './models/schema';
@@ -96,17 +96,17 @@ import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { ConnectedAccountModel } from './models/connectedAccount';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { MembershipTypeModel } from './models/membershipType';
+import { CommitModel } from './models/commit';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { RlsModuleModel } from './models/rlsModule';
-import { CommitModel } from './models/commit';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { AuditLogModel } from './models/auditLog';
 import { AppLevelModel } from './models/appLevel';
 import { SqlMigrationModel } from './models/sqlMigration';
 import { EmailModel } from './models/email';
+import { UserModel } from './models/user';
 import { AstMigrationModel } from './models/astMigration';
 import { AppMembershipModel } from './models/appMembership';
-import { UserModel } from './models/user';
 import { HierarchyModuleModel } from './models/hierarchyModule';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -147,9 +147,9 @@ export function createClient(config: OrmClientConfig) {
     orgGetManagersRecord: new OrgGetManagersRecordModel(client),
     orgGetSubordinatesRecord: new OrgGetSubordinatesRecordModel(client),
     getAllRecord: new GetAllRecordModel(client),
+    object: new ObjectModel(client),
     appPermission: new AppPermissionModel(client),
     orgPermission: new OrgPermissionModel(client),
-    object: new ObjectModel(client),
     appLevelRequirement: new AppLevelRequirementModel(client),
     database: new DatabaseModel(client),
     schema: new SchemaModel(client),
@@ -235,17 +235,17 @@ export function createClient(config: OrmClientConfig) {
     connectedAccount: new ConnectedAccountModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     membershipType: new MembershipTypeModel(client),
+    commit: new CommitModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     rlsModule: new RlsModuleModel(client),
-    commit: new CommitModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     auditLog: new AuditLogModel(client),
     appLevel: new AppLevelModel(client),
     sqlMigration: new SqlMigrationModel(client),
     email: new EmailModel(client),
+    user: new UserModel(client),
     astMigration: new AstMigrationModel(client),
     appMembership: new AppMembershipModel(client),
-    user: new UserModel(client),
     hierarchyModule: new HierarchyModuleModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

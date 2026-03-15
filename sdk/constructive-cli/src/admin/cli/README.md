@@ -61,9 +61,9 @@ csdk auth set-token <your-token>
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
 | `org-is-manager-of` | orgIsManagerOf |
-| `steps-achieved` | stepsAchieved |
 | `app-permissions-get-mask` | appPermissionsGetMask |
 | `org-permissions-get-mask` | orgPermissionsGetMask |
+| `steps-achieved` | stepsAchieved |
 | `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
 | `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
 | `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
@@ -1020,18 +1020,6 @@ orgIsManagerOf
   | `--pUserId` | UUID |
   | `--pMaxDepth` | Int |
 
-### `steps-achieved`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--vlevel` | String |
-  | `--vroleId` | UUID |
-
 ### `app-permissions-get-mask`
 
 appPermissionsGetMask
@@ -1053,6 +1041,18 @@ orgPermissionsGetMask
   | Argument | Type |
   |----------|------|
   | `--ids` | UUID |
+
+### `steps-achieved`
+
+stepsAchieved
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
 
 ### `app-permissions-get-mask-by-names`
 

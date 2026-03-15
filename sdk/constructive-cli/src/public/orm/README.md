@@ -24,9 +24,9 @@ const db = createClient({
 | `orgGetManagersRecord` | findMany, findOne, create, update, delete |
 | `orgGetSubordinatesRecord` | findMany, findOne, create, update, delete |
 | `getAllRecord` | findMany, findOne, create, update, delete |
+| `object` | findMany, findOne, create, update, delete |
 | `appPermission` | findMany, findOne, create, update, delete |
 | `orgPermission` | findMany, findOne, create, update, delete |
-| `object` | findMany, findOne, create, update, delete |
 | `appLevelRequirement` | findMany, findOne, create, update, delete |
 | `database` | findMany, findOne, create, update, delete |
 | `schema` | findMany, findOne, create, update, delete |
@@ -112,17 +112,17 @@ const db = createClient({
 | `connectedAccount` | findMany, findOne, create, update, delete |
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `membershipType` | findMany, findOne, create, update, delete |
+| `commit` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `rlsModule` | findMany, findOne, create, update, delete |
-| `commit` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
 | `appLevel` | findMany, findOne, create, update, delete |
 | `sqlMigration` | findMany, findOne, create, update, delete |
 | `email` | findMany, findOne, create, update, delete |
+| `user` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
 | `appMembership` | findMany, findOne, create, update, delete |
-| `user` | findMany, findOne, create, update, delete |
 | `hierarchyModule` | findMany, findOne, create, update, delete |
 
 ## Table Operations
@@ -217,6 +217,42 @@ const updated = await db.getAllRecord.update({ where: { id: '<value>' }, data: {
 const deleted = await db.getAllRecord.delete({ where: { id: '<value>' } }).execute();
 ```
 
+### `db.object`
+
+CRUD operations for Object records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `hashUuid` | UUID | Yes |
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `kids` | UUID | Yes |
+| `ktree` | String | Yes |
+| `data` | JSON | Yes |
+| `frzn` | Boolean | Yes |
+| `createdAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all object records
+const items = await db.object.findMany({ select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
+
+// Get one by id
+const item = await db.object.findOne({ id: '<value>', select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
+
+// Create
+const created = await db.object.create({ data: { hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<value>', data: '<value>', frzn: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.object.update({ where: { id: '<value>' }, data: { hashUuid: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.object.delete({ where: { id: '<value>' } }).execute();
+```
+
 ### `db.appPermission`
 
 CRUD operations for AppPermission records.
@@ -285,42 +321,6 @@ const updated = await db.orgPermission.update({ where: { id: '<value>' }, data: 
 
 // Delete
 const deleted = await db.orgPermission.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.object`
-
-CRUD operations for Object records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `hashUuid` | UUID | Yes |
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `kids` | UUID | Yes |
-| `ktree` | String | Yes |
-| `data` | JSON | Yes |
-| `frzn` | Boolean | Yes |
-| `createdAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all object records
-const items = await db.object.findMany({ select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
-
-// Get one by id
-const item = await db.object.findOne({ id: '<value>', select: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } }).execute();
-
-// Create
-const created = await db.object.create({ data: { hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<value>', data: '<value>', frzn: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.object.update({ where: { id: '<value>' }, data: { hashUuid: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.object.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.appLevelRequirement`
@@ -3802,6 +3802,45 @@ const updated = await db.membershipType.update({ where: { id: '<value>' }, data:
 const deleted = await db.membershipType.delete({ where: { id: '<value>' } }).execute();
 ```
 
+### `db.commit`
+
+CRUD operations for Commit records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `message` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `storeId` | UUID | Yes |
+| `parentIds` | UUID | Yes |
+| `authorId` | UUID | Yes |
+| `committerId` | UUID | Yes |
+| `treeId` | UUID | Yes |
+| `date` | Datetime | Yes |
+| `messageTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all commit records
+const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.commit.findOne({ id: '<value>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.commit.update({ where: { id: '<value>' }, data: { message: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.commit.delete({ where: { id: '<value>' } }).execute();
+```
+
 ### `db.appMembershipDefault`
 
 CRUD operations for AppMembershipDefault records.
@@ -3879,45 +3918,6 @@ const updated = await db.rlsModule.update({ where: { id: '<value>' }, data: { da
 
 // Delete
 const deleted = await db.rlsModule.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.commit`
-
-CRUD operations for Commit records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `message` | String | Yes |
-| `databaseId` | UUID | Yes |
-| `storeId` | UUID | Yes |
-| `parentIds` | UUID | Yes |
-| `authorId` | UUID | Yes |
-| `committerId` | UUID | Yes |
-| `treeId` | UUID | Yes |
-| `date` | Datetime | Yes |
-| `messageTrgmSimilarity` | Float | Yes |
-| `searchScore` | Float | Yes |
-
-**Operations:**
-
-```typescript
-// List all commit records
-const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } }).execute();
-
-// Get one by id
-const item = await db.commit.findOne({ id: '<value>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } }).execute();
-
-// Create
-const created = await db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.commit.update({ where: { id: '<value>' }, data: { message: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.commit.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.orgMembershipDefault`
@@ -4115,6 +4115,45 @@ const updated = await db.email.update({ where: { id: '<value>' }, data: { ownerI
 const deleted = await db.email.delete({ where: { id: '<value>' } }).execute();
 ```
 
+### `db.user`
+
+CRUD operations for User records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `username` | String | Yes |
+| `displayName` | String | Yes |
+| `profilePicture` | ConstructiveInternalTypeImage | Yes |
+| `searchTsv` | FullText | Yes |
+| `type` | Int | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `searchTsvRank` | Float | Yes |
+| `displayNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all user records
+const items = await db.user.findMany({ select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.user.findOne({ id: '<value>', select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.user.update({ where: { id: '<value>' }, data: { username: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.user.delete({ where: { id: '<value>' } }).execute();
+```
+
 ### `db.astMigration`
 
 CRUD operations for AstMigration records.
@@ -4200,45 +4239,6 @@ const updated = await db.appMembership.update({ where: { id: '<value>' }, data: 
 
 // Delete
 const deleted = await db.appMembership.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.user`
-
-CRUD operations for User records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `username` | String | Yes |
-| `displayName` | String | Yes |
-| `profilePicture` | ConstructiveInternalTypeImage | Yes |
-| `searchTsv` | FullText | Yes |
-| `type` | Int | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-| `searchTsvRank` | Float | Yes |
-| `displayNameTrgmSimilarity` | Float | Yes |
-| `searchScore` | Float | Yes |
-
-**Operations:**
-
-```typescript
-// List all user records
-const items = await db.user.findMany({ select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } }).execute();
-
-// Get one by id
-const item = await db.user.findOne({ id: '<value>', select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } }).execute();
-
-// Create
-const created = await db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.user.update({ where: { id: '<value>' }, data: { username: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.user.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.hierarchyModule`
@@ -4476,42 +4476,6 @@ orgPermissionsGetMaskByNames
 const result = await db.query.orgPermissionsGetMaskByNames({ names: '<value>' }).execute();
 ```
 
-### `db.query.appPermissionsGetByMask`
-
-Reads and enables pagination through a set of `AppPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-```typescript
-const result = await db.query.appPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
-```
-
-### `db.query.orgPermissionsGetByMask`
-
-Reads and enables pagination through a set of `OrgPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-```typescript
-const result = await db.query.orgPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
-```
-
 ### `db.query.getAllObjectsFromRoot`
 
 Reads and enables pagination through a set of `Object`.
@@ -4567,6 +4531,42 @@ getObjectAtPath
 
 ```typescript
 const result = await db.query.getObjectAtPath({ dbId: '<value>', storeId: '<value>', path: '<value>', refname: '<value>' }).execute();
+```
+
+### `db.query.appPermissionsGetByMask`
+
+Reads and enables pagination through a set of `AppPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `mask` | BitString |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
+
+```typescript
+const result = await db.query.appPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
+```
+
+### `db.query.orgPermissionsGetByMask`
+
+Reads and enables pagination through a set of `OrgPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `mask` | BitString |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
+
+```typescript
+const result = await db.query.orgPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
 ```
 
 ### `db.query.stepsRequired`
@@ -4749,6 +4749,21 @@ verifyEmail
 const result = await db.mutation.verifyEmail({ input: '<value>' }).execute();
 ```
 
+### `db.mutation.removeNodeAtPath`
+
+removeNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RemoveNodeAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.removeNodeAtPath({ input: '<value>' }).execute();
+```
+
 ### `db.mutation.resetPassword`
 
 resetPassword
@@ -4779,19 +4794,19 @@ bootstrapUser
 const result = await db.mutation.bootstrapUser({ input: '<value>' }).execute();
 ```
 
-### `db.mutation.removeNodeAtPath`
+### `db.mutation.setFieldOrder`
 
-removeNodeAtPath
+setFieldOrder
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | RemoveNodeAtPathInput (required) |
+  | `input` | SetFieldOrderInput (required) |
 
 ```typescript
-const result = await db.mutation.removeNodeAtPath({ input: '<value>' }).execute();
+const result = await db.mutation.setFieldOrder({ input: '<value>' }).execute();
 ```
 
 ### `db.mutation.setDataAtPath`
@@ -4837,6 +4852,66 @@ provisionDatabaseWithUser
 
 ```typescript
 const result = await db.mutation.provisionDatabaseWithUser({ input: '<value>' }).execute();
+```
+
+### `db.mutation.insertNodeAtPath`
+
+insertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InsertNodeAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.insertNodeAtPath({ input: '<value>' }).execute();
+```
+
+### `db.mutation.updateNodeAtPath`
+
+updateNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | UpdateNodeAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.updateNodeAtPath({ input: '<value>' }).execute();
+```
+
+### `db.mutation.setAndCommit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.setAndCommit({ input: '<value>' }).execute();
+```
+
+### `db.mutation.applyRls`
+
+applyRls
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApplyRlsInput (required) |
+
+```typescript
+const result = await db.mutation.applyRls({ input: '<value>' }).execute();
 ```
 
 ### `db.mutation.signInOneTimeToken`
@@ -4930,21 +5005,6 @@ signUp
 const result = await db.mutation.signUp({ input: '<value>' }).execute();
 ```
 
-### `db.mutation.setFieldOrder`
-
-setFieldOrder
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetFieldOrderInput (required) |
-
-```typescript
-const result = await db.mutation.setFieldOrder({ input: '<value>' }).execute();
-```
-
 ### `db.mutation.oneTimeToken`
 
 oneTimeToken
@@ -4958,66 +5018,6 @@ oneTimeToken
 
 ```typescript
 const result = await db.mutation.oneTimeToken({ input: '<value>' }).execute();
-```
-
-### `db.mutation.insertNodeAtPath`
-
-insertNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | InsertNodeAtPathInput (required) |
-
-```typescript
-const result = await db.mutation.insertNodeAtPath({ input: '<value>' }).execute();
-```
-
-### `db.mutation.updateNodeAtPath`
-
-updateNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | UpdateNodeAtPathInput (required) |
-
-```typescript
-const result = await db.mutation.updateNodeAtPath({ input: '<value>' }).execute();
-```
-
-### `db.mutation.setAndCommit`
-
-setAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetAndCommitInput (required) |
-
-```typescript
-const result = await db.mutation.setAndCommit({ input: '<value>' }).execute();
-```
-
-### `db.mutation.applyRls`
-
-applyRls
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ApplyRlsInput (required) |
-
-```typescript
-const result = await db.mutation.applyRls({ input: '<value>' }).execute();
 ```
 
 ### `db.mutation.forgotPassword`

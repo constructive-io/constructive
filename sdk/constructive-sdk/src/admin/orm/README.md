@@ -1237,22 +1237,6 @@ orgIsManagerOf
 const result = await db.query.orgIsManagerOf({ pEntityId: '<value>', pManagerId: '<value>', pUserId: '<value>', pMaxDepth: '<value>' }).execute();
 ```
 
-### `db.query.stepsAchieved`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
-
-```typescript
-const result = await db.query.stepsAchieved({ vlevel: '<value>', vroleId: '<value>' }).execute();
-```
-
 ### `db.query.appPermissionsGetMask`
 
 appPermissionsGetMask
@@ -1281,6 +1265,22 @@ orgPermissionsGetMask
 
 ```typescript
 const result = await db.query.orgPermissionsGetMask({ ids: '<value>' }).execute();
+```
+
+### `db.query.stepsAchieved`
+
+stepsAchieved
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `vlevel` | String |
+  | `vroleId` | UUID |
+
+```typescript
+const result = await db.query.stepsAchieved({ vlevel: '<value>', vroleId: '<value>' }).execute();
 ```
 
 ### `db.query.appPermissionsGetMaskByNames`

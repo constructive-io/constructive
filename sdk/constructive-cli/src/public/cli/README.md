@@ -29,9 +29,9 @@ csdk auth set-token <your-token>
 | `org-get-managers-record` | orgGetManagersRecord CRUD operations |
 | `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
 | `get-all-record` | getAllRecord CRUD operations |
+| `object` | object CRUD operations |
 | `app-permission` | appPermission CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
-| `object` | object CRUD operations |
 | `app-level-requirement` | appLevelRequirement CRUD operations |
 | `database` | database CRUD operations |
 | `schema` | schema CRUD operations |
@@ -117,17 +117,17 @@ csdk auth set-token <your-token>
 | `connected-account` | connectedAccount CRUD operations |
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `membership-type` | membershipType CRUD operations |
+| `commit` | commit CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
-| `commit` | commit CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `audit-log` | auditLog CRUD operations |
 | `app-level` | appLevel CRUD operations |
 | `sql-migration` | sqlMigration CRUD operations |
 | `email` | email CRUD operations |
+| `user` | user CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `app-membership` | appMembership CRUD operations |
-| `user` | user CRUD operations |
 | `hierarchy-module` | hierarchyModule CRUD operations |
 | `current-user-id` | currentUserId |
 | `current-ip-address` | currentIpAddress |
@@ -141,11 +141,11 @@ csdk auth set-token <your-token>
 | `org-permissions-get-mask` | orgPermissionsGetMask |
 | `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
 | `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
-| `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
-| `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `get-all-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-path-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-object-at-path` | getObjectAtPath |
+| `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
+| `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `steps-required` | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `current-user` | currentUser |
 | `sign-out` | signOut |
@@ -158,12 +158,17 @@ csdk auth set-token <your-token>
 | `confirm-delete-account` | confirmDeleteAccount |
 | `set-password` | setPassword |
 | `verify-email` | verifyEmail |
+| `remove-node-at-path` | removeNodeAtPath |
 | `reset-password` | resetPassword |
 | `bootstrap-user` | bootstrapUser |
-| `remove-node-at-path` | removeNodeAtPath |
+| `set-field-order` | setFieldOrder |
 | `set-data-at-path` | setDataAtPath |
 | `set-props-and-commit` | setPropsAndCommit |
 | `provision-database-with-user` | provisionDatabaseWithUser |
+| `insert-node-at-path` | insertNodeAtPath |
+| `update-node-at-path` | updateNodeAtPath |
+| `set-and-commit` | setAndCommit |
+| `apply-rls` | applyRls |
 | `sign-in-one-time-token` | signInOneTimeToken |
 | `create-user-database` | Creates a new user database with all required modules, permissions, and RLS policies.
 
@@ -185,12 +190,7 @@ Example usage:
 | `extend-token-expires` | extendTokenExpires |
 | `sign-in` | signIn |
 | `sign-up` | signUp |
-| `set-field-order` | setFieldOrder |
 | `one-time-token` | oneTimeToken |
-| `insert-node-at-path` | insertNodeAtPath |
-| `update-node-at-path` | updateNodeAtPath |
-| `set-and-commit` | setAndCommit |
-| `apply-rls` | applyRls |
 | `forgot-password` | forgotPassword |
 | `send-verification-email` | sendVerificationEmail |
 | `verify-password` | verifyPassword |
@@ -300,6 +300,34 @@ CRUD operations for GetAllRecord records.
 
 **Required create fields:** `path`, `data`
 
+### `object`
+
+CRUD operations for Object records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all object records |
+| `get` | Get a object by id |
+| `create` | Create a new object |
+| `update` | Update an existing object |
+| `delete` | Delete a object |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `hashUuid` | UUID |
+| `id` | UUID |
+| `databaseId` | UUID |
+| `kids` | UUID |
+| `ktree` | String |
+| `data` | JSON |
+| `frzn` | Boolean |
+| `createdAt` | Datetime |
+
+**Required create fields:** `hashUuid`, `databaseId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
+
 ### `app-permission`
 
 CRUD operations for AppPermission records.
@@ -353,34 +381,6 @@ CRUD operations for OrgPermission records.
 
 **Required create fields:** `descriptionTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
-
-### `object`
-
-CRUD operations for Object records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all object records |
-| `get` | Get a object by id |
-| `create` | Create a new object |
-| `update` | Update an existing object |
-| `delete` | Delete a object |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `hashUuid` | UUID |
-| `id` | UUID |
-| `databaseId` | UUID |
-| `kids` | UUID |
-| `ktree` | String |
-| `data` | JSON |
-| `frzn` | Boolean |
-| `createdAt` | Datetime |
-
-**Required create fields:** `hashUuid`, `databaseId`
-**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
 
 ### `app-level-requirement`
 
@@ -3172,6 +3172,37 @@ CRUD operations for MembershipType records.
 
 **Required create fields:** `name`, `description`, `prefix`, `descriptionTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
 
+### `commit`
+
+CRUD operations for Commit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all commit records |
+| `get` | Get a commit by id |
+| `create` | Create a new commit |
+| `update` | Update an existing commit |
+| `delete` | Delete a commit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `message` | String |
+| `databaseId` | UUID |
+| `storeId` | UUID |
+| `parentIds` | UUID |
+| `authorId` | UUID |
+| `committerId` | UUID |
+| `treeId` | UUID |
+| `date` | Datetime |
+| `messageTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `databaseId`, `storeId`, `messageTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
+
 ### `app-membership-default`
 
 CRUD operations for AppMembershipDefault records.
@@ -3233,37 +3264,6 @@ CRUD operations for RlsModule records.
 
 **Required create fields:** `databaseId`, `authenticateTrgmSimilarity`, `authenticateStrictTrgmSimilarity`, `currentRoleTrgmSimilarity`, `currentRoleIdTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
-
-### `commit`
-
-CRUD operations for Commit records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all commit records |
-| `get` | Get a commit by id |
-| `create` | Create a new commit |
-| `update` | Update an existing commit |
-| `delete` | Delete a commit |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `message` | String |
-| `databaseId` | UUID |
-| `storeId` | UUID |
-| `parentIds` | UUID |
-| `authorId` | UUID |
-| `committerId` | UUID |
-| `treeId` | UUID |
-| `date` | Datetime |
-| `messageTrgmSimilarity` | Float |
-| `searchScore` | Float |
-
-**Required create fields:** `databaseId`, `storeId`, `messageTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ### `org-membership-default`
 
@@ -3420,6 +3420,37 @@ CRUD operations for Email records.
 **Required create fields:** `email`
 **Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
+### `user`
+
+CRUD operations for User records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all user records |
+| `get` | Get a user by id |
+| `create` | Create a new user |
+| `update` | Update an existing user |
+| `delete` | Delete a user |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `username` | String |
+| `displayName` | String |
+| `profilePicture` | Image |
+| `searchTsv` | FullText |
+| `type` | Int |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `searchTsvRank` | Float |
+| `displayNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `searchTsv`, `searchTsvRank`, `displayNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `type`
+
 ### `ast-migration`
 
 CRUD operations for AstMigration records.
@@ -3490,37 +3521,6 @@ CRUD operations for AppMembership records.
 
 **Required create fields:** `actorId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
-
-### `user`
-
-CRUD operations for User records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all user records |
-| `get` | Get a user by id |
-| `create` | Create a new user |
-| `update` | Update an existing user |
-| `delete` | Delete a user |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `username` | String |
-| `displayName` | String |
-| `profilePicture` | Image |
-| `searchTsv` | FullText |
-| `type` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `searchTsvRank` | Float |
-| `displayNameTrgmSimilarity` | Float |
-| `searchScore` | Float |
-
-**Required create fields:** `searchTsvRank`, `displayNameTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`
 
 ### `hierarchy-module`
 
@@ -3701,34 +3701,6 @@ orgPermissionsGetMaskByNames
   |----------|------|
   | `--names` | String |
 
-### `app-permissions-get-by-mask`
-
-Reads and enables pagination through a set of `AppPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--mask` | BitString |
-  | `--first` | Int |
-  | `--offset` | Int |
-  | `--after` | Cursor |
-
-### `org-permissions-get-by-mask`
-
-Reads and enables pagination through a set of `OrgPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--mask` | BitString |
-  | `--first` | Int |
-  | `--offset` | Int |
-  | `--after` | Cursor |
-
 ### `get-all-objects-from-root`
 
 Reads and enables pagination through a set of `Object`.
@@ -3773,6 +3745,34 @@ getObjectAtPath
   | `--storeId` | UUID |
   | `--path` | String |
   | `--refname` | String |
+
+### `app-permissions-get-by-mask`
+
+Reads and enables pagination through a set of `AppPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
+
+### `org-permissions-get-by-mask`
+
+Reads and enables pagination through a set of `OrgPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `steps-required`
 
@@ -3919,6 +3919,20 @@ verifyEmail
   | `--input.emailId` | UUID |
   | `--input.token` | String |
 
+### `remove-node-at-path`
+
+removeNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+
 ### `reset-password`
 
 resetPassword
@@ -3951,9 +3965,9 @@ bootstrapUser
   | `--input.displayName` | String |
   | `--input.returnApiKey` | Boolean |
 
-### `remove-node-at-path`
+### `set-field-order`
 
-removeNodeAtPath
+setFieldOrder
 
 - **Type:** mutation
 - **Arguments:**
@@ -3961,9 +3975,7 @@ removeNodeAtPath
   | Argument | Type |
   |----------|------|
   | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
-  | `--input.root` | UUID |
-  | `--input.path` | String |
+  | `--input.fieldIds` | UUID |
 
 ### `set-data-at-path`
 
@@ -4011,6 +4023,76 @@ provisionDatabaseWithUser
   | `--input.pSubdomain` | String |
   | `--input.pModules` | String |
   | `--input.pOptions` | JSON |
+
+### `insert-node-at-path`
+
+insertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+
+### `update-node-at-path`
+
+updateNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+
+### `set-and-commit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
+  | `--input.refname` | String |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+
+### `apply-rls`
+
+applyRls
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.tableId` | UUID |
+  | `--input.grants` | JSON |
+  | `--input.policyType` | String |
+  | `--input.vars` | JSON |
+  | `--input.fieldIds` | UUID |
+  | `--input.permissive` | Boolean |
+  | `--input.name` | String |
 
 ### `sign-in-one-time-token`
 
@@ -4103,18 +4185,6 @@ signUp
   | `--input.credentialKind` | String |
   | `--input.csrfToken` | String |
 
-### `set-field-order`
-
-setFieldOrder
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.fieldIds` | UUID |
-
 ### `one-time-token`
 
 oneTimeToken
@@ -4129,76 +4199,6 @@ oneTimeToken
   | `--input.password` | String |
   | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
-
-### `insert-node-at-path`
-
-insertNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
-  | `--input.root` | UUID |
-  | `--input.path` | String |
-  | `--input.data` | JSON |
-  | `--input.kids` | UUID |
-  | `--input.ktree` | String |
-
-### `update-node-at-path`
-
-updateNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
-  | `--input.root` | UUID |
-  | `--input.path` | String |
-  | `--input.data` | JSON |
-  | `--input.kids` | UUID |
-  | `--input.ktree` | String |
-
-### `set-and-commit`
-
-setAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.dbId` | UUID |
-  | `--input.storeId` | UUID |
-  | `--input.refname` | String |
-  | `--input.path` | String |
-  | `--input.data` | JSON |
-  | `--input.kids` | UUID |
-  | `--input.ktree` | String |
-
-### `apply-rls`
-
-applyRls
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.tableId` | UUID |
-  | `--input.grants` | JSON |
-  | `--input.policyType` | String |
-  | `--input.vars` | JSON |
-  | `--input.fieldIds` | UUID |
-  | `--input.permissive` | Boolean |
-  | `--input.name` | String |
 
 ### `forgot-password`
 

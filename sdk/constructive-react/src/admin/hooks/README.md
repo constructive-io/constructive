@@ -189,9 +189,9 @@ function App() {
 | `useAppPermissionsGetPaddedMaskQuery` | Query | appPermissionsGetPaddedMask |
 | `useOrgPermissionsGetPaddedMaskQuery` | Query | orgPermissionsGetPaddedMask |
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
-| `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
+| `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
 | `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
 | `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
@@ -900,18 +900,6 @@ orgIsManagerOf
   | `pUserId` | UUID |
   | `pMaxDepth` | Int |
 
-### `useStepsAchievedQuery`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
-
 ### `useAppPermissionsGetMaskQuery`
 
 appPermissionsGetMask
@@ -933,6 +921,18 @@ orgPermissionsGetMask
   | Argument | Type |
   |----------|------|
   | `ids` | [UUID] |
+
+### `useStepsAchievedQuery`
+
+stepsAchieved
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `vlevel` | String |
+  | `vroleId` | UUID |
 
 ### `useAppPermissionsGetMaskByNamesQuery`
 

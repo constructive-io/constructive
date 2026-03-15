@@ -292,8 +292,8 @@ CRUD operations for User records.
 | `displayNameTrgmSimilarity` | Float |
 | `searchScore` | Float |
 
-**Required create fields:** `searchTsvRank`, `displayNameTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`
+**Required create fields:** `searchTsv`, `searchTsvRank`, `displayNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `type`
 
 ## Custom Operations
 
