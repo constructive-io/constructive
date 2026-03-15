@@ -28,6 +28,7 @@ import {
   generateSingleQueryHook,
 } from '../../core/codegen/queries';
 import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
+import { generateTypesFile } from '../../core/codegen/types';
 import type {
   CleanFieldType,
   CleanOperation,
@@ -332,6 +333,53 @@ describe('Query Hook Generators', () => {
       expect(result).not.toBeNull();
       expect(result.content).toMatchSnapshot();
     });
+  });
+});
+
+describe('Regression: FindManyArgs TCondition type arg', () => {
+  // Bug: queries.ts passed 3 type args to FindManyArgs (TSelect, TWhere, TOrderBy),
+  // but the template defines 4 params: FindManyArgs<TSelect, TWhere, TCondition = never, TOrderBy = never>.
+  // This caused TOrderBy to land in the TCondition slot, defaulting TOrderBy to `never`
+  // and breaking all hook orderBy params.
+
+  it('includes Condition type in imports and re-exports when condition is enabled', () => {
+    const result = generateListQueryHook(simpleUserTable, {
+      reactQueryEnabled: true,
+      useCentralizedKeys: true,
+      condition: true,
+    });
+    expect(result.content).toContain('UserCondition');
+    expect(result.content).toMatch(
+      /import type \{[^}]*UserCondition[^}]*\} from "\.\.\/\.\.\/orm\/input-types"/,
+    );
+    expect(result.content).toMatch(
+      /export type \{[^}]*UserCondition[^}]*\} from "\.\.\/\.\.\/orm\/input-types"/,
+    );
+  });
+
+  it('includes Condition type in FindManyArgs type arguments', () => {
+    const result = generateListQueryHook(simpleUserTable, {
+      reactQueryEnabled: true,
+      useCentralizedKeys: false,
+      condition: true,
+    });
+    // FindManyArgs should have 4 type args: unknown, UserFilter, UserCondition, UsersOrderBy
+    expect(result.content).toMatch(
+      /FindManyArgs<unknown, UserFilter, UserCondition, UsersOrderBy>/,
+    );
+  });
+
+  it('omits Condition type when condition is disabled', () => {
+    const result = generateListQueryHook(simpleUserTable, {
+      reactQueryEnabled: true,
+      useCentralizedKeys: false,
+      condition: false,
+    });
+    // FindManyArgs should have 3 type args: unknown, UserFilter, UsersOrderBy
+    expect(result.content).toMatch(
+      /FindManyArgs<unknown, UserFilter, UsersOrderBy>/,
+    );
+    expect(result.content).not.toContain('UserCondition');
   });
 });
 
@@ -642,5 +690,29 @@ describe('Barrel File Generators', () => {
       );
       expect(result).toMatchSnapshot();
     });
+  });
+});
+
+describe('Regression: VectorFilter in types.ts', () => {
+  // Bug: VectorFilter was generated in ORM input-types-generator.ts but was missing
+  // from the React types.ts FILTER_CONFIGS. schema-types.ts imports VectorFilter
+  // from types.ts, so the missing export caused build failures.
+
+  it('exports VectorFilter interface from types.ts', () => {
+    const result = generateTypesFile([simpleUserTable]);
+    expect(result).toContain('export interface VectorFilter {');
+  });
+
+  it('VectorFilter has equality and distinct operators with number[] type', () => {
+    const result = generateTypesFile([simpleUserTable]);
+    expect(result).toContain('export interface VectorFilter {');
+    // equality operators
+    expect(result).toMatch(/isNull\?:\s*boolean/);
+    // VectorFilter uses number[] type
+    expect(result).toMatch(/equalTo\?:\s*number\[\]/);
+    expect(result).toMatch(/notEqualTo\?:\s*number\[\]/);
+    // distinct operators
+    expect(result).toMatch(/distinctFrom\?:\s*number\[\]/);
+    expect(result).toMatch(/notDistinctFrom\?:\s*number\[\]/);
   });
 });
