@@ -134,8 +134,6 @@ export type UserOrderBy =
   | 'ID_DESC'
   | 'USERNAME_ASC'
   | 'USERNAME_DESC'
-  | 'SEARCH_TSV_ASC'
-  | 'SEARCH_TSV_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -782,7 +780,6 @@ export interface UserInput {
   username?: string;
   displayName?: string;
   profilePicture?: ConstructiveInternalTypeImage;
-  searchTsv?: string;
   type?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -914,7 +911,6 @@ export interface UserPatch {
   username?: string;
   displayName?: string;
   profilePicture?: ConstructiveInternalTypeImage;
-  searchTsv?: string;
   type?: number;
   createdAt?: string;
   updatedAt?: string;

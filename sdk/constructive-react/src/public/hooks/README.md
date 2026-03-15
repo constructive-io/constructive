@@ -38,6 +38,11 @@ function App() {
 | `useCreateOrgGetSubordinatesRecordMutation` | Mutation | Create a orgGetSubordinatesRecord |
 | `useGetAllQuery` | Query | List all getAll |
 | `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
+| `useObjectsQuery` | Query | List all objects |
+| `useObjectQuery` | Query | Get one object |
+| `useCreateObjectMutation` | Mutation | Create a object |
+| `useUpdateObjectMutation` | Mutation | Update a object |
+| `useDeleteObjectMutation` | Mutation | Delete a object |
 | `useAppPermissionsQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useAppPermissionQuery` | Query | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useCreateAppPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
@@ -48,11 +53,6 @@ function App() {
 | `useCreateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useUpdateOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
 | `useDeleteOrgPermissionMutation` | Mutation | Defines available permissions as named bits within a bitmask, used by the RBAC system for access control |
-| `useObjectsQuery` | Query | List all objects |
-| `useObjectQuery` | Query | Get one object |
-| `useCreateObjectMutation` | Mutation | Create a object |
-| `useUpdateObjectMutation` | Mutation | Update a object |
-| `useDeleteObjectMutation` | Mutation | Delete a object |
 | `useAppLevelRequirementsQuery` | Query | Defines the specific requirements that must be met to achieve a level |
 | `useAppLevelRequirementQuery` | Query | Defines the specific requirements that must be met to achieve a level |
 | `useCreateAppLevelRequirementMutation` | Mutation | Defines the specific requirements that must be met to achieve a level |
@@ -513,6 +513,11 @@ function App() {
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCommitsQuery` | Query | A commit records changes to the repository. |
+| `useCommitQuery` | Query | A commit records changes to the repository. |
+| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
@@ -523,11 +528,6 @@ function App() {
 | `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
 | `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
 | `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
-| `useCommitsQuery` | Query | A commit records changes to the repository. |
-| `useCommitQuery` | Query | A commit records changes to the repository. |
-| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
@@ -553,6 +553,11 @@ function App() {
 | `useCreateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useUpdateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useDeleteEmailMutation` | Mutation | User email addresses with verification and primary-email management |
+| `useUsersQuery` | Query | List all users |
+| `useUserQuery` | Query | Get one user |
+| `useCreateUserMutation` | Mutation | Create a user |
+| `useUpdateUserMutation` | Mutation | Update a user |
+| `useDeleteUserMutation` | Mutation | Delete a user |
 | `useAstMigrationsQuery` | Query | List all astMigrations |
 | `useAstMigrationQuery` | Query | Get one astMigration |
 | `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
@@ -563,11 +568,6 @@ function App() {
 | `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useUpdateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useDeleteAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useUsersQuery` | Query | List all users |
-| `useUserQuery` | Query | Get one user |
-| `useCreateUserMutation` | Mutation | Create a user |
-| `useUpdateUserMutation` | Mutation | Update a user |
-| `useDeleteUserMutation` | Mutation | Delete a user |
 | `useHierarchyModulesQuery` | Query | List all hierarchyModules |
 | `useHierarchyModuleQuery` | Query | Get one hierarchyModule |
 | `useCreateHierarchyModuleMutation` | Mutation | Create a hierarchyModule |
@@ -585,11 +585,11 @@ function App() {
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
 | `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
-| `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
-| `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
 | `useGetAllObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
 | `useGetPathObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
 | `useGetObjectAtPathQuery` | Query | getObjectAtPath |
+| `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
+| `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
 | `useStepsRequiredQuery` | Query | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `useCurrentUserQuery` | Query | currentUser |
 | `useSignOutMutation` | Mutation | signOut |
@@ -602,12 +602,17 @@ function App() {
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
 | `useSetPasswordMutation` | Mutation | setPassword |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
+| `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useBootstrapUserMutation` | Mutation | bootstrapUser |
-| `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
+| `useSetFieldOrderMutation` | Mutation | setFieldOrder |
 | `useSetDataAtPathMutation` | Mutation | setDataAtPath |
 | `useSetPropsAndCommitMutation` | Mutation | setPropsAndCommit |
 | `useProvisionDatabaseWithUserMutation` | Mutation | provisionDatabaseWithUser |
+| `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
+| `useUpdateNodeAtPathMutation` | Mutation | updateNodeAtPath |
+| `useSetAndCommitMutation` | Mutation | setAndCommit |
+| `useApplyRlsMutation` | Mutation | applyRls |
 | `useSignInOneTimeTokenMutation` | Mutation | signInOneTimeToken |
 | `useCreateUserDatabaseMutation` | Mutation | Creates a new user database with all required modules, permissions, and RLS policies.
 
@@ -629,12 +634,7 @@ Example usage:
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useSignInMutation` | Mutation | signIn |
 | `useSignUpMutation` | Mutation | signUp |
-| `useSetFieldOrderMutation` | Mutation | setFieldOrder |
 | `useOneTimeTokenMutation` | Mutation | oneTimeToken |
-| `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
-| `useUpdateNodeAtPathMutation` | Mutation | updateNodeAtPath |
-| `useSetAndCommitMutation` | Mutation | setAndCommit |
-| `useApplyRlsMutation` | Mutation | applyRls |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
@@ -687,6 +687,27 @@ const { mutate: create } = useCreateGetAllRecordMutation({
 create({ path: '<value>', data: '<value>' });
 ```
 
+### Object
+
+```typescript
+// List all objects
+const { data, isLoading } = useObjectsQuery({
+  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+});
+
+// Get one object
+const { data: item } = useObjectQuery({
+  id: '<value>',
+  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
+});
+
+// Create a object
+const { mutate: create } = useCreateObjectMutation({
+  selection: { fields: { id: true } },
+});
+create({ hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<value>', data: '<value>', frzn: '<value>' });
+```
+
 ### AppPermission
 
 ```typescript
@@ -727,27 +748,6 @@ const { mutate: create } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
-```
-
-### Object
-
-```typescript
-// List all objects
-const { data, isLoading } = useObjectsQuery({
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
-});
-
-// Get one object
-const { data: item } = useObjectQuery({
-  id: '<value>',
-  selection: { fields: { hashUuid: true, id: true, databaseId: true, kids: true, ktree: true, data: true, frzn: true, createdAt: true } },
-});
-
-// Create a object
-const { mutate: create } = useCreateObjectMutation({
-  selection: { fields: { id: true } },
-});
-create({ hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<value>', data: '<value>', frzn: '<value>' });
 ```
 
 ### AppLevelRequirement
@@ -2535,6 +2535,27 @@ const { mutate: create } = useCreateMembershipTypeMutation({
 create({ name: '<value>', description: '<value>', prefix: '<value>', descriptionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
+### Commit
+
+```typescript
+// List all commits
+const { data, isLoading } = useCommitsQuery({
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one commit
+const { data: item } = useCommitQuery({
+  id: '<value>',
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a commit
+const { mutate: create } = useCreateCommitMutation({
+  selection: { fields: { id: true } },
+});
+create({ message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
 ### AppMembershipDefault
 
 ```typescript
@@ -2575,27 +2596,6 @@ const { mutate: create } = useCreateRlsModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>', authenticateTrgmSimilarity: '<value>', authenticateStrictTrgmSimilarity: '<value>', currentRoleTrgmSimilarity: '<value>', currentRoleIdTrgmSimilarity: '<value>', searchScore: '<value>' });
-```
-
-### Commit
-
-```typescript
-// List all commits
-const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
-});
-
-// Get one commit
-const { data: item } = useCommitQuery({
-  id: '<value>',
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
-});
-
-// Create a commit
-const { mutate: create } = useCreateCommitMutation({
-  selection: { fields: { id: true } },
-});
-create({ message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgMembershipDefault
@@ -2703,6 +2703,27 @@ const { mutate: create } = useCreateEmailMutation({
 create({ ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' });
 ```
 
+### User
+
+```typescript
+// List all users
+const { data, isLoading } = useUsersQuery({
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one user
+const { data: item } = useUserQuery({
+  id: '<value>',
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a user
+const { mutate: create } = useCreateUserMutation({
+  selection: { fields: { id: true } },
+});
+create({ username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
 ### AstMigration
 
 ```typescript
@@ -2743,27 +2764,6 @@ const { mutate: create } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
 create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isVerified: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', profileId: '<value>' });
-```
-
-### User
-
-```typescript
-// List all users
-const { data, isLoading } = useUsersQuery({
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
-});
-
-// Get one user
-const { data: item } = useUserQuery({
-  id: '<value>',
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
-});
-
-// Create a user
-const { mutate: create } = useCreateUserMutation({
-  selection: { fields: { id: true } },
-});
-create({ username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### HierarchyModule
@@ -2915,34 +2915,6 @@ orgPermissionsGetMaskByNames
   |----------|------|
   | `names` | [String] |
 
-### `useAppPermissionsGetByMaskQuery`
-
-Reads and enables pagination through a set of `AppPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-### `useOrgPermissionsGetByMaskQuery`
-
-Reads and enables pagination through a set of `OrgPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
 ### `useGetAllObjectsFromRootQuery`
 
 Reads and enables pagination through a set of `Object`.
@@ -2987,6 +2959,34 @@ getObjectAtPath
   | `storeId` | UUID |
   | `path` | [String] |
   | `refname` | String |
+
+### `useAppPermissionsGetByMaskQuery`
+
+Reads and enables pagination through a set of `AppPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `mask` | BitString |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
+
+### `useOrgPermissionsGetByMaskQuery`
+
+Reads and enables pagination through a set of `OrgPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `mask` | BitString |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
 
 ### `useStepsRequiredQuery`
 
@@ -3120,6 +3120,17 @@ verifyEmail
   |----------|------|
   | `input` | VerifyEmailInput (required) |
 
+### `useRemoveNodeAtPathMutation`
+
+removeNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RemoveNodeAtPathInput (required) |
+
 ### `useResetPasswordMutation`
 
 resetPassword
@@ -3142,16 +3153,16 @@ bootstrapUser
   |----------|------|
   | `input` | BootstrapUserInput (required) |
 
-### `useRemoveNodeAtPathMutation`
+### `useSetFieldOrderMutation`
 
-removeNodeAtPath
+setFieldOrder
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | RemoveNodeAtPathInput (required) |
+  | `input` | SetFieldOrderInput (required) |
 
 ### `useSetDataAtPathMutation`
 
@@ -3185,6 +3196,50 @@ provisionDatabaseWithUser
   | Argument | Type |
   |----------|------|
   | `input` | ProvisionDatabaseWithUserInput (required) |
+
+### `useInsertNodeAtPathMutation`
+
+insertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InsertNodeAtPathInput (required) |
+
+### `useUpdateNodeAtPathMutation`
+
+updateNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | UpdateNodeAtPathInput (required) |
+
+### `useSetAndCommitMutation`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetAndCommitInput (required) |
+
+### `useApplyRlsMutation`
+
+applyRls
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApplyRlsInput (required) |
 
 ### `useSignInOneTimeTokenMutation`
 
@@ -3257,17 +3312,6 @@ signUp
   |----------|------|
   | `input` | SignUpInput (required) |
 
-### `useSetFieldOrderMutation`
-
-setFieldOrder
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetFieldOrderInput (required) |
-
 ### `useOneTimeTokenMutation`
 
 oneTimeToken
@@ -3278,50 +3322,6 @@ oneTimeToken
   | Argument | Type |
   |----------|------|
   | `input` | OneTimeTokenInput (required) |
-
-### `useInsertNodeAtPathMutation`
-
-insertNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | InsertNodeAtPathInput (required) |
-
-### `useUpdateNodeAtPathMutation`
-
-updateNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | UpdateNodeAtPathInput (required) |
-
-### `useSetAndCommitMutation`
-
-setAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetAndCommitInput (required) |
-
-### `useApplyRlsMutation`
-
-applyRls
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ApplyRlsInput (required) |
 
 ### `useForgotPasswordMutation`
 

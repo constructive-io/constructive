@@ -321,12 +321,12 @@ export const customQueryKeys = {
   ) => ['orgPermissionsGetPaddedMask', variables] as const,
   /** Query key for orgIsManagerOf */ orgIsManagerOf: (variables?: object) =>
     ['orgIsManagerOf', variables] as const,
-  /** Query key for stepsAchieved */ stepsAchieved: (variables?: object) =>
-    ['stepsAchieved', variables] as const,
   /** Query key for appPermissionsGetMask */ appPermissionsGetMask: (variables?: object) =>
     ['appPermissionsGetMask', variables] as const,
   /** Query key for orgPermissionsGetMask */ orgPermissionsGetMask: (variables?: object) =>
     ['orgPermissionsGetMask', variables] as const,
+  /** Query key for stepsAchieved */ stepsAchieved: (variables?: object) =>
+    ['stepsAchieved', variables] as const,
   /** Query key for appPermissionsGetMaskByNames */ appPermissionsGetMaskByNames: (
     variables?: object
   ) => ['appPermissionsGetMaskByNames', variables] as const,

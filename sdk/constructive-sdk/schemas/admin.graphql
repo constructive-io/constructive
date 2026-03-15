@@ -43,9 +43,9 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): OrgGetSubordinatesConnection
-  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
   appPermissionsGetMask(ids: [UUID]): BitString
   orgPermissionsGetMask(ids: [UUID]): BitString
+  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
   appPermissionsGetMaskByNames(names: [String]): BitString
   orgPermissionsGetMaskByNames(names: [String]): BitString
 

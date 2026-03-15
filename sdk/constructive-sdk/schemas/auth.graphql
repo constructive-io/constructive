@@ -1886,8 +1886,6 @@ enum UserOrderBy {
   ID_DESC
   USERNAME_ASC
   USERNAME_DESC
-  SEARCH_TSV_ASC
-  SEARCH_TSV_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -3253,7 +3251,6 @@ input UserInput {
   username: String
   displayName: String
   profilePicture: ConstructiveInternalTypeImage
-  searchTsv: FullText
   type: Int
   createdAt: Datetime
   updatedAt: Datetime
@@ -3653,7 +3650,6 @@ input UserPatch {
   username: String
   displayName: String
   profilePicture: ConstructiveInternalTypeImage
-  searchTsv: FullText
   type: Int
   createdAt: Datetime
   updatedAt: Datetime

@@ -894,7 +894,6 @@ export interface CreateUserInput {
     username?: string;
     displayName?: string;
     profilePicture?: ConstructiveInternalTypeImage;
-    searchTsv?: string;
     type?: number;
   };
 }
