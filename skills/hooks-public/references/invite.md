@@ -7,8 +7,8 @@ Invitation records sent to prospective members via email, with token-based redem
 ## Usage
 
 ```typescript
-useInvitesQuery({ selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } } })
-useInviteQuery({ id: '<value>', selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } } })
+useInvitesQuery({ selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } } })
+useInviteQuery({ id: '<value>', selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } } })
 useCreateInviteMutation({ selection: { fields: { id: true } } })
 useUpdateInviteMutation({ selection: { fields: { id: true } } })
 useDeleteInviteMutation({})
@@ -20,7 +20,7 @@ useDeleteInviteMutation({})
 
 ```typescript
 const { data, isLoading } = useInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useInvitesQuery({
 const { mutate } = useCreateInviteMutation({
   selection: { fields: { id: true } },
 });
-mutate({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>' });
+mutate({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

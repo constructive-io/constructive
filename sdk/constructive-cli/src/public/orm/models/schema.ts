@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SchemaModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SchemaSelect>(
-    args: FindManyArgs<S, SchemaFilter, SchemaOrderBy> & {
+    args: FindManyArgs<S, SchemaFilter, never, SchemaOrderBy> & {
       select: S;
     } & StrictSelect<S, SchemaSelect>
   ): QueryBuilder<{

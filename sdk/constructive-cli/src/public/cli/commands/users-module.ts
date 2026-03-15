@@ -16,6 +16,9 @@ const fieldSchema: FieldSchema = {
   tableName: 'string',
   typeTableId: 'uuid',
   typeTableName: 'string',
+  tableNameTrgmSimilarity: 'float',
+  typeTableNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nusers-module <command>\n\nCommands:\n  list                  List all usersModule records\n  get                   Get a usersModule by ID\n  create                Create a new usersModule\n  update                Update an existing usersModule\n  delete                Delete a usersModule\n\n  --help, -h            Show this help message\n';

@@ -9,8 +9,8 @@ CRUD operations for AppPermission records via csdk CLI
 ```bash
 csdk app-permission list
 csdk app-permission get --id <value>
-csdk app-permission create [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
-csdk app-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
+csdk app-permission create --descriptionTrgmSimilarity <value> --searchScore <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
+csdk app-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>] [--descriptionTrgmSimilarity <value>] [--searchScore <value>]
 csdk app-permission delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk app-permission list
 ### Create a appPermission
 
 ```bash
-csdk app-permission create [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
+csdk app-permission create --descriptionTrgmSimilarity <value> --searchScore <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
 ```
 
 ### Get a appPermission by id

@@ -80,14 +80,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RefCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: RefFilter
+    where: RefFilter
 
     """The method to use when ordering `Ref`."""
     orderBy: [RefOrderBy!] = [PRIMARY_KEY_ASC]
@@ -114,14 +109,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: StoreCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: StoreFilter
+    where: StoreFilter
 
     """The method to use when ordering `Store`."""
     orderBy: [StoreOrderBy!] = [PRIMARY_KEY_ASC]
@@ -148,14 +138,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CommitCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: CommitFilter
+    where: CommitFilter
 
     """The method to use when ordering `Commit`."""
     orderBy: [CommitOrderBy!] = [PRIMARY_KEY_ASC]
@@ -182,14 +167,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ObjectCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: ObjectFilter
+    where: ObjectFilter
 
     """The method to use when ordering `Object`."""
     orderBy: [ObjectOrderBy!] = [PRIMARY_KEY_ASC]
@@ -333,6 +313,16 @@ type Ref {
   databaseId: UUID!
   storeId: UUID!
   commitId: UUID
+
+  """
+  TRGM similarity when searching `name`. Returns null when no trgm search filter is active.
+  """
+  nameTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `Ref` edge in the connection."""
@@ -342,26 +332,6 @@ type RefEdge {
 
   """The `Ref` at the end of the edge."""
   node: Ref
-}
-
-"""
-A condition to be used against `Ref` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input RefCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `databaseId` field."""
-  databaseId: UUID
-
-  """Checks for equality with the object’s `storeId` field."""
-  storeId: UUID
-
-  """Checks for equality with the object’s `commitId` field."""
-  commitId: UUID
 }
 
 """
@@ -391,6 +361,17 @@ input RefFilter {
 
   """Negates the expression."""
   not: RefFilter
+
+  """TRGM search on the `name` column."""
+  trgmName: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """
@@ -565,6 +546,29 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
+
+  """
+  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
+  """
+  similarTo: TrgmSearchInput
+
+  """
+  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
+  """
+  wordSimilarTo: TrgmSearchInput
+}
+
+"""
+Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
+"""
+input TrgmSearchInput {
+  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
+  value: String!
+
+  """
+  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
+  """
+  threshold: Float
 }
 
 """Methods to use when ordering `Ref`."""
@@ -578,6 +582,10 @@ enum RefOrderBy {
   DATABASE_ID_DESC
   STORE_ID_ASC
   STORE_ID_DESC
+  NAME_TRGM_SIMILARITY_ASC
+  NAME_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `Store` values."""
@@ -611,6 +619,16 @@ type Store {
   """The current head tree_id for this store."""
   hash: UUID
   createdAt: Datetime
+
+  """
+  TRGM similarity when searching `name`. Returns null when no trgm search filter is active.
+  """
+  nameTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `Store` edge in the connection."""
@@ -620,26 +638,6 @@ type StoreEdge {
 
   """The `Store` at the end of the edge."""
   node: Store
-}
-
-"""
-A condition to be used against `Store` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input StoreCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `databaseId` field."""
-  databaseId: UUID
-
-  """Checks for equality with the object’s `hash` field."""
-  hash: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
 }
 
 """
@@ -669,6 +667,17 @@ input StoreFilter {
 
   """Negates the expression."""
   not: StoreFilter
+
+  """TRGM search on the `name` column."""
+  trgmName: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """
@@ -722,6 +731,10 @@ enum StoreOrderBy {
   ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
+  NAME_TRGM_SIMILARITY_ASC
+  NAME_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `Commit` values."""
@@ -765,6 +778,16 @@ type Commit {
   """The root of the tree"""
   treeId: UUID
   date: Datetime!
+
+  """
+  TRGM similarity when searching `message`. Returns null when no trgm search filter is active.
+  """
+  messageTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `Commit` edge in the connection."""
@@ -774,38 +797,6 @@ type CommitEdge {
 
   """The `Commit` at the end of the edge."""
   node: Commit
-}
-
-"""
-A condition to be used against `Commit` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input CommitCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `message` field."""
-  message: String
-
-  """Checks for equality with the object’s `databaseId` field."""
-  databaseId: UUID
-
-  """Checks for equality with the object’s `storeId` field."""
-  storeId: UUID
-
-  """Checks for equality with the object’s `parentIds` field."""
-  parentIds: [UUID]
-
-  """Checks for equality with the object’s `authorId` field."""
-  authorId: UUID
-
-  """Checks for equality with the object’s `committerId` field."""
-  committerId: UUID
-
-  """Checks for equality with the object’s `treeId` field."""
-  treeId: UUID
-
-  """Checks for equality with the object’s `date` field."""
-  date: Datetime
 }
 
 """
@@ -847,6 +838,17 @@ input CommitFilter {
 
   """Negates the expression."""
   not: CommitFilter
+
+  """TRGM search on the `message` column."""
+  trgmMessage: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """
@@ -921,32 +923,10 @@ enum CommitOrderBy {
   ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-}
-
-"""
-A condition to be used against `Object` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input ObjectCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `databaseId` field."""
-  databaseId: UUID
-
-  """Checks for equality with the object’s `kids` field."""
-  kids: [UUID]
-
-  """Checks for equality with the object’s `ktree` field."""
-  ktree: [String]
-
-  """Checks for equality with the object’s `data` field."""
-  data: JSON
-
-  """Checks for equality with the object’s `frzn` field."""
-  frzn: Boolean
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
+  MESSAGE_TRGM_SIMILARITY_ASC
+  MESSAGE_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """

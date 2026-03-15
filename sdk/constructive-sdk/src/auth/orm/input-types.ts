@@ -234,12 +234,8 @@ export interface UUIDListFilter {
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
-// ============ Entity Types ============
-export interface RoleType {
-  id: number;
-  name?: string | null;
-}
 /** Cryptocurrency wallet addresses owned by users, with network-specific validation and verification */
+// ============ Entity Types ============
 export interface CryptoAddress {
   id: string;
   ownerId?: string | null;
@@ -251,6 +247,14 @@ export interface CryptoAddress {
   isPrimary?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  /** TRGM similarity when searching `address`. Returns null when no trgm search filter is active. */
+  addressTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
+}
+export interface RoleType {
+  id: number;
+  name?: string | null;
 }
 /** User phone numbers with country code, verification, and primary-number management */
 export interface PhoneNumber {
@@ -266,6 +270,12 @@ export interface PhoneNumber {
   isPrimary?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  /** TRGM similarity when searching `cc`. Returns null when no trgm search filter is active. */
+  ccTrgmSimilarity?: number | null;
+  /** TRGM similarity when searching `number`. Returns null when no trgm search filter is active. */
+  numberTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 /** OAuth and social login connections linking external service accounts to users */
 export interface ConnectedAccount {
@@ -281,6 +291,12 @@ export interface ConnectedAccount {
   isVerified?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  /** TRGM similarity when searching `service`. Returns null when no trgm search filter is active. */
+  serviceTrgmSimilarity?: number | null;
+  /** TRGM similarity when searching `identifier`. Returns null when no trgm search filter is active. */
+  identifierTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 /** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
 export interface AuditLog {
@@ -299,6 +315,10 @@ export interface AuditLog {
   success?: boolean | null;
   /** Timestamp when the audit event was recorded */
   createdAt?: string | null;
+  /** TRGM similarity when searching `userAgent`. Returns null when no trgm search filter is active. */
+  userAgentTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 /** User email addresses with verification and primary-email management */
 export interface Email {
@@ -322,8 +342,12 @@ export interface User {
   type?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** Full-text search ranking when filtered by `searchTsv`. Returns null when no search condition is active. */
+  /** TSV rank when searching `searchTsv`. Returns null when no tsv search filter is active. */
   searchTsvRank?: number | null;
+  /** TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active. */
+  displayNameTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -338,10 +362,10 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
-export interface RoleTypeRelations {}
 export interface CryptoAddressRelations {
   owner?: User | null;
 }
+export interface RoleTypeRelations {}
 export interface PhoneNumberRelations {
   owner?: User | null;
 }
@@ -358,18 +382,14 @@ export interface UserRelations {
   roleType?: RoleType | null;
 }
 // ============ Entity Types With Relations ============
-export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
+export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
 export type AuditLogWithRelations = AuditLog & AuditLogRelations;
 export type EmailWithRelations = Email & EmailRelations;
 export type UserWithRelations = User & UserRelations;
 // ============ Entity Select Types ============
-export type RoleTypeSelect = {
-  id?: boolean;
-  name?: boolean;
-};
 export type CryptoAddressSelect = {
   id?: boolean;
   ownerId?: boolean;
@@ -378,9 +398,15 @@ export type CryptoAddressSelect = {
   isPrimary?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
+  addressTrgmSimilarity?: boolean;
+  searchScore?: boolean;
   owner?: {
     select: UserSelect;
   };
+};
+export type RoleTypeSelect = {
+  id?: boolean;
+  name?: boolean;
 };
 export type PhoneNumberSelect = {
   id?: boolean;
@@ -391,6 +417,9 @@ export type PhoneNumberSelect = {
   isPrimary?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
+  ccTrgmSimilarity?: boolean;
+  numberTrgmSimilarity?: boolean;
+  searchScore?: boolean;
   owner?: {
     select: UserSelect;
   };
@@ -404,6 +433,9 @@ export type ConnectedAccountSelect = {
   isVerified?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
+  serviceTrgmSimilarity?: boolean;
+  identifierTrgmSimilarity?: boolean;
+  searchScore?: boolean;
   owner?: {
     select: UserSelect;
   };
@@ -417,6 +449,8 @@ export type AuditLogSelect = {
   ipAddress?: boolean;
   success?: boolean;
   createdAt?: boolean;
+  userAgentTrgmSimilarity?: boolean;
+  searchScore?: boolean;
   actor?: {
     select: UserSelect;
   };
@@ -443,18 +477,13 @@ export type UserSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   searchTsvRank?: boolean;
+  displayNameTrgmSimilarity?: boolean;
+  searchScore?: boolean;
   roleType?: {
     select: RoleTypeSelect;
   };
 };
 // ============ Table Filter Types ============
-export interface RoleTypeFilter {
-  id?: IntFilter;
-  name?: StringFilter;
-  and?: RoleTypeFilter[];
-  or?: RoleTypeFilter[];
-  not?: RoleTypeFilter;
-}
 export interface CryptoAddressFilter {
   id?: UUIDFilter;
   ownerId?: UUIDFilter;
@@ -463,9 +492,18 @@ export interface CryptoAddressFilter {
   isPrimary?: BooleanFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
+  addressTrgmSimilarity?: FloatFilter;
+  searchScore?: FloatFilter;
   and?: CryptoAddressFilter[];
   or?: CryptoAddressFilter[];
   not?: CryptoAddressFilter;
+}
+export interface RoleTypeFilter {
+  id?: IntFilter;
+  name?: StringFilter;
+  and?: RoleTypeFilter[];
+  or?: RoleTypeFilter[];
+  not?: RoleTypeFilter;
 }
 export interface PhoneNumberFilter {
   id?: UUIDFilter;
@@ -476,6 +514,9 @@ export interface PhoneNumberFilter {
   isPrimary?: BooleanFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
+  ccTrgmSimilarity?: FloatFilter;
+  numberTrgmSimilarity?: FloatFilter;
+  searchScore?: FloatFilter;
   and?: PhoneNumberFilter[];
   or?: PhoneNumberFilter[];
   not?: PhoneNumberFilter;
@@ -489,6 +530,9 @@ export interface ConnectedAccountFilter {
   isVerified?: BooleanFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
+  serviceTrgmSimilarity?: FloatFilter;
+  identifierTrgmSimilarity?: FloatFilter;
+  searchScore?: FloatFilter;
   and?: ConnectedAccountFilter[];
   or?: ConnectedAccountFilter[];
   not?: ConnectedAccountFilter;
@@ -502,6 +546,8 @@ export interface AuditLogFilter {
   ipAddress?: InternetAddressFilter;
   success?: BooleanFilter;
   createdAt?: DatetimeFilter;
+  userAgentTrgmSimilarity?: FloatFilter;
+  searchScore?: FloatFilter;
   and?: AuditLogFilter[];
   or?: AuditLogFilter[];
   not?: AuditLogFilter;
@@ -528,19 +574,13 @@ export interface UserFilter {
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
   searchTsvRank?: FloatFilter;
+  displayNameTrgmSimilarity?: FloatFilter;
+  searchScore?: FloatFilter;
   and?: UserFilter[];
   or?: UserFilter[];
   not?: UserFilter;
 }
 // ============ OrderBy Types ============
-export type RoleTypeOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC';
 export type CryptoAddressOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -558,7 +598,19 @@ export type CryptoAddressOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'ADDRESS_TRGM_SIMILARITY_ASC'
+  | 'ADDRESS_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
+export type RoleTypeOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
 export type PhoneNumberOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -578,7 +630,13 @@ export type PhoneNumberOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'CC_TRGM_SIMILARITY_ASC'
+  | 'CC_TRGM_SIMILARITY_DESC'
+  | 'NUMBER_TRGM_SIMILARITY_ASC'
+  | 'NUMBER_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 export type ConnectedAccountOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -598,7 +656,13 @@ export type ConnectedAccountOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'SERVICE_TRGM_SIMILARITY_ASC'
+  | 'SERVICE_TRGM_SIMILARITY_DESC'
+  | 'IDENTIFIER_TRGM_SIMILARITY_ASC'
+  | 'IDENTIFIER_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 export type AuditLogOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -618,7 +682,11 @@ export type AuditLogOrderBy =
   | 'SUCCESS_ASC'
   | 'SUCCESS_DESC'
   | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
+  | 'CREATED_AT_DESC'
+  | 'USER_AGENT_TRGM_SIMILARITY_ASC'
+  | 'USER_AGENT_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 export type EmailOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -658,8 +726,38 @@ export type UserOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'SEARCH_TSV_RANK_ASC'
-  | 'SEARCH_TSV_RANK_DESC';
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'DISPLAY_NAME_TRGM_SIMILARITY_ASC'
+  | 'DISPLAY_NAME_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 // ============ CRUD Input Types ============
+export interface CreateCryptoAddressInput {
+  clientMutationId?: string;
+  cryptoAddress: {
+    ownerId?: string;
+    address: string;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface CryptoAddressPatch {
+  ownerId?: string | null;
+  address?: string | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+  addressTrgmSimilarity?: number | null;
+  searchScore?: number | null;
+}
+export interface UpdateCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+  cryptoAddressPatch: CryptoAddressPatch;
+}
+export interface DeleteCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateRoleTypeInput {
   clientMutationId?: string;
   roleType: {
@@ -678,30 +776,6 @@ export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
 }
-export interface CreateCryptoAddressInput {
-  clientMutationId?: string;
-  cryptoAddress: {
-    ownerId?: string;
-    address: string;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface CryptoAddressPatch {
-  ownerId?: string | null;
-  address?: string | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-}
-export interface UpdateCryptoAddressInput {
-  clientMutationId?: string;
-  id: string;
-  cryptoAddressPatch: CryptoAddressPatch;
-}
-export interface DeleteCryptoAddressInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreatePhoneNumberInput {
   clientMutationId?: string;
   phoneNumber: {
@@ -718,6 +792,9 @@ export interface PhoneNumberPatch {
   number?: string | null;
   isVerified?: boolean | null;
   isPrimary?: boolean | null;
+  ccTrgmSimilarity?: number | null;
+  numberTrgmSimilarity?: number | null;
+  searchScore?: number | null;
 }
 export interface UpdatePhoneNumberInput {
   clientMutationId?: string;
@@ -744,6 +821,9 @@ export interface ConnectedAccountPatch {
   identifier?: string | null;
   details?: Record<string, unknown> | null;
   isVerified?: boolean | null;
+  serviceTrgmSimilarity?: number | null;
+  identifierTrgmSimilarity?: number | null;
+  searchScore?: number | null;
 }
 export interface UpdateConnectedAccountInput {
   clientMutationId?: string;
@@ -772,6 +852,8 @@ export interface AuditLogPatch {
   userAgent?: string | null;
   ipAddress?: string | null;
   success?: boolean | null;
+  userAgentTrgmSimilarity?: number | null;
+  searchScore?: number | null;
 }
 export interface UpdateAuditLogInput {
   clientMutationId?: string;
@@ -823,6 +905,8 @@ export interface UserPatch {
   searchTsv?: string | null;
   type?: number | null;
   searchTsvRank?: number | null;
+  displayNameTrgmSimilarity?: number | null;
+  searchScore?: number | null;
 }
 export interface UpdateUserInput {
   clientMutationId?: string;
@@ -1069,51 +1153,6 @@ export type VerifyTotpPayloadSelect = {
     select: SessionSelect;
   };
 };
-export interface CreateRoleTypePayload {
-  clientMutationId?: string | null;
-  /** The `RoleType` that was created by this mutation. */
-  roleType?: RoleType | null;
-  roleTypeEdge?: RoleTypeEdge | null;
-}
-export type CreateRoleTypePayloadSelect = {
-  clientMutationId?: boolean;
-  roleType?: {
-    select: RoleTypeSelect;
-  };
-  roleTypeEdge?: {
-    select: RoleTypeEdgeSelect;
-  };
-};
-export interface UpdateRoleTypePayload {
-  clientMutationId?: string | null;
-  /** The `RoleType` that was updated by this mutation. */
-  roleType?: RoleType | null;
-  roleTypeEdge?: RoleTypeEdge | null;
-}
-export type UpdateRoleTypePayloadSelect = {
-  clientMutationId?: boolean;
-  roleType?: {
-    select: RoleTypeSelect;
-  };
-  roleTypeEdge?: {
-    select: RoleTypeEdgeSelect;
-  };
-};
-export interface DeleteRoleTypePayload {
-  clientMutationId?: string | null;
-  /** The `RoleType` that was deleted by this mutation. */
-  roleType?: RoleType | null;
-  roleTypeEdge?: RoleTypeEdge | null;
-}
-export type DeleteRoleTypePayloadSelect = {
-  clientMutationId?: boolean;
-  roleType?: {
-    select: RoleTypeSelect;
-  };
-  roleTypeEdge?: {
-    select: RoleTypeEdgeSelect;
-  };
-};
 export interface CreateCryptoAddressPayload {
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was created by this mutation. */
@@ -1157,6 +1196,51 @@ export type DeleteCryptoAddressPayloadSelect = {
   };
   cryptoAddressEdge?: {
     select: CryptoAddressEdgeSelect;
+  };
+};
+export interface CreateRoleTypePayload {
+  clientMutationId?: string | null;
+  /** The `RoleType` that was created by this mutation. */
+  roleType?: RoleType | null;
+  roleTypeEdge?: RoleTypeEdge | null;
+}
+export type CreateRoleTypePayloadSelect = {
+  clientMutationId?: boolean;
+  roleType?: {
+    select: RoleTypeSelect;
+  };
+  roleTypeEdge?: {
+    select: RoleTypeEdgeSelect;
+  };
+};
+export interface UpdateRoleTypePayload {
+  clientMutationId?: string | null;
+  /** The `RoleType` that was updated by this mutation. */
+  roleType?: RoleType | null;
+  roleTypeEdge?: RoleTypeEdge | null;
+}
+export type UpdateRoleTypePayloadSelect = {
+  clientMutationId?: boolean;
+  roleType?: {
+    select: RoleTypeSelect;
+  };
+  roleTypeEdge?: {
+    select: RoleTypeEdgeSelect;
+  };
+};
+export interface DeleteRoleTypePayload {
+  clientMutationId?: string | null;
+  /** The `RoleType` that was deleted by this mutation. */
+  roleType?: RoleType | null;
+  roleTypeEdge?: RoleTypeEdge | null;
+}
+export type DeleteRoleTypePayloadSelect = {
+  clientMutationId?: boolean;
+  roleType?: {
+    select: RoleTypeSelect;
+  };
+  roleTypeEdge?: {
+    select: RoleTypeEdgeSelect;
   };
 };
 export interface CreatePhoneNumberPayload {
@@ -1391,6 +1475,10 @@ export interface SignInOneTimeTokenRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
+  accessTokenTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 export type SignInOneTimeTokenRecordSelect = {
   id?: boolean;
@@ -1399,6 +1487,8 @@ export type SignInOneTimeTokenRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+  accessTokenTrgmSimilarity?: boolean;
+  searchScore?: boolean;
 };
 export interface SignInRecord {
   id?: string | null;
@@ -1407,6 +1497,10 @@ export interface SignInRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
+  accessTokenTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 export type SignInRecordSelect = {
   id?: boolean;
@@ -1415,6 +1509,8 @@ export type SignInRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+  accessTokenTrgmSimilarity?: boolean;
+  searchScore?: boolean;
 };
 export interface SignUpRecord {
   id?: string | null;
@@ -1423,6 +1519,10 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
+  accessTokenTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 export type SignUpRecordSelect = {
   id?: boolean;
@@ -1431,6 +1531,8 @@ export type SignUpRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+  accessTokenTrgmSimilarity?: boolean;
+  searchScore?: boolean;
 };
 export interface ExtendTokenExpiresRecord {
   id?: string | null;
@@ -1469,6 +1571,14 @@ export interface Session {
   csrfSecret?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  /** TRGM similarity when searching `uagent`. Returns null when no trgm search filter is active. */
+  uagentTrgmSimilarity?: number | null;
+  /** TRGM similarity when searching `fingerprintMode`. Returns null when no trgm search filter is active. */
+  fingerprintModeTrgmSimilarity?: number | null;
+  /** TRGM similarity when searching `csrfSecret`. Returns null when no trgm search filter is active. */
+  csrfSecretTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 export type SessionSelect = {
   id?: boolean;
@@ -1485,18 +1595,10 @@ export type SessionSelect = {
   csrfSecret?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-};
-/** A `RoleType` edge in the connection. */
-export interface RoleTypeEdge {
-  cursor?: string | null;
-  /** The `RoleType` at the end of the edge. */
-  node?: RoleType | null;
-}
-export type RoleTypeEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: RoleTypeSelect;
-  };
+  uagentTrgmSimilarity?: boolean;
+  fingerprintModeTrgmSimilarity?: boolean;
+  csrfSecretTrgmSimilarity?: boolean;
+  searchScore?: boolean;
 };
 /** A `CryptoAddress` edge in the connection. */
 export interface CryptoAddressEdge {
@@ -1508,6 +1610,18 @@ export type CryptoAddressEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: CryptoAddressSelect;
+  };
+};
+/** A `RoleType` edge in the connection. */
+export interface RoleTypeEdge {
+  cursor?: string | null;
+  /** The `RoleType` at the end of the edge. */
+  node?: RoleType | null;
+}
+export type RoleTypeEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: RoleTypeSelect;
   };
 };
 /** A `PhoneNumber` edge in the connection. */

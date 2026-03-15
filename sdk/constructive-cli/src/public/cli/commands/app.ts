@@ -18,6 +18,10 @@ const fieldSchema: FieldSchema = {
   appStoreId: 'string',
   appIdPrefix: 'string',
   playStoreLink: 'string',
+  nameTrgmSimilarity: 'float',
+  appStoreIdTrgmSimilarity: 'float',
+  appIdPrefixTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\napp <command>\n\nCommands:\n  list                  List all app records\n  get                   Get a app by ID\n  create                Create a new app\n  update                Update an existing app\n  delete                Delete a app\n\n  --help, -h            Show this help message\n';

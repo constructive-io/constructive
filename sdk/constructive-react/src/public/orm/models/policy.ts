@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class PolicyModel {
   constructor(private client: OrmClient) {}
   findMany<S extends PolicySelect>(
-    args: FindManyArgs<S, PolicyFilter, PolicyOrderBy> & {
+    args: FindManyArgs<S, PolicyFilter, never, PolicyOrderBy> & {
       select: S;
     } & StrictSelect<S, PolicySelect>
   ): QueryBuilder<{

@@ -28,19 +28,11 @@ import type {
   StringListFilter,
   UUIDFilter,
   UUIDListFilter,
+  VectorFilter,
 } from './types';
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
-/** Methods to use when ordering `RoleType`. */
-export type RoleTypeOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC';
 /** Methods to use when ordering `CryptoAddress`. */
 export type CryptoAddressOrderBy =
   | 'NATURAL'
@@ -53,7 +45,20 @@ export type CryptoAddressOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'ADDRESS_TRGM_SIMILARITY_ASC'
+  | 'ADDRESS_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
+/** Methods to use when ordering `RoleType`. */
+export type RoleTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
 /** Methods to use when ordering `PhoneNumber`. */
 export type PhoneNumberOrderBy =
   | 'NATURAL'
@@ -66,7 +71,13 @@ export type PhoneNumberOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'CC_TRGM_SIMILARITY_ASC'
+  | 'CC_TRGM_SIMILARITY_DESC'
+  | 'NUMBER_TRGM_SIMILARITY_ASC'
+  | 'NUMBER_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `ConnectedAccount`. */
 export type ConnectedAccountOrderBy =
   | 'NATURAL'
@@ -81,7 +92,13 @@ export type ConnectedAccountOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'SERVICE_TRGM_SIMILARITY_ASC'
+  | 'SERVICE_TRGM_SIMILARITY_DESC'
+  | 'IDENTIFIER_TRGM_SIMILARITY_ASC'
+  | 'IDENTIFIER_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `AuditLog`. */
 export type AuditLogOrderBy =
   | 'NATURAL'
@@ -90,7 +107,11 @@ export type AuditLogOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EVENT_ASC'
-  | 'EVENT_DESC';
+  | 'EVENT_DESC'
+  | 'USER_AGENT_TRGM_SIMILARITY_ASC'
+  | 'USER_AGENT_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `Email`. */
 export type EmailOrderBy =
   | 'NATURAL'
@@ -120,50 +141,11 @@ export type UserOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'SEARCH_TSV_RANK_ASC'
-  | 'SEARCH_TSV_RANK_DESC';
-/**
- * A condition to be used against `RoleType` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface RoleTypeCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: number;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-}
-/** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
-export interface RoleTypeFilter {
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: RoleTypeFilter[];
-  /** Checks for any expressions in this list. */
-  or?: RoleTypeFilter[];
-  /** Negates the expression. */
-  not?: RoleTypeFilter;
-}
-/**
- * A condition to be used against `CryptoAddress` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface CryptoAddressCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `ownerId` field. */
-  ownerId?: string;
-  /** Checks for equality with the object’s `address` field. */
-  address?: string;
-  /** Checks for equality with the object’s `isVerified` field. */
-  isVerified?: boolean;
-  /** Checks for equality with the object’s `isPrimary` field. */
-  isPrimary?: boolean;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
+  | 'SEARCH_TSV_RANK_DESC'
+  | 'DISPLAY_NAME_TRGM_SIMILARITY_ASC'
+  | 'DISPLAY_NAME_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
 export interface CryptoAddressFilter {
   /** Filter by the object’s `id` field. */
@@ -186,28 +168,110 @@ export interface CryptoAddressFilter {
   or?: CryptoAddressFilter[];
   /** Negates the expression. */
   not?: CryptoAddressFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** TRGM search on the `address` column. */
+  trgmAddress?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
-/**
- * A condition to be used against `PhoneNumber` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface PhoneNumberCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `ownerId` field. */
-  ownerId?: string;
-  /** Checks for equality with the object’s `cc` field. */
-  cc?: string;
-  /** Checks for equality with the object’s `number` field. */
-  number?: string;
-  /** Checks for equality with the object’s `isVerified` field. */
-  isVerified?: boolean;
-  /** Checks for equality with the object’s `isPrimary` field. */
-  isPrimary?: boolean;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
+}
+/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
+export interface UserFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
+  searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
+  type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserFilter[];
+  /** Negates the expression. */
+  not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
+}
+/** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
+export interface RoleTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RoleTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RoleTypeFilter[];
+  /** Negates the expression. */
+  not?: RoleTypeFilter;
 }
 /** A filter to be used against `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
 export interface PhoneNumberFilter {
@@ -233,28 +297,19 @@ export interface PhoneNumberFilter {
   or?: PhoneNumberFilter[];
   /** Negates the expression. */
   not?: PhoneNumberFilter;
-}
-/**
- * A condition to be used against `ConnectedAccount` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface ConnectedAccountCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `ownerId` field. */
-  ownerId?: string;
-  /** Checks for equality with the object’s `service` field. */
-  service?: string;
-  /** Checks for equality with the object’s `identifier` field. */
-  identifier?: string;
-  /** Checks for equality with the object’s `details` field. */
-  details?: unknown;
-  /** Checks for equality with the object’s `isVerified` field. */
-  isVerified?: boolean;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** TRGM search on the `cc` column. */
+  trgmCc?: TrgmSearchInput;
+  /** TRGM search on the `number` column. */
+  trgmNumber?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
 export interface ConnectedAccountFilter {
@@ -280,28 +335,19 @@ export interface ConnectedAccountFilter {
   or?: ConnectedAccountFilter[];
   /** Negates the expression. */
   not?: ConnectedAccountFilter;
-}
-/**
- * A condition to be used against `AuditLog` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface AuditLogCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `event` field. */
-  event?: string;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `origin` field. */
-  origin?: ConstructiveInternalTypeOrigin;
-  /** Checks for equality with the object’s `userAgent` field. */
-  userAgent?: string;
-  /** Checks for equality with the object’s `ipAddress` field. */
-  ipAddress?: string;
-  /** Checks for equality with the object’s `success` field. */
-  success?: boolean;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** TRGM search on the `service` column. */
+  trgmService?: TrgmSearchInput;
+  /** TRGM search on the `identifier` column. */
+  trgmIdentifier?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `AuditLog` object types. All fields are combined with a logical ‘and.’ */
 export interface AuditLogFilter {
@@ -327,6 +373,17 @@ export interface AuditLogFilter {
   or?: AuditLogFilter[];
   /** Negates the expression. */
   not?: AuditLogFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** TRGM search on the `user_agent` column. */
+  trgmUserAgent?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against ConstructiveInternalTypeOrigin fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeOriginFilter {
@@ -405,23 +462,6 @@ export interface ConstructiveInternalTypeOriginFilter {
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
 }
-/** A condition to be used against `Email` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface EmailCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `ownerId` field. */
-  ownerId?: string;
-  /** Checks for equality with the object’s `email` field. */
-  email?: ConstructiveInternalTypeEmail;
-  /** Checks for equality with the object’s `isVerified` field. */
-  isVerified?: boolean;
-  /** Checks for equality with the object’s `isPrimary` field. */
-  isPrimary?: boolean;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
 /** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
 export interface EmailFilter {
   /** Filter by the object’s `id` field. */
@@ -444,6 +484,8 @@ export interface EmailFilter {
   or?: EmailFilter[];
   /** Negates the expression. */
   not?: EmailFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -521,87 +563,6 @@ export interface ConstructiveInternalTypeEmailFilter {
   greaterThanInsensitive?: ConstructiveInternalTypeEmail;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
-}
-/** A condition to be used against `User` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface UserCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `username` field. */
-  username?: string;
-  /** Checks for equality with the object’s `displayName` field. */
-  displayName?: string;
-  /** Checks for equality with the object’s `profilePicture` field. */
-  profilePicture?: ConstructiveInternalTypeImage;
-  /** Checks for equality with the object’s `searchTsv` field. */
-  searchTsv?: string;
-  /** Checks for equality with the object’s `type` field. */
-  type?: number;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Full-text search on the `search_tsv` tsvector column using `websearch_to_tsquery`. */
-  fullTextSearchTsv?: string;
-}
-/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
-export interface UserFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `username` field. */
-  username?: StringFilter;
-  /** Filter by the object’s `displayName` field. */
-  displayName?: StringFilter;
-  /** Filter by the object’s `profilePicture` field. */
-  profilePicture?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `searchTsv` field. */
-  searchTsv?: FullTextFilter;
-  /** Filter by the object’s `type` field. */
-  type?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: UserFilter[];
-  /** Checks for any expressions in this list. */
-  or?: UserFilter[];
-  /** Negates the expression. */
-  not?: UserFilter;
-}
-/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
-export interface ConstructiveInternalTypeImageFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: ConstructiveInternalTypeImage;
-  /** Not equal to the specified value. */
-  notEqualTo?: ConstructiveInternalTypeImage;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: ConstructiveInternalTypeImage;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: ConstructiveInternalTypeImage;
-  /** Included in the specified list. */
-  in?: ConstructiveInternalTypeImage[];
-  /** Not included in the specified list. */
-  notIn?: ConstructiveInternalTypeImage[];
-  /** Less than the specified value. */
-  lessThan?: ConstructiveInternalTypeImage;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
-  /** Greater than the specified value. */
-  greaterThan?: ConstructiveInternalTypeImage;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
-  /** Contains the specified JSON. */
-  contains?: ConstructiveInternalTypeImage;
-  /** Contains the specified key. */
-  containsKey?: string;
-  /** Contains all of the specified keys. */
-  containsAllKeys?: string[];
-  /** Contains any of the specified keys. */
-  containsAnyKeys?: string[];
-  /** Contained by the specified JSON. */
-  containedBy?: ConstructiveInternalTypeImage;
 }
 export interface SignOutInput {
   clientMutationId?: string;
@@ -701,16 +662,6 @@ export interface VerifyTotpInput {
   clientMutationId?: string;
   totpValue: string;
 }
-export interface CreateRoleTypeInput {
-  clientMutationId?: string;
-  /** The `RoleType` to be created by this mutation. */
-  roleType: RoleTypeInput;
-}
-/** An input for mutations affecting `RoleType` */
-export interface RoleTypeInput {
-  id: number;
-  name: string;
-}
 export interface CreateCryptoAddressInput {
   clientMutationId?: string;
   /** The `CryptoAddress` to be created by this mutation. */
@@ -728,6 +679,16 @@ export interface CryptoAddressInput {
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateRoleTypeInput {
+  clientMutationId?: string;
+  /** The `RoleType` to be created by this mutation. */
+  roleType: RoleTypeInput;
+}
+/** An input for mutations affecting `RoleType` */
+export interface RoleTypeInput {
+  id: number;
+  name: string;
 }
 export interface CreatePhoneNumberInput {
   clientMutationId?: string;
@@ -826,17 +787,6 @@ export interface UserInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateRoleTypeInput {
-  clientMutationId?: string;
-  id: number;
-  /** An object where the defined keys will be set on the `RoleType` being updated. */
-  roleTypePatch: RoleTypePatch;
-}
-/** Represents an update to a `RoleType`. Fields that are set will be updated. */
-export interface RoleTypePatch {
-  id?: number;
-  name?: string;
-}
 export interface UpdateCryptoAddressInput {
   clientMutationId?: string;
   id: string;
@@ -855,6 +805,17 @@ export interface CryptoAddressPatch {
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateRoleTypeInput {
+  clientMutationId?: string;
+  id: number;
+  /** An object where the defined keys will be set on the `RoleType` being updated. */
+  roleTypePatch: RoleTypePatch;
+}
+/** Represents an update to a `RoleType`. Fields that are set will be updated. */
+export interface RoleTypePatch {
+  id?: number;
+  name?: string;
 }
 export interface UpdatePhoneNumberInput {
   clientMutationId?: string;
@@ -960,13 +921,13 @@ export interface UserPatch {
   /** File upload for the `profilePicture` field. */
   profilePictureUpload?: File;
 }
-export interface DeleteRoleTypeInput {
-  clientMutationId?: string;
-  id: number;
-}
 export interface DeleteCryptoAddressInput {
   clientMutationId?: string;
   id: string;
+}
+export interface DeleteRoleTypeInput {
+  clientMutationId?: string;
+  id: number;
 }
 export interface DeletePhoneNumberInput {
   clientMutationId?: string;
@@ -988,17 +949,17 @@ export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
 }
-/** A connection to a list of `RoleType` values. */
-export interface RoleTypeConnection {
-  nodes: RoleType[];
-  edges: RoleTypeEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `CryptoAddress` values. */
 export interface CryptoAddressConnection {
   nodes: CryptoAddress[];
   edges: CryptoAddressEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `RoleType` values. */
+export interface RoleTypeConnection {
+  nodes: RoleType[];
+  edges: RoleTypeEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1102,17 +1063,17 @@ export interface VerifyTotpPayload {
   clientMutationId?: string | null;
   result?: Session | null;
 }
-export interface CreateRoleTypePayload {
-  clientMutationId?: string | null;
-  /** The `RoleType` that was created by this mutation. */
-  roleType?: RoleType | null;
-  roleTypeEdge?: RoleTypeEdge | null;
-}
 export interface CreateCryptoAddressPayload {
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was created by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface CreateRoleTypePayload {
+  clientMutationId?: string | null;
+  /** The `RoleType` that was created by this mutation. */
+  roleType?: RoleType | null;
+  roleTypeEdge?: RoleTypeEdge | null;
 }
 export interface CreatePhoneNumberPayload {
   clientMutationId?: string | null;
@@ -1144,17 +1105,17 @@ export interface CreateUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
-export interface UpdateRoleTypePayload {
-  clientMutationId?: string | null;
-  /** The `RoleType` that was updated by this mutation. */
-  roleType?: RoleType | null;
-  roleTypeEdge?: RoleTypeEdge | null;
-}
 export interface UpdateCryptoAddressPayload {
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was updated by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface UpdateRoleTypePayload {
+  clientMutationId?: string | null;
+  /** The `RoleType` that was updated by this mutation. */
+  roleType?: RoleType | null;
+  roleTypeEdge?: RoleTypeEdge | null;
 }
 export interface UpdatePhoneNumberPayload {
   clientMutationId?: string | null;
@@ -1186,17 +1147,17 @@ export interface UpdateUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
-export interface DeleteRoleTypePayload {
-  clientMutationId?: string | null;
-  /** The `RoleType` that was deleted by this mutation. */
-  roleType?: RoleType | null;
-  roleTypeEdge?: RoleTypeEdge | null;
-}
 export interface DeleteCryptoAddressPayload {
   clientMutationId?: string | null;
   /** The `CryptoAddress` that was deleted by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export interface DeleteRoleTypePayload {
+  clientMutationId?: string | null;
+  /** The `RoleType` that was deleted by this mutation. */
+  roleType?: RoleType | null;
+  roleTypeEdge?: RoleTypeEdge | null;
 }
 export interface DeletePhoneNumberPayload {
   clientMutationId?: string | null;
@@ -1228,11 +1189,11 @@ export interface DeleteUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
-/** A `RoleType` edge in the connection. */
-export interface RoleTypeEdge {
+/** A `CryptoAddress` edge in the connection. */
+export interface CryptoAddressEdge {
   cursor?: string | null;
-  /** The `RoleType` at the end of the edge. */
-  node?: RoleType | null;
+  /** The `CryptoAddress` at the end of the edge. */
+  node?: CryptoAddress | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -1245,11 +1206,11 @@ export interface PageInfo {
   /** When paginating forwards, the cursor to continue. */
   endCursor?: string | null;
 }
-/** A `CryptoAddress` edge in the connection. */
-export interface CryptoAddressEdge {
+/** A `RoleType` edge in the connection. */
+export interface RoleTypeEdge {
   cursor?: string | null;
-  /** The `CryptoAddress` at the end of the edge. */
-  node?: CryptoAddress | null;
+  /** The `RoleType` at the end of the edge. */
+  node?: RoleType | null;
 }
 /** A `PhoneNumber` edge in the connection. */
 export interface PhoneNumberEdge {
@@ -1302,6 +1263,10 @@ export interface SignInOneTimeTokenRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
+  accessTokenTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 export interface SignInRecord {
   id?: string | null;
@@ -1310,6 +1275,10 @@ export interface SignInRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
+  accessTokenTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 export interface SignUpRecord {
   id?: string | null;
@@ -1318,6 +1287,10 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
+  accessTokenTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 export interface ExtendTokenExpiresRecord {
   id?: string | null;
@@ -1351,6 +1324,14 @@ export interface Session {
   csrfSecret?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  /** TRGM similarity when searching `uagent`. Returns null when no trgm search filter is active. */
+  uagentTrgmSimilarity?: number | null;
+  /** TRGM similarity when searching `fingerprintMode`. Returns null when no trgm search filter is active. */
+  fingerprintModeTrgmSimilarity?: number | null;
+  /** TRGM similarity when searching `csrfSecret`. Returns null when no trgm search filter is active. */
+  csrfSecretTrgmSimilarity?: number | null;
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  searchScore?: number | null;
 }
 /** Information about a table field/column */
 export interface MetaField {

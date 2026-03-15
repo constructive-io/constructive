@@ -17,6 +17,9 @@ const fieldSchema: FieldSchema = {
   isPrimary: 'boolean',
   createdAt: 'string',
   updatedAt: 'string',
+  ccTrgmSimilarity: 'float',
+  numberTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nphone-number <command>\n\nCommands:\n  list                  List all phoneNumber records\n  get                   Get a phoneNumber by ID\n  create                Create a new phoneNumber\n  update                Update an existing phoneNumber\n  delete                Delete a phoneNumber\n\n  --help, -h            Show this help message\n';

@@ -9,7 +9,7 @@ Append-only log of hierarchy edge grants and revocations; triggers apply changes
 ```typescript
 db.orgChartEdgeGrant.findMany({ select: { id: true } }).execute()
 db.orgChartEdgeGrant.findOne({ id: '<value>', select: { id: true } }).execute()
-db.orgChartEdgeGrant.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>' }, select: { id: true } }).execute()
+db.orgChartEdgeGrant.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.orgChartEdgeGrant.update({ where: { id: '<value>' }, data: { entityId: '<new>' }, select: { id: true } }).execute()
 db.orgChartEdgeGrant.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.orgChartEdgeGrant.findMany({
 
 ```typescript
 const item = await db.orgChartEdgeGrant.create({
-  data: { entityId: 'value', childId: 'value', parentId: 'value', grantorId: 'value', isGrant: 'value', positionTitle: 'value', positionLevel: 'value' },
+  data: { entityId: 'value', childId: 'value', parentId: 'value', grantorId: 'value', isGrant: 'value', positionTitle: 'value', positionLevel: 'value', positionTitleTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

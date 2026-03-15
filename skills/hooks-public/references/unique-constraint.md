@@ -7,8 +7,8 @@ React Query hooks for UniqueConstraint data operations
 ## Usage
 
 ```typescript
-useUniqueConstraintsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
-useUniqueConstraintQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } } })
+useUniqueConstraintsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } } })
+useUniqueConstraintQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } } })
 useCreateUniqueConstraintMutation({ selection: { fields: { id: true } } })
 useUpdateUniqueConstraintMutation({ selection: { fields: { id: true } } })
 useDeleteUniqueConstraintMutation({})
@@ -20,7 +20,7 @@ useDeleteUniqueConstraintMutation({})
 
 ```typescript
 const { data, isLoading } = useUniqueConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUniqueConstraintsQuery({
 const { mutate } = useCreateUniqueConstraintMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+mutate({ databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

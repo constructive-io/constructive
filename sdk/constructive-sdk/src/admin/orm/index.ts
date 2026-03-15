@@ -19,8 +19,8 @@ import { OrgAdminGrantModel } from './models/orgAdminGrant';
 import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
-import { MembershipTypeModel } from './models/membershipType';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
+import { MembershipTypeModel } from './models/membershipType';
 import { AppLimitModel } from './models/appLimit';
 import { AppAchievementModel } from './models/appAchievement';
 import { AppStepModel } from './models/appStep';
@@ -32,10 +32,10 @@ import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
-import { InviteModel } from './models/invite';
-import { AppLevelModel } from './models/appLevel';
 import { AppMembershipModel } from './models/appMembership';
 import { OrgMembershipModel } from './models/orgMembership';
+import { InviteModel } from './models/invite';
+import { AppLevelModel } from './models/appLevel';
 import { OrgInviteModel } from './models/orgInvite';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -86,8 +86,8 @@ export function createClient(config: OrmClientConfig) {
     orgOwnerGrant: new OrgOwnerGrantModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
-    membershipType: new MembershipTypeModel(client),
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
+    membershipType: new MembershipTypeModel(client),
     appLimit: new AppLimitModel(client),
     appAchievement: new AppAchievementModel(client),
     appStep: new AppStepModel(client),
@@ -99,10 +99,10 @@ export function createClient(config: OrmClientConfig) {
     orgGrant: new OrgGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
-    invite: new InviteModel(client),
-    appLevel: new AppLevelModel(client),
     appMembership: new AppMembershipModel(client),
     orgMembership: new OrgMembershipModel(client),
+    invite: new InviteModel(client),
+    appLevel: new AppLevelModel(client),
     orgInvite: new OrgInviteModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

@@ -9,7 +9,7 @@ ORM operations for User records
 ```typescript
 db.user.findMany({ select: { id: true } }).execute()
 db.user.findOne({ id: '<value>', select: { id: true } }).execute()
-db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>' }, select: { id: true } }).execute()
+db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.user.update({ where: { id: '<value>' }, data: { username: '<new>' }, select: { id: true } }).execute()
 db.user.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.user.findMany({
 
 ```typescript
 const item = await db.user.create({
-  data: { username: 'value', displayName: 'value', profilePicture: 'value', searchTsv: 'value', type: 'value', searchTsvRank: 'value' },
+  data: { username: 'value', displayName: 'value', profilePicture: 'value', searchTsv: 'value', type: 'value', searchTsvRank: 'value', displayNameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

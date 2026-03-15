@@ -16,6 +16,10 @@ const fieldSchema: FieldSchema = {
   privilege: 'string',
   granteeName: 'string',
   isGrant: 'boolean',
+  objectTypeTrgmSimilarity: 'float',
+  privilegeTrgmSimilarity: 'float',
+  granteeNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ndefault-privilege <command>\n\nCommands:\n  list                  List all defaultPrivilege records\n  get                   Get a defaultPrivilege by ID\n  create                Create a new defaultPrivilege\n  update                Update an existing defaultPrivilege\n  delete                Delete a defaultPrivilege\n\n  --help, -h            Show this help message\n';

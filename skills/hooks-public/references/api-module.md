@@ -7,8 +7,8 @@ Server-side module configuration for an API endpoint; stores module name and JSO
 ## Usage
 
 ```typescript
-useApiModulesQuery({ selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } } })
-useApiModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } } })
+useApiModulesQuery({ selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } } })
+useApiModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } } })
 useCreateApiModuleMutation({ selection: { fields: { id: true } } })
 useUpdateApiModuleMutation({ selection: { fields: { id: true } } })
 useDeleteApiModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteApiModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useApiModulesQuery({
-  selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } },
+  selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useApiModulesQuery({
 const { mutate } = useCreateApiModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>' });
+mutate({ databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

@@ -9,7 +9,7 @@ Defines available permissions as named bits within a bitmask, used by the RBAC s
 ```typescript
 db.orgPermission.findMany({ select: { id: true } }).execute()
 db.orgPermission.findOne({ id: '<value>', select: { id: true } }).execute()
-db.orgPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' }, select: { id: true } }).execute()
+db.orgPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.orgPermission.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.orgPermission.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.orgPermission.findMany({
 
 ```typescript
 const item = await db.orgPermission.create({
-  data: { name: 'value', bitnum: 'value', bitstr: 'value', description: 'value' },
+  data: { name: 'value', bitnum: 'value', bitstr: 'value', description: 'value', descriptionTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

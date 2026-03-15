@@ -9,8 +9,8 @@ CRUD operations for Schema records via csdk CLI
 ```bash
 csdk schema list
 csdk schema get --id <value>
-csdk schema create --databaseId <value> --name <value> --schemaName <value> [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--isPublic <value>]
-csdk schema update --id <value> [--databaseId <value>] [--name <value>] [--schemaName <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--isPublic <value>]
+csdk schema create --databaseId <value> --name <value> --schemaName <value> --nameTrgmSimilarity <value> --schemaNameTrgmSimilarity <value> --labelTrgmSimilarity <value> --descriptionTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--isPublic <value>]
+csdk schema update --id <value> [--databaseId <value>] [--name <value>] [--schemaName <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--isPublic <value>] [--nameTrgmSimilarity <value>] [--schemaNameTrgmSimilarity <value>] [--labelTrgmSimilarity <value>] [--descriptionTrgmSimilarity <value>] [--moduleTrgmSimilarity <value>] [--searchScore <value>]
 csdk schema delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk schema list
 ### Create a schema
 
 ```bash
-csdk schema create --databaseId <value> --name <value> --schemaName <value> [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--isPublic <value>]
+csdk schema create --databaseId <value> --name <value> --schemaName <value> --nameTrgmSimilarity <value> --schemaNameTrgmSimilarity <value> --labelTrgmSimilarity <value> --descriptionTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--label <value>] [--description <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--isPublic <value>]
 ```
 
 ### Get a schema by id

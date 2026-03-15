@@ -14,6 +14,8 @@ const fieldSchema: FieldSchema = {
   schemaId: 'uuid',
   tableId: 'uuid',
   tableName: 'string',
+  tableNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nsecrets-module <command>\n\nCommands:\n  list                  List all secretsModule records\n  get                   Get a secretsModule by ID\n  create                Create a new secretsModule\n  update                Update an existing secretsModule\n  delete                Delete a secretsModule\n\n  --help, -h            Show this help message\n';

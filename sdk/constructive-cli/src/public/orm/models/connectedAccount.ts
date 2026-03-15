@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ConnectedAccountModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ConnectedAccountSelect>(
-    args: FindManyArgs<S, ConnectedAccountFilter, ConnectedAccountOrderBy> & {
+    args: FindManyArgs<S, ConnectedAccountFilter, never, ConnectedAccountOrderBy> & {
       select: S;
     } & StrictSelect<S, ConnectedAccountSelect>
   ): QueryBuilder<{

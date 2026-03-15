@@ -32,16 +32,16 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
-| `useRoleTypesQuery` | Query | List all roleTypes |
-| `useRoleTypeQuery` | Query | Get one roleType |
-| `useCreateRoleTypeMutation` | Mutation | Create a roleType |
-| `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
-| `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
 | `useCryptoAddressesQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useCryptoAddressQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useRoleTypesQuery` | Query | List all roleTypes |
+| `useRoleTypeQuery` | Query | Get one roleType |
+| `useCreateRoleTypeMutation` | Mutation | Create a roleType |
+| `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
+| `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
 | `usePhoneNumbersQuery` | Query | User phone numbers with country code, verification, and primary-number management |
 | `usePhoneNumberQuery` | Query | User phone numbers with country code, verification, and primary-number management |
 | `useCreatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
@@ -90,6 +90,27 @@ function App() {
 
 ## Table Hooks
 
+### CryptoAddress
+
+```typescript
+// List all cryptoAddresses
+const { data, isLoading } = useCryptoAddressesQuery({
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, addressTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one cryptoAddress
+const { data: item } = useCryptoAddressQuery({
+  id: '<value>',
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, addressTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a cryptoAddress
+const { mutate: create } = useCreateCryptoAddressMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>', addressTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
 ### RoleType
 
 ```typescript
@@ -111,46 +132,25 @@ const { mutate: create } = useCreateRoleTypeMutation({
 create({ name: '<value>' });
 ```
 
-### CryptoAddress
-
-```typescript
-// List all cryptoAddresses
-const { data, isLoading } = useCryptoAddressesQuery({
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one cryptoAddress
-const { data: item } = useCryptoAddressQuery({
-  id: '<value>',
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a cryptoAddress
-const { mutate: create } = useCreateCryptoAddressMutation({
-  selection: { fields: { id: true } },
-});
-create({ ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' });
-```
-
 ### PhoneNumber
 
 ```typescript
 // List all phoneNumbers
 const { data, isLoading } = usePhoneNumbersQuery({
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one phoneNumber
 const { data: item } = usePhoneNumberQuery({
   id: '<value>',
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a phoneNumber
 const { mutate: create } = useCreatePhoneNumberMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' });
+create({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>', ccTrgmSimilarity: '<value>', numberTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ConnectedAccount
@@ -158,20 +158,20 @@ create({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<val
 ```typescript
 // List all connectedAccounts
 const { data, isLoading } = useConnectedAccountsQuery({
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one connectedAccount
 const { data: item } = useConnectedAccountQuery({
   id: '<value>',
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a connectedAccount
 const { mutate: create } = useCreateConnectedAccountMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' });
+create({ ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>', serviceTrgmSimilarity: '<value>', identifierTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AuditLog
@@ -179,20 +179,20 @@ create({ ownerId: '<value>', service: '<value>', identifier: '<value>', details:
 ```typescript
 // List all auditLogs
 const { data, isLoading } = useAuditLogsQuery({
-  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } },
+  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one auditLog
 const { data: item } = useAuditLogQuery({
   id: '<value>',
-  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } },
+  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a auditLog
 const { mutate: create } = useCreateAuditLogMutation({
   selection: { fields: { id: true } },
 });
-create({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' });
+create({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>', userAgentTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Email
@@ -221,20 +221,20 @@ create({ ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary:
 ```typescript
 // List all users
 const { data, isLoading } = useUsersQuery({
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } },
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one user
 const { data: item } = useUserQuery({
   id: '<value>',
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } },
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a user
 const { mutate: create } = useCreateUserMutation({
   selection: { fields: { id: true } },
 });
-create({ username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>' });
+create({ username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ## Custom Operation Hooks

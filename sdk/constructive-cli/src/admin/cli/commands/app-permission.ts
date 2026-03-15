@@ -14,6 +14,8 @@ const fieldSchema: FieldSchema = {
   bitnum: 'int',
   bitstr: 'string',
   description: 'string',
+  descriptionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\napp-permission <command>\n\nCommands:\n  list                  List all appPermission records\n  get                   Get a appPermission by ID\n  create                Create a new appPermission\n  update                Update an existing appPermission\n  delete                Delete a appPermission\n\n  --help, -h            Show this help message\n';

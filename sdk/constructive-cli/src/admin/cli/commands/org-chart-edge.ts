@@ -17,6 +17,8 @@ const fieldSchema: FieldSchema = {
   parentId: 'uuid',
   positionTitle: 'string',
   positionLevel: 'int',
+  positionTitleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\norg-chart-edge <command>\n\nCommands:\n  list                  List all orgChartEdge records\n  get                   Get a orgChartEdge by ID\n  create                Create a new orgChartEdge\n  update                Update an existing orgChartEdge\n  delete                Delete a orgChartEdge\n\n  --help, -h            Show this help message\n';

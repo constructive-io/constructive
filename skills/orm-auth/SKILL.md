@@ -15,7 +15,7 @@ ORM client for the auth API — provides typed CRUD operations for 7 tables and 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: roleType, cryptoAddress, phoneNumber, connectedAccount, auditLog, email, user
+// Available models: cryptoAddress, roleType, phoneNumber, connectedAccount, auditLog, email, user
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<value>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<value>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.roleType.findMany({
+const items = await db.cryptoAddress.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,8 +37,8 @@ const items = await db.roleType.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
-- [role-type](references/role-type.md)
 - [crypto-address](references/crypto-address.md)
+- [role-type](references/role-type.md)
 - [phone-number](references/phone-number.md)
 - [connected-account](references/connected-account.md)
 - [audit-log](references/audit-log.md)

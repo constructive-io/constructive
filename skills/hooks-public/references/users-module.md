@@ -7,8 +7,8 @@ React Query hooks for UsersModule data operations
 ## Usage
 
 ```typescript
-useUsersModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } } })
-useUsersModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } } })
+useUsersModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, tableNameTrgmSimilarity: true, typeTableNameTrgmSimilarity: true, searchScore: true } } })
+useUsersModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, tableNameTrgmSimilarity: true, typeTableNameTrgmSimilarity: true, searchScore: true } } })
 useCreateUsersModuleMutation({ selection: { fields: { id: true } } })
 useUpdateUsersModuleMutation({ selection: { fields: { id: true } } })
 useDeleteUsersModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteUsersModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useUsersModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, tableNameTrgmSimilarity: true, typeTableNameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUsersModulesQuery({
 const { mutate } = useCreateUsersModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', typeTableId: '<value>', typeTableName: '<value>' });
+mutate({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', typeTableId: '<value>', typeTableName: '<value>', tableNameTrgmSimilarity: '<value>', typeTableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

@@ -19,6 +19,10 @@ csdk context use <name>
 # Authentication
 csdk auth set-token <token>
 
+# Config variables
+csdk config set <key> <value>
+csdk config get <key>
+
 # CRUD for any table (e.g. org-get-managers-record)
 csdk org-get-managers-record list
 csdk org-get-managers-record get --id <value>
@@ -51,6 +55,7 @@ See the `references/` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
+- [config](references/config.md)
 - [org-get-managers-record](references/org-get-managers-record.md)
 - [org-get-subordinates-record](references/org-get-subordinates-record.md)
 - [app-permission](references/app-permission.md)
@@ -65,8 +70,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-owner-grant](references/org-owner-grant.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
-- [membership-type](references/membership-type.md)
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
+- [membership-type](references/membership-type.md)
 - [app-limit](references/app-limit.md)
 - [app-achievement](references/app-achievement.md)
 - [app-step](references/app-step.md)
@@ -78,10 +83,10 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
 - [org-membership-default](references/org-membership-default.md)
-- [invite](references/invite.md)
-- [app-level](references/app-level.md)
 - [app-membership](references/app-membership.md)
 - [org-membership](references/org-membership.md)
+- [invite](references/invite.md)
+- [app-level](references/app-level.md)
 - [org-invite](references/org-invite.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)

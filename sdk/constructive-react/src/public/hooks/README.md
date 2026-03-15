@@ -143,11 +143,6 @@ function App() {
 | `useCreateViewRuleMutation` | Mutation | DO INSTEAD rules for views (e.g., read-only enforcement) |
 | `useUpdateViewRuleMutation` | Mutation | DO INSTEAD rules for views (e.g., read-only enforcement) |
 | `useDeleteViewRuleMutation` | Mutation | DO INSTEAD rules for views (e.g., read-only enforcement) |
-| `useTableModulesQuery` | Query | List all tableModules |
-| `useTableModuleQuery` | Query | Get one tableModule |
-| `useCreateTableModuleMutation` | Mutation | Create a tableModule |
-| `useUpdateTableModuleMutation` | Mutation | Update a tableModule |
-| `useDeleteTableModuleMutation` | Mutation | Delete a tableModule |
 | `useTableTemplateModulesQuery` | Query | List all tableTemplateModules |
 | `useTableTemplateModuleQuery` | Query | Get one tableTemplateModule |
 | `useCreateTableTemplateModuleMutation` | Mutation | Create a tableTemplateModule |
@@ -338,11 +333,6 @@ function App() {
 | `useCreateProfilesModuleMutation` | Mutation | Create a profilesModule |
 | `useUpdateProfilesModuleMutation` | Mutation | Update a profilesModule |
 | `useDeleteProfilesModuleMutation` | Mutation | Delete a profilesModule |
-| `useRlsModulesQuery` | Query | List all rlsModules |
-| `useRlsModuleQuery` | Query | Get one rlsModule |
-| `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
-| `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
-| `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
 | `useSecretsModulesQuery` | Query | List all secretsModules |
 | `useSecretsModuleQuery` | Query | Get one secretsModule |
 | `useCreateSecretsModuleMutation` | Mutation | Create a secretsModule |
@@ -478,6 +468,11 @@ function App() {
 | `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useCryptoAddressesQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useCryptoAddressQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useRoleTypesQuery` | Query | List all roleTypes |
 | `useRoleTypeQuery` | Query | Get one roleType |
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
@@ -488,11 +483,11 @@ function App() {
 | `useCreateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useUpdateOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useDeleteOrgPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useCryptoAddressesQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
-| `useCryptoAddressQuery` | Query | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
-| `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
-| `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
-| `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `usePhoneNumbersQuery` | Query | User phone numbers with country code, verification, and primary-number management |
+| `usePhoneNumberQuery` | Query | User phone numbers with country code, verification, and primary-number management |
+| `useCreatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useUpdatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
+| `useDeletePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
 | `useAppLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useAppLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useCreateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
@@ -508,26 +503,26 @@ function App() {
 | `useCreateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
 | `useUpdateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
 | `useDeleteConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
-| `usePhoneNumbersQuery` | Query | User phone numbers with country code, verification, and primary-number management |
-| `usePhoneNumberQuery` | Query | User phone numbers with country code, verification, and primary-number management |
-| `useCreatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
-| `useUpdatePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
-| `useDeletePhoneNumberMutation` | Mutation | User phone numbers with country code, verification, and primary-number management |
-| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useNodeTypeRegistriesQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useNodeTypeRegistryQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useCreateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useUpdateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useDeleteNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useRlsModulesQuery` | Query | List all rlsModules |
+| `useRlsModuleQuery` | Query | Get one rlsModule |
+| `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
+| `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
+| `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
 | `useCommitsQuery` | Query | A commit records changes to the repository. |
 | `useCommitQuery` | Query | A commit records changes to the repository. |
 | `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
@@ -548,31 +543,31 @@ function App() {
 | `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useEmailsQuery` | Query | User email addresses with verification and primary-email management |
-| `useEmailQuery` | Query | User email addresses with verification and primary-email management |
-| `useCreateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
-| `useUpdateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
-| `useDeleteEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useSqlMigrationsQuery` | Query | List all sqlMigrations |
 | `useSqlMigrationQuery` | Query | Get one sqlMigration |
 | `useCreateSqlMigrationMutation` | Mutation | Create a sqlMigration |
 | `useUpdateSqlMigrationMutation` | Mutation | Update a sqlMigration |
 | `useDeleteSqlMigrationMutation` | Mutation | Delete a sqlMigration |
+| `useEmailsQuery` | Query | User email addresses with verification and primary-email management |
+| `useEmailQuery` | Query | User email addresses with verification and primary-email management |
+| `useCreateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
+| `useUpdateEmailMutation` | Mutation | User email addresses with verification and primary-email management |
+| `useDeleteEmailMutation` | Mutation | User email addresses with verification and primary-email management |
 | `useAstMigrationsQuery` | Query | List all astMigrations |
 | `useAstMigrationQuery` | Query | Get one astMigration |
 | `useCreateAstMigrationMutation` | Mutation | Create a astMigration |
 | `useUpdateAstMigrationMutation` | Mutation | Update a astMigration |
 | `useDeleteAstMigrationMutation` | Mutation | Delete a astMigration |
-| `useUsersQuery` | Query | List all users |
-| `useUserQuery` | Query | Get one user |
-| `useCreateUserMutation` | Mutation | Create a user |
-| `useUpdateUserMutation` | Mutation | Update a user |
-| `useDeleteUserMutation` | Mutation | Delete a user |
 | `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useUpdateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useDeleteAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useUsersQuery` | Query | List all users |
+| `useUserQuery` | Query | Get one user |
+| `useCreateUserMutation` | Mutation | Create a user |
+| `useUpdateUserMutation` | Mutation | Update a user |
+| `useDeleteUserMutation` | Mutation | Delete a user |
 | `useHierarchyModulesQuery` | Query | List all hierarchyModules |
 | `useHierarchyModuleQuery` | Query | Get one hierarchyModule |
 | `useCreateHierarchyModuleMutation` | Mutation | Create a hierarchyModule |
@@ -608,8 +603,8 @@ function App() {
 | `useSetPasswordMutation` | Mutation | setPassword |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useResetPasswordMutation` | Mutation | resetPassword |
-| `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
 | `useBootstrapUserMutation` | Mutation | bootstrapUser |
+| `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
 | `useSetDataAtPathMutation` | Mutation | setDataAtPath |
 | `useSetPropsAndCommitMutation` | Mutation | setPropsAndCommit |
 | `useProvisionDatabaseWithUserMutation` | Mutation | provisionDatabaseWithUser |
@@ -697,20 +692,20 @@ create({ path: '<value>', data: '<value>' });
 ```typescript
 // List all appPermissions
 const { data, isLoading } = useAppPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one appPermission
 const { data: item } = useAppPermissionQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a appPermission
 const { mutate: create } = useCreateAppPermissionMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' });
+create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgPermission
@@ -718,20 +713,20 @@ create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<v
 ```typescript
 // List all orgPermissions
 const { data, isLoading } = useOrgPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgPermission
 const { data: item } = useOrgPermissionQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgPermission
 const { mutate: create } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' });
+create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Object
@@ -760,20 +755,20 @@ create({ hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<v
 ```typescript
 // List all appLevelRequirements
 const { data, isLoading } = useAppLevelRequirementsQuery({
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one appLevelRequirement
 const { data: item } = useAppLevelRequirementQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a appLevelRequirement
 const { mutate: create } = useCreateAppLevelRequirementMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>' });
+create({ name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Database
@@ -781,20 +776,20 @@ create({ name: '<value>', level: '<value>', description: '<value>', requiredCoun
 ```typescript
 // List all databases
 const { data, isLoading } = useDatabasesQuery({
-  selection: { fields: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true, schemaHashTrgmSimilarity: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one database
 const { data: item } = useDatabaseQuery({
   id: '<value>',
-  selection: { fields: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true, schemaHashTrgmSimilarity: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a database
 const { mutate: create } = useCreateDatabaseMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<value>', hash: '<value>' });
+create({ ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<value>', hash: '<value>', schemaHashTrgmSimilarity: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Schema
@@ -802,20 +797,20 @@ create({ ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<va
 ```typescript
 // List all schemas
 const { data, isLoading } = useSchemasQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, schemaNameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one schema
 const { data: item } = useSchemaQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, schemaNameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a schema
 const { mutate: create } = useCreateSchemaMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>' });
+create({ databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>', nameTrgmSimilarity: '<value>', schemaNameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Table
@@ -823,20 +818,20 @@ create({ databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '
 ```typescript
 // List all tables
 const { data, isLoading } = useTablesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, pluralNameTrgmSimilarity: true, singularNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one table
 const { data: item } = useTableQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, pluralNameTrgmSimilarity: true, singularNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a table
 const { mutate: create } = useCreateTableMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', useRls: '<value>', timestamps: '<value>', peoplestamps: '<value>', pluralName: '<value>', singularName: '<value>', tags: '<value>', inheritsId: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', useRls: '<value>', timestamps: '<value>', peoplestamps: '<value>', pluralName: '<value>', singularName: '<value>', tags: '<value>', inheritsId: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', pluralNameTrgmSimilarity: '<value>', singularNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### CheckConstraint
@@ -844,20 +839,20 @@ create({ databaseId: '<value>', schemaId: '<value>', name: '<value>', label: '<v
 ```typescript
 // List all checkConstraints
 const { data, isLoading } = useCheckConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one checkConstraint
 const { data: item } = useCheckConstraintQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a checkConstraint
 const { mutate: create } = useCreateCheckConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', expr: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', expr: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Field
@@ -865,20 +860,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<val
 ```typescript
 // List all fields
 const { data, isLoading } = useFieldsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, defaultValueTrgmSimilarity: true, regexpTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one field
 const { data: item } = useFieldQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, defaultValueTrgmSimilarity: true, regexpTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a field
 const { mutate: create } = useCreateFieldMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', isRequired: '<value>', defaultValue: '<value>', defaultValueAst: '<value>', isHidden: '<value>', type: '<value>', fieldOrder: '<value>', regexp: '<value>', chk: '<value>', chkExpr: '<value>', min: '<value>', max: '<value>', tags: '<value>', category: '<value>', module: '<value>', scope: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', isRequired: '<value>', defaultValue: '<value>', defaultValueAst: '<value>', isHidden: '<value>', type: '<value>', fieldOrder: '<value>', regexp: '<value>', chk: '<value>', chkExpr: '<value>', min: '<value>', max: '<value>', tags: '<value>', category: '<value>', module: '<value>', scope: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', defaultValueTrgmSimilarity: '<value>', regexpTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ForeignKeyConstraint
@@ -886,20 +881,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<va
 ```typescript
 // List all foreignKeyConstraints
 const { data, isLoading } = useForeignKeyConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, deleteActionTrgmSimilarity: true, updateActionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one foreignKeyConstraint
 const { data: item } = useForeignKeyConstraintQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, deleteActionTrgmSimilarity: true, updateActionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a foreignKeyConstraint
 const { mutate: create } = useCreateForeignKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', refTableId: '<value>', refFieldIds: '<value>', deleteAction: '<value>', updateAction: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', refTableId: '<value>', refFieldIds: '<value>', deleteAction: '<value>', updateAction: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', deleteActionTrgmSimilarity: '<value>', updateActionTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### FullTextSearch
@@ -928,20 +923,20 @@ create({ databaseId: '<value>', tableId: '<value>', fieldId: '<value>', fieldIds
 ```typescript
 // List all indices
 const { data, isLoading } = useIndicesQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, accessMethodTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one index
 const { data: item } = useIndexQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, accessMethodTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a index
 const { mutate: create } = useCreateIndexMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', options: '<value>', opClasses: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', accessMethodTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Policy
@@ -949,20 +944,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '
 ```typescript
 // List all policies
 const { data, isLoading } = usePoliciesQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one policy
 const { data: item } = usePolicyQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a policy
 const { mutate: create } = useCreatePolicyMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', granteeName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', granteeName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', policyTypeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### PrimaryKeyConstraint
@@ -970,20 +965,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', granteeName
 ```typescript
 // List all primaryKeyConstraints
 const { data, isLoading } = usePrimaryKeyConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one primaryKeyConstraint
 const { data: item } = usePrimaryKeyConstraintQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a primaryKeyConstraint
 const { mutate: create } = useCreatePrimaryKeyConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### TableGrant
@@ -991,20 +986,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<val
 ```typescript
 // List all tableGrants
 const { data, isLoading } = useTableGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one tableGrant
 const { data: item } = useTableGrantQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a tableGrant
 const { mutate: create } = useCreateTableGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', privilege: '<value>', granteeName: '<value>', fieldIds: '<value>', isGrant: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', privilege: '<value>', granteeName: '<value>', fieldIds: '<value>', isGrant: '<value>', privilegeTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Trigger
@@ -1012,20 +1007,20 @@ create({ databaseId: '<value>', tableId: '<value>', privilege: '<value>', grante
 ```typescript
 // List all triggers
 const { data, isLoading } = useTriggersQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, functionNameTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one trigger
 const { data: item } = useTriggerQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, functionNameTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a trigger
 const { mutate: create } = useCreateTriggerMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', event: '<value>', functionName: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', event: '<value>', functionName: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', eventTrgmSimilarity: '<value>', functionNameTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### UniqueConstraint
@@ -1033,20 +1028,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', event: '<va
 ```typescript
 // List all uniqueConstraints
 const { data, isLoading } = useUniqueConstraintsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one uniqueConstraint
 const { data: item } = useUniqueConstraintQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a uniqueConstraint
 const { mutate: create } = useCreateUniqueConstraintMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### View
@@ -1054,20 +1049,20 @@ create({ databaseId: '<value>', tableId: '<value>', name: '<value>', description
 ```typescript
 // List all views
 const { data, isLoading } = useViewsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true, nameTrgmSimilarity: true, viewTypeTrgmSimilarity: true, filterTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one view
 const { data: item } = useViewQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true, nameTrgmSimilarity: true, viewTypeTrgmSimilarity: true, filterTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a view
 const { mutate: create } = useCreateViewMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', name: '<value>', tableId: '<value>', viewType: '<value>', data: '<value>', filterType: '<value>', filterData: '<value>', securityInvoker: '<value>', isReadOnly: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', name: '<value>', tableId: '<value>', viewType: '<value>', data: '<value>', filterType: '<value>', filterData: '<value>', securityInvoker: '<value>', isReadOnly: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', viewTypeTrgmSimilarity: '<value>', filterTypeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ViewTable
@@ -1096,20 +1091,20 @@ create({ viewId: '<value>', tableId: '<value>', joinOrder: '<value>' });
 ```typescript
 // List all viewGrants
 const { data, isLoading } = useViewGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one viewGrant
 const { data: item } = useViewGrantQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a viewGrant
 const { mutate: create } = useCreateViewGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>' });
+create({ databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>', granteeNameTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ViewRule
@@ -1117,41 +1112,20 @@ create({ databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privi
 ```typescript
 // List all viewRules
 const { data, isLoading } = useViewRulesQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one viewRule
 const { data: item } = useViewRuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a viewRule
 const { mutate: create } = useCreateViewRuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>' });
-```
-
-### TableModule
-
-```typescript
-// List all tableModules
-const { data, isLoading } = useTableModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, data: true, fields: true } },
-});
-
-// Get one tableModule
-const { data: item } = useTableModuleQuery({
-  id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, data: true, fields: true } },
-});
-
-// Create a tableModule
-const { mutate: create } = useCreateTableModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', data: '<value>', fields: '<value>' });
+create({ databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>', nameTrgmSimilarity: '<value>', eventTrgmSimilarity: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### TableTemplateModule
@@ -1159,20 +1133,20 @@ create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableNa
 ```typescript
 // List all tableTemplateModules
 const { data, isLoading } = useTableTemplateModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one tableTemplateModule
 const { data: item } = useTableTemplateModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a tableTemplateModule
 const { mutate: create } = useCreateTableTemplateModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', nodeType: '<value>', data: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', nodeType: '<value>', data: '<value>', tableNameTrgmSimilarity: '<value>', nodeTypeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### SecureTableProvision
@@ -1180,20 +1154,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all secureTableProvisions
 const { data, isLoading } = useSecureTableProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one secureTableProvision
 const { data: item } = useSecureTableProvisionQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a secureTableProvision
 const { mutate: create } = useCreateSecureTableProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFields: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', nodeData: '<value>', fields: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFields: '<value>', tableNameTrgmSimilarity: '<value>', nodeTypeTrgmSimilarity: '<value>', policyTypeTrgmSimilarity: '<value>', policyRoleTrgmSimilarity: '<value>', policyNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### RelationProvision
@@ -1201,20 +1175,20 @@ create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableNa
 ```typescript
 // List all relationProvisions
 const { data, isLoading } = useRelationProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true, relationTypeTrgmSimilarity: true, fieldNameTrgmSimilarity: true, deleteActionTrgmSimilarity: true, junctionTableNameTrgmSimilarity: true, sourceFieldNameTrgmSimilarity: true, targetFieldNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one relationProvision
 const { data: item } = useRelationProvisionQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true, relationTypeTrgmSimilarity: true, fieldNameTrgmSimilarity: true, deleteActionTrgmSimilarity: true, junctionTableNameTrgmSimilarity: true, sourceFieldNameTrgmSimilarity: true, targetFieldNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a relationProvision
 const { mutate: create } = useCreateRelationProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', relationType: '<value>', sourceTableId: '<value>', targetTableId: '<value>', fieldName: '<value>', deleteAction: '<value>', isRequired: '<value>', junctionTableId: '<value>', junctionTableName: '<value>', junctionSchemaId: '<value>', sourceFieldName: '<value>', targetFieldName: '<value>', useCompositeKey: '<value>', nodeType: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFieldId: '<value>', outJunctionTableId: '<value>', outSourceFieldId: '<value>', outTargetFieldId: '<value>' });
+create({ databaseId: '<value>', relationType: '<value>', sourceTableId: '<value>', targetTableId: '<value>', fieldName: '<value>', deleteAction: '<value>', isRequired: '<value>', junctionTableId: '<value>', junctionTableName: '<value>', junctionSchemaId: '<value>', sourceFieldName: '<value>', targetFieldName: '<value>', useCompositeKey: '<value>', nodeType: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFieldId: '<value>', outJunctionTableId: '<value>', outSourceFieldId: '<value>', outTargetFieldId: '<value>', relationTypeTrgmSimilarity: '<value>', fieldNameTrgmSimilarity: '<value>', deleteActionTrgmSimilarity: '<value>', junctionTableNameTrgmSimilarity: '<value>', sourceFieldNameTrgmSimilarity: '<value>', targetFieldNameTrgmSimilarity: '<value>', nodeTypeTrgmSimilarity: '<value>', policyTypeTrgmSimilarity: '<value>', policyRoleTrgmSimilarity: '<value>', policyNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### SchemaGrant
@@ -1222,20 +1196,20 @@ create({ databaseId: '<value>', relationType: '<value>', sourceTableId: '<value>
 ```typescript
 // List all schemaGrants
 const { data, isLoading } = useSchemaGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one schemaGrant
 const { data: item } = useSchemaGrantQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a schemaGrant
 const { mutate: create } = useCreateSchemaGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', granteeName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', granteeName: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### DefaultPrivilege
@@ -1243,20 +1217,20 @@ create({ databaseId: '<value>', schemaId: '<value>', granteeName: '<value>' });
 ```typescript
 // List all defaultPrivileges
 const { data, isLoading } = useDefaultPrivilegesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true, objectTypeTrgmSimilarity: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one defaultPrivilege
 const { data: item } = useDefaultPrivilegeQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true, objectTypeTrgmSimilarity: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a defaultPrivilege
 const { mutate: create } = useCreateDefaultPrivilegeMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>', objectTypeTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ApiSchema
@@ -1285,20 +1259,20 @@ create({ databaseId: '<value>', schemaId: '<value>', apiId: '<value>' });
 ```typescript
 // List all apiModules
 const { data, isLoading } = useApiModulesQuery({
-  selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } },
+  selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one apiModule
 const { data: item } = useApiModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true } },
+  selection: { fields: { id: true, databaseId: true, apiId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a apiModule
 const { mutate: create } = useCreateApiModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>' });
+create({ databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Domain
@@ -1327,20 +1301,20 @@ create({ databaseId: '<value>', apiId: '<value>', siteId: '<value>', subdomain: 
 ```typescript
 // List all siteMetadata
 const { data, isLoading } = useSiteMetadataQuery({
-  selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } },
+  selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one siteMetadatum
 const { data: item } = useSiteMetadatumQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } },
+  selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a siteMetadatum
 const { mutate: create } = useCreateSiteMetadatumMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>' });
+create({ databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### SiteModule
@@ -1348,20 +1322,20 @@ create({ databaseId: '<value>', siteId: '<value>', title: '<value>', description
 ```typescript
 // List all siteModules
 const { data, isLoading } = useSiteModulesQuery({
-  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, data: true } },
+  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one siteModule
 const { data: item } = useSiteModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, data: true } },
+  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a siteModule
 const { mutate: create } = useCreateSiteModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>' });
+create({ databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### SiteTheme
@@ -1390,20 +1364,20 @@ create({ databaseId: '<value>', siteId: '<value>', theme: '<value>' });
 ```typescript
 // List all triggerFunctions
 const { data, isLoading } = useTriggerFunctionsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, codeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one triggerFunction
 const { data: item } = useTriggerFunctionQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, codeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a triggerFunction
 const { mutate: create } = useCreateTriggerFunctionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', name: '<value>', code: '<value>' });
+create({ databaseId: '<value>', name: '<value>', code: '<value>', nameTrgmSimilarity: '<value>', codeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Api
@@ -1411,20 +1385,20 @@ create({ databaseId: '<value>', name: '<value>', code: '<value>' });
 ```typescript
 // List all apis
 const { data, isLoading } = useApisQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true, nameTrgmSimilarity: true, dbnameTrgmSimilarity: true, roleNameTrgmSimilarity: true, anonRoleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one api
 const { data: item } = useApiQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true, nameTrgmSimilarity: true, dbnameTrgmSimilarity: true, roleNameTrgmSimilarity: true, anonRoleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a api
 const { mutate: create } = useCreateApiMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>' });
+create({ databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>', nameTrgmSimilarity: '<value>', dbnameTrgmSimilarity: '<value>', roleNameTrgmSimilarity: '<value>', anonRoleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Site
@@ -1432,20 +1406,20 @@ create({ databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<
 ```typescript
 // List all sites
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } },
+  selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, dbnameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one site
 const { data: item } = useSiteQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } },
+  selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, dbnameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a site
 const { mutate: create } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>' });
+create({ databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', dbnameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### App
@@ -1453,20 +1427,20 @@ create({ databaseId: '<value>', title: '<value>', description: '<value>', ogImag
 ```typescript
 // List all apps
 const { data, isLoading } = useAppsQuery({
-  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true } },
+  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true, nameTrgmSimilarity: true, appStoreIdTrgmSimilarity: true, appIdPrefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one app
 const { data: item } = useAppQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true } },
+  selection: { fields: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true, nameTrgmSimilarity: true, appStoreIdTrgmSimilarity: true, appIdPrefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a app
 const { mutate: create } = useCreateAppMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>' });
+create({ databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>', nameTrgmSimilarity: '<value>', appStoreIdTrgmSimilarity: '<value>', appIdPrefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ConnectedAccountsModule
@@ -1474,20 +1448,20 @@ create({ databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<
 ```typescript
 // List all connectedAccountsModules
 const { data, isLoading } = useConnectedAccountsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one connectedAccountsModule
 const { data: item } = useConnectedAccountsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a connectedAccountsModule
 const { mutate: create } = useCreateConnectedAccountsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### CryptoAddressesModule
@@ -1495,20 +1469,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all cryptoAddressesModules
 const { data, isLoading } = useCryptoAddressesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true, tableNameTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one cryptoAddressesModule
 const { data: item } = useCryptoAddressesModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true, tableNameTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a cryptoAddressesModule
 const { mutate: create } = useCreateCryptoAddressesModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', cryptoNetwork: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', cryptoNetwork: '<value>', tableNameTrgmSimilarity: '<value>', cryptoNetworkTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### CryptoAuthModule
@@ -1516,20 +1490,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all cryptoAuthModules
 const { data, isLoading } = useCryptoAuthModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true, userFieldTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, signInRequestChallengeTrgmSimilarity: true, signInRecordFailureTrgmSimilarity: true, signUpWithKeyTrgmSimilarity: true, signInWithChallengeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one cryptoAuthModule
 const { data: item } = useCryptoAuthModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true, userFieldTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, signInRequestChallengeTrgmSimilarity: true, signInRecordFailureTrgmSimilarity: true, signUpWithKeyTrgmSimilarity: true, signInWithChallengeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a cryptoAuthModule
 const { mutate: create } = useCreateCryptoAuthModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', addressesTableId: '<value>', userField: '<value>', cryptoNetwork: '<value>', signInRequestChallenge: '<value>', signInRecordFailure: '<value>', signUpWithKey: '<value>', signInWithChallenge: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', addressesTableId: '<value>', userField: '<value>', cryptoNetwork: '<value>', signInRequestChallenge: '<value>', signInRecordFailure: '<value>', signUpWithKey: '<value>', signInWithChallenge: '<value>', userFieldTrgmSimilarity: '<value>', cryptoNetworkTrgmSimilarity: '<value>', signInRequestChallengeTrgmSimilarity: '<value>', signInRecordFailureTrgmSimilarity: '<value>', signUpWithKeyTrgmSimilarity: '<value>', signInWithChallengeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### DefaultIdsModule
@@ -1558,20 +1532,20 @@ create({ databaseId: '<value>' });
 ```typescript
 // List all denormalizedTableFields
 const { data, isLoading } = useDenormalizedTableFieldsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true, funcNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one denormalizedTableField
 const { data: item } = useDenormalizedTableFieldQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true, funcNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a denormalizedTableField
 const { mutate: create } = useCreateDenormalizedTableFieldMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>' });
+create({ databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>', funcNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### EmailsModule
@@ -1579,20 +1553,20 @@ create({ databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: 
 ```typescript
 // List all emailsModules
 const { data, isLoading } = useEmailsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one emailsModule
 const { data: item } = useEmailsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a emailsModule
 const { mutate: create } = useCreateEmailsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### EncryptedSecretsModule
@@ -1600,20 +1574,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all encryptedSecretsModules
 const { data, isLoading } = useEncryptedSecretsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one encryptedSecretsModule
 const { data: item } = useEncryptedSecretsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a encryptedSecretsModule
 const { mutate: create } = useCreateEncryptedSecretsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### FieldModule
@@ -1621,20 +1595,20 @@ create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableNa
 ```typescript
 // List all fieldModules
 const { data, isLoading } = useFieldModulesQuery({
-  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } },
+  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true, nodeTypeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one fieldModule
 const { data: item } = useFieldModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } },
+  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true, nodeTypeTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a fieldModule
 const { mutate: create } = useCreateFieldModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', fieldId: '<value>', nodeType: '<value>', data: '<value>', triggers: '<value>', functions: '<value>' });
+create({ databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', fieldId: '<value>', nodeType: '<value>', data: '<value>', triggers: '<value>', functions: '<value>', nodeTypeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### InvitesModule
@@ -1642,20 +1616,20 @@ create({ databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', 
 ```typescript
 // List all invitesModules
 const { data, isLoading } = useInvitesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true, invitesTableNameTrgmSimilarity: true, claimedInvitesTableNameTrgmSimilarity: true, submitInviteCodeFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one invitesModule
 const { data: item } = useInvitesModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true, invitesTableNameTrgmSimilarity: true, claimedInvitesTableNameTrgmSimilarity: true, submitInviteCodeFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a invitesModule
 const { mutate: create } = useCreateInvitesModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', invitesTableId: '<value>', claimedInvitesTableId: '<value>', invitesTableName: '<value>', claimedInvitesTableName: '<value>', submitInviteCodeFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', invitesTableId: '<value>', claimedInvitesTableId: '<value>', invitesTableName: '<value>', claimedInvitesTableName: '<value>', submitInviteCodeFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', invitesTableNameTrgmSimilarity: '<value>', claimedInvitesTableNameTrgmSimilarity: '<value>', submitInviteCodeFunctionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### LevelsModule
@@ -1663,20 +1637,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all levelsModules
 const { data, isLoading } = useLevelsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, stepsTableNameTrgmSimilarity: true, achievementsTableNameTrgmSimilarity: true, levelsTableNameTrgmSimilarity: true, levelRequirementsTableNameTrgmSimilarity: true, completedStepTrgmSimilarity: true, incompletedStepTrgmSimilarity: true, tgAchievementTrgmSimilarity: true, tgAchievementToggleTrgmSimilarity: true, tgAchievementToggleBooleanTrgmSimilarity: true, tgAchievementBooleanTrgmSimilarity: true, upsertAchievementTrgmSimilarity: true, tgUpdateAchievementsTrgmSimilarity: true, stepsRequiredTrgmSimilarity: true, levelAchievedTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one levelsModule
 const { data: item } = useLevelsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, stepsTableNameTrgmSimilarity: true, achievementsTableNameTrgmSimilarity: true, levelsTableNameTrgmSimilarity: true, levelRequirementsTableNameTrgmSimilarity: true, completedStepTrgmSimilarity: true, incompletedStepTrgmSimilarity: true, tgAchievementTrgmSimilarity: true, tgAchievementToggleTrgmSimilarity: true, tgAchievementToggleBooleanTrgmSimilarity: true, tgAchievementBooleanTrgmSimilarity: true, upsertAchievementTrgmSimilarity: true, tgUpdateAchievementsTrgmSimilarity: true, stepsRequiredTrgmSimilarity: true, levelAchievedTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a levelsModule
 const { mutate: create } = useCreateLevelsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', stepsTableId: '<value>', stepsTableName: '<value>', achievementsTableId: '<value>', achievementsTableName: '<value>', levelsTableId: '<value>', levelsTableName: '<value>', levelRequirementsTableId: '<value>', levelRequirementsTableName: '<value>', completedStep: '<value>', incompletedStep: '<value>', tgAchievement: '<value>', tgAchievementToggle: '<value>', tgAchievementToggleBoolean: '<value>', tgAchievementBoolean: '<value>', upsertAchievement: '<value>', tgUpdateAchievements: '<value>', stepsRequired: '<value>', levelAchieved: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', stepsTableId: '<value>', stepsTableName: '<value>', achievementsTableId: '<value>', achievementsTableName: '<value>', levelsTableId: '<value>', levelsTableName: '<value>', levelRequirementsTableId: '<value>', levelRequirementsTableName: '<value>', completedStep: '<value>', incompletedStep: '<value>', tgAchievement: '<value>', tgAchievementToggle: '<value>', tgAchievementToggleBoolean: '<value>', tgAchievementBoolean: '<value>', upsertAchievement: '<value>', tgUpdateAchievements: '<value>', stepsRequired: '<value>', levelAchieved: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', stepsTableNameTrgmSimilarity: '<value>', achievementsTableNameTrgmSimilarity: '<value>', levelsTableNameTrgmSimilarity: '<value>', levelRequirementsTableNameTrgmSimilarity: '<value>', completedStepTrgmSimilarity: '<value>', incompletedStepTrgmSimilarity: '<value>', tgAchievementTrgmSimilarity: '<value>', tgAchievementToggleTrgmSimilarity: '<value>', tgAchievementToggleBooleanTrgmSimilarity: '<value>', tgAchievementBooleanTrgmSimilarity: '<value>', upsertAchievementTrgmSimilarity: '<value>', tgUpdateAchievementsTrgmSimilarity: '<value>', stepsRequiredTrgmSimilarity: '<value>', levelAchievedTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### LimitsModule
@@ -1684,20 +1658,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all limitsModules
 const { data, isLoading } = useLimitsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, limitIncrementFunctionTrgmSimilarity: true, limitDecrementFunctionTrgmSimilarity: true, limitIncrementTriggerTrgmSimilarity: true, limitDecrementTriggerTrgmSimilarity: true, limitUpdateTriggerTrgmSimilarity: true, limitCheckFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one limitsModule
 const { data: item } = useLimitsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, limitIncrementFunctionTrgmSimilarity: true, limitDecrementFunctionTrgmSimilarity: true, limitIncrementTriggerTrgmSimilarity: true, limitDecrementTriggerTrgmSimilarity: true, limitUpdateTriggerTrgmSimilarity: true, limitCheckFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a limitsModule
 const { mutate: create } = useCreateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', limitIncrementFunction: '<value>', limitDecrementFunction: '<value>', limitIncrementTrigger: '<value>', limitDecrementTrigger: '<value>', limitUpdateTrigger: '<value>', limitCheckFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', limitIncrementFunction: '<value>', limitDecrementFunction: '<value>', limitIncrementTrigger: '<value>', limitDecrementTrigger: '<value>', limitUpdateTrigger: '<value>', limitCheckFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', tableNameTrgmSimilarity: '<value>', defaultTableNameTrgmSimilarity: '<value>', limitIncrementFunctionTrgmSimilarity: '<value>', limitDecrementFunctionTrgmSimilarity: '<value>', limitIncrementTriggerTrgmSimilarity: '<value>', limitDecrementTriggerTrgmSimilarity: '<value>', limitUpdateTriggerTrgmSimilarity: '<value>', limitCheckFunctionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### MembershipTypesModule
@@ -1705,20 +1679,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all membershipTypesModules
 const { data, isLoading } = useMembershipTypesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one membershipTypesModule
 const { data: item } = useMembershipTypesModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a membershipTypesModule
 const { mutate: create } = useCreateMembershipTypesModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### MembershipsModule
@@ -1726,20 +1700,20 @@ create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableNa
 ```typescript
 // List all membershipsModules
 const { data, isLoading } = useMembershipsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, membershipsTableNameTrgmSimilarity: true, membersTableNameTrgmSimilarity: true, membershipDefaultsTableNameTrgmSimilarity: true, grantsTableNameTrgmSimilarity: true, adminGrantsTableNameTrgmSimilarity: true, ownerGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, actorMaskCheckTrgmSimilarity: true, actorPermCheckTrgmSimilarity: true, entityIdsByMaskTrgmSimilarity: true, entityIdsByPermTrgmSimilarity: true, entityIdsFunctionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one membershipsModule
 const { data: item } = useMembershipsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, membershipsTableNameTrgmSimilarity: true, membersTableNameTrgmSimilarity: true, membershipDefaultsTableNameTrgmSimilarity: true, grantsTableNameTrgmSimilarity: true, adminGrantsTableNameTrgmSimilarity: true, ownerGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, actorMaskCheckTrgmSimilarity: true, actorPermCheckTrgmSimilarity: true, entityIdsByMaskTrgmSimilarity: true, entityIdsByPermTrgmSimilarity: true, entityIdsFunctionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a membershipsModule
 const { mutate: create } = useCreateMembershipsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', membershipsTableId: '<value>', membershipsTableName: '<value>', membersTableId: '<value>', membersTableName: '<value>', membershipDefaultsTableId: '<value>', membershipDefaultsTableName: '<value>', grantsTableId: '<value>', grantsTableName: '<value>', actorTableId: '<value>', limitsTableId: '<value>', defaultLimitsTableId: '<value>', permissionsTableId: '<value>', defaultPermissionsTableId: '<value>', sprtTableId: '<value>', adminGrantsTableId: '<value>', adminGrantsTableName: '<value>', ownerGrantsTableId: '<value>', ownerGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', entityTableOwnerId: '<value>', prefix: '<value>', actorMaskCheck: '<value>', actorPermCheck: '<value>', entityIdsByMask: '<value>', entityIdsByPerm: '<value>', entityIdsFunction: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', membershipsTableId: '<value>', membershipsTableName: '<value>', membersTableId: '<value>', membersTableName: '<value>', membershipDefaultsTableId: '<value>', membershipDefaultsTableName: '<value>', grantsTableId: '<value>', grantsTableName: '<value>', actorTableId: '<value>', limitsTableId: '<value>', defaultLimitsTableId: '<value>', permissionsTableId: '<value>', defaultPermissionsTableId: '<value>', sprtTableId: '<value>', adminGrantsTableId: '<value>', adminGrantsTableName: '<value>', ownerGrantsTableId: '<value>', ownerGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', entityTableOwnerId: '<value>', prefix: '<value>', actorMaskCheck: '<value>', actorPermCheck: '<value>', entityIdsByMask: '<value>', entityIdsByPerm: '<value>', entityIdsFunction: '<value>', membershipsTableNameTrgmSimilarity: '<value>', membersTableNameTrgmSimilarity: '<value>', membershipDefaultsTableNameTrgmSimilarity: '<value>', grantsTableNameTrgmSimilarity: '<value>', adminGrantsTableNameTrgmSimilarity: '<value>', ownerGrantsTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', actorMaskCheckTrgmSimilarity: '<value>', actorPermCheckTrgmSimilarity: '<value>', entityIdsByMaskTrgmSimilarity: '<value>', entityIdsByPermTrgmSimilarity: '<value>', entityIdsFunctionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### PermissionsModule
@@ -1747,20 +1721,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all permissionsModules
 const { data, isLoading } = usePermissionsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, getPaddedMaskTrgmSimilarity: true, getMaskTrgmSimilarity: true, getByMaskTrgmSimilarity: true, getMaskByNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one permissionsModule
 const { data: item } = usePermissionsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, getPaddedMaskTrgmSimilarity: true, getMaskTrgmSimilarity: true, getByMaskTrgmSimilarity: true, getMaskByNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a permissionsModule
 const { mutate: create } = useCreatePermissionsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>', tableNameTrgmSimilarity: '<value>', defaultTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', getPaddedMaskTrgmSimilarity: '<value>', getMaskTrgmSimilarity: '<value>', getByMaskTrgmSimilarity: '<value>', getMaskByNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### PhoneNumbersModule
@@ -1768,20 +1742,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all phoneNumbersModules
 const { data, isLoading } = usePhoneNumbersModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one phoneNumbersModule
 const { data: item } = usePhoneNumbersModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a phoneNumbersModule
 const { mutate: create } = useCreatePhoneNumbersModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ProfilesModule
@@ -1789,41 +1763,20 @@ create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>',
 ```typescript
 // List all profilesModules
 const { data, isLoading } = useProfilesModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true, tableNameTrgmSimilarity: true, profilePermissionsTableNameTrgmSimilarity: true, profileGrantsTableNameTrgmSimilarity: true, profileDefinitionGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one profilesModule
 const { data: item } = useProfilesModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true, tableNameTrgmSimilarity: true, profilePermissionsTableNameTrgmSimilarity: true, profileGrantsTableNameTrgmSimilarity: true, profileDefinitionGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a profilesModule
 const { mutate: create } = useCreateProfilesModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>' });
-```
-
-### RlsModule
-
-```typescript
-// List all rlsModules
-const { data, isLoading } = useRlsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, apiId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } },
-});
-
-// Get one rlsModule
-const { data: item } = useRlsModuleQuery({
-  id: '<value>',
-  selection: { fields: { id: true, databaseId: true, apiId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } },
-});
-
-// Create a rlsModule
-const { mutate: create } = useCreateRlsModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<value>', apiId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>', tableNameTrgmSimilarity: '<value>', profilePermissionsTableNameTrgmSimilarity: '<value>', profileGrantsTableNameTrgmSimilarity: '<value>', profileDefinitionGrantsTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### SecretsModule
@@ -1831,20 +1784,20 @@ create({ databaseId: '<value>', apiId: '<value>', schemaId: '<value>', privateSc
 ```typescript
 // List all secretsModules
 const { data, isLoading } = useSecretsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one secretsModule
 const { data: item } = useSecretsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a secretsModule
 const { mutate: create } = useCreateSecretsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### SessionsModule
@@ -1852,20 +1805,20 @@ create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableNa
 ```typescript
 // List all sessionsModules
 const { data, isLoading } = useSessionsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true, sessionsTableTrgmSimilarity: true, sessionCredentialsTableTrgmSimilarity: true, authSettingsTableTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one sessionsModule
 const { data: item } = useSessionsModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true, sessionsTableTrgmSimilarity: true, sessionCredentialsTableTrgmSimilarity: true, authSettingsTableTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a sessionsModule
 const { mutate: create } = useCreateSessionsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', authSettingsTableId: '<value>', usersTableId: '<value>', sessionsDefaultExpiration: '<value>', sessionsTable: '<value>', sessionCredentialsTable: '<value>', authSettingsTable: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', authSettingsTableId: '<value>', usersTableId: '<value>', sessionsDefaultExpiration: '<value>', sessionsTable: '<value>', sessionCredentialsTable: '<value>', authSettingsTable: '<value>', sessionsTableTrgmSimilarity: '<value>', sessionCredentialsTableTrgmSimilarity: '<value>', authSettingsTableTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### UserAuthModule
@@ -1873,20 +1826,20 @@ create({ databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>',
 ```typescript
 // List all userAuthModules
 const { data, isLoading } = useUserAuthModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true, auditsTableNameTrgmSimilarity: true, signInFunctionTrgmSimilarity: true, signUpFunctionTrgmSimilarity: true, signOutFunctionTrgmSimilarity: true, setPasswordFunctionTrgmSimilarity: true, resetPasswordFunctionTrgmSimilarity: true, forgotPasswordFunctionTrgmSimilarity: true, sendVerificationEmailFunctionTrgmSimilarity: true, verifyEmailFunctionTrgmSimilarity: true, verifyPasswordFunctionTrgmSimilarity: true, checkPasswordFunctionTrgmSimilarity: true, sendAccountDeletionEmailFunctionTrgmSimilarity: true, deleteAccountFunctionTrgmSimilarity: true, signInOneTimeTokenFunctionTrgmSimilarity: true, oneTimeTokenFunctionTrgmSimilarity: true, extendTokenExpiresTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one userAuthModule
 const { data: item } = useUserAuthModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true, auditsTableNameTrgmSimilarity: true, signInFunctionTrgmSimilarity: true, signUpFunctionTrgmSimilarity: true, signOutFunctionTrgmSimilarity: true, setPasswordFunctionTrgmSimilarity: true, resetPasswordFunctionTrgmSimilarity: true, forgotPasswordFunctionTrgmSimilarity: true, sendVerificationEmailFunctionTrgmSimilarity: true, verifyEmailFunctionTrgmSimilarity: true, verifyPasswordFunctionTrgmSimilarity: true, checkPasswordFunctionTrgmSimilarity: true, sendAccountDeletionEmailFunctionTrgmSimilarity: true, deleteAccountFunctionTrgmSimilarity: true, signInOneTimeTokenFunctionTrgmSimilarity: true, oneTimeTokenFunctionTrgmSimilarity: true, extendTokenExpiresTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a userAuthModule
 const { mutate: create } = useCreateUserAuthModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', encryptedTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', auditsTableId: '<value>', auditsTableName: '<value>', signInFunction: '<value>', signUpFunction: '<value>', signOutFunction: '<value>', setPasswordFunction: '<value>', resetPasswordFunction: '<value>', forgotPasswordFunction: '<value>', sendVerificationEmailFunction: '<value>', verifyEmailFunction: '<value>', verifyPasswordFunction: '<value>', checkPasswordFunction: '<value>', sendAccountDeletionEmailFunction: '<value>', deleteAccountFunction: '<value>', signInOneTimeTokenFunction: '<value>', oneTimeTokenFunction: '<value>', extendTokenExpires: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', encryptedTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', auditsTableId: '<value>', auditsTableName: '<value>', signInFunction: '<value>', signUpFunction: '<value>', signOutFunction: '<value>', setPasswordFunction: '<value>', resetPasswordFunction: '<value>', forgotPasswordFunction: '<value>', sendVerificationEmailFunction: '<value>', verifyEmailFunction: '<value>', verifyPasswordFunction: '<value>', checkPasswordFunction: '<value>', sendAccountDeletionEmailFunction: '<value>', deleteAccountFunction: '<value>', signInOneTimeTokenFunction: '<value>', oneTimeTokenFunction: '<value>', extendTokenExpires: '<value>', auditsTableNameTrgmSimilarity: '<value>', signInFunctionTrgmSimilarity: '<value>', signUpFunctionTrgmSimilarity: '<value>', signOutFunctionTrgmSimilarity: '<value>', setPasswordFunctionTrgmSimilarity: '<value>', resetPasswordFunctionTrgmSimilarity: '<value>', forgotPasswordFunctionTrgmSimilarity: '<value>', sendVerificationEmailFunctionTrgmSimilarity: '<value>', verifyEmailFunctionTrgmSimilarity: '<value>', verifyPasswordFunctionTrgmSimilarity: '<value>', checkPasswordFunctionTrgmSimilarity: '<value>', sendAccountDeletionEmailFunctionTrgmSimilarity: '<value>', deleteAccountFunctionTrgmSimilarity: '<value>', signInOneTimeTokenFunctionTrgmSimilarity: '<value>', oneTimeTokenFunctionTrgmSimilarity: '<value>', extendTokenExpiresTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### UsersModule
@@ -1894,20 +1847,20 @@ create({ databaseId: '<value>', schemaId: '<value>', emailsTableId: '<value>', u
 ```typescript
 // List all usersModules
 const { data, isLoading } = useUsersModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, tableNameTrgmSimilarity: true, typeTableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one usersModule
 const { data: item } = useUsersModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, tableNameTrgmSimilarity: true, typeTableNameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a usersModule
 const { mutate: create } = useCreateUsersModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', typeTableId: '<value>', typeTableName: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', typeTableId: '<value>', typeTableName: '<value>', tableNameTrgmSimilarity: '<value>', typeTableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### UuidModule
@@ -1915,20 +1868,20 @@ create({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableNa
 ```typescript
 // List all uuidModules
 const { data, isLoading } = useUuidModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true, uuidFunctionTrgmSimilarity: true, uuidSeedTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one uuidModule
 const { data: item } = useUuidModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true, uuidFunctionTrgmSimilarity: true, uuidSeedTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a uuidModule
 const { mutate: create } = useCreateUuidModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>', uuidFunctionTrgmSimilarity: '<value>', uuidSeedTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### DatabaseProvisionModule
@@ -1936,20 +1889,20 @@ create({ databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uu
 ```typescript
 // List all databaseProvisionModules
 const { data, isLoading } = useDatabaseProvisionModulesQuery({
-  selection: { fields: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true } },
+  selection: { fields: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true, databaseNameTrgmSimilarity: true, subdomainTrgmSimilarity: true, domainTrgmSimilarity: true, statusTrgmSimilarity: true, errorMessageTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one databaseProvisionModule
 const { data: item } = useDatabaseProvisionModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true } },
+  selection: { fields: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true, databaseNameTrgmSimilarity: true, subdomainTrgmSimilarity: true, domainTrgmSimilarity: true, statusTrgmSimilarity: true, errorMessageTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a databaseProvisionModule
 const { mutate: create } = useCreateDatabaseProvisionModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseName: '<value>', ownerId: '<value>', subdomain: '<value>', domain: '<value>', modules: '<value>', options: '<value>', bootstrapUser: '<value>', status: '<value>', errorMessage: '<value>', databaseId: '<value>', completedAt: '<value>' });
+create({ databaseName: '<value>', ownerId: '<value>', subdomain: '<value>', domain: '<value>', modules: '<value>', options: '<value>', bootstrapUser: '<value>', status: '<value>', errorMessage: '<value>', databaseId: '<value>', completedAt: '<value>', databaseNameTrgmSimilarity: '<value>', subdomainTrgmSimilarity: '<value>', domainTrgmSimilarity: '<value>', statusTrgmSimilarity: '<value>', errorMessageTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppAdminGrant
@@ -2125,20 +2078,20 @@ create({ permissions: '<value>', isGrant: '<value>', actorId: '<value>', entityI
 ```typescript
 // List all orgChartEdges
 const { data, isLoading } = useOrgChartEdgesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgChartEdge
 const { data: item } = useOrgChartEdgeQuery({
   id: '<value>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgChartEdge
 const { mutate: create } = useCreateOrgChartEdgeMutation({
   selection: { fields: { id: true } },
 });
-create({ entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>' });
+create({ entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgChartEdgeGrant
@@ -2146,20 +2099,20 @@ create({ entityId: '<value>', childId: '<value>', parentId: '<value>', positionT
 ```typescript
 // List all orgChartEdgeGrants
 const { data, isLoading } = useOrgChartEdgeGrantsQuery({
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgChartEdgeGrant
 const { data: item } = useOrgChartEdgeGrantQuery({
   id: '<value>',
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgChartEdgeGrant
 const { mutate: create } = useCreateOrgChartEdgeGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>' });
+create({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppLimit
@@ -2251,20 +2204,20 @@ create({ actorId: '<value>', name: '<value>', count: '<value>' });
 ```typescript
 // List all invites
 const { data, isLoading } = useInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one invite
 const { data: item } = useInviteQuery({
   id: '<value>',
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a invite
 const { mutate: create } = useCreateInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>' });
+create({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### ClaimedInvite
@@ -2293,20 +2246,20 @@ create({ data: '<value>', senderId: '<value>', receiverId: '<value>' });
 ```typescript
 // List all orgInvites
 const { data, isLoading } = useOrgInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgInvite
 const { data: item } = useOrgInviteQuery({
   id: '<value>',
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgInvite
 const { mutate: create } = useCreateOrgInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>' });
+create({ email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgClaimedInvite
@@ -2335,20 +2288,20 @@ create({ data: '<value>', senderId: '<value>', receiverId: '<value>', entityId: 
 ```typescript
 // List all refs
 const { data, isLoading } = useRefsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one ref
 const { data: item } = useRefQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a ref
 const { mutate: create } = useCreateRefMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>' });
+create({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Store
@@ -2356,20 +2309,20 @@ create({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '
 ```typescript
 // List all stores
 const { data, isLoading } = useStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one store
 const { data: item } = useStoreQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a store
 const { mutate: create } = useCreateStoreMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', databaseId: '<value>', hash: '<value>' });
+create({ name: '<value>', databaseId: '<value>', hash: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppPermissionDefault
@@ -2391,6 +2344,27 @@ const { mutate: create } = useCreateAppPermissionDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ permissions: '<value>' });
+```
+
+### CryptoAddress
+
+```typescript
+// List all cryptoAddresses
+const { data, isLoading } = useCryptoAddressesQuery({
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, addressTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one cryptoAddress
+const { data: item } = useCryptoAddressQuery({
+  id: '<value>',
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, addressTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a cryptoAddress
+const { mutate: create } = useCreateCryptoAddressMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>', addressTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### RoleType
@@ -2435,25 +2409,25 @@ const { mutate: create } = useCreateOrgPermissionDefaultMutation({
 create({ permissions: '<value>', entityId: '<value>' });
 ```
 
-### CryptoAddress
+### PhoneNumber
 
 ```typescript
-// List all cryptoAddresses
-const { data, isLoading } = useCryptoAddressesQuery({
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+// List all phoneNumbers
+const { data, isLoading } = usePhoneNumbersQuery({
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } },
 });
 
-// Get one cryptoAddress
-const { data: item } = useCryptoAddressQuery({
+// Get one phoneNumber
+const { data: item } = usePhoneNumberQuery({
   id: '<value>',
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } },
 });
 
-// Create a cryptoAddress
-const { mutate: create } = useCreateCryptoAddressMutation({
+// Create a phoneNumber
+const { mutate: create } = useCreatePhoneNumberMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' });
+create({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>', ccTrgmSimilarity: '<value>', numberTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppLimitDefault
@@ -2503,62 +2477,20 @@ create({ name: '<value>', max: '<value>' });
 ```typescript
 // List all connectedAccounts
 const { data, isLoading } = useConnectedAccountsQuery({
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one connectedAccount
 const { data: item } = useConnectedAccountQuery({
   id: '<value>',
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a connectedAccount
 const { mutate: create } = useCreateConnectedAccountMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' });
-```
-
-### PhoneNumber
-
-```typescript
-// List all phoneNumbers
-const { data, isLoading } = usePhoneNumbersQuery({
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one phoneNumber
-const { data: item } = usePhoneNumberQuery({
-  id: '<value>',
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a phoneNumber
-const { mutate: create } = useCreatePhoneNumberMutation({
-  selection: { fields: { id: true } },
-});
-create({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' });
-```
-
-### MembershipType
-
-```typescript
-// List all membershipTypes
-const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Get one membershipType
-const { data: item } = useMembershipTypeQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Create a membershipType
-const { mutate: create } = useCreateMembershipTypeMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<value>', description: '<value>', prefix: '<value>' });
+create({ ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>', serviceTrgmSimilarity: '<value>', identifierTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### NodeTypeRegistry
@@ -2566,20 +2498,41 @@ create({ name: '<value>', description: '<value>', prefix: '<value>' });
 ```typescript
 // List all nodeTypeRegistries
 const { data, isLoading } = useNodeTypeRegistriesQuery({
-  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, slugTrgmSimilarity: true, categoryTrgmSimilarity: true, displayNameTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one nodeTypeRegistry
 const { data: item } = useNodeTypeRegistryQuery({
   name: '<value>',
-  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, slugTrgmSimilarity: true, categoryTrgmSimilarity: true, displayNameTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a nodeTypeRegistry
 const { mutate: create } = useCreateNodeTypeRegistryMutation({
   selection: { fields: { name: true } },
 });
-create({ slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>' });
+create({ slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', slugTrgmSimilarity: '<value>', categoryTrgmSimilarity: '<value>', displayNameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
+### MembershipType
+
+```typescript
+// List all membershipTypes
+const { data, isLoading } = useMembershipTypesQuery({
+  selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one membershipType
+const { data: item } = useMembershipTypeQuery({
+  id: '<value>',
+  selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a membershipType
+const { mutate: create } = useCreateMembershipTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<value>', description: '<value>', prefix: '<value>', descriptionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppMembershipDefault
@@ -2603,25 +2556,46 @@ const { mutate: create } = useCreateAppMembershipDefaultMutation({
 create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isVerified: '<value>' });
 ```
 
+### RlsModule
+
+```typescript
+// List all rlsModules
+const { data, isLoading } = useRlsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, authenticateTrgmSimilarity: true, authenticateStrictTrgmSimilarity: true, currentRoleTrgmSimilarity: true, currentRoleIdTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one rlsModule
+const { data: item } = useRlsModuleQuery({
+  id: '<value>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, authenticateTrgmSimilarity: true, authenticateStrictTrgmSimilarity: true, currentRoleTrgmSimilarity: true, currentRoleIdTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a rlsModule
+const { mutate: create } = useCreateRlsModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>', authenticateTrgmSimilarity: '<value>', authenticateStrictTrgmSimilarity: '<value>', currentRoleTrgmSimilarity: '<value>', currentRoleIdTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
 ### Commit
 
 ```typescript
 // List all commits
 const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one commit
 const { data: item } = useCommitQuery({
   id: '<value>',
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a commit
 const { mutate: create } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-create({ message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>' });
+create({ message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgMembershipDefault
@@ -2650,20 +2624,20 @@ create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', enti
 ```typescript
 // List all auditLogs
 const { data, isLoading } = useAuditLogsQuery({
-  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } },
+  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one auditLog
 const { data: item } = useAuditLogQuery({
   id: '<value>',
-  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } },
+  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a auditLog
 const { mutate: create } = useCreateAuditLogMutation({
   selection: { fields: { id: true } },
 });
-create({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' });
+create({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>', userAgentTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppLevel
@@ -2671,20 +2645,41 @@ create({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<v
 ```typescript
 // List all appLevels
 const { data, isLoading } = useAppLevelsQuery({
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one appLevel
 const { data: item } = useAppLevelQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a appLevel
 const { mutate: create } = useCreateAppLevelMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>' });
+create({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
+### SqlMigration
+
+```typescript
+// List all sqlMigrations
+const { data, isLoading } = useSqlMigrationsQuery({
+  selection: { fields: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, nameTrgmSimilarity: true, deployTrgmSimilarity: true, contentTrgmSimilarity: true, revertTrgmSimilarity: true, verifyTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one sqlMigration
+const { data: item } = useSqlMigrationQuery({
+  id: '<value>',
+  selection: { fields: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, nameTrgmSimilarity: true, deployTrgmSimilarity: true, contentTrgmSimilarity: true, revertTrgmSimilarity: true, verifyTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a sqlMigration
+const { mutate: create } = useCreateSqlMigrationMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>', nameTrgmSimilarity: '<value>', deployTrgmSimilarity: '<value>', contentTrgmSimilarity: '<value>', revertTrgmSimilarity: '<value>', verifyTrgmSimilarity: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Email
@@ -2708,67 +2703,25 @@ const { mutate: create } = useCreateEmailMutation({
 create({ ownerId: '<value>', email: '<value>', isVerified: '<value>', isPrimary: '<value>' });
 ```
 
-### SqlMigration
-
-```typescript
-// List all sqlMigrations
-const { data, isLoading } = useSqlMigrationsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
-});
-
-// Get one sqlMigration
-const { data: item } = useSqlMigrationQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
-});
-
-// Create a sqlMigration
-const { mutate: create } = useCreateSqlMigrationMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' });
-```
-
 ### AstMigration
 
 ```typescript
 // List all astMigrations
 const { data, isLoading } = useAstMigrationsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, actionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one astMigration
 const { data: item } = useAstMigrationQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, actionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a astMigration
 const { mutate: create } = useCreateAstMigrationMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', name: '<value>', requires: '<value>', payload: '<value>', deploys: '<value>', deploy: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' });
-```
-
-### User
-
-```typescript
-// List all users
-const { data, isLoading } = useUsersQuery({
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } },
-});
-
-// Get one user
-const { data: item } = useUserQuery({
-  id: '<value>',
-  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } },
-});
-
-// Create a user
-const { mutate: create } = useCreateUserMutation({
-  selection: { fields: { id: true } },
-});
-create({ username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>' });
+create({ databaseId: '<value>', name: '<value>', requires: '<value>', payload: '<value>', deploys: '<value>', deploy: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppMembership
@@ -2792,25 +2745,46 @@ const { mutate: create } = useCreateAppMembershipMutation({
 create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isVerified: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', profileId: '<value>' });
 ```
 
+### User
+
+```typescript
+// List all users
+const { data, isLoading } = useUsersQuery({
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one user
+const { data: item } = useUserQuery({
+  id: '<value>',
+  selection: { fields: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a user
+const { mutate: create } = useCreateUserMutation({
+  selection: { fields: { id: true } },
+});
+create({ username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
 ### HierarchyModule
 
 ```typescript
 // List all hierarchyModules
 const { data, isLoading } = useHierarchyModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true, chartEdgesTableNameTrgmSimilarity: true, hierarchySprtTableNameTrgmSimilarity: true, chartEdgeGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, privateSchemaNameTrgmSimilarity: true, sprtTableNameTrgmSimilarity: true, rebuildHierarchyFunctionTrgmSimilarity: true, getSubordinatesFunctionTrgmSimilarity: true, getManagersFunctionTrgmSimilarity: true, isManagerOfFunctionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one hierarchyModule
 const { data: item } = useHierarchyModuleQuery({
   id: '<value>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true, chartEdgesTableNameTrgmSimilarity: true, hierarchySprtTableNameTrgmSimilarity: true, chartEdgeGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, privateSchemaNameTrgmSimilarity: true, sprtTableNameTrgmSimilarity: true, rebuildHierarchyFunctionTrgmSimilarity: true, getSubordinatesFunctionTrgmSimilarity: true, getManagersFunctionTrgmSimilarity: true, isManagerOfFunctionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a hierarchyModule
 const { mutate: create } = useCreateHierarchyModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', chartEdgesTableId: '<value>', chartEdgesTableName: '<value>', hierarchySprtTableId: '<value>', hierarchySprtTableName: '<value>', chartEdgeGrantsTableId: '<value>', chartEdgeGrantsTableName: '<value>', entityTableId: '<value>', usersTableId: '<value>', prefix: '<value>', privateSchemaName: '<value>', sprtTableName: '<value>', rebuildHierarchyFunction: '<value>', getSubordinatesFunction: '<value>', getManagersFunction: '<value>', isManagerOfFunction: '<value>' });
+create({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', chartEdgesTableId: '<value>', chartEdgesTableName: '<value>', hierarchySprtTableId: '<value>', hierarchySprtTableName: '<value>', chartEdgeGrantsTableId: '<value>', chartEdgeGrantsTableName: '<value>', entityTableId: '<value>', usersTableId: '<value>', prefix: '<value>', privateSchemaName: '<value>', sprtTableName: '<value>', rebuildHierarchyFunction: '<value>', getSubordinatesFunction: '<value>', getManagersFunction: '<value>', isManagerOfFunction: '<value>', chartEdgesTableNameTrgmSimilarity: '<value>', hierarchySprtTableNameTrgmSimilarity: '<value>', chartEdgeGrantsTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', privateSchemaNameTrgmSimilarity: '<value>', sprtTableNameTrgmSimilarity: '<value>', rebuildHierarchyFunctionTrgmSimilarity: '<value>', getSubordinatesFunctionTrgmSimilarity: '<value>', getManagersFunctionTrgmSimilarity: '<value>', isManagerOfFunctionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ## Custom Operation Hooks
@@ -3157,17 +3131,6 @@ resetPassword
   |----------|------|
   | `input` | ResetPasswordInput (required) |
 
-### `useRemoveNodeAtPathMutation`
-
-removeNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | RemoveNodeAtPathInput (required) |
-
 ### `useBootstrapUserMutation`
 
 bootstrapUser
@@ -3178,6 +3141,17 @@ bootstrapUser
   | Argument | Type |
   |----------|------|
   | `input` | BootstrapUserInput (required) |
+
+### `useRemoveNodeAtPathMutation`
+
+removeNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RemoveNodeAtPathInput (required) |
 
 ### `useSetDataAtPathMutation`
 

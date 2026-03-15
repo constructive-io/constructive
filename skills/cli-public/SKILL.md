@@ -1,13 +1,13 @@
 ---
 name: cli-public
-description: CLI tool (csdk) for the public API — provides CRUD commands for 104 tables and 50 custom operations
+description: CLI tool (csdk) for the public API — provides CRUD commands for 103 tables and 50 custom operations
 ---
 
 # cli-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the public API — provides CRUD commands for 104 tables and 50 custom operations
+CLI tool (csdk) for the public API — provides CRUD commands for 103 tables and 50 custom operations
 
 ## Usage
 
@@ -18,6 +18,10 @@ csdk context use <name>
 
 # Authentication
 csdk auth set-token <token>
+
+# Config variables
+csdk config set <key> <value>
+csdk config get <key>
 
 # CRUD for any table (e.g. org-get-managers-record)
 csdk org-get-managers-record list
@@ -51,6 +55,7 @@ See the `references/` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
+- [config](references/config.md)
 - [org-get-managers-record](references/org-get-managers-record.md)
 - [org-get-subordinates-record](references/org-get-subordinates-record.md)
 - [get-all-record](references/get-all-record.md)
@@ -75,7 +80,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [view-table](references/view-table.md)
 - [view-grant](references/view-grant.md)
 - [view-rule](references/view-rule.md)
-- [table-module](references/table-module.md)
 - [table-template-module](references/table-template-module.md)
 - [secure-table-provision](references/secure-table-provision.md)
 - [relation-provision](references/relation-provision.md)
@@ -107,7 +111,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [permissions-module](references/permissions-module.md)
 - [phone-numbers-module](references/phone-numbers-module.md)
 - [profiles-module](references/profiles-module.md)
-- [rls-module](references/rls-module.md)
 - [secrets-module](references/secrets-module.md)
 - [sessions-module](references/sessions-module.md)
 - [user-auth-module](references/user-auth-module.md)
@@ -135,25 +138,26 @@ See the `references/` directory for detailed per-entity API documentation:
 - [ref](references/ref.md)
 - [store](references/store.md)
 - [app-permission-default](references/app-permission-default.md)
+- [crypto-address](references/crypto-address.md)
 - [role-type](references/role-type.md)
 - [org-permission-default](references/org-permission-default.md)
-- [crypto-address](references/crypto-address.md)
+- [phone-number](references/phone-number.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
 - [connected-account](references/connected-account.md)
-- [phone-number](references/phone-number.md)
-- [membership-type](references/membership-type.md)
 - [node-type-registry](references/node-type-registry.md)
+- [membership-type](references/membership-type.md)
 - [app-membership-default](references/app-membership-default.md)
+- [rls-module](references/rls-module.md)
 - [commit](references/commit.md)
 - [org-membership-default](references/org-membership-default.md)
 - [audit-log](references/audit-log.md)
 - [app-level](references/app-level.md)
-- [email](references/email.md)
 - [sql-migration](references/sql-migration.md)
+- [email](references/email.md)
 - [ast-migration](references/ast-migration.md)
-- [user](references/user.md)
 - [app-membership](references/app-membership.md)
+- [user](references/user.md)
 - [hierarchy-module](references/hierarchy-module.md)
 - [current-user-id](references/current-user-id.md)
 - [current-ip-address](references/current-ip-address.md)
@@ -185,8 +189,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [set-password](references/set-password.md)
 - [verify-email](references/verify-email.md)
 - [reset-password](references/reset-password.md)
-- [remove-node-at-path](references/remove-node-at-path.md)
 - [bootstrap-user](references/bootstrap-user.md)
+- [remove-node-at-path](references/remove-node-at-path.md)
 - [set-data-at-path](references/set-data-at-path.md)
 - [set-props-and-commit](references/set-props-and-commit.md)
 - [provision-database-with-user](references/provision-database-with-user.md)

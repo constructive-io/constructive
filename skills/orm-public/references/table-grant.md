@@ -9,7 +9,7 @@ ORM operations for TableGrant records
 ```typescript
 db.tableGrant.findMany({ select: { id: true } }).execute()
 db.tableGrant.findOne({ id: '<value>', select: { id: true } }).execute()
-db.tableGrant.create({ data: { databaseId: '<value>', tableId: '<value>', privilege: '<value>', granteeName: '<value>', fieldIds: '<value>', isGrant: '<value>' }, select: { id: true } }).execute()
+db.tableGrant.create({ data: { databaseId: '<value>', tableId: '<value>', privilege: '<value>', granteeName: '<value>', fieldIds: '<value>', isGrant: '<value>', privilegeTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.tableGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.tableGrant.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.tableGrant.findMany({
 
 ```typescript
 const item = await db.tableGrant.create({
-  data: { databaseId: 'value', tableId: 'value', privilege: 'value', granteeName: 'value', fieldIds: 'value', isGrant: 'value' },
+  data: { databaseId: 'value', tableId: 'value', privilege: 'value', granteeName: 'value', fieldIds: 'value', isGrant: 'value', privilegeTrgmSimilarity: 'value', granteeNameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

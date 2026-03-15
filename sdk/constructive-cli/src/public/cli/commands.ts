@@ -30,7 +30,6 @@ import viewCmd from './commands/view';
 import viewTableCmd from './commands/view-table';
 import viewGrantCmd from './commands/view-grant';
 import viewRuleCmd from './commands/view-rule';
-import tableModuleCmd from './commands/table-module';
 import tableTemplateModuleCmd from './commands/table-template-module';
 import secureTableProvisionCmd from './commands/secure-table-provision';
 import relationProvisionCmd from './commands/relation-provision';
@@ -62,7 +61,6 @@ import membershipsModuleCmd from './commands/memberships-module';
 import permissionsModuleCmd from './commands/permissions-module';
 import phoneNumbersModuleCmd from './commands/phone-numbers-module';
 import profilesModuleCmd from './commands/profiles-module';
-import rlsModuleCmd from './commands/rls-module';
 import secretsModuleCmd from './commands/secrets-module';
 import sessionsModuleCmd from './commands/sessions-module';
 import userAuthModuleCmd from './commands/user-auth-module';
@@ -90,25 +88,26 @@ import orgClaimedInviteCmd from './commands/org-claimed-invite';
 import refCmd from './commands/ref';
 import storeCmd from './commands/store';
 import appPermissionDefaultCmd from './commands/app-permission-default';
+import cryptoAddressCmd from './commands/crypto-address';
 import roleTypeCmd from './commands/role-type';
 import orgPermissionDefaultCmd from './commands/org-permission-default';
-import cryptoAddressCmd from './commands/crypto-address';
+import phoneNumberCmd from './commands/phone-number';
 import appLimitDefaultCmd from './commands/app-limit-default';
 import orgLimitDefaultCmd from './commands/org-limit-default';
 import connectedAccountCmd from './commands/connected-account';
-import phoneNumberCmd from './commands/phone-number';
-import membershipTypeCmd from './commands/membership-type';
 import nodeTypeRegistryCmd from './commands/node-type-registry';
+import membershipTypeCmd from './commands/membership-type';
 import appMembershipDefaultCmd from './commands/app-membership-default';
+import rlsModuleCmd from './commands/rls-module';
 import commitCmd from './commands/commit';
 import orgMembershipDefaultCmd from './commands/org-membership-default';
 import auditLogCmd from './commands/audit-log';
 import appLevelCmd from './commands/app-level';
-import emailCmd from './commands/email';
 import sqlMigrationCmd from './commands/sql-migration';
+import emailCmd from './commands/email';
 import astMigrationCmd from './commands/ast-migration';
-import userCmd from './commands/user';
 import appMembershipCmd from './commands/app-membership';
+import userCmd from './commands/user';
 import hierarchyModuleCmd from './commands/hierarchy-module';
 import currentUserIdCmd from './commands/current-user-id';
 import currentIpAddressCmd from './commands/current-ip-address';
@@ -140,8 +139,8 @@ import confirmDeleteAccountCmd from './commands/confirm-delete-account';
 import setPasswordCmd from './commands/set-password';
 import verifyEmailCmd from './commands/verify-email';
 import resetPasswordCmd from './commands/reset-password';
-import removeNodeAtPathCmd from './commands/remove-node-at-path';
 import bootstrapUserCmd from './commands/bootstrap-user';
+import removeNodeAtPathCmd from './commands/remove-node-at-path';
 import setDataAtPathCmd from './commands/set-data-at-path';
 import setPropsAndCommitCmd from './commands/set-props-and-commit';
 import provisionDatabaseWithUserCmd from './commands/provision-database-with-user';
@@ -194,7 +193,6 @@ const createCommandMap: () => Record<
   'view-table': viewTableCmd,
   'view-grant': viewGrantCmd,
   'view-rule': viewRuleCmd,
-  'table-module': tableModuleCmd,
   'table-template-module': tableTemplateModuleCmd,
   'secure-table-provision': secureTableProvisionCmd,
   'relation-provision': relationProvisionCmd,
@@ -226,7 +224,6 @@ const createCommandMap: () => Record<
   'permissions-module': permissionsModuleCmd,
   'phone-numbers-module': phoneNumbersModuleCmd,
   'profiles-module': profilesModuleCmd,
-  'rls-module': rlsModuleCmd,
   'secrets-module': secretsModuleCmd,
   'sessions-module': sessionsModuleCmd,
   'user-auth-module': userAuthModuleCmd,
@@ -254,25 +251,26 @@ const createCommandMap: () => Record<
   ref: refCmd,
   store: storeCmd,
   'app-permission-default': appPermissionDefaultCmd,
+  'crypto-address': cryptoAddressCmd,
   'role-type': roleTypeCmd,
   'org-permission-default': orgPermissionDefaultCmd,
-  'crypto-address': cryptoAddressCmd,
+  'phone-number': phoneNumberCmd,
   'app-limit-default': appLimitDefaultCmd,
   'org-limit-default': orgLimitDefaultCmd,
   'connected-account': connectedAccountCmd,
-  'phone-number': phoneNumberCmd,
-  'membership-type': membershipTypeCmd,
   'node-type-registry': nodeTypeRegistryCmd,
+  'membership-type': membershipTypeCmd,
   'app-membership-default': appMembershipDefaultCmd,
+  'rls-module': rlsModuleCmd,
   commit: commitCmd,
   'org-membership-default': orgMembershipDefaultCmd,
   'audit-log': auditLogCmd,
   'app-level': appLevelCmd,
-  email: emailCmd,
   'sql-migration': sqlMigrationCmd,
+  email: emailCmd,
   'ast-migration': astMigrationCmd,
-  user: userCmd,
   'app-membership': appMembershipCmd,
+  user: userCmd,
   'hierarchy-module': hierarchyModuleCmd,
   'current-user-id': currentUserIdCmd,
   'current-ip-address': currentIpAddressCmd,
@@ -304,8 +302,8 @@ const createCommandMap: () => Record<
   'set-password': setPasswordCmd,
   'verify-email': verifyEmailCmd,
   'reset-password': resetPasswordCmd,
-  'remove-node-at-path': removeNodeAtPathCmd,
   'bootstrap-user': bootstrapUserCmd,
+  'remove-node-at-path': removeNodeAtPathCmd,
   'set-data-at-path': setDataAtPathCmd,
   'set-props-and-commit': setPropsAndCommitCmd,
   'provision-database-with-user': provisionDatabaseWithUserCmd,
@@ -326,7 +324,7 @@ const createCommandMap: () => Record<
   'verify-totp': verifyTotpCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  object               object CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  database             database CRUD operations\n  schema               schema CRUD operations\n  table                table CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  field                field CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  index                index CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view                 view CRUD operations\n  view-table           viewTable CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  table-module         tableModule CRUD operations\n  table-template-module tableTemplateModule CRUD operations\n  secure-table-provision secureTableProvision CRUD operations\n  relation-provision   relationProvision CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  api-schema           apiSchema CRUD operations\n  api-module           apiModule CRUD operations\n  domain               domain CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  api                  api CRUD operations\n  site                 site CRUD operations\n  app                  app CRUD operations\n  connected-accounts-module connectedAccountsModule CRUD operations\n  crypto-addresses-module cryptoAddressesModule CRUD operations\n  crypto-auth-module   cryptoAuthModule CRUD operations\n  default-ids-module   defaultIdsModule CRUD operations\n  denormalized-table-field denormalizedTableField CRUD operations\n  emails-module        emailsModule CRUD operations\n  encrypted-secrets-module encryptedSecretsModule CRUD operations\n  field-module         fieldModule CRUD operations\n  invites-module       invitesModule CRUD operations\n  levels-module        levelsModule CRUD operations\n  limits-module        limitsModule CRUD operations\n  membership-types-module membershipTypesModule CRUD operations\n  memberships-module   membershipsModule CRUD operations\n  permissions-module   permissionsModule CRUD operations\n  phone-numbers-module phoneNumbersModule CRUD operations\n  profiles-module      profilesModule CRUD operations\n  rls-module           rlsModule CRUD operations\n  secrets-module       secretsModule CRUD operations\n  sessions-module      sessionsModule CRUD operations\n  user-auth-module     userAuthModule CRUD operations\n  users-module         usersModule CRUD operations\n  uuid-module          uuidModule CRUD operations\n  database-provision-module databaseProvisionModule CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-grant            appGrant CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-member           orgMember CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  app-limit            appLimit CRUD operations\n  org-limit            orgLimit CRUD operations\n  app-step             appStep CRUD operations\n  app-achievement      appAchievement CRUD operations\n  invite               invite CRUD operations\n  claimed-invite       claimedInvite CRUD operations\n  org-invite           orgInvite CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  role-type            roleType CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  connected-account    connectedAccount CRUD operations\n  phone-number         phoneNumber CRUD operations\n  membership-type      membershipType CRUD operations\n  node-type-registry   nodeTypeRegistry CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  commit               commit CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  audit-log            auditLog CRUD operations\n  app-level            appLevel CRUD operations\n  email                email CRUD operations\n  sql-migration        sqlMigration CRUD operations\n  ast-migration        astMigration CRUD operations\n  user                 user CRUD operations\n  app-membership       appMembership CRUD operations\n  hierarchy-module     hierarchyModule CRUD operations\n  current-user-id      currentUserId\n  current-ip-address   currentIpAddress\n  current-user-agent   currentUserAgent\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  steps-achieved       stepsAchieved\n  rev-parse            revParse\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  get-all-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-path-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-object-at-path   getObjectAtPath\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  submit-invite-code   submitInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  freeze-objects       freezeObjects\n  init-empty-repo      initEmptyRepo\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  reset-password       resetPassword\n  remove-node-at-path  removeNodeAtPath\n  bootstrap-user       bootstrapUser\n  set-data-at-path     setDataAtPath\n  set-props-and-commit setPropsAndCommit\n  provision-database-with-user provisionDatabaseWithUser\n  sign-in-one-time-token signInOneTimeToken\n  create-user-database Creates a new user database with all required modules, permissions, and RLS policies.\n\nParameters:\n  - database_name: Name for the new database (required)\n  - owner_id: UUID of the owner user (required)\n  - include_invites: Include invite system (default: true)\n  - include_groups: Include group-level memberships (default: false)\n  - include_levels: Include levels/achievements (default: false)\n  - bitlen: Bit length for permission masks (default: 64)\n  - tokens_expiration: Token expiration interval (default: 30 days)\n\nReturns the database_id UUID of the newly created database.\n\nExample usage:\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups\n\n  extend-token-expires extendTokenExpires\n  sign-in              signIn\n  sign-up              signUp\n  set-field-order      setFieldOrder\n  one-time-token       oneTimeToken\n  insert-node-at-path  insertNodeAtPath\n  update-node-at-path  updateNodeAtPath\n  set-and-commit       setAndCommit\n  apply-rls            applyRls\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  object               object CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  database             database CRUD operations\n  schema               schema CRUD operations\n  table                table CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  field                field CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  index                index CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view                 view CRUD operations\n  view-table           viewTable CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  table-template-module tableTemplateModule CRUD operations\n  secure-table-provision secureTableProvision CRUD operations\n  relation-provision   relationProvision CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  api-schema           apiSchema CRUD operations\n  api-module           apiModule CRUD operations\n  domain               domain CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  api                  api CRUD operations\n  site                 site CRUD operations\n  app                  app CRUD operations\n  connected-accounts-module connectedAccountsModule CRUD operations\n  crypto-addresses-module cryptoAddressesModule CRUD operations\n  crypto-auth-module   cryptoAuthModule CRUD operations\n  default-ids-module   defaultIdsModule CRUD operations\n  denormalized-table-field denormalizedTableField CRUD operations\n  emails-module        emailsModule CRUD operations\n  encrypted-secrets-module encryptedSecretsModule CRUD operations\n  field-module         fieldModule CRUD operations\n  invites-module       invitesModule CRUD operations\n  levels-module        levelsModule CRUD operations\n  limits-module        limitsModule CRUD operations\n  membership-types-module membershipTypesModule CRUD operations\n  memberships-module   membershipsModule CRUD operations\n  permissions-module   permissionsModule CRUD operations\n  phone-numbers-module phoneNumbersModule CRUD operations\n  profiles-module      profilesModule CRUD operations\n  secrets-module       secretsModule CRUD operations\n  sessions-module      sessionsModule CRUD operations\n  user-auth-module     userAuthModule CRUD operations\n  users-module         usersModule CRUD operations\n  uuid-module          uuidModule CRUD operations\n  database-provision-module databaseProvisionModule CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-grant            appGrant CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-member           orgMember CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  app-limit            appLimit CRUD operations\n  org-limit            orgLimit CRUD operations\n  app-step             appStep CRUD operations\n  app-achievement      appAchievement CRUD operations\n  invite               invite CRUD operations\n  claimed-invite       claimedInvite CRUD operations\n  org-invite           orgInvite CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  role-type            roleType CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  phone-number         phoneNumber CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  connected-account    connectedAccount CRUD operations\n  node-type-registry   nodeTypeRegistry CRUD operations\n  membership-type      membershipType CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  rls-module           rlsModule CRUD operations\n  commit               commit CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  audit-log            auditLog CRUD operations\n  app-level            appLevel CRUD operations\n  sql-migration        sqlMigration CRUD operations\n  email                email CRUD operations\n  ast-migration        astMigration CRUD operations\n  app-membership       appMembership CRUD operations\n  user                 user CRUD operations\n  hierarchy-module     hierarchyModule CRUD operations\n  current-user-id      currentUserId\n  current-ip-address   currentIpAddress\n  current-user-agent   currentUserAgent\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  steps-achieved       stepsAchieved\n  rev-parse            revParse\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  get-all-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-path-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-object-at-path   getObjectAtPath\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  submit-invite-code   submitInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  freeze-objects       freezeObjects\n  init-empty-repo      initEmptyRepo\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  reset-password       resetPassword\n  bootstrap-user       bootstrapUser\n  remove-node-at-path  removeNodeAtPath\n  set-data-at-path     setDataAtPath\n  set-props-and-commit setPropsAndCommit\n  provision-database-with-user provisionDatabaseWithUser\n  sign-in-one-time-token signInOneTimeToken\n  create-user-database Creates a new user database with all required modules, permissions, and RLS policies.\n\nParameters:\n  - database_name: Name for the new database (required)\n  - owner_id: UUID of the owner user (required)\n  - include_invites: Include invite system (default: true)\n  - include_groups: Include group-level memberships (default: false)\n  - include_levels: Include levels/achievements (default: false)\n  - bitlen: Bit length for permission masks (default: 64)\n  - tokens_expiration: Token expiration interval (default: 30 days)\n\nReturns the database_id UUID of the newly created database.\n\nExample usage:\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups\n\n  extend-token-expires extendTokenExpires\n  sign-in              signIn\n  sign-up              signUp\n  set-field-order      setFieldOrder\n  one-time-token       oneTimeToken\n  insert-node-at-path  insertNodeAtPath\n  update-node-at-path  updateNodeAtPath\n  set-and-commit       setAndCommit\n  apply-rls            applyRls\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

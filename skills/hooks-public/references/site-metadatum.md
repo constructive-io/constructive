@@ -7,8 +7,8 @@ SEO and social sharing metadata for a site: page title, description, and Open Gr
 ## Usage
 
 ```typescript
-useSiteMetadataQuery({ selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } } })
-useSiteMetadatumQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } } })
+useSiteMetadataQuery({ selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } } })
+useSiteMetadatumQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } } })
 useCreateSiteMetadatumMutation({ selection: { fields: { id: true } } })
 useUpdateSiteMetadatumMutation({ selection: { fields: { id: true } } })
 useDeleteSiteMetadatumMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteMetadatumMutation({})
 
 ```typescript
 const { data, isLoading } = useSiteMetadataQuery({
-  selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } },
+  selection: { fields: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSiteMetadataQuery({
 const { mutate } = useCreateSiteMetadatumMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>' });
+mutate({ databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

@@ -9,8 +9,8 @@ CRUD operations for Ref records via csdk CLI
 ```bash
 csdk ref list
 csdk ref get --id <value>
-csdk ref create --name <value> --databaseId <value> --storeId <value> [--commitId <value>]
-csdk ref update --id <value> [--name <value>] [--databaseId <value>] [--storeId <value>] [--commitId <value>]
+csdk ref create --name <value> --databaseId <value> --storeId <value> --nameTrgmSimilarity <value> --searchScore <value> [--commitId <value>]
+csdk ref update --id <value> [--name <value>] [--databaseId <value>] [--storeId <value>] [--commitId <value>] [--nameTrgmSimilarity <value>] [--searchScore <value>]
 csdk ref delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk ref list
 ### Create a ref
 
 ```bash
-csdk ref create --name <value> --databaseId <value> --storeId <value> [--commitId <value>]
+csdk ref create --name <value> --databaseId <value> --storeId <value> --nameTrgmSimilarity <value> --searchScore <value> [--commitId <value>]
 ```
 
 ### Get a ref by id

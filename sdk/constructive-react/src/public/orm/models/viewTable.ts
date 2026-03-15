@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ViewTableModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ViewTableSelect>(
-    args: FindManyArgs<S, ViewTableFilter, ViewTableOrderBy> & {
+    args: FindManyArgs<S, ViewTableFilter, never, ViewTableOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewTableSelect>
   ): QueryBuilder<{

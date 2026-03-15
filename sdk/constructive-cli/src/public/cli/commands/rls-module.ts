@@ -11,7 +11,6 @@ import type { CreateRlsModuleInput, RlsModulePatch } from '../../orm/input-types
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
-  apiId: 'uuid',
   schemaId: 'uuid',
   privateSchemaId: 'uuid',
   sessionCredentialsTableId: 'uuid',
@@ -21,6 +20,11 @@ const fieldSchema: FieldSchema = {
   authenticateStrict: 'string',
   currentRole: 'string',
   currentRoleId: 'string',
+  authenticateTrgmSimilarity: 'float',
+  authenticateStrictTrgmSimilarity: 'float',
+  currentRoleTrgmSimilarity: 'float',
+  currentRoleIdTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nrls-module <command>\n\nCommands:\n  list                  List all rlsModule records\n  get                   Get a rlsModule by ID\n  create                Create a new rlsModule\n  update                Update an existing rlsModule\n  delete                Delete a rlsModule\n\n  --help, -h            Show this help message\n';
@@ -76,7 +80,6 @@ async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: In
         select: {
           id: true,
           databaseId: true,
-          apiId: true,
           schemaId: true,
           privateSchemaId: true,
           sessionCredentialsTableId: true,
@@ -115,7 +118,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
         select: {
           id: true,
           databaseId: true,
-          apiId: true,
           schemaId: true,
           privateSchemaId: true,
           sessionCredentialsTableId: true,
@@ -145,13 +147,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: true,
-      },
-      {
-        type: 'text',
-        name: 'apiId',
-        message: 'apiId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -224,7 +219,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       .create({
         data: {
           databaseId: cleanedData.databaseId,
-          apiId: cleanedData.apiId,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           sessionCredentialsTableId: cleanedData.sessionCredentialsTableId,
@@ -238,7 +232,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
-          apiId: true,
           schemaId: true,
           privateSchemaId: true,
           sessionCredentialsTableId: true,
@@ -274,13 +267,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'databaseId',
         message: 'databaseId',
         required: false,
-      },
-      {
-        type: 'text',
-        name: 'apiId',
-        message: 'apiId',
-        required: false,
-        skipPrompt: true,
       },
       {
         type: 'text',
@@ -356,7 +342,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         },
         data: {
           databaseId: cleanedData.databaseId,
-          apiId: cleanedData.apiId,
           schemaId: cleanedData.schemaId,
           privateSchemaId: cleanedData.privateSchemaId,
           sessionCredentialsTableId: cleanedData.sessionCredentialsTableId,
@@ -370,7 +355,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         select: {
           id: true,
           databaseId: true,
-          apiId: true,
           schemaId: true,
           privateSchemaId: true,
           sessionCredentialsTableId: true,

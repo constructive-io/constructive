@@ -9,7 +9,7 @@ OAuth and social login connections linking external service accounts to users
 ```typescript
 db.connectedAccount.findMany({ select: { id: true } }).execute()
 db.connectedAccount.findOne({ id: '<value>', select: { id: true } }).execute()
-db.connectedAccount.create({ data: { ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' }, select: { id: true } }).execute()
+db.connectedAccount.create({ data: { ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>', serviceTrgmSimilarity: '<value>', identifierTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.connectedAccount.update({ where: { id: '<value>' }, data: { ownerId: '<new>' }, select: { id: true } }).execute()
 db.connectedAccount.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.connectedAccount.findMany({
 
 ```typescript
 const item = await db.connectedAccount.create({
-  data: { ownerId: 'value', service: 'value', identifier: 'value', details: 'value', isVerified: 'value' },
+  data: { ownerId: 'value', service: 'value', identifier: 'value', details: 'value', isVerified: 'value', serviceTrgmSimilarity: 'value', identifierTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

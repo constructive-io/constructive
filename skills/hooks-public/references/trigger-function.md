@@ -7,8 +7,8 @@ React Query hooks for TriggerFunction data operations
 ## Usage
 
 ```typescript
-useTriggerFunctionsQuery({ selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } } })
-useTriggerFunctionQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } } })
+useTriggerFunctionsQuery({ selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, codeTrgmSimilarity: true, searchScore: true } } })
+useTriggerFunctionQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, codeTrgmSimilarity: true, searchScore: true } } })
 useCreateTriggerFunctionMutation({ selection: { fields: { id: true } } })
 useUpdateTriggerFunctionMutation({ selection: { fields: { id: true } } })
 useDeleteTriggerFunctionMutation({})
@@ -20,7 +20,7 @@ useDeleteTriggerFunctionMutation({})
 
 ```typescript
 const { data, isLoading } = useTriggerFunctionsQuery({
-  selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, codeTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useTriggerFunctionsQuery({
 const { mutate } = useCreateTriggerFunctionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', name: '<value>', code: '<value>' });
+mutate({ databaseId: '<value>', name: '<value>', code: '<value>', nameTrgmSimilarity: '<value>', codeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

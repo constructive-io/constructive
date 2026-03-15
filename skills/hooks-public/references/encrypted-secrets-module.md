@@ -7,8 +7,8 @@ React Query hooks for EncryptedSecretsModule data operations
 ## Usage
 
 ```typescript
-useEncryptedSecretsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
-useEncryptedSecretsModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
+useEncryptedSecretsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } } })
+useEncryptedSecretsModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } } })
 useCreateEncryptedSecretsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateEncryptedSecretsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteEncryptedSecretsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteEncryptedSecretsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useEncryptedSecretsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useEncryptedSecretsModulesQuery({
 const { mutate } = useCreateEncryptedSecretsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' });
+mutate({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

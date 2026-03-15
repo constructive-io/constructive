@@ -7,8 +7,8 @@ React Query hooks for PermissionsModule data operations
 ## Usage
 
 ```typescript
-usePermissionsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } } })
-usePermissionsModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } } })
+usePermissionsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, getPaddedMaskTrgmSimilarity: true, getMaskTrgmSimilarity: true, getByMaskTrgmSimilarity: true, getMaskByNameTrgmSimilarity: true, searchScore: true } } })
+usePermissionsModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, getPaddedMaskTrgmSimilarity: true, getMaskTrgmSimilarity: true, getByMaskTrgmSimilarity: true, getMaskByNameTrgmSimilarity: true, searchScore: true } } })
 useCreatePermissionsModuleMutation({ selection: { fields: { id: true } } })
 useUpdatePermissionsModuleMutation({ selection: { fields: { id: true } } })
 useDeletePermissionsModuleMutation({})
@@ -20,7 +20,7 @@ useDeletePermissionsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = usePermissionsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, getPaddedMaskTrgmSimilarity: true, getMaskTrgmSimilarity: true, getByMaskTrgmSimilarity: true, getMaskByNameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePermissionsModulesQuery({
 const { mutate } = useCreatePermissionsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>' });
+mutate({ databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>', tableNameTrgmSimilarity: '<value>', defaultTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', getPaddedMaskTrgmSimilarity: '<value>', getMaskTrgmSimilarity: '<value>', getByMaskTrgmSimilarity: '<value>', getMaskByNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

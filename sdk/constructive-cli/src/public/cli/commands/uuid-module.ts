@@ -14,6 +14,9 @@ const fieldSchema: FieldSchema = {
   schemaId: 'uuid',
   uuidFunction: 'string',
   uuidSeed: 'string',
+  uuidFunctionTrgmSimilarity: 'float',
+  uuidSeedTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nuuid-module <command>\n\nCommands:\n  list                  List all uuidModule records\n  get                   Get a uuidModule by ID\n  create                Create a new uuidModule\n  update                Update an existing uuidModule\n  delete                Delete a uuidModule\n\n  --help, -h            Show this help message\n';

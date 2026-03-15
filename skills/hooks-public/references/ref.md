@@ -7,8 +7,8 @@ A ref is a data structure for pointing to a commit.
 ## Usage
 
 ```typescript
-useRefsQuery({ selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } } })
-useRefQuery({ id: '<value>', selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } } })
+useRefsQuery({ selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } } })
+useRefQuery({ id: '<value>', selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } } })
 useCreateRefMutation({ selection: { fields: { id: true } } })
 useUpdateRefMutation({ selection: { fields: { id: true } } })
 useDeleteRefMutation({})
@@ -20,7 +20,7 @@ useDeleteRefMutation({})
 
 ```typescript
 const { data, isLoading } = useRefsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useRefsQuery({
 const { mutate } = useCreateRefMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>' });
+mutate({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

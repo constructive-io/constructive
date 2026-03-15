@@ -9,7 +9,7 @@ Server-side module configuration for an API endpoint; stores module name and JSO
 ```typescript
 db.apiModule.findMany({ select: { id: true } }).execute()
 db.apiModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.apiModule.create({ data: { databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>' }, select: { id: true } }).execute()
+db.apiModule.create({ data: { databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.apiModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.apiModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.apiModule.findMany({
 
 ```typescript
 const item = await db.apiModule.create({
-  data: { databaseId: 'value', apiId: 'value', name: 'value', data: 'value' },
+  data: { databaseId: 'value', apiId: 'value', name: 'value', data: 'value', nameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

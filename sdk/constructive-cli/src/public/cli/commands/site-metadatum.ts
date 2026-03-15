@@ -15,6 +15,9 @@ const fieldSchema: FieldSchema = {
   title: 'string',
   description: 'string',
   ogImage: 'string',
+  titleTrgmSimilarity: 'float',
+  descriptionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nsite-metadatum <command>\n\nCommands:\n  list                  List all siteMetadatum records\n  get                   Get a siteMetadatum by ID\n  create                Create a new siteMetadatum\n  update                Update an existing siteMetadatum\n  delete                Delete a siteMetadatum\n\n  --help, -h            Show this help message\n';

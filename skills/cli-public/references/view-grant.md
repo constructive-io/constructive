@@ -9,8 +9,8 @@ CRUD operations for ViewGrant records via csdk CLI
 ```bash
 csdk view-grant list
 csdk view-grant get --id <value>
-csdk view-grant create --viewId <value> --granteeName <value> --privilege <value> [--databaseId <value>] [--withGrantOption <value>] [--isGrant <value>]
-csdk view-grant update --id <value> [--databaseId <value>] [--viewId <value>] [--granteeName <value>] [--privilege <value>] [--withGrantOption <value>] [--isGrant <value>]
+csdk view-grant create --viewId <value> --granteeName <value> --privilege <value> --granteeNameTrgmSimilarity <value> --privilegeTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--withGrantOption <value>] [--isGrant <value>]
+csdk view-grant update --id <value> [--databaseId <value>] [--viewId <value>] [--granteeName <value>] [--privilege <value>] [--withGrantOption <value>] [--isGrant <value>] [--granteeNameTrgmSimilarity <value>] [--privilegeTrgmSimilarity <value>] [--searchScore <value>]
 csdk view-grant delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk view-grant list
 ### Create a viewGrant
 
 ```bash
-csdk view-grant create --viewId <value> --granteeName <value> --privilege <value> [--databaseId <value>] [--withGrantOption <value>] [--isGrant <value>]
+csdk view-grant create --viewId <value> --granteeName <value> --privilege <value> --granteeNameTrgmSimilarity <value> --privilegeTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--withGrantOption <value>] [--isGrant <value>]
 ```
 
 ### Get a viewGrant by id

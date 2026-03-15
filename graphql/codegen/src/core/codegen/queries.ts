@@ -185,7 +185,7 @@ export function generateListQueryHook(
     const findManyKeyTypeArgs: t.TSType[] = [
       t.tsUnknownKeyword(),
       typeRef(filterTypeName),
-      ...(conditionTypeName ? [typeRef(conditionTypeName)] : []),
+      conditionTypeName ? typeRef(conditionTypeName) : t.tsNeverKeyword(),
       typeRef(orderByTypeName),
     ];
     const keyFn = t.arrowFunctionExpression(

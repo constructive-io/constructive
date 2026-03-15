@@ -9,7 +9,7 @@ ORM operations for TriggerFunction records
 ```typescript
 db.triggerFunction.findMany({ select: { id: true } }).execute()
 db.triggerFunction.findOne({ id: '<value>', select: { id: true } }).execute()
-db.triggerFunction.create({ data: { databaseId: '<value>', name: '<value>', code: '<value>' }, select: { id: true } }).execute()
+db.triggerFunction.create({ data: { databaseId: '<value>', name: '<value>', code: '<value>', nameTrgmSimilarity: '<value>', codeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.triggerFunction.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.triggerFunction.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.triggerFunction.findMany({
 
 ```typescript
 const item = await db.triggerFunction.create({
-  data: { databaseId: 'value', name: 'value', code: 'value' },
+  data: { databaseId: 'value', name: 'value', code: 'value', nameTrgmSimilarity: 'value', codeTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

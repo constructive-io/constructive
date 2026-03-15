@@ -15,6 +15,9 @@ const fieldSchema: FieldSchema = {
   code: 'string',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  codeTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ntrigger-function <command>\n\nCommands:\n  list                  List all triggerFunction records\n  get                   Get a triggerFunction by ID\n  create                Create a new triggerFunction\n  update                Update an existing triggerFunction\n  delete                Delete a triggerFunction\n\n  --help, -h            Show this help message\n';

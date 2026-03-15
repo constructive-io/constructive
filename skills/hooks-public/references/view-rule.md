@@ -7,8 +7,8 @@ DO INSTEAD rules for views (e.g., read-only enforcement)
 ## Usage
 
 ```typescript
-useViewRulesQuery({ selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } } })
-useViewRuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } } })
+useViewRulesQuery({ selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } } })
+useViewRuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } } })
 useCreateViewRuleMutation({ selection: { fields: { id: true } } })
 useUpdateViewRuleMutation({ selection: { fields: { id: true } } })
 useDeleteViewRuleMutation({})
@@ -20,7 +20,7 @@ useDeleteViewRuleMutation({})
 
 ```typescript
 const { data, isLoading } = useViewRulesQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useViewRulesQuery({
 const { mutate } = useCreateViewRuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>' });
+mutate({ databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>', nameTrgmSimilarity: '<value>', eventTrgmSimilarity: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

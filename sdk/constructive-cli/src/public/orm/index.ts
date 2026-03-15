@@ -29,7 +29,6 @@ import { ViewModel } from './models/view';
 import { ViewTableModel } from './models/viewTable';
 import { ViewGrantModel } from './models/viewGrant';
 import { ViewRuleModel } from './models/viewRule';
-import { TableModuleModel } from './models/tableModule';
 import { TableTemplateModuleModel } from './models/tableTemplateModule';
 import { SecureTableProvisionModel } from './models/secureTableProvision';
 import { RelationProvisionModel } from './models/relationProvision';
@@ -61,7 +60,6 @@ import { MembershipsModuleModel } from './models/membershipsModule';
 import { PermissionsModuleModel } from './models/permissionsModule';
 import { PhoneNumbersModuleModel } from './models/phoneNumbersModule';
 import { ProfilesModuleModel } from './models/profilesModule';
-import { RlsModuleModel } from './models/rlsModule';
 import { SecretsModuleModel } from './models/secretsModule';
 import { SessionsModuleModel } from './models/sessionsModule';
 import { UserAuthModuleModel } from './models/userAuthModule';
@@ -89,25 +87,26 @@ import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
+import { CryptoAddressModel } from './models/cryptoAddress';
 import { RoleTypeModel } from './models/roleType';
 import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
-import { CryptoAddressModel } from './models/cryptoAddress';
+import { PhoneNumberModel } from './models/phoneNumber';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { ConnectedAccountModel } from './models/connectedAccount';
-import { PhoneNumberModel } from './models/phoneNumber';
-import { MembershipTypeModel } from './models/membershipType';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
+import { MembershipTypeModel } from './models/membershipType';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
+import { RlsModuleModel } from './models/rlsModule';
 import { CommitModel } from './models/commit';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { AuditLogModel } from './models/auditLog';
 import { AppLevelModel } from './models/appLevel';
-import { EmailModel } from './models/email';
 import { SqlMigrationModel } from './models/sqlMigration';
+import { EmailModel } from './models/email';
 import { AstMigrationModel } from './models/astMigration';
-import { UserModel } from './models/user';
 import { AppMembershipModel } from './models/appMembership';
+import { UserModel } from './models/user';
 import { HierarchyModuleModel } from './models/hierarchyModule';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -169,7 +168,6 @@ export function createClient(config: OrmClientConfig) {
     viewTable: new ViewTableModel(client),
     viewGrant: new ViewGrantModel(client),
     viewRule: new ViewRuleModel(client),
-    tableModule: new TableModuleModel(client),
     tableTemplateModule: new TableTemplateModuleModel(client),
     secureTableProvision: new SecureTableProvisionModel(client),
     relationProvision: new RelationProvisionModel(client),
@@ -201,7 +199,6 @@ export function createClient(config: OrmClientConfig) {
     permissionsModule: new PermissionsModuleModel(client),
     phoneNumbersModule: new PhoneNumbersModuleModel(client),
     profilesModule: new ProfilesModuleModel(client),
-    rlsModule: new RlsModuleModel(client),
     secretsModule: new SecretsModuleModel(client),
     sessionsModule: new SessionsModuleModel(client),
     userAuthModule: new UserAuthModuleModel(client),
@@ -229,25 +226,26 @@ export function createClient(config: OrmClientConfig) {
     ref: new RefModel(client),
     store: new StoreModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
+    cryptoAddress: new CryptoAddressModel(client),
     roleType: new RoleTypeModel(client),
     orgPermissionDefault: new OrgPermissionDefaultModel(client),
-    cryptoAddress: new CryptoAddressModel(client),
+    phoneNumber: new PhoneNumberModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
     connectedAccount: new ConnectedAccountModel(client),
-    phoneNumber: new PhoneNumberModel(client),
-    membershipType: new MembershipTypeModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
+    membershipType: new MembershipTypeModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
+    rlsModule: new RlsModuleModel(client),
     commit: new CommitModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     auditLog: new AuditLogModel(client),
     appLevel: new AppLevelModel(client),
-    email: new EmailModel(client),
     sqlMigration: new SqlMigrationModel(client),
+    email: new EmailModel(client),
     astMigration: new AstMigrationModel(client),
-    user: new UserModel(client),
     appMembership: new AppMembershipModel(client),
+    user: new UserModel(client),
     hierarchyModule: new HierarchyModuleModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

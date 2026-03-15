@@ -25,6 +25,7 @@ csdk auth set-token <your-token>
 |---------|-------------|
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
+| `config` | Manage config key-value store (per-context) |
 | `get-all-record` | getAllRecord CRUD operations |
 | `object` | object CRUD operations |
 | `ref` | ref CRUD operations |
@@ -68,6 +69,19 @@ Manage authentication tokens per context.
 | `set-token <token>` | Store bearer token for current context |
 | `status` | Show auth status across all contexts |
 | `logout` | Remove credentials for current context |
+
+### `config`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| `get <key>` | Get a config value |
+| `set <key> <value>` | Set a config value |
+| `list` | List all config values |
+| `delete <key>` | Delete a config value |
+
+Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
@@ -141,8 +155,10 @@ CRUD operations for Ref records.
 | `databaseId` | UUID |
 | `storeId` | UUID |
 | `commitId` | UUID |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `name`, `databaseId`, `storeId`
+**Required create fields:** `name`, `databaseId`, `storeId`, `nameTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `commitId`
 
 ### `store`
@@ -166,8 +182,10 @@ CRUD operations for Store records.
 | `databaseId` | UUID |
 | `hash` | UUID |
 | `createdAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `name`, `databaseId`
+**Required create fields:** `name`, `databaseId`, `nameTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `hash`
 
 ### `commit`
@@ -195,8 +213,10 @@ CRUD operations for Commit records.
 | `committerId` | UUID |
 | `treeId` | UUID |
 | `date` | Datetime |
+| `messageTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `databaseId`, `storeId`
+**Required create fields:** `databaseId`, `storeId`, `messageTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ## Custom Operations

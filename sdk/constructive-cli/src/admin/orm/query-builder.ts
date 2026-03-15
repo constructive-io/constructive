@@ -229,7 +229,6 @@ export function buildFindManyDocument<TSelect, TWhere, TCondition = never>(
   addVariable(
     {
       varName: 'where',
-      argName: 'filter',
       typeName: filterTypeName,
       value: args.where,
     },
@@ -339,7 +338,6 @@ export function buildFindFirstDocument<TSelect, TWhere, TCondition = never>(
   addVariable(
     {
       varName: 'where',
-      argName: 'filter',
       typeName: filterTypeName,
       value: args.where,
     },

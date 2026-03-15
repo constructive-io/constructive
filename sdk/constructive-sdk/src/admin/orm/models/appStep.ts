@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppStepModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppStepSelect>(
-    args: FindManyArgs<S, AppStepFilter, AppStepOrderBy> & {
+    args: FindManyArgs<S, AppStepFilter, never, AppStepOrderBy> & {
       select: S;
     } & StrictSelect<S, AppStepSelect>
   ): QueryBuilder<{

@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppPermissionDefaultModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppPermissionDefaultSelect>(
-    args: FindManyArgs<S, AppPermissionDefaultFilter, AppPermissionDefaultOrderBy> & {
+    args: FindManyArgs<S, AppPermissionDefaultFilter, never, AppPermissionDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, AppPermissionDefaultSelect>
   ): QueryBuilder<{

@@ -9,8 +9,8 @@ CRUD operations for Field records via csdk CLI
 ```bash
 csdk field list
 csdk field get --id <value>
-csdk field create --tableId <value> --name <value> --type <value> [--databaseId <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>]
-csdk field update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--type <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>]
+csdk field create --tableId <value> --name <value> --type <value> --nameTrgmSimilarity <value> --labelTrgmSimilarity <value> --descriptionTrgmSimilarity <value> --defaultValueTrgmSimilarity <value> --regexpTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>]
+csdk field update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--type <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>] [--nameTrgmSimilarity <value>] [--labelTrgmSimilarity <value>] [--descriptionTrgmSimilarity <value>] [--defaultValueTrgmSimilarity <value>] [--regexpTrgmSimilarity <value>] [--moduleTrgmSimilarity <value>] [--searchScore <value>]
 csdk field delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk field list
 ### Create a field
 
 ```bash
-csdk field create --tableId <value> --name <value> --type <value> [--databaseId <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>]
+csdk field create --tableId <value> --name <value> --type <value> --nameTrgmSimilarity <value> --labelTrgmSimilarity <value> --descriptionTrgmSimilarity <value> --defaultValueTrgmSimilarity <value> --regexpTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--label <value>] [--description <value>] [--smartTags <value>] [--isRequired <value>] [--defaultValue <value>] [--defaultValueAst <value>] [--isHidden <value>] [--fieldOrder <value>] [--regexp <value>] [--chk <value>] [--chkExpr <value>] [--min <value>] [--max <value>] [--tags <value>] [--category <value>] [--module <value>] [--scope <value>]
 ```
 
 ### Get a field by id

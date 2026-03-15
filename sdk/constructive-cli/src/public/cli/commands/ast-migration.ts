@@ -22,6 +22,8 @@ const fieldSchema: FieldSchema = {
   action: 'string',
   actionId: 'uuid',
   actorId: 'uuid',
+  actionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nast-migration <command>\n\nCommands:\n  list                  List all astMigration records\n  create                Create a new astMigration\n\n  --help, -h            Show this help message\n';
