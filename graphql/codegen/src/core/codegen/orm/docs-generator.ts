@@ -8,7 +8,6 @@ import {
   getEditableFields,
   categorizeSpecialFields,
   buildSpecialFieldsMarkdown,
-  buildSpecialFieldsPlain,
   getReadmeHeader,
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
@@ -162,24 +161,22 @@ export function generateOrmAgentsDocs(
   customOperations: CleanOperation[],
 ): GeneratedDocFile {
   const lines: string[] = [];
+  const tableCount = tables.length;
+  const customOpCount = customOperations.length;
 
-  lines.push('# ORM Client - Agent Reference');
+  lines.push('# ORM Client');
   lines.push('');
   lines.push('<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->');
-  lines.push('> This document is structured for LLM/agent consumption.');
   lines.push('');
 
-  lines.push('## OVERVIEW');
+  lines.push('## Stack');
   lines.push('');
-  lines.push(
-    'Prisma-like ORM client for interacting with a GraphQL API.',
-  );
-  lines.push(
-    'All methods return a query builder. Call `.execute()` to run the query.',
-  );
+  lines.push('- Prisma-like ORM client for a GraphQL API (TypeScript)');
+  lines.push(`- ${tableCount} model${tableCount !== 1 ? 's' : ''}${customOpCount > 0 ? `, ${customOpCount} custom operation${customOpCount !== 1 ? 's' : ''}` : ''}`);
+  lines.push('- All methods return a query builder; call `.execute()` to run');
   lines.push('');
 
-  lines.push('## SETUP');
+  lines.push('## Quick Start');
   lines.push('');
   lines.push('```typescript');
   lines.push("import { createClient } from './orm';");
@@ -191,129 +188,24 @@ export function generateOrmAgentsDocs(
   lines.push('```');
   lines.push('');
 
-  lines.push('## MODELS');
+  lines.push('## Resources');
+  lines.push('');
+  lines.push(`- **Full API reference:** [README.md](./README.md) — model docs for all ${tableCount} tables`);
+  lines.push('- **Schema types:** [types.ts](./types.ts)');
+  lines.push('- **ORM client:** [orm.ts](./orm.ts)');
   lines.push('');
 
-  for (const table of tables) {
-    const { singularName } = getTableNames(table);
-    const pk = getPrimaryKeyInfo(table)[0];
-    const scalarFields = getScalarFields(table);
-    const editableFields = getEditableFields(table);
-
-    lines.push(`### MODEL: ${singularName}`);
-    lines.push('');
-    lines.push(`Access: \`db.${singularName}\``);
-    lines.push('');
-    lines.push('```');
-    lines.push('METHODS:');
-    lines.push(
-      `  db.${singularName}.findMany({ select, where?, orderBy?, first?, offset? })`,
-    );
-    lines.push(
-      `  db.${singularName}.findOne({ ${pk.name}, select })`,
-    );
-    lines.push(
-      `  db.${singularName}.create({ data: { ${editableFields.map((f) => f.name).join(', ')} }, select })`,
-    );
-    lines.push(
-      `  db.${singularName}.update({ where: { ${pk.name} }, data, select })`,
-    );
-    lines.push(`  db.${singularName}.delete({ where: { ${pk.name} } })`);
-    lines.push('');
-    lines.push('FIELDS:');
-    for (const f of scalarFields) {
-      const isPk = f.name === pk.name;
-      lines.push(
-        `  ${f.name}: ${fieldTypeToTs(f.type)}${isPk ? ' (primary key)' : ''}`,
-      );
-    }
-    lines.push('');
-    lines.push('EDITABLE FIELDS:');
-    for (const f of editableFields) {
-      lines.push(`  ${f.name}: ${fieldTypeToTs(f.type)}`);
-    }
-    lines.push('');
-    const ormAgentSpecialGroups = categorizeSpecialFields(table);
-    const ormAgentSpecialLines = buildSpecialFieldsPlain(ormAgentSpecialGroups);
-    if (ormAgentSpecialLines.length > 0) {
-      for (const sl of ormAgentSpecialLines) {
-        lines.push(sl);
-      }
-      lines.push('');
-    }
-    lines.push('OUTPUT: Promise<JSON>');
-    lines.push(
-      `  findMany: [{ ${scalarFields.map((f) => f.name).join(', ')} }]`,
-    );
-    lines.push(
-      `  findOne:  { ${scalarFields.map((f) => f.name).join(', ')} }`,
-    );
-    lines.push(
-      `  create:   { ${scalarFields.map((f) => f.name).join(', ')} }`,
-    );
-    lines.push(
-      `  update:   { ${scalarFields.map((f) => f.name).join(', ')} }`,
-    );
-    lines.push(`  delete:   { ${pk.name} }`);
-    lines.push('```');
-    lines.push('');
-  }
-
-  if (customOperations.length > 0) {
-    lines.push('## CUSTOM OPERATIONS');
-    lines.push('');
-
-    for (const op of customOperations) {
-      const accessor = op.kind === 'query' ? 'query' : 'mutation';
-
-      lines.push(`### OPERATION: ${op.name}`);
-      lines.push('');
-      lines.push(op.description || op.name);
-      lines.push('');
-      lines.push('```');
-      lines.push(`TYPE: ${op.kind}`);
-      lines.push(`ACCESS: db.${accessor}.${op.name}`);
-      if (op.args.length > 0) {
-        lines.push(
-          `USAGE: db.${accessor}.${op.name}({ ${op.args.map((a) => `${a.name}: <value>`).join(', ')} }).execute()`,
-        );
-        lines.push('');
-        lines.push('INPUT:');
-        for (const arg of op.args) {
-          lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
-        }
-      } else {
-        lines.push(
-          `USAGE: db.${accessor}.${op.name}().execute()`,
-        );
-        lines.push('');
-        lines.push('INPUT: none');
-      }
-      lines.push('');
-      lines.push('OUTPUT: Promise<JSON>');
-      lines.push('```');
-      lines.push('');
-    }
-  }
-
-  lines.push('## PATTERNS');
+  lines.push('## Conventions');
   lines.push('');
-  lines.push('```typescript');
-  lines.push('// All methods require .execute() to run');
-  lines.push(
-    'const result = await db.modelName.findMany({ select: { id: true } }).execute();',
-  );
+  lines.push('- Access models via `db.<ModelName>` (e.g. `db.User`)');
+  lines.push('- CRUD methods: `findMany`, `findOne`, `create`, `update`, `delete`');
+  lines.push('- Always call `.execute()` to run the query');
+  lines.push('- Custom operations via `db.query.<name>` or `db.mutation.<name>`');
   lines.push('');
-  lines.push('// Select specific fields');
-  lines.push(
-    'const partial = await db.modelName.findMany({ select: { id: true, name: true } }).execute();',
-  );
+
+  lines.push('## Boundaries');
   lines.push('');
-  lines.push('// Filter with where clause');
-  lines.push(
-    "const filtered = await db.modelName.findMany({ select: { id: true }, where: { name: 'test' } }).execute();",
-  );
-  lines.push('```');
+  lines.push('All files in this directory are generated. Do not edit manually.');
   lines.push('');
 
   return {

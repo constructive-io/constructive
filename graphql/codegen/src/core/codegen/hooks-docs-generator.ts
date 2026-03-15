@@ -184,24 +184,22 @@ export function generateHooksAgentsDocs(
   customOperations: CleanOperation[],
 ): GeneratedDocFile {
   const lines: string[] = [];
+  const tableCount = tables.length;
+  const customOpCount = customOperations.length;
 
-  lines.push('# React Query Hooks - Agent Reference');
+  lines.push('# React Query Hooks');
   lines.push('');
   lines.push('<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->');
-  lines.push('> This document is structured for LLM/agent consumption.');
   lines.push('');
 
-  lines.push('## OVERVIEW');
+  lines.push('## Stack');
   lines.push('');
-  lines.push(
-    'React Query hooks wrapping ORM operations for data fetching and mutations.',
-  );
-  lines.push(
-    'All query hooks return `UseQueryResult`. All mutation hooks return `UseMutationResult`.',
-  );
+  lines.push('- React Query hooks wrapping ORM operations (TypeScript)');
+  lines.push(`- ${tableCount} table${tableCount !== 1 ? 's' : ''}${customOpCount > 0 ? `, ${customOpCount} custom operation${customOpCount !== 1 ? 's' : ''}` : ''}`);
+  lines.push('- Query hooks return `UseQueryResult`, mutation hooks return `UseMutationResult`');
   lines.push('');
 
-  lines.push('## SETUP');
+  lines.push('## Quick Start');
   lines.push('');
   lines.push('```typescript');
   lines.push("import { configure } from './hooks';");
@@ -213,150 +211,24 @@ export function generateHooksAgentsDocs(
   lines.push('```');
   lines.push('');
 
-  lines.push('## HOOKS');
+  lines.push('## Resources');
+  lines.push('');
+  lines.push(`- **Full API reference:** [README.md](./README.md) — hook docs for all ${tableCount} tables`);
+  lines.push('- **Schema types:** [types.ts](./types.ts)');
+  lines.push('- **Hooks module:** [hooks.ts](./hooks.ts)');
   lines.push('');
 
-  for (const table of tables) {
-    const { singularName, pluralName } = getTableNames(table);
-    const pk = getPrimaryKeyInfo(table)[0];
-    const scalarFields = getScalarFields(table);
+  lines.push('## Conventions');
+  lines.push('');
+  lines.push('- Query hooks: `use<PluralName>Query`, `use<SingularName>Query`');
+  lines.push('- Mutation hooks: `useCreate<Name>Mutation`, `useUpdate<Name>Mutation`, `useDelete<Name>Mutation`');
+  lines.push('- All hooks accept a `selection` parameter to pick fields');
+  lines.push('');
 
-    lines.push(`### HOOK: ${getListQueryHookName(table)}`);
-    lines.push('');
-    lines.push(`${table.description || `List all ${pluralName}`}.`);
-    lines.push('');
-    lines.push('```');
-    lines.push(`TYPE: query`);
-    lines.push(
-      `USAGE: ${getListQueryHookName(table)}({ selection: { fields: { ... } } })`,
-    );
-    lines.push('');
-    lines.push('INPUT:');
-    lines.push(
-      '  selection: { fields: Record<string, boolean> } - Fields to select',
-    );
-    lines.push('');
-    lines.push('OUTPUT: UseQueryResult<Array<{');
-    for (const f of scalarFields) {
-      lines.push(`  ${f.name}: ${fieldTypeToTs(f.type)}`);
-    }
-    lines.push('}>>');
-    lines.push('```');
-    lines.push('');
-
-    if (hasValidPrimaryKey(table)) {
-      lines.push(`### HOOK: ${getSingleQueryHookName(table)}`);
-      lines.push('');
-      lines.push(`${table.description || `Get a single ${singularName} by ${pk.name}`}.`);
-      lines.push('');
-      lines.push('```');
-      lines.push(`TYPE: query`);
-      lines.push(
-        `USAGE: ${getSingleQueryHookName(table)}({ ${pk.name}: '<value>', selection: { fields: { ... } } })`,
-      );
-      lines.push('');
-      lines.push('INPUT:');
-      lines.push(`  ${pk.name}: ${pk.tsType} (required)`);
-      lines.push(
-        '  selection: { fields: Record<string, boolean> } - Fields to select',
-      );
-      lines.push('');
-      lines.push('OUTPUT: UseQueryResult<{');
-      for (const f of scalarFields) {
-        lines.push(`  ${f.name}: ${fieldTypeToTs(f.type)}`);
-      }
-      lines.push('}>');
-      lines.push('```');
-      lines.push('');
-    }
-
-    lines.push(`### HOOK: ${getCreateMutationHookName(table)}`);
-    lines.push('');
-    lines.push(`${table.description || `Create a new ${singularName}`}.`);
-    lines.push('');
-    lines.push('```');
-    lines.push('TYPE: mutation');
-    lines.push(
-      `USAGE: const { mutate } = ${getCreateMutationHookName(table)}({ selection: { fields: { ... } } })`,
-    );
-    lines.push('');
-    lines.push('OUTPUT: UseMutationResult');
-    lines.push('```');
-    lines.push('');
-
-    if (hasValidPrimaryKey(table)) {
-      lines.push(`### HOOK: ${getUpdateMutationHookName(table)}`);
-      lines.push('');
-      lines.push(`${table.description || `Update an existing ${singularName}`}.`);
-      lines.push('');
-      lines.push('```');
-      lines.push('TYPE: mutation');
-      lines.push(
-        `USAGE: const { mutate } = ${getUpdateMutationHookName(table)}({ selection: { fields: { ... } } })`,
-      );
-      lines.push('');
-      lines.push('OUTPUT: UseMutationResult');
-      lines.push('```');
-      lines.push('');
-
-      lines.push(`### HOOK: ${getDeleteMutationHookName(table)}`);
-      lines.push('');
-      lines.push(`${table.description || `Delete a ${singularName}`}.`);
-      lines.push('');
-      lines.push('```');
-      lines.push('TYPE: mutation');
-      lines.push(
-        `USAGE: const { mutate } = ${getDeleteMutationHookName(table)}({})`,
-      );
-      lines.push('');
-      lines.push('OUTPUT: UseMutationResult');
-      lines.push('```');
-      lines.push('');
-    }
-  }
-
-  if (customOperations.length > 0) {
-    lines.push('## CUSTOM OPERATION HOOKS');
-    lines.push('');
-
-    for (const op of customOperations) {
-      const hookName = getCustomHookName(op);
-
-      lines.push(`### HOOK: ${hookName}`);
-      lines.push('');
-      lines.push(op.description || op.name);
-      lines.push('');
-      lines.push('```');
-      lines.push(`TYPE: ${op.kind}`);
-      if (op.args.length > 0) {
-        if (op.kind === 'mutation') {
-          lines.push(`USAGE: const { mutate } = ${hookName}()`);
-          lines.push(
-            `  mutate({ ${op.args.map((a) => `${a.name}: <value>`).join(', ')} })`,
-          );
-        } else {
-          lines.push(
-            `USAGE: ${hookName}({ ${op.args.map((a) => `${a.name}: <value>`).join(', ')} })`,
-          );
-        }
-        lines.push('');
-        lines.push('INPUT:');
-        for (const arg of op.args) {
-          lines.push(`  ${arg.name}: ${formatArgType(arg)}`);
-        }
-      } else {
-        lines.push(`USAGE: ${hookName}()`);
-        lines.push('');
-        lines.push('INPUT: none');
-      }
-      lines.push('');
-      lines.push(
-        `OUTPUT: ${op.kind === 'query' ? 'UseQueryResult' : 'UseMutationResult'}`,
-      );
-      lines.push('```');
-      lines.push('');
-    }
-  }
+  lines.push('## Boundaries');
+  lines.push('');
+  lines.push('All files in this directory are generated. Do not edit manually.');
+  lines.push('');
 
   return {
     fileName: 'AGENTS.md',

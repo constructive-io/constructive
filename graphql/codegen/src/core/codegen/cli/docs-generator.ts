@@ -9,7 +9,6 @@ import {
   getSearchFields,
   categorizeSpecialFields,
   buildSpecialFieldsMarkdown,
-  buildSpecialFieldsPlain,
   getReadmeHeader,
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
@@ -213,252 +212,49 @@ export function generateAgentsDocs(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   toolName: string,
-  registry?: TypeRegistry,
+  _registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
+  const tableCount = tables.length;
+  const customOpCount = customOperations.length;
 
-  lines.push(`# ${toolName} CLI - Agent Reference`);
+  lines.push(`# ${toolName} CLI`);
   lines.push('');
   lines.push('<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->');
-  lines.push('> This document is structured for LLM/agent consumption.');
   lines.push('');
 
-  lines.push('## OVERVIEW');
+  lines.push('## Stack');
   lines.push('');
-  lines.push(`\`${toolName}\` is a CLI tool for interacting with a GraphQL API.`);
-  lines.push('All commands output JSON to stdout. All commands accept `--help` or `-h` for usage.');
-  lines.push(`Configuration is stored at \`~/.${toolName}/config/\` via appstash.`);
-  lines.push('');
-
-  lines.push('## PREREQUISITES');
-  lines.push('');
-  lines.push('Before running any data commands, you must:');
-  lines.push('');
-  lines.push(`1. Create a context: \`${toolName} context create <name> --endpoint <url>\``);
-  lines.push(`2. Activate it: \`${toolName} context use <name>\``);
-  lines.push(`3. Authenticate: \`${toolName} auth set-token <token>\``);
+  lines.push(`- Generated CLI for a GraphQL API (TypeScript)`);
+  lines.push(`- ${tableCount} table${tableCount !== 1 ? 's' : ''}${customOpCount > 0 ? `, ${customOpCount} custom operation${customOpCount !== 1 ? 's' : ''}` : ''}`);
+  lines.push(`- Config stored at \`~/.${toolName}/config/\` via appstash`);
   lines.push('');
 
-  lines.push('## TOOLS');
-  lines.push('');
-
-  lines.push('### TOOL: context');
-  lines.push('');
-  lines.push('Manage named API endpoint contexts (like kubectl contexts).');
-  lines.push('');
-  lines.push('```');
-  lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} context create <name> --endpoint <url>   Create a new context`);
-  lines.push(`  ${toolName} context list                              List all contexts`);
-  lines.push(`  ${toolName} context use <name>                        Set active context`);
-  lines.push(`  ${toolName} context current                           Show active context`);
-  lines.push(`  ${toolName} context delete <name>                     Delete a context`);
-  lines.push('');
-  lines.push('INPUT:');
-  lines.push('  name:     string (required) - Context identifier');
-  lines.push('  endpoint: string (required for create) - GraphQL endpoint URL');
-  lines.push('');
-  lines.push('OUTPUT: JSON');
-  lines.push('  create:  { name, endpoint }');
-  lines.push('  list:    [{ name, endpoint, isCurrent, hasCredentials }]');
-  lines.push('  use:     { name, endpoint }');
-  lines.push('  current: { name, endpoint }');
-  lines.push('  delete:  { deleted: name }');
-  lines.push('```');
-  lines.push('');
-
-  lines.push('### TOOL: auth');
-  lines.push('');
-  lines.push('Manage authentication tokens per context.');
-  lines.push('');
-  lines.push('```');
-  lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} auth set-token <token>   Store bearer token for current context`);
-  lines.push(`  ${toolName} auth status               Show auth status for all contexts`);
-  lines.push(`  ${toolName} auth logout                Remove credentials for current context`);
-  lines.push('');
-  lines.push('INPUT:');
-  lines.push('  token: string (required for set-token) - Bearer token value');
-  lines.push('');
-  lines.push('OUTPUT: JSON');
-  lines.push('  set-token: { context, status: "authenticated" }');
-  lines.push('  status:    [{ context, authenticated: boolean }]');
-  lines.push('  logout:    { context, status: "logged out" }');
-  lines.push('```');
-  lines.push('');
-
-  lines.push('### TOOL: config');
-  lines.push('');
-  lines.push('Manage per-context key-value configuration variables.');
-  lines.push('');
-  lines.push('```');
-  lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} config get <key>             Get a config value`);
-  lines.push(`  ${toolName} config set <key> <value>     Set a config value`);
-  lines.push(`  ${toolName} config list                  List all config values`);
-  lines.push(`  ${toolName} config delete <key>          Delete a config value`);
-  lines.push('');
-  lines.push('INPUT:');
-  lines.push('  key:   string (required for get/set/delete) - Variable name');
-  lines.push('  value: string (required for set) - Variable value');
-  lines.push('');
-  lines.push('OUTPUT: JSON');
-  lines.push('  get:    { key, value }');
-  lines.push('  set:    { key, value }');
-  lines.push('  list:   { vars: { key: value, ... } }');
-  lines.push('  delete: { deleted: key }');
-  lines.push('```');
-  lines.push('');
-
-  for (const table of tables) {
-    const { singularName } = getTableNames(table);
-    const kebab = toKebabCase(singularName);
-    const pk = getPrimaryKeyInfo(table)[0];
-    const scalarFields = getScalarFields(table);
-    const editableFields = getEditableFields(table, registry);
-    const defaultFields = getFieldsWithDefaults(table, registry);
-    const requiredCreateFields = editableFields.filter((f) => !defaultFields.has(f.name));
-    const optionalCreateFields = editableFields.filter((f) => defaultFields.has(f.name));
-    const createFlags = [
-      ...requiredCreateFields.map((f) => `--${f.name} <value>`),
-      ...optionalCreateFields.map((f) => `[--${f.name} <value>]`),
-    ].join(' ');
-
-    lines.push(`### TOOL: ${kebab}`);
-    lines.push('');
-    lines.push(`CRUD operations for ${table.name} records.`);
-    lines.push('');
-    lines.push('```');
-    lines.push('SUBCOMMANDS:');
-    lines.push(`  ${toolName} ${kebab} list                               List all records`);
-    lines.push(`  ${toolName} ${kebab} get --${pk.name} <value>              Get one record`);
-    lines.push(`  ${toolName} ${kebab} create ${createFlags}`);
-    lines.push(`  ${toolName} ${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`);
-    lines.push(`  ${toolName} ${kebab} delete --${pk.name} <value>           Delete one record`);
-    lines.push('');
-    lines.push('INPUT FIELDS:');
-    for (const f of scalarFields) {
-      const isPk = f.name === pk.name;
-      lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${isPk ? ' (primary key)' : ''}`);
-    }
-    lines.push('');
-    lines.push('EDITABLE FIELDS (for create/update):');
-    for (const f of editableFields) {
-      const optLabel = defaultFields.has(f.name) ? ' (optional, has backend default)' : '';
-      lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${optLabel}`);
-    }
-    lines.push('');
-    const agentSpecialGroups = categorizeSpecialFields(table, registry);
-    const agentSpecialLines = buildSpecialFieldsPlain(agentSpecialGroups);
-    if (agentSpecialLines.length > 0) {
-      for (const sl of agentSpecialLines) {
-        lines.push(sl);
-      }
-      lines.push('');
-    }
-    lines.push('OUTPUT: JSON');
-    lines.push(`  list:   [{ ${scalarFields.map((f) => f.name).join(', ')} }]`);
-    lines.push(`  get:    { ${scalarFields.map((f) => f.name).join(', ')} }`);
-    lines.push(`  create: { ${scalarFields.map((f) => f.name).join(', ')} }`);
-    lines.push(`  update: { ${scalarFields.map((f) => f.name).join(', ')} }`);
-    lines.push(`  delete: { ${pk.name} }`);
-    lines.push('```');
-    lines.push('');
-  }
-
-  for (const op of customOperations) {
-    const kebab = toKebabCase(op.name);
-    const flat = flattenArgs(op.args, registry);
-
-    lines.push(`### TOOL: ${kebab}`);
-    lines.push('');
-    lines.push(op.description || op.name);
-    lines.push('');
-    lines.push('```');
-    lines.push(`TYPE: ${op.kind}`);
-    if (flat.length > 0) {
-      const flags = flattenedArgsToFlags(flat);
-      lines.push(`USAGE: ${toolName} ${kebab} ${flags}`);
-      lines.push('');
-      lines.push('INPUT:');
-      for (const a of flat) {
-        const reqLabel = a.required ? ' (required)' : '';
-        lines.push(`  ${a.flag}: ${a.type}${reqLabel}`);
-      }
-    } else {
-      lines.push(`USAGE: ${toolName} ${kebab}`);
-      lines.push('');
-      lines.push('INPUT: none');
-    }
-    lines.push('');
-    lines.push('OUTPUT: JSON');
-    lines.push('```');
-    lines.push('');
-  }
-
-  lines.push('## WORKFLOWS');
-  lines.push('');
-  lines.push('### Initial setup');
+  lines.push('## Quick Start');
   lines.push('');
   lines.push('```bash');
-  lines.push(`${toolName} context create dev --endpoint http://localhost:5000/graphql`);
+  lines.push(`${toolName} context create dev --endpoint <url>`);
   lines.push(`${toolName} context use dev`);
-  lines.push(`${toolName} auth set-token eyJhbGciOiJIUzI1NiIs...`);
+  lines.push(`${toolName} auth set-token <token>`);
   lines.push('```');
   lines.push('');
 
-  if (tables.length > 0) {
-    const firstTable = tables[0];
-    const { singularName } = getTableNames(firstTable);
-    const kebab = toKebabCase(singularName);
-    const editableFields = getEditableFields(firstTable, registry);
-    const pk = getPrimaryKeyInfo(firstTable)[0];
-
-    lines.push(`### CRUD workflow (${kebab})`);
-    lines.push('');
-    lines.push('```bash');
-    lines.push(`# List all`);
-    lines.push(`${toolName} ${kebab} list`);
-    lines.push('');
-    lines.push(`# Create`);
-    lines.push(`${toolName} ${kebab} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`);
-    lines.push('');
-    lines.push(`# Get by ${pk.name}`);
-    lines.push(`${toolName} ${kebab} get --${pk.name} <value>`);
-    lines.push('');
-    lines.push(`# Update`);
-    lines.push(`${toolName} ${kebab} update --${pk.name} <value> --${editableFields[0]?.name || 'field'} "new-value"`);
-    lines.push('');
-    lines.push(`# Delete`);
-    lines.push(`${toolName} ${kebab} delete --${pk.name} <value>`);
-    lines.push('```');
-    lines.push('');
-  }
-
-  lines.push('### Piping output');
+  lines.push('## Resources');
   lines.push('');
-  lines.push('```bash');
-  lines.push(`# Pretty print`);
-  lines.push(`${toolName} car list | jq '.'`);
-  lines.push('');
-  lines.push(`# Extract field`);
-  lines.push(`${toolName} car list | jq '.[].id'`);
-  lines.push('');
-  lines.push(`# Count results`);
-  lines.push(`${toolName} car list | jq 'length'`);
-  lines.push('```');
+  lines.push(`- **Full API reference:** [README.md](./README.md) — CRUD docs for all ${tableCount} tables`);
+  lines.push('- **Schema types:** [types.ts](./types.ts)');
   lines.push('');
 
-  lines.push('## ERROR HANDLING');
+  lines.push('## Conventions');
   lines.push('');
-  lines.push('All errors are written to stderr. Exit codes:');
-  lines.push('- `0`: Success');
-  lines.push('- `1`: Error (auth failure, not found, validation error, network error)');
+  lines.push('- All commands output JSON to stdout');
+  lines.push('- Use `--help` on any command for usage');
+  lines.push('- Exit 0 = success, 1 = error');
   lines.push('');
-  lines.push('Common errors:');
-  lines.push('- "No active context": Run `context use <name>` first');
-  lines.push('- "Not authenticated": Run `auth set-token <token>` first');
-  lines.push('- "Record not found": The requested ID does not exist');
+
+  lines.push('## Boundaries');
+  lines.push('');
+  lines.push('All files in this directory are generated. Do not edit manually.');
   lines.push('');
 
   return {
@@ -1240,308 +1036,57 @@ export function generateMultiTargetReadme(
 export function generateMultiTargetAgentsDocs(
   input: MultiTargetDocsInput,
 ): GeneratedDocFile {
-  const { toolName, builtinNames, targets, registry } = input;
+  const { toolName, builtinNames, targets } = input;
   const lines: string[] = [];
+  const totalTables = targets.reduce((sum, t) => sum + t.tables.length, 0);
+  const totalCustomOps = targets.reduce((sum, t) => sum + t.customOperations.length, 0);
 
-  lines.push(`# ${toolName} CLI - Agent Reference`);
+  lines.push(`# ${toolName} CLI`);
   lines.push('');
   lines.push('<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->');
-  lines.push('> This document is structured for LLM/agent consumption.');
   lines.push('');
 
-  lines.push('## OVERVIEW');
+  lines.push('## Stack');
   lines.push('');
-  lines.push(`\`${toolName}\` is a unified multi-target CLI for interacting with multiple GraphQL APIs.`);
-  lines.push('All commands output JSON to stdout. All commands accept `--help` or `-h` for usage.');
-  lines.push(`Configuration is stored at \`~/.${toolName}/config/\` via appstash.`);
-  lines.push('');
-  lines.push('TARGETS:');
-  for (const tgt of targets) {
-    lines.push(`  ${tgt.name}: ${tgt.endpoint}`);
-  }
-  lines.push('');
-  lines.push('COMMAND FORMAT:');
-  lines.push(`  ${toolName} <target>:<command> <subcommand> [flags]    Target-specific commands`);
-  lines.push(`  ${toolName} ${builtinNames.context} <subcommand> [flags]              Context management`);
-  lines.push(`  ${toolName} ${builtinNames.auth} <subcommand> [flags]                 Authentication`);
-  lines.push(`  ${toolName} ${builtinNames.config} <subcommand> [flags]               Config key-value store`);
+  lines.push(`- Unified multi-target CLI for GraphQL APIs (TypeScript)`);
+  lines.push(`- ${targets.length} target${targets.length !== 1 ? 's' : ''}: ${targets.map((t) => t.name).join(', ')}`);
+  lines.push(`- ${totalTables} table${totalTables !== 1 ? 's' : ''}${totalCustomOps > 0 ? `, ${totalCustomOps} custom operation${totalCustomOps !== 1 ? 's' : ''}` : ''}`);
+  lines.push(`- Config stored at \`~/.${toolName}/config/\` via appstash`);
   lines.push('');
 
-  lines.push('## PREREQUISITES');
-  lines.push('');
-  lines.push('Before running any data commands, you must:');
-  lines.push('');
-  lines.push(`1. Create a context: \`${toolName} ${builtinNames.context} create <name>\``);
-  lines.push(`   (prompts for per-target endpoints, defaults baked from config)`);
-  lines.push(`2. Activate it: \`${toolName} ${builtinNames.context} use <name>\``);
-  lines.push(`3. Authenticate: \`${toolName} ${builtinNames.auth} set-token <token>\``);
-  lines.push('');
-  lines.push('For local development, create a context accepting all defaults:');
-  lines.push('');
-  lines.push('```bash');
-  lines.push(`${toolName} ${builtinNames.context} create local`);
-  lines.push(`${toolName} ${builtinNames.context} use local`);
-  lines.push(`${toolName} ${builtinNames.auth} set-token <token>`);
-  lines.push('```');
-  lines.push('');
-
-  lines.push('## TOOLS');
-  lines.push('');
-
-  lines.push(`### TOOL: ${builtinNames.context}`);
-  lines.push('');
-  lines.push('Manage named API endpoint contexts. Each context stores per-target endpoint overrides.');
-  lines.push('');
-  lines.push('```');
-  lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} ${builtinNames.context} create <name>   Create a new context`);
-  lines.push(`  ${toolName} ${builtinNames.context} list              List all contexts`);
-  lines.push(`  ${toolName} ${builtinNames.context} use <name>        Set active context`);
-  lines.push(`  ${toolName} ${builtinNames.context} current           Show active context`);
-  lines.push(`  ${toolName} ${builtinNames.context} delete <name>     Delete a context`);
-  lines.push('');
-  lines.push('CREATE OPTIONS:');
-  for (const tgt of targets) {
-    lines.push(`  --${tgt.name}-endpoint: string (default: ${tgt.endpoint})`);
-  }
-  lines.push('');
-  lines.push('OUTPUT: JSON');
-  lines.push('  create:  { name, endpoint, targets }');
-  lines.push('  list:    [{ name, endpoint, isCurrent, hasCredentials }]');
-  lines.push('  use:     { name, endpoint }');
-  lines.push('  current: { name, endpoint }');
-  lines.push('  delete:  { deleted: name }');
-  lines.push('```');
-  lines.push('');
-
-  lines.push(`### TOOL: ${builtinNames.auth}`);
-  lines.push('');
-  lines.push('Manage authentication tokens per context. One shared token across all targets.');
-  lines.push('');
-  lines.push('```');
-  lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} ${builtinNames.auth} set-token <token>   Store bearer token for current context`);
-  lines.push(`  ${toolName} ${builtinNames.auth} status               Show auth status for all contexts`);
-  lines.push(`  ${toolName} ${builtinNames.auth} logout                Remove credentials for current context`);
-  lines.push('');
-  lines.push('INPUT:');
-  lines.push('  token: string (required for set-token) - Bearer token value');
-  lines.push('');
-  lines.push('OUTPUT: JSON');
-  lines.push('  set-token: { context, status: "authenticated" }');
-  lines.push('  status:    [{ context, authenticated: boolean }]');
-  lines.push('  logout:    { context, status: "logged out" }');
-  lines.push('```');
-  lines.push('');
-
-  lines.push(`### TOOL: ${builtinNames.config}`);
-  lines.push('');
-  lines.push('Manage per-context key-value configuration variables.');
-  lines.push('');
-  lines.push('```');
-  lines.push('SUBCOMMANDS:');
-  lines.push(`  ${toolName} ${builtinNames.config} get <key>             Get a config value`);
-  lines.push(`  ${toolName} ${builtinNames.config} set <key> <value>     Set a config value`);
-  lines.push(`  ${toolName} ${builtinNames.config} list                  List all config values`);
-  lines.push(`  ${toolName} ${builtinNames.config} delete <key>          Delete a config value`);
-  lines.push('');
-  lines.push('INPUT:');
-  lines.push('  key:   string (required for get/set/delete) - Variable name');
-  lines.push('  value: string (required for set) - Variable value');
-  lines.push('');
-  lines.push('OUTPUT: JSON');
-  lines.push('  get:    { key, value }');
-  lines.push('  set:    { key, value }');
-  lines.push('  list:   { vars: { key: value, ... } }');
-  lines.push('  delete: { deleted: key }');
-  lines.push('```');
-  lines.push('');
-
-  lines.push('### TOOL: helpers (SDK)');
-  lines.push('');
-  lines.push('Typed client factories for use in scripts and services (generated helpers.ts).');
-  lines.push('Resolves credentials via: appstash store -> env vars -> throw.');
-  lines.push('');
-  lines.push('```');
-  lines.push('FACTORIES:');
-  for (const tgt of targets) {
-    const pascalName = tgt.name.charAt(0).toUpperCase() + tgt.name.slice(1);
-    lines.push(`  create${pascalName}Client(contextName?)   Create a configured ${tgt.name} ORM client`);
-  }
-  lines.push('');
-  lines.push('USAGE:');
-  lines.push(`  import { create${targets[0] ? targets[0].name.charAt(0).toUpperCase() + targets[0].name.slice(1) : 'Target'}Client } from './helpers';`);
-  lines.push(`  const client = create${targets[0] ? targets[0].name.charAt(0).toUpperCase() + targets[0].name.slice(1) : 'Target'}Client();`);
-  lines.push('');
-  lines.push('CREDENTIAL RESOLUTION:');
-  lines.push(`  1. appstash store (~/.${toolName}/config/)`);
-  const envPrefix = toolName.toUpperCase().replace(/-/g, '_');
-  lines.push(`  2. env vars (${envPrefix}_TOKEN, ${envPrefix}_<TARGET>_ENDPOINT)`);
-  lines.push('  3. throws with actionable error message');
-  lines.push('```');
-  lines.push('');
-
-  for (const tgt of targets) {
-    for (const table of tgt.tables) {
-      const { singularName } = getTableNames(table);
-      const kebab = toKebabCase(singularName);
-      const pk = getPrimaryKeyInfo(table)[0];
-      const scalarFields = getScalarFields(table);
-      const editableFields = getEditableFields(table, registry);
-      const defaultFields = getFieldsWithDefaults(table, registry);
-      const requiredCreateFields = editableFields.filter((f) => !defaultFields.has(f.name));
-      const optionalCreateFields = editableFields.filter((f) => defaultFields.has(f.name));
-      const createFlags = [
-        ...requiredCreateFields.map((f) => `--${f.name} <value>`),
-        ...optionalCreateFields.map((f) => `[--${f.name} <value>]`),
-      ].join(' ');
-
-      lines.push(`### TOOL: ${tgt.name}:${kebab}`);
-      lines.push('');
-      lines.push(`CRUD operations for ${table.name} records (${tgt.name} target).`);
-      lines.push('');
-      lines.push('```');
-      lines.push('SUBCOMMANDS:');
-      lines.push(`  ${toolName} ${tgt.name}:${kebab} list                               List all records`);
-      lines.push(`  ${toolName} ${tgt.name}:${kebab} get --${pk.name} <value>              Get one record`);
-      lines.push(`  ${toolName} ${tgt.name}:${kebab} create ${createFlags}`);
-      lines.push(`  ${toolName} ${tgt.name}:${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`);
-      lines.push(`  ${toolName} ${tgt.name}:${kebab} delete --${pk.name} <value>           Delete one record`);
-      lines.push('');
-      lines.push('INPUT FIELDS:');
-      for (const f of scalarFields) {
-        const isPk = f.name === pk.name;
-        lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${isPk ? ' (primary key)' : ''}`);
-      }
-      lines.push('');
-      lines.push('EDITABLE FIELDS (for create/update):');
-      for (const f of editableFields) {
-        const optLabel = defaultFields.has(f.name) ? ' (optional, has backend default)' : '';
-        lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${optLabel}`);
-      }
-      lines.push('');
-      const mtAgentSpecialGroups = categorizeSpecialFields(table, registry);
-      const mtAgentSpecialLines = buildSpecialFieldsPlain(mtAgentSpecialGroups);
-      if (mtAgentSpecialLines.length > 0) {
-        for (const sl of mtAgentSpecialLines) {
-          lines.push(sl);
-        }
-        lines.push('');
-      }
-      lines.push('OUTPUT: JSON');
-      lines.push(`  list:   [{ ${scalarFields.map((f) => f.name).join(', ')} }]`);
-      lines.push(`  get:    { ${scalarFields.map((f) => f.name).join(', ')} }`);
-      lines.push(`  create: { ${scalarFields.map((f) => f.name).join(', ')} }`);
-      lines.push(`  update: { ${scalarFields.map((f) => f.name).join(', ')} }`);
-      lines.push(`  delete: { ${pk.name} }`);
-      lines.push('```');
-      lines.push('');
-    }
-
-    for (const op of tgt.customOperations) {
-      const kebab = toKebabCase(op.name);
-      const flat = flattenArgs(op.args, registry);
-
-      lines.push(`### TOOL: ${tgt.name}:${kebab}`);
-      lines.push('');
-      lines.push(op.description || op.name);
-      lines.push('');
-      lines.push('```');
-      lines.push(`TYPE: ${op.kind}`);
-      if (flat.length > 0) {
-        const flags = flattenedArgsToFlags(flat);
-        lines.push(`USAGE: ${toolName} ${tgt.name}:${kebab} ${flags}`);
-        lines.push('');
-        lines.push('INPUT:');
-        for (const a of flat) {
-          const reqLabel = a.required ? ' (required)' : '';
-          lines.push(`  ${a.flag}: ${a.type}${reqLabel}`);
-        }
-      } else {
-        lines.push(`USAGE: ${toolName} ${tgt.name}:${kebab}`);
-        lines.push('');
-        lines.push('INPUT: none');
-      }
-      if (tgt.isAuthTarget && op.kind === 'mutation') {
-        lines.push('');
-        lines.push('FLAGS:');
-        lines.push('  --save-token: boolean - Auto-save returned token to credentials');
-      }
-      lines.push('');
-      lines.push('OUTPUT: JSON');
-      lines.push('```');
-      lines.push('');
-    }
-  }
-
-  lines.push('## WORKFLOWS');
-  lines.push('');
-  lines.push('### Initial setup');
+  lines.push('## Quick Start');
   lines.push('');
   lines.push('```bash');
   lines.push(`${toolName} ${builtinNames.context} create dev`);
   lines.push(`${toolName} ${builtinNames.context} use dev`);
-  lines.push(`${toolName} ${builtinNames.auth} set-token eyJhbGciOiJIUzI1NiIs...`);
+  lines.push(`${toolName} ${builtinNames.auth} set-token <token>`);
   lines.push('```');
   lines.push('');
 
-  lines.push('### Switch environment');
+  lines.push('## Command Format');
   lines.push('');
-  lines.push('```bash');
-  lines.push(`${toolName} ${builtinNames.context} create production \\`);
-  for (let i = 0; i < targets.length; i++) {
-    const tgt = targets[i];
-    const continuation = i < targets.length - 1 ? ' \\' : '';
-    lines.push(`  --${tgt.name}-endpoint https://${tgt.name}.prod.example.com/graphql${continuation}`);
-  }
-  lines.push(`${toolName} ${builtinNames.context} use production`);
+  lines.push('```');
+  lines.push(`${toolName} <target>:<command> <subcommand> [flags]`);
   lines.push('```');
   lines.push('');
 
-  if (targets.length > 0 && targets[0].tables.length > 0) {
-    const tgt = targets[0];
-    const table = tgt.tables[0];
-    const { singularName } = getTableNames(table);
-    const kebab = toKebabCase(singularName);
-    const editableFields = getEditableFields(table, registry);
-    const pk = getPrimaryKeyInfo(table)[0];
-
-    lines.push(`### CRUD workflow (${tgt.name}:${kebab})`);
-    lines.push('');
-    lines.push('```bash');
-    lines.push(`${toolName} ${tgt.name}:${kebab} list`);
-    lines.push(`${toolName} ${tgt.name}:${kebab} create ${editableFields.map((f) => `--${f.name} "value"`).join(' ')}`);
-    lines.push(`${toolName} ${tgt.name}:${kebab} get --${pk.name} <value>`);
-    lines.push(`${toolName} ${tgt.name}:${kebab} update --${pk.name} <value> --${editableFields[0]?.name || 'field'} "new-value"`);
-    lines.push(`${toolName} ${tgt.name}:${kebab} delete --${pk.name} <value>`);
-    lines.push('```');
-    lines.push('');
-  }
-
-  lines.push('### Piping output');
+  lines.push('## Resources');
   lines.push('');
-  lines.push('```bash');
-  if (targets.length > 0 && targets[0].tables.length > 0) {
-    const tgt = targets[0];
-    const kebab = toKebabCase(getTableNames(tgt.tables[0]).singularName);
-    lines.push(`${toolName} ${tgt.name}:${kebab} list | jq '.'`);
-    lines.push(`${toolName} ${tgt.name}:${kebab} list | jq '.[].id'`);
-    lines.push(`${toolName} ${tgt.name}:${kebab} list | jq 'length'`);
-  }
-  lines.push('```');
+  lines.push(`- **Full API reference:** [README.md](./README.md) — CRUD docs for all ${totalTables} tables across ${targets.length} targets`);
+  lines.push('- **Schema types:** [types.ts](./types.ts)');
+  lines.push('- **SDK helpers:** [helpers.ts](./helpers.ts) — typed client factories');
   lines.push('');
 
-  lines.push('## ERROR HANDLING');
+  lines.push('## Conventions');
   lines.push('');
-  lines.push('All errors are written to stderr. Exit codes:');
-  lines.push('- `0`: Success');
-  lines.push('- `1`: Error (auth failure, not found, validation error, network error)');
+  lines.push('- All commands output JSON to stdout');
+  lines.push('- Use `--help` on any command for usage');
+  lines.push('- Exit 0 = success, 1 = error');
   lines.push('');
-  lines.push('Common errors:');
-  lines.push(`- "No active context": Run \`${builtinNames.context} use <name>\` first`);
-  lines.push(`- "Not authenticated": Run \`${builtinNames.auth} set-token <token>\` first`);
-  lines.push('- "Unknown target": The target name is not recognized');
-  lines.push('- "Record not found": The requested ID does not exist');
+
+  lines.push('## Boundaries');
+  lines.push('');
+  lines.push('All files in this directory are generated. Do not edit manually.');
   lines.push('');
 
   return {
