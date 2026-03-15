@@ -1,5 +1,17 @@
 # @constructive-io/send-email-link-fn
 
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
+   <a href="https://www.npmjs.com/package/@constructive-io/send-email-link-fn"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=functions%2Fsend-email-link%2Fpackage.json"/></a>
+</p>
+
 Knative-compatible email link function used with the Constructive jobs system. It is designed to be invoked by `@constructive-io/knative-job-worker` as an HTTP function named `send-email-link`.
 
 The function:
