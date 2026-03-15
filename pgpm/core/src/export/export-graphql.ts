@@ -13,6 +13,7 @@ import { sync as glob } from 'glob';
 import path from 'path';
 
 import { Inquirerer } from 'inquirerer';
+import { createClient as createMigrateClient } from '@constructive-db/migrate-client';
 
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
@@ -309,16 +310,47 @@ export const exportGraphQL = async ({
 
   if (migrateEndpoint) {
     console.log(`Fetching sql_actions from ${migrateEndpoint}...`);
-    const migrateClient = new GraphQLClient({ endpoint: migrateEndpoint, token });
+    const migrateDb = createMigrateClient({
+      endpoint: migrateEndpoint,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
 
     try {
-      const rawRows = await migrateClient.fetchAllNodes(
-        'sqlActions',
-        'id\ndatabaseId\nname\ndeploy\nrevert\nverify\ncontent\ndeps\naction\nactionId\nactorId\npayload',
-        { databaseId }
-      );
+      const allNodes: Record<string, unknown>[] = [];
+      let hasNextPage = true;
+      let afterCursor: string | undefined;
 
-      sqlActionRows = rawRows.map(graphqlRowToPostgresRow);
+      while (hasNextPage) {
+        const result = await migrateDb.sqlAction.findMany({
+          select: {
+            id: true,
+            databaseId: true,
+            name: true,
+            deploy: true,
+            revert: true,
+            verify: true,
+            content: true,
+            deps: true,
+            action: true,
+            actionId: true,
+            actorId: true,
+            payload: true,
+          },
+          where: { databaseId: { equalTo: databaseId } },
+          first: 100,
+          ...(afterCursor ? { after: afterCursor } : {}),
+        }).unwrap();
+
+        allNodes.push(
+          ...result.sqlActions.nodes.map(node =>
+            graphqlRowToPostgresRow(node as Record<string, unknown>)
+          )
+        );
+        hasNextPage = result.sqlActions.pageInfo.hasNextPage;
+        afterCursor = result.sqlActions.pageInfo.endCursor ?? undefined;
+      }
+
+      sqlActionRows = allNodes;
       console.log(`  Found ${sqlActionRows.length} sql_actions`);
     } catch (err) {
       console.warn(`  Warning: Could not fetch sql_actions: ${err instanceof Error ? err.message : err}`);
