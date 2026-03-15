@@ -4,7 +4,6 @@ import { Logger } from '@pgpmjs/logger';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
-import { randomUUID } from 'crypto';
 import express, { Express, RequestHandler } from 'express';
 import type { Server as HttpServer } from 'http';
 import graphqlUpload from 'graphql-upload';
@@ -13,6 +12,14 @@ import { graphileCache, closeAllCaches } from 'graphile-cache';
 import { getPgPool } from 'pg-cache';
 import requestIp from 'request-ip';
 
+import type { DebugSamplerHandle } from './diagnostics/debug-sampler';
+import { closeDebugDatabasePools } from './diagnostics/debug-db-snapshot';
+import {
+  isDevelopmentObservabilityMode,
+  isGraphqlObservabilityEnabled,
+  isGraphqlObservabilityRequested,
+  isLoopbackHost,
+} from './diagnostics/observability';
 import { createApiMiddleware } from './middleware/api';
 import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
@@ -21,8 +28,12 @@ import { favicon } from './middleware/favicon';
 import { flush, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
+import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
+import { debugMemory } from './middleware/observability/debug-memory';
+import { localObservabilityOnly } from './middleware/observability/guard';
+import { createRequestLogger } from './middleware/observability/request-logger';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
-import { debugMemory } from './middleware/debug-memory';
+import { startDebugSampler } from './diagnostics/debug-sampler';
 
 const log = new Logger('server');
 
@@ -62,47 +73,19 @@ class Server {
   private shuttingDown = false;
   private closed = false;
   private httpServer: HttpServer | null = null;
+  private debugSampler: DebugSamplerHandle | null = null;
 
   constructor(opts: ConstructiveOptions) {
     this.opts = getEnvOptions(opts);
     const effectiveOpts = this.opts;
+    const observabilityRequested = isGraphqlObservabilityRequested();
+    const observabilityEnabled = isGraphqlObservabilityEnabled(effectiveOpts.server?.host);
 
     const app = express();
     const api = createApiMiddleware(effectiveOpts);
     const authenticate = createAuthenticateMiddleware(effectiveOpts);
     const uploadAuthenticate = createUploadAuthenticateMiddleware(effectiveOpts);
-    const SAFE_REQUEST_ID = /^[a-zA-Z0-9\-_]{1,128}$/;
-    const requestLogger: RequestHandler = (req, res, next) => {
-      const headerRequestId = req.header('x-request-id');
-      const reqId = (headerRequestId && SAFE_REQUEST_ID.test(headerRequestId))
-        ? headerRequestId
-        : randomUUID();
-      const start = process.hrtime.bigint();
-
-      req.requestId = reqId;
-
-      const host = req.hostname || req.headers.host || 'unknown';
-      const ip = req.clientIp || req.ip;
-
-      log.debug(`[${reqId}] -> ${req.method} ${req.originalUrl} host=${host} ip=${ip}`);
-
-      res.on('finish', () => {
-        const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
-        const apiInfo = req.api
-          ? `db=${req.api.dbname} schemas=${req.api.schema?.join(',') || 'none'}`
-          : 'api=unresolved';
-        const authInfo = req.token ? 'auth=token' : 'auth=anon';
-        const svcInfo = req.svc_key ? `svc=${req.svc_key}` : 'svc=unset';
-
-        log.debug(
-          `[${reqId}] <- ${res.statusCode} ${req.method} ${req.originalUrl} (${durationMs.toFixed(
-            1,
-          )} ms) ${apiInfo} ${svcInfo} ${authInfo}`,
-        );
-      });
-
-      next();
-    };
+    const requestLogger = createRequestLogger({ observabilityEnabled });
 
     // Log startup configuration (non-sensitive values only)
     const apiOpts = (effectiveOpts as any).api || {};
@@ -118,10 +101,34 @@ class Server {
       exposedSchemas: apiOpts.exposedSchemas?.join(',') || 'none',
       anonRole: apiOpts.anonRole,
       roleName: apiOpts.roleName,
+      observabilityEnabled,
     });
 
+    if (observabilityRequested && !observabilityEnabled) {
+      const reasons = [];
+      if (!isDevelopmentObservabilityMode()) {
+        reasons.push('NODE_ENV must be development');
+      }
+      if (!isLoopbackHost(effectiveOpts.server?.host)) {
+        reasons.push('server host must be localhost, 127.0.0.1, or ::1');
+      }
+
+      log.warn(
+        `GRAPHQL_OBSERVABILITY_ENABLED was requested but observability remains disabled${
+          reasons.length > 0 ? `: ${reasons.join('; ')}` : ''
+        }`,
+      );
+    }
+
     healthz(app);
-    app.get('/debug/memory', debugMemory);
+    if (observabilityEnabled) {
+      app.get('/debug/memory', localObservabilityOnly, debugMemory);
+      app.get('/debug/db', localObservabilityOnly, createDebugDatabaseMiddleware(effectiveOpts));
+    } else {
+      app.use('/debug', (_req, res) => {
+        res.status(404).send('Not found');
+      });
+    }
     app.use(favicon);
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
@@ -159,6 +166,7 @@ class Server {
     app.use(errorHandler); // Catches all thrown errors
 
     this.app = app;
+    this.debugSampler = observabilityEnabled ? startDebugSampler(effectiveOpts) : null;
   }
 
   listen(): HttpServer {
@@ -266,9 +274,14 @@ class Server {
     this.closed = true;
     this.shuttingDown = true;
     await this.removeEventListener();
+    if (this.debugSampler) {
+      await this.debugSampler.stop();
+      this.debugSampler = null;
+    }
     if (this.httpServer?.listening) {
       await new Promise<void>((resolve) => this.httpServer!.close(() => resolve()));
     }
+    await closeDebugDatabasePools();
     if (closeCaches) {
       await Server.closeCaches({ closePools: true });
     }
