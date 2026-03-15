@@ -300,31 +300,6 @@ type Post {
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
-
-  """
-  TRGM similarity when searching \`title\`. Returns null when no trgm search filter is active.
-  """
-  titleTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`slug\`. Returns null when no trgm search filter is active.
-  """
-  slugTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`content\`. Returns null when no trgm search filter is active.
-  """
-  contentTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`excerpt\`. Returns null when no trgm search filter is active.
-  """
-  excerptTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A connection to a list of \`Tag\` values, with data from \`PostTag\`."""
@@ -409,31 +384,6 @@ type Tag {
     """The method to use when ordering \`PostTag\`."""
     orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostTagConnection!
-
-  """
-  TRGM similarity when searching \`name\`. Returns null when no trgm search filter is active.
-  """
-  nameTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`slug\`. Returns null when no trgm search filter is active.
-  """
-  slugTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`description\`. Returns null when no trgm search filter is active.
-  """
-  descriptionTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`color\`. Returns null when no trgm search filter is active.
-  """
-  colorTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A connection to a list of \`Post\` values, with data from \`PostTag\`."""
@@ -542,26 +492,6 @@ input PostFilter {
 
   """\`comments\` exist."""
   commentsExist: Boolean
-
-  """TRGM search on the \`title\` column."""
-  trgmTitle: TrgmSearchInput
-
-  """TRGM search on the \`slug\` column."""
-  trgmSlug: TrgmSearchInput
-
-  """TRGM search on the \`content\` column."""
-  trgmContent: TrgmSearchInput
-
-  """TRGM search on the \`excerpt\` column."""
-  trgmExcerpt: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -938,29 +868,6 @@ input UserFilter {
 
   """\`authoredComments\` exist."""
   authoredCommentsExist: Boolean
-
-  """TRGM search on the \`email\` column."""
-  trgmEmail: TrgmSearchInput
-
-  """TRGM search on the \`username\` column."""
-  trgmUsername: TrgmSearchInput
-
-  """TRGM search on the \`display_name\` column."""
-  trgmDisplayName: TrgmSearchInput
-
-  """TRGM search on the \`bio\` column."""
-  trgmBio: TrgmSearchInput
-
-  """TRGM search on the \`role\` column."""
-  trgmRole: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -1048,17 +955,6 @@ input CommentFilter {
 
   """\`childComments\` exist."""
   childCommentsExist: Boolean
-
-  """TRGM search on the \`content\` column."""
-  trgmContent: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -1157,26 +1053,6 @@ input TagFilter {
 
   """\`postTags\` exist."""
   postTagsExist: Boolean
-
-  """TRGM search on the \`name\` column."""
-  trgmName: TrgmSearchInput
-
-  """TRGM search on the \`slug\` column."""
-  trgmSlug: TrgmSearchInput
-
-  """TRGM search on the \`description\` column."""
-  trgmDescription: TrgmSearchInput
-
-  """TRGM search on the \`color\` column."""
-  trgmColor: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -1222,16 +1098,6 @@ enum PostOrderBy {
   PUBLISHED_AT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  TITLE_TRGM_SIMILARITY_ASC
-  TITLE_TRGM_SIMILARITY_DESC
-  SLUG_TRGM_SIMILARITY_ASC
-  SLUG_TRGM_SIMILARITY_DESC
-  CONTENT_TRGM_SIMILARITY_ASC
-  CONTENT_TRGM_SIMILARITY_DESC
-  EXCERPT_TRGM_SIMILARITY_ASC
-  EXCERPT_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """Methods to use when ordering \`PostTag\`."""
@@ -1269,16 +1135,6 @@ enum TagOrderBy {
   NAME_DESC
   SLUG_ASC
   SLUG_DESC
-  NAME_TRGM_SIMILARITY_ASC
-  NAME_TRGM_SIMILARITY_DESC
-  SLUG_TRGM_SIMILARITY_ASC
-  SLUG_TRGM_SIMILARITY_DESC
-  DESCRIPTION_TRGM_SIMILARITY_ASC
-  DESCRIPTION_TRGM_SIMILARITY_DESC
-  COLOR_TRGM_SIMILARITY_ASC
-  COLOR_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 type User {
@@ -1349,36 +1205,6 @@ type User {
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
-
-  """
-  TRGM similarity when searching \`email\`. Returns null when no trgm search filter is active.
-  """
-  emailTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`username\`. Returns null when no trgm search filter is active.
-  """
-  usernameTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`displayName\`. Returns null when no trgm search filter is active.
-  """
-  displayNameTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`bio\`. Returns null when no trgm search filter is active.
-  """
-  bioTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching \`role\`. Returns null when no trgm search filter is active.
-  """
-  roleTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A connection to a list of \`Post\` values."""
@@ -1472,16 +1298,6 @@ type Comment {
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
-
-  """
-  TRGM similarity when searching \`content\`. Returns null when no trgm search filter is active.
-  """
-  contentTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """Methods to use when ordering \`Comment\`."""
@@ -1499,10 +1315,6 @@ enum CommentOrderBy {
   PARENT_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  CONTENT_TRGM_SIMILARITY_ASC
-  CONTENT_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A \`Comment\` edge in the connection."""
@@ -1588,18 +1400,6 @@ enum UserOrderBy {
   USERNAME_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  EMAIL_TRGM_SIMILARITY_ASC
-  EMAIL_TRGM_SIMILARITY_DESC
-  USERNAME_TRGM_SIMILARITY_ASC
-  USERNAME_TRGM_SIMILARITY_DESC
-  DISPLAY_NAME_TRGM_SIMILARITY_ASC
-  DISPLAY_NAME_TRGM_SIMILARITY_DESC
-  BIO_TRGM_SIMILARITY_ASC
-  BIO_TRGM_SIMILARITY_DESC
-  ROLE_TRGM_SIMILARITY_ASC
-  ROLE_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """Root meta schema type"""
