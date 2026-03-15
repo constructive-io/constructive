@@ -9,8 +9,8 @@ CRUD operations for SecureTableProvision records via csdk CLI
 ```bash
 csdk secure-table-provision list
 csdk secure-table-provision get --id <value>
-csdk secure-table-provision create --databaseId <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--nodeType <value>] [--useRls <value>] [--nodeData <value>] [--grantRoles <value>] [--grantPrivileges <value>] [--policyType <value>] [--policyPrivileges <value>] [--policyRole <value>] [--policyPermissive <value>] [--policyName <value>] [--policyData <value>] [--outFields <value>]
-csdk secure-table-provision update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--nodeType <value>] [--useRls <value>] [--nodeData <value>] [--grantRoles <value>] [--grantPrivileges <value>] [--policyType <value>] [--policyPrivileges <value>] [--policyRole <value>] [--policyPermissive <value>] [--policyName <value>] [--policyData <value>] [--outFields <value>]
+csdk secure-table-provision create --databaseId <value> --tableNameTrgmSimilarity <value> --nodeTypeTrgmSimilarity <value> --policyTypeTrgmSimilarity <value> --policyRoleTrgmSimilarity <value> --policyNameTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--nodeType <value>] [--useRls <value>] [--nodeData <value>] [--fields <value>] [--grantRoles <value>] [--grantPrivileges <value>] [--policyType <value>] [--policyPrivileges <value>] [--policyRole <value>] [--policyPermissive <value>] [--policyName <value>] [--policyData <value>] [--outFields <value>]
+csdk secure-table-provision update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--nodeType <value>] [--useRls <value>] [--nodeData <value>] [--fields <value>] [--grantRoles <value>] [--grantPrivileges <value>] [--policyType <value>] [--policyPrivileges <value>] [--policyRole <value>] [--policyPermissive <value>] [--policyName <value>] [--policyData <value>] [--outFields <value>] [--tableNameTrgmSimilarity <value>] [--nodeTypeTrgmSimilarity <value>] [--policyTypeTrgmSimilarity <value>] [--policyRoleTrgmSimilarity <value>] [--policyNameTrgmSimilarity <value>] [--searchScore <value>]
 csdk secure-table-provision delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk secure-table-provision list
 ### Create a secureTableProvision
 
 ```bash
-csdk secure-table-provision create --databaseId <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--nodeType <value>] [--useRls <value>] [--nodeData <value>] [--grantRoles <value>] [--grantPrivileges <value>] [--policyType <value>] [--policyPrivileges <value>] [--policyRole <value>] [--policyPermissive <value>] [--policyName <value>] [--policyData <value>] [--outFields <value>]
+csdk secure-table-provision create --databaseId <value> --tableNameTrgmSimilarity <value> --nodeTypeTrgmSimilarity <value> --policyTypeTrgmSimilarity <value> --policyRoleTrgmSimilarity <value> --policyNameTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--nodeType <value>] [--useRls <value>] [--nodeData <value>] [--fields <value>] [--grantRoles <value>] [--grantPrivileges <value>] [--policyType <value>] [--policyPrivileges <value>] [--policyRole <value>] [--policyPermissive <value>] [--policyName <value>] [--policyData <value>] [--outFields <value>]
 ```
 
 ### Get a secureTableProvision by id

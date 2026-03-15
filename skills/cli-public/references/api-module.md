@@ -9,8 +9,8 @@ CRUD operations for ApiModule records via csdk CLI
 ```bash
 csdk api-module list
 csdk api-module get --id <value>
-csdk api-module create --databaseId <value> --apiId <value> --name <value> --data <value>
-csdk api-module update --id <value> [--databaseId <value>] [--apiId <value>] [--name <value>] [--data <value>]
+csdk api-module create --databaseId <value> --apiId <value> --name <value> --data <value> --nameTrgmSimilarity <value> --searchScore <value>
+csdk api-module update --id <value> [--databaseId <value>] [--apiId <value>] [--name <value>] [--data <value>] [--nameTrgmSimilarity <value>] [--searchScore <value>]
 csdk api-module delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk api-module list
 ### Create a apiModule
 
 ```bash
-csdk api-module create --databaseId <value> --apiId <value> --name <value> --data <value>
+csdk api-module create --databaseId <value> --apiId <value> --name <value> --data <value> --nameTrgmSimilarity <value> --searchScore <value>
 ```
 
 ### Get a apiModule by id

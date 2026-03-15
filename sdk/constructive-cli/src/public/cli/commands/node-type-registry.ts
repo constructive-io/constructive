@@ -18,6 +18,12 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  slugTrgmSimilarity: 'float',
+  categoryTrgmSimilarity: 'float',
+  displayNameTrgmSimilarity: 'float',
+  descriptionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nnode-type-registry <command>\n\nCommands:\n  list                  List all nodeTypeRegistry records\n  get                   Get a nodeTypeRegistry by ID\n  create                Create a new nodeTypeRegistry\n  update                Update an existing nodeTypeRegistry\n  delete                Delete a nodeTypeRegistry\n\n  --help, -h            Show this help message\n';

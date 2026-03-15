@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class NodeTypeRegistryModel {
   constructor(private client: OrmClient) {}
   findMany<S extends NodeTypeRegistrySelect>(
-    args: FindManyArgs<S, NodeTypeRegistryFilter, NodeTypeRegistryOrderBy> & {
+    args: FindManyArgs<S, NodeTypeRegistryFilter, never, NodeTypeRegistryOrderBy> & {
       select: S;
     } & StrictSelect<S, NodeTypeRegistrySelect>
   ): QueryBuilder<{

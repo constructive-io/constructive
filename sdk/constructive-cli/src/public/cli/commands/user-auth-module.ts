@@ -35,6 +35,23 @@ const fieldSchema: FieldSchema = {
   signInOneTimeTokenFunction: 'string',
   oneTimeTokenFunction: 'string',
   extendTokenExpires: 'string',
+  auditsTableNameTrgmSimilarity: 'float',
+  signInFunctionTrgmSimilarity: 'float',
+  signUpFunctionTrgmSimilarity: 'float',
+  signOutFunctionTrgmSimilarity: 'float',
+  setPasswordFunctionTrgmSimilarity: 'float',
+  resetPasswordFunctionTrgmSimilarity: 'float',
+  forgotPasswordFunctionTrgmSimilarity: 'float',
+  sendVerificationEmailFunctionTrgmSimilarity: 'float',
+  verifyEmailFunctionTrgmSimilarity: 'float',
+  verifyPasswordFunctionTrgmSimilarity: 'float',
+  checkPasswordFunctionTrgmSimilarity: 'float',
+  sendAccountDeletionEmailFunctionTrgmSimilarity: 'float',
+  deleteAccountFunctionTrgmSimilarity: 'float',
+  signInOneTimeTokenFunctionTrgmSimilarity: 'float',
+  oneTimeTokenFunctionTrgmSimilarity: 'float',
+  extendTokenExpiresTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nuser-auth-module <command>\n\nCommands:\n  list                  List all userAuthModule records\n  get                   Get a userAuthModule by ID\n  create                Create a new userAuthModule\n  update                Update an existing userAuthModule\n  delete                Delete a userAuthModule\n\n  --help, -h            Show this help message\n';

@@ -9,8 +9,8 @@ CRUD operations for App records via csdk CLI
 ```bash
 csdk app list
 csdk app get --id <value>
-csdk app create --databaseId <value> --siteId <value> [--name <value>] [--appImage <value>] [--appStoreLink <value>] [--appStoreId <value>] [--appIdPrefix <value>] [--playStoreLink <value>]
-csdk app update --id <value> [--databaseId <value>] [--siteId <value>] [--name <value>] [--appImage <value>] [--appStoreLink <value>] [--appStoreId <value>] [--appIdPrefix <value>] [--playStoreLink <value>]
+csdk app create --databaseId <value> --siteId <value> --nameTrgmSimilarity <value> --appStoreIdTrgmSimilarity <value> --appIdPrefixTrgmSimilarity <value> --searchScore <value> [--name <value>] [--appImage <value>] [--appStoreLink <value>] [--appStoreId <value>] [--appIdPrefix <value>] [--playStoreLink <value>]
+csdk app update --id <value> [--databaseId <value>] [--siteId <value>] [--name <value>] [--appImage <value>] [--appStoreLink <value>] [--appStoreId <value>] [--appIdPrefix <value>] [--playStoreLink <value>] [--nameTrgmSimilarity <value>] [--appStoreIdTrgmSimilarity <value>] [--appIdPrefixTrgmSimilarity <value>] [--searchScore <value>]
 csdk app delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk app list
 ### Create a app
 
 ```bash
-csdk app create --databaseId <value> --siteId <value> [--name <value>] [--appImage <value>] [--appStoreLink <value>] [--appStoreId <value>] [--appIdPrefix <value>] [--playStoreLink <value>]
+csdk app create --databaseId <value> --siteId <value> --nameTrgmSimilarity <value> --appStoreIdTrgmSimilarity <value> --appIdPrefixTrgmSimilarity <value> --searchScore <value> [--name <value>] [--appImage <value>] [--appStoreLink <value>] [--appStoreId <value>] [--appIdPrefix <value>] [--playStoreLink <value>]
 ```
 
 ### Get a app by id

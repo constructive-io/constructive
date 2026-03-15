@@ -23,6 +23,13 @@ const fieldSchema: FieldSchema = {
   signInRecordFailure: 'string',
   signUpWithKey: 'string',
   signInWithChallenge: 'string',
+  userFieldTrgmSimilarity: 'float',
+  cryptoNetworkTrgmSimilarity: 'float',
+  signInRequestChallengeTrgmSimilarity: 'float',
+  signInRecordFailureTrgmSimilarity: 'float',
+  signUpWithKeyTrgmSimilarity: 'float',
+  signInWithChallengeTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ncrypto-auth-module <command>\n\nCommands:\n  list                  List all cryptoAuthModule records\n  get                   Get a cryptoAuthModule by ID\n  create                Create a new cryptoAuthModule\n  update                Update an existing cryptoAuthModule\n  delete                Delete a cryptoAuthModule\n\n  --help, -h            Show this help message\n';

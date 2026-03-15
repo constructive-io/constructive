@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ViewModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ViewSelect>(
-    args: FindManyArgs<S, ViewFilter, ViewOrderBy> & {
+    args: FindManyArgs<S, ViewFilter, never, ViewOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewSelect>
   ): QueryBuilder<{

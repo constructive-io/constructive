@@ -23,6 +23,11 @@ const fieldSchema: FieldSchema = {
   prefix: 'string',
   membershipType: 'int',
   entityTableId: 'uuid',
+  invitesTableNameTrgmSimilarity: 'float',
+  claimedInvitesTableNameTrgmSimilarity: 'float',
+  submitInviteCodeFunctionTrgmSimilarity: 'float',
+  prefixTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ninvites-module <command>\n\nCommands:\n  list                  List all invitesModule records\n  get                   Get a invitesModule by ID\n  create                Create a new invitesModule\n  update                Update an existing invitesModule\n  delete                Delete a invitesModule\n\n  --help, -h            Show this help message\n';

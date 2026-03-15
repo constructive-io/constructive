@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class TableTemplateModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends TableTemplateModuleSelect>(
-    args: FindManyArgs<S, TableTemplateModuleFilter, TableTemplateModuleOrderBy> & {
+    args: FindManyArgs<S, TableTemplateModuleFilter, never, TableTemplateModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, TableTemplateModuleSelect>
   ): QueryBuilder<{

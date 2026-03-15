@@ -9,7 +9,7 @@ Provisions security, fields, grants, and policies onto a table. Each row can ind
 ```typescript
 db.secureTableProvision.findMany({ select: { id: true } }).execute()
 db.secureTableProvision.findOne({ id: '<value>', select: { id: true } }).execute()
-db.secureTableProvision.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFields: '<value>' }, select: { id: true } }).execute()
+db.secureTableProvision.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', nodeData: '<value>', fields: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFields: '<value>', tableNameTrgmSimilarity: '<value>', nodeTypeTrgmSimilarity: '<value>', policyTypeTrgmSimilarity: '<value>', policyRoleTrgmSimilarity: '<value>', policyNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.secureTableProvision.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.secureTableProvision.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.secureTableProvision.findMany({
 
 ```typescript
 const item = await db.secureTableProvision.create({
-  data: { databaseId: 'value', schemaId: 'value', tableId: 'value', tableName: 'value', nodeType: 'value', useRls: 'value', nodeData: 'value', grantRoles: 'value', grantPrivileges: 'value', policyType: 'value', policyPrivileges: 'value', policyRole: 'value', policyPermissive: 'value', policyName: 'value', policyData: 'value', outFields: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', tableId: 'value', tableName: 'value', nodeType: 'value', useRls: 'value', nodeData: 'value', fields: 'value', grantRoles: 'value', grantPrivileges: 'value', policyType: 'value', policyPrivileges: 'value', policyRole: 'value', policyPermissive: 'value', policyName: 'value', policyData: 'value', outFields: 'value', tableNameTrgmSimilarity: 'value', nodeTypeTrgmSimilarity: 'value', policyTypeTrgmSimilarity: 'value', policyRoleTrgmSimilarity: 'value', policyNameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

@@ -7,8 +7,8 @@ OAuth and social login connections linking external service accounts to users
 ## Usage
 
 ```typescript
-useConnectedAccountsQuery({ selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } } })
-useConnectedAccountQuery({ id: '<value>', selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } } })
+useConnectedAccountsQuery({ selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } } })
+useConnectedAccountQuery({ id: '<value>', selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } } })
 useCreateConnectedAccountMutation({ selection: { fields: { id: true } } })
 useUpdateConnectedAccountMutation({ selection: { fields: { id: true } } })
 useDeleteConnectedAccountMutation({})
@@ -20,7 +20,7 @@ useDeleteConnectedAccountMutation({})
 
 ```typescript
 const { data, isLoading } = useConnectedAccountsQuery({
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useConnectedAccountsQuery({
 const { mutate } = useCreateConnectedAccountMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' });
+mutate({ ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>', serviceTrgmSimilarity: '<value>', identifierTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

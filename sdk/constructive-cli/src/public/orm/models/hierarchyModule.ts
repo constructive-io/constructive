@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class HierarchyModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends HierarchyModuleSelect>(
-    args: FindManyArgs<S, HierarchyModuleFilter, HierarchyModuleOrderBy> & {
+    args: FindManyArgs<S, HierarchyModuleFilter, never, HierarchyModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, HierarchyModuleSelect>
   ): QueryBuilder<{

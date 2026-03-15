@@ -23,6 +23,10 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  typeTrgmSimilarity: 'float',
+  moduleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ncheck-constraint <command>\n\nCommands:\n  list                  List all checkConstraint records\n  get                   Get a checkConstraint by ID\n  create                Create a new checkConstraint\n  update                Update an existing checkConstraint\n  delete                Delete a checkConstraint\n\n  --help, -h            Show this help message\n';

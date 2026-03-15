@@ -9,7 +9,7 @@ ORM operations for Schema records
 ```typescript
 db.schema.findMany({ select: { id: true } }).execute()
 db.schema.findOne({ id: '<value>', select: { id: true } }).execute()
-db.schema.create({ data: { databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>' }, select: { id: true } }).execute()
+db.schema.create({ data: { databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>', nameTrgmSimilarity: '<value>', schemaNameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.schema.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.schema.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.schema.findMany({
 
 ```typescript
 const item = await db.schema.create({
-  data: { databaseId: 'value', name: 'value', schemaName: 'value', label: 'value', description: 'value', smartTags: 'value', category: 'value', module: 'value', scope: 'value', tags: 'value', isPublic: 'value' },
+  data: { databaseId: 'value', name: 'value', schemaName: 'value', label: 'value', description: 'value', smartTags: 'value', category: 'value', module: 'value', scope: 'value', tags: 'value', isPublic: 'value', nameTrgmSimilarity: 'value', schemaNameTrgmSimilarity: 'value', labelTrgmSimilarity: 'value', descriptionTrgmSimilarity: 'value', moduleTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

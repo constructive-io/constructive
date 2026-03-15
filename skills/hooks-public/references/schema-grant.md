@@ -7,8 +7,8 @@ React Query hooks for SchemaGrant data operations
 ## Usage
 
 ```typescript
-useSchemaGrantsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } } })
-useSchemaGrantQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } } })
+useSchemaGrantsQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true, granteeNameTrgmSimilarity: true, searchScore: true } } })
+useSchemaGrantQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true, granteeNameTrgmSimilarity: true, searchScore: true } } })
 useCreateSchemaGrantMutation({ selection: { fields: { id: true } } })
 useUpdateSchemaGrantMutation({ selection: { fields: { id: true } } })
 useDeleteSchemaGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteSchemaGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useSchemaGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSchemaGrantsQuery({
 const { mutate } = useCreateSchemaGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', schemaId: '<value>', granteeName: '<value>' });
+mutate({ databaseId: '<value>', schemaId: '<value>', granteeName: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

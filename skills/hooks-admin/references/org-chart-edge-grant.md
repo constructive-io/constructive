@@ -7,8 +7,8 @@ Append-only log of hierarchy edge grants and revocations; triggers apply changes
 ## Usage
 
 ```typescript
-useOrgChartEdgeGrantsQuery({ selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } } })
-useOrgChartEdgeGrantQuery({ id: '<value>', selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } } })
+useOrgChartEdgeGrantsQuery({ selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } } })
+useOrgChartEdgeGrantQuery({ id: '<value>', selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } } })
 useCreateOrgChartEdgeGrantMutation({ selection: { fields: { id: true } } })
 useUpdateOrgChartEdgeGrantMutation({ selection: { fields: { id: true } } })
 useDeleteOrgChartEdgeGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgChartEdgeGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgChartEdgeGrantsQuery({
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgChartEdgeGrantsQuery({
 const { mutate } = useCreateOrgChartEdgeGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>' });
+mutate({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

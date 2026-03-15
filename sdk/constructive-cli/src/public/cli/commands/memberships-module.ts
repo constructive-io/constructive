@@ -40,6 +40,19 @@ const fieldSchema: FieldSchema = {
   entityIdsByMask: 'string',
   entityIdsByPerm: 'string',
   entityIdsFunction: 'string',
+  membershipsTableNameTrgmSimilarity: 'float',
+  membersTableNameTrgmSimilarity: 'float',
+  membershipDefaultsTableNameTrgmSimilarity: 'float',
+  grantsTableNameTrgmSimilarity: 'float',
+  adminGrantsTableNameTrgmSimilarity: 'float',
+  ownerGrantsTableNameTrgmSimilarity: 'float',
+  prefixTrgmSimilarity: 'float',
+  actorMaskCheckTrgmSimilarity: 'float',
+  actorPermCheckTrgmSimilarity: 'float',
+  entityIdsByMaskTrgmSimilarity: 'float',
+  entityIdsByPermTrgmSimilarity: 'float',
+  entityIdsFunctionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nmemberships-module <command>\n\nCommands:\n  list                  List all membershipsModule records\n  get                   Get a membershipsModule by ID\n  create                Create a new membershipsModule\n  update                Update an existing membershipsModule\n  delete                Delete a membershipsModule\n\n  --help, -h            Show this help message\n';

@@ -25,6 +25,7 @@ csdk auth set-token <your-token>
 |---------|-------------|
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
+| `config` | Manage config key-value store (per-context) |
 | `org-get-managers-record` | orgGetManagersRecord CRUD operations |
 | `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
 | `app-permission` | appPermission CRUD operations |
@@ -39,8 +40,8 @@ csdk auth set-token <your-token>
 | `org-owner-grant` | orgOwnerGrant CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
-| `membership-type` | membershipType CRUD operations |
 | `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
+| `membership-type` | membershipType CRUD operations |
 | `app-limit` | appLimit CRUD operations |
 | `app-achievement` | appAchievement CRUD operations |
 | `app-step` | appStep CRUD operations |
@@ -52,10 +53,10 @@ csdk auth set-token <your-token>
 | `org-grant` | orgGrant CRUD operations |
 | `org-chart-edge` | orgChartEdge CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
-| `invite` | invite CRUD operations |
-| `app-level` | appLevel CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
+| `invite` | invite CRUD operations |
+| `app-level` | appLevel CRUD operations |
 | `org-invite` | orgInvite CRUD operations |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
@@ -96,6 +97,19 @@ Manage authentication tokens per context.
 | `set-token <token>` | Store bearer token for current context |
 | `status` | Show auth status across all contexts |
 | `logout` | Remove credentials for current context |
+
+### `config`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| `get <key>` | Get a config value |
+| `set <key> <value>` | Set a config value |
+| `list` | List all config values |
+| `delete <key>` | Delete a config value |
+
+Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
@@ -162,7 +176,10 @@ CRUD operations for AppPermission records.
 | `bitnum` | Int |
 | `bitstr` | BitString |
 | `description` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
+**Required create fields:** `descriptionTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `org-permission`
@@ -186,7 +203,10 @@ CRUD operations for OrgPermission records.
 | `bitnum` | Int |
 | `bitstr` | BitString |
 | `description` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
+**Required create fields:** `descriptionTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `app-level-requirement`
@@ -213,8 +233,10 @@ CRUD operations for AppLevelRequirement records.
 | `priority` | Int |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `name`, `level`
+**Required create fields:** `name`, `level`, `descriptionTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
 ### `org-member`
@@ -437,29 +459,6 @@ CRUD operations for OrgLimitDefault records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`
 
-### `membership-type`
-
-CRUD operations for MembershipType records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all membershipType records |
-| `get` | Get a membershipType by id |
-| `create` | Create a new membershipType |
-| `update` | Update an existing membershipType |
-| `delete` | Delete a membershipType |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-| `description` | String |
-| `prefix` | String |
-
-**Required create fields:** `name`, `description`, `prefix`
-
 ### `org-chart-edge-grant`
 
 CRUD operations for OrgChartEdgeGrant records.
@@ -485,9 +484,37 @@ CRUD operations for OrgChartEdgeGrant records.
 | `positionTitle` | String |
 | `positionLevel` | Int |
 | `createdAt` | Datetime |
+| `positionTitleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `entityId`, `childId`, `grantorId`
+**Required create fields:** `entityId`, `childId`, `grantorId`, `positionTitleTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `parentId`, `isGrant`, `positionTitle`, `positionLevel`
+
+### `membership-type`
+
+CRUD operations for MembershipType records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all membershipType records |
+| `get` | Get a membershipType by id |
+| `create` | Create a new membershipType |
+| `update` | Update an existing membershipType |
+| `delete` | Delete a membershipType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | Int |
+| `name` | String |
+| `description` | String |
+| `prefix` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `name`, `description`, `prefix`, `descriptionTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
 
 ### `app-limit`
 
@@ -749,8 +776,10 @@ CRUD operations for OrgChartEdge records.
 | `parentId` | UUID |
 | `positionTitle` | String |
 | `positionLevel` | Int |
+| `positionTitleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `entityId`, `childId`
+**Required create fields:** `entityId`, `childId`, `positionTitleTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `parentId`, `positionTitle`, `positionLevel`
 
 ### `org-membership-default`
@@ -781,64 +810,6 @@ CRUD operations for OrgMembershipDefault records.
 
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
-
-### `invite`
-
-CRUD operations for Invite records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all invite records |
-| `get` | Get a invite by id |
-| `create` | Create a new invite |
-| `update` | Update an existing invite |
-| `delete` | Delete a invite |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `email` | Email |
-| `senderId` | UUID |
-| `inviteToken` | String |
-| `inviteValid` | Boolean |
-| `inviteLimit` | Int |
-| `inviteCount` | Int |
-| `multiple` | Boolean |
-| `data` | JSON |
-| `expiresAt` | Datetime |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
-
-### `app-level`
-
-CRUD operations for AppLevel records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLevel records |
-| `get` | Get a appLevel by id |
-| `create` | Create a new appLevel |
-| `update` | Update an existing appLevel |
-| `delete` | Delete a appLevel |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `description` | String |
-| `image` | Image |
-| `ownerId` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
 
 ### `app-membership`
 
@@ -912,6 +883,69 @@ CRUD operations for OrgMembership records.
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
+### `invite`
+
+CRUD operations for Invite records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all invite records |
+| `get` | Get a invite by id |
+| `create` | Create a new invite |
+| `update` | Update an existing invite |
+| `delete` | Delete a invite |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `email` | Email |
+| `senderId` | UUID |
+| `inviteToken` | String |
+| `inviteValid` | Boolean |
+| `inviteLimit` | Int |
+| `inviteCount` | Int |
+| `multiple` | Boolean |
+| `data` | JSON |
+| `expiresAt` | Datetime |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `inviteTokenTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `inviteTokenTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+
+### `app-level`
+
+CRUD operations for AppLevel records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLevel records |
+| `get` | Get a appLevel by id |
+| `create` | Create a new appLevel |
+| `update` | Update an existing appLevel |
+| `delete` | Delete a appLevel |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `description` | String |
+| `image` | Image |
+| `ownerId` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `name`, `descriptionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
+
 ### `org-invite`
 
 CRUD operations for OrgInvite records.
@@ -942,8 +976,10 @@ CRUD operations for OrgInvite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
+| `inviteTokenTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `entityId`
+**Required create fields:** `entityId`, `inviteTokenTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ## Custom Operations

@@ -15,8 +15,8 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  roleTypeKeys,
   cryptoAddressKeys,
+  roleTypeKeys,
   phoneNumberKeys,
   connectedAccountKeys,
   auditLogKeys,
@@ -43,20 +43,6 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate roleType queries */ roleType: {
-    /** Invalidate all roleType queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: roleTypeKeys.all,
-      }),
-    /** Invalidate roleType list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: roleTypeKeys.lists(),
-      }),
-    /** Invalidate a specific roleType */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: roleTypeKeys.detail(id),
-      }),
-  },
   /** Invalidate cryptoAddress queries */ cryptoAddress: {
     /** Invalidate all cryptoAddress queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -72,6 +58,20 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: cryptoAddressKeys.detail(id),
+      }),
+  },
+  /** Invalidate roleType queries */ roleType: {
+    /** Invalidate all roleType queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: roleTypeKeys.all,
+      }),
+    /** Invalidate roleType list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: roleTypeKeys.lists(),
+      }),
+    /** Invalidate a specific roleType */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: roleTypeKeys.detail(id),
       }),
   },
   /** Invalidate phoneNumber queries */ phoneNumber: {
@@ -163,17 +163,17 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: roleTypeKeys.detail(id),
-    });
-  },
   /** Remove cryptoAddress from cache */ cryptoAddress: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: cryptoAddressKeys.detail(id),
+    });
+  },
+  /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: roleTypeKeys.detail(id),
     });
   },
   /** Remove phoneNumber from cache */ phoneNumber: (

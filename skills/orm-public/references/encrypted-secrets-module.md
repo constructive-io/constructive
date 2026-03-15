@@ -9,7 +9,7 @@ ORM operations for EncryptedSecretsModule records
 ```typescript
 db.encryptedSecretsModule.findMany({ select: { id: true } }).execute()
 db.encryptedSecretsModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.encryptedSecretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute()
+db.encryptedSecretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.encryptedSecretsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.encryptedSecretsModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.encryptedSecretsModule.findMany({
 
 ```typescript
 const item = await db.encryptedSecretsModule.create({
-  data: { databaseId: 'value', schemaId: 'value', tableId: 'value', tableName: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', tableId: 'value', tableName: 'value', tableNameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

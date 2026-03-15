@@ -26,6 +26,12 @@ const fieldSchema: FieldSchema = {
   createdAt: 'string',
   updatedAt: 'string',
   completedAt: 'string',
+  databaseNameTrgmSimilarity: 'float',
+  subdomainTrgmSimilarity: 'float',
+  domainTrgmSimilarity: 'float',
+  statusTrgmSimilarity: 'float',
+  errorMessageTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ndatabase-provision-module <command>\n\nCommands:\n  list                  List all databaseProvisionModule records\n  get                   Get a databaseProvisionModule by ID\n  create                Create a new databaseProvisionModule\n  update                Update an existing databaseProvisionModule\n  delete                Delete a databaseProvisionModule\n\n  --help, -h            Show this help message\n';

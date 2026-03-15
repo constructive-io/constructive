@@ -7,8 +7,8 @@ React Query hooks for DenormalizedTableField data operations
 ## Usage
 
 ```typescript
-useDenormalizedTableFieldsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } } })
-useDenormalizedTableFieldQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } } })
+useDenormalizedTableFieldsQuery({ selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true, funcNameTrgmSimilarity: true, searchScore: true } } })
+useDenormalizedTableFieldQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true, funcNameTrgmSimilarity: true, searchScore: true } } })
 useCreateDenormalizedTableFieldMutation({ selection: { fields: { id: true } } })
 useUpdateDenormalizedTableFieldMutation({ selection: { fields: { id: true } } })
 useDeleteDenormalizedTableFieldMutation({})
@@ -20,7 +20,7 @@ useDeleteDenormalizedTableFieldMutation({})
 
 ```typescript
 const { data, isLoading } = useDenormalizedTableFieldsQuery({
-  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } },
+  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true, funcNameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDenormalizedTableFieldsQuery({
 const { mutate } = useCreateDenormalizedTableFieldMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>' });
+mutate({ databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>', funcNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

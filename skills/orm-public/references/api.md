@@ -9,7 +9,7 @@ API endpoint configurations: each record defines a PostGraphile/PostgREST API wi
 ```typescript
 db.api.findMany({ select: { id: true } }).execute()
 db.api.findOne({ id: '<value>', select: { id: true } }).execute()
-db.api.create({ data: { databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>' }, select: { id: true } }).execute()
+db.api.create({ data: { databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>', nameTrgmSimilarity: '<value>', dbnameTrgmSimilarity: '<value>', roleNameTrgmSimilarity: '<value>', anonRoleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.api.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.api.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.api.findMany({
 
 ```typescript
 const item = await db.api.create({
-  data: { databaseId: 'value', name: 'value', dbname: 'value', roleName: 'value', anonRole: 'value', isPublic: 'value' },
+  data: { databaseId: 'value', name: 'value', dbname: 'value', roleName: 'value', anonRole: 'value', isPublic: 'value', nameTrgmSimilarity: 'value', dbnameTrgmSimilarity: 'value', roleNameTrgmSimilarity: 'value', anonRoleTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

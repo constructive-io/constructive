@@ -21,6 +21,9 @@ const fieldSchema: FieldSchema = {
   tableName: 'string',
   nodeType: 'string',
   data: 'json',
+  tableNameTrgmSimilarity: 'float',
+  nodeTypeTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ntable-template-module <command>\n\nCommands:\n  list                  List all tableTemplateModule records\n  get                   Get a tableTemplateModule by ID\n  create                Create a new tableTemplateModule\n  update                Update an existing tableTemplateModule\n  delete                Delete a tableTemplateModule\n\n  --help, -h            Show this help message\n';

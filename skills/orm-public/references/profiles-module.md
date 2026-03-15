@@ -9,7 +9,7 @@ ORM operations for ProfilesModule records
 ```typescript
 db.profilesModule.findMany({ select: { id: true } }).execute()
 db.profilesModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.profilesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>' }, select: { id: true } }).execute()
+db.profilesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>', tableNameTrgmSimilarity: '<value>', profilePermissionsTableNameTrgmSimilarity: '<value>', profileGrantsTableNameTrgmSimilarity: '<value>', profileDefinitionGrantsTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.profilesModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.profilesModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.profilesModule.findMany({
 
 ```typescript
 const item = await db.profilesModule.create({
-  data: { databaseId: 'value', schemaId: 'value', privateSchemaId: 'value', tableId: 'value', tableName: 'value', profilePermissionsTableId: 'value', profilePermissionsTableName: 'value', profileGrantsTableId: 'value', profileGrantsTableName: 'value', profileDefinitionGrantsTableId: 'value', profileDefinitionGrantsTableName: 'value', membershipType: 'value', entityTableId: 'value', actorTableId: 'value', permissionsTableId: 'value', membershipsTableId: 'value', prefix: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', privateSchemaId: 'value', tableId: 'value', tableName: 'value', profilePermissionsTableId: 'value', profilePermissionsTableName: 'value', profileGrantsTableId: 'value', profileGrantsTableName: 'value', profileDefinitionGrantsTableId: 'value', profileDefinitionGrantsTableName: 'value', membershipType: 'value', entityTableId: 'value', actorTableId: 'value', permissionsTableId: 'value', membershipsTableId: 'value', prefix: 'value', tableNameTrgmSimilarity: 'value', profilePermissionsTableNameTrgmSimilarity: 'value', profileGrantsTableNameTrgmSimilarity: 'value', profileDefinitionGrantsTableNameTrgmSimilarity: 'value', prefixTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

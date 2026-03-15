@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppAdminGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppAdminGrantSelect>(
-    args: FindManyArgs<S, AppAdminGrantFilter, AppAdminGrantOrderBy> & {
+    args: FindManyArgs<S, AppAdminGrantFilter, never, AppAdminGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, AppAdminGrantSelect>
   ): QueryBuilder<{

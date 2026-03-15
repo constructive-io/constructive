@@ -16,6 +16,8 @@ const fieldSchema: FieldSchema = {
   tableId: 'uuid',
   ownerTableId: 'uuid',
   tableName: 'string',
+  tableNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nphone-numbers-module <command>\n\nCommands:\n  list                  List all phoneNumbersModule records\n  get                   Get a phoneNumbersModule by ID\n  create                Create a new phoneNumbersModule\n  update                Update an existing phoneNumbersModule\n  delete                Delete a phoneNumbersModule\n\n  --help, -h            Show this help message\n';

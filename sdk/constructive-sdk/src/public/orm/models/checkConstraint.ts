@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class CheckConstraintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CheckConstraintSelect>(
-    args: FindManyArgs<S, CheckConstraintFilter, CheckConstraintOrderBy> & {
+    args: FindManyArgs<S, CheckConstraintFilter, never, CheckConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, CheckConstraintSelect>
   ): QueryBuilder<{

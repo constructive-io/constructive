@@ -7,8 +7,8 @@ Defines the specific requirements that must be met to achieve a level
 ## Usage
 
 ```typescript
-useAppLevelRequirementsQuery({ selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } } })
-useAppLevelRequirementQuery({ id: '<value>', selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } } })
+useAppLevelRequirementsQuery({ selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } } })
+useAppLevelRequirementQuery({ id: '<value>', selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } } })
 useCreateAppLevelRequirementMutation({ selection: { fields: { id: true } } })
 useUpdateAppLevelRequirementMutation({ selection: { fields: { id: true } } })
 useDeleteAppLevelRequirementMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLevelRequirementMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLevelRequirementsQuery({
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLevelRequirementsQuery({
 const { mutate } = useCreateAppLevelRequirementMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>' });
+mutate({ name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

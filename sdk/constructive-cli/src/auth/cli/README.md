@@ -25,8 +25,9 @@ csdk auth set-token <your-token>
 |---------|-------------|
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
-| `role-type` | roleType CRUD operations |
+| `config` | Manage config key-value store (per-context) |
 | `crypto-address` | cryptoAddress CRUD operations |
+| `role-type` | roleType CRUD operations |
 | `phone-number` | phoneNumber CRUD operations |
 | `connected-account` | connectedAccount CRUD operations |
 | `audit-log` | auditLog CRUD operations |
@@ -79,28 +80,20 @@ Manage authentication tokens per context.
 | `status` | Show auth status across all contexts |
 | `logout` | Remove credentials for current context |
 
-## Table Commands
+### `config`
 
-### `role-type`
-
-CRUD operations for RoleType records.
+Manage per-context key-value configuration variables.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all roleType records |
-| `get` | Get a roleType by id |
-| `create` | Create a new roleType |
-| `update` | Update an existing roleType |
-| `delete` | Delete a roleType |
+| `get <key>` | Get a config value |
+| `set <key> <value>` | Set a config value |
+| `list` | List all config values |
+| `delete <key>` | Delete a config value |
 
-**Fields:**
+Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-
-**Required create fields:** `name`
+## Table Commands
 
 ### `crypto-address`
 
@@ -125,9 +118,32 @@ CRUD operations for CryptoAddress records.
 | `isPrimary` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `addressTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `address`
+**Required create fields:** `address`, `addressTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+
+### `role-type`
+
+CRUD operations for RoleType records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all roleType records |
+| `get` | Get a roleType by id |
+| `create` | Create a new roleType |
+| `update` | Update an existing roleType |
+| `delete` | Delete a roleType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | Int |
+| `name` | String |
+
+**Required create fields:** `name`
 
 ### `phone-number`
 
@@ -153,8 +169,11 @@ CRUD operations for PhoneNumber records.
 | `isPrimary` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `ccTrgmSimilarity` | Float |
+| `numberTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `cc`, `number`
+**Required create fields:** `cc`, `number`, `ccTrgmSimilarity`, `numberTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
 ### `connected-account`
@@ -181,8 +200,11 @@ CRUD operations for ConnectedAccount records.
 | `isVerified` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `serviceTrgmSimilarity` | Float |
+| `identifierTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `service`, `identifier`, `details`
+**Required create fields:** `service`, `identifier`, `details`, `serviceTrgmSimilarity`, `identifierTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `ownerId`, `isVerified`
 
 ### `audit-log`
@@ -209,8 +231,10 @@ CRUD operations for AuditLog records.
 | `ipAddress` | InternetAddress |
 | `success` | Boolean |
 | `createdAt` | Datetime |
+| `userAgentTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `event`, `success`
+**Required create fields:** `event`, `success`, `userAgentTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
 ### `email`
@@ -265,8 +289,10 @@ CRUD operations for User records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `searchTsvRank` | Float |
+| `displayNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Required create fields:** `searchTsvRank`
+**Required create fields:** `searchTsvRank`, `displayNameTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`
 
 ## Custom Operations

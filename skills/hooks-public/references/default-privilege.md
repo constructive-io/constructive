@@ -7,8 +7,8 @@ React Query hooks for DefaultPrivilege data operations
 ## Usage
 
 ```typescript
-useDefaultPrivilegesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } } })
-useDefaultPrivilegeQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } } })
+useDefaultPrivilegesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true, objectTypeTrgmSimilarity: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } } })
+useDefaultPrivilegeQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true, objectTypeTrgmSimilarity: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } } })
 useCreateDefaultPrivilegeMutation({ selection: { fields: { id: true } } })
 useUpdateDefaultPrivilegeMutation({ selection: { fields: { id: true } } })
 useDeleteDefaultPrivilegeMutation({})
@@ -20,7 +20,7 @@ useDeleteDefaultPrivilegeMutation({})
 
 ```typescript
 const { data, isLoading } = useDefaultPrivilegesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true, objectTypeTrgmSimilarity: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useDefaultPrivilegesQuery({
 const { mutate } = useCreateDefaultPrivilegeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>' });
+mutate({ databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>', objectTypeTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

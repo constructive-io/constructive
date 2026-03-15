@@ -18,8 +18,8 @@ import type {
   SetPasswordInput,
   VerifyEmailInput,
   ResetPasswordInput,
-  RemoveNodeAtPathInput,
   BootstrapUserInput,
+  RemoveNodeAtPathInput,
   SetDataAtPathInput,
   SetPropsAndCommitInput,
   ProvisionDatabaseWithUserInput,
@@ -49,8 +49,8 @@ import type {
   SetPasswordPayload,
   VerifyEmailPayload,
   ResetPasswordPayload,
-  RemoveNodeAtPathPayload,
   BootstrapUserPayload,
+  RemoveNodeAtPathPayload,
   SetDataAtPathPayload,
   SetPropsAndCommitPayload,
   ProvisionDatabaseWithUserPayload,
@@ -80,8 +80,8 @@ import type {
   SetPasswordPayloadSelect,
   VerifyEmailPayloadSelect,
   ResetPasswordPayloadSelect,
-  RemoveNodeAtPathPayloadSelect,
   BootstrapUserPayloadSelect,
+  RemoveNodeAtPathPayloadSelect,
   SetDataAtPathPayloadSelect,
   SetPropsAndCommitPayloadSelect,
   ProvisionDatabaseWithUserPayloadSelect,
@@ -135,11 +135,11 @@ export interface VerifyEmailVariables {
 export interface ResetPasswordVariables {
   input: ResetPasswordInput;
 }
-export interface RemoveNodeAtPathVariables {
-  input: RemoveNodeAtPathInput;
-}
 export interface BootstrapUserVariables {
   input: BootstrapUserInput;
+}
+export interface RemoveNodeAtPathVariables {
+  input: RemoveNodeAtPathInput;
 }
 export interface SetDataAtPathVariables {
   input: SetDataAtPathInput;
@@ -535,35 +535,6 @@ export function createMutationOperations(client: OrmClient) {
           'ResetPasswordPayload'
         ),
       }),
-    removeNodeAtPath: <S extends RemoveNodeAtPathPayloadSelect>(
-      args: RemoveNodeAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, RemoveNodeAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        removeNodeAtPath: InferSelectResult<RemoveNodeAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'RemoveNodeAtPath',
-        fieldName: 'removeNodeAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'RemoveNodeAtPath',
-          'removeNodeAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'RemoveNodeAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'RemoveNodeAtPathPayload'
-        ),
-      }),
     bootstrapUser: <S extends BootstrapUserPayloadSelect>(
       args: BootstrapUserVariables,
       options: {
@@ -591,6 +562,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'BootstrapUserPayload'
+        ),
+      }),
+    removeNodeAtPath: <S extends RemoveNodeAtPathPayloadSelect>(
+      args: RemoveNodeAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RemoveNodeAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        removeNodeAtPath: InferSelectResult<RemoveNodeAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RemoveNodeAtPath',
+        fieldName: 'removeNodeAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'RemoveNodeAtPath',
+          'removeNodeAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RemoveNodeAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RemoveNodeAtPathPayload'
         ),
       }),
     setDataAtPath: <S extends SetDataAtPathPayloadSelect>(

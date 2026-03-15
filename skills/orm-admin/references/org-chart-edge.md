@@ -9,7 +9,7 @@ Organizational chart edges defining parent-child reporting relationships between
 ```typescript
 db.orgChartEdge.findMany({ select: { id: true } }).execute()
 db.orgChartEdge.findOne({ id: '<value>', select: { id: true } }).execute()
-db.orgChartEdge.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>' }, select: { id: true } }).execute()
+db.orgChartEdge.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.orgChartEdge.update({ where: { id: '<value>' }, data: { entityId: '<new>' }, select: { id: true } }).execute()
 db.orgChartEdge.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.orgChartEdge.findMany({
 
 ```typescript
 const item = await db.orgChartEdge.create({
-  data: { entityId: 'value', childId: 'value', parentId: 'value', positionTitle: 'value', positionLevel: 'value' },
+  data: { entityId: 'value', childId: 'value', parentId: 'value', positionTitle: 'value', positionLevel: 'value', positionTitleTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

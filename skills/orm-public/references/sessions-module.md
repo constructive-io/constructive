@@ -9,7 +9,7 @@ ORM operations for SessionsModule records
 ```typescript
 db.sessionsModule.findMany({ select: { id: true } }).execute()
 db.sessionsModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.sessionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', authSettingsTableId: '<value>', usersTableId: '<value>', sessionsDefaultExpiration: '<value>', sessionsTable: '<value>', sessionCredentialsTable: '<value>', authSettingsTable: '<value>' }, select: { id: true } }).execute()
+db.sessionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', authSettingsTableId: '<value>', usersTableId: '<value>', sessionsDefaultExpiration: '<value>', sessionsTable: '<value>', sessionCredentialsTable: '<value>', authSettingsTable: '<value>', sessionsTableTrgmSimilarity: '<value>', sessionCredentialsTableTrgmSimilarity: '<value>', authSettingsTableTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.sessionsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.sessionsModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.sessionsModule.findMany({
 
 ```typescript
 const item = await db.sessionsModule.create({
-  data: { databaseId: 'value', schemaId: 'value', sessionsTableId: 'value', sessionCredentialsTableId: 'value', authSettingsTableId: 'value', usersTableId: 'value', sessionsDefaultExpiration: 'value', sessionsTable: 'value', sessionCredentialsTable: 'value', authSettingsTable: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', sessionsTableId: 'value', sessionCredentialsTableId: 'value', authSettingsTableId: 'value', usersTableId: 'value', sessionsDefaultExpiration: 'value', sessionsTable: 'value', sessionCredentialsTable: 'value', authSettingsTable: 'value', sessionsTableTrgmSimilarity: 'value', sessionCredentialsTableTrgmSimilarity: 'value', authSettingsTableTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

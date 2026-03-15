@@ -19,6 +19,10 @@ csdk context use <name>
 # Authentication
 csdk auth set-token <token>
 
+# Config variables
+csdk config set <key> <value>
+csdk config get <key>
+
 # CRUD for any table (e.g. get-all-record)
 csdk get-all-record list
 csdk get-all-record get --id <value>
@@ -51,6 +55,7 @@ See the `references/` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
+- [config](references/config.md)
 - [get-all-record](references/get-all-record.md)
 - [object](references/object.md)
 - [ref](references/ref.md)

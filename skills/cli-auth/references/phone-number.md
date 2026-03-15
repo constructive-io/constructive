@@ -9,8 +9,8 @@ CRUD operations for PhoneNumber records via csdk CLI
 ```bash
 csdk phone-number list
 csdk phone-number get --id <value>
-csdk phone-number create --cc <value> --number <value> [--ownerId <value>] [--isVerified <value>] [--isPrimary <value>]
-csdk phone-number update --id <value> [--ownerId <value>] [--cc <value>] [--number <value>] [--isVerified <value>] [--isPrimary <value>]
+csdk phone-number create --cc <value> --number <value> --ccTrgmSimilarity <value> --numberTrgmSimilarity <value> --searchScore <value> [--ownerId <value>] [--isVerified <value>] [--isPrimary <value>]
+csdk phone-number update --id <value> [--ownerId <value>] [--cc <value>] [--number <value>] [--isVerified <value>] [--isPrimary <value>] [--ccTrgmSimilarity <value>] [--numberTrgmSimilarity <value>] [--searchScore <value>]
 csdk phone-number delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk phone-number list
 ### Create a phoneNumber
 
 ```bash
-csdk phone-number create --cc <value> --number <value> [--ownerId <value>] [--isVerified <value>] [--isPrimary <value>]
+csdk phone-number create --cc <value> --number <value> --ccTrgmSimilarity <value> --numberTrgmSimilarity <value> --searchScore <value> [--ownerId <value>] [--isVerified <value>] [--isPrimary <value>]
 ```
 
 ### Get a phoneNumber by id

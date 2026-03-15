@@ -33,6 +33,13 @@ const fieldSchema: FieldSchema = {
   scope: 'int',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  labelTrgmSimilarity: 'float',
+  descriptionTrgmSimilarity: 'float',
+  defaultValueTrgmSimilarity: 'float',
+  regexpTrgmSimilarity: 'float',
+  moduleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nfield <command>\n\nCommands:\n  list                  List all field records\n  get                   Get a field by ID\n  create                Create a new field\n  update                Update an existing field\n  delete                Delete a field\n\n  --help, -h            Show this help message\n';

@@ -22,6 +22,13 @@ const fieldSchema: FieldSchema = {
   action: 'string',
   actionId: 'uuid',
   actorId: 'uuid',
+  nameTrgmSimilarity: 'float',
+  deployTrgmSimilarity: 'float',
+  contentTrgmSimilarity: 'float',
+  revertTrgmSimilarity: 'float',
+  verifyTrgmSimilarity: 'float',
+  actionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nsql-migration <command>\n\nCommands:\n  list                  List all sqlMigration records\n  create                Create a new sqlMigration\n\n  --help, -h            Show this help message\n';

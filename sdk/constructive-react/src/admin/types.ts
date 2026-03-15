@@ -19,6 +19,8 @@ export interface AppPermission {
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
+  descriptionTrgmSimilarity: number | null;
+  searchScore: number | null;
 }
 export interface OrgPermission {
   id: string | null;
@@ -26,6 +28,8 @@ export interface OrgPermission {
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
+  descriptionTrgmSimilarity: number | null;
+  searchScore: number | null;
 }
 export interface AppLevelRequirement {
   id: string | null;
@@ -36,6 +40,8 @@ export interface AppLevelRequirement {
   priority: number | null;
   createdAt: string | null;
   updatedAt: string | null;
+  descriptionTrgmSimilarity: number | null;
+  searchScore: number | null;
 }
 export interface OrgMember {
   id: string | null;
@@ -96,12 +102,6 @@ export interface OrgLimitDefault {
   name: string | null;
   max: number | null;
 }
-export interface MembershipType {
-  id: number | null;
-  name: string | null;
-  description: string | null;
-  prefix: string | null;
-}
 export interface OrgChartEdgeGrant {
   id: string | null;
   entityId: string | null;
@@ -112,6 +112,17 @@ export interface OrgChartEdgeGrant {
   positionTitle: string | null;
   positionLevel: number | null;
   createdAt: string | null;
+  positionTitleTrgmSimilarity: number | null;
+  searchScore: number | null;
+}
+export interface MembershipType {
+  id: number | null;
+  name: string | null;
+  description: string | null;
+  prefix: string | null;
+  descriptionTrgmSimilarity: number | null;
+  prefixTrgmSimilarity: number | null;
+  searchScore: number | null;
 }
 export interface AppLimit {
   id: string | null;
@@ -198,6 +209,8 @@ export interface OrgChartEdge {
   parentId: string | null;
   positionTitle: string | null;
   positionLevel: number | null;
+  positionTitleTrgmSimilarity: number | null;
+  searchScore: number | null;
 }
 export interface OrgMembershipDefault {
   id: string | null;
@@ -209,29 +222,6 @@ export interface OrgMembershipDefault {
   entityId: string | null;
   deleteMemberCascadeGroups: boolean | null;
   createGroupsCascadeMembers: boolean | null;
-}
-export interface Invite {
-  id: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  senderId: string | null;
-  inviteToken: string | null;
-  inviteValid: boolean | null;
-  inviteLimit: number | null;
-  inviteCount: number | null;
-  multiple: boolean | null;
-  data: unknown | null;
-  expiresAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface AppLevel {
-  id: string | null;
-  name: string | null;
-  description: string | null;
-  image: ConstructiveInternalTypeImage | null;
-  ownerId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
 }
 export interface AppMembership {
   id: string | null;
@@ -269,6 +259,33 @@ export interface OrgMembership {
   entityId: string | null;
   profileId: string | null;
 }
+export interface Invite {
+  id: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  senderId: string | null;
+  inviteToken: string | null;
+  inviteValid: boolean | null;
+  inviteLimit: number | null;
+  inviteCount: number | null;
+  multiple: boolean | null;
+  data: unknown | null;
+  expiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  inviteTokenTrgmSimilarity: number | null;
+  searchScore: number | null;
+}
+export interface AppLevel {
+  id: string | null;
+  name: string | null;
+  description: string | null;
+  image: ConstructiveInternalTypeImage | null;
+  ownerId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  descriptionTrgmSimilarity: number | null;
+  searchScore: number | null;
+}
 export interface OrgInvite {
   id: string | null;
   email: ConstructiveInternalTypeEmail | null;
@@ -284,6 +301,8 @@ export interface OrgInvite {
   createdAt: string | null;
   updatedAt: string | null;
   entityId: string | null;
+  inviteTokenTrgmSimilarity: number | null;
+  searchScore: number | null;
 }
 export interface StringFilter {
   isNull?: boolean;
@@ -441,6 +460,13 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
 }
 export interface StringListFilter {
   isNull?: boolean;

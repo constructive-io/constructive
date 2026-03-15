@@ -37,6 +37,17 @@ const fieldSchema: FieldSchema = {
   outJunctionTableId: 'uuid',
   outSourceFieldId: 'uuid',
   outTargetFieldId: 'uuid',
+  relationTypeTrgmSimilarity: 'float',
+  fieldNameTrgmSimilarity: 'float',
+  deleteActionTrgmSimilarity: 'float',
+  junctionTableNameTrgmSimilarity: 'float',
+  sourceFieldNameTrgmSimilarity: 'float',
+  targetFieldNameTrgmSimilarity: 'float',
+  nodeTypeTrgmSimilarity: 'float',
+  policyTypeTrgmSimilarity: 'float',
+  policyRoleTrgmSimilarity: 'float',
+  policyNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nrelation-provision <command>\n\nCommands:\n  list                  List all relationProvision records\n  get                   Get a relationProvision by ID\n  create                Create a new relationProvision\n  update                Update an existing relationProvision\n  delete                Delete a relationProvision\n\n  --help, -h            Show this help message\n';

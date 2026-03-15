@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ApiModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ApiSelect>(
-    args: FindManyArgs<S, ApiFilter, ApiOrderBy> & {
+    args: FindManyArgs<S, ApiFilter, never, ApiOrderBy> & {
       select: S;
     } & StrictSelect<S, ApiSelect>
   ): QueryBuilder<{

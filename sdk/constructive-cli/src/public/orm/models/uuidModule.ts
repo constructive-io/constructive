@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class UuidModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends UuidModuleSelect>(
-    args: FindManyArgs<S, UuidModuleFilter, UuidModuleOrderBy> & {
+    args: FindManyArgs<S, UuidModuleFilter, never, UuidModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, UuidModuleSelect>
   ): QueryBuilder<{

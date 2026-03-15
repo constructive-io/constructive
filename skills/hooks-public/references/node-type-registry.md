@@ -7,8 +7,8 @@ Registry of high-level semantic AST node types using domain-prefixed naming. The
 ## Usage
 
 ```typescript
-useNodeTypeRegistriesQuery({ selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } } })
-useNodeTypeRegistryQuery({ name: '<value>', selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } } })
+useNodeTypeRegistriesQuery({ selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, slugTrgmSimilarity: true, categoryTrgmSimilarity: true, displayNameTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } } })
+useNodeTypeRegistryQuery({ name: '<value>', selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, slugTrgmSimilarity: true, categoryTrgmSimilarity: true, displayNameTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } } })
 useCreateNodeTypeRegistryMutation({ selection: { fields: { name: true } } })
 useUpdateNodeTypeRegistryMutation({ selection: { fields: { name: true } } })
 useDeleteNodeTypeRegistryMutation({})
@@ -20,7 +20,7 @@ useDeleteNodeTypeRegistryMutation({})
 
 ```typescript
 const { data, isLoading } = useNodeTypeRegistriesQuery({
-  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, slugTrgmSimilarity: true, categoryTrgmSimilarity: true, displayNameTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useNodeTypeRegistriesQuery({
 const { mutate } = useCreateNodeTypeRegistryMutation({
   selection: { fields: { name: true } },
 });
-mutate({ slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>' });
+mutate({ slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', slugTrgmSimilarity: '<value>', categoryTrgmSimilarity: '<value>', displayNameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

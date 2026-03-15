@@ -7,8 +7,8 @@ A store represents an isolated object repository within a database.
 ## Usage
 
 ```typescript
-useStoresQuery({ selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } } })
-useStoreQuery({ id: '<value>', selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } } })
+useStoresQuery({ selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } } })
+useStoreQuery({ id: '<value>', selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } } })
 useCreateStoreMutation({ selection: { fields: { id: true } } })
 useUpdateStoreMutation({ selection: { fields: { id: true } } })
 useDeleteStoreMutation({})
@@ -20,7 +20,7 @@ useDeleteStoreMutation({})
 
 ```typescript
 const { data, isLoading } = useStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useStoresQuery({
 const { mutate } = useCreateStoreMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<value>', databaseId: '<value>', hash: '<value>' });
+mutate({ name: '<value>', databaseId: '<value>', hash: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

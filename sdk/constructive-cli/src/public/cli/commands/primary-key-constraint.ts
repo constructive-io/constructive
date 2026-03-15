@@ -25,6 +25,10 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  typeTrgmSimilarity: 'float',
+  moduleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nprimary-key-constraint <command>\n\nCommands:\n  list                  List all primaryKeyConstraint records\n  get                   Get a primaryKeyConstraint by ID\n  create                Create a new primaryKeyConstraint\n  update                Update an existing primaryKeyConstraint\n  delete                Delete a primaryKeyConstraint\n\n  --help, -h            Show this help message\n';

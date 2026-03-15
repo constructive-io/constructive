@@ -9,7 +9,7 @@ A commit records changes to the repository.
 ```typescript
 db.commit.findMany({ select: { id: true } }).execute()
 db.commit.findOne({ id: '<value>', select: { id: true } }).execute()
-db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>' }, select: { id: true } }).execute()
+db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.commit.update({ where: { id: '<value>' }, data: { message: '<new>' }, select: { id: true } }).execute()
 db.commit.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.commit.findMany({
 
 ```typescript
 const item = await db.commit.create({
-  data: { message: 'value', databaseId: 'value', storeId: 'value', parentIds: 'value', authorId: 'value', committerId: 'value', treeId: 'value', date: 'value' },
+  data: { message: 'value', databaseId: 'value', storeId: 'value', parentIds: 'value', authorId: 'value', committerId: 'value', treeId: 'value', date: 'value', messageTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

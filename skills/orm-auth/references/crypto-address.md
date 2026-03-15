@@ -9,7 +9,7 @@ Cryptocurrency wallet addresses owned by users, with network-specific validation
 ```typescript
 db.cryptoAddress.findMany({ select: { id: true } }).execute()
 db.cryptoAddress.findOne({ id: '<value>', select: { id: true } }).execute()
-db.cryptoAddress.create({ data: { ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute()
+db.cryptoAddress.create({ data: { ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>', addressTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.cryptoAddress.update({ where: { id: '<value>' }, data: { ownerId: '<new>' }, select: { id: true } }).execute()
 db.cryptoAddress.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.cryptoAddress.findMany({
 
 ```typescript
 const item = await db.cryptoAddress.create({
-  data: { ownerId: 'value', address: 'value', isVerified: 'value', isPrimary: 'value' },
+  data: { ownerId: 'value', address: 'value', isVerified: 'value', isPrimary: 'value', addressTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

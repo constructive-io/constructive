@@ -29,6 +29,17 @@ const fieldSchema: FieldSchema = {
   getManagersFunction: 'string',
   isManagerOfFunction: 'string',
   createdAt: 'string',
+  chartEdgesTableNameTrgmSimilarity: 'float',
+  hierarchySprtTableNameTrgmSimilarity: 'float',
+  chartEdgeGrantsTableNameTrgmSimilarity: 'float',
+  prefixTrgmSimilarity: 'float',
+  privateSchemaNameTrgmSimilarity: 'float',
+  sprtTableNameTrgmSimilarity: 'float',
+  rebuildHierarchyFunctionTrgmSimilarity: 'float',
+  getSubordinatesFunctionTrgmSimilarity: 'float',
+  getManagersFunctionTrgmSimilarity: 'float',
+  isManagerOfFunctionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nhierarchy-module <command>\n\nCommands:\n  list                  List all hierarchyModule records\n  get                   Get a hierarchyModule by ID\n  create                Create a new hierarchyModule\n  update                Update an existing hierarchyModule\n  delete                Delete a hierarchyModule\n\n  --help, -h            Show this help message\n';
