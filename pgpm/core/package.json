@@ -48,6 +48,7 @@
     "makage": "^0.1.12"
   },
   "dependencies": {
+    "@constructive-db/migrate-client": "^0.0.1",
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
