@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.3](https://github.com/constructive-io/constructive/compare/graphile-cache@3.3.2...graphile-cache@3.3.3) (2026-03-15)
+
+### Bug Fixes
+
+- align all graphile ecosystem deps to latest compatible pinned RC versions ([d3f7761](https://github.com/constructive-io/constructive/commit/d3f7761182e0470cf992028155d1a5fa00cf9211))
+
 ## [3.3.2](https://github.com/constructive-io/constructive/compare/graphile-cache@3.3.1...graphile-cache@3.3.2) (2026-03-12)
 
 **Note:** Version bump only for package graphile-cache

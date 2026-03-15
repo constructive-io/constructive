@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/orm",
-  "version": "2.11.2",
+  "version": "2.11.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL ORM",
   "main": "index.js",

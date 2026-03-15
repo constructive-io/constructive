@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/constructive-io/constructive/compare/graphile-schema@1.6.0...graphile-schema@1.6.1) (2026-03-15)
+
+### Bug Fixes
+
+- align all graphile ecosystem deps to latest compatible pinned RC versions ([d3f7761](https://github.com/constructive-io/constructive/commit/d3f7761182e0470cf992028155d1a5fa00cf9211))
+
 # [1.6.0](https://github.com/constructive-io/constructive/compare/graphile-schema@1.5.4...graphile-schema@1.6.0) (2026-03-14)
 
 **Note:** Version bump only for package graphile-schema

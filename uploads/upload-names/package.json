@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/upload-names",
-  "version": "2.9.2",
+  "version": "2.9.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "upload names",
   "main": "index.js",

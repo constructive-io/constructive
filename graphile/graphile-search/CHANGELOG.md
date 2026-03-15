@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.1.0...graphile-search@1.1.1) (2026-03-15)
+
+### Bug Fixes
+
+- align all graphile ecosystem deps to latest compatible pinned RC versions ([d3f7761](https://github.com/constructive-io/constructive/commit/d3f7761182e0470cf992028155d1a5fa00cf9211))
+- update tsvector detection for graphile-build-pg rc.8 built-in codec support ([875366a](https://github.com/constructive-io/constructive/commit/875366a17cdd13b05535001613c93a0dd1a8c69c))
+
 # 1.1.0 (2026-03-14)
 
 ### Bug Fixes

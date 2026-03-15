@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.10.0...@constructive-io/graphql-server@4.11.0) (2026-03-15)
+
+### Bug Fixes
+
+- align all graphile ecosystem deps to latest compatible pinned RC versions ([d3f7761](https://github.com/constructive-io/constructive/commit/d3f7761182e0470cf992028155d1a5fa00cf9211))
+
+### Features
+
+- **graphql-server:** add local-only observability tooling ([ca89146](https://github.com/constructive-io/constructive/commit/ca891467df721224ae709f7b67392fb24e86004e))
+
 # [4.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.9.0...@constructive-io/graphql-server@4.10.0) (2026-03-15)
 
 ### Features
