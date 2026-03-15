@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.9.0...@constructive-io/graphql-server@4.10.0) (2026-03-15)
+
+### Features
+
+- pass schema naming strategy env vars to pgSettings ([0ef5f37](https://github.com/constructive-io/constructive/commit/0ef5f37ed7cc671081d4b20c549e5b9fc9ccd5dc)), closes [#576](https://github.com/constructive-io/constructive/issues/576)
+
 # [4.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.8.4...@constructive-io/graphql-server@4.9.0) (2026-03-14)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
