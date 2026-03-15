@@ -29,20 +29,20 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@graphile-contrib/pg-many-to-many": "2.0.0-rc.1",
+    "@graphile-contrib/pg-many-to-many": "2.0.0-rc.2",
     "@pgsql/quotes": "^17.1.0",
-    "graphile-utils": "5.0.0-rc.5",
+    "graphile-utils": "5.0.0-rc.8",
     "inflekt": "^0.3.3",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-query-context": "workspace:^"
   },
   "peerDependencies": {
-    "grafast": "1.0.0-rc.7",
-    "graphile-build": "5.0.0-rc.4",
-    "graphile-build-pg": "5.0.0-rc.5",
-    "graphile-config": "1.0.0-rc.5",
-    "graphql": "^16.9.0",
-    "pg-sql2": "5.0.0-rc.4"
+    "grafast": "1.0.0-rc.9",
+    "graphile-build": "5.0.0-rc.6",
+    "graphile-build-pg": "5.0.0-rc.8",
+    "graphile-config": "1.0.0-rc.6",
+    "graphql": "16.13.0",
+    "pg-sql2": "5.0.0-rc.5"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",

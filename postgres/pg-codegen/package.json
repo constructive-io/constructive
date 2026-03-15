@@ -44,7 +44,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-test": "workspace:^"

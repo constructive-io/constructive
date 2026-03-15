@@ -9,9 +9,13 @@ import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../type
 import type { SQL } from 'pg-sql2';
 
 function isTsvectorCodec(codec: any): boolean {
+  // In graphile-build-pg >= 5.0.0-rc.8, the built-in TYPES.tsvector codec
+  // has name === 'tsvector' but does NOT have extensions.pg. We need to
+  // match both the built-in codec and our custom codec (for older versions).
   return (
-    codec?.extensions?.pg?.schemaName === 'pg_catalog' &&
-    codec?.extensions?.pg?.name === 'tsvector'
+    codec?.name === 'tsvector' ||
+    (codec?.extensions?.pg?.schemaName === 'pg_catalog' &&
+      codec?.extensions?.pg?.name === 'tsvector')
   );
 }
 

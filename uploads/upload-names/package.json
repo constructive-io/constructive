@@ -30,7 +30,7 @@
   },
   "keywords": [],
   "devDependencies": {
-    "glob": "^13.0.0",
+    "glob": "^13.0.6",
     "makage": "^0.1.12"
   }
 }

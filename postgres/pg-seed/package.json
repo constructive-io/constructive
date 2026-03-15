@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "csv-parse": "^6.1.0",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-copy-streams": "^7.0.0"
   }
 }

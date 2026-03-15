@@ -42,7 +42,7 @@
     "express": "^5.2.1",
     "graphile-schema": "workspace:^",
     "graphql": "16.13.0",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-cache": "workspace:^",
     "pgsql-test": "workspace:^",
     "supertest": "^7.0.0"

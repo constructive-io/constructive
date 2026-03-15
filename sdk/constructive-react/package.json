@@ -44,7 +44,7 @@
     "@constructive-io/graphql-types": "workspace:^",
     "@tanstack/react-query": "^5.90.21",
     "gql-ast": "workspace:^",
-    "graphql": "^16.13.0"
+    "graphql": "16.13.0"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"
