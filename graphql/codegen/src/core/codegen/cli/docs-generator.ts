@@ -7,6 +7,9 @@ import {
   cleanTypeName,
   getEditableFields,
   getSearchFields,
+  categorizeSpecialFields,
+  buildSpecialFieldsMarkdown,
+  buildSpecialFieldsPlain,
   getReadmeHeader,
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
@@ -147,10 +150,8 @@ export function generateReadme(
       if (requiredCreate.length === 0 && optionalCreate.length === 0) {
         lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
       }
-      const searchFields = getSearchFields(table, registry);
-      if (searchFields.length > 0) {
-        lines.push(`**Search API fields (computed, read-only):** ${searchFields.map((f) => `\`${f.name}\``).join(', ')}`);
-      }
+      const specialGroups = categorizeSpecialFields(table, registry);
+      lines.push(...buildSpecialFieldsMarkdown(specialGroups));
       lines.push('');
     }
   }
@@ -347,6 +348,14 @@ export function generateAgentsDocs(
       lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${optLabel}`);
     }
     lines.push('');
+    const agentSpecialGroups = categorizeSpecialFields(table, registry);
+    const agentSpecialLines = buildSpecialFieldsPlain(agentSpecialGroups);
+    if (agentSpecialLines.length > 0) {
+      for (const sl of agentSpecialLines) {
+        lines.push(sl);
+      }
+      lines.push('');
+    }
     lines.push('OUTPUT: JSON');
     lines.push(`  list:   [{ ${scalarFields.map((f) => f.name).join(', ')} }]`);
     lines.push(`  get:    { ${scalarFields.map((f) => f.name).join(', ')} }`);
@@ -822,11 +831,17 @@ export function generateSkills(
 
     referenceNames.push(kebab);
 
+    const skillSpecialGroups = categorizeSpecialFields(table, registry);
+    const skillSpecialDesc = skillSpecialGroups.length > 0
+      ? `CRUD operations for ${table.name} records via ${toolName} CLI\n\n` +
+        skillSpecialGroups.map((g) => `**${g.label}:** ${g.fields.map((f) => `\`${f.name}\``).join(', ')}\n${g.description}`).join('\n\n')
+      : `CRUD operations for ${table.name} records via ${toolName} CLI`;
+
     files.push({
       fileName: `${skillName}/references/${kebab}.md`,
       content: buildSkillReference({
         title: singularName,
-        description: `CRUD operations for ${table.name} records via ${toolName} CLI`,
+        description: skillSpecialDesc,
         usage: [
           `${toolName} ${kebab} list`,
           `${toolName} ${kebab} get --${pk.name} <value>`,
@@ -1156,10 +1171,8 @@ export function generateMultiTargetReadme(
       if (requiredCreate.length === 0 && optionalCreate.length === 0) {
         lines.push(`**Create fields:** ${editableFields.map((f) => `\`${f.name}\``).join(', ')}`);
       }
-      const searchFields = getSearchFields(table, registry);
-      if (searchFields.length > 0) {
-        lines.push(`**Search API fields (computed, read-only):** ${searchFields.map((f) => `\`${f.name}\``).join(', ')}`);
-      }
+      const mtSpecialGroups = categorizeSpecialFields(table, registry);
+      lines.push(...buildSpecialFieldsMarkdown(mtSpecialGroups));
       lines.push('');
     }
 
@@ -1407,6 +1420,14 @@ export function generateMultiTargetAgentsDocs(
         lines.push(`  ${f.name}: ${cleanTypeName(f.type.gqlType)}${optLabel}`);
       }
       lines.push('');
+      const mtAgentSpecialGroups = categorizeSpecialFields(table, registry);
+      const mtAgentSpecialLines = buildSpecialFieldsPlain(mtAgentSpecialGroups);
+      if (mtAgentSpecialLines.length > 0) {
+        for (const sl of mtAgentSpecialLines) {
+          lines.push(sl);
+        }
+        lines.push('');
+      }
       lines.push('OUTPUT: JSON');
       lines.push(`  list:   [{ ${scalarFields.map((f) => f.name).join(', ')} }]`);
       lines.push(`  get:    { ${scalarFields.map((f) => f.name).join(', ')} }`);
@@ -1960,11 +1981,17 @@ export function generateMultiTargetSkills(
 
       tgtReferenceNames.push(kebab);
 
+      const mtSkillSpecialGroups = categorizeSpecialFields(table, registry);
+      const mtSkillSpecialDesc = mtSkillSpecialGroups.length > 0
+        ? `CRUD operations for ${table.name} records via ${toolName} CLI (${tgt.name} target)\n\n` +
+          mtSkillSpecialGroups.map((g) => `**${g.label}:** ${g.fields.map((f) => `\`${f.name}\``).join(', ')}\n${g.description}`).join('\n\n')
+        : `CRUD operations for ${table.name} records via ${toolName} CLI (${tgt.name} target)`;
+
       files.push({
         fileName: `${tgtSkillName}/references/${kebab}.md`,
         content: buildSkillReference({
           title: singularName,
-          description: `CRUD operations for ${table.name} records via ${toolName} CLI (${tgt.name} target)`,
+          description: mtSkillSpecialDesc,
           usage: [
             `${toolName} ${cmd} list`,
             `${toolName} ${cmd} get --${pk.name} <value>`,

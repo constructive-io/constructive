@@ -137,6 +137,150 @@ export function getSearchFields(table: CleanTable, typeRegistry?: TypeRegistry):
   );
 }
 
+// ---------------------------------------------------------------------------
+// Special field categorization — PostGIS, pgvector, Unified Search
+// ---------------------------------------------------------------------------
+
+export interface SpecialFieldGroup {
+  /** Category key */
+  category: 'geospatial' | 'embedding' | 'search';
+  /** Human-readable label */
+  label: string;
+  /** One-line description of this category */
+  description: string;
+  /** Fields belonging to this category */
+  fields: CleanField[];
+}
+
+function isPostGISField(f: CleanField): boolean {
+  const pgType = f.type.pgType?.toLowerCase();
+  if (pgType === 'geometry' || pgType === 'geography') return true;
+  const gql = f.type.gqlType;
+  if (/^(GeoJSON|GeographyPoint|GeographyLineString|GeographyPolygon|GeometryPoint|GeometryLineString|GeometryPolygon|GeographyMulti|GeometryMulti|GeometryCollection|GeographyCollection)/i.test(gql)) return true;
+  return false;
+}
+
+function isEmbeddingField(f: CleanField): boolean {
+  const pgType = f.type.pgType?.toLowerCase();
+  if (pgType === 'vector') return true;
+  if (/embedding$/i.test(f.name) && f.type.isArray && f.type.gqlType === 'Float') return true;
+  return false;
+}
+
+function isTsvectorField(f: CleanField): boolean {
+  const pgType = f.type.pgType?.toLowerCase();
+  return pgType === 'tsvector';
+}
+
+function isSearchComputedField(f: CleanField): boolean {
+  if (f.name === 'searchScore') return true;
+  if (/TrgmSimilarity$/.test(f.name)) return true;
+  if (/TsvectorRank$/.test(f.name)) return true;
+  if (/Bm25Score$/.test(f.name)) return true;
+  return false;
+}
+
+/**
+ * Categorize "special" fields on a table into PostGIS, pgvector, and
+ * Unified Search groups.  Returns only non-empty groups.
+ *
+ * The function inspects ALL scalar fields (not just computed ones) so that
+ * real columns (geometry, vector, tsvector) are also surfaced with
+ * descriptive context in generated docs.
+ */
+export function categorizeSpecialFields(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): SpecialFieldGroup[] {
+  const allFields = getScalarFields(table);
+  const computedFields = getSearchFields(table, typeRegistry);
+  const computedSet = new Set(computedFields.map((f) => f.name));
+
+  const geospatial: CleanField[] = [];
+  const embedding: CleanField[] = [];
+  const search: CleanField[] = [];
+
+  for (const f of allFields) {
+    if (isPostGISField(f)) {
+      geospatial.push(f);
+    } else if (isEmbeddingField(f)) {
+      embedding.push(f);
+    } else if (isTsvectorField(f)) {
+      search.push(f);
+    } else if (computedSet.has(f.name) && isSearchComputedField(f)) {
+      search.push(f);
+    }
+  }
+
+  const groups: SpecialFieldGroup[] = [];
+
+  if (geospatial.length > 0) {
+    groups.push({
+      category: 'geospatial',
+      label: 'PostGIS geospatial fields',
+      description:
+        'Geographic/geometric columns managed by PostGIS. Supports spatial queries (distance, containment, intersection) via the Unified Search API PostGIS adapter.',
+      fields: geospatial,
+    });
+  }
+
+  if (embedding.length > 0) {
+    groups.push({
+      category: 'embedding',
+      label: 'pgvector embedding fields',
+      description:
+        'High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.',
+      fields: embedding,
+    });
+  }
+
+  if (search.length > 0) {
+    groups.push({
+      category: 'search',
+      label: 'Unified Search API fields',
+      description:
+        'Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.',
+      fields: search,
+    });
+  }
+
+  return groups;
+}
+
+/**
+ * Build markdown lines describing special fields for README-style docs.
+ * Returns empty array when there are no special fields.
+ */
+export function buildSpecialFieldsMarkdown(groups: SpecialFieldGroup[]): string[] {
+  if (groups.length === 0) return [];
+  const lines: string[] = [];
+  for (const g of groups) {
+    const fieldList = g.fields.map((f) => `\`${f.name}\``).join(', ');
+    lines.push(`> **${g.label}:** ${fieldList}`);
+    lines.push(`> ${g.description}`);
+    lines.push('');
+  }
+  return lines;
+}
+
+/**
+ * Build plain-text lines describing special fields for AGENTS-style docs.
+ * Returns empty array when there are no special fields.
+ */
+export function buildSpecialFieldsPlain(groups: SpecialFieldGroup[]): string[] {
+  if (groups.length === 0) return [];
+  const lines: string[] = [];
+  lines.push('SPECIAL FIELDS:');
+  for (const g of groups) {
+    lines.push(`  [${g.label}]`);
+    lines.push(`  ${g.description}`);
+    for (const f of g.fields) {
+      lines.push(`    ${f.name}: ${cleanTypeName(f.type.gqlType)}`);
+    }
+  }
+  return lines;
+}
+
 /**
  * Represents a flattened argument for docs/skills generation.
  * INPUT_OBJECT args are expanded to dot-notation fields.

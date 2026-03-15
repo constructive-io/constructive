@@ -6,6 +6,9 @@ import {
   buildSkillReference,
   formatArgType,
   getEditableFields,
+  categorizeSpecialFields,
+  buildSpecialFieldsMarkdown,
+  buildSpecialFieldsPlain,
   getReadmeHeader,
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
@@ -104,6 +107,8 @@ export function generateOrmReadme(
       );
       lines.push('```');
       lines.push('');
+      const ormSpecialGroups = categorizeSpecialFields(table);
+      lines.push(...buildSpecialFieldsMarkdown(ormSpecialGroups));
     }
   }
 
@@ -228,6 +233,14 @@ export function generateOrmAgentsDocs(
       lines.push(`  ${f.name}: ${fieldTypeToTs(f.type)}`);
     }
     lines.push('');
+    const ormAgentSpecialGroups = categorizeSpecialFields(table);
+    const ormAgentSpecialLines = buildSpecialFieldsPlain(ormAgentSpecialGroups);
+    if (ormAgentSpecialLines.length > 0) {
+      for (const sl of ormAgentSpecialLines) {
+        lines.push(sl);
+      }
+      lines.push('');
+    }
     lines.push('OUTPUT: Promise<JSON>');
     lines.push(
       `  findMany: [{ ${scalarFields.map((f) => f.name).join(', ')} }]`,
@@ -468,11 +481,18 @@ export function generateOrmSkills(
     const refName = toKebabCase(singularName);
     referenceNames.push(refName);
 
+    const ormSkillSpecialGroups = categorizeSpecialFields(table);
+    const ormSkillBaseDesc = table.description || `ORM operations for ${table.name} records`;
+    const ormSkillSpecialDesc = ormSkillSpecialGroups.length > 0
+      ? ormSkillBaseDesc + '\n\n' +
+        ormSkillSpecialGroups.map((g) => `**${g.label}:** ${g.fields.map((f) => `\`${f.name}\``).join(', ')}\n${g.description}`).join('\n\n')
+      : ormSkillBaseDesc;
+
     files.push({
       fileName: `${skillName}/references/${refName}.md`,
       content: buildSkillReference({
         title: singularName,
-        description: table.description || `ORM operations for ${table.name} records`,
+        description: ormSkillSpecialDesc,
         language: 'typescript',
         usage: [
           `db.${modelName}.findMany({ select: { id: true } }).execute()`,
