@@ -2,15 +2,20 @@
  * TsvectorCodecPlugin
  *
  * Teaches PostGraphile v5 how to handle PostgreSQL's tsvector and tsquery types.
- * Without this, tsvector columns are invisible to the schema builder and the
- * search plugin cannot generate condition fields.
  *
- * This plugin:
+ * In graphile-build-pg >= 5.0.0-rc.8, tsvector/tsquery codecs are handled
+ * natively and tsvector columns are HIDDEN by default (PgAttributesPlugin
+ * HIDE_BY_DEFAULT). This plugin:
+ *
  * 1. Creates codecs for tsvector/tsquery via gather.hooks.pgCodecs_findPgCodec
+ *    (kept for backward compatibility with older versions; rc.8+ handles this
+ *    natively so the hook returns early when event.pgCodec is already set)
  * 2. Registers a custom "FullText" scalar type for tsvector columns
  * 3. Maps tsvector codec to the FullText scalar (isolating filter operators)
  * 4. Maps tsquery codec to GraphQL String
- * 5. Optionally hides tsvector columns from output types
+ * 5. Re-enables tsvector columns for select/filterBy so that search plugins
+ *    can detect and use them (overrides rc.8's HIDE_BY_DEFAULT)
+ * 6. Optionally hides tsvector columns from output types
  */
 
 import type { GraphileConfig } from 'graphile-config';
@@ -178,25 +183,42 @@ export function createTsvectorCodecPlugin(
         },
       },
 
-      ...(hideTsvectorColumns
-        ? {
-            entityBehavior: {
-              pgCodecAttribute: {
-                inferred: {
-                  after: ['postInferred'],
-                  provides: ['hideTsvectorColumns'],
-                  callback(behavior: any, [codec, attributeName]: [any, string]) {
-                    const attr = codec.attributes?.[attributeName];
-                    if (attr?.codec?.name === 'tsvector') {
-                      return [behavior, '-select'] as any;
-                    }
-                    return behavior;
-                  },
-                },
-              },
+      // In graphile-build-pg >= 5.0.0-rc.8, PgAttributesPlugin HIDE_BY_DEFAULT
+      // hides tsvector columns entirely (-attribute:select, -attribute:base,
+      // -condition:attribute:filterBy, etc.). We need entity behavior to
+      // re-enable them so search plugins can detect and use them.
+      entityBehavior: {
+        pgCodecAttribute: {
+          inferred: {
+            after: ['default'],
+            provides: ['tsvectorCodecPlugin'],
+            callback(behavior: any, [codec, attributeName]: [any, string]) {
+              const attr = codec.attributes?.[attributeName];
+              const attrCodec = attr?.codec;
+              const isTsvector =
+                attrCodec?.name === 'tsvector' ||
+                (attrCodec?.extensions?.pg?.schemaName === 'pg_catalog' &&
+                  attrCodec?.extensions?.pg?.name === 'tsvector');
+              if (!isTsvector) {
+                return behavior;
+              }
+              if (hideTsvectorColumns) {
+                // User explicitly wants tsvector columns hidden from output
+                return [behavior, '-attribute:select'] as any;
+              }
+              // Re-enable tsvector columns that rc.8 hides by default.
+              // The search plugin needs attribute:select to detect columns,
+              // and condition:attribute:filterBy for standard filter support.
+              return [
+                behavior,
+                'attribute:select',
+                'attribute:base',
+                'condition:attribute:filterBy',
+              ] as any;
             },
-          }
-        : {}),
+          },
+        },
+      },
     },
   };
 }
