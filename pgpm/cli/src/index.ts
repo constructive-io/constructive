@@ -53,7 +53,15 @@ if (require.main === module) {
     process.exit(0);
   }
 
-  const app = new CLI(commands, options);
+  // Detect non-TTY environment:
+  // 1. Explicit --no-tty flag
+  // 2. CI environment variable
+  // 3. stdin is not a TTY (running from script, pipe, etc.)
+  const noTty = process.argv.includes('--no-tty') || 
+                process.env.CI === 'true' || 
+                !process.stdin.isTTY;
+
+  const app = new CLI(commands, { ...options, noTty });
 
   app.run().then(() => {
   }).catch(error => {
