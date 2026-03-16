@@ -335,7 +335,11 @@ const exportMigrationsToDisk = async ({
 
     const metaReplacer = makeReplacer({
       schemas: metaSchemasForReplacement,
-      name: metaExtensionName
+      name: metaExtensionName,
+      // Use extensionName for schema prefix — the services metadata references
+      // schemas owned by the application package (e.g. agent_db_auth_public),
+      // not the services package (agent_db_services_auth_public)
+      schemaPrefix: name
     });
 
     // Create separate files for each table type
@@ -527,6 +531,14 @@ interface Schema {
 interface MakeReplacerOptions {
   schemas: Schema[];
   name: string;
+  /**
+   * Optional prefix for schema name replacement.
+   * When provided, schema names are replaced using this prefix instead of `name`.
+   * This is needed for the services/meta package where `name` is the services
+   * extension name (e.g. "agent-db-services") but schemas should use the
+   * application extension prefix (e.g. "agent-db" → "agent_db_auth_public").
+   */
+  schemaPrefix?: string;
 }
 
 interface ReplacerResult {
@@ -606,11 +618,12 @@ const preparePackage = async ({
 /**
  * Generates a function for replacing schema names and extension names in strings.
  */
-const makeReplacer = ({ schemas, name }: MakeReplacerOptions): ReplacerResult => {
+const makeReplacer = ({ schemas, name, schemaPrefix }: MakeReplacerOptions): ReplacerResult => {
   const replacements: [string, string] = ['constructive-extension-name', name];
+  const prefix = schemaPrefix || name;
   const schemaReplacers: [string, string][] = schemas.map((schema) => [
     schema.schema_name,
-    toSnakeCase(`${name}_${schema.name}`)
+    toSnakeCase(`${prefix}_${schema.name}`)
   ]);
 
   const replace: [RegExp, string][] = [...schemaReplacers, replacements].map(
