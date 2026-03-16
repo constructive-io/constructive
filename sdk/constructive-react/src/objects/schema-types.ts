@@ -26,6 +26,7 @@ import type {
   StringListFilter,
   UUIDFilter,
   UUIDListFilter,
+  VectorFilter,
 } from './types';
 /** Methods to use when ordering `Ref`. */
 export type RefOrderBy =
@@ -37,7 +38,11 @@ export type RefOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
+  | 'STORE_ID_DESC'
+  | 'NAME_TRGM_SIMILARITY_ASC'
+  | 'NAME_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `Store`. */
 export type StoreOrderBy =
   | 'NATURAL'
@@ -46,7 +51,11 @@ export type StoreOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
+  | 'DATABASE_ID_DESC'
+  | 'NAME_TRGM_SIMILARITY_ASC'
+  | 'NAME_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `Commit`. */
 export type CommitOrderBy =
   | 'NATURAL'
@@ -55,7 +64,11 @@ export type CommitOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
+  | 'DATABASE_ID_DESC'
+  | 'MESSAGE_TRGM_SIMILARITY_ASC'
+  | 'MESSAGE_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `Object`. */
 export type ObjectOrderBy =
   | 'NATURAL'
@@ -67,19 +80,6 @@ export type ObjectOrderBy =
   | 'DATABASE_ID_DESC'
   | 'FRZN_ASC'
   | 'FRZN_DESC';
-/** A condition to be used against `Ref` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface RefCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `databaseId` field. */
-  databaseId?: string;
-  /** Checks for equality with the object’s `storeId` field. */
-  storeId?: string;
-  /** Checks for equality with the object’s `commitId` field. */
-  commitId?: string;
-}
 /** A filter to be used against `Ref` object types. All fields are combined with a logical ‘and.’ */
 export interface RefFilter {
   /** Filter by the object’s `id` field. */
@@ -98,19 +98,22 @@ export interface RefFilter {
   or?: RefFilter[];
   /** Negates the expression. */
   not?: RefFilter;
+  /** TRGM search on the `name` column. */
+  trgmName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
-/** A condition to be used against `Store` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface StoreCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `databaseId` field. */
-  databaseId?: string;
-  /** Checks for equality with the object’s `hash` field. */
-  hash?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
 }
 /** A filter to be used against `Store` object types. All fields are combined with a logical ‘and.’ */
 export interface StoreFilter {
@@ -130,27 +133,15 @@ export interface StoreFilter {
   or?: StoreFilter[];
   /** Negates the expression. */
   not?: StoreFilter;
-}
-/** A condition to be used against `Commit` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface CommitCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `message` field. */
-  message?: string;
-  /** Checks for equality with the object’s `databaseId` field. */
-  databaseId?: string;
-  /** Checks for equality with the object’s `storeId` field. */
-  storeId?: string;
-  /** Checks for equality with the object’s `parentIds` field. */
-  parentIds?: string[];
-  /** Checks for equality with the object’s `authorId` field. */
-  authorId?: string;
-  /** Checks for equality with the object’s `committerId` field. */
-  committerId?: string;
-  /** Checks for equality with the object’s `treeId` field. */
-  treeId?: string;
-  /** Checks for equality with the object’s `date` field. */
-  date?: string;
+  /** TRGM search on the `name` column. */
+  trgmName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’ */
 export interface CommitFilter {
@@ -178,23 +169,15 @@ export interface CommitFilter {
   or?: CommitFilter[];
   /** Negates the expression. */
   not?: CommitFilter;
-}
-/** A condition to be used against `Object` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface ObjectCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `databaseId` field. */
-  databaseId?: string;
-  /** Checks for equality with the object’s `kids` field. */
-  kids?: string[];
-  /** Checks for equality with the object’s `ktree` field. */
-  ktree?: string[];
-  /** Checks for equality with the object’s `data` field. */
-  data?: unknown;
-  /** Checks for equality with the object’s `frzn` field. */
-  frzn?: boolean;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
+  /** TRGM search on the `message` column. */
+  trgmMessage?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’ */
 export interface ObjectFilter {

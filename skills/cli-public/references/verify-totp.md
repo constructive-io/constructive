@@ -7,7 +7,7 @@ Execute the verifyTotp mutation
 ## Usage
 
 ```bash
-csdk verify-totp --input <value>
+csdk verify-totp --input.clientMutationId <value> --input.totpValue <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk verify-totp --input <value>
 ### Run verifyTotp
 
 ```bash
-csdk verify-totp --input <value>
+csdk verify-totp --input.clientMutationId <value> --input.totpValue <value>
 ```

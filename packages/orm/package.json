@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/orm",
-  "version": "2.9.1",
+  "version": "2.11.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL ORM",
   "main": "index.js",
@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "pg": "^8.19.0"
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "@types/pg": "^8.18.0",

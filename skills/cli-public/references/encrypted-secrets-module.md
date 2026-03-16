@@ -9,8 +9,8 @@ CRUD operations for EncryptedSecretsModule records via csdk CLI
 ```bash
 csdk encrypted-secrets-module list
 csdk encrypted-secrets-module get --id <value>
-csdk encrypted-secrets-module create --databaseId <value> --schemaId <value> --tableId <value> --tableName <value>
-csdk encrypted-secrets-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>]
+csdk encrypted-secrets-module create --databaseId <value> --tableNameTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>]
+csdk encrypted-secrets-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--tableId <value>] [--tableName <value>] [--tableNameTrgmSimilarity <value>] [--searchScore <value>]
 csdk encrypted-secrets-module delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk encrypted-secrets-module list
 ### Create a encryptedSecretsModule
 
 ```bash
-csdk encrypted-secrets-module create --databaseId "value" --schemaId "value" --tableId "value" --tableName "value"
+csdk encrypted-secrets-module create --databaseId <value> --tableNameTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--tableId <value>] [--tableName <value>]
 ```
 
 ### Get a encryptedSecretsModule by id

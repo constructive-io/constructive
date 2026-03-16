@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class LevelsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends LevelsModuleSelect>(
-    args: FindManyArgs<S, LevelsModuleFilter, LevelsModuleOrderBy> & {
+    args: FindManyArgs<S, LevelsModuleFilter, never, LevelsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, LevelsModuleSelect>
   ): QueryBuilder<{

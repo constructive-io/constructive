@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.3](https://github.com/constructive-io/constructive/compare/stream-to-etag@2.10.2...stream-to-etag@2.10.3) (2026-03-15)
+
+**Note:** Version bump only for package stream-to-etag
+
+## [2.10.2](https://github.com/constructive-io/constructive/compare/stream-to-etag@2.10.1...stream-to-etag@2.10.2) (2026-03-12)
+
+**Note:** Version bump only for package stream-to-etag
+
+## [2.10.1](https://github.com/constructive-io/constructive/compare/stream-to-etag@2.9.0...stream-to-etag@2.10.1) (2026-03-12)
+
+**Note:** Version bump only for package stream-to-etag
+
+# [2.10.0](https://github.com/constructive-io/constructive/compare/stream-to-etag@2.9.0...stream-to-etag@2.10.0) (2026-03-12)
+
+**Note:** Version bump only for package stream-to-etag
+
+# [2.9.0](https://github.com/constructive-io/constructive/compare/stream-to-etag@2.8.0...stream-to-etag@2.9.0) (2026-03-12)
+
+**Note:** Version bump only for package stream-to-etag
+
 # [2.8.0](https://github.com/constructive-io/constructive/compare/stream-to-etag@2.7.0...stream-to-etag@2.8.0) (2026-02-24)
 
 **Note:** Version bump only for package stream-to-etag

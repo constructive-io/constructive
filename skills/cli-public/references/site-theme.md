@@ -25,7 +25,7 @@ csdk site-theme list
 ### Create a siteTheme
 
 ```bash
-csdk site-theme create --databaseId "value" --siteId "value" --theme "value"
+csdk site-theme create --databaseId <value> --siteId <value> --theme <value>
 ```
 
 ### Get a siteTheme by id

@@ -322,6 +322,11 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
     operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
+  // VectorFilter: equality/distinct operators for vector columns on Filter types.
+  // Similarity search uses condition types (embeddingNearby), not filters, but
+  // connection-filter may still generate a filter for vector columns. This ensures
+  // the generated type uses number[] rather than being silently omitted.
+  { name: 'VectorFilter', tsType: 'number[]', operators: ['equality', 'distinct'] },
   // List filters (for array fields like string[], int[], uuid[])
   {
     name: 'StringListFilter',
@@ -1116,10 +1121,18 @@ function generateTableFilterTypes(tables: CleanTable[]): t.Statement[] {
 
 /**
  * Build properties for a table condition interface
- * Condition types are simpler than Filter types - they use direct value equality
+ * Condition types are simpler than Filter types - they use direct value equality.
+ *
+ * Also merges any extra fields from the GraphQL schema's condition type
+ * (e.g., plugin-injected fields like vectorEmbedding from VectorSearchPlugin)
+ * that are not derived from the table's own columns.
  */
-function buildTableConditionProperties(table: CleanTable): InterfaceProperty[] {
+function buildTableConditionProperties(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): InterfaceProperty[] {
   const properties: InterfaceProperty[] = [];
+  const generatedFieldNames = new Set<string>();
 
   for (const field of table.fields) {
     const fieldType =
@@ -1133,6 +1146,30 @@ function buildTableConditionProperties(table: CleanTable): InterfaceProperty[] {
       type: `${tsType} | null`,
       optional: true,
     });
+    generatedFieldNames.add(field.name);
+  }
+
+  // Merge any additional fields from the schema's condition type
+  // (e.g., plugin-added fields like vectorEmbedding from VectorSearchPlugin)
+  if (typeRegistry) {
+    const conditionTypeName = getConditionTypeName(table);
+    const conditionType = typeRegistry.get(conditionTypeName);
+    if (
+      conditionType?.kind === 'INPUT_OBJECT' &&
+      conditionType.inputFields
+    ) {
+      for (const field of conditionType.inputFields) {
+        if (generatedFieldNames.has(field.name)) continue;
+
+        const tsType = typeRefToTs(field.type);
+        properties.push({
+          name: field.name,
+          type: tsType,
+          optional: true,
+          description: stripSmartComments(field.description, true),
+        });
+      }
+    }
   }
 
   return properties;
@@ -1141,7 +1178,10 @@ function buildTableConditionProperties(table: CleanTable): InterfaceProperty[] {
 /**
  * Generate table condition type statements
  */
-function generateTableConditionTypes(tables: CleanTable[]): t.Statement[] {
+function generateTableConditionTypes(
+  tables: CleanTable[],
+  typeRegistry?: TypeRegistry,
+): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
@@ -1149,7 +1189,7 @@ function generateTableConditionTypes(tables: CleanTable[]): t.Statement[] {
     statements.push(
       createExportedInterface(
         conditionName,
-        buildTableConditionProperties(table),
+        buildTableConditionProperties(table, typeRegistry),
       ),
     );
   }
@@ -1165,9 +1205,16 @@ function generateTableConditionTypes(tables: CleanTable[]): t.Statement[] {
 // ============================================================================
 
 /**
- * Build OrderBy union type values
+ * Build OrderBy union type values.
+ *
+ * Also merges any extra values from the GraphQL schema's orderBy enum
+ * (e.g., plugin-injected values like EMBEDDING_DISTANCE_ASC/DESC
+ * from VectorSearchPlugin).
  */
-function buildOrderByValues(table: CleanTable): string[] {
+function buildOrderByValues(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): string[] {
   const values: string[] = ['PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'NATURAL'];
 
   for (const field of table.fields) {
@@ -1177,18 +1224,36 @@ function buildOrderByValues(table: CleanTable): string[] {
     values.push(`${upperSnake}_DESC`);
   }
 
+  // Merge any additional values from the schema's orderBy enum type
+  // (e.g., plugin-added values like EMBEDDING_DISTANCE_ASC/DESC)
+  if (typeRegistry) {
+    const orderByTypeName = getOrderByTypeName(table);
+    const orderByType = typeRegistry.get(orderByTypeName);
+    if (orderByType?.kind === 'ENUM' && orderByType.enumValues) {
+      const existingValues = new Set(values);
+      for (const value of orderByType.enumValues) {
+        if (!existingValues.has(value)) {
+          values.push(value);
+        }
+      }
+    }
+  }
+
   return values;
 }
 
 /**
  * Generate OrderBy type statements
  */
-function generateOrderByTypes(tables: CleanTable[]): t.Statement[] {
+function generateOrderByTypes(
+  tables: CleanTable[],
+  typeRegistry?: TypeRegistry,
+): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
     const enumName = getOrderByTypeName(table);
-    const values = buildOrderByValues(table);
+    const values = buildOrderByValues(table, typeRegistry);
     const unionType = createStringLiteralUnion(values);
     const typeAlias = t.tsTypeAliasDeclaration(
       t.identifier(enumName),
@@ -1507,9 +1572,10 @@ function generateCustomInputTypes(
   usedInputTypes: Set<string>,
   tableCrudTypes?: Set<string>,
   comments: boolean = true,
+  alreadyGeneratedTypes?: Set<string>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
-  const generatedTypes = new Set<string>();
+  const generatedTypes = new Set<string>(alreadyGeneratedTypes ?? []);
   const typesToGenerate = new Set(Array.from(usedInputTypes));
 
   // Filter out types we've already generated (exact matches for table CRUD types only)
@@ -1556,12 +1622,13 @@ function generateCustomInputTypes(
           description: stripSmartComments(field.description, comments),
         });
 
-        // Follow nested Input types
+        // Follow nested types (Input objects, Enums, etc.) that exist in the registry
         const baseType = getTypeBaseName(field.type);
         if (
           baseType &&
-          baseType.endsWith('Input') &&
-          !generatedTypes.has(baseType)
+          !SCALAR_NAMES.has(baseType) &&
+          !generatedTypes.has(baseType) &&
+          typeRegistry.has(baseType)
         ) {
           typesToGenerate.add(baseType);
         }
@@ -1842,6 +1909,55 @@ function generateConnectionFieldsMap(
 }
 
 // ============================================================================
+// Plugin-Injected Type Collector
+// ============================================================================
+
+/**
+ * Collect extra input type names referenced by plugin-injected condition fields.
+ *
+ * When plugins (like VectorSearchPlugin) inject fields into condition types,
+ * they reference types (like VectorNearbyInput, VectorMetric) that also need
+ * to be generated. This function discovers those types by comparing the
+ * schema's condition type fields against the table's own columns.
+ */
+function collectConditionExtraInputTypes(
+  tables: CleanTable[],
+  typeRegistry: TypeRegistry,
+): Set<string> {
+  const extraTypes = new Set<string>();
+
+  for (const table of tables) {
+    const conditionTypeName = getConditionTypeName(table);
+    const conditionType = typeRegistry.get(conditionTypeName);
+    if (
+      !conditionType ||
+      conditionType.kind !== 'INPUT_OBJECT' ||
+      !conditionType.inputFields
+    ) {
+      continue;
+    }
+
+    const tableFieldNames = new Set(
+      table.fields
+        .filter((f) => !isRelationField(f.name, table))
+        .map((f) => f.name),
+    );
+
+    for (const field of conditionType.inputFields) {
+      if (tableFieldNames.has(field.name)) continue;
+
+      // Collect the base type name of this extra field
+      const baseName = getTypeBaseName(field.type);
+      if (baseName && !SCALAR_NAMES.has(baseName)) {
+        extraTypes.add(baseName);
+      }
+    }
+  }
+
+  return extraTypes;
+}
+
+// ============================================================================
 // Main Generator (AST-based)
 // ============================================================================
 
@@ -1854,7 +1970,9 @@ export function generateInputTypesFile(
   tables?: CleanTable[],
   usedPayloadTypes?: Set<string>,
   comments: boolean = true,
+  options?: { condition?: boolean },
 ): GeneratedInputTypesFile {
+  const conditionEnabled = options?.condition !== false;
   const statements: t.Statement[] = [];
   const tablesList = tables ?? [];
   const hasTables = tablesList.length > 0;
@@ -1889,10 +2007,16 @@ export function generateInputTypesFile(
     statements.push(...generateTableFilterTypes(tablesList));
 
     // 4b. Table condition types (simple equality filter)
-    statements.push(...generateTableConditionTypes(tablesList));
+    // Pass typeRegistry to merge plugin-injected condition fields
+    // (e.g., vectorEmbedding from VectorSearchPlugin)
+    if (conditionEnabled) {
+      statements.push(...generateTableConditionTypes(tablesList, typeRegistry));
+    }
 
     // 5. OrderBy types
-    statements.push(...generateOrderByTypes(tablesList));
+    // Pass typeRegistry to merge plugin-injected orderBy values
+    // (e.g., EMBEDDING_DISTANCE_ASC/DESC from VectorSearchPlugin)
+    statements.push(...generateOrderByTypes(tablesList, typeRegistry));
 
     // 6. CRUD input types
     statements.push(...generateAllCrudInputTypes(tablesList, typeRegistry));
@@ -1903,9 +2027,25 @@ export function generateInputTypesFile(
   statements.push(...generateConnectionFieldsMap(tablesList, tableByName));
 
   // 7. Custom input types from TypeRegistry
+  // Also include any extra types referenced by plugin-injected condition fields
+  const mergedUsedInputTypes = new Set(usedInputTypes);
+  if (hasTables && conditionEnabled) {
+    const conditionExtraTypes = collectConditionExtraInputTypes(
+      tablesList,
+      typeRegistry,
+    );
+    for (const typeName of conditionExtraTypes) {
+      mergedUsedInputTypes.add(typeName);
+    }
+  }
   const tableCrudTypes = tables ? buildTableCrudTypeNames(tables) : undefined;
+  // Pass customScalarTypes + enumTypes as already-generated to avoid duplicate declarations
+  const alreadyGenerated = new Set<string>([
+    ...customScalarTypes,
+    ...enumTypes,
+  ]);
   statements.push(
-    ...generateCustomInputTypes(typeRegistry, usedInputTypes, tableCrudTypes, comments),
+    ...generateCustomInputTypes(typeRegistry, mergedUsedInputTypes, tableCrudTypes, comments, alreadyGenerated),
   );
 
   // 8. Payload/return types for custom operations

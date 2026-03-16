@@ -9,7 +9,7 @@ ORM operations for CryptoAuthModule records
 ```typescript
 db.cryptoAuthModule.findMany({ select: { id: true } }).execute()
 db.cryptoAuthModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.cryptoAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', addressesTableId: '<value>', userField: '<value>', cryptoNetwork: '<value>', signInRequestChallenge: '<value>', signInRecordFailure: '<value>', signUpWithKey: '<value>', signInWithChallenge: '<value>' }, select: { id: true } }).execute()
+db.cryptoAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', addressesTableId: '<value>', userField: '<value>', cryptoNetwork: '<value>', signInRequestChallenge: '<value>', signInRecordFailure: '<value>', signUpWithKey: '<value>', signInWithChallenge: '<value>', userFieldTrgmSimilarity: '<value>', cryptoNetworkTrgmSimilarity: '<value>', signInRequestChallengeTrgmSimilarity: '<value>', signInRecordFailureTrgmSimilarity: '<value>', signUpWithKeyTrgmSimilarity: '<value>', signInWithChallengeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.cryptoAuthModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.cryptoAuthModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.cryptoAuthModule.findMany({
 
 ```typescript
 const item = await db.cryptoAuthModule.create({
-  data: { databaseId: 'value', schemaId: 'value', usersTableId: 'value', secretsTableId: 'value', sessionsTableId: 'value', sessionCredentialsTableId: 'value', addressesTableId: 'value', userField: 'value', cryptoNetwork: 'value', signInRequestChallenge: 'value', signInRecordFailure: 'value', signUpWithKey: 'value', signInWithChallenge: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', usersTableId: 'value', secretsTableId: 'value', sessionsTableId: 'value', sessionCredentialsTableId: 'value', addressesTableId: 'value', userField: 'value', cryptoNetwork: 'value', signInRequestChallenge: 'value', signInRecordFailure: 'value', signUpWithKey: 'value', signInWithChallenge: 'value', userFieldTrgmSimilarity: 'value', cryptoNetworkTrgmSimilarity: 'value', signInRequestChallengeTrgmSimilarity: 'value', signInRecordFailureTrgmSimilarity: 'value', signUpWithKeyTrgmSimilarity: 'value', signInWithChallengeTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

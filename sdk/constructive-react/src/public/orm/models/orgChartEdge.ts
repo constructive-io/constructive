@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgChartEdgeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgChartEdgeSelect>(
-    args: FindManyArgs<S, OrgChartEdgeFilter, OrgChartEdgeOrderBy> & {
+    args: FindManyArgs<S, OrgChartEdgeFilter, never, OrgChartEdgeOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgChartEdgeSelect>
   ): QueryBuilder<{

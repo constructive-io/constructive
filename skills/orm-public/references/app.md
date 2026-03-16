@@ -9,7 +9,7 @@ Mobile and native app configuration linked to a site, including store links and 
 ```typescript
 db.app.findMany({ select: { id: true } }).execute()
 db.app.findOne({ id: '<value>', select: { id: true } }).execute()
-db.app.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>' }, select: { id: true } }).execute()
+db.app.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>', nameTrgmSimilarity: '<value>', appStoreIdTrgmSimilarity: '<value>', appIdPrefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.app.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.app.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.app.findMany({
 
 ```typescript
 const item = await db.app.create({
-  data: { databaseId: 'value', siteId: 'value', name: 'value', appImage: 'value', appStoreLink: 'value', appStoreId: 'value', appIdPrefix: 'value', playStoreLink: 'value' },
+  data: { databaseId: 'value', siteId: 'value', name: 'value', appImage: 'value', appStoreLink: 'value', appStoreId: 'value', appIdPrefix: 'value', playStoreLink: 'value', nameTrgmSimilarity: 'value', appStoreIdTrgmSimilarity: 'value', appIdPrefixTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

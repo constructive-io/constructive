@@ -1,5 +1,17 @@
 # simple-smtp-server
 
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
+   <a href="https://www.npmjs.com/package/simple-smtp-server"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Fsmtppostmaster%2Fpackage.json"/></a>
+</p>
+
 SMTP-based email sender for Constructive services. This package exposes a `send` helper with the same call shape used by `@launchql/postmaster` (e.g. `{ to, subject, html, text }`).
 
 Configuration is managed through the centralized `@pgpmjs/env` system, which merges defaults, config files, environment variables, and runtime overrides.

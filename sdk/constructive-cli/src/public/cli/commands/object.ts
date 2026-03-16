@@ -70,7 +70,6 @@ async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: In
     const result = await client.object
       .findMany({
         select: {
-          hashUuid: true,
           id: true,
           databaseId: true,
           kids: true,
@@ -105,7 +104,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
       .findOne({
         id: answers.id as string,
         select: {
-          hashUuid: true,
           id: true,
           databaseId: true,
           kids: true,
@@ -176,7 +174,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           frzn: cleanedData.frzn,
         },
         select: {
-          hashUuid: true,
           id: true,
           databaseId: true,
           kids: true,
@@ -256,7 +253,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           frzn: cleanedData.frzn,
         },
         select: {
-          hashUuid: true,
           id: true,
           databaseId: true,
           kids: true,

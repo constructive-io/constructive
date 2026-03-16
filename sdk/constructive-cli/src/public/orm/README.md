@@ -24,9 +24,9 @@ const db = createClient({
 | `orgGetManagersRecord` | findMany, findOne, create, update, delete |
 | `orgGetSubordinatesRecord` | findMany, findOne, create, update, delete |
 | `getAllRecord` | findMany, findOne, create, update, delete |
+| `object` | findMany, findOne, create, update, delete |
 | `appPermission` | findMany, findOne, create, update, delete |
 | `orgPermission` | findMany, findOne, create, update, delete |
-| `object` | findMany, findOne, create, update, delete |
 | `appLevelRequirement` | findMany, findOne, create, update, delete |
 | `database` | findMany, findOne, create, update, delete |
 | `schema` | findMany, findOne, create, update, delete |
@@ -45,7 +45,6 @@ const db = createClient({
 | `viewTable` | findMany, findOne, create, update, delete |
 | `viewGrant` | findMany, findOne, create, update, delete |
 | `viewRule` | findMany, findOne, create, update, delete |
-| `tableModule` | findMany, findOne, create, update, delete |
 | `tableTemplateModule` | findMany, findOne, create, update, delete |
 | `secureTableProvision` | findMany, findOne, create, update, delete |
 | `relationProvision` | findMany, findOne, create, update, delete |
@@ -77,7 +76,6 @@ const db = createClient({
 | `permissionsModule` | findMany, findOne, create, update, delete |
 | `phoneNumbersModule` | findMany, findOne, create, update, delete |
 | `profilesModule` | findMany, findOne, create, update, delete |
-| `rlsModule` | findMany, findOne, create, update, delete |
 | `secretsModule` | findMany, findOne, create, update, delete |
 | `sessionsModule` | findMany, findOne, create, update, delete |
 | `userAuthModule` | findMany, findOne, create, update, delete |
@@ -105,24 +103,25 @@ const db = createClient({
 | `ref` | findMany, findOne, create, update, delete |
 | `store` | findMany, findOne, create, update, delete |
 | `appPermissionDefault` | findMany, findOne, create, update, delete |
+| `cryptoAddress` | findMany, findOne, create, update, delete |
 | `roleType` | findMany, findOne, create, update, delete |
 | `orgPermissionDefault` | findMany, findOne, create, update, delete |
-| `cryptoAddress` | findMany, findOne, create, update, delete |
+| `phoneNumber` | findMany, findOne, create, update, delete |
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
 | `connectedAccount` | findMany, findOne, create, update, delete |
-| `phoneNumber` | findMany, findOne, create, update, delete |
-| `membershipType` | findMany, findOne, create, update, delete |
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
-| `appMembershipDefault` | findMany, findOne, create, update, delete |
+| `membershipType` | findMany, findOne, create, update, delete |
 | `commit` | findMany, findOne, create, update, delete |
+| `appMembershipDefault` | findMany, findOne, create, update, delete |
+| `rlsModule` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
 | `appLevel` | findMany, findOne, create, update, delete |
-| `email` | findMany, findOne, create, update, delete |
 | `sqlMigration` | findMany, findOne, create, update, delete |
-| `astMigration` | findMany, findOne, create, update, delete |
+| `email` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
+| `astMigration` | findMany, findOne, create, update, delete |
 | `appMembership` | findMany, findOne, create, update, delete |
 | `hierarchyModule` | findMany, findOne, create, update, delete |
 
@@ -218,72 +217,6 @@ const updated = await db.getAllRecord.update({ where: { id: '<value>' }, data: {
 const deleted = await db.getAllRecord.delete({ where: { id: '<value>' } }).execute();
 ```
 
-### `db.appPermission`
-
-CRUD operations for AppPermission records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `bitnum` | Int | Yes |
-| `bitstr` | BitString | Yes |
-| `description` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all appPermission records
-const items = await db.appPermission.findMany({ select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
-
-// Get one by id
-const item = await db.appPermission.findOne({ id: '<value>', select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
-
-// Create
-const created = await db.appPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.appPermission.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.appPermission.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.orgPermission`
-
-CRUD operations for OrgPermission records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `bitnum` | Int | Yes |
-| `bitstr` | BitString | Yes |
-| `description` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all orgPermission records
-const items = await db.orgPermission.findMany({ select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
-
-// Get one by id
-const item = await db.orgPermission.findOne({ id: '<value>', select: { id: true, name: true, bitnum: true, bitstr: true, description: true } }).execute();
-
-// Create
-const created = await db.orgPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.orgPermission.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.orgPermission.delete({ where: { id: '<value>' } }).execute();
-```
-
 ### `db.object`
 
 CRUD operations for Object records.
@@ -320,6 +253,76 @@ const updated = await db.object.update({ where: { id: '<value>' }, data: { hashU
 const deleted = await db.object.delete({ where: { id: '<value>' } }).execute();
 ```
 
+### `db.appPermission`
+
+CRUD operations for AppPermission records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `bitnum` | Int | Yes |
+| `bitstr` | BitString | Yes |
+| `description` | String | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all appPermission records
+const items = await db.appPermission.findMany({ select: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.appPermission.findOne({ id: '<value>', select: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.appPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.appPermission.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.appPermission.delete({ where: { id: '<value>' } }).execute();
+```
+
+### `db.orgPermission`
+
+CRUD operations for OrgPermission records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `bitnum` | Int | Yes |
+| `bitstr` | BitString | Yes |
+| `description` | String | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all orgPermission records
+const items = await db.orgPermission.findMany({ select: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.orgPermission.findOne({ id: '<value>', select: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.orgPermission.create({ data: { name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgPermission.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgPermission.delete({ where: { id: '<value>' } }).execute();
+```
+
 ### `db.appLevelRequirement`
 
 CRUD operations for AppLevelRequirement records.
@@ -336,18 +339,20 @@ CRUD operations for AppLevelRequirement records.
 | `priority` | Int | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all appLevelRequirement records
-const items = await db.appLevelRequirement.findMany({ select: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.appLevelRequirement.findMany({ select: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.appLevelRequirement.findOne({ id: '<value>', select: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appLevelRequirement.findOne({ id: '<value>', select: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.appLevelRequirement.create({ data: { name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>' }, select: { id: true } }).execute();
+const created = await db.appLevelRequirement.create({ data: { name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.appLevelRequirement.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
@@ -372,18 +377,22 @@ CRUD operations for Database records.
 | `hash` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `schemaHashTrgmSimilarity` | Float | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `labelTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all database records
-const items = await db.database.findMany({ select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.database.findMany({ select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true, schemaHashTrgmSimilarity: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.database.findOne({ id: '<value>', select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.database.findOne({ id: '<value>', select: { id: true, ownerId: true, schemaHash: true, name: true, label: true, hash: true, createdAt: true, updatedAt: true, schemaHashTrgmSimilarity: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.database.create({ data: { ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<value>', hash: '<value>' }, select: { id: true } }).execute();
+const created = await db.database.create({ data: { ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<value>', hash: '<value>', schemaHashTrgmSimilarity: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.database.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
@@ -414,18 +423,24 @@ CRUD operations for Schema records.
 | `isPublic` | Boolean | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `schemaNameTrgmSimilarity` | Float | Yes |
+| `labelTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all schema records
-const items = await db.schema.findMany({ select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.schema.findMany({ select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, schemaNameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.schema.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.schema.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, schemaName: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, tags: true, isPublic: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, schemaNameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.schema.create({ data: { databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>' }, select: { id: true } }).execute();
+const created = await db.schema.create({ data: { databaseId: '<value>', name: '<value>', schemaName: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', isPublic: '<value>', nameTrgmSimilarity: '<value>', schemaNameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.schema.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -461,18 +476,25 @@ CRUD operations for Table records.
 | `inheritsId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `labelTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `pluralNameTrgmSimilarity` | Float | Yes |
+| `singularNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all table records
-const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.table.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, pluralNameTrgmSimilarity: true, singularNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.table.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.table.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, name: true, label: true, description: true, smartTags: true, category: true, module: true, scope: true, useRls: true, timestamps: true, peoplestamps: true, pluralName: true, singularName: true, tags: true, inheritsId: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, moduleTrgmSimilarity: true, pluralNameTrgmSimilarity: true, singularNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.table.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', useRls: '<value>', timestamps: '<value>', peoplestamps: '<value>', pluralName: '<value>', singularName: '<value>', tags: '<value>', inheritsId: '<value>' }, select: { id: true } }).execute();
+const created = await db.table.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', useRls: '<value>', timestamps: '<value>', peoplestamps: '<value>', pluralName: '<value>', singularName: '<value>', tags: '<value>', inheritsId: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', pluralNameTrgmSimilarity: '<value>', singularNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.table.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -503,18 +525,22 @@ CRUD operations for CheckConstraint records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `typeTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all checkConstraint records
-const items = await db.checkConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.checkConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.checkConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.checkConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, expr: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.checkConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', expr: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.checkConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', expr: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.checkConstraint.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -555,18 +581,25 @@ CRUD operations for Field records.
 | `scope` | Int | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `labelTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `defaultValueTrgmSimilarity` | Float | Yes |
+| `regexpTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all field records
-const items = await db.field.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.field.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, defaultValueTrgmSimilarity: true, regexpTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.field.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.field.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, label: true, description: true, smartTags: true, isRequired: true, defaultValue: true, defaultValueAst: true, isHidden: true, type: true, fieldOrder: true, regexp: true, chk: true, chkExpr: true, min: true, max: true, tags: true, category: true, module: true, scope: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, labelTrgmSimilarity: true, descriptionTrgmSimilarity: true, defaultValueTrgmSimilarity: true, regexpTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.field.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', isRequired: '<value>', defaultValue: '<value>', defaultValueAst: '<value>', isHidden: '<value>', type: '<value>', fieldOrder: '<value>', regexp: '<value>', chk: '<value>', chkExpr: '<value>', min: '<value>', max: '<value>', tags: '<value>', category: '<value>', module: '<value>', scope: '<value>' }, select: { id: true } }).execute();
+const created = await db.field.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', isRequired: '<value>', defaultValue: '<value>', defaultValueAst: '<value>', isHidden: '<value>', type: '<value>', fieldOrder: '<value>', regexp: '<value>', chk: '<value>', chkExpr: '<value>', min: '<value>', max: '<value>', tags: '<value>', category: '<value>', module: '<value>', scope: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', defaultValueTrgmSimilarity: '<value>', regexpTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.field.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -601,18 +634,25 @@ CRUD operations for ForeignKeyConstraint records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `typeTrgmSimilarity` | Float | Yes |
+| `deleteActionTrgmSimilarity` | Float | Yes |
+| `updateActionTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all foreignKeyConstraint records
-const items = await db.foreignKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.foreignKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, deleteActionTrgmSimilarity: true, updateActionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.foreignKeyConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.foreignKeyConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, refTableId: true, refFieldIds: true, deleteAction: true, updateAction: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, deleteActionTrgmSimilarity: true, updateActionTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.foreignKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', refTableId: '<value>', refFieldIds: '<value>', deleteAction: '<value>', updateAction: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.foreignKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', refTableId: '<value>', refFieldIds: '<value>', deleteAction: '<value>', updateAction: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', deleteActionTrgmSimilarity: '<value>', updateActionTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.foreignKeyConstraint.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -676,6 +716,8 @@ CRUD operations for Index records.
 | `indexParams` | JSON | Yes |
 | `whereClause` | JSON | Yes |
 | `isUnique` | Boolean | Yes |
+| `options` | JSON | Yes |
+| `opClasses` | String | Yes |
 | `smartTags` | JSON | Yes |
 | `category` | ObjectCategory | Yes |
 | `module` | String | Yes |
@@ -683,18 +725,22 @@ CRUD operations for Index records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `accessMethodTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all index records
-const items = await db.index.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.index.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, accessMethodTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.index.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.index.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, fieldIds: true, includeFieldIds: true, accessMethod: true, indexParams: true, whereClause: true, isUnique: true, options: true, opClasses: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, accessMethodTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.index.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.index.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', options: '<value>', opClasses: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', accessMethodTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.index.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -728,18 +774,24 @@ CRUD operations for Policy records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `granteeNameTrgmSimilarity` | Float | Yes |
+| `privilegeTrgmSimilarity` | Float | Yes |
+| `policyTypeTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all policy records
-const items = await db.policy.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.policy.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.policy.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.policy.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, granteeName: true, privilege: true, permissive: true, disabled: true, policyType: true, data: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.policy.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', granteeName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.policy.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', granteeName: '<value>', privilege: '<value>', permissive: '<value>', disabled: '<value>', policyType: '<value>', data: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', policyTypeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.policy.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -769,18 +821,22 @@ CRUD operations for PrimaryKeyConstraint records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `typeTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all primaryKeyConstraint records
-const items = await db.primaryKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.primaryKeyConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.primaryKeyConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.primaryKeyConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, type: true, fieldIds: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.primaryKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.primaryKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.primaryKeyConstraint.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -806,18 +862,21 @@ CRUD operations for TableGrant records.
 | `isGrant` | Boolean | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `privilegeTrgmSimilarity` | Float | Yes |
+| `granteeNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all tableGrant records
-const items = await db.tableGrant.findMany({ select: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.tableGrant.findMany({ select: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.tableGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.tableGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, privilege: true, granteeName: true, fieldIds: true, isGrant: true, createdAt: true, updatedAt: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.tableGrant.create({ data: { databaseId: '<value>', tableId: '<value>', privilege: '<value>', granteeName: '<value>', fieldIds: '<value>', isGrant: '<value>' }, select: { id: true } }).execute();
+const created = await db.tableGrant.create({ data: { databaseId: '<value>', tableId: '<value>', privilege: '<value>', granteeName: '<value>', fieldIds: '<value>', isGrant: '<value>', privilegeTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.tableGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -847,18 +906,23 @@ CRUD operations for Trigger records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `eventTrgmSimilarity` | Float | Yes |
+| `functionNameTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all trigger records
-const items = await db.trigger.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.trigger.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, functionNameTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.trigger.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.trigger.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, event: true, functionName: true, smartTags: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, functionNameTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.trigger.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', event: '<value>', functionName: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.trigger.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', event: '<value>', functionName: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', eventTrgmSimilarity: '<value>', functionNameTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.trigger.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -889,18 +953,23 @@ CRUD operations for UniqueConstraint records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `typeTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all uniqueConstraint records
-const items = await db.uniqueConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.uniqueConstraint.findMany({ select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.uniqueConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.uniqueConstraint.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, name: true, description: true, smartTags: true, type: true, fieldIds: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, descriptionTrgmSimilarity: true, typeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.uniqueConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.uniqueConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', description: '<value>', smartTags: '<value>', type: '<value>', fieldIds: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.uniqueConstraint.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -933,18 +1002,23 @@ CRUD operations for View records.
 | `module` | String | Yes |
 | `scope` | Int | Yes |
 | `tags` | String | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `viewTypeTrgmSimilarity` | Float | Yes |
+| `filterTypeTrgmSimilarity` | Float | Yes |
+| `moduleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all view records
-const items = await db.view.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } }).execute();
+const items = await db.view.findMany({ select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true, nameTrgmSimilarity: true, viewTypeTrgmSimilarity: true, filterTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.view.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true } }).execute();
+const item = await db.view.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, name: true, tableId: true, viewType: true, data: true, filterType: true, filterData: true, securityInvoker: true, isReadOnly: true, smartTags: true, category: true, module: true, scope: true, tags: true, nameTrgmSimilarity: true, viewTypeTrgmSimilarity: true, filterTypeTrgmSimilarity: true, moduleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.view.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', tableId: '<value>', viewType: '<value>', data: '<value>', filterType: '<value>', filterData: '<value>', securityInvoker: '<value>', isReadOnly: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute();
+const created = await db.view.create({ data: { databaseId: '<value>', schemaId: '<value>', name: '<value>', tableId: '<value>', viewType: '<value>', data: '<value>', filterType: '<value>', filterData: '<value>', securityInvoker: '<value>', isReadOnly: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', viewTypeTrgmSimilarity: '<value>', filterTypeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.view.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1000,18 +1074,21 @@ CRUD operations for ViewGrant records.
 | `privilege` | String | Yes |
 | `withGrantOption` | Boolean | Yes |
 | `isGrant` | Boolean | Yes |
+| `granteeNameTrgmSimilarity` | Float | Yes |
+| `privilegeTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all viewGrant records
-const items = await db.viewGrant.findMany({ select: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } }).execute();
+const items = await db.viewGrant.findMany({ select: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.viewGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } }).execute();
+const item = await db.viewGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.viewGrant.create({ data: { databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>' }, select: { id: true } }).execute();
+const created = await db.viewGrant.create({ data: { databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>', granteeNameTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.viewGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1034,61 +1111,28 @@ CRUD operations for ViewRule records.
 | `name` | String | Yes |
 | `event` | String | Yes |
 | `action` | String | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `eventTrgmSimilarity` | Float | Yes |
+| `actionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all viewRule records
-const items = await db.viewRule.findMany({ select: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } }).execute();
+const items = await db.viewRule.findMany({ select: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.viewRule.findOne({ id: '<value>', select: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true } }).execute();
+const item = await db.viewRule.findOne({ id: '<value>', select: { id: true, databaseId: true, viewId: true, name: true, event: true, action: true, nameTrgmSimilarity: true, eventTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.viewRule.create({ data: { databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>' }, select: { id: true } }).execute();
+const created = await db.viewRule.create({ data: { databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>', nameTrgmSimilarity: '<value>', eventTrgmSimilarity: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.viewRule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.viewRule.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.tableModule`
-
-CRUD operations for TableModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `schemaId` | UUID | Yes |
-| `tableId` | UUID | Yes |
-| `tableName` | String | Yes |
-| `nodeType` | String | Yes |
-| `useRls` | Boolean | Yes |
-| `data` | JSON | Yes |
-| `fields` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all tableModule records
-const items = await db.tableModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, data: true, fields: true } }).execute();
-
-// Get one by id
-const item = await db.tableModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, data: true, fields: true } }).execute();
-
-// Create
-const created = await db.tableModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', data: '<value>', fields: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.tableModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.tableModule.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.tableTemplateModule`
@@ -1108,18 +1152,21 @@ CRUD operations for TableTemplateModule records.
 | `tableName` | String | Yes |
 | `nodeType` | String | Yes |
 | `data` | JSON | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `nodeTypeTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all tableTemplateModule records
-const items = await db.tableTemplateModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } }).execute();
+const items = await db.tableTemplateModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.tableTemplateModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } }).execute();
+const item = await db.tableTemplateModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.tableTemplateModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', nodeType: '<value>', data: '<value>' }, select: { id: true } }).execute();
+const created = await db.tableTemplateModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', nodeType: '<value>', data: '<value>', tableNameTrgmSimilarity: '<value>', nodeTypeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.tableTemplateModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1144,6 +1191,7 @@ CRUD operations for SecureTableProvision records.
 | `nodeType` | String | Yes |
 | `useRls` | Boolean | Yes |
 | `nodeData` | JSON | Yes |
+| `fields` | JSON | Yes |
 | `grantRoles` | String | Yes |
 | `grantPrivileges` | JSON | Yes |
 | `policyType` | String | Yes |
@@ -1153,18 +1201,24 @@ CRUD operations for SecureTableProvision records.
 | `policyName` | String | Yes |
 | `policyData` | JSON | Yes |
 | `outFields` | UUID | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `nodeTypeTrgmSimilarity` | Float | Yes |
+| `policyTypeTrgmSimilarity` | Float | Yes |
+| `policyRoleTrgmSimilarity` | Float | Yes |
+| `policyNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all secureTableProvision records
-const items = await db.secureTableProvision.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } }).execute();
+const items = await db.secureTableProvision.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.secureTableProvision.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } }).execute();
+const item = await db.secureTableProvision.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true, tableNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.secureTableProvision.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFields: '<value>' }, select: { id: true } }).execute();
+const created = await db.secureTableProvision.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', nodeType: '<value>', useRls: '<value>', nodeData: '<value>', fields: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFields: '<value>', tableNameTrgmSimilarity: '<value>', nodeTypeTrgmSimilarity: '<value>', policyTypeTrgmSimilarity: '<value>', policyRoleTrgmSimilarity: '<value>', policyNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.secureTableProvision.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1209,18 +1263,29 @@ CRUD operations for RelationProvision records.
 | `outJunctionTableId` | UUID | Yes |
 | `outSourceFieldId` | UUID | Yes |
 | `outTargetFieldId` | UUID | Yes |
+| `relationTypeTrgmSimilarity` | Float | Yes |
+| `fieldNameTrgmSimilarity` | Float | Yes |
+| `deleteActionTrgmSimilarity` | Float | Yes |
+| `junctionTableNameTrgmSimilarity` | Float | Yes |
+| `sourceFieldNameTrgmSimilarity` | Float | Yes |
+| `targetFieldNameTrgmSimilarity` | Float | Yes |
+| `nodeTypeTrgmSimilarity` | Float | Yes |
+| `policyTypeTrgmSimilarity` | Float | Yes |
+| `policyRoleTrgmSimilarity` | Float | Yes |
+| `policyNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all relationProvision records
-const items = await db.relationProvision.findMany({ select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } }).execute();
+const items = await db.relationProvision.findMany({ select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true, relationTypeTrgmSimilarity: true, fieldNameTrgmSimilarity: true, deleteActionTrgmSimilarity: true, junctionTableNameTrgmSimilarity: true, sourceFieldNameTrgmSimilarity: true, targetFieldNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.relationProvision.findOne({ id: '<value>', select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } }).execute();
+const item = await db.relationProvision.findOne({ id: '<value>', select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true, relationTypeTrgmSimilarity: true, fieldNameTrgmSimilarity: true, deleteActionTrgmSimilarity: true, junctionTableNameTrgmSimilarity: true, sourceFieldNameTrgmSimilarity: true, targetFieldNameTrgmSimilarity: true, nodeTypeTrgmSimilarity: true, policyTypeTrgmSimilarity: true, policyRoleTrgmSimilarity: true, policyNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.relationProvision.create({ data: { databaseId: '<value>', relationType: '<value>', sourceTableId: '<value>', targetTableId: '<value>', fieldName: '<value>', deleteAction: '<value>', isRequired: '<value>', junctionTableId: '<value>', junctionTableName: '<value>', junctionSchemaId: '<value>', sourceFieldName: '<value>', targetFieldName: '<value>', useCompositeKey: '<value>', nodeType: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFieldId: '<value>', outJunctionTableId: '<value>', outSourceFieldId: '<value>', outTargetFieldId: '<value>' }, select: { id: true } }).execute();
+const created = await db.relationProvision.create({ data: { databaseId: '<value>', relationType: '<value>', sourceTableId: '<value>', targetTableId: '<value>', fieldName: '<value>', deleteAction: '<value>', isRequired: '<value>', junctionTableId: '<value>', junctionTableName: '<value>', junctionSchemaId: '<value>', sourceFieldName: '<value>', targetFieldName: '<value>', useCompositeKey: '<value>', nodeType: '<value>', nodeData: '<value>', grantRoles: '<value>', grantPrivileges: '<value>', policyType: '<value>', policyPrivileges: '<value>', policyRole: '<value>', policyPermissive: '<value>', policyName: '<value>', policyData: '<value>', outFieldId: '<value>', outJunctionTableId: '<value>', outSourceFieldId: '<value>', outTargetFieldId: '<value>', relationTypeTrgmSimilarity: '<value>', fieldNameTrgmSimilarity: '<value>', deleteActionTrgmSimilarity: '<value>', junctionTableNameTrgmSimilarity: '<value>', sourceFieldNameTrgmSimilarity: '<value>', targetFieldNameTrgmSimilarity: '<value>', nodeTypeTrgmSimilarity: '<value>', policyTypeTrgmSimilarity: '<value>', policyRoleTrgmSimilarity: '<value>', policyNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.relationProvision.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1243,18 +1308,20 @@ CRUD operations for SchemaGrant records.
 | `granteeName` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `granteeNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all schemaGrant records
-const items = await db.schemaGrant.findMany({ select: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.schemaGrant.findMany({ select: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true, granteeNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.schemaGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.schemaGrant.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, granteeName: true, createdAt: true, updatedAt: true, granteeNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.schemaGrant.create({ data: { databaseId: '<value>', schemaId: '<value>', granteeName: '<value>' }, select: { id: true } }).execute();
+const created = await db.schemaGrant.create({ data: { databaseId: '<value>', schemaId: '<value>', granteeName: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.schemaGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1278,18 +1345,22 @@ CRUD operations for DefaultPrivilege records.
 | `privilege` | String | Yes |
 | `granteeName` | String | Yes |
 | `isGrant` | Boolean | Yes |
+| `objectTypeTrgmSimilarity` | Float | Yes |
+| `privilegeTrgmSimilarity` | Float | Yes |
+| `granteeNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all defaultPrivilege records
-const items = await db.defaultPrivilege.findMany({ select: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } }).execute();
+const items = await db.defaultPrivilege.findMany({ select: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true, objectTypeTrgmSimilarity: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.defaultPrivilege.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true } }).execute();
+const item = await db.defaultPrivilege.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, objectType: true, privilege: true, granteeName: true, isGrant: true, objectTypeTrgmSimilarity: true, privilegeTrgmSimilarity: true, granteeNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.defaultPrivilege.create({ data: { databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>' }, select: { id: true } }).execute();
+const created = await db.defaultPrivilege.create({ data: { databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>', objectTypeTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.defaultPrivilege.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1343,18 +1414,20 @@ CRUD operations for ApiModule records.
 | `apiId` | UUID | Yes |
 | `name` | String | Yes |
 | `data` | JSON | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all apiModule records
-const items = await db.apiModule.findMany({ select: { id: true, databaseId: true, apiId: true, name: true, data: true } }).execute();
+const items = await db.apiModule.findMany({ select: { id: true, databaseId: true, apiId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.apiModule.findOne({ id: '<value>', select: { id: true, databaseId: true, apiId: true, name: true, data: true } }).execute();
+const item = await db.apiModule.findOne({ id: '<value>', select: { id: true, databaseId: true, apiId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.apiModule.create({ data: { databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>' }, select: { id: true } }).execute();
+const created = await db.apiModule.create({ data: { databaseId: '<value>', apiId: '<value>', name: '<value>', data: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.apiModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1411,18 +1484,21 @@ CRUD operations for SiteMetadatum records.
 | `title` | String | Yes |
 | `description` | String | Yes |
 | `ogImage` | ConstructiveInternalTypeImage | Yes |
+| `titleTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all siteMetadatum records
-const items = await db.siteMetadatum.findMany({ select: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } }).execute();
+const items = await db.siteMetadatum.findMany({ select: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.siteMetadatum.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true } }).execute();
+const item = await db.siteMetadatum.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, title: true, description: true, ogImage: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.siteMetadatum.create({ data: { databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>' }, select: { id: true } }).execute();
+const created = await db.siteMetadatum.create({ data: { databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.siteMetadatum.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1444,18 +1520,20 @@ CRUD operations for SiteModule records.
 | `siteId` | UUID | Yes |
 | `name` | String | Yes |
 | `data` | JSON | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all siteModule records
-const items = await db.siteModule.findMany({ select: { id: true, databaseId: true, siteId: true, name: true, data: true } }).execute();
+const items = await db.siteModule.findMany({ select: { id: true, databaseId: true, siteId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.siteModule.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, name: true, data: true } }).execute();
+const item = await db.siteModule.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, name: true, data: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.siteModule.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>' }, select: { id: true } }).execute();
+const created = await db.siteModule.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.siteModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1510,18 +1588,21 @@ CRUD operations for TriggerFunction records.
 | `code` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `codeTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all triggerFunction records
-const items = await db.triggerFunction.findMany({ select: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.triggerFunction.findMany({ select: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, codeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.triggerFunction.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.triggerFunction.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, code: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, codeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.triggerFunction.create({ data: { databaseId: '<value>', name: '<value>', code: '<value>' }, select: { id: true } }).execute();
+const created = await db.triggerFunction.create({ data: { databaseId: '<value>', name: '<value>', code: '<value>', nameTrgmSimilarity: '<value>', codeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.triggerFunction.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1545,18 +1626,23 @@ CRUD operations for Api records.
 | `roleName` | String | Yes |
 | `anonRole` | String | Yes |
 | `isPublic` | Boolean | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `dbnameTrgmSimilarity` | Float | Yes |
+| `roleNameTrgmSimilarity` | Float | Yes |
+| `anonRoleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all api records
-const items = await db.api.findMany({ select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } }).execute();
+const items = await db.api.findMany({ select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true, nameTrgmSimilarity: true, dbnameTrgmSimilarity: true, roleNameTrgmSimilarity: true, anonRoleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.api.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true } }).execute();
+const item = await db.api.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, dbname: true, roleName: true, anonRole: true, isPublic: true, nameTrgmSimilarity: true, dbnameTrgmSimilarity: true, roleNameTrgmSimilarity: true, anonRoleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.api.create({ data: { databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>' }, select: { id: true } }).execute();
+const created = await db.api.create({ data: { databaseId: '<value>', name: '<value>', dbname: '<value>', roleName: '<value>', anonRole: '<value>', isPublic: '<value>', nameTrgmSimilarity: '<value>', dbnameTrgmSimilarity: '<value>', roleNameTrgmSimilarity: '<value>', anonRoleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.api.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1582,18 +1668,22 @@ CRUD operations for Site records.
 | `appleTouchIcon` | ConstructiveInternalTypeImage | Yes |
 | `logo` | ConstructiveInternalTypeImage | Yes |
 | `dbname` | String | Yes |
+| `titleTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `dbnameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all site records
-const items = await db.site.findMany({ select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } }).execute();
+const items = await db.site.findMany({ select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, dbnameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.site.findOne({ id: '<value>', select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } }).execute();
+const item = await db.site.findOne({ id: '<value>', select: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, dbnameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.site.create({ data: { databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>' }, select: { id: true } }).execute();
+const created = await db.site.create({ data: { databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', dbnameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.site.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1619,18 +1709,22 @@ CRUD operations for App records.
 | `appStoreId` | String | Yes |
 | `appIdPrefix` | String | Yes |
 | `playStoreLink` | ConstructiveInternalTypeUrl | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `appStoreIdTrgmSimilarity` | Float | Yes |
+| `appIdPrefixTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all app records
-const items = await db.app.findMany({ select: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true } }).execute();
+const items = await db.app.findMany({ select: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true, nameTrgmSimilarity: true, appStoreIdTrgmSimilarity: true, appIdPrefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.app.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true } }).execute();
+const item = await db.app.findOne({ id: '<value>', select: { id: true, databaseId: true, siteId: true, name: true, appImage: true, appStoreLink: true, appStoreId: true, appIdPrefix: true, playStoreLink: true, nameTrgmSimilarity: true, appStoreIdTrgmSimilarity: true, appIdPrefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.app.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>' }, select: { id: true } }).execute();
+const created = await db.app.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', appImage: '<value>', appStoreLink: '<value>', appStoreId: '<value>', appIdPrefix: '<value>', playStoreLink: '<value>', nameTrgmSimilarity: '<value>', appStoreIdTrgmSimilarity: '<value>', appIdPrefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.app.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1654,18 +1748,20 @@ CRUD operations for ConnectedAccountsModule records.
 | `tableId` | UUID | Yes |
 | `ownerTableId` | UUID | Yes |
 | `tableName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all connectedAccountsModule records
-const items = await db.connectedAccountsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const items = await db.connectedAccountsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.connectedAccountsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const item = await db.connectedAccountsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.connectedAccountsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
+const created = await db.connectedAccountsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.connectedAccountsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1690,18 +1786,21 @@ CRUD operations for CryptoAddressesModule records.
 | `ownerTableId` | UUID | Yes |
 | `tableName` | String | Yes |
 | `cryptoNetwork` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `cryptoNetworkTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all cryptoAddressesModule records
-const items = await db.cryptoAddressesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true } }).execute();
+const items = await db.cryptoAddressesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true, tableNameTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAddressesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true } }).execute();
+const item = await db.cryptoAddressesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, cryptoNetwork: true, tableNameTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.cryptoAddressesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', cryptoNetwork: '<value>' }, select: { id: true } }).execute();
+const created = await db.cryptoAddressesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', cryptoNetwork: '<value>', tableNameTrgmSimilarity: '<value>', cryptoNetworkTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.cryptoAddressesModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1732,18 +1831,25 @@ CRUD operations for CryptoAuthModule records.
 | `signInRecordFailure` | String | Yes |
 | `signUpWithKey` | String | Yes |
 | `signInWithChallenge` | String | Yes |
+| `userFieldTrgmSimilarity` | Float | Yes |
+| `cryptoNetworkTrgmSimilarity` | Float | Yes |
+| `signInRequestChallengeTrgmSimilarity` | Float | Yes |
+| `signInRecordFailureTrgmSimilarity` | Float | Yes |
+| `signUpWithKeyTrgmSimilarity` | Float | Yes |
+| `signInWithChallengeTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all cryptoAuthModule records
-const items = await db.cryptoAuthModule.findMany({ select: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true } }).execute();
+const items = await db.cryptoAuthModule.findMany({ select: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true, userFieldTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, signInRequestChallengeTrgmSimilarity: true, signInRecordFailureTrgmSimilarity: true, signUpWithKeyTrgmSimilarity: true, signInWithChallengeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAuthModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true } }).execute();
+const item = await db.cryptoAuthModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, usersTableId: true, secretsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, addressesTableId: true, userField: true, cryptoNetwork: true, signInRequestChallenge: true, signInRecordFailure: true, signUpWithKey: true, signInWithChallenge: true, userFieldTrgmSimilarity: true, cryptoNetworkTrgmSimilarity: true, signInRequestChallengeTrgmSimilarity: true, signInRecordFailureTrgmSimilarity: true, signUpWithKeyTrgmSimilarity: true, signInWithChallengeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.cryptoAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', addressesTableId: '<value>', userField: '<value>', cryptoNetwork: '<value>', signInRequestChallenge: '<value>', signInRecordFailure: '<value>', signUpWithKey: '<value>', signInWithChallenge: '<value>' }, select: { id: true } }).execute();
+const created = await db.cryptoAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', addressesTableId: '<value>', userField: '<value>', cryptoNetwork: '<value>', signInRequestChallenge: '<value>', signInRecordFailure: '<value>', signUpWithKey: '<value>', signInWithChallenge: '<value>', userFieldTrgmSimilarity: '<value>', cryptoNetworkTrgmSimilarity: '<value>', signInRequestChallengeTrgmSimilarity: '<value>', signInRecordFailureTrgmSimilarity: '<value>', signUpWithKeyTrgmSimilarity: '<value>', signInWithChallengeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.cryptoAuthModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1802,18 +1908,20 @@ CRUD operations for DenormalizedTableField records.
 | `updateDefaults` | Boolean | Yes |
 | `funcName` | String | Yes |
 | `funcOrder` | Int | Yes |
+| `funcNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all denormalizedTableField records
-const items = await db.denormalizedTableField.findMany({ select: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } }).execute();
+const items = await db.denormalizedTableField.findMany({ select: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true, funcNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.denormalizedTableField.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true } }).execute();
+const item = await db.denormalizedTableField.findOne({ id: '<value>', select: { id: true, databaseId: true, tableId: true, fieldId: true, setIds: true, refTableId: true, refFieldId: true, refIds: true, useUpdates: true, updateDefaults: true, funcName: true, funcOrder: true, funcNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.denormalizedTableField.create({ data: { databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>' }, select: { id: true } }).execute();
+const created = await db.denormalizedTableField.create({ data: { databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>', funcNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.denormalizedTableField.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1837,18 +1945,20 @@ CRUD operations for EmailsModule records.
 | `tableId` | UUID | Yes |
 | `ownerTableId` | UUID | Yes |
 | `tableName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all emailsModule records
-const items = await db.emailsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const items = await db.emailsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.emailsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const item = await db.emailsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.emailsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
+const created = await db.emailsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.emailsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1870,18 +1980,20 @@ CRUD operations for EncryptedSecretsModule records.
 | `schemaId` | UUID | Yes |
 | `tableId` | UUID | Yes |
 | `tableName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all encryptedSecretsModule records
-const items = await db.encryptedSecretsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const items = await db.encryptedSecretsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.encryptedSecretsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const item = await db.encryptedSecretsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.encryptedSecretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
+const created = await db.encryptedSecretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.encryptedSecretsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1907,18 +2019,20 @@ CRUD operations for FieldModule records.
 | `data` | JSON | Yes |
 | `triggers` | String | Yes |
 | `functions` | String | Yes |
+| `nodeTypeTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all fieldModule records
-const items = await db.fieldModule.findMany({ select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } }).execute();
+const items = await db.fieldModule.findMany({ select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true, nodeTypeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.fieldModule.findOne({ id: '<value>', select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } }).execute();
+const item = await db.fieldModule.findOne({ id: '<value>', select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true, nodeTypeTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.fieldModule.create({ data: { databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', fieldId: '<value>', nodeType: '<value>', data: '<value>', triggers: '<value>', functions: '<value>' }, select: { id: true } }).execute();
+const created = await db.fieldModule.create({ data: { databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', fieldId: '<value>', nodeType: '<value>', data: '<value>', triggers: '<value>', functions: '<value>', nodeTypeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.fieldModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -1949,18 +2063,23 @@ CRUD operations for InvitesModule records.
 | `prefix` | String | Yes |
 | `membershipType` | Int | Yes |
 | `entityTableId` | UUID | Yes |
+| `invitesTableNameTrgmSimilarity` | Float | Yes |
+| `claimedInvitesTableNameTrgmSimilarity` | Float | Yes |
+| `submitInviteCodeFunctionTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all invitesModule records
-const items = await db.invitesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true } }).execute();
+const items = await db.invitesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true, invitesTableNameTrgmSimilarity: true, claimedInvitesTableNameTrgmSimilarity: true, submitInviteCodeFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.invitesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true } }).execute();
+const item = await db.invitesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, emailsTableId: true, usersTableId: true, invitesTableId: true, claimedInvitesTableId: true, invitesTableName: true, claimedInvitesTableName: true, submitInviteCodeFunction: true, prefix: true, membershipType: true, entityTableId: true, invitesTableNameTrgmSimilarity: true, claimedInvitesTableNameTrgmSimilarity: true, submitInviteCodeFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.invitesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', invitesTableId: '<value>', claimedInvitesTableId: '<value>', invitesTableName: '<value>', claimedInvitesTableName: '<value>', submitInviteCodeFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>' }, select: { id: true } }).execute();
+const created = await db.invitesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', invitesTableId: '<value>', claimedInvitesTableId: '<value>', invitesTableName: '<value>', claimedInvitesTableName: '<value>', submitInviteCodeFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', invitesTableNameTrgmSimilarity: '<value>', claimedInvitesTableNameTrgmSimilarity: '<value>', submitInviteCodeFunctionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.invitesModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2003,18 +2122,34 @@ CRUD operations for LevelsModule records.
 | `membershipType` | Int | Yes |
 | `entityTableId` | UUID | Yes |
 | `actorTableId` | UUID | Yes |
+| `stepsTableNameTrgmSimilarity` | Float | Yes |
+| `achievementsTableNameTrgmSimilarity` | Float | Yes |
+| `levelsTableNameTrgmSimilarity` | Float | Yes |
+| `levelRequirementsTableNameTrgmSimilarity` | Float | Yes |
+| `completedStepTrgmSimilarity` | Float | Yes |
+| `incompletedStepTrgmSimilarity` | Float | Yes |
+| `tgAchievementTrgmSimilarity` | Float | Yes |
+| `tgAchievementToggleTrgmSimilarity` | Float | Yes |
+| `tgAchievementToggleBooleanTrgmSimilarity` | Float | Yes |
+| `tgAchievementBooleanTrgmSimilarity` | Float | Yes |
+| `upsertAchievementTrgmSimilarity` | Float | Yes |
+| `tgUpdateAchievementsTrgmSimilarity` | Float | Yes |
+| `stepsRequiredTrgmSimilarity` | Float | Yes |
+| `levelAchievedTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all levelsModule records
-const items = await db.levelsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
+const items = await db.levelsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, stepsTableNameTrgmSimilarity: true, achievementsTableNameTrgmSimilarity: true, levelsTableNameTrgmSimilarity: true, levelRequirementsTableNameTrgmSimilarity: true, completedStepTrgmSimilarity: true, incompletedStepTrgmSimilarity: true, tgAchievementTrgmSimilarity: true, tgAchievementToggleTrgmSimilarity: true, tgAchievementToggleBooleanTrgmSimilarity: true, tgAchievementBooleanTrgmSimilarity: true, upsertAchievementTrgmSimilarity: true, tgUpdateAchievementsTrgmSimilarity: true, stepsRequiredTrgmSimilarity: true, levelAchievedTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.levelsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
+const item = await db.levelsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, stepsTableId: true, stepsTableName: true, achievementsTableId: true, achievementsTableName: true, levelsTableId: true, levelsTableName: true, levelRequirementsTableId: true, levelRequirementsTableName: true, completedStep: true, incompletedStep: true, tgAchievement: true, tgAchievementToggle: true, tgAchievementToggleBoolean: true, tgAchievementBoolean: true, upsertAchievement: true, tgUpdateAchievements: true, stepsRequired: true, levelAchieved: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, stepsTableNameTrgmSimilarity: true, achievementsTableNameTrgmSimilarity: true, levelsTableNameTrgmSimilarity: true, levelRequirementsTableNameTrgmSimilarity: true, completedStepTrgmSimilarity: true, incompletedStepTrgmSimilarity: true, tgAchievementTrgmSimilarity: true, tgAchievementToggleTrgmSimilarity: true, tgAchievementToggleBooleanTrgmSimilarity: true, tgAchievementBooleanTrgmSimilarity: true, upsertAchievementTrgmSimilarity: true, tgUpdateAchievementsTrgmSimilarity: true, stepsRequiredTrgmSimilarity: true, levelAchievedTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.levelsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', stepsTableId: '<value>', stepsTableName: '<value>', achievementsTableId: '<value>', achievementsTableName: '<value>', levelsTableId: '<value>', levelsTableName: '<value>', levelRequirementsTableId: '<value>', levelRequirementsTableName: '<value>', completedStep: '<value>', incompletedStep: '<value>', tgAchievement: '<value>', tgAchievementToggle: '<value>', tgAchievementToggleBoolean: '<value>', tgAchievementBoolean: '<value>', upsertAchievement: '<value>', tgUpdateAchievements: '<value>', stepsRequired: '<value>', levelAchieved: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>' }, select: { id: true } }).execute();
+const created = await db.levelsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', stepsTableId: '<value>', stepsTableName: '<value>', achievementsTableId: '<value>', achievementsTableName: '<value>', levelsTableId: '<value>', levelsTableName: '<value>', levelRequirementsTableId: '<value>', levelRequirementsTableName: '<value>', completedStep: '<value>', incompletedStep: '<value>', tgAchievement: '<value>', tgAchievementToggle: '<value>', tgAchievementToggleBoolean: '<value>', tgAchievementBoolean: '<value>', upsertAchievement: '<value>', tgUpdateAchievements: '<value>', stepsRequired: '<value>', levelAchieved: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', stepsTableNameTrgmSimilarity: '<value>', achievementsTableNameTrgmSimilarity: '<value>', levelsTableNameTrgmSimilarity: '<value>', levelRequirementsTableNameTrgmSimilarity: '<value>', completedStepTrgmSimilarity: '<value>', incompletedStepTrgmSimilarity: '<value>', tgAchievementTrgmSimilarity: '<value>', tgAchievementToggleTrgmSimilarity: '<value>', tgAchievementToggleBooleanTrgmSimilarity: '<value>', tgAchievementBooleanTrgmSimilarity: '<value>', upsertAchievementTrgmSimilarity: '<value>', tgUpdateAchievementsTrgmSimilarity: '<value>', stepsRequiredTrgmSimilarity: '<value>', levelAchievedTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.levelsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2049,18 +2184,28 @@ CRUD operations for LimitsModule records.
 | `membershipType` | Int | Yes |
 | `entityTableId` | UUID | Yes |
 | `actorTableId` | UUID | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `defaultTableNameTrgmSimilarity` | Float | Yes |
+| `limitIncrementFunctionTrgmSimilarity` | Float | Yes |
+| `limitDecrementFunctionTrgmSimilarity` | Float | Yes |
+| `limitIncrementTriggerTrgmSimilarity` | Float | Yes |
+| `limitDecrementTriggerTrgmSimilarity` | Float | Yes |
+| `limitUpdateTriggerTrgmSimilarity` | Float | Yes |
+| `limitCheckFunctionTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all limitsModule records
-const items = await db.limitsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
+const items = await db.limitsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, limitIncrementFunctionTrgmSimilarity: true, limitDecrementFunctionTrgmSimilarity: true, limitIncrementTriggerTrgmSimilarity: true, limitDecrementTriggerTrgmSimilarity: true, limitUpdateTriggerTrgmSimilarity: true, limitCheckFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.limitsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true } }).execute();
+const item = await db.limitsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, limitIncrementFunction: true, limitDecrementFunction: true, limitIncrementTrigger: true, limitDecrementTrigger: true, limitUpdateTrigger: true, limitCheckFunction: true, prefix: true, membershipType: true, entityTableId: true, actorTableId: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, limitIncrementFunctionTrgmSimilarity: true, limitDecrementFunctionTrgmSimilarity: true, limitIncrementTriggerTrgmSimilarity: true, limitDecrementTriggerTrgmSimilarity: true, limitUpdateTriggerTrgmSimilarity: true, limitCheckFunctionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.limitsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', limitIncrementFunction: '<value>', limitDecrementFunction: '<value>', limitIncrementTrigger: '<value>', limitDecrementTrigger: '<value>', limitUpdateTrigger: '<value>', limitCheckFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>' }, select: { id: true } }).execute();
+const created = await db.limitsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', limitIncrementFunction: '<value>', limitDecrementFunction: '<value>', limitIncrementTrigger: '<value>', limitDecrementTrigger: '<value>', limitUpdateTrigger: '<value>', limitCheckFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', tableNameTrgmSimilarity: '<value>', defaultTableNameTrgmSimilarity: '<value>', limitIncrementFunctionTrgmSimilarity: '<value>', limitDecrementFunctionTrgmSimilarity: '<value>', limitIncrementTriggerTrgmSimilarity: '<value>', limitDecrementTriggerTrgmSimilarity: '<value>', limitUpdateTriggerTrgmSimilarity: '<value>', limitCheckFunctionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.limitsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2082,18 +2227,20 @@ CRUD operations for MembershipTypesModule records.
 | `schemaId` | UUID | Yes |
 | `tableId` | UUID | Yes |
 | `tableName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all membershipTypesModule records
-const items = await db.membershipTypesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const items = await db.membershipTypesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.membershipTypesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const item = await db.membershipTypesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.membershipTypesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
+const created = await db.membershipTypesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.membershipTypesModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2141,18 +2288,31 @@ CRUD operations for MembershipsModule records.
 | `entityIdsByMask` | String | Yes |
 | `entityIdsByPerm` | String | Yes |
 | `entityIdsFunction` | String | Yes |
+| `membershipsTableNameTrgmSimilarity` | Float | Yes |
+| `membersTableNameTrgmSimilarity` | Float | Yes |
+| `membershipDefaultsTableNameTrgmSimilarity` | Float | Yes |
+| `grantsTableNameTrgmSimilarity` | Float | Yes |
+| `adminGrantsTableNameTrgmSimilarity` | Float | Yes |
+| `ownerGrantsTableNameTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `actorMaskCheckTrgmSimilarity` | Float | Yes |
+| `actorPermCheckTrgmSimilarity` | Float | Yes |
+| `entityIdsByMaskTrgmSimilarity` | Float | Yes |
+| `entityIdsByPermTrgmSimilarity` | Float | Yes |
+| `entityIdsFunctionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all membershipsModule records
-const items = await db.membershipsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } }).execute();
+const items = await db.membershipsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, membershipsTableNameTrgmSimilarity: true, membersTableNameTrgmSimilarity: true, membershipDefaultsTableNameTrgmSimilarity: true, grantsTableNameTrgmSimilarity: true, adminGrantsTableNameTrgmSimilarity: true, ownerGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, actorMaskCheckTrgmSimilarity: true, actorPermCheckTrgmSimilarity: true, entityIdsByMaskTrgmSimilarity: true, entityIdsByPermTrgmSimilarity: true, entityIdsFunctionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.membershipsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } }).execute();
+const item = await db.membershipsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, membershipsTableNameTrgmSimilarity: true, membersTableNameTrgmSimilarity: true, membershipDefaultsTableNameTrgmSimilarity: true, grantsTableNameTrgmSimilarity: true, adminGrantsTableNameTrgmSimilarity: true, ownerGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, actorMaskCheckTrgmSimilarity: true, actorPermCheckTrgmSimilarity: true, entityIdsByMaskTrgmSimilarity: true, entityIdsByPermTrgmSimilarity: true, entityIdsFunctionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.membershipsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', membershipsTableId: '<value>', membershipsTableName: '<value>', membersTableId: '<value>', membersTableName: '<value>', membershipDefaultsTableId: '<value>', membershipDefaultsTableName: '<value>', grantsTableId: '<value>', grantsTableName: '<value>', actorTableId: '<value>', limitsTableId: '<value>', defaultLimitsTableId: '<value>', permissionsTableId: '<value>', defaultPermissionsTableId: '<value>', sprtTableId: '<value>', adminGrantsTableId: '<value>', adminGrantsTableName: '<value>', ownerGrantsTableId: '<value>', ownerGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', entityTableOwnerId: '<value>', prefix: '<value>', actorMaskCheck: '<value>', actorPermCheck: '<value>', entityIdsByMask: '<value>', entityIdsByPerm: '<value>', entityIdsFunction: '<value>' }, select: { id: true } }).execute();
+const created = await db.membershipsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', membershipsTableId: '<value>', membershipsTableName: '<value>', membersTableId: '<value>', membersTableName: '<value>', membershipDefaultsTableId: '<value>', membershipDefaultsTableName: '<value>', grantsTableId: '<value>', grantsTableName: '<value>', actorTableId: '<value>', limitsTableId: '<value>', defaultLimitsTableId: '<value>', permissionsTableId: '<value>', defaultPermissionsTableId: '<value>', sprtTableId: '<value>', adminGrantsTableId: '<value>', adminGrantsTableName: '<value>', ownerGrantsTableId: '<value>', ownerGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', entityTableOwnerId: '<value>', prefix: '<value>', actorMaskCheck: '<value>', actorPermCheck: '<value>', entityIdsByMask: '<value>', entityIdsByPerm: '<value>', entityIdsFunction: '<value>', membershipsTableNameTrgmSimilarity: '<value>', membersTableNameTrgmSimilarity: '<value>', membershipDefaultsTableNameTrgmSimilarity: '<value>', grantsTableNameTrgmSimilarity: '<value>', adminGrantsTableNameTrgmSimilarity: '<value>', ownerGrantsTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', actorMaskCheckTrgmSimilarity: '<value>', actorPermCheckTrgmSimilarity: '<value>', entityIdsByMaskTrgmSimilarity: '<value>', entityIdsByPermTrgmSimilarity: '<value>', entityIdsFunctionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.membershipsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2186,18 +2346,26 @@ CRUD operations for PermissionsModule records.
 | `getMask` | String | Yes |
 | `getByMask` | String | Yes |
 | `getMaskByName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `defaultTableNameTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `getPaddedMaskTrgmSimilarity` | Float | Yes |
+| `getMaskTrgmSimilarity` | Float | Yes |
+| `getByMaskTrgmSimilarity` | Float | Yes |
+| `getMaskByNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all permissionsModule records
-const items = await db.permissionsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } }).execute();
+const items = await db.permissionsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, getPaddedMaskTrgmSimilarity: true, getMaskTrgmSimilarity: true, getByMaskTrgmSimilarity: true, getMaskByNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.permissionsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true } }).execute();
+const item = await db.permissionsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, defaultTableId: true, defaultTableName: true, bitlen: true, membershipType: true, entityTableId: true, actorTableId: true, prefix: true, getPaddedMask: true, getMask: true, getByMask: true, getMaskByName: true, tableNameTrgmSimilarity: true, defaultTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, getPaddedMaskTrgmSimilarity: true, getMaskTrgmSimilarity: true, getByMaskTrgmSimilarity: true, getMaskByNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.permissionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>' }, select: { id: true } }).execute();
+const created = await db.permissionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', bitlen: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', prefix: '<value>', getPaddedMask: '<value>', getMask: '<value>', getByMask: '<value>', getMaskByName: '<value>', tableNameTrgmSimilarity: '<value>', defaultTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', getPaddedMaskTrgmSimilarity: '<value>', getMaskTrgmSimilarity: '<value>', getByMaskTrgmSimilarity: '<value>', getMaskByNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.permissionsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2221,18 +2389,20 @@ CRUD operations for PhoneNumbersModule records.
 | `tableId` | UUID | Yes |
 | `ownerTableId` | UUID | Yes |
 | `tableName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all phoneNumbersModule records
-const items = await db.phoneNumbersModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const items = await db.phoneNumbersModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.phoneNumbersModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } }).execute();
+const item = await db.phoneNumbersModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.phoneNumbersModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
+const created = await db.phoneNumbersModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', ownerTableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.phoneNumbersModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2267,64 +2437,30 @@ CRUD operations for ProfilesModule records.
 | `permissionsTableId` | UUID | Yes |
 | `membershipsTableId` | UUID | Yes |
 | `prefix` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `profilePermissionsTableNameTrgmSimilarity` | Float | Yes |
+| `profileGrantsTableNameTrgmSimilarity` | Float | Yes |
+| `profileDefinitionGrantsTableNameTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all profilesModule records
-const items = await db.profilesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } }).execute();
+const items = await db.profilesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true, tableNameTrgmSimilarity: true, profilePermissionsTableNameTrgmSimilarity: true, profileGrantsTableNameTrgmSimilarity: true, profileDefinitionGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.profilesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true } }).execute();
+const item = await db.profilesModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true, profilePermissionsTableId: true, profilePermissionsTableName: true, profileGrantsTableId: true, profileGrantsTableName: true, profileDefinitionGrantsTableId: true, profileDefinitionGrantsTableName: true, membershipType: true, entityTableId: true, actorTableId: true, permissionsTableId: true, membershipsTableId: true, prefix: true, tableNameTrgmSimilarity: true, profilePermissionsTableNameTrgmSimilarity: true, profileGrantsTableNameTrgmSimilarity: true, profileDefinitionGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.profilesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>' }, select: { id: true } }).execute();
+const created = await db.profilesModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', profilePermissionsTableId: '<value>', profilePermissionsTableName: '<value>', profileGrantsTableId: '<value>', profileGrantsTableName: '<value>', profileDefinitionGrantsTableId: '<value>', profileDefinitionGrantsTableName: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', permissionsTableId: '<value>', membershipsTableId: '<value>', prefix: '<value>', tableNameTrgmSimilarity: '<value>', profilePermissionsTableNameTrgmSimilarity: '<value>', profileGrantsTableNameTrgmSimilarity: '<value>', profileDefinitionGrantsTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.profilesModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.profilesModule.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.rlsModule`
-
-CRUD operations for RlsModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `apiId` | UUID | Yes |
-| `schemaId` | UUID | Yes |
-| `privateSchemaId` | UUID | Yes |
-| `sessionCredentialsTableId` | UUID | Yes |
-| `sessionsTableId` | UUID | Yes |
-| `usersTableId` | UUID | Yes |
-| `authenticate` | String | Yes |
-| `authenticateStrict` | String | Yes |
-| `currentRole` | String | Yes |
-| `currentRoleId` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all rlsModule records
-const items = await db.rlsModule.findMany({ select: { id: true, databaseId: true, apiId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } }).execute();
-
-// Get one by id
-const item = await db.rlsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, apiId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } }).execute();
-
-// Create
-const created = await db.rlsModule.create({ data: { databaseId: '<value>', apiId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.rlsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.rlsModule.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.secretsModule`
@@ -2340,18 +2476,20 @@ CRUD operations for SecretsModule records.
 | `schemaId` | UUID | Yes |
 | `tableId` | UUID | Yes |
 | `tableName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all secretsModule records
-const items = await db.secretsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const items = await db.secretsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.secretsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } }).execute();
+const item = await db.secretsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.secretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' }, select: { id: true } }).execute();
+const created = await db.secretsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.secretsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2379,18 +2517,22 @@ CRUD operations for SessionsModule records.
 | `sessionsTable` | String | Yes |
 | `sessionCredentialsTable` | String | Yes |
 | `authSettingsTable` | String | Yes |
+| `sessionsTableTrgmSimilarity` | Float | Yes |
+| `sessionCredentialsTableTrgmSimilarity` | Float | Yes |
+| `authSettingsTableTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all sessionsModule records
-const items = await db.sessionsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } }).execute();
+const items = await db.sessionsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true, sessionsTableTrgmSimilarity: true, sessionCredentialsTableTrgmSimilarity: true, authSettingsTableTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.sessionsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true } }).execute();
+const item = await db.sessionsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, sessionsTableId: true, sessionCredentialsTableId: true, authSettingsTableId: true, usersTableId: true, sessionsDefaultExpiration: true, sessionsTable: true, sessionCredentialsTable: true, authSettingsTable: true, sessionsTableTrgmSimilarity: true, sessionCredentialsTableTrgmSimilarity: true, authSettingsTableTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.sessionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', authSettingsTableId: '<value>', usersTableId: '<value>', sessionsDefaultExpiration: '<value>', sessionsTable: '<value>', sessionCredentialsTable: '<value>', authSettingsTable: '<value>' }, select: { id: true } }).execute();
+const created = await db.sessionsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', authSettingsTableId: '<value>', usersTableId: '<value>', sessionsDefaultExpiration: '<value>', sessionsTable: '<value>', sessionCredentialsTable: '<value>', authSettingsTable: '<value>', sessionsTableTrgmSimilarity: '<value>', sessionCredentialsTableTrgmSimilarity: '<value>', authSettingsTableTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.sessionsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2433,18 +2575,35 @@ CRUD operations for UserAuthModule records.
 | `signInOneTimeTokenFunction` | String | Yes |
 | `oneTimeTokenFunction` | String | Yes |
 | `extendTokenExpires` | String | Yes |
+| `auditsTableNameTrgmSimilarity` | Float | Yes |
+| `signInFunctionTrgmSimilarity` | Float | Yes |
+| `signUpFunctionTrgmSimilarity` | Float | Yes |
+| `signOutFunctionTrgmSimilarity` | Float | Yes |
+| `setPasswordFunctionTrgmSimilarity` | Float | Yes |
+| `resetPasswordFunctionTrgmSimilarity` | Float | Yes |
+| `forgotPasswordFunctionTrgmSimilarity` | Float | Yes |
+| `sendVerificationEmailFunctionTrgmSimilarity` | Float | Yes |
+| `verifyEmailFunctionTrgmSimilarity` | Float | Yes |
+| `verifyPasswordFunctionTrgmSimilarity` | Float | Yes |
+| `checkPasswordFunctionTrgmSimilarity` | Float | Yes |
+| `sendAccountDeletionEmailFunctionTrgmSimilarity` | Float | Yes |
+| `deleteAccountFunctionTrgmSimilarity` | Float | Yes |
+| `signInOneTimeTokenFunctionTrgmSimilarity` | Float | Yes |
+| `oneTimeTokenFunctionTrgmSimilarity` | Float | Yes |
+| `extendTokenExpiresTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all userAuthModule records
-const items = await db.userAuthModule.findMany({ select: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } }).execute();
+const items = await db.userAuthModule.findMany({ select: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true, auditsTableNameTrgmSimilarity: true, signInFunctionTrgmSimilarity: true, signUpFunctionTrgmSimilarity: true, signOutFunctionTrgmSimilarity: true, setPasswordFunctionTrgmSimilarity: true, resetPasswordFunctionTrgmSimilarity: true, forgotPasswordFunctionTrgmSimilarity: true, sendVerificationEmailFunctionTrgmSimilarity: true, verifyEmailFunctionTrgmSimilarity: true, verifyPasswordFunctionTrgmSimilarity: true, checkPasswordFunctionTrgmSimilarity: true, sendAccountDeletionEmailFunctionTrgmSimilarity: true, deleteAccountFunctionTrgmSimilarity: true, signInOneTimeTokenFunctionTrgmSimilarity: true, oneTimeTokenFunctionTrgmSimilarity: true, extendTokenExpiresTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.userAuthModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } }).execute();
+const item = await db.userAuthModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true, auditsTableNameTrgmSimilarity: true, signInFunctionTrgmSimilarity: true, signUpFunctionTrgmSimilarity: true, signOutFunctionTrgmSimilarity: true, setPasswordFunctionTrgmSimilarity: true, resetPasswordFunctionTrgmSimilarity: true, forgotPasswordFunctionTrgmSimilarity: true, sendVerificationEmailFunctionTrgmSimilarity: true, verifyEmailFunctionTrgmSimilarity: true, verifyPasswordFunctionTrgmSimilarity: true, checkPasswordFunctionTrgmSimilarity: true, sendAccountDeletionEmailFunctionTrgmSimilarity: true, deleteAccountFunctionTrgmSimilarity: true, signInOneTimeTokenFunctionTrgmSimilarity: true, oneTimeTokenFunctionTrgmSimilarity: true, extendTokenExpiresTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.userAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', encryptedTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', auditsTableId: '<value>', auditsTableName: '<value>', signInFunction: '<value>', signUpFunction: '<value>', signOutFunction: '<value>', setPasswordFunction: '<value>', resetPasswordFunction: '<value>', forgotPasswordFunction: '<value>', sendVerificationEmailFunction: '<value>', verifyEmailFunction: '<value>', verifyPasswordFunction: '<value>', checkPasswordFunction: '<value>', sendAccountDeletionEmailFunction: '<value>', deleteAccountFunction: '<value>', signInOneTimeTokenFunction: '<value>', oneTimeTokenFunction: '<value>', extendTokenExpires: '<value>' }, select: { id: true } }).execute();
+const created = await db.userAuthModule.create({ data: { databaseId: '<value>', schemaId: '<value>', emailsTableId: '<value>', usersTableId: '<value>', secretsTableId: '<value>', encryptedTableId: '<value>', sessionsTableId: '<value>', sessionCredentialsTableId: '<value>', auditsTableId: '<value>', auditsTableName: '<value>', signInFunction: '<value>', signUpFunction: '<value>', signOutFunction: '<value>', setPasswordFunction: '<value>', resetPasswordFunction: '<value>', forgotPasswordFunction: '<value>', sendVerificationEmailFunction: '<value>', verifyEmailFunction: '<value>', verifyPasswordFunction: '<value>', checkPasswordFunction: '<value>', sendAccountDeletionEmailFunction: '<value>', deleteAccountFunction: '<value>', signInOneTimeTokenFunction: '<value>', oneTimeTokenFunction: '<value>', extendTokenExpires: '<value>', auditsTableNameTrgmSimilarity: '<value>', signInFunctionTrgmSimilarity: '<value>', signUpFunctionTrgmSimilarity: '<value>', signOutFunctionTrgmSimilarity: '<value>', setPasswordFunctionTrgmSimilarity: '<value>', resetPasswordFunctionTrgmSimilarity: '<value>', forgotPasswordFunctionTrgmSimilarity: '<value>', sendVerificationEmailFunctionTrgmSimilarity: '<value>', verifyEmailFunctionTrgmSimilarity: '<value>', verifyPasswordFunctionTrgmSimilarity: '<value>', checkPasswordFunctionTrgmSimilarity: '<value>', sendAccountDeletionEmailFunctionTrgmSimilarity: '<value>', deleteAccountFunctionTrgmSimilarity: '<value>', signInOneTimeTokenFunctionTrgmSimilarity: '<value>', oneTimeTokenFunctionTrgmSimilarity: '<value>', extendTokenExpiresTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.userAuthModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2468,18 +2627,21 @@ CRUD operations for UsersModule records.
 | `tableName` | String | Yes |
 | `typeTableId` | UUID | Yes |
 | `typeTableName` | String | Yes |
+| `tableNameTrgmSimilarity` | Float | Yes |
+| `typeTableNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all usersModule records
-const items = await db.usersModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } }).execute();
+const items = await db.usersModule.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, tableNameTrgmSimilarity: true, typeTableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.usersModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true } }).execute();
+const item = await db.usersModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, typeTableId: true, typeTableName: true, tableNameTrgmSimilarity: true, typeTableNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.usersModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', typeTableId: '<value>', typeTableName: '<value>' }, select: { id: true } }).execute();
+const created = await db.usersModule.create({ data: { databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', typeTableId: '<value>', typeTableName: '<value>', tableNameTrgmSimilarity: '<value>', typeTableNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.usersModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2501,18 +2663,21 @@ CRUD operations for UuidModule records.
 | `schemaId` | UUID | Yes |
 | `uuidFunction` | String | Yes |
 | `uuidSeed` | String | Yes |
+| `uuidFunctionTrgmSimilarity` | Float | Yes |
+| `uuidSeedTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all uuidModule records
-const items = await db.uuidModule.findMany({ select: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } }).execute();
+const items = await db.uuidModule.findMany({ select: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true, uuidFunctionTrgmSimilarity: true, uuidSeedTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.uuidModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } }).execute();
+const item = await db.uuidModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true, uuidFunctionTrgmSimilarity: true, uuidSeedTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.uuidModule.create({ data: { databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>' }, select: { id: true } }).execute();
+const created = await db.uuidModule.create({ data: { databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>', uuidFunctionTrgmSimilarity: '<value>', uuidSeedTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.uuidModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -2543,18 +2708,24 @@ CRUD operations for DatabaseProvisionModule records.
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 | `completedAt` | Datetime | Yes |
+| `databaseNameTrgmSimilarity` | Float | Yes |
+| `subdomainTrgmSimilarity` | Float | Yes |
+| `domainTrgmSimilarity` | Float | Yes |
+| `statusTrgmSimilarity` | Float | Yes |
+| `errorMessageTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all databaseProvisionModule records
-const items = await db.databaseProvisionModule.findMany({ select: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true } }).execute();
+const items = await db.databaseProvisionModule.findMany({ select: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true, databaseNameTrgmSimilarity: true, subdomainTrgmSimilarity: true, domainTrgmSimilarity: true, statusTrgmSimilarity: true, errorMessageTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.databaseProvisionModule.findOne({ id: '<value>', select: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true } }).execute();
+const item = await db.databaseProvisionModule.findOne({ id: '<value>', select: { id: true, databaseName: true, ownerId: true, subdomain: true, domain: true, modules: true, options: true, bootstrapUser: true, status: true, errorMessage: true, databaseId: true, createdAt: true, updatedAt: true, completedAt: true, databaseNameTrgmSimilarity: true, subdomainTrgmSimilarity: true, domainTrgmSimilarity: true, statusTrgmSimilarity: true, errorMessageTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.databaseProvisionModule.create({ data: { databaseName: '<value>', ownerId: '<value>', subdomain: '<value>', domain: '<value>', modules: '<value>', options: '<value>', bootstrapUser: '<value>', status: '<value>', errorMessage: '<value>', databaseId: '<value>', completedAt: '<value>' }, select: { id: true } }).execute();
+const created = await db.databaseProvisionModule.create({ data: { databaseName: '<value>', ownerId: '<value>', subdomain: '<value>', domain: '<value>', modules: '<value>', options: '<value>', bootstrapUser: '<value>', status: '<value>', errorMessage: '<value>', databaseId: '<value>', completedAt: '<value>', databaseNameTrgmSimilarity: '<value>', subdomainTrgmSimilarity: '<value>', domainTrgmSimilarity: '<value>', statusTrgmSimilarity: '<value>', errorMessageTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.databaseProvisionModule.update({ where: { id: '<value>' }, data: { databaseName: '<new-value>' }, select: { id: true } }).execute();
@@ -2864,18 +3035,20 @@ CRUD operations for OrgChartEdge records.
 | `parentId` | UUID | Yes |
 | `positionTitle` | String | Yes |
 | `positionLevel` | Int | Yes |
+| `positionTitleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all orgChartEdge records
-const items = await db.orgChartEdge.findMany({ select: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } }).execute();
+const items = await db.orgChartEdge.findMany({ select: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.orgChartEdge.findOne({ id: '<value>', select: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } }).execute();
+const item = await db.orgChartEdge.findOne({ id: '<value>', select: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.orgChartEdge.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>' }, select: { id: true } }).execute();
+const created = await db.orgChartEdge.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.orgChartEdge.update({ where: { id: '<value>' }, data: { entityId: '<new-value>' }, select: { id: true } }).execute();
@@ -2901,18 +3074,20 @@ CRUD operations for OrgChartEdgeGrant records.
 | `positionTitle` | String | Yes |
 | `positionLevel` | Int | Yes |
 | `createdAt` | Datetime | No |
+| `positionTitleTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all orgChartEdgeGrant records
-const items = await db.orgChartEdgeGrant.findMany({ select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } }).execute();
+const items = await db.orgChartEdgeGrant.findMany({ select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.orgChartEdgeGrant.findOne({ id: '<value>', select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } }).execute();
+const item = await db.orgChartEdgeGrant.findOne({ id: '<value>', select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.orgChartEdgeGrant.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>' }, select: { id: true } }).execute();
+const created = await db.orgChartEdgeGrant.create({ data: { entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.orgChartEdgeGrant.update({ where: { id: '<value>' }, data: { entityId: '<new-value>' }, select: { id: true } }).execute();
@@ -3076,18 +3251,20 @@ CRUD operations for Invite records.
 | `expiresAt` | Datetime | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `inviteTokenTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all invite records
-const items = await db.invite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.invite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.invite.findOne({ id: '<value>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.invite.findOne({ id: '<value>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.invite.create({ data: { email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>' }, select: { id: true } }).execute();
+const created = await db.invite.create({ data: { email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.invite.update({ where: { id: '<value>' }, data: { email: '<new-value>' }, select: { id: true } }).execute();
@@ -3152,18 +3329,20 @@ CRUD operations for OrgInvite records.
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 | `entityId` | UUID | Yes |
+| `inviteTokenTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all orgInvite records
-const items = await db.orgInvite.findMany({ select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
+const items = await db.orgInvite.findMany({ select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.orgInvite.findOne({ id: '<value>', select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } }).execute();
+const item = await db.orgInvite.findOne({ id: '<value>', select: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.orgInvite.create({ data: { email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>' }, select: { id: true } }).execute();
+const created = await db.orgInvite.create({ data: { email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.orgInvite.update({ where: { id: '<value>' }, data: { email: '<new-value>' }, select: { id: true } }).execute();
@@ -3220,18 +3399,20 @@ CRUD operations for Ref records.
 | `databaseId` | UUID | Yes |
 | `storeId` | UUID | Yes |
 | `commitId` | UUID | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all ref records
-const items = await db.ref.findMany({ select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const items = await db.ref.findMany({ select: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.ref.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, storeId: true, commitId: true } }).execute();
+const item = await db.ref.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.ref.create({ data: { name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>' }, select: { id: true } }).execute();
+const created = await db.ref.create({ data: { name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.ref.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
@@ -3253,18 +3434,20 @@ CRUD operations for Store records.
 | `databaseId` | UUID | Yes |
 | `hash` | UUID | Yes |
 | `createdAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all store records
-const items = await db.store.findMany({ select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const items = await db.store.findMany({ select: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.store.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, hash: true, createdAt: true } }).execute();
+const item = await db.store.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.store.create({ data: { name: '<value>', databaseId: '<value>', hash: '<value>' }, select: { id: true } }).execute();
+const created = await db.store.create({ data: { name: '<value>', databaseId: '<value>', hash: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.store.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
@@ -3301,6 +3484,43 @@ const updated = await db.appPermissionDefault.update({ where: { id: '<value>' },
 
 // Delete
 const deleted = await db.appPermissionDefault.delete({ where: { id: '<value>' } }).execute();
+```
+
+### `db.cryptoAddress`
+
+CRUD operations for CryptoAddress records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `ownerId` | UUID | Yes |
+| `address` | String | Yes |
+| `isVerified` | Boolean | Yes |
+| `isPrimary` | Boolean | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+| `addressTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all cryptoAddress records
+const items = await db.cryptoAddress.findMany({ select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, addressTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.cryptoAddress.findOne({ id: '<value>', select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, addressTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.cryptoAddress.create({ data: { ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>', addressTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.cryptoAddress.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.cryptoAddress.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.roleType`
@@ -3364,9 +3584,9 @@ const updated = await db.orgPermissionDefault.update({ where: { id: '<value>' },
 const deleted = await db.orgPermissionDefault.delete({ where: { id: '<value>' } }).execute();
 ```
 
-### `db.cryptoAddress`
+### `db.phoneNumber`
 
-CRUD operations for CryptoAddress records.
+CRUD operations for PhoneNumber records.
 
 **Fields:**
 
@@ -3374,29 +3594,33 @@ CRUD operations for CryptoAddress records.
 |-------|------|----------|
 | `id` | UUID | No |
 | `ownerId` | UUID | Yes |
-| `address` | String | Yes |
+| `cc` | String | Yes |
+| `number` | String | Yes |
 | `isVerified` | Boolean | Yes |
 | `isPrimary` | Boolean | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `ccTrgmSimilarity` | Float | Yes |
+| `numberTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
-// List all cryptoAddress records
-const items = await db.cryptoAddress.findMany({ select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+// List all phoneNumber records
+const items = await db.phoneNumber.findMany({ select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAddress.findOne({ id: '<value>', select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.phoneNumber.findOne({ id: '<value>', select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.cryptoAddress.create({ data: { ownerId: '<value>', address: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
+const created = await db.phoneNumber.create({ data: { ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>', ccTrgmSimilarity: '<value>', numberTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.cryptoAddress.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
+const updated = await db.phoneNumber.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.cryptoAddress.delete({ where: { id: '<value>' } }).execute();
+const deleted = await db.phoneNumber.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.appLimitDefault`
@@ -3477,92 +3701,27 @@ CRUD operations for ConnectedAccount records.
 | `isVerified` | Boolean | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `serviceTrgmSimilarity` | Float | Yes |
+| `identifierTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all connectedAccount records
-const items = await db.connectedAccount.findMany({ select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.connectedAccount.findMany({ select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.connectedAccount.findOne({ id: '<value>', select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.connectedAccount.findOne({ id: '<value>', select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true, serviceTrgmSimilarity: true, identifierTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.connectedAccount.create({ data: { ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>' }, select: { id: true } }).execute();
+const created = await db.connectedAccount.create({ data: { ownerId: '<value>', service: '<value>', identifier: '<value>', details: '<value>', isVerified: '<value>', serviceTrgmSimilarity: '<value>', identifierTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.connectedAccount.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.connectedAccount.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.phoneNumber`
-
-CRUD operations for PhoneNumber records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `ownerId` | UUID | Yes |
-| `cc` | String | Yes |
-| `number` | String | Yes |
-| `isVerified` | Boolean | Yes |
-| `isPrimary` | Boolean | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all phoneNumber records
-const items = await db.phoneNumber.findMany({ select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.phoneNumber.findOne({ id: '<value>', select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.phoneNumber.create({ data: { ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.phoneNumber.update({ where: { id: '<value>' }, data: { ownerId: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.phoneNumber.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.membershipType`
-
-CRUD operations for MembershipType records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | Int | No |
-| `name` | String | Yes |
-| `description` | String | Yes |
-| `prefix` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all membershipType records
-const items = await db.membershipType.findMany({ select: { id: true, name: true, description: true, prefix: true } }).execute();
-
-// Get one by id
-const item = await db.membershipType.findOne({ id: '<value>', select: { id: true, name: true, description: true, prefix: true } }).execute();
-
-// Create
-const created = await db.membershipType.create({ data: { name: '<value>', description: '<value>', prefix: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.membershipType.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.membershipType.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.nodeTypeRegistry`
@@ -3582,24 +3741,104 @@ CRUD operations for NodeTypeRegistry records.
 | `tags` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `nameTrgmSimilarity` | Float | Yes |
+| `slugTrgmSimilarity` | Float | Yes |
+| `categoryTrgmSimilarity` | Float | Yes |
+| `displayNameTrgmSimilarity` | Float | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all nodeTypeRegistry records
-const items = await db.nodeTypeRegistry.findMany({ select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.nodeTypeRegistry.findMany({ select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, slugTrgmSimilarity: true, categoryTrgmSimilarity: true, displayNameTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by name
-const item = await db.nodeTypeRegistry.findOne({ name: '<value>', select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.nodeTypeRegistry.findOne({ name: '<value>', select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true, nameTrgmSimilarity: true, slugTrgmSimilarity: true, categoryTrgmSimilarity: true, displayNameTrgmSimilarity: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.nodeTypeRegistry.create({ data: { slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>' }, select: { name: true } }).execute();
+const created = await db.nodeTypeRegistry.create({ data: { slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', slugTrgmSimilarity: '<value>', categoryTrgmSimilarity: '<value>', displayNameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { name: true } }).execute();
 
 // Update
 const updated = await db.nodeTypeRegistry.update({ where: { name: '<value>' }, data: { slug: '<new-value>' }, select: { name: true } }).execute();
 
 // Delete
 const deleted = await db.nodeTypeRegistry.delete({ where: { name: '<value>' } }).execute();
+```
+
+### `db.membershipType`
+
+CRUD operations for MembershipType records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | Int | No |
+| `name` | String | Yes |
+| `description` | String | Yes |
+| `prefix` | String | Yes |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all membershipType records
+const items = await db.membershipType.findMany({ select: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.membershipType.findOne({ id: '<value>', select: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.membershipType.create({ data: { name: '<value>', description: '<value>', prefix: '<value>', descriptionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.membershipType.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.membershipType.delete({ where: { id: '<value>' } }).execute();
+```
+
+### `db.commit`
+
+CRUD operations for Commit records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `message` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `storeId` | UUID | Yes |
+| `parentIds` | UUID | Yes |
+| `authorId` | UUID | Yes |
+| `committerId` | UUID | Yes |
+| `treeId` | UUID | Yes |
+| `date` | Datetime | Yes |
+| `messageTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all commit records
+const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.commit.findOne({ id: '<value>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.commit.update({ where: { id: '<value>' }, data: { message: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.commit.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.appMembershipDefault`
@@ -3637,41 +3876,48 @@ const updated = await db.appMembershipDefault.update({ where: { id: '<value>' },
 const deleted = await db.appMembershipDefault.delete({ where: { id: '<value>' } }).execute();
 ```
 
-### `db.commit`
+### `db.rlsModule`
 
-CRUD operations for Commit records.
+CRUD operations for RlsModule records.
 
 **Fields:**
 
 | Field | Type | Editable |
 |-------|------|----------|
 | `id` | UUID | No |
-| `message` | String | Yes |
 | `databaseId` | UUID | Yes |
-| `storeId` | UUID | Yes |
-| `parentIds` | UUID | Yes |
-| `authorId` | UUID | Yes |
-| `committerId` | UUID | Yes |
-| `treeId` | UUID | Yes |
-| `date` | Datetime | Yes |
+| `schemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `sessionCredentialsTableId` | UUID | Yes |
+| `sessionsTableId` | UUID | Yes |
+| `usersTableId` | UUID | Yes |
+| `authenticate` | String | Yes |
+| `authenticateStrict` | String | Yes |
+| `currentRole` | String | Yes |
+| `currentRoleId` | String | Yes |
+| `authenticateTrgmSimilarity` | Float | Yes |
+| `authenticateStrictTrgmSimilarity` | Float | Yes |
+| `currentRoleTrgmSimilarity` | Float | Yes |
+| `currentRoleIdTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
-// List all commit records
-const items = await db.commit.findMany({ select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
+// List all rlsModule records
+const items = await db.rlsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, authenticateTrgmSimilarity: true, authenticateStrictTrgmSimilarity: true, currentRoleTrgmSimilarity: true, currentRoleIdTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.commit.findOne({ id: '<value>', select: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } }).execute();
+const item = await db.rlsModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true, authenticateTrgmSimilarity: true, authenticateStrictTrgmSimilarity: true, currentRoleTrgmSimilarity: true, currentRoleIdTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.commit.create({ data: { message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>' }, select: { id: true } }).execute();
+const created = await db.rlsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>', authenticateTrgmSimilarity: '<value>', authenticateStrictTrgmSimilarity: '<value>', currentRoleTrgmSimilarity: '<value>', currentRoleIdTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.commit.update({ where: { id: '<value>' }, data: { message: '<new-value>' }, select: { id: true } }).execute();
+const updated = await db.rlsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.commit.delete({ where: { id: '<value>' } }).execute();
+const deleted = await db.rlsModule.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.orgMembershipDefault`
@@ -3727,18 +3973,20 @@ CRUD operations for AuditLog records.
 | `ipAddress` | InternetAddress | Yes |
 | `success` | Boolean | Yes |
 | `createdAt` | Datetime | No |
+| `userAgentTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all auditLog records
-const items = await db.auditLog.findMany({ select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
+const items = await db.auditLog.findMany({ select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.auditLog.findOne({ id: '<value>', select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } }).execute();
+const item = await db.auditLog.findOne({ id: '<value>', select: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.auditLog.create({ data: { event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' }, select: { id: true } }).execute();
+const created = await db.auditLog.create({ data: { event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>', userAgentTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.auditLog.update({ where: { id: '<value>' }, data: { event: '<new-value>' }, select: { id: true } }).execute();
@@ -3762,24 +4010,74 @@ CRUD operations for AppLevel records.
 | `ownerId` | UUID | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
+| `descriptionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all appLevel records
-const items = await db.appLevel.findMany({ select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.appLevel.findMany({ select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.appLevel.findOne({ id: '<value>', select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appLevel.findOne({ id: '<value>', select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.appLevel.create({ data: { name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>' }, select: { id: true } }).execute();
+const created = await db.appLevel.create({ data: { name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.appLevel.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.appLevel.delete({ where: { id: '<value>' } }).execute();
+```
+
+### `db.sqlMigration`
+
+CRUD operations for SqlMigration records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | Int | No |
+| `name` | String | Yes |
+| `databaseId` | UUID | Yes |
+| `deploy` | String | Yes |
+| `deps` | String | Yes |
+| `payload` | JSON | Yes |
+| `content` | String | Yes |
+| `revert` | String | Yes |
+| `verify` | String | Yes |
+| `createdAt` | Datetime | No |
+| `action` | String | Yes |
+| `actionId` | UUID | Yes |
+| `actorId` | UUID | Yes |
+| `nameTrgmSimilarity` | Float | Yes |
+| `deployTrgmSimilarity` | Float | Yes |
+| `contentTrgmSimilarity` | Float | Yes |
+| `revertTrgmSimilarity` | Float | Yes |
+| `verifyTrgmSimilarity` | Float | Yes |
+| `actionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
+
+**Operations:**
+
+```typescript
+// List all sqlMigration records
+const items = await db.sqlMigration.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, nameTrgmSimilarity: true, deployTrgmSimilarity: true, contentTrgmSimilarity: true, revertTrgmSimilarity: true, verifyTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Get one by id
+const item = await db.sqlMigration.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, nameTrgmSimilarity: true, deployTrgmSimilarity: true, contentTrgmSimilarity: true, revertTrgmSimilarity: true, verifyTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
+
+// Create
+const created = await db.sqlMigration.create({ data: { name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>', nameTrgmSimilarity: '<value>', deployTrgmSimilarity: '<value>', contentTrgmSimilarity: '<value>', revertTrgmSimilarity: '<value>', verifyTrgmSimilarity: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.sqlMigration.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.sqlMigration.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.email`
@@ -3817,45 +4115,43 @@ const updated = await db.email.update({ where: { id: '<value>' }, data: { ownerI
 const deleted = await db.email.delete({ where: { id: '<value>' } }).execute();
 ```
 
-### `db.sqlMigration`
+### `db.user`
 
-CRUD operations for SqlMigration records.
+CRUD operations for User records.
 
 **Fields:**
 
 | Field | Type | Editable |
 |-------|------|----------|
-| `id` | Int | No |
-| `name` | String | Yes |
-| `databaseId` | UUID | Yes |
-| `deploy` | String | Yes |
-| `deps` | String | Yes |
-| `payload` | JSON | Yes |
-| `content` | String | Yes |
-| `revert` | String | Yes |
-| `verify` | String | Yes |
+| `id` | UUID | No |
+| `username` | String | Yes |
+| `displayName` | String | Yes |
+| `profilePicture` | ConstructiveInternalTypeImage | Yes |
+| `searchTsv` | FullText | Yes |
+| `type` | Int | Yes |
 | `createdAt` | Datetime | No |
-| `action` | String | Yes |
-| `actionId` | UUID | Yes |
-| `actorId` | UUID | Yes |
+| `updatedAt` | Datetime | No |
+| `searchTsvRank` | Float | Yes |
+| `displayNameTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
-// List all sqlMigration records
-const items = await db.sqlMigration.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+// List all user records
+const items = await db.user.findMany({ select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.sqlMigration.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.user.findOne({ id: '<value>', select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true, displayNameTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.sqlMigration.create({ data: { name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' }, select: { id: true } }).execute();
+const created = await db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>', displayNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.sqlMigration.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+const updated = await db.user.update({ where: { id: '<value>' }, data: { username: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.sqlMigration.delete({ where: { id: '<value>' } }).execute();
+const deleted = await db.user.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.astMigration`
@@ -3879,61 +4175,26 @@ CRUD operations for AstMigration records.
 | `action` | String | Yes |
 | `actionId` | UUID | Yes |
 | `actorId` | UUID | Yes |
+| `actionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all astMigration records
-const items = await db.astMigration.findMany({ select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const items = await db.astMigration.findMany({ select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.astMigration.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.astMigration.findOne({ id: '<value>', select: { id: true, databaseId: true, name: true, requires: true, payload: true, deploys: true, deploy: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.astMigration.create({ data: { databaseId: '<value>', name: '<value>', requires: '<value>', payload: '<value>', deploys: '<value>', deploy: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' }, select: { id: true } }).execute();
+const created = await db.astMigration.create({ data: { databaseId: '<value>', name: '<value>', requires: '<value>', payload: '<value>', deploys: '<value>', deploy: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.astMigration.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.astMigration.delete({ where: { id: '<value>' } }).execute();
-```
-
-### `db.user`
-
-CRUD operations for User records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `username` | String | Yes |
-| `displayName` | String | Yes |
-| `profilePicture` | ConstructiveInternalTypeImage | Yes |
-| `searchTsv` | FullText | Yes |
-| `type` | Int | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-| `searchTsvRank` | Float | Yes |
-
-**Operations:**
-
-```typescript
-// List all user records
-const items = await db.user.findMany({ select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
-
-// Get one by id
-const item = await db.user.findOne({ id: '<value>', select: { id: true, username: true, displayName: true, profilePicture: true, searchTsv: true, type: true, createdAt: true, updatedAt: true, searchTsvRank: true } }).execute();
-
-// Create
-const created = await db.user.create({ data: { username: '<value>', displayName: '<value>', profilePicture: '<value>', searchTsv: '<value>', type: '<value>', searchTsvRank: '<value>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.user.update({ where: { id: '<value>' }, data: { username: '<new-value>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.user.delete({ where: { id: '<value>' } }).execute();
 ```
 
 ### `db.appMembership`
@@ -4008,18 +4269,29 @@ CRUD operations for HierarchyModule records.
 | `getManagersFunction` | String | Yes |
 | `isManagerOfFunction` | String | Yes |
 | `createdAt` | Datetime | No |
+| `chartEdgesTableNameTrgmSimilarity` | Float | Yes |
+| `hierarchySprtTableNameTrgmSimilarity` | Float | Yes |
+| `chartEdgeGrantsTableNameTrgmSimilarity` | Float | Yes |
+| `prefixTrgmSimilarity` | Float | Yes |
+| `privateSchemaNameTrgmSimilarity` | Float | Yes |
+| `sprtTableNameTrgmSimilarity` | Float | Yes |
+| `rebuildHierarchyFunctionTrgmSimilarity` | Float | Yes |
+| `getSubordinatesFunctionTrgmSimilarity` | Float | Yes |
+| `getManagersFunctionTrgmSimilarity` | Float | Yes |
+| `isManagerOfFunctionTrgmSimilarity` | Float | Yes |
+| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all hierarchyModule records
-const items = await db.hierarchyModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true } }).execute();
+const items = await db.hierarchyModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true, chartEdgesTableNameTrgmSimilarity: true, hierarchySprtTableNameTrgmSimilarity: true, chartEdgeGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, privateSchemaNameTrgmSimilarity: true, sprtTableNameTrgmSimilarity: true, rebuildHierarchyFunctionTrgmSimilarity: true, getSubordinatesFunctionTrgmSimilarity: true, getManagersFunctionTrgmSimilarity: true, isManagerOfFunctionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Get one by id
-const item = await db.hierarchyModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true } }).execute();
+const item = await db.hierarchyModule.findOne({ id: '<value>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, chartEdgesTableId: true, chartEdgesTableName: true, hierarchySprtTableId: true, hierarchySprtTableName: true, chartEdgeGrantsTableId: true, chartEdgeGrantsTableName: true, entityTableId: true, usersTableId: true, prefix: true, privateSchemaName: true, sprtTableName: true, rebuildHierarchyFunction: true, getSubordinatesFunction: true, getManagersFunction: true, isManagerOfFunction: true, createdAt: true, chartEdgesTableNameTrgmSimilarity: true, hierarchySprtTableNameTrgmSimilarity: true, chartEdgeGrantsTableNameTrgmSimilarity: true, prefixTrgmSimilarity: true, privateSchemaNameTrgmSimilarity: true, sprtTableNameTrgmSimilarity: true, rebuildHierarchyFunctionTrgmSimilarity: true, getSubordinatesFunctionTrgmSimilarity: true, getManagersFunctionTrgmSimilarity: true, isManagerOfFunctionTrgmSimilarity: true, searchScore: true } }).execute();
 
 // Create
-const created = await db.hierarchyModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', chartEdgesTableId: '<value>', chartEdgesTableName: '<value>', hierarchySprtTableId: '<value>', hierarchySprtTableName: '<value>', chartEdgeGrantsTableId: '<value>', chartEdgeGrantsTableName: '<value>', entityTableId: '<value>', usersTableId: '<value>', prefix: '<value>', privateSchemaName: '<value>', sprtTableName: '<value>', rebuildHierarchyFunction: '<value>', getSubordinatesFunction: '<value>', getManagersFunction: '<value>', isManagerOfFunction: '<value>' }, select: { id: true } }).execute();
+const created = await db.hierarchyModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', chartEdgesTableId: '<value>', chartEdgesTableName: '<value>', hierarchySprtTableId: '<value>', hierarchySprtTableName: '<value>', chartEdgeGrantsTableId: '<value>', chartEdgeGrantsTableName: '<value>', entityTableId: '<value>', usersTableId: '<value>', prefix: '<value>', privateSchemaName: '<value>', sprtTableName: '<value>', rebuildHierarchyFunction: '<value>', getSubordinatesFunction: '<value>', getManagersFunction: '<value>', isManagerOfFunction: '<value>', chartEdgesTableNameTrgmSimilarity: '<value>', hierarchySprtTableNameTrgmSimilarity: '<value>', chartEdgeGrantsTableNameTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', privateSchemaNameTrgmSimilarity: '<value>', sprtTableNameTrgmSimilarity: '<value>', rebuildHierarchyFunctionTrgmSimilarity: '<value>', getSubordinatesFunctionTrgmSimilarity: '<value>', getManagersFunctionTrgmSimilarity: '<value>', isManagerOfFunctionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.hierarchyModule.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
@@ -4204,42 +4476,6 @@ orgPermissionsGetMaskByNames
 const result = await db.query.orgPermissionsGetMaskByNames({ names: '<value>' }).execute();
 ```
 
-### `db.query.appPermissionsGetByMask`
-
-Reads and enables pagination through a set of `AppPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-```typescript
-const result = await db.query.appPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
-```
-
-### `db.query.orgPermissionsGetByMask`
-
-Reads and enables pagination through a set of `OrgPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-```typescript
-const result = await db.query.orgPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
-```
-
 ### `db.query.getAllObjectsFromRoot`
 
 Reads and enables pagination through a set of `Object`.
@@ -4295,6 +4531,42 @@ getObjectAtPath
 
 ```typescript
 const result = await db.query.getObjectAtPath({ dbId: '<value>', storeId: '<value>', path: '<value>', refname: '<value>' }).execute();
+```
+
+### `db.query.appPermissionsGetByMask`
+
+Reads and enables pagination through a set of `AppPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `mask` | BitString |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
+
+```typescript
+const result = await db.query.appPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
+```
+
+### `db.query.orgPermissionsGetByMask`
+
+Reads and enables pagination through a set of `OrgPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `mask` | BitString |
+  | `first` | Int |
+  | `offset` | Int |
+  | `after` | Cursor |
+
+```typescript
+const result = await db.query.orgPermissionsGetByMask({ mask: '<value>', first: '<value>', offset: '<value>', after: '<value>' }).execute();
 ```
 
 ### `db.query.stepsRequired`
@@ -4477,21 +4749,6 @@ verifyEmail
 const result = await db.mutation.verifyEmail({ input: '<value>' }).execute();
 ```
 
-### `db.mutation.resetPassword`
-
-resetPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ResetPasswordInput (required) |
-
-```typescript
-const result = await db.mutation.resetPassword({ input: '<value>' }).execute();
-```
-
 ### `db.mutation.removeNodeAtPath`
 
 removeNodeAtPath
@@ -4507,6 +4764,21 @@ removeNodeAtPath
 const result = await db.mutation.removeNodeAtPath({ input: '<value>' }).execute();
 ```
 
+### `db.mutation.resetPassword`
+
+resetPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ResetPasswordInput (required) |
+
+```typescript
+const result = await db.mutation.resetPassword({ input: '<value>' }).execute();
+```
+
 ### `db.mutation.bootstrapUser`
 
 bootstrapUser
@@ -4520,6 +4792,21 @@ bootstrapUser
 
 ```typescript
 const result = await db.mutation.bootstrapUser({ input: '<value>' }).execute();
+```
+
+### `db.mutation.setFieldOrder`
+
+setFieldOrder
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetFieldOrderInput (required) |
+
+```typescript
+const result = await db.mutation.setFieldOrder({ input: '<value>' }).execute();
 ```
 
 ### `db.mutation.setDataAtPath`
@@ -4565,6 +4852,66 @@ provisionDatabaseWithUser
 
 ```typescript
 const result = await db.mutation.provisionDatabaseWithUser({ input: '<value>' }).execute();
+```
+
+### `db.mutation.insertNodeAtPath`
+
+insertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | InsertNodeAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.insertNodeAtPath({ input: '<value>' }).execute();
+```
+
+### `db.mutation.updateNodeAtPath`
+
+updateNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | UpdateNodeAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.updateNodeAtPath({ input: '<value>' }).execute();
+```
+
+### `db.mutation.setAndCommit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.setAndCommit({ input: '<value>' }).execute();
+```
+
+### `db.mutation.applyRls`
+
+applyRls
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ApplyRlsInput (required) |
+
+```typescript
+const result = await db.mutation.applyRls({ input: '<value>' }).execute();
 ```
 
 ### `db.mutation.signInOneTimeToken`
@@ -4658,21 +5005,6 @@ signUp
 const result = await db.mutation.signUp({ input: '<value>' }).execute();
 ```
 
-### `db.mutation.setFieldOrder`
-
-setFieldOrder
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetFieldOrderInput (required) |
-
-```typescript
-const result = await db.mutation.setFieldOrder({ input: '<value>' }).execute();
-```
-
 ### `db.mutation.oneTimeToken`
 
 oneTimeToken
@@ -4686,66 +5018,6 @@ oneTimeToken
 
 ```typescript
 const result = await db.mutation.oneTimeToken({ input: '<value>' }).execute();
-```
-
-### `db.mutation.insertNodeAtPath`
-
-insertNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | InsertNodeAtPathInput (required) |
-
-```typescript
-const result = await db.mutation.insertNodeAtPath({ input: '<value>' }).execute();
-```
-
-### `db.mutation.updateNodeAtPath`
-
-updateNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | UpdateNodeAtPathInput (required) |
-
-```typescript
-const result = await db.mutation.updateNodeAtPath({ input: '<value>' }).execute();
-```
-
-### `db.mutation.setAndCommit`
-
-setAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetAndCommitInput (required) |
-
-```typescript
-const result = await db.mutation.setAndCommit({ input: '<value>' }).execute();
-```
-
-### `db.mutation.applyRls`
-
-applyRls
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ApplyRlsInput (required) |
-
-```typescript
-const result = await db.mutation.applyRls({ input: '<value>' }).execute();
 ```
 
 ### `db.mutation.forgotPassword`

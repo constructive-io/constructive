@@ -9,7 +9,7 @@ ORM operations for PrimaryKeyConstraint records
 ```typescript
 db.primaryKeyConstraint.findMany({ select: { id: true } }).execute()
 db.primaryKeyConstraint.findOne({ id: '<value>', select: { id: true } }).execute()
-db.primaryKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
+db.primaryKeyConstraint.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', type: '<value>', fieldIds: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', typeTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.primaryKeyConstraint.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.primaryKeyConstraint.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.primaryKeyConstraint.findMany({
 
 ```typescript
 const item = await db.primaryKeyConstraint.create({
-  data: { databaseId: 'value', tableId: 'value', name: 'value', type: 'value', fieldIds: 'value', smartTags: 'value', category: 'value', module: 'value', scope: 'value', tags: 'value' },
+  data: { databaseId: 'value', tableId: 'value', name: 'value', type: 'value', fieldIds: 'value', smartTags: 'value', category: 'value', module: 'value', scope: 'value', tags: 'value', nameTrgmSimilarity: 'value', typeTrgmSimilarity: 'value', moduleTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

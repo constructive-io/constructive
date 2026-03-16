@@ -220,6 +220,9 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       singleRelation(previous, _options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
+        if (!relation) {
+          return previous!(details);
+        }
         if (typeof relation.extensions?.tags?.fieldName === 'string') {
           return relation.extensions.tags.fieldName;
         }
@@ -255,6 +258,9 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       singleRelationBackwards(previous, _options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
+        if (!relation) {
+          return previous!(details);
+        }
         if (
           typeof relation.extensions?.tags?.foreignSingleFieldName === 'string'
         ) {
@@ -294,7 +300,10 @@ export const InflektPlugin: GraphileConfig.Plugin = {
       _manyRelation(previous, _options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        if (!relation) {
+          return previous!(details);
+        }
+        const baseOverride = relation.extensions?.tags?.foreignFieldName;
         if (typeof baseOverride === 'string') {
           return baseOverride;
         }
@@ -352,7 +361,10 @@ export const InflektPlugin: GraphileConfig.Plugin = {
         const { leftTable, rightTable, junctionTable, rightRelationName } =
           details;
 
-        const junctionRightRelation = junctionTable.getRelation(rightRelationName);
+        const junctionRightRelation = junctionTable.getRelation?.(rightRelationName);
+        if (!junctionRightRelation) {
+          return previous!(details);
+        }
         const baseOverride =
           junctionRightRelation.extensions?.tags?.manyToManyFieldName;
         if (typeof baseOverride === 'string') {

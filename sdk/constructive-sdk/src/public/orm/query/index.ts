@@ -11,9 +11,9 @@ import type {
   User,
   ObjectSelect,
   UserSelect,
+  ObjectConnection,
   AppPermissionConnection,
   OrgPermissionConnection,
-  ObjectConnection,
   AppLevelRequirementConnection,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
@@ -50,30 +50,6 @@ export interface AppPermissionsGetMaskByNamesVariables {
 export interface OrgPermissionsGetMaskByNamesVariables {
   names?: string[];
 }
-export interface AppPermissionsGetByMaskVariables {
-  mask?: string;
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-}
-export interface OrgPermissionsGetByMaskVariables {
-  mask?: string;
-  /** Only read the first `n` values of the set. */
-  first?: number;
-  /**
-   * Skip the first `n` values from our `after` cursor, an alternative to cursor
-   * based pagination. May not be used with `last`.
-   */
-  offset?: number;
-  /** Read all values in the set after (below) this cursor. */
-  after?: string;
-}
 export interface GetAllObjectsFromRootVariables {
   databaseId?: string;
   id?: string;
@@ -106,6 +82,30 @@ export interface GetObjectAtPathVariables {
   storeId?: string;
   path?: string[];
   refname?: string;
+}
+export interface AppPermissionsGetByMaskVariables {
+  mask?: string;
+  /** Only read the first `n` values of the set. */
+  first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
+  offset?: number;
+  /** Read all values in the set after (below) this cursor. */
+  after?: string;
+}
+export interface OrgPermissionsGetByMaskVariables {
+  mask?: string;
+  /** Only read the first `n` values of the set. */
+  first?: number;
+  /**
+   * Skip the first `n` values from our `after` cursor, an alternative to cursor
+   * based pagination. May not be used with `last`.
+   */
+  offset?: number;
+  /** Read all values in the set after (below) this cursor. */
+  after?: string;
 }
 export interface StepsRequiredVariables {
   vlevel?: string;
@@ -464,88 +464,6 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    appPermissionsGetByMask: (
-      args: AppPermissionsGetByMaskVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        appPermissionsGetByMask: AppPermissionConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'AppPermissionsGetByMask',
-        fieldName: 'appPermissionsGetByMask',
-        ...buildCustomDocument(
-          'query',
-          'AppPermissionsGetByMask',
-          'appPermissionsGetByMask',
-          options?.select,
-          args,
-          [
-            {
-              name: 'mask',
-              type: 'BitString',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
-    orgPermissionsGetByMask: (
-      args: OrgPermissionsGetByMaskVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        orgPermissionsGetByMask: OrgPermissionConnection | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'OrgPermissionsGetByMask',
-        fieldName: 'orgPermissionsGetByMask',
-        ...buildCustomDocument(
-          'query',
-          'OrgPermissionsGetByMask',
-          'orgPermissionsGetByMask',
-          options?.select,
-          args,
-          [
-            {
-              name: 'mask',
-              type: 'BitString',
-            },
-            {
-              name: 'first',
-              type: 'Int',
-            },
-            {
-              name: 'offset',
-              type: 'Int',
-            },
-            {
-              name: 'after',
-              type: 'Cursor',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
     getAllObjectsFromRoot: (
       args: GetAllObjectsFromRootVariables,
       options?: {
@@ -679,6 +597,88 @@ export function createQueryOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'Object'
+        ),
+      }),
+    appPermissionsGetByMask: (
+      args: AppPermissionsGetByMaskVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        appPermissionsGetByMask: AppPermissionConnection | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'AppPermissionsGetByMask',
+        fieldName: 'appPermissionsGetByMask',
+        ...buildCustomDocument(
+          'query',
+          'AppPermissionsGetByMask',
+          'appPermissionsGetByMask',
+          options?.select,
+          args,
+          [
+            {
+              name: 'mask',
+              type: 'BitString',
+            },
+            {
+              name: 'first',
+              type: 'Int',
+            },
+            {
+              name: 'offset',
+              type: 'Int',
+            },
+            {
+              name: 'after',
+              type: 'Cursor',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    orgPermissionsGetByMask: (
+      args: OrgPermissionsGetByMaskVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        orgPermissionsGetByMask: OrgPermissionConnection | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'OrgPermissionsGetByMask',
+        fieldName: 'orgPermissionsGetByMask',
+        ...buildCustomDocument(
+          'query',
+          'OrgPermissionsGetByMask',
+          'orgPermissionsGetByMask',
+          options?.select,
+          args,
+          [
+            {
+              name: 'mask',
+              type: 'BitString',
+            },
+            {
+              name: 'first',
+              type: 'Int',
+            },
+            {
+              name: 'offset',
+              type: 'Int',
+            },
+            {
+              name: 'after',
+              type: 'Cursor',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
         ),
       }),
     stepsRequired: (

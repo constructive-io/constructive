@@ -20,8 +20,8 @@ import orgAdminGrantCmd from './commands/org-admin-grant';
 import orgOwnerGrantCmd from './commands/org-owner-grant';
 import appLimitDefaultCmd from './commands/app-limit-default';
 import orgLimitDefaultCmd from './commands/org-limit-default';
-import membershipTypeCmd from './commands/membership-type';
 import orgChartEdgeGrantCmd from './commands/org-chart-edge-grant';
+import membershipTypeCmd from './commands/membership-type';
 import appLimitCmd from './commands/app-limit';
 import appAchievementCmd from './commands/app-achievement';
 import appStepCmd from './commands/app-step';
@@ -33,17 +33,17 @@ import orgClaimedInviteCmd from './commands/org-claimed-invite';
 import orgGrantCmd from './commands/org-grant';
 import orgChartEdgeCmd from './commands/org-chart-edge';
 import orgMembershipDefaultCmd from './commands/org-membership-default';
-import inviteCmd from './commands/invite';
-import appLevelCmd from './commands/app-level';
 import appMembershipCmd from './commands/app-membership';
 import orgMembershipCmd from './commands/org-membership';
+import inviteCmd from './commands/invite';
+import appLevelCmd from './commands/app-level';
 import orgInviteCmd from './commands/org-invite';
 import appPermissionsGetPaddedMaskCmd from './commands/app-permissions-get-padded-mask';
 import orgPermissionsGetPaddedMaskCmd from './commands/org-permissions-get-padded-mask';
 import orgIsManagerOfCmd from './commands/org-is-manager-of';
-import stepsAchievedCmd from './commands/steps-achieved';
 import appPermissionsGetMaskCmd from './commands/app-permissions-get-mask';
 import orgPermissionsGetMaskCmd from './commands/org-permissions-get-mask';
+import stepsAchievedCmd from './commands/steps-achieved';
 import appPermissionsGetMaskByNamesCmd from './commands/app-permissions-get-mask-by-names';
 import orgPermissionsGetMaskByNamesCmd from './commands/org-permissions-get-mask-by-names';
 import appPermissionsGetByMaskCmd from './commands/app-permissions-get-by-mask';
@@ -75,8 +75,8 @@ const createCommandMap: () => Record<
   'org-owner-grant': orgOwnerGrantCmd,
   'app-limit-default': appLimitDefaultCmd,
   'org-limit-default': orgLimitDefaultCmd,
-  'membership-type': membershipTypeCmd,
   'org-chart-edge-grant': orgChartEdgeGrantCmd,
+  'membership-type': membershipTypeCmd,
   'app-limit': appLimitCmd,
   'app-achievement': appAchievementCmd,
   'app-step': appStepCmd,
@@ -88,17 +88,17 @@ const createCommandMap: () => Record<
   'org-grant': orgGrantCmd,
   'org-chart-edge': orgChartEdgeCmd,
   'org-membership-default': orgMembershipDefaultCmd,
-  invite: inviteCmd,
-  'app-level': appLevelCmd,
   'app-membership': appMembershipCmd,
   'org-membership': orgMembershipCmd,
+  invite: inviteCmd,
+  'app-level': appLevelCmd,
   'org-invite': orgInviteCmd,
   'app-permissions-get-padded-mask': appPermissionsGetPaddedMaskCmd,
   'org-permissions-get-padded-mask': orgPermissionsGetPaddedMaskCmd,
   'org-is-manager-of': orgIsManagerOfCmd,
-  'steps-achieved': stepsAchievedCmd,
   'app-permissions-get-mask': appPermissionsGetMaskCmd,
   'org-permissions-get-mask': orgPermissionsGetMaskCmd,
+  'steps-achieved': stepsAchievedCmd,
   'app-permissions-get-mask-by-names': appPermissionsGetMaskByNamesCmd,
   'org-permissions-get-mask-by-names': orgPermissionsGetMaskByNamesCmd,
   'app-permissions-get-by-mask': appPermissionsGetByMaskCmd,
@@ -108,7 +108,7 @@ const createCommandMap: () => Record<
   'submit-org-invite-code': submitOrgInviteCodeCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  org-member           orgMember CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  membership-type      membershipType CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  app-limit            appLimit CRUD operations\n  app-achievement      appAchievement CRUD operations\n  app-step             appStep CRUD operations\n  claimed-invite       claimedInvite CRUD operations\n  app-grant            appGrant CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  org-limit            orgLimit CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  invite               invite CRUD operations\n  app-level            appLevel CRUD operations\n  app-membership       appMembership CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-invite           orgInvite CRUD operations\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  org-is-manager-of    orgIsManagerOf\n  steps-achieved       stepsAchieved\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  submit-invite-code   submitInviteCode\n  submit-org-invite-code submitOrgInviteCode\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  org-member           orgMember CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  membership-type      membershipType CRUD operations\n  app-limit            appLimit CRUD operations\n  app-achievement      appAchievement CRUD operations\n  app-step             appStep CRUD operations\n  claimed-invite       claimedInvite CRUD operations\n  app-grant            appGrant CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  org-limit            orgLimit CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  app-membership       appMembership CRUD operations\n  org-membership       orgMembership CRUD operations\n  invite               invite CRUD operations\n  app-level            appLevel CRUD operations\n  org-invite           orgInvite CRUD operations\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  steps-achieved       stepsAchieved\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  submit-invite-code   submitInviteCode\n  submit-org-invite-code submitOrgInviteCode\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

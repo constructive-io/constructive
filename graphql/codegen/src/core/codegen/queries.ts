@@ -52,6 +52,7 @@ import {
 } from './hooks-ast';
 import {
   getAllRowsQueryName,
+  getConditionTypeName,
   getFilterTypeName,
   getListQueryFileName,
   getListQueryHookName,
@@ -75,6 +76,7 @@ export interface QueryGeneratorOptions {
   reactQueryEnabled?: boolean;
   useCentralizedKeys?: boolean;
   hasRelationships?: boolean;
+  condition?: boolean;
 }
 
 export function generateListQueryHook(
@@ -85,12 +87,14 @@ export function generateListQueryHook(
     reactQueryEnabled = true,
     useCentralizedKeys = true,
     hasRelationships = false,
+    condition: conditionEnabled = true,
   } = options;
   const { typeName, pluralName, singularName } = getTableNames(table);
   const hookName = getListQueryHookName(table);
   const queryName = getAllRowsQueryName(table);
   const filterTypeName = getFilterTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
+  const conditionTypeName = conditionEnabled ? getConditionTypeName(table) : undefined;
   const keysName = `${lcFirst(typeName)}Keys`;
   const scopeTypeName = `${typeName}Scope`;
   const selectTypeName = `${typeName}Select`;
@@ -131,10 +135,12 @@ export function generateListQueryHook(
     }
   }
 
+  const inputTypeImports = [selectTypeName, relationTypeName, filterTypeName, orderByTypeName];
+  if (conditionTypeName) inputTypeImports.push(conditionTypeName);
   statements.push(
     createImportDeclaration(
       '../../orm/input-types',
-      [selectTypeName, relationTypeName, filterTypeName, orderByTypeName],
+      inputTypeImports,
       true,
     ),
   );
@@ -152,9 +158,11 @@ export function generateListQueryHook(
   );
 
   // Re-exports
+  const reExportTypes = [selectTypeName, relationTypeName, filterTypeName, orderByTypeName];
+  if (conditionTypeName) reExportTypes.push(conditionTypeName);
   statements.push(
     createTypeReExport(
-      [selectTypeName, relationTypeName, filterTypeName, orderByTypeName],
+      reExportTypes,
       '../../orm/input-types',
     ),
   );
@@ -174,15 +182,17 @@ export function generateListQueryHook(
     ]);
     statements.push(keyDecl);
   } else {
+    const findManyKeyTypeArgs: t.TSType[] = [
+      t.tsUnknownKeyword(),
+      typeRef(filterTypeName),
+      conditionTypeName ? typeRef(conditionTypeName) : t.tsNeverKeyword(),
+      typeRef(orderByTypeName),
+    ];
     const keyFn = t.arrowFunctionExpression(
       [
         createFunctionParam(
           'variables',
-          typeRef('FindManyArgs', [
-            t.tsUnknownKeyword(),
-            typeRef(filterTypeName),
-            typeRef(orderByTypeName),
-          ]),
+          typeRef('FindManyArgs', findManyKeyTypeArgs),
           true,
         ),
       ],

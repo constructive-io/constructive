@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.6.4](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.6.3...@constructive-io/knative-job-service@2.6.4) (2026-03-16)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [2.6.3](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.6.2...@constructive-io/knative-job-service@2.6.3) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [2.6.2](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.6.1...@constructive-io/knative-job-service@2.6.2) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [2.6.1](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.6.0...@constructive-io/knative-job-service@2.6.1) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+# [2.6.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.5.4...@constructive-io/knative-job-service@2.6.0) (2026-03-14)
+
+### Bug Fixes
+
+- migrate remaining condition queries to filter, register filterBy behavior for pgCodecRelation, update schema snapshot with relation filter types ([5207254](https://github.com/constructive-io/jobs/commit/5207254ad96ec30100e93f6268137eaede1e4387))
+- update knative-job-service test query filter→where argument ([8f8c3fe](https://github.com/constructive-io/jobs/commit/8f8c3fe6e326ce95cccb847ed9ab7a5eadabd88e))
+
+## [2.5.4](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.5.3...@constructive-io/knative-job-service@2.5.4) (2026-03-13)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [2.5.3](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.5.2...@constructive-io/knative-job-service@2.5.3) (2026-03-13)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [2.5.2](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.5.1...@constructive-io/knative-job-service@2.5.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [2.5.1](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.4.0...@constructive-io/knative-job-service@2.5.1) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+# [2.5.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.4.0...@constructive-io/knative-job-service@2.5.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+# [2.4.0](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.3.5...@constructive-io/knative-job-service@2.4.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
+## [2.3.5](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.3.4...@constructive-io/knative-job-service@2.3.5) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/knative-job-service
+
 ## [2.3.4](https://github.com/constructive-io/jobs/compare/@constructive-io/knative-job-service@2.3.3...@constructive-io/knative-job-service@2.3.4) (2026-03-04)
 
 **Note:** Version bump only for package @constructive-io/knative-job-service

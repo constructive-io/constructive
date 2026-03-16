@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/examples-codegen-integration",
-  "version": "1.3.6",
+  "version": "1.6.6",
   "private": true,
   "scripts": {
     "codegen": "tsx scripts/codegen-runner.ts",

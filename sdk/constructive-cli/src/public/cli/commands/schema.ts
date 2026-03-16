@@ -23,6 +23,12 @@ const fieldSchema: FieldSchema = {
   isPublic: 'boolean',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  schemaNameTrgmSimilarity: 'float',
+  labelTrgmSimilarity: 'float',
+  descriptionTrgmSimilarity: 'float',
+  moduleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nschema <command>\n\nCommands:\n  list                  List all schema records\n  get                   Get a schema by ID\n  create                Create a new schema\n  update                Update an existing schema\n  delete                Delete a schema\n\n  --help, -h            Show this help message\n';

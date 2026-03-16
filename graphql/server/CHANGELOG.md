@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.11.1...@constructive-io/graphql-server@4.11.2) (2026-03-16)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.11.0...@constructive-io/graphql-server@4.11.1) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.10.0...@constructive-io/graphql-server@4.11.0) (2026-03-15)
+
+### Bug Fixes
+
+- align all graphile ecosystem deps to latest compatible pinned RC versions ([d3f7761](https://github.com/constructive-io/constructive/commit/d3f7761182e0470cf992028155d1a5fa00cf9211))
+
+### Features
+
+- **graphql-server:** add local-only observability tooling ([ca89146](https://github.com/constructive-io/constructive/commit/ca891467df721224ae709f7b67392fb24e86004e))
+
+# [4.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.9.0...@constructive-io/graphql-server@4.10.0) (2026-03-15)
+
+### Features
+
+- pass schema naming strategy env vars to pgSettings ([0ef5f37](https://github.com/constructive-io/constructive/commit/0ef5f37ed7cc671081d4b20c549e5b9fc9ccd5dc)), closes [#576](https://github.com/constructive-io/constructive/issues/576)
+
+# [4.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.8.4...@constructive-io/graphql-server@4.9.0) (2026-03-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.8.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.8.3...@constructive-io/graphql-server@4.8.4) (2026-03-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.8.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.8.2...@constructive-io/graphql-server@4.8.3) (2026-03-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.8.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.8.1...@constructive-io/graphql-server@4.8.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.7.0...@constructive-io/graphql-server@4.8.1) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.7.0...@constructive-io/graphql-server@4.8.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.6.2...@constructive-io/graphql-server@4.7.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.6.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.6.1...@constructive-io/graphql-server@4.6.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [4.6.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.6.0...@constructive-io/graphql-server@4.6.1) (2026-03-04)
 
 ### Bug Fixes

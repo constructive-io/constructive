@@ -7,8 +7,8 @@ React Query hooks for ViewGrant data operations
 ## Usage
 
 ```typescript
-useViewGrantsQuery({ selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } } })
-useViewGrantQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } } })
+useViewGrantsQuery({ selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, searchScore: true } } })
+useViewGrantQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, searchScore: true } } })
 useCreateViewGrantMutation({ selection: { fields: { id: true } } })
 useUpdateViewGrantMutation({ selection: { fields: { id: true } } })
 useDeleteViewGrantMutation({})
@@ -20,7 +20,7 @@ useDeleteViewGrantMutation({})
 
 ```typescript
 const { data, isLoading } = useViewGrantsQuery({
-  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true } },
+  selection: { fields: { id: true, databaseId: true, viewId: true, granteeName: true, privilege: true, withGrantOption: true, isGrant: true, granteeNameTrgmSimilarity: true, privilegeTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useViewGrantsQuery({
 const { mutate } = useCreateViewGrantMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>' });
+mutate({ databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>', granteeNameTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

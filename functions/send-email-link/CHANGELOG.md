@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.5.0...@constructive-io/send-email-link-fn@2.5.1) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/send-email-link-fn
+
+# [2.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.4.2...@constructive-io/send-email-link-fn@2.5.0) (2026-03-14)
+
+### Bug Fixes
+
+- migrate remaining condition queries to filter, register filterBy behavior for pgCodecRelation, update schema snapshot with relation filter types ([5207254](https://github.com/constructive-io/constructive/commit/5207254ad96ec30100e93f6268137eaede1e4387))
+- update send-email-link GraphQL queries filter→where argument ([971b7ed](https://github.com/constructive-io/constructive/commit/971b7edda82341db26ecf57de90bde44f115c172))
+
+## [2.4.2](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.4.1...@constructive-io/send-email-link-fn@2.4.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/send-email-link-fn
+
+## [2.4.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.3.0...@constructive-io/send-email-link-fn@2.4.1) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/send-email-link-fn
+
+# [2.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.3.0...@constructive-io/send-email-link-fn@2.4.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/send-email-link-fn
+
+# [2.3.0](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.2.2...@constructive-io/send-email-link-fn@2.3.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/send-email-link-fn
+
 ## [2.2.2](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.2.1...@constructive-io/send-email-link-fn@2.2.2) (2026-03-04)
 
 **Note:** Version bump only for package @constructive-io/send-email-link-fn

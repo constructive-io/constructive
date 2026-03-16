@@ -9,7 +9,7 @@ Registry of high-level semantic AST node types using domain-prefixed naming. The
 ```typescript
 db.nodeTypeRegistry.findMany({ select: { id: true } }).execute()
 db.nodeTypeRegistry.findOne({ name: '<value>', select: { id: true } }).execute()
-db.nodeTypeRegistry.create({ data: { slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>' }, select: { id: true } }).execute()
+db.nodeTypeRegistry.create({ data: { slug: '<value>', category: '<value>', displayName: '<value>', description: '<value>', parameterSchema: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', slugTrgmSimilarity: '<value>', categoryTrgmSimilarity: '<value>', displayNameTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.nodeTypeRegistry.update({ where: { name: '<value>' }, data: { slug: '<new>' }, select: { id: true } }).execute()
 db.nodeTypeRegistry.delete({ where: { name: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.nodeTypeRegistry.findMany({
 
 ```typescript
 const item = await db.nodeTypeRegistry.create({
-  data: { slug: 'value', category: 'value', displayName: 'value', description: 'value', parameterSchema: 'value', tags: 'value' },
+  data: { slug: 'value', category: 'value', displayName: 'value', description: 'value', parameterSchema: 'value', tags: 'value', nameTrgmSimilarity: 'value', slugTrgmSimilarity: 'value', categoryTrgmSimilarity: 'value', displayNameTrgmSimilarity: 'value', descriptionTrgmSimilarity: 'value', searchScore: 'value' },
   select: { name: true }
 }).execute();
 ```

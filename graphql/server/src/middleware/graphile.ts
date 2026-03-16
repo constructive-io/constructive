@@ -10,7 +10,9 @@ import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { buildConnectionString } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
+import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
+import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -151,6 +153,15 @@ const buildPreset = (
       const req = (requestContext as { expressv4?: { req?: Request } })?.expressv4?.req;
       const context: Record<string, string> = {};
 
+      // Schema naming strategy settings (for local development).
+      // See constructive-db: get_available_schema_hash / create_schema_trigger.
+      if (process.env.CONSTRUCTIVE_SIMPLE_SCHEMA_NAMES) {
+        context['constructive.simple_schema_names'] = process.env.CONSTRUCTIVE_SIMPLE_SCHEMA_NAMES;
+      }
+      if (process.env.CONSTRUCTIVE_SCHEMA_USE_UNDERSCORES) {
+        context['constructive.schema_use_underscores'] = process.env.CONSTRUCTIVE_SCHEMA_USE_UNDERSCORES;
+      }
+
       if (req) {
         if (req.databaseId) {
           context['jwt.claims.database_id'] = req.databaseId;
@@ -188,6 +199,8 @@ const buildPreset = (
 });
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
+  const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
     try {
@@ -267,7 +280,15 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const preset = buildPreset(connectionString, schema || [], anonRole, roleName);
-      const creationPromise = createGraphileInstance({ preset, cacheKey: key });
+      const creationPromise = observeGraphileBuild(
+        {
+          cacheKey: key,
+          serviceKey: key,
+          databaseId: api.databaseId ?? null,
+        },
+        () => createGraphileInstance({ preset, cacheKey: key }),
+        { enabled: observabilityEnabled },
+      );
       creating.set(key, creationPromise);
 
       try {

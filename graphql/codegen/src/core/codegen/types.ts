@@ -93,6 +93,12 @@ const FILTER_CONFIGS: Array<{
     operators: ['equality', 'distinct', 'inArray', 'comparison', 'inet'],
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
+  // Vector filter (for pgvector embedding columns)
+  {
+    name: 'VectorFilter',
+    tsType: 'number[]',
+    operators: ['equality', 'distinct'],
+  },
   // List filters
   {
     name: 'StringListFilter',

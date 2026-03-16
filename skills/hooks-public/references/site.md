@@ -7,8 +7,8 @@ Top-level site configuration: branding assets, title, and description for a depl
 ## Usage
 
 ```typescript
-useSitesQuery({ selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } } })
-useSiteQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } } })
+useSitesQuery({ selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, dbnameTrgmSimilarity: true, searchScore: true } } })
+useSiteQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, dbnameTrgmSimilarity: true, searchScore: true } } })
 useCreateSiteMutation({ selection: { fields: { id: true } } })
 useUpdateSiteMutation({ selection: { fields: { id: true } } })
 useDeleteSiteMutation({})
@@ -20,7 +20,7 @@ useDeleteSiteMutation({})
 
 ```typescript
 const { data, isLoading } = useSitesQuery({
-  selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true } },
+  selection: { fields: { id: true, databaseId: true, title: true, description: true, ogImage: true, favicon: true, appleTouchIcon: true, logo: true, dbname: true, titleTrgmSimilarity: true, descriptionTrgmSimilarity: true, dbnameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSitesQuery({
 const { mutate } = useCreateSiteMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>' });
+mutate({ databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', dbnameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

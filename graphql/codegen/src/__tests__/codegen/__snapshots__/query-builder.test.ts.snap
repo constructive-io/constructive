@@ -2,7 +2,7 @@
 
 exports[`query-builder snapshots findMany document with filter and pagination 1`] = `
 "query UserQuery($where: UserFilter, $orderBy: [UsersOrderBy!], $first: Int) {
-  users(filter: $where, orderBy: $orderBy, first: $first) {
+  users(where: $where, orderBy: $orderBy, first: $first) {
     nodes {
       id
       name

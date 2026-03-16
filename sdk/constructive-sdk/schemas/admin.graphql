@@ -43,9 +43,9 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): OrgGetSubordinatesConnection
-  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
   appPermissionsGetMask(ids: [UUID]): BitString
   orgPermissionsGetMask(ids: [UUID]): BitString
+  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
   appPermissionsGetMaskByNames(names: [String]): BitString
   orgPermissionsGetMaskByNames(names: [String]): BitString
 
@@ -122,14 +122,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgMemberCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgMemberFilter
+    where: OrgMemberFilter
 
     """The method to use when ordering `OrgMember`."""
     orderBy: [OrgMemberOrderBy!] = [PRIMARY_KEY_ASC]
@@ -156,14 +151,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppPermissionDefaultCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppPermissionDefaultFilter
+    where: AppPermissionDefaultFilter
 
     """The method to use when ordering `AppPermissionDefault`."""
     orderBy: [AppPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
@@ -190,14 +180,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgPermissionDefaultCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgPermissionDefaultFilter
+    where: OrgPermissionDefaultFilter
 
     """The method to use when ordering `OrgPermissionDefault`."""
     orderBy: [OrgPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
@@ -224,14 +209,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppAdminGrantCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppAdminGrantFilter
+    where: AppAdminGrantFilter
 
     """The method to use when ordering `AppAdminGrant`."""
     orderBy: [AppAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
@@ -258,14 +238,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppOwnerGrantCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppOwnerGrantFilter
+    where: AppOwnerGrantFilter
 
     """The method to use when ordering `AppOwnerGrant`."""
     orderBy: [AppOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
@@ -292,14 +267,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgAdminGrantCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgAdminGrantFilter
+    where: OrgAdminGrantFilter
 
     """The method to use when ordering `OrgAdminGrant`."""
     orderBy: [OrgAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
@@ -326,14 +296,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgOwnerGrantCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgOwnerGrantFilter
+    where: OrgOwnerGrantFilter
 
     """The method to use when ordering `OrgOwnerGrant`."""
     orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
@@ -360,14 +325,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppLimitDefaultCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppLimitDefaultFilter
+    where: AppLimitDefaultFilter
 
     """The method to use when ordering `AppLimitDefault`."""
     orderBy: [AppLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
@@ -394,52 +354,13 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgLimitDefaultCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgLimitDefaultFilter
+    where: OrgLimitDefaultFilter
 
     """The method to use when ordering `OrgLimitDefault`."""
     orderBy: [OrgLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgLimitDefaultConnection
-
-  """Reads and enables pagination through a set of `MembershipType`."""
-  membershipTypes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: MembershipTypeCondition
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    filter: MembershipTypeFilter
-
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MembershipTypeConnection
 
   """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
   orgChartEdgeGrants(
@@ -462,18 +383,42 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgChartEdgeGrantCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgChartEdgeGrantFilter
+    where: OrgChartEdgeGrantFilter
 
     """The method to use when ordering `OrgChartEdgeGrant`."""
     orderBy: [OrgChartEdgeGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgChartEdgeGrantConnection
+
+  """Reads and enables pagination through a set of `MembershipType`."""
+  membershipTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MembershipTypeFilter
+
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MembershipTypeConnection
 
   """Reads and enables pagination through a set of `AppPermission`."""
   appPermissions(
@@ -496,14 +441,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppPermissionCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppPermissionFilter
+    where: AppPermissionFilter
 
     """The method to use when ordering `AppPermission`."""
     orderBy: [AppPermissionOrderBy!] = [PRIMARY_KEY_ASC]
@@ -530,14 +470,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgPermissionCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgPermissionFilter
+    where: OrgPermissionFilter
 
     """The method to use when ordering `OrgPermission`."""
     orderBy: [OrgPermissionOrderBy!] = [PRIMARY_KEY_ASC]
@@ -564,14 +499,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppLimitCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppLimitFilter
+    where: AppLimitFilter
 
     """The method to use when ordering `AppLimit`."""
     orderBy: [AppLimitOrderBy!] = [PRIMARY_KEY_ASC]
@@ -598,14 +528,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppAchievementCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppAchievementFilter
+    where: AppAchievementFilter
 
     """The method to use when ordering `AppAchievement`."""
     orderBy: [AppAchievementOrderBy!] = [PRIMARY_KEY_ASC]
@@ -632,14 +557,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppStepCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppStepFilter
+    where: AppStepFilter
 
     """The method to use when ordering `AppStep`."""
     orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
@@ -666,14 +586,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ClaimedInviteCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: ClaimedInviteFilter
+    where: ClaimedInviteFilter
 
     """The method to use when ordering `ClaimedInvite`."""
     orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
@@ -700,14 +615,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppGrantCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppGrantFilter
+    where: AppGrantFilter
 
     """The method to use when ordering `AppGrant`."""
     orderBy: [AppGrantOrderBy!] = [PRIMARY_KEY_ASC]
@@ -734,14 +644,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppMembershipDefaultCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppMembershipDefaultFilter
+    where: AppMembershipDefaultFilter
 
     """The method to use when ordering `AppMembershipDefault`."""
     orderBy: [AppMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
@@ -768,14 +673,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgLimitCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgLimitFilter
+    where: OrgLimitFilter
 
     """The method to use when ordering `OrgLimit`."""
     orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
@@ -802,14 +702,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgClaimedInviteCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgClaimedInviteFilter
+    where: OrgClaimedInviteFilter
 
     """The method to use when ordering `OrgClaimedInvite`."""
     orderBy: [OrgClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
@@ -836,14 +731,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgGrantCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgGrantFilter
+    where: OrgGrantFilter
 
     """The method to use when ordering `OrgGrant`."""
     orderBy: [OrgGrantOrderBy!] = [PRIMARY_KEY_ASC]
@@ -870,14 +760,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgChartEdgeCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgChartEdgeFilter
+    where: OrgChartEdgeFilter
 
     """The method to use when ordering `OrgChartEdge`."""
     orderBy: [OrgChartEdgeOrderBy!] = [PRIMARY_KEY_ASC]
@@ -904,14 +789,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgMembershipDefaultCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgMembershipDefaultFilter
+    where: OrgMembershipDefaultFilter
 
     """The method to use when ordering `OrgMembershipDefault`."""
     orderBy: [OrgMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
@@ -938,86 +818,13 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppLevelRequirementCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppLevelRequirementFilter
+    where: AppLevelRequirementFilter
 
     """The method to use when ordering `AppLevelRequirement`."""
     orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLevelRequirementConnection
-
-  """Reads and enables pagination through a set of `Invite`."""
-  invites(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: InviteCondition
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    filter: InviteFilter
-
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): InviteConnection
-
-  """Reads and enables pagination through a set of `AppLevel`."""
-  appLevels(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppLevelCondition
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    filter: AppLevelFilter
-
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelConnection
 
   """Reads and enables pagination through a set of `AppMembership`."""
   appMemberships(
@@ -1040,14 +847,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AppMembershipCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AppMembershipFilter
+    where: AppMembershipFilter
 
     """The method to use when ordering `AppMembership`."""
     orderBy: [AppMembershipOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1074,18 +876,71 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgMembershipCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgMembershipFilter
+    where: OrgMembershipFilter
 
     """The method to use when ordering `OrgMembership`."""
     orderBy: [OrgMembershipOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMembershipConnection
+
+  """Reads and enables pagination through a set of `Invite`."""
+  invites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: InviteFilter
+
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): InviteConnection
+
+  """Reads and enables pagination through a set of `AppLevel`."""
+  appLevels(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLevelFilter
+
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLevelConnection
 
   """Reads and enables pagination through a set of `OrgInvite`."""
   orgInvites(
@@ -1108,14 +963,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: OrgInviteCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: OrgInviteFilter
+    where: OrgInviteFilter
 
     """The method to use when ordering `OrgInvite`."""
     orderBy: [OrgInviteOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1257,6 +1107,16 @@ type AppPermission {
 
   """Human-readable description of what this permission allows"""
   description: String
+
+  """
+  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
+  """
+  descriptionTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `AppPermission` edge in the connection."""
@@ -1306,6 +1166,16 @@ type OrgPermission {
 
   """Human-readable description of what this permission allows"""
   description: String
+
+  """
+  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
+  """
+  descriptionTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `OrgPermission` edge in the connection."""
@@ -1356,6 +1226,16 @@ type AppLevelRequirement {
   priority: Int!
   createdAt: Datetime
   updatedAt: Datetime
+
+  """
+  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
+  """
+  descriptionTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """
@@ -1416,24 +1296,6 @@ type OrgMemberEdge {
 
   """The `OrgMember` at the end of the edge."""
   node: OrgMember
-}
-
-"""
-A condition to be used against `OrgMember` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input OrgMemberCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `isAdmin` field."""
-  isAdmin: Boolean
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
 }
 
 """
@@ -1600,18 +1462,6 @@ type AppPermissionDefaultEdge {
 }
 
 """
-A condition to be used against `AppPermissionDefault` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input AppPermissionDefaultCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `permissions` field."""
-  permissions: BitString
-}
-
-"""
 A filter to be used against `AppPermissionDefault` object types. All fields are combined with a logical ‘and.’
 """
 input AppPermissionDefaultFilter {
@@ -1724,21 +1574,6 @@ type OrgPermissionDefaultEdge {
 }
 
 """
-A condition to be used against `OrgPermissionDefault` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input OrgPermissionDefaultCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `permissions` field."""
-  permissions: BitString
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-}
-
-"""
 A filter to be used against `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’
 """
 input OrgPermissionDefaultFilter {
@@ -1808,30 +1643,6 @@ type AppAdminGrantEdge {
 
   """The `AppAdminGrant` at the end of the edge."""
   node: AppAdminGrant
-}
-
-"""
-A condition to be used against `AppAdminGrant` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input AppAdminGrantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `isGrant` field."""
-  isGrant: Boolean
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `grantorId` field."""
-  grantorId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
 }
 
 """
@@ -1964,30 +1775,6 @@ type AppOwnerGrantEdge {
 }
 
 """
-A condition to be used against `AppOwnerGrant` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input AppOwnerGrantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `isGrant` field."""
-  isGrant: Boolean
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `grantorId` field."""
-  grantorId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’
 """
 input AppOwnerGrantFilter {
@@ -2075,33 +1862,6 @@ type OrgAdminGrantEdge {
 
   """The `OrgAdminGrant` at the end of the edge."""
   node: OrgAdminGrant
-}
-
-"""
-A condition to be used against `OrgAdminGrant` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgAdminGrantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `isGrant` field."""
-  isGrant: Boolean
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s `grantorId` field."""
-  grantorId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
 }
 
 """
@@ -2200,33 +1960,6 @@ type OrgOwnerGrantEdge {
 }
 
 """
-A condition to be used against `OrgOwnerGrant` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgOwnerGrantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `isGrant` field."""
-  isGrant: Boolean
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s `grantorId` field."""
-  grantorId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’
 """
 input OrgOwnerGrantFilter {
@@ -2317,21 +2050,6 @@ type AppLimitDefaultEdge {
 
   """The `AppLimitDefault` at the end of the edge."""
   node: AppLimitDefault
-}
-
-"""
-A condition to be used against `AppLimitDefault` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input AppLimitDefaultCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `max` field."""
-  max: Int
 }
 
 """
@@ -2487,6 +2205,29 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
+
+  """
+  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
+  """
+  similarTo: TrgmSearchInput
+
+  """
+  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
+  """
+  wordSimilarTo: TrgmSearchInput
+}
+
+"""
+Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
+"""
+input TrgmSearchInput {
+  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
+  value: String!
+
+  """
+  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
+  """
+  threshold: Float
 }
 
 """
@@ -2584,21 +2325,6 @@ type OrgLimitDefaultEdge {
 }
 
 """
-A condition to be used against `OrgLimitDefault` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgLimitDefaultCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `max` field."""
-  max: Int
-}
-
-"""
 A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’
 """
 input OrgLimitDefaultFilter {
@@ -2623,108 +2349,6 @@ input OrgLimitDefaultFilter {
 
 """Methods to use when ordering `OrgLimitDefault`."""
 enum OrgLimitDefaultOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
-"""A connection to a list of `MembershipType` values."""
-type MembershipTypeConnection {
-  """A list of `MembershipType` objects."""
-  nodes: [MembershipType]!
-
-  """
-  A list of edges which contains the `MembershipType` and cursor to aid in pagination.
-  """
-  edges: [MembershipTypeEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `MembershipType` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member)
-"""
-type MembershipType {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """Human-readable name of the membership type"""
-  name: String!
-
-  """Description of what this membership type represents"""
-  description: String!
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String!
-}
-
-"""A `MembershipType` edge in the connection."""
-type MembershipTypeEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `MembershipType` at the end of the edge."""
-  node: MembershipType
-}
-
-"""
-A condition to be used against `MembershipType` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input MembershipTypeCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `description` field."""
-  description: String
-
-  """Checks for equality with the object’s `prefix` field."""
-  prefix: String
-}
-
-"""
-A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’
-"""
-input MembershipTypeFilter {
-  """Filter by the object’s `id` field."""
-  id: IntFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `prefix` field."""
-  prefix: StringFilter
-
-  """Checks for all expressions in this list."""
-  and: [MembershipTypeFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [MembershipTypeFilter!]
-
-  """Negates the expression."""
-  not: MembershipTypeFilter
-}
-
-"""Methods to use when ordering `MembershipType`."""
-enum MembershipTypeOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -2782,6 +2406,16 @@ type OrgChartEdgeGrant {
 
   """Timestamp when this grant or revocation was recorded"""
   createdAt: Datetime!
+
+  """
+  TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active.
+  """
+  positionTitleTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `OrgChartEdgeGrant` edge in the connection."""
@@ -2791,39 +2425,6 @@ type OrgChartEdgeGrantEdge {
 
   """The `OrgChartEdgeGrant` at the end of the edge."""
   node: OrgChartEdgeGrant
-}
-
-"""
-A condition to be used against `OrgChartEdgeGrant` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgChartEdgeGrantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s `childId` field."""
-  childId: UUID
-
-  """Checks for equality with the object’s `parentId` field."""
-  parentId: UUID
-
-  """Checks for equality with the object’s `grantorId` field."""
-  grantorId: UUID
-
-  """Checks for equality with the object’s `isGrant` field."""
-  isGrant: Boolean
-
-  """Checks for equality with the object’s `positionTitle` field."""
-  positionTitle: String
-
-  """Checks for equality with the object’s `positionLevel` field."""
-  positionLevel: Int
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
 }
 
 """
@@ -2865,6 +2466,17 @@ input OrgChartEdgeGrantFilter {
 
   """Negates the expression."""
   not: OrgChartEdgeGrantFilter
+
+  """TRGM search on the `position_title` column."""
+  trgmPositionTitle: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgChartEdgeGrant`."""
@@ -2882,27 +2494,129 @@ enum OrgChartEdgeGrantOrderBy {
   PARENT_ID_DESC
   GRANTOR_ID_ASC
   GRANTOR_ID_DESC
+  POSITION_TITLE_TRGM_SIMILARITY_ASC
+  POSITION_TITLE_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+}
+
+"""A connection to a list of `MembershipType` values."""
+type MembershipTypeConnection {
+  """A list of `MembershipType` objects."""
+  nodes: [MembershipType]!
+
+  """
+  A list of edges which contains the `MembershipType` and cursor to aid in pagination.
+  """
+  edges: [MembershipTypeEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MembershipType` you could get from the connection."""
+  totalCount: Int!
 }
 
 """
-A condition to be used against `AppPermission` object types. All fields are
-tested for equality and combined with a logical ‘and.’
+Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member)
 """
-input AppPermissionCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
+type MembershipType {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
 
-  """Checks for equality with the object’s `name` field."""
-  name: String
+  """Human-readable name of the membership type"""
+  name: String!
 
-  """Checks for equality with the object’s `bitnum` field."""
-  bitnum: Int
+  """Description of what this membership type represents"""
+  description: String!
 
-  """Checks for equality with the object’s `bitstr` field."""
-  bitstr: BitString
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String!
 
-  """Checks for equality with the object’s `description` field."""
-  description: String
+  """
+  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
+  """
+  descriptionTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active.
+  """
+  prefixTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
+}
+
+"""A `MembershipType` edge in the connection."""
+type MembershipTypeEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MembershipType` at the end of the edge."""
+  node: MembershipType
+}
+
+"""
+A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’
+"""
+input MembershipTypeFilter {
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [MembershipTypeFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [MembershipTypeFilter!]
+
+  """Negates the expression."""
+  not: MembershipTypeFilter
+
+  """TRGM search on the `description` column."""
+  trgmDescription: TrgmSearchInput
+
+  """TRGM search on the `prefix` column."""
+  trgmPrefix: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
+}
+
+"""Methods to use when ordering `MembershipType`."""
+enum MembershipTypeOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_TRGM_SIMILARITY_ASC
+  DESCRIPTION_TRGM_SIMILARITY_DESC
+  PREFIX_TRGM_SIMILARITY_ASC
+  PREFIX_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """
@@ -2932,6 +2646,17 @@ input AppPermissionFilter {
 
   """Negates the expression."""
   not: AppPermissionFilter
+
+  """TRGM search on the `description` column."""
+  trgmDescription: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """Methods to use when ordering `AppPermission`."""
@@ -2945,27 +2670,10 @@ enum AppPermissionOrderBy {
   NAME_DESC
   BITNUM_ASC
   BITNUM_DESC
-}
-
-"""
-A condition to be used against `OrgPermission` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgPermissionCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `bitnum` field."""
-  bitnum: Int
-
-  """Checks for equality with the object’s `bitstr` field."""
-  bitstr: BitString
-
-  """Checks for equality with the object’s `description` field."""
-  description: String
+  DESCRIPTION_TRGM_SIMILARITY_ASC
+  DESCRIPTION_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """
@@ -2995,6 +2703,17 @@ input OrgPermissionFilter {
 
   """Negates the expression."""
   not: OrgPermissionFilter
+
+  """TRGM search on the `description` column."""
+  trgmDescription: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgPermission`."""
@@ -3008,6 +2727,10 @@ enum OrgPermissionOrderBy {
   NAME_DESC
   BITNUM_ASC
   BITNUM_DESC
+  DESCRIPTION_TRGM_SIMILARITY_ASC
+  DESCRIPTION_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `AppLimit` values."""
@@ -3051,27 +2774,6 @@ type AppLimitEdge {
 
   """The `AppLimit` at the end of the edge."""
   node: AppLimit
-}
-
-"""
-A condition to be used against `AppLimit` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input AppLimitCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `num` field."""
-  num: Int
-
-  """Checks for equality with the object’s `max` field."""
-  max: Int
 }
 
 """
@@ -3156,30 +2858,6 @@ type AppAchievementEdge {
 
   """The `AppAchievement` at the end of the edge."""
   node: AppAchievement
-}
-
-"""
-A condition to be used against `AppAchievement` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input AppAchievementCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `count` field."""
-  count: Int
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
 }
 
 """
@@ -3271,29 +2949,6 @@ type AppStepEdge {
 
   """The `AppStep` at the end of the edge."""
   node: AppStep
-}
-
-"""
-A condition to be used against `AppStep` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input AppStepCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `count` field."""
-  count: Int
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
 }
 
 """
@@ -3395,30 +3050,6 @@ type ClaimedInviteEdge {
 }
 
 """
-A condition to be used against `ClaimedInvite` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input ClaimedInviteCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `data` field."""
-  data: JSON
-
-  """Checks for equality with the object’s `senderId` field."""
-  senderId: UUID
-
-  """Checks for equality with the object’s `receiverId` field."""
-  receiverId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’
 """
 input ClaimedInviteFilter {
@@ -3507,33 +3138,6 @@ type AppGrantEdge {
 
   """The `AppGrant` at the end of the edge."""
   node: AppGrant
-}
-
-"""
-A condition to be used against `AppGrant` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input AppGrantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `permissions` field."""
-  permissions: BitString
-
-  """Checks for equality with the object’s `isGrant` field."""
-  isGrant: Boolean
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `grantorId` field."""
-  grantorId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
 }
 
 """
@@ -3629,33 +3233,6 @@ type AppMembershipDefaultEdge {
 
   """The `AppMembershipDefault` at the end of the edge."""
   node: AppMembershipDefault
-}
-
-"""
-A condition to be used against `AppMembershipDefault` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input AppMembershipDefaultCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s `createdBy` field."""
-  createdBy: UUID
-
-  """Checks for equality with the object’s `updatedBy` field."""
-  updatedBy: UUID
-
-  """Checks for equality with the object’s `isApproved` field."""
-  isApproved: Boolean
-
-  """Checks for equality with the object’s `isVerified` field."""
-  isVerified: Boolean
 }
 
 """
@@ -3755,30 +3332,6 @@ type OrgLimitEdge {
 }
 
 """
-A condition to be used against `OrgLimit` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input OrgLimitCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `num` field."""
-  num: Int
-
-  """Checks for equality with the object’s `max` field."""
-  max: Int
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-}
-
-"""
 A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’
 """
 input OrgLimitFilter {
@@ -3870,33 +3423,6 @@ type OrgClaimedInviteEdge {
 
   """The `OrgClaimedInvite` at the end of the edge."""
   node: OrgClaimedInvite
-}
-
-"""
-A condition to be used against `OrgClaimedInvite` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgClaimedInviteCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `data` field."""
-  data: JSON
-
-  """Checks for equality with the object’s `senderId` field."""
-  senderId: UUID
-
-  """Checks for equality with the object’s `receiverId` field."""
-  receiverId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
 }
 
 """
@@ -3997,36 +3523,6 @@ type OrgGrantEdge {
 }
 
 """
-A condition to be used against `OrgGrant` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input OrgGrantCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `permissions` field."""
-  permissions: BitString
-
-  """Checks for equality with the object’s `isGrant` field."""
-  isGrant: Boolean
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s `grantorId` field."""
-  grantorId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against `OrgGrant` object types. All fields are combined with a logical ‘and.’
 """
 input OrgGrantFilter {
@@ -4122,6 +3618,16 @@ type OrgChartEdge {
 
   """Numeric seniority level for this position (higher = more senior)"""
   positionLevel: Int
+
+  """
+  TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active.
+  """
+  positionTitleTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `OrgChartEdge` edge in the connection."""
@@ -4131,36 +3637,6 @@ type OrgChartEdgeEdge {
 
   """The `OrgChartEdge` at the end of the edge."""
   node: OrgChartEdge
-}
-
-"""
-A condition to be used against `OrgChartEdge` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgChartEdgeCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s `childId` field."""
-  childId: UUID
-
-  """Checks for equality with the object’s `parentId` field."""
-  parentId: UUID
-
-  """Checks for equality with the object’s `positionTitle` field."""
-  positionTitle: String
-
-  """Checks for equality with the object’s `positionLevel` field."""
-  positionLevel: Int
 }
 
 """
@@ -4199,6 +3675,17 @@ input OrgChartEdgeFilter {
 
   """Negates the expression."""
   not: OrgChartEdgeFilter
+
+  """TRGM search on the `position_title` column."""
+  trgmPositionTitle: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgChartEdge`."""
@@ -4218,6 +3705,10 @@ enum OrgChartEdgeOrderBy {
   CHILD_ID_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
+  POSITION_TITLE_TRGM_SIMILARITY_ASC
+  POSITION_TITLE_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `OrgMembershipDefault` values."""
@@ -4273,43 +3764,6 @@ type OrgMembershipDefaultEdge {
 
   """The `OrgMembershipDefault` at the end of the edge."""
   node: OrgMembershipDefault
-}
-
-"""
-A condition to be used against `OrgMembershipDefault` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input OrgMembershipDefaultCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s `createdBy` field."""
-  createdBy: UUID
-
-  """Checks for equality with the object’s `updatedBy` field."""
-  updatedBy: UUID
-
-  """Checks for equality with the object’s `isApproved` field."""
-  isApproved: Boolean
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-
-  """
-  Checks for equality with the object’s `deleteMemberCascadeGroups` field.
-  """
-  deleteMemberCascadeGroups: Boolean
-
-  """
-  Checks for equality with the object’s `createGroupsCascadeMembers` field.
-  """
-  createGroupsCascadeMembers: Boolean
 }
 
 """
@@ -4373,36 +3827,6 @@ enum OrgMembershipDefaultOrderBy {
 }
 
 """
-A condition to be used against `AppLevelRequirement` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input AppLevelRequirementCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `level` field."""
-  level: String
-
-  """Checks for equality with the object’s `description` field."""
-  description: String
-
-  """Checks for equality with the object’s `requiredCount` field."""
-  requiredCount: Int
-
-  """Checks for equality with the object’s `priority` field."""
-  priority: Int
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’
 """
 input AppLevelRequirementFilter {
@@ -4438,6 +3862,17 @@ input AppLevelRequirementFilter {
 
   """Negates the expression."""
   not: AppLevelRequirementFilter
+
+  """TRGM search on the `description` column."""
+  trgmDescription: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """Methods to use when ordering `AppLevelRequirement`."""
@@ -4457,496 +3892,10 @@ enum AppLevelRequirementOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
-}
-
-"""A connection to a list of `Invite` values."""
-type InviteConnection {
-  """A list of `Invite` objects."""
-  nodes: [Invite]!
-
-  """
-  A list of edges which contains the `Invite` and cursor to aid in pagination.
-  """
-  edges: [InviteEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Invite` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Invitation records sent to prospective members via email, with token-based redemption and expiration
-"""
-type Invite {
-  id: UUID!
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID!
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String!
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean!
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int!
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int!
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean!
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime!
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-scalar ConstructiveInternalTypeEmail
-
-"""A `Invite` edge in the connection."""
-type InviteEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Invite` at the end of the edge."""
-  node: Invite
-}
-
-"""
-A condition to be used against `Invite` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input InviteCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `email` field."""
-  email: ConstructiveInternalTypeEmail
-
-  """Checks for equality with the object’s `senderId` field."""
-  senderId: UUID
-
-  """Checks for equality with the object’s `inviteToken` field."""
-  inviteToken: String
-
-  """Checks for equality with the object’s `inviteValid` field."""
-  inviteValid: Boolean
-
-  """Checks for equality with the object’s `inviteLimit` field."""
-  inviteLimit: Int
-
-  """Checks for equality with the object’s `inviteCount` field."""
-  inviteCount: Int
-
-  """Checks for equality with the object’s `multiple` field."""
-  multiple: Boolean
-
-  """Checks for equality with the object’s `data` field."""
-  data: JSON
-
-  """Checks for equality with the object’s `expiresAt` field."""
-  expiresAt: Datetime
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
-A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’
-"""
-input InviteFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `email` field."""
-  email: ConstructiveInternalTypeEmailFilter
-
-  """Filter by the object’s `senderId` field."""
-  senderId: UUIDFilter
-
-  """Filter by the object’s `inviteToken` field."""
-  inviteToken: StringFilter
-
-  """Filter by the object’s `inviteValid` field."""
-  inviteValid: BooleanFilter
-
-  """Filter by the object’s `inviteLimit` field."""
-  inviteLimit: IntFilter
-
-  """Filter by the object’s `inviteCount` field."""
-  inviteCount: IntFilter
-
-  """Filter by the object’s `multiple` field."""
-  multiple: BooleanFilter
-
-  """Filter by the object’s `expiresAt` field."""
-  expiresAt: DatetimeFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [InviteFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [InviteFilter!]
-
-  """Negates the expression."""
-  not: InviteFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeEmailFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: ConstructiveInternalTypeEmail
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: ConstructiveInternalTypeEmail
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: ConstructiveInternalTypeEmail
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-}
-
-"""Methods to use when ordering `Invite`."""
-enum InviteOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  SENDER_ID_ASC
-  SENDER_ID_DESC
-  INVITE_TOKEN_ASC
-  INVITE_TOKEN_DESC
-  INVITE_VALID_ASC
-  INVITE_VALID_DESC
-  EXPIRES_AT_ASC
-  EXPIRES_AT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `AppLevel` values."""
-type AppLevelConnection {
-  """A list of `AppLevel` objects."""
-  nodes: [AppLevel]!
-
-  """
-  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
-  """
-  edges: [AppLevelEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppLevel` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Defines available levels that users can achieve by completing requirements
-"""
-type AppLevel {
-  id: UUID!
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-scalar ConstructiveInternalTypeImage
-
-"""A `AppLevel` edge in the connection."""
-type AppLevelEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppLevel` at the end of the edge."""
-  node: AppLevel
-}
-
-"""
-A condition to be used against `AppLevel` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input AppLevelCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `description` field."""
-  description: String
-
-  """Checks for equality with the object’s `image` field."""
-  image: ConstructiveInternalTypeImage
-
-  """Checks for equality with the object’s `ownerId` field."""
-  ownerId: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
-A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
-"""
-input AppLevelFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `image` field."""
-  image: ConstructiveInternalTypeImageFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppLevelFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppLevelFilter!]
-
-  """Negates the expression."""
-  not: AppLevelFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeImageFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: ConstructiveInternalTypeImage
-
-  """Not equal to the specified value."""
-  notEqualTo: ConstructiveInternalTypeImage
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: ConstructiveInternalTypeImage
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: ConstructiveInternalTypeImage
-
-  """Included in the specified list."""
-  in: [ConstructiveInternalTypeImage!]
-
-  """Not included in the specified list."""
-  notIn: [ConstructiveInternalTypeImage!]
-
-  """Less than the specified value."""
-  lessThan: ConstructiveInternalTypeImage
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Greater than the specified value."""
-  greaterThan: ConstructiveInternalTypeImage
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Contains the specified JSON."""
-  contains: ConstructiveInternalTypeImage
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: ConstructiveInternalTypeImage
-}
-
-"""Methods to use when ordering `AppLevel`."""
-enum AppLevelOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  DESCRIPTION_TRGM_SIMILARITY_ASC
+  DESCRIPTION_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `AppMembership` values."""
@@ -5021,60 +3970,6 @@ type AppMembershipEdge {
 
   """The `AppMembership` at the end of the edge."""
   node: AppMembership
-}
-
-"""
-A condition to be used against `AppMembership` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input AppMembershipCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s `createdBy` field."""
-  createdBy: UUID
-
-  """Checks for equality with the object’s `updatedBy` field."""
-  updatedBy: UUID
-
-  """Checks for equality with the object’s `isApproved` field."""
-  isApproved: Boolean
-
-  """Checks for equality with the object’s `isBanned` field."""
-  isBanned: Boolean
-
-  """Checks for equality with the object’s `isDisabled` field."""
-  isDisabled: Boolean
-
-  """Checks for equality with the object’s `isVerified` field."""
-  isVerified: Boolean
-
-  """Checks for equality with the object’s `isActive` field."""
-  isActive: Boolean
-
-  """Checks for equality with the object’s `isOwner` field."""
-  isOwner: Boolean
-
-  """Checks for equality with the object’s `isAdmin` field."""
-  isAdmin: Boolean
-
-  """Checks for equality with the object’s `permissions` field."""
-  permissions: BitString
-
-  """Checks for equality with the object’s `granted` field."""
-  granted: BitString
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `profileId` field."""
-  profileId: UUID
 }
 
 """
@@ -5239,60 +4134,6 @@ type OrgMembershipEdge {
 }
 
 """
-A condition to be used against `OrgMembership` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrgMembershipCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s `createdBy` field."""
-  createdBy: UUID
-
-  """Checks for equality with the object’s `updatedBy` field."""
-  updatedBy: UUID
-
-  """Checks for equality with the object’s `isApproved` field."""
-  isApproved: Boolean
-
-  """Checks for equality with the object’s `isBanned` field."""
-  isBanned: Boolean
-
-  """Checks for equality with the object’s `isDisabled` field."""
-  isDisabled: Boolean
-
-  """Checks for equality with the object’s `isActive` field."""
-  isActive: Boolean
-
-  """Checks for equality with the object’s `isOwner` field."""
-  isOwner: Boolean
-
-  """Checks for equality with the object’s `isAdmin` field."""
-  isAdmin: Boolean
-
-  """Checks for equality with the object’s `permissions` field."""
-  permissions: BitString
-
-  """Checks for equality with the object’s `granted` field."""
-  granted: BitString
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s `profileId` field."""
-  profileId: UUID
-}
-
-"""
 A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’
 """
 input OrgMembershipFilter {
@@ -5381,6 +4222,478 @@ enum OrgMembershipOrderBy {
   PROFILE_ID_DESC
 }
 
+"""A connection to a list of `Invite` values."""
+type InviteConnection {
+  """A list of `Invite` objects."""
+  nodes: [Invite]!
+
+  """
+  A list of edges which contains the `Invite` and cursor to aid in pagination.
+  """
+  edges: [InviteEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Invite` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Invitation records sent to prospective members via email, with token-based redemption and expiration
+"""
+type Invite {
+  id: UUID!
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID!
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String!
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean!
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int!
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int!
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean!
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """
+  TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active.
+  """
+  inviteTokenTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
+}
+
+scalar ConstructiveInternalTypeEmail
+
+"""A `Invite` edge in the connection."""
+type InviteEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Invite` at the end of the edge."""
+  node: Invite
+}
+
+"""
+A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’
+"""
+input InviteFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `email` field."""
+  email: ConstructiveInternalTypeEmailFilter
+
+  """Filter by the object’s `senderId` field."""
+  senderId: UUIDFilter
+
+  """Filter by the object’s `inviteToken` field."""
+  inviteToken: StringFilter
+
+  """Filter by the object’s `inviteValid` field."""
+  inviteValid: BooleanFilter
+
+  """Filter by the object’s `inviteLimit` field."""
+  inviteLimit: IntFilter
+
+  """Filter by the object’s `inviteCount` field."""
+  inviteCount: IntFilter
+
+  """Filter by the object’s `multiple` field."""
+  multiple: BooleanFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [InviteFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [InviteFilter!]
+
+  """Negates the expression."""
+  not: InviteFilter
+
+  """TRGM search on the `invite_token` column."""
+  trgmInviteToken: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeEmailFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: ConstructiveInternalTypeEmail
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: ConstructiveInternalTypeEmail
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: ConstructiveInternalTypeEmail
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+}
+
+"""Methods to use when ordering `Invite`."""
+enum InviteOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  SENDER_ID_ASC
+  SENDER_ID_DESC
+  INVITE_TOKEN_ASC
+  INVITE_TOKEN_DESC
+  INVITE_VALID_ASC
+  INVITE_VALID_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  INVITE_TOKEN_TRGM_SIMILARITY_ASC
+  INVITE_TOKEN_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+}
+
+"""A connection to a list of `AppLevel` values."""
+type AppLevelConnection {
+  """A list of `AppLevel` objects."""
+  nodes: [AppLevel]!
+
+  """
+  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
+  """
+  edges: [AppLevelEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppLevel` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Defines available levels that users can achieve by completing requirements
+"""
+type AppLevel {
+  id: UUID!
+
+  """Unique name of the level"""
+  name: String!
+
+  """Human-readable description of what this level represents"""
+  description: String
+
+  """Badge or icon image associated with this level"""
+  image: ConstructiveInternalTypeImage
+
+  """Optional owner (actor) who created or manages this level"""
+  ownerId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """
+  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
+  """
+  descriptionTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
+}
+
+scalar ConstructiveInternalTypeImage
+
+"""A `AppLevel` edge in the connection."""
+type AppLevelEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLevel` at the end of the edge."""
+  node: AppLevel
+}
+
+"""
+A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLevelFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `image` field."""
+  image: ConstructiveInternalTypeImageFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLevelFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLevelFilter!]
+
+  """Negates the expression."""
+  not: AppLevelFilter
+
+  """TRGM search on the `description` column."""
+  trgmDescription: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeImageFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: ConstructiveInternalTypeImage
+
+  """Not equal to the specified value."""
+  notEqualTo: ConstructiveInternalTypeImage
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ConstructiveInternalTypeImage
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ConstructiveInternalTypeImage
+
+  """Included in the specified list."""
+  in: [ConstructiveInternalTypeImage!]
+
+  """Not included in the specified list."""
+  notIn: [ConstructiveInternalTypeImage!]
+
+  """Less than the specified value."""
+  lessThan: ConstructiveInternalTypeImage
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Greater than the specified value."""
+  greaterThan: ConstructiveInternalTypeImage
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Contains the specified JSON."""
+  contains: ConstructiveInternalTypeImage
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: ConstructiveInternalTypeImage
+}
+
+"""Methods to use when ordering `AppLevel`."""
+enum AppLevelOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  DESCRIPTION_TRGM_SIMILARITY_ASC
+  DESCRIPTION_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+}
+
 """A connection to a list of `OrgInvite` values."""
 type OrgInviteConnection {
   """A list of `OrgInvite` objects."""
@@ -5436,6 +4749,16 @@ type OrgInvite {
   createdAt: Datetime
   updatedAt: Datetime
   entityId: UUID!
+
+  """
+  TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active.
+  """
+  inviteTokenTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `OrgInvite` edge in the connection."""
@@ -5445,54 +4768,6 @@ type OrgInviteEdge {
 
   """The `OrgInvite` at the end of the edge."""
   node: OrgInvite
-}
-
-"""
-A condition to be used against `OrgInvite` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input OrgInviteCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `email` field."""
-  email: ConstructiveInternalTypeEmail
-
-  """Checks for equality with the object’s `senderId` field."""
-  senderId: UUID
-
-  """Checks for equality with the object’s `receiverId` field."""
-  receiverId: UUID
-
-  """Checks for equality with the object’s `inviteToken` field."""
-  inviteToken: String
-
-  """Checks for equality with the object’s `inviteValid` field."""
-  inviteValid: Boolean
-
-  """Checks for equality with the object’s `inviteLimit` field."""
-  inviteLimit: Int
-
-  """Checks for equality with the object’s `inviteCount` field."""
-  inviteCount: Int
-
-  """Checks for equality with the object’s `multiple` field."""
-  multiple: Boolean
-
-  """Checks for equality with the object’s `data` field."""
-  data: JSON
-
-  """Checks for equality with the object’s `expiresAt` field."""
-  expiresAt: Datetime
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s `entityId` field."""
-  entityId: UUID
 }
 
 """
@@ -5546,6 +4821,17 @@ input OrgInviteFilter {
 
   """Negates the expression."""
   not: OrgInviteFilter
+
+  """TRGM search on the `invite_token` column."""
+  trgmInviteToken: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgInvite`."""
@@ -5571,6 +4857,10 @@ enum OrgInviteOrderBy {
   UPDATED_AT_DESC
   ENTITY_ID_ASC
   ENTITY_ID_DESC
+  INVITE_TOKEN_TRGM_SIMILARITY_ASC
+  INVITE_TOKEN_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """Root meta schema type"""
@@ -5808,14 +5098,6 @@ type Mutation {
     input: CreateOrgLimitDefaultInput!
   ): CreateOrgLimitDefaultPayload
 
-  """Creates a single `MembershipType`."""
-  createMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMembershipTypeInput!
-  ): CreateMembershipTypePayload
-
   """Creates a single `OrgChartEdgeGrant`."""
   createOrgChartEdgeGrant(
     """
@@ -5823,6 +5105,14 @@ type Mutation {
     """
     input: CreateOrgChartEdgeGrantInput!
   ): CreateOrgChartEdgeGrantPayload
+
+  """Creates a single `MembershipType`."""
+  createMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMembershipTypeInput!
+  ): CreateMembershipTypePayload
 
   """Creates a single `AppPermission`."""
   createAppPermission(
@@ -5936,22 +5226,6 @@ type Mutation {
     input: CreateAppLevelRequirementInput!
   ): CreateAppLevelRequirementPayload
 
-  """Creates a single `Invite`."""
-  createInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateInviteInput!
-  ): CreateInvitePayload
-
-  """Creates a single `AppLevel`."""
-  createAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLevelInput!
-  ): CreateAppLevelPayload
-
   """Creates a single `AppMembership`."""
   createAppMembership(
     """
@@ -5967,6 +5241,22 @@ type Mutation {
     """
     input: CreateOrgMembershipInput!
   ): CreateOrgMembershipPayload
+
+  """Creates a single `Invite`."""
+  createInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateInviteInput!
+  ): CreateInvitePayload
+
+  """Creates a single `AppLevel`."""
+  createAppLevel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLevelInput!
+  ): CreateAppLevelPayload
 
   """Creates a single `OrgInvite`."""
   createOrgInvite(
@@ -6052,14 +5342,6 @@ type Mutation {
     input: UpdateOrgLimitDefaultInput!
   ): UpdateOrgLimitDefaultPayload
 
-  """Updates a single `MembershipType` using a unique key and a patch."""
-  updateMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMembershipTypeInput!
-  ): UpdateMembershipTypePayload
-
   """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
   updateOrgChartEdgeGrant(
     """
@@ -6067,6 +5349,14 @@ type Mutation {
     """
     input: UpdateOrgChartEdgeGrantInput!
   ): UpdateOrgChartEdgeGrantPayload
+
+  """Updates a single `MembershipType` using a unique key and a patch."""
+  updateMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMembershipTypeInput!
+  ): UpdateMembershipTypePayload
 
   """Updates a single `AppPermission` using a unique key and a patch."""
   updateAppPermission(
@@ -6184,22 +5474,6 @@ type Mutation {
     input: UpdateAppLevelRequirementInput!
   ): UpdateAppLevelRequirementPayload
 
-  """Updates a single `Invite` using a unique key and a patch."""
-  updateInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateInviteInput!
-  ): UpdateInvitePayload
-
-  """Updates a single `AppLevel` using a unique key and a patch."""
-  updateAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLevelInput!
-  ): UpdateAppLevelPayload
-
   """Updates a single `AppMembership` using a unique key and a patch."""
   updateAppMembership(
     """
@@ -6215,6 +5489,22 @@ type Mutation {
     """
     input: UpdateOrgMembershipInput!
   ): UpdateOrgMembershipPayload
+
+  """Updates a single `Invite` using a unique key and a patch."""
+  updateInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInviteInput!
+  ): UpdateInvitePayload
+
+  """Updates a single `AppLevel` using a unique key and a patch."""
+  updateAppLevel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLevelInput!
+  ): UpdateAppLevelPayload
 
   """Updates a single `OrgInvite` using a unique key and a patch."""
   updateOrgInvite(
@@ -6296,14 +5586,6 @@ type Mutation {
     input: DeleteOrgLimitDefaultInput!
   ): DeleteOrgLimitDefaultPayload
 
-  """Deletes a single `MembershipType` using a unique key."""
-  deleteMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMembershipTypeInput!
-  ): DeleteMembershipTypePayload
-
   """Deletes a single `OrgChartEdgeGrant` using a unique key."""
   deleteOrgChartEdgeGrant(
     """
@@ -6311,6 +5593,14 @@ type Mutation {
     """
     input: DeleteOrgChartEdgeGrantInput!
   ): DeleteOrgChartEdgeGrantPayload
+
+  """Deletes a single `MembershipType` using a unique key."""
+  deleteMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMembershipTypeInput!
+  ): DeleteMembershipTypePayload
 
   """Deletes a single `AppPermission` using a unique key."""
   deleteAppPermission(
@@ -6424,22 +5714,6 @@ type Mutation {
     input: DeleteAppLevelRequirementInput!
   ): DeleteAppLevelRequirementPayload
 
-  """Deletes a single `Invite` using a unique key."""
-  deleteInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteInviteInput!
-  ): DeleteInvitePayload
-
-  """Deletes a single `AppLevel` using a unique key."""
-  deleteAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLevelInput!
-  ): DeleteAppLevelPayload
-
   """Deletes a single `AppMembership` using a unique key."""
   deleteAppMembership(
     """
@@ -6455,6 +5729,22 @@ type Mutation {
     """
     input: DeleteOrgMembershipInput!
   ): DeleteOrgMembershipPayload
+
+  """Deletes a single `Invite` using a unique key."""
+  deleteInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteInviteInput!
+  ): DeleteInvitePayload
+
+  """Deletes a single `AppLevel` using a unique key."""
+  deleteAppLevel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLevelInput!
+  ): DeleteAppLevelPayload
 
   """Deletes a single `OrgInvite` using a unique key."""
   deleteOrgInvite(
@@ -6947,60 +6237,6 @@ input OrgLimitDefaultInput {
   max: Int
 }
 
-"""The output of our create `MembershipType` mutation."""
-type CreateMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was created by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the create `MembershipType` mutation."""
-input CreateMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` to be created by this mutation."""
-  membershipType: MembershipTypeInput!
-}
-
-"""An input for mutations affecting `MembershipType`"""
-input MembershipTypeInput {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """Human-readable name of the membership type"""
-  name: String!
-
-  """Description of what this membership type represents"""
-  description: String!
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String!
-}
-
 """The output of our create `OrgChartEdgeGrant` mutation."""
 type CreateOrgChartEdgeGrantPayload {
   """
@@ -7063,6 +6299,60 @@ input OrgChartEdgeGrantInput {
 
   """Timestamp when this grant or revocation was recorded"""
   createdAt: Datetime
+}
+
+"""The output of our create `MembershipType` mutation."""
+type CreateMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was created by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the create `MembershipType` mutation."""
+input CreateMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` to be created by this mutation."""
+  membershipType: MembershipTypeInput!
+}
+
+"""An input for mutations affecting `MembershipType`"""
+input MembershipTypeInput {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """Human-readable name of the membership type"""
+  name: String!
+
+  """Description of what this membership type represents"""
+  description: String!
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String!
 }
 
 """The output of our create `AppPermission` mutation."""
@@ -7816,129 +7106,6 @@ input AppLevelRequirementInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `Invite` mutation."""
-type CreateInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Invite` that was created by this mutation."""
-  invite: Invite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
-}
-
-"""All input for the create `Invite` mutation."""
-input CreateInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Invite` to be created by this mutation."""
-  invite: InviteInput!
-}
-
-"""An input for mutations affecting `Invite`"""
-input InviteInput {
-  id: UUID
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `AppLevel` mutation."""
-type CreateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was created by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the create `AppLevel` mutation."""
-input CreateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` to be created by this mutation."""
-  appLevel: AppLevelInput!
-}
-
-"""An input for mutations affecting `AppLevel`"""
-input AppLevelInput {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `AppMembership` mutation."""
 type CreateAppMembershipPayload {
   """
@@ -8099,6 +7266,129 @@ input OrgMembershipInput {
   """References the entity (org or group) this membership belongs to"""
   entityId: UUID!
   profileId: UUID
+}
+
+"""The output of our create `Invite` mutation."""
+type CreateInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Invite` that was created by this mutation."""
+  invite: Invite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Invite`. May be used by Relay 1."""
+  inviteEdge(
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InviteEdge
+}
+
+"""All input for the create `Invite` mutation."""
+input CreateInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Invite` to be created by this mutation."""
+  invite: InviteInput!
+}
+
+"""An input for mutations affecting `Invite`"""
+input InviteInput {
+  id: UUID
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `AppLevel` mutation."""
+type CreateAppLevelPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLevel` that was created by this mutation."""
+  appLevel: AppLevel
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLevel`. May be used by Relay 1."""
+  appLevelEdge(
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelEdge
+}
+
+"""All input for the create `AppLevel` mutation."""
+input CreateAppLevelInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLevel` to be created by this mutation."""
+  appLevel: AppLevelInput!
+}
+
+"""An input for mutations affecting `AppLevel`"""
+input AppLevelInput {
+  id: UUID
+
+  """Unique name of the level"""
+  name: String!
+
+  """Human-readable description of what this level represents"""
+  description: String
+
+  """Badge or icon image associated with this level"""
+  image: ConstructiveInternalTypeImage
+
+  """Optional owner (actor) who created or manages this level"""
+  ownerId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our create `OrgInvite` mutation."""
@@ -8651,69 +7941,6 @@ input OrgLimitDefaultPatch {
   max: Int
 }
 
-"""The output of our update `MembershipType` mutation."""
-type UpdateMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was updated by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the `updateMembershipType` mutation."""
-input UpdateMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `MembershipType` being updated.
-  """
-  membershipTypePatch: MembershipTypePatch!
-}
-
-"""
-Represents an update to a `MembershipType`. Fields that are set will be updated.
-"""
-input MembershipTypePatch {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int
-
-  """Human-readable name of the membership type"""
-  name: String
-
-  """Description of what this membership type represents"""
-  description: String
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String
-}
-
 """The output of our update `OrgChartEdgeGrant` mutation."""
 type UpdateOrgChartEdgeGrantPayload {
   """
@@ -8781,6 +8008,69 @@ input OrgChartEdgeGrantPatch {
 
   """Timestamp when this grant or revocation was recorded"""
   createdAt: Datetime
+}
+
+"""The output of our update `MembershipType` mutation."""
+type UpdateMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was updated by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the `updateMembershipType` mutation."""
+input UpdateMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `MembershipType` being updated.
+  """
+  membershipTypePatch: MembershipTypePatch!
+}
+
+"""
+Represents an update to a `MembershipType`. Fields that are set will be updated.
+"""
+input MembershipTypePatch {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int
+
+  """Human-readable name of the membership type"""
+  name: String
+
+  """Description of what this membership type represents"""
+  description: String
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String
 }
 
 """The output of our update `AppPermission` mutation."""
@@ -9604,145 +8894,6 @@ input AppLevelRequirementPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `Invite` mutation."""
-type UpdateInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Invite` that was updated by this mutation."""
-  invite: Invite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
-}
-
-"""All input for the `updateInvite` mutation."""
-input UpdateInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Invite` being updated.
-  """
-  invitePatch: InvitePatch!
-}
-
-"""
-Represents an update to a `Invite`. Fields that are set will be updated.
-"""
-input InvitePatch {
-  id: UUID
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `AppLevel` mutation."""
-type UpdateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was updated by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `updateAppLevel` mutation."""
-input UpdateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppLevel` being updated.
-  """
-  appLevelPatch: AppLevelPatch!
-}
-
-"""
-Represents an update to a `AppLevel`. Fields that are set will be updated.
-"""
-input AppLevelPatch {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Upload for Badge or icon image associated with this level"""
-  imageUpload: Upload
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
 """The output of our update `AppMembership` mutation."""
 type UpdateAppMembershipPayload {
   """
@@ -9914,6 +9065,145 @@ input OrgMembershipPatch {
   entityId: UUID
   profileId: UUID
 }
+
+"""The output of our update `Invite` mutation."""
+type UpdateInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Invite` that was updated by this mutation."""
+  invite: Invite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Invite`. May be used by Relay 1."""
+  inviteEdge(
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InviteEdge
+}
+
+"""All input for the `updateInvite` mutation."""
+input UpdateInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Invite` being updated.
+  """
+  invitePatch: InvitePatch!
+}
+
+"""
+Represents an update to a `Invite`. Fields that are set will be updated.
+"""
+input InvitePatch {
+  id: UUID
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our update `AppLevel` mutation."""
+type UpdateAppLevelPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLevel` that was updated by this mutation."""
+  appLevel: AppLevel
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLevel`. May be used by Relay 1."""
+  appLevelEdge(
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelEdge
+}
+
+"""All input for the `updateAppLevel` mutation."""
+input UpdateAppLevelInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLevel` being updated.
+  """
+  appLevelPatch: AppLevelPatch!
+}
+
+"""
+Represents an update to a `AppLevel`. Fields that are set will be updated.
+"""
+input AppLevelPatch {
+  id: UUID
+
+  """Unique name of the level"""
+  name: String
+
+  """Human-readable description of what this level represents"""
+  description: String
+
+  """Badge or icon image associated with this level"""
+  image: ConstructiveInternalTypeImage
+
+  """Optional owner (actor) who created or manages this level"""
+  ownerId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Upload for Badge or icon image associated with this level"""
+  imageUpload: Upload
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 """The output of our update `OrgInvite` mutation."""
 type UpdateOrgInvitePayload {
@@ -10290,6 +9580,39 @@ input DeleteOrgLimitDefaultInput {
   id: UUID!
 }
 
+"""The output of our delete `OrgChartEdgeGrant` mutation."""
+type DeleteOrgChartEdgeGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgChartEdgeGrant` that was deleted by this mutation."""
+  orgChartEdgeGrant: OrgChartEdgeGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
+  orgChartEdgeGrantEdge(
+    """The method to use when ordering `OrgChartEdgeGrant`."""
+    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgChartEdgeGrantEdge
+}
+
+"""All input for the `deleteOrgChartEdgeGrant` mutation."""
+input DeleteOrgChartEdgeGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `MembershipType` mutation."""
 type DeleteMembershipTypePayload {
   """
@@ -10325,39 +9648,6 @@ input DeleteMembershipTypeInput {
   Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
   """
   id: Int!
-}
-
-"""The output of our delete `OrgChartEdgeGrant` mutation."""
-type DeleteOrgChartEdgeGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` that was deleted by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrant
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
-  orgChartEdgeGrantEdge(
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantEdge
-}
-
-"""All input for the `deleteOrgChartEdgeGrant` mutation."""
-input DeleteOrgChartEdgeGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
 }
 
 """The output of our delete `AppPermission` mutation."""
@@ -10822,72 +10112,6 @@ input DeleteAppLevelRequirementInput {
   id: UUID!
 }
 
-"""The output of our delete `Invite` mutation."""
-type DeleteInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Invite` that was deleted by this mutation."""
-  invite: Invite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
-}
-
-"""All input for the `deleteInvite` mutation."""
-input DeleteInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppLevel` mutation."""
-type DeleteAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was deleted by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `deleteAppLevel` mutation."""
-input DeleteAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `AppMembership` mutation."""
 type DeleteAppMembershipPayload {
   """
@@ -10946,6 +10170,72 @@ type DeleteOrgMembershipPayload {
 
 """All input for the `deleteOrgMembership` mutation."""
 input DeleteOrgMembershipInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Invite` mutation."""
+type DeleteInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Invite` that was deleted by this mutation."""
+  invite: Invite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Invite`. May be used by Relay 1."""
+  inviteEdge(
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InviteEdge
+}
+
+"""All input for the `deleteInvite` mutation."""
+input DeleteInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `AppLevel` mutation."""
+type DeleteAppLevelPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLevel` that was deleted by this mutation."""
+  appLevel: AppLevel
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLevel`. May be used by Relay 1."""
+  appLevelEdge(
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelEdge
+}
+
+"""All input for the `deleteAppLevel` mutation."""
+input DeleteAppLevelInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.

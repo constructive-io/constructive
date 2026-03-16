@@ -23,6 +23,11 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  descriptionTrgmSimilarity: 'float',
+  typeTrgmSimilarity: 'float',
+  moduleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nunique-constraint <command>\n\nCommands:\n  list                  List all uniqueConstraint records\n  get                   Get a uniqueConstraint by ID\n  create                Create a new uniqueConstraint\n  update                Update an existing uniqueConstraint\n  delete                Delete a uniqueConstraint\n\n  --help, -h            Show this help message\n';

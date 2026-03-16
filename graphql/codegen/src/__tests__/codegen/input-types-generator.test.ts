@@ -455,6 +455,18 @@ describe('scalar filter types', () => {
     // Float filters
     expect(result.content).toContain('export interface FloatFilter {');
   });
+
+  it('includes VectorFilter for pgvector embedding fields', () => {
+    const result = generateInputTypesFile(new Map(), new Set(), [userTable]);
+
+    // VectorFilter should be generated as a scalar filter type
+    expect(result.content).toContain('export interface VectorFilter {');
+    expect(result.content).toContain('isNull?: boolean;');
+    expect(result.content).toContain('equalTo?: number[];');
+    expect(result.content).toContain('notEqualTo?: number[];');
+    expect(result.content).toContain('distinctFrom?: number[];');
+    expect(result.content).toContain('notDistinctFrom?: number[];');
+  });
 });
 
 // ============================================================================
@@ -874,6 +886,229 @@ describe('collectPayloadTypeNames', () => {
     const result = collectPayloadTypeNames(operations);
 
     expect(result.has('UsersConnection')).toBe(true);
+  });
+});
+
+// ============================================================================
+// Tests - Plugin-Injected Condition Fields (e.g., VectorSearchPlugin)
+// ============================================================================
+
+describe('plugin-injected condition fields', () => {
+  /**
+   * Simulates a table with a vector embedding column.
+   * The VectorSearchPlugin adds extra condition fields (e.g., embeddingNearby)
+   * that are NOT derived from the table's own columns, but are injected into
+   * the GraphQL schema's condition type via plugin hooks.
+   */
+  const contactTable = createTable({
+    name: 'Contact',
+    fields: [
+      { name: 'id', type: fieldTypes.uuid },
+      { name: 'name', type: fieldTypes.string },
+      { name: 'email', type: fieldTypes.string },
+      {
+        name: 'embedding',
+        type: { gqlType: 'Vector', isArray: false } as CleanFieldType,
+      },
+    ],
+    query: {
+      all: 'contacts',
+      one: 'contact',
+      create: 'createContact',
+      update: 'updateContact',
+      delete: 'deleteContact',
+    },
+  });
+
+  it('includes plugin-injected condition fields from TypeRegistry', () => {
+    // Registry simulates what PostGraphile + VectorSearchPlugin produce:
+    // The ContactCondition type has the regular columns PLUS an extra
+    // "embeddingNearby" field of type VectorNearbyInput injected by the plugin.
+    const registry = createTypeRegistry({
+      ContactCondition: {
+        kind: 'INPUT_OBJECT',
+        name: 'ContactCondition',
+        inputFields: [
+          { name: 'id', type: createTypeRef('SCALAR', 'UUID') },
+          { name: 'name', type: createTypeRef('SCALAR', 'String') },
+          { name: 'email', type: createTypeRef('SCALAR', 'String') },
+          { name: 'embedding', type: createTypeRef('SCALAR', 'Vector') },
+          {
+            name: 'embeddingNearby',
+            type: createTypeRef('INPUT_OBJECT', 'VectorNearbyInput'),
+            description: 'Find contacts near a vector embedding',
+          },
+        ],
+      },
+      VectorNearbyInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'VectorNearbyInput',
+        inputFields: [
+          {
+            name: 'vector',
+            type: createNonNull(createTypeRef('SCALAR', 'Vector')),
+          },
+          {
+            name: 'metric',
+            type: createTypeRef('ENUM', 'VectorMetric'),
+          },
+          {
+            name: 'threshold',
+            type: createTypeRef('SCALAR', 'Float'),
+          },
+        ],
+      },
+      VectorMetric: {
+        kind: 'ENUM',
+        name: 'VectorMetric',
+        enumValues: ['L2', 'INNER_PRODUCT', 'COSINE'],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+
+    // Regular table column fields should still be present
+    expect(result.content).toContain('export interface ContactCondition {');
+    expect(result.content).toContain('id?: string | null;');
+    expect(result.content).toContain('name?: string | null;');
+    expect(result.content).toContain('email?: string | null;');
+
+    // Plugin-injected field should also be present
+    expect(result.content).toContain('embeddingNearby?: VectorNearbyInput');
+
+    // The referenced VectorNearbyInput type should be generated as a custom input type
+    expect(result.content).toContain('export interface VectorNearbyInput {');
+
+    // Transitively referenced enum type (VectorMetric) should also be generated
+    expect(result.content).toContain('VectorMetric');
+    expect(result.content).toContain('"L2"');
+    expect(result.content).toContain('"INNER_PRODUCT"');
+    expect(result.content).toContain('"COSINE"');
+  });
+
+  it('generates transitively referenced enum types from input fields', () => {
+    // This specifically tests that enum types referenced by input object fields
+    // are followed and generated, not just types ending with "Input".
+    // VectorNearbyInput.metric references VectorMetric (an ENUM),
+    // which must be included in the output.
+    const registry = createTypeRegistry({
+      ContactCondition: {
+        kind: 'INPUT_OBJECT',
+        name: 'ContactCondition',
+        inputFields: [
+          { name: 'id', type: createTypeRef('SCALAR', 'UUID') },
+          { name: 'name', type: createTypeRef('SCALAR', 'String') },
+          {
+            name: 'embeddingNearby',
+            type: createTypeRef('INPUT_OBJECT', 'VectorNearbyInput'),
+          },
+        ],
+      },
+      VectorNearbyInput: {
+        kind: 'INPUT_OBJECT',
+        name: 'VectorNearbyInput',
+        inputFields: [
+          {
+            name: 'vector',
+            type: createNonNull(createTypeRef('SCALAR', 'Vector')),
+          },
+          {
+            name: 'metric',
+            type: createTypeRef('ENUM', 'VectorMetric'),
+          },
+        ],
+      },
+      VectorMetric: {
+        kind: 'ENUM',
+        name: 'VectorMetric',
+        enumValues: ['L2', 'INNER_PRODUCT', 'COSINE'],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+
+    // VectorNearbyInput should be generated (follows *Input pattern)
+    expect(result.content).toContain('export interface VectorNearbyInput {');
+
+    // VectorMetric enum should ALSO be generated (transitive enum resolution)
+    expect(result.content).toMatch(/export type VectorMetric\s*=/);
+    expect(result.content).toContain('"L2"');
+    expect(result.content).toContain('"INNER_PRODUCT"');
+    expect(result.content).toContain('"COSINE"');
+  });
+
+  it('does not duplicate fields already derived from table columns', () => {
+    const registry = createTypeRegistry({
+      ContactCondition: {
+        kind: 'INPUT_OBJECT',
+        name: 'ContactCondition',
+        inputFields: [
+          { name: 'id', type: createTypeRef('SCALAR', 'UUID') },
+          { name: 'name', type: createTypeRef('SCALAR', 'String') },
+          { name: 'email', type: createTypeRef('SCALAR', 'String') },
+          { name: 'embedding', type: createTypeRef('SCALAR', 'Vector') },
+        ],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+
+    // Count occurrences of 'id?' in the ContactCondition interface
+    const conditionMatch = result.content.match(
+      /export interface ContactCondition \{([^}]*)\}/s,
+    );
+    expect(conditionMatch).toBeTruthy();
+    const conditionBody = conditionMatch![1];
+
+    // Each field should appear only once
+    const idOccurrences = (conditionBody.match(/\bid\?/g) || []).length;
+    expect(idOccurrences).toBe(1);
+  });
+
+  it('includes plugin-injected orderBy values from TypeRegistry', () => {
+    const registry = createTypeRegistry({
+      ContactsOrderBy: {
+        kind: 'ENUM',
+        name: 'ContactsOrderBy',
+        enumValues: [
+          'PRIMARY_KEY_ASC',
+          'PRIMARY_KEY_DESC',
+          'NATURAL',
+          'ID_ASC',
+          'ID_DESC',
+          'NAME_ASC',
+          'NAME_DESC',
+          'EMAIL_ASC',
+          'EMAIL_DESC',
+          'EMBEDDING_ASC',
+          'EMBEDDING_DESC',
+          // Plugin-injected values from VectorSearchPlugin
+          'EMBEDDING_DISTANCE_ASC',
+          'EMBEDDING_DISTANCE_DESC',
+        ],
+      },
+    });
+
+    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+
+    expect(result.content).toContain('export type ContactsOrderBy =');
+    // Standard column-derived values
+    expect(result.content).toContain('"ID_ASC"');
+    expect(result.content).toContain('"NAME_DESC"');
+    // Plugin-injected values
+    expect(result.content).toContain('"EMBEDDING_DISTANCE_ASC"');
+    expect(result.content).toContain('"EMBEDDING_DISTANCE_DESC"');
+  });
+
+  it('works without typeRegistry (backwards compatible)', () => {
+    // When no typeRegistry has the condition type, only table columns are used
+    const result = generateInputTypesFile(new Map(), new Set(), [contactTable]);
+
+    expect(result.content).toContain('export interface ContactCondition {');
+    expect(result.content).toContain('id?: string | null;');
+    expect(result.content).toContain('name?: string | null;');
+    // No plugin-injected fields
+    expect(result.content).not.toContain('embeddingNearby');
   });
 });
 

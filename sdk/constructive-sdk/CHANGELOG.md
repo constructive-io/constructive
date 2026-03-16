@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.7](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.6...@constructive-io/sdk@0.7.7) (2026-03-16)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.7.6](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.5...@constructive-io/sdk@0.7.6) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.7.5](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.4...@constructive-io/sdk@0.7.5) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.7.4](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.3...@constructive-io/sdk@0.7.4) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.7.3](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.2...@constructive-io/sdk@0.7.3) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.7.2](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.1...@constructive-io/sdk@0.7.2) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.7.1](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.0...@constructive-io/sdk@0.7.1) (2026-03-14)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+# [0.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.6.1...@constructive-io/sdk@0.7.0) (2026-03-14)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.6.1](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.6.0...@constructive-io/sdk@0.6.1) (2026-03-13)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+# [0.6.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.5.2...@constructive-io/sdk@0.6.0) (2026-03-13)
+
+### Features
+
+- **codegen:** add optional condition generation toggle ([abe0e3e](https://github.com/constructive-io/constructive/commit/abe0e3efd00119ee9fb4265c6480799b4a5f62d4))
+
+## [0.5.2](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.5.1...@constructive-io/sdk@0.5.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.5.1](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.4.0...@constructive-io/sdk@0.5.1) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.4.0...@constructive-io/sdk@0.5.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+# [0.4.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.3.3...@constructive-io/sdk@0.4.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+## [0.3.3](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.3.2...@constructive-io/sdk@0.3.3) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
 ## [0.3.2](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.3.1...@constructive-io/sdk@0.3.2) (2026-03-05)
 
 **Note:** Version bump only for package @constructive-io/sdk

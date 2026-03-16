@@ -9,7 +9,7 @@ ORM operations for Database records
 ```typescript
 db.database.findMany({ select: { id: true } }).execute()
 db.database.findOne({ id: '<value>', select: { id: true } }).execute()
-db.database.create({ data: { ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<value>', hash: '<value>' }, select: { id: true } }).execute()
+db.database.create({ data: { ownerId: '<value>', schemaHash: '<value>', name: '<value>', label: '<value>', hash: '<value>', schemaHashTrgmSimilarity: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.database.update({ where: { id: '<value>' }, data: { ownerId: '<new>' }, select: { id: true } }).execute()
 db.database.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.database.findMany({
 
 ```typescript
 const item = await db.database.create({
-  data: { ownerId: 'value', schemaHash: 'value', name: 'value', label: 'value', hash: 'value' },
+  data: { ownerId: 'value', schemaHash: 'value', name: 'value', label: 'value', hash: 'value', schemaHashTrgmSimilarity: 'value', nameTrgmSimilarity: 'value', labelTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

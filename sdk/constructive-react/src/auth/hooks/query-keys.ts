@@ -19,15 +19,6 @@
 // Entity Query Keys
 // ============================================================================
 
-export const roleTypeKeys = {
-  /** All roleType queries */ all: ['roletype'] as const,
-  /** List query keys */ lists: () => [...roleTypeKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...roleTypeKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...roleTypeKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...roleTypeKeys.details(), id] as const,
-} as const;
 export const cryptoAddressKeys = {
   /** All cryptoAddress queries */ all: ['cryptoaddress'] as const,
   /** List query keys */ lists: () => [...cryptoAddressKeys.all, 'list'] as const,
@@ -36,6 +27,15 @@ export const cryptoAddressKeys = {
   /** Detail query keys */ details: () => [...cryptoAddressKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...cryptoAddressKeys.details(), id] as const,
+} as const;
+export const roleTypeKeys = {
+  /** All roleType queries */ all: ['roletype'] as const,
+  /** List query keys */ lists: () => [...roleTypeKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...roleTypeKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...roleTypeKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...roleTypeKeys.details(), id] as const,
 } as const;
 export const phoneNumberKeys = {
   /** All phoneNumber queries */ all: ['phonenumber'] as const,
@@ -116,8 +116,8 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
-  roleType: roleTypeKeys,
   cryptoAddress: cryptoAddressKeys,
+  roleType: roleTypeKeys,
   phoneNumber: phoneNumberKeys,
   connectedAccount: connectedAccountKeys,
   auditLog: auditLogKeys,

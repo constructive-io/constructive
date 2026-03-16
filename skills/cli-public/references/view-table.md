@@ -9,7 +9,7 @@ CRUD operations for ViewTable records via csdk CLI
 ```bash
 csdk view-table list
 csdk view-table get --id <value>
-csdk view-table create --viewId <value> --tableId <value> --joinOrder <value>
+csdk view-table create --viewId <value> --tableId <value> [--joinOrder <value>]
 csdk view-table update --id <value> [--viewId <value>] [--tableId <value>] [--joinOrder <value>]
 csdk view-table delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk view-table list
 ### Create a viewTable
 
 ```bash
-csdk view-table create --viewId "value" --tableId "value" --joinOrder "value"
+csdk view-table create --viewId <value> --tableId <value> [--joinOrder <value>]
 ```
 
 ### Get a viewTable by id

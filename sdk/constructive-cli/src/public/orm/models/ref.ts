@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RefModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RefSelect>(
-    args: FindManyArgs<S, RefFilter, RefOrderBy> & {
+    args: FindManyArgs<S, RefFilter, never, RefOrderBy> & {
       select: S;
     } & StrictSelect<S, RefSelect>
   ): QueryBuilder<{

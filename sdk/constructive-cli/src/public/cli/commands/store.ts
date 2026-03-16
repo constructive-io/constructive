@@ -14,6 +14,8 @@ const fieldSchema: FieldSchema = {
   databaseId: 'uuid',
   hash: 'uuid',
   createdAt: 'string',
+  nameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nstore <command>\n\nCommands:\n  list                  List all store records\n  get                   Get a store by ID\n  create                Create a new store\n  update                Update an existing store\n  delete                Delete a store\n\n  --help, -h            Show this help message\n';

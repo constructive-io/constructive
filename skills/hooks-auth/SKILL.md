@@ -13,12 +13,12 @@ React Query hooks for the auth API — provides typed query and mutation hooks f
 
 ```typescript
 // Import hooks
-import { useRoleTypesQuery } from './hooks';
+import { useCryptoAddressesQuery } from './hooks';
 
 // Query hooks: use<Model>Query, use<Model>sQuery
 // Mutation hooks: useCreate<Model>Mutation, useUpdate<Model>Mutation, useDelete<Model>Mutation
 
-const { data, isLoading } = useRoleTypesQuery({
+const { data, isLoading } = useCryptoAddressesQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -28,7 +28,7 @@ const { data, isLoading } = useRoleTypesQuery({
 ### Query records
 
 ```typescript
-const { data, isLoading } = useRoleTypesQuery({
+const { data, isLoading } = useCryptoAddressesQuery({
   selection: { fields: { id: true } },
 });
 ```
@@ -37,8 +37,8 @@ const { data, isLoading } = useRoleTypesQuery({
 
 See the `references/` directory for detailed per-entity API documentation:
 
-- [role-type](references/role-type.md)
 - [crypto-address](references/crypto-address.md)
+- [role-type](references/role-type.md)
 - [phone-number](references/phone-number.md)
 - [connected-account](references/connected-account.md)
 - [audit-log](references/audit-log.md)

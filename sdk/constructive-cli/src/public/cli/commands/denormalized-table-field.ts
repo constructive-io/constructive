@@ -24,6 +24,8 @@ const fieldSchema: FieldSchema = {
   updateDefaults: 'boolean',
   funcName: 'string',
   funcOrder: 'int',
+  funcNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ndenormalized-table-field <command>\n\nCommands:\n  list                  List all denormalizedTableField records\n  get                   Get a denormalizedTableField by ID\n  create                Create a new denormalizedTableField\n  update                Update an existing denormalizedTableField\n  delete                Delete a denormalizedTableField\n\n  --help, -h            Show this help message\n';

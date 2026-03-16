@@ -16,6 +16,8 @@ const fieldSchema: FieldSchema = {
   tableId: 'uuid',
   ownerTableId: 'uuid',
   tableName: 'string',
+  tableNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nemails-module <command>\n\nCommands:\n  list                  List all emailsModule records\n  get                   Get a emailsModule by ID\n  create                Create a new emailsModule\n  update                Update an existing emailsModule\n  delete                Delete a emailsModule\n\n  --help, -h            Show this help message\n';

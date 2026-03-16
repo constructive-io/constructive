@@ -21,6 +21,8 @@ const fieldSchema: FieldSchema = {
   expiresAt: 'string',
   createdAt: 'string',
   updatedAt: 'string',
+  inviteTokenTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ninvite <command>\n\nCommands:\n  list                  List all invite records\n  get                   Get a invite by ID\n  create                Create a new invite\n  update                Update an existing invite\n  delete                Delete a invite\n\n  --help, -h            Show this help message\n';

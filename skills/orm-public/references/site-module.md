@@ -9,7 +9,7 @@ Site-level module configuration; stores module name and JSON settings used by th
 ```typescript
 db.siteModule.findMany({ select: { id: true } }).execute()
 db.siteModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.siteModule.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>' }, select: { id: true } }).execute()
+db.siteModule.create({ data: { databaseId: '<value>', siteId: '<value>', name: '<value>', data: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.siteModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.siteModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.siteModule.findMany({
 
 ```typescript
 const item = await db.siteModule.create({
-  data: { databaseId: 'value', siteId: 'value', name: 'value', data: 'value' },
+  data: { databaseId: 'value', siteId: 'value', name: 'value', data: 'value', nameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

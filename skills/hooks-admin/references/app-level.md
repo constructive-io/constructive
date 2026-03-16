@@ -7,8 +7,8 @@ Defines available levels that users can achieve by completing requirements
 ## Usage
 
 ```typescript
-useAppLevelsQuery({ selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } } })
-useAppLevelQuery({ id: '<value>', selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } } })
+useAppLevelsQuery({ selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } } })
+useAppLevelQuery({ id: '<value>', selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } } })
 useCreateAppLevelMutation({ selection: { fields: { id: true } } })
 useUpdateAppLevelMutation({ selection: { fields: { id: true } } })
 useDeleteAppLevelMutation({})
@@ -20,7 +20,7 @@ useDeleteAppLevelMutation({})
 
 ```typescript
 const { data, isLoading } = useAppLevelsQuery({
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppLevelsQuery({
 const { mutate } = useCreateAppLevelMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>' });
+mutate({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

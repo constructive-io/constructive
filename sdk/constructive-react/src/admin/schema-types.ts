@@ -53,6 +53,7 @@ import type {
   StringListFilter,
   UUIDFilter,
   UUIDListFilter,
+  VectorFilter,
 } from './types';
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
@@ -157,15 +158,6 @@ export type OrgLimitDefaultOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
-/** Methods to use when ordering `MembershipType`. */
-export type MembershipTypeOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC';
 /** Methods to use when ordering `OrgChartEdgeGrant`. */
 export type OrgChartEdgeGrantOrderBy =
   | 'NATURAL'
@@ -180,7 +172,26 @@ export type OrgChartEdgeGrantOrderBy =
   | 'PARENT_ID_ASC'
   | 'PARENT_ID_DESC'
   | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC';
+  | 'GRANTOR_ID_DESC'
+  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
+  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
+/** Methods to use when ordering `MembershipType`. */
+export type MembershipTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'PREFIX_TRGM_SIMILARITY_ASC'
+  | 'PREFIX_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `AppPermission`. */
 export type AppPermissionOrderBy =
   | 'NATURAL'
@@ -191,7 +202,11 @@ export type AppPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC';
+  | 'BITNUM_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `OrgPermission`. */
 export type OrgPermissionOrderBy =
   | 'NATURAL'
@@ -202,7 +217,11 @@ export type OrgPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC';
+  | 'BITNUM_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `AppLimit`. */
 export type AppLimitOrderBy =
   | 'NATURAL'
@@ -346,7 +365,11 @@ export type OrgChartEdgeOrderBy =
   | 'CHILD_ID_ASC'
   | 'CHILD_ID_DESC'
   | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC';
+  | 'PARENT_ID_DESC'
+  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
+  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `OrgMembershipDefault`. */
 export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
@@ -380,41 +403,11 @@ export type AppLevelRequirementOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `Invite`. */
-export type InviteOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'INVITE_TOKEN_ASC'
-  | 'INVITE_TOKEN_DESC'
-  | 'INVITE_VALID_ASC'
-  | 'INVITE_VALID_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `AppLevel`. */
-export type AppLevelOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `AppMembership`. */
 export type AppMembershipOrderBy =
   | 'NATURAL'
@@ -463,6 +456,48 @@ export type OrgMembershipOrderBy =
   | 'ENTITY_ID_DESC'
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
+/** Methods to use when ordering `Invite`. */
+export type InviteOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'SENDER_ID_ASC'
+  | 'SENDER_ID_DESC'
+  | 'INVITE_TOKEN_ASC'
+  | 'INVITE_TOKEN_DESC'
+  | 'INVITE_VALID_ASC'
+  | 'INVITE_VALID_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
+  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
+/** Methods to use when ordering `AppLevel`. */
+export type AppLevelOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
+  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** Methods to use when ordering `OrgInvite`. */
 export type OrgInviteOrderBy =
   | 'NATURAL'
@@ -485,21 +520,11 @@ export type OrgInviteOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
-/**
- * A condition to be used against `OrgMember` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface OrgMemberCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `isAdmin` field. */
-  isAdmin?: boolean;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-}
+  | 'ENTITY_ID_DESC'
+  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
+  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
+  | 'SEARCH_SCORE_ASC'
+  | 'SEARCH_SCORE_DESC';
 /** A filter to be used against `OrgMember` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgMemberFilter {
   /** Filter by the object’s `id` field. */
@@ -517,16 +542,6 @@ export interface OrgMemberFilter {
   /** Negates the expression. */
   not?: OrgMemberFilter;
 }
-/**
- * A condition to be used against `AppPermissionDefault` object types. All fields
- * are tested for equality and combined with a logical ‘and.’
- */
-export interface AppPermissionDefaultCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `permissions` field. */
-  permissions?: string;
-}
 /** A filter to be used against `AppPermissionDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface AppPermissionDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -539,18 +554,6 @@ export interface AppPermissionDefaultFilter {
   or?: AppPermissionDefaultFilter[];
   /** Negates the expression. */
   not?: AppPermissionDefaultFilter;
-}
-/**
- * A condition to be used against `OrgPermissionDefault` object types. All fields
- * are tested for equality and combined with a logical ‘and.’
- */
-export interface OrgPermissionDefaultCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `permissions` field. */
-  permissions?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
 }
 /** A filter to be used against `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgPermissionDefaultFilter {
@@ -566,24 +569,6 @@ export interface OrgPermissionDefaultFilter {
   or?: OrgPermissionDefaultFilter[];
   /** Negates the expression. */
   not?: OrgPermissionDefaultFilter;
-}
-/**
- * A condition to be used against `AppAdminGrant` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface AppAdminGrantCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `isGrant` field. */
-  isGrant?: boolean;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `grantorId` field. */
-  grantorId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
 }
 /** A filter to be used against `AppAdminGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface AppAdminGrantFilter {
@@ -606,24 +591,6 @@ export interface AppAdminGrantFilter {
   /** Negates the expression. */
   not?: AppAdminGrantFilter;
 }
-/**
- * A condition to be used against `AppOwnerGrant` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface AppOwnerGrantCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `isGrant` field. */
-  isGrant?: boolean;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `grantorId` field. */
-  grantorId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
 /** A filter to be used against `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface AppOwnerGrantFilter {
   /** Filter by the object’s `id` field. */
@@ -644,26 +611,6 @@ export interface AppOwnerGrantFilter {
   or?: AppOwnerGrantFilter[];
   /** Negates the expression. */
   not?: AppOwnerGrantFilter;
-}
-/**
- * A condition to be used against `OrgAdminGrant` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgAdminGrantCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `isGrant` field. */
-  isGrant?: boolean;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-  /** Checks for equality with the object’s `grantorId` field. */
-  grantorId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
 }
 /** A filter to be used against `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgAdminGrantFilter {
@@ -688,26 +635,6 @@ export interface OrgAdminGrantFilter {
   /** Negates the expression. */
   not?: OrgAdminGrantFilter;
 }
-/**
- * A condition to be used against `OrgOwnerGrant` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgOwnerGrantCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `isGrant` field. */
-  isGrant?: boolean;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-  /** Checks for equality with the object’s `grantorId` field. */
-  grantorId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
 /** A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgOwnerGrantFilter {
   /** Filter by the object’s `id` field. */
@@ -731,18 +658,6 @@ export interface OrgOwnerGrantFilter {
   /** Negates the expression. */
   not?: OrgOwnerGrantFilter;
 }
-/**
- * A condition to be used against `AppLimitDefault` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface AppLimitDefaultCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `max` field. */
-  max?: number;
-}
 /** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -758,17 +673,12 @@ export interface AppLimitDefaultFilter {
   /** Negates the expression. */
   not?: AppLimitDefaultFilter;
 }
-/**
- * A condition to be used against `OrgLimitDefault` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgLimitDefaultCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `max` field. */
-  max?: number;
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
 }
 /** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgLimitDefaultFilter {
@@ -784,61 +694,6 @@ export interface OrgLimitDefaultFilter {
   or?: OrgLimitDefaultFilter[];
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
-}
-/**
- * A condition to be used against `MembershipType` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface MembershipTypeCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: number;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `description` field. */
-  description?: string;
-  /** Checks for equality with the object’s `prefix` field. */
-  prefix?: string;
-}
-/** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
-export interface MembershipTypeFilter {
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: MembershipTypeFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MembershipTypeFilter[];
-  /** Negates the expression. */
-  not?: MembershipTypeFilter;
-}
-/**
- * A condition to be used against `OrgChartEdgeGrant` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgChartEdgeGrantCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-  /** Checks for equality with the object’s `childId` field. */
-  childId?: string;
-  /** Checks for equality with the object’s `parentId` field. */
-  parentId?: string;
-  /** Checks for equality with the object’s `grantorId` field. */
-  grantorId?: string;
-  /** Checks for equality with the object’s `isGrant` field. */
-  isGrant?: boolean;
-  /** Checks for equality with the object’s `positionTitle` field. */
-  positionTitle?: string;
-  /** Checks for equality with the object’s `positionLevel` field. */
-  positionLevel?: number;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
 }
 /** A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgChartEdgeGrantFilter {
@@ -866,22 +721,43 @@ export interface OrgChartEdgeGrantFilter {
   or?: OrgChartEdgeGrantFilter[];
   /** Negates the expression. */
   not?: OrgChartEdgeGrantFilter;
+  /** TRGM search on the `position_title` column. */
+  trgmPositionTitle?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
-/**
- * A condition to be used against `AppPermission` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface AppPermissionCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `bitnum` field. */
-  bitnum?: number;
-  /** Checks for equality with the object’s `bitstr` field. */
-  bitstr?: string;
-  /** Checks for equality with the object’s `description` field. */
-  description?: string;
+/** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
+export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipTypeFilter[];
+  /** Negates the expression. */
+  not?: MembershipTypeFilter;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /** TRGM search on the `prefix` column. */
+  trgmPrefix?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `AppPermission` object types. All fields are combined with a logical ‘and.’ */
 export interface AppPermissionFilter {
@@ -901,22 +777,15 @@ export interface AppPermissionFilter {
   or?: AppPermissionFilter[];
   /** Negates the expression. */
   not?: AppPermissionFilter;
-}
-/**
- * A condition to be used against `OrgPermission` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgPermissionCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `bitnum` field. */
-  bitnum?: number;
-  /** Checks for equality with the object’s `bitstr` field. */
-  bitstr?: string;
-  /** Checks for equality with the object’s `description` field. */
-  description?: string;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `OrgPermission` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgPermissionFilter {
@@ -936,22 +805,15 @@ export interface OrgPermissionFilter {
   or?: OrgPermissionFilter[];
   /** Negates the expression. */
   not?: OrgPermissionFilter;
-}
-/**
- * A condition to be used against `AppLimit` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface AppLimitCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `num` field. */
-  num?: number;
-  /** Checks for equality with the object’s `max` field. */
-  max?: number;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `AppLimit` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitFilter {
@@ -971,24 +833,6 @@ export interface AppLimitFilter {
   or?: AppLimitFilter[];
   /** Negates the expression. */
   not?: AppLimitFilter;
-}
-/**
- * A condition to be used against `AppAchievement` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface AppAchievementCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `count` field. */
-  count?: number;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
 }
 /** A filter to be used against `AppAchievement` object types. All fields are combined with a logical ‘and.’ */
 export interface AppAchievementFilter {
@@ -1011,21 +855,6 @@ export interface AppAchievementFilter {
   /** Negates the expression. */
   not?: AppAchievementFilter;
 }
-/** A condition to be used against `AppStep` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface AppStepCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `count` field. */
-  count?: number;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
 /** A filter to be used against `AppStep` object types. All fields are combined with a logical ‘and.’ */
 export interface AppStepFilter {
   /** Filter by the object’s `id` field. */
@@ -1047,24 +876,6 @@ export interface AppStepFilter {
   /** Negates the expression. */
   not?: AppStepFilter;
 }
-/**
- * A condition to be used against `ClaimedInvite` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface ClaimedInviteCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `data` field. */
-  data?: unknown;
-  /** Checks for equality with the object’s `senderId` field. */
-  senderId?: string;
-  /** Checks for equality with the object’s `receiverId` field. */
-  receiverId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
 /** A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
 export interface ClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
@@ -1083,26 +894,6 @@ export interface ClaimedInviteFilter {
   or?: ClaimedInviteFilter[];
   /** Negates the expression. */
   not?: ClaimedInviteFilter;
-}
-/**
- * A condition to be used against `AppGrant` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface AppGrantCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `permissions` field. */
-  permissions?: string;
-  /** Checks for equality with the object’s `isGrant` field. */
-  isGrant?: boolean;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `grantorId` field. */
-  grantorId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
 }
 /** A filter to be used against `AppGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface AppGrantFilter {
@@ -1127,26 +918,6 @@ export interface AppGrantFilter {
   /** Negates the expression. */
   not?: AppGrantFilter;
 }
-/**
- * A condition to be used against `AppMembershipDefault` object types. All fields
- * are tested for equality and combined with a logical ‘and.’
- */
-export interface AppMembershipDefaultCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Checks for equality with the object’s `createdBy` field. */
-  createdBy?: string;
-  /** Checks for equality with the object’s `updatedBy` field. */
-  updatedBy?: string;
-  /** Checks for equality with the object’s `isApproved` field. */
-  isApproved?: boolean;
-  /** Checks for equality with the object’s `isVerified` field. */
-  isVerified?: boolean;
-}
 /** A filter to be used against `AppMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface AppMembershipDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -1170,24 +941,6 @@ export interface AppMembershipDefaultFilter {
   /** Negates the expression. */
   not?: AppMembershipDefaultFilter;
 }
-/**
- * A condition to be used against `OrgLimit` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface OrgLimitCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `num` field. */
-  num?: number;
-  /** Checks for equality with the object’s `max` field. */
-  max?: number;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-}
 /** A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgLimitFilter {
   /** Filter by the object’s `id` field. */
@@ -1209,26 +962,6 @@ export interface OrgLimitFilter {
   /** Negates the expression. */
   not?: OrgLimitFilter;
 }
-/**
- * A condition to be used against `OrgClaimedInvite` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgClaimedInviteCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `data` field. */
-  data?: unknown;
-  /** Checks for equality with the object’s `senderId` field. */
-  senderId?: string;
-  /** Checks for equality with the object’s `receiverId` field. */
-  receiverId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-}
 /** A filter to be used against `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
@@ -1249,28 +982,6 @@ export interface OrgClaimedInviteFilter {
   or?: OrgClaimedInviteFilter[];
   /** Negates the expression. */
   not?: OrgClaimedInviteFilter;
-}
-/**
- * A condition to be used against `OrgGrant` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface OrgGrantCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `permissions` field. */
-  permissions?: string;
-  /** Checks for equality with the object’s `isGrant` field. */
-  isGrant?: boolean;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-  /** Checks for equality with the object’s `grantorId` field. */
-  grantorId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
 }
 /** A filter to be used against `OrgGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgGrantFilter {
@@ -1297,28 +1008,6 @@ export interface OrgGrantFilter {
   /** Negates the expression. */
   not?: OrgGrantFilter;
 }
-/**
- * A condition to be used against `OrgChartEdge` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgChartEdgeCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-  /** Checks for equality with the object’s `childId` field. */
-  childId?: string;
-  /** Checks for equality with the object’s `parentId` field. */
-  parentId?: string;
-  /** Checks for equality with the object’s `positionTitle` field. */
-  positionTitle?: string;
-  /** Checks for equality with the object’s `positionLevel` field. */
-  positionLevel?: number;
-}
 /** A filter to be used against `OrgChartEdge` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgChartEdgeFilter {
   /** Filter by the object’s `id` field. */
@@ -1343,30 +1032,15 @@ export interface OrgChartEdgeFilter {
   or?: OrgChartEdgeFilter[];
   /** Negates the expression. */
   not?: OrgChartEdgeFilter;
-}
-/**
- * A condition to be used against `OrgMembershipDefault` object types. All fields
- * are tested for equality and combined with a logical ‘and.’
- */
-export interface OrgMembershipDefaultCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Checks for equality with the object’s `createdBy` field. */
-  createdBy?: string;
-  /** Checks for equality with the object’s `updatedBy` field. */
-  updatedBy?: string;
-  /** Checks for equality with the object’s `isApproved` field. */
-  isApproved?: boolean;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-  /** Checks for equality with the object’s `deleteMemberCascadeGroups` field. */
-  deleteMemberCascadeGroups?: boolean;
-  /** Checks for equality with the object’s `createGroupsCascadeMembers` field. */
-  createGroupsCascadeMembers?: boolean;
+  /** TRGM search on the `position_title` column. */
+  trgmPositionTitle?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgMembershipDefaultFilter {
@@ -1395,28 +1069,6 @@ export interface OrgMembershipDefaultFilter {
   /** Negates the expression. */
   not?: OrgMembershipDefaultFilter;
 }
-/**
- * A condition to be used against `AppLevelRequirement` object types. All fields
- * are tested for equality and combined with a logical ‘and.’
- */
-export interface AppLevelRequirementCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `level` field. */
-  level?: string;
-  /** Checks for equality with the object’s `description` field. */
-  description?: string;
-  /** Checks for equality with the object’s `requiredCount` field. */
-  requiredCount?: number;
-  /** Checks for equality with the object’s `priority` field. */
-  priority?: number;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
 /** A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLevelRequirementFilter {
   /** Filter by the object’s `id` field. */
@@ -1441,33 +1093,97 @@ export interface AppLevelRequirementFilter {
   or?: AppLevelRequirementFilter[];
   /** Negates the expression. */
   not?: AppLevelRequirementFilter;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
-/** A condition to be used against `Invite` object types. All fields are tested for equality and combined with a logical ‘and.’ */
-export interface InviteCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `email` field. */
-  email?: ConstructiveInternalTypeEmail;
-  /** Checks for equality with the object’s `senderId` field. */
-  senderId?: string;
-  /** Checks for equality with the object’s `inviteToken` field. */
-  inviteToken?: string;
-  /** Checks for equality with the object’s `inviteValid` field. */
-  inviteValid?: boolean;
-  /** Checks for equality with the object’s `inviteLimit` field. */
-  inviteLimit?: number;
-  /** Checks for equality with the object’s `inviteCount` field. */
-  inviteCount?: number;
-  /** Checks for equality with the object’s `multiple` field. */
-  multiple?: boolean;
-  /** Checks for equality with the object’s `data` field. */
-  data?: unknown;
-  /** Checks for equality with the object’s `expiresAt` field. */
-  expiresAt?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
+/** A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface AppMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppMembershipFilter[];
+  /** Negates the expression. */
+  not?: AppMembershipFilter;
+}
+/** A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipFilter;
 }
 /** A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’ */
 export interface InviteFilter {
@@ -1499,6 +1215,15 @@ export interface InviteFilter {
   or?: InviteFilter[];
   /** Negates the expression. */
   not?: InviteFilter;
+  /** TRGM search on the `invite_token` column. */
+  trgmInviteToken?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -1577,26 +1302,6 @@ export interface ConstructiveInternalTypeEmailFilter {
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
 }
-/**
- * A condition to be used against `AppLevel` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface AppLevelCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `name` field. */
-  name?: string;
-  /** Checks for equality with the object’s `description` field. */
-  description?: string;
-  /** Checks for equality with the object’s `image` field. */
-  image?: ConstructiveInternalTypeImage;
-  /** Checks for equality with the object’s `ownerId` field. */
-  ownerId?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-}
 /** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLevelFilter {
   /** Filter by the object’s `id` field. */
@@ -1619,6 +1324,15 @@ export interface AppLevelFilter {
   or?: AppLevelFilter[];
   /** Negates the expression. */
   not?: AppLevelFilter;
+  /** TRGM search on the `description` column. */
+  trgmDescription?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 /** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeImageFilter {
@@ -1655,198 +1369,6 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Contained by the specified JSON. */
   containedBy?: ConstructiveInternalTypeImage;
 }
-/**
- * A condition to be used against `AppMembership` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface AppMembershipCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Checks for equality with the object’s `createdBy` field. */
-  createdBy?: string;
-  /** Checks for equality with the object’s `updatedBy` field. */
-  updatedBy?: string;
-  /** Checks for equality with the object’s `isApproved` field. */
-  isApproved?: boolean;
-  /** Checks for equality with the object’s `isBanned` field. */
-  isBanned?: boolean;
-  /** Checks for equality with the object’s `isDisabled` field. */
-  isDisabled?: boolean;
-  /** Checks for equality with the object’s `isVerified` field. */
-  isVerified?: boolean;
-  /** Checks for equality with the object’s `isActive` field. */
-  isActive?: boolean;
-  /** Checks for equality with the object’s `isOwner` field. */
-  isOwner?: boolean;
-  /** Checks for equality with the object’s `isAdmin` field. */
-  isAdmin?: boolean;
-  /** Checks for equality with the object’s `permissions` field. */
-  permissions?: string;
-  /** Checks for equality with the object’s `granted` field. */
-  granted?: string;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `profileId` field. */
-  profileId?: string;
-}
-/** A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’ */
-export interface AppMembershipFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `isApproved` field. */
-  isApproved?: BooleanFilter;
-  /** Filter by the object’s `isBanned` field. */
-  isBanned?: BooleanFilter;
-  /** Filter by the object’s `isDisabled` field. */
-  isDisabled?: BooleanFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `isOwner` field. */
-  isOwner?: BooleanFilter;
-  /** Filter by the object’s `isAdmin` field. */
-  isAdmin?: BooleanFilter;
-  /** Filter by the object’s `permissions` field. */
-  permissions?: BitStringFilter;
-  /** Filter by the object’s `granted` field. */
-  granted?: BitStringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `profileId` field. */
-  profileId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppMembershipFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppMembershipFilter[];
-  /** Negates the expression. */
-  not?: AppMembershipFilter;
-}
-/**
- * A condition to be used against `OrgMembership` object types. All fields are
- * tested for equality and combined with a logical ‘and.’
- */
-export interface OrgMembershipCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Checks for equality with the object’s `createdBy` field. */
-  createdBy?: string;
-  /** Checks for equality with the object’s `updatedBy` field. */
-  updatedBy?: string;
-  /** Checks for equality with the object’s `isApproved` field. */
-  isApproved?: boolean;
-  /** Checks for equality with the object’s `isBanned` field. */
-  isBanned?: boolean;
-  /** Checks for equality with the object’s `isDisabled` field. */
-  isDisabled?: boolean;
-  /** Checks for equality with the object’s `isActive` field. */
-  isActive?: boolean;
-  /** Checks for equality with the object’s `isOwner` field. */
-  isOwner?: boolean;
-  /** Checks for equality with the object’s `isAdmin` field. */
-  isAdmin?: boolean;
-  /** Checks for equality with the object’s `permissions` field. */
-  permissions?: string;
-  /** Checks for equality with the object’s `granted` field. */
-  granted?: string;
-  /** Checks for equality with the object’s `actorId` field. */
-  actorId?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-  /** Checks for equality with the object’s `profileId` field. */
-  profileId?: string;
-}
-/** A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgMembershipFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `isApproved` field. */
-  isApproved?: BooleanFilter;
-  /** Filter by the object’s `isBanned` field. */
-  isBanned?: BooleanFilter;
-  /** Filter by the object’s `isDisabled` field. */
-  isDisabled?: BooleanFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `isOwner` field. */
-  isOwner?: BooleanFilter;
-  /** Filter by the object’s `isAdmin` field. */
-  isAdmin?: BooleanFilter;
-  /** Filter by the object’s `permissions` field. */
-  permissions?: BitStringFilter;
-  /** Filter by the object’s `granted` field. */
-  granted?: BitStringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `profileId` field. */
-  profileId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgMembershipFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgMembershipFilter[];
-  /** Negates the expression. */
-  not?: OrgMembershipFilter;
-}
-/**
- * A condition to be used against `OrgInvite` object types. All fields are tested
- * for equality and combined with a logical ‘and.’
- */
-export interface OrgInviteCondition {
-  /** Checks for equality with the object’s `id` field. */
-  id?: string;
-  /** Checks for equality with the object’s `email` field. */
-  email?: ConstructiveInternalTypeEmail;
-  /** Checks for equality with the object’s `senderId` field. */
-  senderId?: string;
-  /** Checks for equality with the object’s `receiverId` field. */
-  receiverId?: string;
-  /** Checks for equality with the object’s `inviteToken` field. */
-  inviteToken?: string;
-  /** Checks for equality with the object’s `inviteValid` field. */
-  inviteValid?: boolean;
-  /** Checks for equality with the object’s `inviteLimit` field. */
-  inviteLimit?: number;
-  /** Checks for equality with the object’s `inviteCount` field. */
-  inviteCount?: number;
-  /** Checks for equality with the object’s `multiple` field. */
-  multiple?: boolean;
-  /** Checks for equality with the object’s `data` field. */
-  data?: unknown;
-  /** Checks for equality with the object’s `expiresAt` field. */
-  expiresAt?: string;
-  /** Checks for equality with the object’s `createdAt` field. */
-  createdAt?: string;
-  /** Checks for equality with the object’s `updatedAt` field. */
-  updatedAt?: string;
-  /** Checks for equality with the object’s `entityId` field. */
-  entityId?: string;
-}
 /** A filter to be used against `OrgInvite` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgInviteFilter {
   /** Filter by the object’s `id` field. */
@@ -1881,6 +1403,15 @@ export interface OrgInviteFilter {
   or?: OrgInviteFilter[];
   /** Negates the expression. */
   not?: OrgInviteFilter;
+  /** TRGM search on the `invite_token` column. */
+  trgmInviteToken?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 export interface SubmitInviteCodeInput {
   clientMutationId?: string;
@@ -2023,22 +1554,6 @@ export interface OrgLimitDefaultInput {
   /** Default maximum usage allowed for this limit */
   max?: number;
 }
-export interface CreateMembershipTypeInput {
-  clientMutationId?: string;
-  /** The `MembershipType` to be created by this mutation. */
-  membershipType: MembershipTypeInput;
-}
-/** An input for mutations affecting `MembershipType` */
-export interface MembershipTypeInput {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** Human-readable name of the membership type */
-  name: string;
-  /** Description of what this membership type represents */
-  description: string;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix: string;
-}
 export interface CreateOrgChartEdgeGrantInput {
   clientMutationId?: string;
   /** The `OrgChartEdgeGrant` to be created by this mutation. */
@@ -2063,6 +1578,22 @@ export interface OrgChartEdgeGrantInput {
   positionLevel?: number;
   /** Timestamp when this grant or revocation was recorded */
   createdAt?: string;
+}
+export interface CreateMembershipTypeInput {
+  clientMutationId?: string;
+  /** The `MembershipType` to be created by this mutation. */
+  membershipType: MembershipTypeInput;
+}
+/** An input for mutations affecting `MembershipType` */
+export interface MembershipTypeInput {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** Human-readable name of the membership type */
+  name: string;
+  /** Description of what this membership type represents */
+  description: string;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix: string;
 }
 export interface CreateAppPermissionInput {
   clientMutationId?: string;
@@ -2318,54 +1849,6 @@ export interface AppLevelRequirementInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateInviteInput {
-  clientMutationId?: string;
-  /** The `Invite` to be created by this mutation. */
-  invite: InviteInput;
-}
-/** An input for mutations affecting `Invite` */
-export interface InviteInput {
-  id?: string;
-  /** Email address of the invited recipient */
-  email?: ConstructiveInternalTypeEmail;
-  /** User ID of the member who sent this invitation */
-  senderId?: string;
-  /** Unique random hex token used to redeem this invitation */
-  inviteToken?: string;
-  /** Whether this invitation is still valid and can be redeemed */
-  inviteValid?: boolean;
-  /** Maximum number of times this invite can be claimed; -1 means unlimited */
-  inviteLimit?: number;
-  /** Running count of how many times this invite has been claimed */
-  inviteCount?: number;
-  /** Whether this invite can be claimed by multiple recipients */
-  multiple?: boolean;
-  /** Optional JSON payload of additional invite metadata */
-  data?: unknown;
-  /** Timestamp after which this invitation can no longer be redeemed */
-  expiresAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface CreateAppLevelInput {
-  clientMutationId?: string;
-  /** The `AppLevel` to be created by this mutation. */
-  appLevel: AppLevelInput;
-}
-/** An input for mutations affecting `AppLevel` */
-export interface AppLevelInput {
-  id?: string;
-  /** Unique name of the level */
-  name: string;
-  /** Human-readable description of what this level represents */
-  description?: string;
-  /** Badge or icon image associated with this level */
-  image?: ConstructiveInternalTypeImage;
-  /** Optional owner (actor) who created or manages this level */
-  ownerId?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface CreateAppMembershipInput {
   clientMutationId?: string;
   /** The `AppMembership` to be created by this mutation. */
@@ -2433,6 +1916,54 @@ export interface OrgMembershipInput {
   /** References the entity (org or group) this membership belongs to */
   entityId: string;
   profileId?: string;
+}
+export interface CreateInviteInput {
+  clientMutationId?: string;
+  /** The `Invite` to be created by this mutation. */
+  invite: InviteInput;
+}
+/** An input for mutations affecting `Invite` */
+export interface InviteInput {
+  id?: string;
+  /** Email address of the invited recipient */
+  email?: ConstructiveInternalTypeEmail;
+  /** User ID of the member who sent this invitation */
+  senderId?: string;
+  /** Unique random hex token used to redeem this invitation */
+  inviteToken?: string;
+  /** Whether this invitation is still valid and can be redeemed */
+  inviteValid?: boolean;
+  /** Maximum number of times this invite can be claimed; -1 means unlimited */
+  inviteLimit?: number;
+  /** Running count of how many times this invite has been claimed */
+  inviteCount?: number;
+  /** Whether this invite can be claimed by multiple recipients */
+  multiple?: boolean;
+  /** Optional JSON payload of additional invite metadata */
+  data?: unknown;
+  /** Timestamp after which this invitation can no longer be redeemed */
+  expiresAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface CreateAppLevelInput {
+  clientMutationId?: string;
+  /** The `AppLevel` to be created by this mutation. */
+  appLevel: AppLevelInput;
+}
+/** An input for mutations affecting `AppLevel` */
+export interface AppLevelInput {
+  id?: string;
+  /** Unique name of the level */
+  name: string;
+  /** Human-readable description of what this level represents */
+  description?: string;
+  /** Badge or icon image associated with this level */
+  image?: ConstructiveInternalTypeImage;
+  /** Optional owner (actor) who created or manages this level */
+  ownerId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface CreateOrgInviteInput {
   clientMutationId?: string;
@@ -2608,24 +2139,6 @@ export interface OrgLimitDefaultPatch {
   /** Default maximum usage allowed for this limit */
   max?: number;
 }
-export interface UpdateMembershipTypeInput {
-  clientMutationId?: string;
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** An object where the defined keys will be set on the `MembershipType` being updated. */
-  membershipTypePatch: MembershipTypePatch;
-}
-/** Represents an update to a `MembershipType`. Fields that are set will be updated. */
-export interface MembershipTypePatch {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id?: number;
-  /** Human-readable name of the membership type */
-  name?: string;
-  /** Description of what this membership type represents */
-  description?: string;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix?: string;
-}
 export interface UpdateOrgChartEdgeGrantInput {
   clientMutationId?: string;
   id: string;
@@ -2651,6 +2164,24 @@ export interface OrgChartEdgeGrantPatch {
   positionLevel?: number;
   /** Timestamp when this grant or revocation was recorded */
   createdAt?: string;
+}
+export interface UpdateMembershipTypeInput {
+  clientMutationId?: string;
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** An object where the defined keys will be set on the `MembershipType` being updated. */
+  membershipTypePatch: MembershipTypePatch;
+}
+/** Represents an update to a `MembershipType`. Fields that are set will be updated. */
+export interface MembershipTypePatch {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id?: number;
+  /** Human-readable name of the membership type */
+  name?: string;
+  /** Description of what this membership type represents */
+  description?: string;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix?: string;
 }
 export interface UpdateAppPermissionInput {
   clientMutationId?: string;
@@ -2920,58 +2451,6 @@ export interface AppLevelRequirementPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateInviteInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `Invite` being updated. */
-  invitePatch: InvitePatch;
-}
-/** Represents an update to a `Invite`. Fields that are set will be updated. */
-export interface InvitePatch {
-  id?: string;
-  /** Email address of the invited recipient */
-  email?: ConstructiveInternalTypeEmail;
-  /** User ID of the member who sent this invitation */
-  senderId?: string;
-  /** Unique random hex token used to redeem this invitation */
-  inviteToken?: string;
-  /** Whether this invitation is still valid and can be redeemed */
-  inviteValid?: boolean;
-  /** Maximum number of times this invite can be claimed; -1 means unlimited */
-  inviteLimit?: number;
-  /** Running count of how many times this invite has been claimed */
-  inviteCount?: number;
-  /** Whether this invite can be claimed by multiple recipients */
-  multiple?: boolean;
-  /** Optional JSON payload of additional invite metadata */
-  data?: unknown;
-  /** Timestamp after which this invitation can no longer be redeemed */
-  expiresAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-export interface UpdateAppLevelInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppLevel` being updated. */
-  appLevelPatch: AppLevelPatch;
-}
-/** Represents an update to a `AppLevel`. Fields that are set will be updated. */
-export interface AppLevelPatch {
-  id?: string;
-  /** Unique name of the level */
-  name?: string;
-  /** Human-readable description of what this level represents */
-  description?: string;
-  /** Badge or icon image associated with this level */
-  image?: ConstructiveInternalTypeImage;
-  /** Optional owner (actor) who created or manages this level */
-  ownerId?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  /** Upload for Badge or icon image associated with this level */
-  imageUpload?: File;
-}
 export interface UpdateAppMembershipInput {
   clientMutationId?: string;
   id: string;
@@ -3042,6 +2521,58 @@ export interface OrgMembershipPatch {
   entityId?: string;
   profileId?: string;
 }
+export interface UpdateInviteInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `Invite` being updated. */
+  invitePatch: InvitePatch;
+}
+/** Represents an update to a `Invite`. Fields that are set will be updated. */
+export interface InvitePatch {
+  id?: string;
+  /** Email address of the invited recipient */
+  email?: ConstructiveInternalTypeEmail;
+  /** User ID of the member who sent this invitation */
+  senderId?: string;
+  /** Unique random hex token used to redeem this invitation */
+  inviteToken?: string;
+  /** Whether this invitation is still valid and can be redeemed */
+  inviteValid?: boolean;
+  /** Maximum number of times this invite can be claimed; -1 means unlimited */
+  inviteLimit?: number;
+  /** Running count of how many times this invite has been claimed */
+  inviteCount?: number;
+  /** Whether this invite can be claimed by multiple recipients */
+  multiple?: boolean;
+  /** Optional JSON payload of additional invite metadata */
+  data?: unknown;
+  /** Timestamp after which this invitation can no longer be redeemed */
+  expiresAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface UpdateAppLevelInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppLevel` being updated. */
+  appLevelPatch: AppLevelPatch;
+}
+/** Represents an update to a `AppLevel`. Fields that are set will be updated. */
+export interface AppLevelPatch {
+  id?: string;
+  /** Unique name of the level */
+  name?: string;
+  /** Human-readable description of what this level represents */
+  description?: string;
+  /** Badge or icon image associated with this level */
+  image?: ConstructiveInternalTypeImage;
+  /** Optional owner (actor) who created or manages this level */
+  ownerId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** Upload for Badge or icon image associated with this level */
+  imageUpload?: File;
+}
 export interface UpdateOrgInviteInput {
   clientMutationId?: string;
   id: string;
@@ -3111,14 +2642,14 @@ export interface DeleteOrgLimitDefaultInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteOrgChartEdgeGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteMembershipTypeInput {
   clientMutationId?: string;
   /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
   id: number;
-}
-export interface DeleteOrgChartEdgeGrantInput {
-  clientMutationId?: string;
-  id: string;
 }
 export interface DeleteAppPermissionInput {
   clientMutationId?: string;
@@ -3176,19 +2707,19 @@ export interface DeleteAppLevelRequirementInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteInviteInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface DeleteAppLevelInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteAppMembershipInput {
   clientMutationId?: string;
   id: string;
 }
 export interface DeleteOrgMembershipInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteInviteInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteAppLevelInput {
   clientMutationId?: string;
   id: string;
 }
@@ -3294,17 +2825,17 @@ export interface OrgLimitDefaultConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `MembershipType` values. */
-export interface MembershipTypeConnection {
-  nodes: MembershipType[];
-  edges: MembershipTypeEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `OrgChartEdgeGrant` values. */
 export interface OrgChartEdgeGrantConnection {
   nodes: OrgChartEdgeGrant[];
   edges: OrgChartEdgeGrantEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `MembershipType` values. */
+export interface MembershipTypeConnection {
+  nodes: MembershipType[];
+  edges: MembershipTypeEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -3385,20 +2916,6 @@ export interface OrgMembershipDefaultConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Invite` values. */
-export interface InviteConnection {
-  nodes: Invite[];
-  edges: InviteEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `AppLevel` values. */
-export interface AppLevelConnection {
-  nodes: AppLevel[];
-  edges: AppLevelEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `AppMembership` values. */
 export interface AppMembershipConnection {
   nodes: AppMembership[];
@@ -3410,6 +2927,20 @@ export interface AppMembershipConnection {
 export interface OrgMembershipConnection {
   nodes: OrgMembership[];
   edges: OrgMembershipEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Invite` values. */
+export interface InviteConnection {
+  nodes: Invite[];
+  edges: InviteEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `AppLevel` values. */
+export interface AppLevelConnection {
+  nodes: AppLevel[];
+  edges: AppLevelEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -3486,17 +3017,17 @@ export interface CreateOrgLimitDefaultPayload {
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
-export interface CreateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was created by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
 export interface CreateOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
   /** The `OrgChartEdgeGrant` that was created by this mutation. */
   orgChartEdgeGrant?: OrgChartEdgeGrant | null;
   orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
+}
+export interface CreateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was created by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface CreateAppPermissionPayload {
   clientMutationId?: string | null;
@@ -3582,18 +3113,6 @@ export interface CreateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface CreateInvitePayload {
-  clientMutationId?: string | null;
-  /** The `Invite` that was created by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
-}
-export interface CreateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was created by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
 export interface CreateAppMembershipPayload {
   clientMutationId?: string | null;
   /** The `AppMembership` that was created by this mutation. */
@@ -3605,6 +3124,18 @@ export interface CreateOrgMembershipPayload {
   /** The `OrgMembership` that was created by this mutation. */
   orgMembership?: OrgMembership | null;
   orgMembershipEdge?: OrgMembershipEdge | null;
+}
+export interface CreateInvitePayload {
+  clientMutationId?: string | null;
+  /** The `Invite` that was created by this mutation. */
+  invite?: Invite | null;
+  inviteEdge?: InviteEdge | null;
+}
+export interface CreateAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was created by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
 }
 export interface CreateOrgInvitePayload {
   clientMutationId?: string | null;
@@ -3666,17 +3197,17 @@ export interface UpdateOrgLimitDefaultPayload {
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
-export interface UpdateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was updated by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
 export interface UpdateOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
   /** The `OrgChartEdgeGrant` that was updated by this mutation. */
   orgChartEdgeGrant?: OrgChartEdgeGrant | null;
   orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
+}
+export interface UpdateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was updated by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface UpdateAppPermissionPayload {
   clientMutationId?: string | null;
@@ -3762,18 +3293,6 @@ export interface UpdateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface UpdateInvitePayload {
-  clientMutationId?: string | null;
-  /** The `Invite` that was updated by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
-}
-export interface UpdateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was updated by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
 export interface UpdateAppMembershipPayload {
   clientMutationId?: string | null;
   /** The `AppMembership` that was updated by this mutation. */
@@ -3785,6 +3304,18 @@ export interface UpdateOrgMembershipPayload {
   /** The `OrgMembership` that was updated by this mutation. */
   orgMembership?: OrgMembership | null;
   orgMembershipEdge?: OrgMembershipEdge | null;
+}
+export interface UpdateInvitePayload {
+  clientMutationId?: string | null;
+  /** The `Invite` that was updated by this mutation. */
+  invite?: Invite | null;
+  inviteEdge?: InviteEdge | null;
+}
+export interface UpdateAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was updated by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
 }
 export interface UpdateOrgInvitePayload {
   clientMutationId?: string | null;
@@ -3846,17 +3377,17 @@ export interface DeleteOrgLimitDefaultPayload {
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
 }
-export interface DeleteMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was deleted by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
 export interface DeleteOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
   /** The `OrgChartEdgeGrant` that was deleted by this mutation. */
   orgChartEdgeGrant?: OrgChartEdgeGrant | null;
   orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
+}
+export interface DeleteMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was deleted by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface DeleteAppPermissionPayload {
   clientMutationId?: string | null;
@@ -3942,18 +3473,6 @@ export interface DeleteAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface DeleteInvitePayload {
-  clientMutationId?: string | null;
-  /** The `Invite` that was deleted by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
-}
-export interface DeleteAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was deleted by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
 export interface DeleteAppMembershipPayload {
   clientMutationId?: string | null;
   /** The `AppMembership` that was deleted by this mutation. */
@@ -3965,6 +3484,18 @@ export interface DeleteOrgMembershipPayload {
   /** The `OrgMembership` that was deleted by this mutation. */
   orgMembership?: OrgMembership | null;
   orgMembershipEdge?: OrgMembershipEdge | null;
+}
+export interface DeleteInvitePayload {
+  clientMutationId?: string | null;
+  /** The `Invite` that was deleted by this mutation. */
+  invite?: Invite | null;
+  inviteEdge?: InviteEdge | null;
+}
+export interface DeleteAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was deleted by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
 }
 export interface DeleteOrgInvitePayload {
   clientMutationId?: string | null;
@@ -4067,17 +3598,17 @@ export interface OrgLimitDefaultEdge {
   /** The `OrgLimitDefault` at the end of the edge. */
   node?: OrgLimitDefault | null;
 }
-/** A `MembershipType` edge in the connection. */
-export interface MembershipTypeEdge {
-  cursor?: string | null;
-  /** The `MembershipType` at the end of the edge. */
-  node?: MembershipType | null;
-}
 /** A `OrgChartEdgeGrant` edge in the connection. */
 export interface OrgChartEdgeGrantEdge {
   cursor?: string | null;
   /** The `OrgChartEdgeGrant` at the end of the edge. */
   node?: OrgChartEdgeGrant | null;
+}
+/** A `MembershipType` edge in the connection. */
+export interface MembershipTypeEdge {
+  cursor?: string | null;
+  /** The `MembershipType` at the end of the edge. */
+  node?: MembershipType | null;
 }
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
@@ -4145,18 +3676,6 @@ export interface OrgMembershipDefaultEdge {
   /** The `OrgMembershipDefault` at the end of the edge. */
   node?: OrgMembershipDefault | null;
 }
-/** A `Invite` edge in the connection. */
-export interface InviteEdge {
-  cursor?: string | null;
-  /** The `Invite` at the end of the edge. */
-  node?: Invite | null;
-}
-/** A `AppLevel` edge in the connection. */
-export interface AppLevelEdge {
-  cursor?: string | null;
-  /** The `AppLevel` at the end of the edge. */
-  node?: AppLevel | null;
-}
 /** A `AppMembership` edge in the connection. */
 export interface AppMembershipEdge {
   cursor?: string | null;
@@ -4168,6 +3687,18 @@ export interface OrgMembershipEdge {
   cursor?: string | null;
   /** The `OrgMembership` at the end of the edge. */
   node?: OrgMembership | null;
+}
+/** A `Invite` edge in the connection. */
+export interface InviteEdge {
+  cursor?: string | null;
+  /** The `Invite` at the end of the edge. */
+  node?: Invite | null;
+}
+/** A `AppLevel` edge in the connection. */
+export interface AppLevelEdge {
+  cursor?: string | null;
+  /** The `AppLevel` at the end of the edge. */
+  node?: AppLevel | null;
 }
 /** A `OrgInvite` edge in the connection. */
 export interface OrgInviteEdge {

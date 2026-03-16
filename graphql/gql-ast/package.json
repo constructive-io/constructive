@@ -1,6 +1,6 @@
 {
   "name": "gql-ast",
-  "version": "3.1.1",
+  "version": "3.3.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "GraphQL ASTs",
   "main": "index.js",
@@ -29,7 +29,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "graphql": "^16.13.0"
+    "graphql": "16.13.0"
   },
   "keywords": [
     "graphql",

@@ -96,16 +96,16 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
-| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useOrgChartEdgeGrantsQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useOrgChartEdgeGrantQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useCreateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useUpdateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useDeleteOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
+| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useAppLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useAppLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
@@ -161,16 +161,6 @@ function App() {
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useCreateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useUpdateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useDeleteInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
-| `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
-| `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
@@ -181,6 +171,16 @@ function App() {
 | `useCreateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useUpdateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useDeleteOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
+| `useInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useCreateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useUpdateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useDeleteInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
+| `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
+| `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
+| `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
@@ -189,9 +189,9 @@ function App() {
 | `useAppPermissionsGetPaddedMaskQuery` | Query | appPermissionsGetPaddedMask |
 | `useOrgPermissionsGetPaddedMaskQuery` | Query | orgPermissionsGetPaddedMask |
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
-| `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
+| `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
 | `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
 | `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
@@ -237,20 +237,20 @@ create({ userId: '<value>', depth: '<value>' });
 ```typescript
 // List all appPermissions
 const { data, isLoading } = useAppPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one appPermission
 const { data: item } = useAppPermissionQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a appPermission
 const { mutate: create } = useCreateAppPermissionMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' });
+create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgPermission
@@ -258,20 +258,20 @@ create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<v
 ```typescript
 // List all orgPermissions
 const { data, isLoading } = useOrgPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgPermission
 const { data: item } = useOrgPermissionQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgPermission
 const { mutate: create } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' });
+create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppLevelRequirement
@@ -279,20 +279,20 @@ create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<v
 ```typescript
 // List all appLevelRequirements
 const { data, isLoading } = useAppLevelRequirementsQuery({
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one appLevelRequirement
 const { data: item } = useAppLevelRequirementQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a appLevelRequirement
 const { mutate: create } = useCreateAppLevelRequirementMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>' });
+create({ name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgMember
@@ -484,46 +484,46 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
 create({ name: '<value>', max: '<value>' });
 ```
 
-### MembershipType
-
-```typescript
-// List all membershipTypes
-const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Get one membershipType
-const { data: item } = useMembershipTypeQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Create a membershipType
-const { mutate: create } = useCreateMembershipTypeMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<value>', description: '<value>', prefix: '<value>' });
-```
-
 ### OrgChartEdgeGrant
 
 ```typescript
 // List all orgChartEdgeGrants
 const { data, isLoading } = useOrgChartEdgeGrantsQuery({
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgChartEdgeGrant
 const { data: item } = useOrgChartEdgeGrantQuery({
   id: '<value>',
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgChartEdgeGrant
 const { mutate: create } = useCreateOrgChartEdgeGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>' });
+create({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
+### MembershipType
+
+```typescript
+// List all membershipTypes
+const { data, isLoading } = useMembershipTypesQuery({
+  selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one membershipType
+const { data: item } = useMembershipTypeQuery({
+  id: '<value>',
+  selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a membershipType
+const { mutate: create } = useCreateMembershipTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<value>', description: '<value>', prefix: '<value>', descriptionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### AppLimit
@@ -720,20 +720,20 @@ create({ permissions: '<value>', isGrant: '<value>', actorId: '<value>', entityI
 ```typescript
 // List all orgChartEdges
 const { data, isLoading } = useOrgChartEdgesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgChartEdge
 const { data: item } = useOrgChartEdgeQuery({
   id: '<value>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgChartEdge
 const { mutate: create } = useCreateOrgChartEdgeMutation({
   selection: { fields: { id: true } },
 });
-create({ entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>' });
+create({ entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### OrgMembershipDefault
@@ -755,48 +755,6 @@ const { mutate: create } = useCreateOrgMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', entityId: '<value>', deleteMemberCascadeGroups: '<value>', createGroupsCascadeMembers: '<value>' });
-```
-
-### Invite
-
-```typescript
-// List all invites
-const { data, isLoading } = useInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one invite
-const { data: item } = useInviteQuery({
-  id: '<value>',
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a invite
-const { mutate: create } = useCreateInviteMutation({
-  selection: { fields: { id: true } },
-});
-create({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>' });
-```
-
-### AppLevel
-
-```typescript
-// List all appLevels
-const { data, isLoading } = useAppLevelsQuery({
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one appLevel
-const { data: item } = useAppLevelQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a appLevel
-const { mutate: create } = useCreateAppLevelMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>' });
 ```
 
 ### AppMembership
@@ -841,25 +799,67 @@ const { mutate: create } = useCreateOrgMembershipMutation({
 create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', entityId: '<value>', profileId: '<value>' });
 ```
 
+### Invite
+
+```typescript
+// List all invites
+const { data, isLoading } = useInvitesQuery({
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one invite
+const { data: item } = useInviteQuery({
+  id: '<value>',
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a invite
+const { mutate: create } = useCreateInviteMutation({
+  selection: { fields: { id: true } },
+});
+create({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
+### AppLevel
+
+```typescript
+// List all appLevels
+const { data, isLoading } = useAppLevelsQuery({
+  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
+});
+
+// Get one appLevel
+const { data: item } = useAppLevelQuery({
+  id: '<value>',
+  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
+});
+
+// Create a appLevel
+const { mutate: create } = useCreateAppLevelMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
+```
+
 ### OrgInvite
 
 ```typescript
 // List all orgInvites
 const { data, isLoading } = useOrgInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one orgInvite
 const { data: item } = useOrgInviteQuery({
   id: '<value>',
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a orgInvite
 const { mutate: create } = useCreateOrgInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>' });
+create({ email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ## Custom Operation Hooks
@@ -900,18 +900,6 @@ orgIsManagerOf
   | `pUserId` | UUID |
   | `pMaxDepth` | Int |
 
-### `useStepsAchievedQuery`
-
-stepsAchieved
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
-
 ### `useAppPermissionsGetMaskQuery`
 
 appPermissionsGetMask
@@ -933,6 +921,18 @@ orgPermissionsGetMask
   | Argument | Type |
   |----------|------|
   | `ids` | [UUID] |
+
+### `useStepsAchievedQuery`
+
+stepsAchieved
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `vlevel` | String |
+  | `vroleId` | UUID |
 
 ### `useAppPermissionsGetMaskByNamesQuery`
 

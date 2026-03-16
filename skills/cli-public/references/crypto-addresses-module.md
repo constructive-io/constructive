@@ -9,8 +9,8 @@ CRUD operations for CryptoAddressesModule records via csdk CLI
 ```bash
 csdk crypto-addresses-module list
 csdk crypto-addresses-module get --id <value>
-csdk crypto-addresses-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --tableId <value> --ownerTableId <value> --tableName <value> --cryptoNetwork <value>
-csdk crypto-addresses-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--tableName <value>] [--cryptoNetwork <value>]
+csdk crypto-addresses-module create --databaseId <value> --tableName <value> --tableNameTrgmSimilarity <value> --cryptoNetworkTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--cryptoNetwork <value>]
+csdk crypto-addresses-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--tableName <value>] [--cryptoNetwork <value>] [--tableNameTrgmSimilarity <value>] [--cryptoNetworkTrgmSimilarity <value>] [--searchScore <value>]
 csdk crypto-addresses-module delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk crypto-addresses-module list
 ### Create a cryptoAddressesModule
 
 ```bash
-csdk crypto-addresses-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --tableId "value" --ownerTableId "value" --tableName "value" --cryptoNetwork "value"
+csdk crypto-addresses-module create --databaseId <value> --tableName <value> --tableNameTrgmSimilarity <value> --cryptoNetworkTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--privateSchemaId <value>] [--tableId <value>] [--ownerTableId <value>] [--cryptoNetwork <value>]
 ```
 
 ### Get a cryptoAddressesModule by id

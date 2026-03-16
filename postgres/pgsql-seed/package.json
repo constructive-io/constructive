@@ -1,6 +1,6 @@
 {
   "name": "pgsql-seed",
-  "version": "2.3.2",
+  "version": "2.5.5",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL seeding utilities with pgpm integration - batteries included",
   "main": "index.js",
@@ -48,7 +48,7 @@
   "dependencies": {
     "@pgpmjs/core": "workspace:^",
     "@pgpmjs/env": "workspace:^",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-env": "workspace:^",
     "pg-seed": "workspace:^"
   }

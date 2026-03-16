@@ -9,8 +9,8 @@ CRUD operations for TableGrant records via csdk CLI
 ```bash
 csdk table-grant list
 csdk table-grant get --id <value>
-csdk table-grant create --databaseId <value> --tableId <value> --privilege <value> --granteeName <value> --fieldIds <value> --isGrant <value>
-csdk table-grant update --id <value> [--databaseId <value>] [--tableId <value>] [--privilege <value>] [--granteeName <value>] [--fieldIds <value>] [--isGrant <value>]
+csdk table-grant create --tableId <value> --privilege <value> --granteeName <value> --privilegeTrgmSimilarity <value> --granteeNameTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--fieldIds <value>] [--isGrant <value>]
+csdk table-grant update --id <value> [--databaseId <value>] [--tableId <value>] [--privilege <value>] [--granteeName <value>] [--fieldIds <value>] [--isGrant <value>] [--privilegeTrgmSimilarity <value>] [--granteeNameTrgmSimilarity <value>] [--searchScore <value>]
 csdk table-grant delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk table-grant list
 ### Create a tableGrant
 
 ```bash
-csdk table-grant create --databaseId "value" --tableId "value" --privilege "value" --granteeName "value" --fieldIds "value" --isGrant "value"
+csdk table-grant create --tableId <value> --privilege <value> --granteeName <value> --privilegeTrgmSimilarity <value> --granteeNameTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--fieldIds <value>] [--isGrant <value>]
 ```
 
 ### Get a tableGrant by id

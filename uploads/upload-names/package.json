@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/upload-names",
-  "version": "2.7.0",
+  "version": "2.9.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "upload names",
   "main": "index.js",
@@ -30,7 +30,7 @@
   },
   "keywords": [],
   "devDependencies": {
-    "glob": "^13.0.0",
+    "glob": "^13.0.6",
     "makage": "^0.1.12"
   }
 }

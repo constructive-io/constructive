@@ -9,8 +9,8 @@ CRUD operations for OrgChartEdgeGrant records via csdk CLI
 ```bash
 csdk org-chart-edge-grant list
 csdk org-chart-edge-grant get --id <value>
-csdk org-chart-edge-grant create --entityId <value> --childId <value> --parentId <value> --grantorId <value> --isGrant <value> --positionTitle <value> --positionLevel <value>
-csdk org-chart-edge-grant update --id <value> [--entityId <value>] [--childId <value>] [--parentId <value>] [--grantorId <value>] [--isGrant <value>] [--positionTitle <value>] [--positionLevel <value>]
+csdk org-chart-edge-grant create --entityId <value> --childId <value> --grantorId <value> --positionTitleTrgmSimilarity <value> --searchScore <value> [--parentId <value>] [--isGrant <value>] [--positionTitle <value>] [--positionLevel <value>]
+csdk org-chart-edge-grant update --id <value> [--entityId <value>] [--childId <value>] [--parentId <value>] [--grantorId <value>] [--isGrant <value>] [--positionTitle <value>] [--positionLevel <value>] [--positionTitleTrgmSimilarity <value>] [--searchScore <value>]
 csdk org-chart-edge-grant delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk org-chart-edge-grant list
 ### Create a orgChartEdgeGrant
 
 ```bash
-csdk org-chart-edge-grant create --entityId "value" --childId "value" --parentId "value" --grantorId "value" --isGrant "value" --positionTitle "value" --positionLevel "value"
+csdk org-chart-edge-grant create --entityId <value> --childId <value> --grantorId <value> --positionTitleTrgmSimilarity <value> --searchScore <value> [--parentId <value>] [--isGrant <value>] [--positionTitle <value>] [--positionLevel <value>]
 ```
 
 ### Get a orgChartEdgeGrant by id

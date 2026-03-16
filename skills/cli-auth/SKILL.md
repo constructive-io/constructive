@@ -19,10 +19,17 @@ csdk context use <name>
 # Authentication
 csdk auth set-token <token>
 
-# CRUD for any table (e.g. role-type)
-csdk role-type list
-csdk role-type get --id <value>
-csdk role-type create --<field> <value>
+# Config variables
+csdk config set <key> <value>
+csdk config get <key>
+
+# CRUD for any table (e.g. crypto-address)
+csdk crypto-address list
+csdk crypto-address get --id <value>
+csdk crypto-address create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+csdk --no-tty crypto-address list
 ```
 
 ## Examples
@@ -33,7 +40,13 @@ csdk role-type create --<field> <value>
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk role-type list
+csdk crypto-address list
+```
+
+### Non-interactive mode (for scripts and CI)
+
+```bash
+csdk --no-tty crypto-address create --<field> <value>
 ```
 
 ## References
@@ -42,8 +55,9 @@ See the `references/` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
-- [role-type](references/role-type.md)
+- [config](references/config.md)
 - [crypto-address](references/crypto-address.md)
+- [role-type](references/role-type.md)
 - [phone-number](references/phone-number.md)
 - [connected-account](references/connected-account.md)
 - [audit-log](references/audit-log.md)

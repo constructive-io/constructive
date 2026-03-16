@@ -9,7 +9,7 @@ ORM operations for Index records
 ```typescript
 db.index.findMany({ select: { id: true } }).execute()
 db.index.findOne({ id: '<value>', select: { id: true } }).execute()
-db.index.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>' }, select: { id: true } }).execute()
+db.index.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', fieldIds: '<value>', includeFieldIds: '<value>', accessMethod: '<value>', indexParams: '<value>', whereClause: '<value>', isUnique: '<value>', options: '<value>', opClasses: '<value>', smartTags: '<value>', category: '<value>', module: '<value>', scope: '<value>', tags: '<value>', nameTrgmSimilarity: '<value>', accessMethodTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.index.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.index.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.index.findMany({
 
 ```typescript
 const item = await db.index.create({
-  data: { databaseId: 'value', tableId: 'value', name: 'value', fieldIds: 'value', includeFieldIds: 'value', accessMethod: 'value', indexParams: 'value', whereClause: 'value', isUnique: 'value', smartTags: 'value', category: 'value', module: 'value', scope: 'value', tags: 'value' },
+  data: { databaseId: 'value', tableId: 'value', name: 'value', fieldIds: 'value', includeFieldIds: 'value', accessMethod: 'value', indexParams: 'value', whereClause: 'value', isUnique: 'value', options: 'value', opClasses: 'value', smartTags: 'value', category: 'value', module: 'value', scope: 'value', tags: 'value', nameTrgmSimilarity: 'value', accessMethodTrgmSimilarity: 'value', moduleTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

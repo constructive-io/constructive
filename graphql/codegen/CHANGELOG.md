@@ -3,6 +3,95 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.15.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.0...@constructive-io/graphql-codegen@4.15.1) (2026-03-16)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.4...@constructive-io/graphql-codegen@4.15.0) (2026-03-15)
+
+### Bug Fixes
+
+- make trgm adapter supplementary and filter search fields from codegen docs ([4393bf8](https://github.com/constructive-io/constructive/commit/4393bf8e93f8bde912250d95ab5c95b4e91716d4))
+
+### Features
+
+- add PostGIS, pgvector, and Unified Search field sections to all generated docs ([e8c5508](https://github.com/constructive-io/constructive/commit/e8c5508479890bd1a8212d013c3ff6ed0cfef7f1))
+
+## [4.14.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.3...@constructive-io/graphql-codegen@4.14.4) (2026-03-15)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.14.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.2...@constructive-io/graphql-codegen@4.14.3) (2026-03-15)
+
+### Bug Fixes
+
+- **codegen:** always pass 4 type args to FindManyArgs (explicit never for TCondition) ([64ba70f](https://github.com/constructive-io/constructive/commit/64ba70f3b625d52f4b780585b4c651ccdc22a420))
+
+## [4.14.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.1...@constructive-io/graphql-codegen@4.14.2) (2026-03-15)
+
+### Bug Fixes
+
+- **codegen:** include TCondition in React hooks FindManyArgs + add VectorFilter to types.ts ([b8acf20](https://github.com/constructive-io/constructive/commit/b8acf20cf24d8e771e87cac1f7ab5cba71069623))
+
+## [4.14.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.14.0...@constructive-io/graphql-codegen@4.14.1) (2026-03-14)
+
+### Bug Fixes
+
+- **codegen:** exclude computed fields from default CLI select objects ([d96c8c1](https://github.com/constructive-io/constructive/commit/d96c8c1aef35853bb1027536faf07504c016b94a))
+
+# [4.14.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.13.1...@constructive-io/graphql-codegen@4.14.0) (2026-03-14)
+
+### Bug Fixes
+
+- update snapshots and test assertions for filter→where argument rename ([c3b4990](https://github.com/constructive-io/constructive/commit/c3b4990a02e7462e0421ca8635f6cfcd1e350670))
+
+### Features
+
+- rename filter argument to where (configurable via connectionFilterArgumentName) ([10b4fc6](https://github.com/constructive-io/constructive/commit/10b4fc6360774cd79fa936d442dfef4fa9e5f252))
+
+## [4.13.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.13.0...@constructive-io/graphql-codegen@4.13.1) (2026-03-13)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.12.2...@constructive-io/graphql-codegen@4.13.0) (2026-03-13)
+
+### Features
+
+- **codegen:** add config command, helpers.ts generation, and collision handling ([4273a61](https://github.com/constructive-io/constructive/commit/4273a618989f6eb55ae120221b97167074de04ff)), closes [constructive-io/dev-utils#70](https://github.com/constructive-io/dev-utils/issues/70)
+- **codegen:** add optional condition generation toggle ([abe0e3e](https://github.com/constructive-io/constructive/commit/abe0e3efd00119ee9fb4265c6480799b4a5f62d4))
+
+## [4.12.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.12.1...@constructive-io/graphql-codegen@4.12.2) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.12.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.11.0...@constructive-io/graphql-codegen@4.12.1) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.12.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.11.0...@constructive-io/graphql-codegen@4.12.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.10.0...@constructive-io/graphql-codegen@4.11.0) (2026-03-12)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.9.0...@constructive-io/graphql-codegen@4.10.0) (2026-03-12)
+
+### Bug Fixes
+
+- **codegen:** add VectorFilter scalar filter type for pgvector fields ([7aa49cb](https://github.com/constructive-io/constructive/commit/7aa49cbd3db1d1c204f7902394cf03771b6674a6))
+- **codegen:** include plugin-injected fields in condition and orderBy types ([3c4a91a](https://github.com/constructive-io/constructive/commit/3c4a91a85ab2290fd2aa54c3359a701c3db8f23e)), closes [constructive-io/constructive-planning#663](https://github.com/constructive-io/constructive-planning/issues/663)
+- **codegen:** mark fields with backend defaults as optional in generated docs ([ac6d46e](https://github.com/constructive-io/constructive/commit/ac6d46e6db4a9ed2889d036009aa425e7bf07a9f))
+- **codegen:** resolve transitive enum types referenced by input fields ([0ffda8e](https://github.com/constructive-io/constructive/commit/0ffda8eb9f6d56d5a3e34142b6372aa23b1abf23))
+- **codegen:** strip ConstructiveInternalType prefix from generated docs type names ([bc62778](https://github.com/constructive-io/constructive/commit/bc627789bbfd1bf20c1c42446895e38a9dafbfb7))
+
+### Features
+
+- **codegen:** semantic question types, INPUT_OBJECT dot-notation, --no-tty flag ([46156de](https://github.com/constructive-io/constructive/commit/46156deb156ed9d7adb14ab53b87b570cda072fc))
+- **codegen:** update docs generators with INPUT_OBJECT dot-notation, TypeRegistry threading, and --no-tty docs ([e481604](https://github.com/constructive-io/constructive/commit/e481604c2e161d42b5b3eede54d164db55c5016e))
+- **codegen:** wire condition arg through ORM query builder for findMany/findFirst ([1588296](https://github.com/constructive-io/constructive/commit/1588296da227fe56633bbe5b4165858544615753))
+
 # [4.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.8.1...@constructive-io/graphql-codegen@4.9.0) (2026-03-05)
 
 ### Features

@@ -9,8 +9,8 @@ CRUD operations for MembershipType records via csdk CLI
 ```bash
 csdk membership-type list
 csdk membership-type get --id <value>
-csdk membership-type create --name <value> --description <value> --prefix <value>
-csdk membership-type update --id <value> [--name <value>] [--description <value>] [--prefix <value>]
+csdk membership-type create --name <value> --description <value> --prefix <value> --descriptionTrgmSimilarity <value> --prefixTrgmSimilarity <value> --searchScore <value>
+csdk membership-type update --id <value> [--name <value>] [--description <value>] [--prefix <value>] [--descriptionTrgmSimilarity <value>] [--prefixTrgmSimilarity <value>] [--searchScore <value>]
 csdk membership-type delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk membership-type list
 ### Create a membershipType
 
 ```bash
-csdk membership-type create --name "value" --description "value" --prefix "value"
+csdk membership-type create --name <value> --description <value> --prefix <value> --descriptionTrgmSimilarity <value> --prefixTrgmSimilarity <value> --searchScore <value>
 ```
 
 ### Get a membershipType by id

@@ -1,216 +1,5 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`cli docs generator generates CLI AGENTS.md 1`] = `
-"# myapp CLI - Agent Reference
-
-<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
-> This document is structured for LLM/agent consumption.
-
-## OVERVIEW
-
-\`myapp\` is a CLI tool for interacting with a GraphQL API.
-All commands output JSON to stdout. All commands accept \`--help\` or \`-h\` for usage.
-Configuration is stored at \`~/.myapp/config/\` via appstash.
-
-## PREREQUISITES
-
-Before running any data commands, you must:
-
-1. Create a context: \`myapp context create <name> --endpoint <url>\`
-2. Activate it: \`myapp context use <name>\`
-3. Authenticate: \`myapp auth set-token <token>\`
-
-## TOOLS
-
-### TOOL: context
-
-Manage named API endpoint contexts (like kubectl contexts).
-
-\`\`\`
-SUBCOMMANDS:
-  myapp context create <name> --endpoint <url>   Create a new context
-  myapp context list                              List all contexts
-  myapp context use <name>                        Set active context
-  myapp context current                           Show active context
-  myapp context delete <name>                     Delete a context
-
-INPUT:
-  name:     string (required) - Context identifier
-  endpoint: string (required for create) - GraphQL endpoint URL
-
-OUTPUT: JSON
-  create:  { name, endpoint }
-  list:    [{ name, endpoint, isCurrent, hasCredentials }]
-  use:     { name, endpoint }
-  current: { name, endpoint }
-  delete:  { deleted: name }
-\`\`\`
-
-### TOOL: auth
-
-Manage authentication tokens per context.
-
-\`\`\`
-SUBCOMMANDS:
-  myapp auth set-token <token>   Store bearer token for current context
-  myapp auth status               Show auth status for all contexts
-  myapp auth logout                Remove credentials for current context
-
-INPUT:
-  token: string (required for set-token) - Bearer token value
-
-OUTPUT: JSON
-  set-token: { context, status: "authenticated" }
-  status:    [{ context, authenticated: boolean }]
-  logout:    { context, status: "logged out" }
-\`\`\`
-
-### TOOL: car
-
-CRUD operations for Car records.
-
-\`\`\`
-SUBCOMMANDS:
-  myapp car list                               List all records
-  myapp car get --id <value>              Get one record
-  myapp car create --make <value> --model <value> --year <value> --isElectric <value>
-  myapp car update --id <value> [--make <value>] [--model <value>] [--year <value>] [--isElectric <value>]
-  myapp car delete --id <value>           Delete one record
-
-INPUT FIELDS:
-  id: UUID (primary key)
-  make: String
-  model: String
-  year: Int
-  isElectric: Boolean
-  createdAt: Datetime
-
-EDITABLE FIELDS (for create/update):
-  make: String
-  model: String
-  year: Int
-  isElectric: Boolean
-
-OUTPUT: JSON
-  list:   [{ id, make, model, year, isElectric, createdAt }]
-  get:    { id, make, model, year, isElectric, createdAt }
-  create: { id, make, model, year, isElectric, createdAt }
-  update: { id, make, model, year, isElectric, createdAt }
-  delete: { id }
-\`\`\`
-
-### TOOL: driver
-
-CRUD operations for Driver records.
-
-\`\`\`
-SUBCOMMANDS:
-  myapp driver list                               List all records
-  myapp driver get --id <value>              Get one record
-  myapp driver create --name <value> --licenseNumber <value>
-  myapp driver update --id <value> [--name <value>] [--licenseNumber <value>]
-  myapp driver delete --id <value>           Delete one record
-
-INPUT FIELDS:
-  id: UUID (primary key)
-  name: String
-  licenseNumber: String
-
-EDITABLE FIELDS (for create/update):
-  name: String
-  licenseNumber: String
-
-OUTPUT: JSON
-  list:   [{ id, name, licenseNumber }]
-  get:    { id, name, licenseNumber }
-  create: { id, name, licenseNumber }
-  update: { id, name, licenseNumber }
-  delete: { id }
-\`\`\`
-
-### TOOL: current-user
-
-Get the currently authenticated user
-
-\`\`\`
-TYPE: query
-USAGE: myapp current-user
-
-INPUT: none
-
-OUTPUT: JSON
-\`\`\`
-
-### TOOL: login
-
-Authenticate a user
-
-\`\`\`
-TYPE: mutation
-USAGE: myapp login --email <value> --password <value>
-
-INPUT:
-  email: String (required)
-  password: String (required)
-
-OUTPUT: JSON
-\`\`\`
-
-## WORKFLOWS
-
-### Initial setup
-
-\`\`\`bash
-myapp context create dev --endpoint http://localhost:5000/graphql
-myapp context use dev
-myapp auth set-token eyJhbGciOiJIUzI1NiIs...
-\`\`\`
-
-### CRUD workflow (car)
-
-\`\`\`bash
-# List all
-myapp car list
-
-# Create
-myapp car create --make "value" --model "value" --year "value" --isElectric "value"
-
-# Get by id
-myapp car get --id <value>
-
-# Update
-myapp car update --id <value> --make "new-value"
-
-# Delete
-myapp car delete --id <value>
-\`\`\`
-
-### Piping output
-
-\`\`\`bash
-# Pretty print
-myapp car list | jq '.'
-
-# Extract field
-myapp car list | jq '.[].id'
-
-# Count results
-myapp car list | jq 'length'
-\`\`\`
-
-## ERROR HANDLING
-
-All errors are written to stderr. Exit codes:
-- \`0\`: Success
-- \`1\`: Error (auth failure, not found, validation error, network error)
-
-Common errors:
-- "No active context": Run \`context use <name>\` first
-- "Not authenticated": Run \`auth set-token <token>\` first
-- "Record not found": The requested ID does not exist
-"
-`;
-
 exports[`cli docs generator generates CLI README 1`] = `
 "# myapp CLI
 
@@ -239,6 +28,7 @@ myapp auth set-token <your-token>
 |---------|-------------|
 | \`context\` | Manage API contexts (endpoints) |
 | \`auth\` | Manage authentication tokens |
+| \`config\` | Manage config key-value store (per-context) |
 | \`car\` | car CRUD operations |
 | \`driver\` | driver CRUD operations |
 | \`current-user\` | Get the currently authenticated user |
@@ -270,6 +60,19 @@ Manage authentication tokens per context.
 | \`status\` | Show auth status across all contexts |
 | \`logout\` | Remove credentials for current context |
 
+### \`config\`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| \`get <key>\` | Get a config value |
+| \`set <key> <value>\` | Set a config value |
+| \`list\` | List all config values |
+| \`delete <key>\` | Delete a config value |
+
+Variables are scoped to the active context and stored at \`~/.myapp/config/\`.
+
 ## Table Commands
 
 ### \`car\`
@@ -295,7 +98,7 @@ CRUD operations for Car records.
 | \`isElectric\` | Boolean |
 | \`createdAt\` | Datetime |
 
-**Create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
+**Required create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
 
 ### \`driver\`
 
@@ -317,7 +120,7 @@ CRUD operations for Driver records.
 | \`name\` | String |
 | \`licenseNumber\` | String |
 
-**Create fields:** \`name\`, \`licenseNumber\`
+**Required create fields:** \`name\`, \`licenseNumber\`
 
 ## Custom Operations
 
@@ -337,8 +140,8 @@ Authenticate a user
 
   | Argument | Type |
   |----------|------|
-  | \`email\` | String (required) |
-  | \`password\` | String (required) |
+  | \`--email\` | String (required) |
+  | \`--password\` | String (required) |
 
 ## Output
 
@@ -347,6 +150,14 @@ All commands output JSON to stdout. Pipe to \`jq\` for formatting:
 \`\`\`bash
 myapp car list | jq '.[]'
 myapp car get --id <uuid> | jq '.'
+\`\`\`
+
+## Non-Interactive Mode
+
+Use \`--no-tty\` to skip all interactive prompts (useful for scripts and CI):
+
+\`\`\`bash
+myapp --no-tty car create --name "Sedan" --year 2024
 \`\`\`
 
 ---
@@ -427,6 +238,39 @@ myapp auth status
 `;
 
 exports[`cli docs generator generates CLI skill files 3`] = `
+"# Config Variables
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+Manage per-context key-value configuration variables for myapp
+
+## Usage
+
+\`\`\`bash
+myapp config get <key>
+myapp config set <key> <value>
+myapp config list
+myapp config delete <key>
+\`\`\`
+
+## Examples
+
+### Store and retrieve a config variable
+
+\`\`\`bash
+myapp config set orgId abc-123
+myapp config get orgId
+\`\`\`
+
+### List all config variables
+
+\`\`\`bash
+myapp config list
+\`\`\`
+"
+`;
+
+exports[`cli docs generator generates CLI skill files 4`] = `
 "# car
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -454,7 +298,7 @@ myapp car list
 ### Create a car
 
 \`\`\`bash
-myapp car create --make "value" --model "value" --year "value" --isElectric "value"
+myapp car create --make <value> --model <value> --year <value> --isElectric <value>
 \`\`\`
 
 ### Get a car by id
@@ -465,7 +309,7 @@ myapp car get --id <value>
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 4`] = `
+exports[`cli docs generator generates CLI skill files 5`] = `
 "# driver
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -493,7 +337,7 @@ myapp driver list
 ### Create a driver
 
 \`\`\`bash
-myapp driver create --name "value" --licenseNumber "value"
+myapp driver create --name <value> --licenseNumber <value>
 \`\`\`
 
 ### Get a driver by id
@@ -504,7 +348,7 @@ myapp driver get --id <value>
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 5`] = `
+exports[`cli docs generator generates CLI skill files 6`] = `
 "# currentUser
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -527,7 +371,7 @@ myapp current-user
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 6`] = `
+exports[`cli docs generator generates CLI skill files 7`] = `
 "# login
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
@@ -550,7 +394,7 @@ myapp login --email <value> --password <value>
 "
 `;
 
-exports[`cli docs generator generates CLI skill files 7`] = `
+exports[`cli docs generator generates CLI skill files 8`] = `
 "---
 name: cli-default
 description: CLI tool (myapp) for the default API — provides CRUD commands for 2 tables and 2 custom operations
@@ -572,10 +416,17 @@ myapp context use <name>
 # Authentication
 myapp auth set-token <token>
 
+# Config variables
+myapp config set <key> <value>
+myapp config get <key>
+
 # CRUD for any table (e.g. car)
 myapp car list
 myapp car get --id <value>
 myapp car create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty car list
 \`\`\`
 
 ## Examples
@@ -589,12 +440,19 @@ myapp auth set-token <token>
 myapp car list
 \`\`\`
 
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty car create --<field> <value>
+\`\`\`
+
 ## References
 
 See the \`references/\` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
+- [config](references/config.md)
 - [car](references/car.md)
 - [driver](references/driver.md)
 - [current-user](references/current-user.md)
@@ -1491,209 +1349,6 @@ export function getClient(contextName?: string) {
 }"
 `;
 
-exports[`hooks docs generator generates hooks AGENTS.md 1`] = `
-"# React Query Hooks - Agent Reference
-
-<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
-> This document is structured for LLM/agent consumption.
-
-## OVERVIEW
-
-React Query hooks wrapping ORM operations for data fetching and mutations.
-All query hooks return \`UseQueryResult\`. All mutation hooks return \`UseMutationResult\`.
-
-## SETUP
-
-\`\`\`typescript
-import { configure } from './hooks';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-configure({ endpoint: 'https://api.example.com/graphql' });
-const queryClient = new QueryClient();
-// Wrap app in <QueryClientProvider client={queryClient}>
-\`\`\`
-
-## HOOKS
-
-### HOOK: useCarsQuery
-
-List all cars.
-
-\`\`\`
-TYPE: query
-USAGE: useCarsQuery({ selection: { fields: { ... } } })
-
-INPUT:
-  selection: { fields: Record<string, boolean> } - Fields to select
-
-OUTPUT: UseQueryResult<Array<{
-  id: string
-  make: string
-  model: string
-  year: number
-  isElectric: boolean
-  createdAt: string
-}>>
-\`\`\`
-
-### HOOK: useCarQuery
-
-Get a single car by id.
-
-\`\`\`
-TYPE: query
-USAGE: useCarQuery({ id: '<value>', selection: { fields: { ... } } })
-
-INPUT:
-  id: string (required)
-  selection: { fields: Record<string, boolean> } - Fields to select
-
-OUTPUT: UseQueryResult<{
-  id: string
-  make: string
-  model: string
-  year: number
-  isElectric: boolean
-  createdAt: string
-}>
-\`\`\`
-
-### HOOK: useCreateCarMutation
-
-Create a new car.
-
-\`\`\`
-TYPE: mutation
-USAGE: const { mutate } = useCreateCarMutation({ selection: { fields: { ... } } })
-
-OUTPUT: UseMutationResult
-\`\`\`
-
-### HOOK: useUpdateCarMutation
-
-Update an existing car.
-
-\`\`\`
-TYPE: mutation
-USAGE: const { mutate } = useUpdateCarMutation({ selection: { fields: { ... } } })
-
-OUTPUT: UseMutationResult
-\`\`\`
-
-### HOOK: useDeleteCarMutation
-
-Delete a car.
-
-\`\`\`
-TYPE: mutation
-USAGE: const { mutate } = useDeleteCarMutation({})
-
-OUTPUT: UseMutationResult
-\`\`\`
-
-### HOOK: useDriversQuery
-
-List all drivers.
-
-\`\`\`
-TYPE: query
-USAGE: useDriversQuery({ selection: { fields: { ... } } })
-
-INPUT:
-  selection: { fields: Record<string, boolean> } - Fields to select
-
-OUTPUT: UseQueryResult<Array<{
-  id: string
-  name: string
-  licenseNumber: string
-}>>
-\`\`\`
-
-### HOOK: useDriverQuery
-
-Get a single driver by id.
-
-\`\`\`
-TYPE: query
-USAGE: useDriverQuery({ id: '<value>', selection: { fields: { ... } } })
-
-INPUT:
-  id: string (required)
-  selection: { fields: Record<string, boolean> } - Fields to select
-
-OUTPUT: UseQueryResult<{
-  id: string
-  name: string
-  licenseNumber: string
-}>
-\`\`\`
-
-### HOOK: useCreateDriverMutation
-
-Create a new driver.
-
-\`\`\`
-TYPE: mutation
-USAGE: const { mutate } = useCreateDriverMutation({ selection: { fields: { ... } } })
-
-OUTPUT: UseMutationResult
-\`\`\`
-
-### HOOK: useUpdateDriverMutation
-
-Update an existing driver.
-
-\`\`\`
-TYPE: mutation
-USAGE: const { mutate } = useUpdateDriverMutation({ selection: { fields: { ... } } })
-
-OUTPUT: UseMutationResult
-\`\`\`
-
-### HOOK: useDeleteDriverMutation
-
-Delete a driver.
-
-\`\`\`
-TYPE: mutation
-USAGE: const { mutate } = useDeleteDriverMutation({})
-
-OUTPUT: UseMutationResult
-\`\`\`
-
-## CUSTOM OPERATION HOOKS
-
-### HOOK: useCurrentUserQuery
-
-Get the currently authenticated user
-
-\`\`\`
-TYPE: query
-USAGE: useCurrentUserQuery()
-
-INPUT: none
-
-OUTPUT: UseQueryResult
-\`\`\`
-
-### HOOK: useLoginMutation
-
-Authenticate a user
-
-\`\`\`
-TYPE: mutation
-USAGE: const { mutate } = useLoginMutation()
-  mutate({ email: <value>, password: <value> })
-
-INPUT:
-  email: String (required)
-  password: String (required)
-
-OUTPUT: UseMutationResult
-\`\`\`
-"
-`;
-
 exports[`hooks docs generator generates hooks README 1`] = `
 "# React Query Hooks
 
@@ -1989,264 +1644,6 @@ See the \`references/\` directory for detailed per-entity API documentation:
 "
 `;
 
-exports[`multi-target cli docs generates multi-target AGENTS.md 1`] = `
-"# myapp CLI - Agent Reference
-
-<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
-> This document is structured for LLM/agent consumption.
-
-## OVERVIEW
-
-\`myapp\` is a unified multi-target CLI for interacting with multiple GraphQL APIs.
-All commands output JSON to stdout. All commands accept \`--help\` or \`-h\` for usage.
-Configuration is stored at \`~/.myapp/config/\` via appstash.
-
-TARGETS:
-  auth: http://auth.localhost/graphql
-  members: http://members.localhost/graphql
-  app: http://app.localhost/graphql
-
-COMMAND FORMAT:
-  myapp <target>:<command> <subcommand> [flags]    Target-specific commands
-  myapp context <subcommand> [flags]              Context management
-  myapp credentials <subcommand> [flags]                 Authentication
-
-## PREREQUISITES
-
-Before running any data commands, you must:
-
-1. Create a context: \`myapp context create <name>\`
-   (prompts for per-target endpoints, defaults baked from config)
-2. Activate it: \`myapp context use <name>\`
-3. Authenticate: \`myapp credentials set-token <token>\`
-
-For local development, create a context accepting all defaults:
-
-\`\`\`bash
-myapp context create local
-myapp context use local
-myapp credentials set-token <token>
-\`\`\`
-
-## TOOLS
-
-### TOOL: context
-
-Manage named API endpoint contexts. Each context stores per-target endpoint overrides.
-
-\`\`\`
-SUBCOMMANDS:
-  myapp context create <name>   Create a new context
-  myapp context list              List all contexts
-  myapp context use <name>        Set active context
-  myapp context current           Show active context
-  myapp context delete <name>     Delete a context
-
-CREATE OPTIONS:
-  --auth-endpoint: string (default: http://auth.localhost/graphql)
-  --members-endpoint: string (default: http://members.localhost/graphql)
-  --app-endpoint: string (default: http://app.localhost/graphql)
-
-OUTPUT: JSON
-  create:  { name, endpoint, targets }
-  list:    [{ name, endpoint, isCurrent, hasCredentials }]
-  use:     { name, endpoint }
-  current: { name, endpoint }
-  delete:  { deleted: name }
-\`\`\`
-
-### TOOL: credentials
-
-Manage authentication tokens per context. One shared token across all targets.
-
-\`\`\`
-SUBCOMMANDS:
-  myapp credentials set-token <token>   Store bearer token for current context
-  myapp credentials status               Show auth status for all contexts
-  myapp credentials logout                Remove credentials for current context
-
-INPUT:
-  token: string (required for set-token) - Bearer token value
-
-OUTPUT: JSON
-  set-token: { context, status: "authenticated" }
-  status:    [{ context, authenticated: boolean }]
-  logout:    { context, status: "logged out" }
-\`\`\`
-
-### TOOL: auth:user
-
-CRUD operations for User records (auth target).
-
-\`\`\`
-SUBCOMMANDS:
-  myapp auth:user list                               List all records
-  myapp auth:user get --id <value>              Get one record
-  myapp auth:user create --email <value> --name <value>
-  myapp auth:user update --id <value> [--email <value>] [--name <value>]
-  myapp auth:user delete --id <value>           Delete one record
-
-INPUT FIELDS:
-  id: UUID (primary key)
-  email: String
-  name: String
-
-EDITABLE FIELDS (for create/update):
-  email: String
-  name: String
-
-OUTPUT: JSON
-  list:   [{ id, email, name }]
-  get:    { id, email, name }
-  create: { id, email, name }
-  update: { id, email, name }
-  delete: { id }
-\`\`\`
-
-### TOOL: auth:current-user
-
-Get the currently authenticated user
-
-\`\`\`
-TYPE: query
-USAGE: myapp auth:current-user
-
-INPUT: none
-
-OUTPUT: JSON
-\`\`\`
-
-### TOOL: auth:login
-
-Authenticate a user
-
-\`\`\`
-TYPE: mutation
-USAGE: myapp auth:login --email <value> --password <value>
-
-INPUT:
-  email: String (required)
-  password: String (required)
-
-FLAGS:
-  --save-token: boolean - Auto-save returned token to credentials
-
-OUTPUT: JSON
-\`\`\`
-
-### TOOL: members:member
-
-CRUD operations for Member records (members target).
-
-\`\`\`
-SUBCOMMANDS:
-  myapp members:member list                               List all records
-  myapp members:member get --id <value>              Get one record
-  myapp members:member create --role <value>
-  myapp members:member update --id <value> [--role <value>]
-  myapp members:member delete --id <value>           Delete one record
-
-INPUT FIELDS:
-  id: UUID (primary key)
-  role: String
-
-EDITABLE FIELDS (for create/update):
-  role: String
-
-OUTPUT: JSON
-  list:   [{ id, role }]
-  get:    { id, role }
-  create: { id, role }
-  update: { id, role }
-  delete: { id }
-\`\`\`
-
-### TOOL: app:car
-
-CRUD operations for Car records (app target).
-
-\`\`\`
-SUBCOMMANDS:
-  myapp app:car list                               List all records
-  myapp app:car get --id <value>              Get one record
-  myapp app:car create --make <value> --model <value> --year <value> --isElectric <value>
-  myapp app:car update --id <value> [--make <value>] [--model <value>] [--year <value>] [--isElectric <value>]
-  myapp app:car delete --id <value>           Delete one record
-
-INPUT FIELDS:
-  id: UUID (primary key)
-  make: String
-  model: String
-  year: Int
-  isElectric: Boolean
-  createdAt: Datetime
-
-EDITABLE FIELDS (for create/update):
-  make: String
-  model: String
-  year: Int
-  isElectric: Boolean
-
-OUTPUT: JSON
-  list:   [{ id, make, model, year, isElectric, createdAt }]
-  get:    { id, make, model, year, isElectric, createdAt }
-  create: { id, make, model, year, isElectric, createdAt }
-  update: { id, make, model, year, isElectric, createdAt }
-  delete: { id }
-\`\`\`
-
-## WORKFLOWS
-
-### Initial setup
-
-\`\`\`bash
-myapp context create dev
-myapp context use dev
-myapp credentials set-token eyJhbGciOiJIUzI1NiIs...
-\`\`\`
-
-### Switch environment
-
-\`\`\`bash
-myapp context create production \\
-  --auth-endpoint https://auth.prod.example.com/graphql \\
-  --members-endpoint https://members.prod.example.com/graphql \\
-  --app-endpoint https://app.prod.example.com/graphql
-myapp context use production
-\`\`\`
-
-### CRUD workflow (auth:user)
-
-\`\`\`bash
-myapp auth:user list
-myapp auth:user create --email "value" --name "value"
-myapp auth:user get --id <value>
-myapp auth:user update --id <value> --email "new-value"
-myapp auth:user delete --id <value>
-\`\`\`
-
-### Piping output
-
-\`\`\`bash
-myapp auth:user list | jq '.'
-myapp auth:user list | jq '.[].id'
-myapp auth:user list | jq 'length'
-\`\`\`
-
-## ERROR HANDLING
-
-All errors are written to stderr. Exit codes:
-- \`0\`: Success
-- \`1\`: Error (auth failure, not found, validation error, network error)
-
-Common errors:
-- "No active context": Run \`context use <name>\` first
-- "Not authenticated": Run \`credentials set-token <token>\` first
-- "Unknown target": The target name is not recognized
-- "Record not found": The requested ID does not exist
-"
-`;
-
 exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
 [
   {
@@ -2356,6 +1753,67 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
       "type": "object",
     },
     "name": "myapp_credentials_logout",
+  },
+  {
+    "description": "Get a config variable value for the current context",
+    "inputSchema": {
+      "properties": {
+        "key": {
+          "description": "Variable name",
+          "type": "string",
+        },
+      },
+      "required": [
+        "key",
+      ],
+      "type": "object",
+    },
+    "name": "myapp_config_get",
+  },
+  {
+    "description": "Set a config variable value for the current context",
+    "inputSchema": {
+      "properties": {
+        "key": {
+          "description": "Variable name",
+          "type": "string",
+        },
+        "value": {
+          "description": "Variable value",
+          "type": "string",
+        },
+      },
+      "required": [
+        "key",
+        "value",
+      ],
+      "type": "object",
+    },
+    "name": "myapp_config_set",
+  },
+  {
+    "description": "List all config variables for the current context",
+    "inputSchema": {
+      "properties": {},
+      "type": "object",
+    },
+    "name": "myapp_config_list",
+  },
+  {
+    "description": "Delete a config variable for the current context",
+    "inputSchema": {
+      "properties": {
+        "key": {
+          "description": "Variable name to delete",
+          "type": "string",
+        },
+      },
+      "required": [
+        "key",
+      ],
+      "type": "object",
+    },
+    "name": "myapp_config_delete",
   },
   {
     "description": "List all User records (auth target)",
@@ -2820,6 +2278,7 @@ myapp auth:login --email <value> --password <value> --save-token
 |---------|-------------|
 | \`context\` | Manage API contexts (per-target endpoints) |
 | \`credentials\` | Manage authentication tokens |
+| \`config\` | Manage config key-value store (per-context) |
 
 ### auth
 
@@ -2873,6 +2332,38 @@ Manage authentication tokens per context. One shared token is used across all ta
 | \`status\` | Show auth status across all contexts |
 | \`logout\` | Remove credentials for current context |
 
+### \`config\`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| \`get <key>\` | Get a config value |
+| \`set <key> <value>\` | Set a config value |
+| \`list\` | List all config values |
+| \`delete <key>\` | Delete a config value |
+
+Variables are scoped to the active context and stored at \`~/.myapp/config/\`.
+
+## SDK Helpers
+
+The generated \`helpers.ts\` provides typed client factories for use in scripts and services:
+
+\`\`\`typescript
+import { createAuthClient } from './helpers';
+import { createMembersClient } from './helpers';
+import { createAppClient } from './helpers';
+
+const auth = createAuthClient();
+const members = createMembersClient();
+const app = createAppClient();
+\`\`\`
+
+Credential resolution order:
+1. appstash store (\`~/.myapp/config/\`)
+2. Environment variables (\`MYAPP_TOKEN\`, \`MYAPP_<TARGET>_ENDPOINT\`)
+3. Throws with actionable error message
+
 ## auth Commands
 
 ### \`auth:user\`
@@ -2895,7 +2386,7 @@ CRUD operations for User records.
 | \`email\` | String |
 | \`name\` | String |
 
-**Create fields:** \`email\`, \`name\`
+**Required create fields:** \`email\`, \`name\`
 
 ### \`auth:current-user\`
 
@@ -2913,8 +2404,8 @@ Authenticate a user
 
   | Argument | Type |
   |----------|------|
-  | \`email\` | String (required) |
-  | \`password\` | String (required) |
+  | \`--email\` | String (required) |
+  | \`--password\` | String (required) |
 - **Flags:** \`--save-token\` auto-saves returned token to credentials
 
 ## members Commands
@@ -2938,7 +2429,7 @@ CRUD operations for Member records.
 | \`id\` | UUID |
 | \`role\` | String |
 
-**Create fields:** \`role\`
+**Required create fields:** \`role\`
 
 ## app Commands
 
@@ -2965,7 +2456,7 @@ CRUD operations for Car records.
 | \`isElectric\` | Boolean |
 | \`createdAt\` | Datetime |
 
-**Create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
+**Required create fields:** \`make\`, \`model\`, \`year\`, \`isElectric\`
 
 ## Output
 
@@ -2974,6 +2465,14 @@ All commands output JSON to stdout. Pipe to \`jq\` for formatting:
 \`\`\`bash
 myapp auth:user list | jq '.[]'
 myapp auth:user get --id <uuid> | jq '.'
+\`\`\`
+
+## Non-Interactive Mode
+
+Use \`--no-tty\` to skip all interactive prompts (useful for scripts and CI):
+
+\`\`\`bash
+myapp --no-tty auth:user create --name "Example"
 \`\`\`
 
 ---
@@ -3057,16 +2556,49 @@ myapp credentials status
     "fileName": "cli-common/references/auth.md",
   },
   {
+    "content": "# Config Variables
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+Manage per-context key-value configuration variables for myapp
+
+## Usage
+
+\`\`\`bash
+myapp config get <key>
+myapp config set <key> <value>
+myapp config list
+myapp config delete <key>
+\`\`\`
+
+## Examples
+
+### Store and retrieve a config variable
+
+\`\`\`bash
+myapp config set orgId abc-123
+myapp config get orgId
+\`\`\`
+
+### List all config variables
+
+\`\`\`bash
+myapp config list
+\`\`\`
+",
+    "fileName": "cli-common/references/config.md",
+  },
+  {
     "content": "---
 name: cli-common
-description: Shared CLI utilities for myapp — context management and authentication across targets: auth, members, app
+description: Shared CLI utilities for myapp — context management, authentication, and config across targets: auth, members, app
 ---
 
 # cli-common
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-Shared CLI utilities for myapp — context management and authentication across targets: auth, members, app
+Shared CLI utilities for myapp — context management, authentication, and config across targets: auth, members, app
 
 ## Usage
 
@@ -3078,6 +2610,11 @@ myapp context use <name>
 # Authentication
 myapp credentials set-token <token>
 myapp credentials status
+
+# Config variables
+myapp config set <key> <value>
+myapp config get <key>
+myapp config list
 \`\`\`
 
 ## Examples
@@ -3090,12 +2627,19 @@ myapp context use local
 myapp credentials set-token <token>
 \`\`\`
 
+### Store a config variable
+
+\`\`\`bash
+myapp config set orgId abc-123
+\`\`\`
+
 ## References
 
 See the \`references/\` directory for detailed per-entity API documentation:
 
 - [context](references/context.md)
 - [auth](references/auth.md)
+- [config](references/config.md)
 ",
     "fileName": "cli-common/SKILL.md",
   },
@@ -3127,7 +2671,7 @@ myapp auth:user list
 ### Create a user
 
 \`\`\`bash
-myapp auth:user create --email "value" --name "value"
+myapp auth:user create --email <value> --name <value>
 \`\`\`
 ",
     "fileName": "cli-auth/references/user.md",
@@ -3198,6 +2742,9 @@ CLI commands for the auth API target — 1 tables and 2 custom operations via my
 myapp auth:user list
 myapp auth:user get --id <value>
 myapp auth:user create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty auth:user list
 \`\`\`
 
 ## Examples
@@ -3206,6 +2753,12 @@ myapp auth:user create --<field> <value>
 
 \`\`\`bash
 myapp auth:user list
+\`\`\`
+
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty auth:user create --<field> <value>
 \`\`\`
 
 ## References
@@ -3246,7 +2799,7 @@ myapp members:member list
 ### Create a member
 
 \`\`\`bash
-myapp members:member create --role "value"
+myapp members:member create --role <value>
 \`\`\`
 ",
     "fileName": "cli-members/references/member.md",
@@ -3270,6 +2823,9 @@ CLI commands for the members API target — 1 tables and 0 custom operations via
 myapp members:member list
 myapp members:member get --id <value>
 myapp members:member create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty members:member list
 \`\`\`
 
 ## Examples
@@ -3278,6 +2834,12 @@ myapp members:member create --<field> <value>
 
 \`\`\`bash
 myapp members:member list
+\`\`\`
+
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty members:member create --<field> <value>
 \`\`\`
 
 ## References
@@ -3316,7 +2878,7 @@ myapp app:car list
 ### Create a car
 
 \`\`\`bash
-myapp app:car create --make "value" --model "value" --year "value" --isElectric "value"
+myapp app:car create --make <value> --model <value> --year <value> --isElectric <value>
 \`\`\`
 ",
     "fileName": "cli-app/references/car.md",
@@ -3340,6 +2902,9 @@ CLI commands for the app API target — 1 tables and 0 custom operations via mya
 myapp app:car list
 myapp app:car get --id <value>
 myapp app:car create --<field> <value>
+
+# Non-interactive mode (skip all prompts, use flags only)
+myapp --no-tty app:car list
 \`\`\`
 
 ## Examples
@@ -3348,6 +2913,12 @@ myapp app:car create --<field> <value>
 
 \`\`\`bash
 myapp app:car list
+\`\`\`
+
+### Non-interactive mode (for scripts and CI)
+
+\`\`\`bash
+myapp --no-tty app:car create --<field> <value>
 \`\`\`
 
 ## References
@@ -3359,6 +2930,138 @@ See the \`references/\` directory for detailed per-entity API documentation:
     "fileName": "cli-app/SKILL.md",
   },
 ]
+`;
+
+exports[`multi-target cli generator generates config command 1`] = `
+"/**
+ * Config key-value store commands
+ * @generated by @constructive-io/graphql-codegen
+ * DO NOT EDIT - changes will be overwritten
+ */
+import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
+import { getStore } from "../executor";
+const usage = "\\nmyapp config <command>\\n\\nCommands:\\n  get <key>             Get a config value\\n  set <key> <value>     Set a config value\\n  list                  List all config values\\n  delete <key>          Delete a config value\\n\\n  --help, -h            Show this help message\\n";
+export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
+  if (argv.help || argv.h) {
+    console.log(usage);
+    process.exit(0);
+  }
+  const store = getStore();
+  const {
+    first: subcommand,
+    newArgv
+  } = extractFirst(argv);
+  if (!subcommand) {
+    const answer = await prompter.prompt(argv, [{
+      type: "autocomplete",
+      name: "subcommand",
+      message: "What do you want to do?",
+      options: ["get", "set", "list", "delete"]
+    }]);
+    return handleSubcommand(answer.subcommand, newArgv, prompter, store);
+  }
+  return handleSubcommand(subcommand, newArgv, prompter, store);
+};
+async function handleSubcommand(subcommand: string, argv: Partial<Record<string, unknown>>, prompter: Inquirerer, store: ReturnType<typeof getStore>) {
+  switch (subcommand) {
+    case "get":
+      return handleGet(argv, prompter, store);
+    case "set":
+      return handleSet(argv, prompter, store);
+    case "list":
+      return handleList(store);
+    case "delete":
+      return handleDelete(argv, prompter, store);
+    default:
+      console.log(usage);
+      process.exit(1);
+  }
+}
+async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inquirerer, store: ReturnType<typeof getStore>) {
+  const {
+    first: key
+  } = extractFirst(argv);
+  if (!key) {
+    const answers = await prompter.prompt(argv, [{
+      type: "text",
+      name: "key",
+      message: "Config key",
+      required: true
+    }]);
+    const value = store.getVar(answers.key);
+    if (value === undefined) {
+      console.error(\`Key "\${answers.key}" not found.\`);
+    } else {
+      console.log(value);
+    }
+    return;
+  }
+  const value = store.getVar(key);
+  if (value === undefined) {
+    console.error(\`Key "\${key}" not found.\`);
+  } else {
+    console.log(value);
+  }
+}
+async function handleSet(argv: Partial<Record<string, unknown>>, prompter: Inquirerer, store: ReturnType<typeof getStore>) {
+  const {
+    first: key,
+    newArgv: restArgv
+  } = extractFirst(argv);
+  const {
+    first: value
+  } = extractFirst(restArgv);
+  if (!key || !value) {
+    const answers = await prompter.prompt({
+      key,
+      value
+    }, [{
+      type: "text",
+      name: "key",
+      message: "Config key",
+      required: true
+    }, {
+      type: "text",
+      name: "value",
+      message: "Config value",
+      required: true
+    }]);
+    store.setVar(answers.key, String.call(undefined, answers.value));
+    console.log(\`Set \${answers.key} = \${answers.value}\`);
+    return;
+  }
+  store.setVar(key, String(value));
+  console.log(\`Set \${key} = \${value}\`);
+}
+function handleList(store: ReturnType<typeof getStore>) {
+  const vars = store.listVars();
+  const entries = Object.entries(vars);
+  if (entries.length === 0) {
+    console.log("No config values set.");
+    return;
+  }
+  for (const [key, value] of entries) {
+    console.log(\`\${key} = \${value}\`);
+  }
+}
+async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: Inquirerer, store: ReturnType<typeof getStore>) {
+  const {
+    first: key
+  } = extractFirst(argv);
+  if (!key) {
+    const answers = await prompter.prompt(argv, [{
+      type: "text",
+      name: "key",
+      message: "Config key to delete",
+      required: true
+    }]);
+    store.deleteVar(answers.key);
+    console.log(\`Deleted key: \${answers.key}\`);
+    return;
+  }
+  store.deleteVar(key);
+  console.log(\`Deleted key: \${key}\`);
+}"
 `;
 
 exports[`multi-target cli generator generates credentials command (renamed from auth) 1`] = `
@@ -3467,6 +3170,45 @@ async function handleLogout(argv: Partial<Record<string, unknown>>, prompter: In
 }"
 `;
 
+exports[`multi-target cli generator generates helpers.ts with typed client factories 1`] = `
+"/**
+ * SDK helpers — typed per-target client factories with 3-tier credential resolution
+ * @generated by @constructive-io/graphql-codegen
+ * DO NOT EDIT - changes will be overwritten
+ */
+import { createConfigStore } from "appstash";
+import type { ClientConfig } from "appstash";
+import { createClient as createAuthOrmClient } from "../../generated/auth/orm";
+import { createClient as createMembersOrmClient } from "../../generated/members/orm";
+import { createClient as createAppOrmClient } from "../../generated/app/orm";
+const store = createConfigStore("myapp");
+export const getStore = () => store;
+export function getClientConfig(targetName: string, contextName?: string): ClientConfig {
+  return store.getClientConfig(targetName, contextName);
+}
+export function createAuthClient(contextName?: string) {
+  const config = store.getClientConfig("auth", contextName);
+  return createAuthOrmClient({
+    endpoint: config.endpoint,
+    headers: config.headers
+  });
+}
+export function createMembersClient(contextName?: string) {
+  const config = store.getClientConfig("members", contextName);
+  return createMembersOrmClient({
+    endpoint: config.endpoint,
+    headers: config.headers
+  });
+}
+export function createAppClient(contextName?: string) {
+  const config = store.getClientConfig("app", contextName);
+  return createAppOrmClient({
+    endpoint: config.endpoint,
+    headers: config.headers
+  });
+}"
+`;
+
 exports[`multi-target cli generator generates multi-target command map 1`] = `
 "/**
  * Multi-target CLI command map and entry point
@@ -3476,6 +3218,7 @@ exports[`multi-target cli generator generates multi-target command map 1`] = `
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import contextCmd from "./commands/context";
 import credentialsCmd from "./commands/credentials";
+import configCmd from "./commands/config";
 import authUserCmd from "./commands/auth/user";
 import authCurrentUserCmd from "./commands/auth/current-user";
 import authLoginCmd from "./commands/auth/login";
@@ -3484,13 +3227,14 @@ import appCarCmd from "./commands/app/car";
 const createCommandMap: (() => Record<string, (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, options: CLIOptions) => Promise<void>>) = () => ({
   "context": contextCmd,
   "credentials": credentialsCmd,
+  "config": configCmd,
   "auth:user": authUserCmd,
   "auth:current-user": authCurrentUserCmd,
   "auth:login": authLoginCmd,
   "members:member": membersMemberCmd,
   "app:car": appCarCmd
 });
-const usage = "\\nmyapp <command>\\n\\nCommands:\\n  context              Manage API contexts\\n  credentials          Manage authentication\\n\\n  auth:\\n    auth:user              user CRUD operations\\n    auth:current-user      Get the currently authenticated user\\n    auth:login             Authenticate a user\\n\\n  members:\\n    members:member         member CRUD operations\\n\\n  app:\\n    app:car                car CRUD operations\\n\\n  --help, -h            Show this help message\\n  --version, -v         Show version\\n";
+const usage = "\\nmyapp <command>\\n\\nCommands:\\n  context              Manage API contexts\\n  credentials          Manage authentication\\n  config               Manage config key-value store\\n\\n  auth:\\n    auth:user              user CRUD operations\\n    auth:current-user      Get the currently authenticated user\\n    auth:login             Authenticate a user\\n\\n  members:\\n    members:member         member CRUD operations\\n\\n  app:\\n    app:car                car CRUD operations\\n\\n  --help, -h            Show this help message\\n  --version, -v         Show version\\n";
 export const commands = async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -4459,140 +4203,6 @@ async function handleDelete(argv: Partial<Record<string, unknown>>, prompter: In
 }"
 `;
 
-exports[`orm docs generator generates ORM AGENTS.md 1`] = `
-"# ORM Client - Agent Reference
-
-<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
-> This document is structured for LLM/agent consumption.
-
-## OVERVIEW
-
-Prisma-like ORM client for interacting with a GraphQL API.
-All methods return a query builder. Call \`.execute()\` to run the query.
-
-## SETUP
-
-\`\`\`typescript
-import { createClient } from './orm';
-
-const db = createClient({
-  endpoint: 'https://api.example.com/graphql',
-  headers: { Authorization: 'Bearer <token>' },
-});
-\`\`\`
-
-## MODELS
-
-### MODEL: car
-
-Access: \`db.car\`
-
-\`\`\`
-METHODS:
-  db.car.findMany({ select, where?, orderBy?, first?, offset? })
-  db.car.findOne({ id, select })
-  db.car.create({ data: { make, model, year, isElectric }, select })
-  db.car.update({ where: { id }, data, select })
-  db.car.delete({ where: { id } })
-
-FIELDS:
-  id: string (primary key)
-  make: string
-  model: string
-  year: number
-  isElectric: boolean
-  createdAt: string
-
-EDITABLE FIELDS:
-  make: string
-  model: string
-  year: number
-  isElectric: boolean
-
-OUTPUT: Promise<JSON>
-  findMany: [{ id, make, model, year, isElectric, createdAt }]
-  findOne:  { id, make, model, year, isElectric, createdAt }
-  create:   { id, make, model, year, isElectric, createdAt }
-  update:   { id, make, model, year, isElectric, createdAt }
-  delete:   { id }
-\`\`\`
-
-### MODEL: driver
-
-Access: \`db.driver\`
-
-\`\`\`
-METHODS:
-  db.driver.findMany({ select, where?, orderBy?, first?, offset? })
-  db.driver.findOne({ id, select })
-  db.driver.create({ data: { name, licenseNumber }, select })
-  db.driver.update({ where: { id }, data, select })
-  db.driver.delete({ where: { id } })
-
-FIELDS:
-  id: string (primary key)
-  name: string
-  licenseNumber: string
-
-EDITABLE FIELDS:
-  name: string
-  licenseNumber: string
-
-OUTPUT: Promise<JSON>
-  findMany: [{ id, name, licenseNumber }]
-  findOne:  { id, name, licenseNumber }
-  create:   { id, name, licenseNumber }
-  update:   { id, name, licenseNumber }
-  delete:   { id }
-\`\`\`
-
-## CUSTOM OPERATIONS
-
-### OPERATION: currentUser
-
-Get the currently authenticated user
-
-\`\`\`
-TYPE: query
-ACCESS: db.query.currentUser
-USAGE: db.query.currentUser().execute()
-
-INPUT: none
-
-OUTPUT: Promise<JSON>
-\`\`\`
-
-### OPERATION: login
-
-Authenticate a user
-
-\`\`\`
-TYPE: mutation
-ACCESS: db.mutation.login
-USAGE: db.mutation.login({ email: <value>, password: <value> }).execute()
-
-INPUT:
-  email: String (required)
-  password: String (required)
-
-OUTPUT: Promise<JSON>
-\`\`\`
-
-## PATTERNS
-
-\`\`\`typescript
-// All methods require .execute() to run
-const result = await db.modelName.findMany({ select: { id: true } }).execute();
-
-// Select specific fields
-const partial = await db.modelName.findMany({ select: { id: true, name: true } }).execute();
-
-// Filter with where clause
-const filtered = await db.modelName.findMany({ select: { id: true }, where: { name: 'test' } }).execute();
-\`\`\`
-"
-`;
-
 exports[`orm docs generator generates ORM README 1`] = `
 "# ORM Client
 
@@ -5002,6 +4612,67 @@ exports[`target docs generator generates combined MCP config 1`] = `
       "inputSchema": {
         "type": "object",
         "properties": {}
+      }
+    },
+    {
+      "name": "myapp_config_get",
+      "description": "Get a config variable value for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      }
+    },
+    {
+      "name": "myapp_config_set",
+      "description": "Set a config variable value for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name"
+          },
+          "value": {
+            "type": "string",
+            "description": "Variable value"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "myapp_config_list",
+      "description": "List all config variables for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "myapp_config_delete",
+      "description": "Delete a config variable for the current context",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name to delete"
+          }
+        },
+        "required": [
+          "key"
+        ]
       }
     },
     {
