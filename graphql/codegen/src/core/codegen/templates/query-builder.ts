@@ -627,13 +627,34 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
   select?: TSelect,
   connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
+  return buildDeleteByCompositePkDocument(
+    operationName,
+    mutationField,
+    entityField,
+    { [idFieldName]: id },
+    inputTypeName,
+    select,
+    connectionFieldsMap,
+  );
+}
+
+export function buildDeleteByCompositePkDocument<TSelect = undefined>(
+  operationName: string,
+  mutationField: string,
+  entityField: string,
+  pkFields: Record<string, string | number>,
+  inputTypeName: string,
+  select?: TSelect,
+  connectionFieldsMap?: Record<string, Record<string, string>>,
+): { document: string; variables: Record<string, unknown> } {
+  const firstFieldName = Object.keys(pkFields)[0] ?? 'id';
   const entitySelections = select
     ? buildSelections(
         select as Record<string, unknown>,
         connectionFieldsMap,
         operationName,
       )
-    : [t.field({ name: 'id' })];
+    : [t.field({ name: firstFieldName })];
 
   return {
     document: buildInputMutationDocument({
@@ -648,9 +669,7 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
       ],
     }),
     variables: {
-      input: {
-        [idFieldName]: id,
-      },
+      input: pkFields,
     },
   };
 }

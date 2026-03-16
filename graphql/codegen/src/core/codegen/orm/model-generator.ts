@@ -2,21 +2,29 @@
  * Model class generator for ORM client (Babel AST-based)
  *
  * Generates per-table model classes with findMany, findFirst, create, update, delete methods.
+ * Plus M:N junction methods (add/remove/set) when manyToMany relations exist.
  * Each method uses function overloads for IDE autocompletion of select objects.
  */
 import * as t from '@babel/types';
+import { singularize } from 'inflekt';
 
-import type { CleanTable } from '../../../types/schema';
+import type { CleanField, CleanManyToManyRelation, CleanTable } from '../../../types/schema';
 import { asConst, generateCode } from '../babel-ast';
 import {
+  fieldTypeToTs,
+  getCreateInputTypeName,
+  getCreateMutationName,
+  getDeleteInputTypeName,
   getFilterTypeName,
   getGeneratedFileHeader,
   getOrderByTypeName,
   getPrimaryKeyInfo,
+  getScalarFields,
   getSingleRowQueryName,
   getTableNames,
   hasValidPrimaryKey,
   lcFirst,
+  ucFirst,
 } from '../utils';
 
 export interface GeneratedModelFile {
@@ -161,10 +169,152 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
   );
 }
 
+// ============================================================================
+// M:N Junction Method Support
+// ============================================================================
+
+interface JunctionInfo {
+  junctionTypeName: string;
+  junctionSingularName: string;
+  junctionCreateMutation: string;
+  junctionDeleteMutation: string;
+  junctionCreateInputType: string;
+  junctionDeleteInputType: string;
+  leftFkField: { name: string; tsType: string };
+  rightFkField: { name: string; tsType: string };
+  hasExtraFields: boolean;
+  addMethodName: string;
+  removeMethodName: string;
+}
+
+/**
+ * Resolve junction table metadata needed to generate add/remove/set methods.
+ * Returns null if the junction table is missing, lacks mutations, or FK fields can't be resolved.
+ */
+function resolveJunctionInfo(
+  table: CleanTable,
+  relation: CleanManyToManyRelation,
+  allTables: CleanTable[],
+  needsDisambiguation: boolean,
+): JunctionInfo | null {
+  const junctionTable = allTables.find((t) => t.name === relation.junctionTable);
+  if (!junctionTable) return null;
+
+  const junctionNames = getTableNames(junctionTable);
+  const junctionDeleteMutation = junctionTable.query?.delete;
+  if (!junctionDeleteMutation) return null;
+
+  const junctionCreateMutation = getCreateMutationName(junctionTable);
+
+  const rightTable = allTables.find((t) => t.name === relation.rightTable);
+  if (!rightTable) return null;
+
+  const rightNames = getTableNames(rightTable);
+
+  // Resolve FK fields — prefer _meta data, fall back to junction's belongsTo relations
+  let leftFk: CleanField | undefined;
+  let rightFk: CleanField | undefined;
+
+  if (relation.junctionLeftKeys?.length && relation.junctionRightKeys?.length) {
+    leftFk = relation.junctionLeftKeys[0];
+    rightFk = relation.junctionRightKeys[0];
+  } else {
+    const leftBelongsTo = junctionTable.relations.belongsTo.find(
+      (r) => r.referencesTable === table.name,
+    );
+    const rightBelongsTo = junctionTable.relations.belongsTo.find(
+      (r) => r.referencesTable === relation.rightTable && r !== leftBelongsTo,
+    );
+    if (!leftBelongsTo?.keys?.[0] || !rightBelongsTo?.keys?.[0]) return null;
+    leftFk = leftBelongsTo.keys[0];
+    rightFk = rightBelongsTo.keys[0];
+  }
+
+  // Determine method names from relation fieldName or right table name
+  const fieldName = relation.fieldName;
+  const singularRight = fieldName
+    ? ucFirst(singularize(fieldName))
+    : rightNames.typeName;
+
+  const suffix = needsDisambiguation ? `Via${junctionNames.typeName}` : '';
+
+  // Check if junction has extra fields (non-FK scalar fields)
+  const junctionScalarFields = getScalarFields(junctionTable);
+  const fkFieldNames = new Set([leftFk.name, rightFk.name]);
+  const hasExtraFields = junctionScalarFields.some(
+    (f) => !fkFieldNames.has(f.name),
+  );
+
+  return {
+    junctionTypeName: junctionNames.typeName,
+    junctionSingularName: junctionNames.singularName,
+    junctionCreateMutation,
+    junctionDeleteMutation,
+    junctionCreateInputType: getCreateInputTypeName(junctionTable),
+    junctionDeleteInputType: getDeleteInputTypeName(junctionTable),
+    leftFkField: {
+      name: leftFk.name,
+      tsType: fieldTypeToTs(leftFk.type),
+    },
+    rightFkField: {
+      name: rightFk.name,
+      tsType: fieldTypeToTs(rightFk.type),
+    },
+    hasExtraFields,
+    addMethodName: `add${singularRight}${suffix}`,
+    removeMethodName: `remove${singularRight}${suffix}`,
+  };
+}
+
+/**
+ * Determine which M:N relations need disambiguation (multiple to same right table).
+ */
+function getDisambiguationSet(relations: CleanManyToManyRelation[]): Set<number> {
+  const rightTableCounts = new Map<string, number>();
+  for (const rel of relations) {
+    rightTableCounts.set(
+      rel.rightTable,
+      (rightTableCounts.get(rel.rightTable) ?? 0) + 1,
+    );
+  }
+  const needsDisambiguation = new Set<number>();
+  relations.forEach((rel, i) => {
+    if ((rightTableCounts.get(rel.rightTable) ?? 0) > 1) {
+      needsDisambiguation.add(i);
+    }
+  });
+  return needsDisambiguation;
+}
+
+/**
+ * Build `Partial<Omit<CreateXInput["entity"], "leftFk" | "rightFk">>` AST type.
+ * Used for both the `data?` param on add and the items intersection on set.
+ */
+function buildExtraFieldsType(info: JunctionInfo): t.TSType {
+  return t.tsTypeReference(
+    t.identifier('Partial'),
+    t.tsTypeParameterInstantiation([
+      t.tsTypeReference(
+        t.identifier('Omit'),
+        t.tsTypeParameterInstantiation([
+          t.tsIndexedAccessType(
+            t.tsTypeReference(t.identifier(info.junctionCreateInputType)),
+            t.tsLiteralType(t.stringLiteral(info.junctionSingularName)),
+          ),
+          t.tsUnionType([
+            t.tsLiteralType(t.stringLiteral(info.leftFkField.name)),
+            t.tsLiteralType(t.stringLiteral(info.rightFkField.name)),
+          ]),
+        ]),
+      ),
+    ]),
+  );
+}
+
 export function generateModelFile(
   table: CleanTable,
   _useSharedTypes: boolean,
-  options?: { condition?: boolean },
+  options?: { condition?: boolean; allTables?: CleanTable[] },
 ): GeneratedModelFile {
   const conditionEnabled = options?.condition !== false;
   const { typeName, singularName, pluralName } = getTableNames(table);
@@ -196,16 +346,22 @@ export function generateModelFile(
   const statements: t.Statement[] = [];
 
   statements.push(createImportDeclaration('../client', ['OrmClient']));
+  const hasManyToMany = (options?.allTables?.length ?? 0) > 0
+    && table.relations.manyToMany.length > 0;
+  const queryBuilderImports = [
+    'QueryBuilder',
+    'buildFindManyDocument',
+    'buildFindFirstDocument',
+    'buildFindOneDocument',
+    'buildCreateDocument',
+    'buildUpdateByPkDocument',
+    'buildDeleteByPkDocument',
+    ...(hasManyToMany
+      ? ['buildDeleteByCompositePkDocument']
+      : []),
+  ];
   statements.push(
-    createImportDeclaration('../query-builder', [
-      'QueryBuilder',
-      'buildFindManyDocument',
-      'buildFindFirstDocument',
-      'buildFindOneDocument',
-      'buildCreateDocument',
-      'buildUpdateByPkDocument',
-      'buildDeleteByPkDocument',
-    ]),
+    createImportDeclaration('../query-builder', queryBuilderImports),
   );
   statements.push(
     createImportDeclaration(
@@ -982,6 +1138,208 @@ export function generateModelFile(
     );
   }
 
+  // ── M:N junction methods (add/remove/set) ─────────────────────────────
+  const allTables = options?.allTables;
+  if (allTables && table.relations.manyToMany.length > 0) {
+    const disambiguationSet = getDisambiguationSet(table.relations.manyToMany);
+    const junctionInfos: JunctionInfo[] = [];
+
+    table.relations.manyToMany.forEach((rel, i) => {
+      const info = resolveJunctionInfo(
+        table, rel, allTables, disambiguationSet.has(i),
+      );
+      if (info) junctionInfos.push(info);
+    });
+
+    // Inject junction type imports
+    if (junctionInfos.length > 0) {
+      const junctionImportTypes = new Set<string>();
+      for (const info of junctionInfos) {
+        junctionImportTypes.add(info.junctionTypeName);
+        junctionImportTypes.add(info.junctionCreateInputType);
+      }
+      statements.push(
+        createImportDeclaration(
+          '../input-types',
+          [...junctionImportTypes],
+          true,
+        ),
+      );
+    }
+
+    for (const info of junctionInfos) {
+      const leftTsType = () => tsTypeFromPrimitive(info.leftFkField.tsType);
+      const rightTsType = () => tsTypeFromPrimitive(info.rightFkField.tsType);
+
+      // Junction entity return type: { createXxx: { xxx: XxxType } }
+      const junctionRetType = (mutationName: string) =>
+        t.tsTypeAnnotation(
+          t.tsTypeReference(
+            t.identifier('QueryBuilder'),
+            t.tsTypeParameterInstantiation([
+              t.tsTypeLiteral([
+                t.tsPropertySignature(
+                  t.identifier(mutationName),
+                  t.tsTypeAnnotation(
+                    t.tsTypeLiteral([
+                      t.tsPropertySignature(
+                        t.identifier(info.junctionSingularName),
+                        t.tsTypeAnnotation(
+                          t.tsTypeReference(t.identifier(info.junctionTypeName)),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ]),
+            ]),
+          ),
+        );
+
+      // Select literal for junction (FK fields)
+      const junctionSelectExpr = t.objectExpression([
+        t.objectProperty(t.identifier(info.leftFkField.name), t.booleanLiteral(true)),
+        t.objectProperty(t.identifier(info.rightFkField.name), t.booleanLiteral(true)),
+      ]);
+
+      // ── add{Right} ────────────────────────────────────────────────
+      {
+        const params: (t.Identifier | t.TSParameterProperty)[] = [];
+
+        // leftFk param
+        const leftParam = t.identifier(info.leftFkField.name);
+        leftParam.typeAnnotation = t.tsTypeAnnotation(leftTsType());
+        params.push(leftParam);
+
+        // rightFk param
+        const rightParam = t.identifier(info.rightFkField.name);
+        rightParam.typeAnnotation = t.tsTypeAnnotation(rightTsType());
+        params.push(rightParam);
+
+        // Optional data param (only if junction has extra fields)
+        if (info.hasExtraFields) {
+          const dataParam = t.identifier('data');
+          dataParam.optional = true;
+          dataParam.typeAnnotation = t.tsTypeAnnotation(buildExtraFieldsType(info));
+          params.push(dataParam);
+        }
+
+        // Body: buildCreateDocument call
+        const dataExpr = info.hasExtraFields
+          ? t.objectExpression([
+              t.objectProperty(
+                t.identifier(info.leftFkField.name),
+                t.identifier(info.leftFkField.name),
+                false,
+                true,
+              ),
+              t.objectProperty(
+                t.identifier(info.rightFkField.name),
+                t.identifier(info.rightFkField.name),
+                false,
+                true,
+              ),
+              t.spreadElement(t.identifier('data')),
+            ])
+          : t.objectExpression([
+              t.objectProperty(
+                t.identifier(info.leftFkField.name),
+                t.identifier(info.leftFkField.name),
+                false,
+                true,
+              ),
+              t.objectProperty(
+                t.identifier(info.rightFkField.name),
+                t.identifier(info.rightFkField.name),
+                false,
+                true,
+              ),
+            ]);
+
+        const bodyArgs = [
+          t.stringLiteral(info.junctionTypeName),
+          t.stringLiteral(info.junctionCreateMutation),
+          t.stringLiteral(info.junctionSingularName),
+          junctionSelectExpr,
+          dataExpr,
+          t.stringLiteral(info.junctionCreateInputType),
+          t.identifier('connectionFieldsMap'),
+        ];
+
+        classBody.push(
+          createClassMethod(
+            info.addMethodName,
+            null,
+            params,
+            junctionRetType(info.junctionCreateMutation),
+            buildMethodBody(
+              'buildCreateDocument',
+              bodyArgs,
+              'mutation',
+              info.junctionTypeName,
+              info.junctionCreateMutation,
+            ),
+          ),
+        );
+      }
+
+      // ── remove{Right} ─────────────────────────────────────────────
+      {
+        const params: t.Identifier[] = [];
+
+        const leftParam = t.identifier(info.leftFkField.name);
+        leftParam.typeAnnotation = t.tsTypeAnnotation(leftTsType());
+        params.push(leftParam);
+
+        const rightParam = t.identifier(info.rightFkField.name);
+        rightParam.typeAnnotation = t.tsTypeAnnotation(rightTsType());
+        params.push(rightParam);
+
+        const pkFieldsExpr = t.objectExpression([
+          t.objectProperty(
+            t.identifier(info.leftFkField.name),
+            t.identifier(info.leftFkField.name),
+            false,
+            true,
+          ),
+          t.objectProperty(
+            t.identifier(info.rightFkField.name),
+            t.identifier(info.rightFkField.name),
+            false,
+            true,
+          ),
+        ]);
+
+        const bodyArgs = [
+          t.stringLiteral(info.junctionTypeName),
+          t.stringLiteral(info.junctionDeleteMutation),
+          t.stringLiteral(info.junctionSingularName),
+          pkFieldsExpr,
+          t.stringLiteral(info.junctionDeleteInputType),
+          junctionSelectExpr,
+          t.identifier('connectionFieldsMap'),
+        ];
+
+        classBody.push(
+          createClassMethod(
+            info.removeMethodName,
+            null,
+            params,
+            junctionRetType(info.junctionDeleteMutation),
+            buildMethodBody(
+              'buildDeleteByCompositePkDocument',
+              bodyArgs,
+              'mutation',
+              info.junctionTypeName,
+              info.junctionDeleteMutation,
+            ),
+          ),
+        );
+      }
+
+    }
+  }
+
   const classDecl = t.classDeclaration(
     t.identifier(modelName),
     null,
@@ -1005,5 +1363,7 @@ export function generateAllModelFiles(
   useSharedTypes: boolean,
   options?: { condition?: boolean },
 ): GeneratedModelFile[] {
-  return tables.map((table) => generateModelFile(table, useSharedTypes, options));
+  return tables.map((table) =>
+    generateModelFile(table, useSharedTypes, { ...options, allTables: tables }),
+  );
 }

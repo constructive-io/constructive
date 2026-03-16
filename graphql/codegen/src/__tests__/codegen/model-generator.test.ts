@@ -233,6 +233,356 @@ describe('model-generator', () => {
     expect(result.content).toContain('ProductPatch');
   });
 
+  // ============================================================================
+  // M:N Junction Methods
+  // ============================================================================
+
+  it('generates add/remove junction methods for M:N relations', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+      ],
+      relations: {
+        ...emptyRelations,
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: 'PostTagsManyToManyConnection',
+            junctionLeftKeys: [{ name: 'postId', type: fieldTypes.uuid }],
+            junctionRightKeys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: {
+        all: 'posts',
+        one: 'post',
+        create: 'createPost',
+        update: 'updatePost',
+        delete: 'deletePost',
+      },
+    });
+
+    const tagTable = createTable({
+      name: 'Tag',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'name', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'tags',
+        one: 'tag',
+        create: 'createTag',
+        update: 'updateTag',
+        delete: 'deleteTag',
+      },
+    });
+
+    const postTagTable = createTable({
+      name: 'PostTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+      ],
+      relations: {
+        ...emptyRelations,
+        belongsTo: [
+          {
+            fieldName: 'post',
+            isUnique: false,
+            referencesTable: 'Post',
+            type: null,
+            keys: [{ name: 'postId', type: fieldTypes.uuid }],
+          },
+          {
+            fieldName: 'tag',
+            isUnique: false,
+            referencesTable: 'Tag',
+            type: null,
+            keys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: {
+        all: 'postTags',
+        one: null,
+        create: 'createPostTag',
+        update: null,
+        delete: 'deletePostTag',
+      },
+    });
+
+    const allTables = [postTable, tagTable, postTagTable];
+    const result = generateModelFile(postTable, false, { allTables });
+
+    expect(result.content).toMatchSnapshot();
+
+    // add method
+    expect(result.content).toContain('addTag(postId: string, tagId: string)');
+    expect(result.content).toContain('buildCreateDocument("PostTag", "createPostTag"');
+
+    // remove method
+    expect(result.content).toContain('removeTag(postId: string, tagId: string)');
+    expect(result.content).toContain('buildDeleteByCompositePkDocument("PostTag", "deletePostTag"');
+
+    // no set method (removed — consumers compose add/remove themselves)
+    expect(result.content).not.toContain('setTags');
+  });
+
+  it('generates junction methods with extra fields (data param)', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+      ],
+      relations: {
+        ...emptyRelations,
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+            junctionLeftKeys: [{ name: 'postId', type: fieldTypes.uuid }],
+            junctionRightKeys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: {
+        all: 'posts',
+        one: 'post',
+        create: 'createPost',
+        update: 'updatePost',
+        delete: 'deletePost',
+      },
+    });
+
+    const tagTable = createTable({
+      name: 'Tag',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      query: { all: 'tags', one: 'tag', create: 'createTag', update: null, delete: 'deleteTag' },
+    });
+
+    const postTagTable = createTable({
+      name: 'PostTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+        { name: 'position', type: fieldTypes.int },
+      ],
+      query: { all: 'postTags', one: null, create: 'createPostTag', update: null, delete: 'deletePostTag' },
+    });
+
+    const result = generateModelFile(postTable, false, {
+      allTables: [postTable, tagTable, postTagTable],
+    });
+
+    // data param should be present for add (junction has extra fields)
+    expect(result.content).toContain('data?: Partial<Omit<CreatePostTagInput["postTag"]');
+  });
+
+  it('disambiguates junction methods when multiple M:N to same target', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      relations: {
+        ...emptyRelations,
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+            junctionLeftKeys: [{ name: 'postId', type: fieldTypes.uuid }],
+            junctionRightKeys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+          {
+            fieldName: 'featuredTags',
+            rightTable: 'Tag',
+            junctionTable: 'PostFeaturedTag',
+            type: null,
+            junctionLeftKeys: [{ name: 'postId', type: fieldTypes.uuid }],
+            junctionRightKeys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: { all: 'posts', one: 'post', create: 'createPost', update: null, delete: null },
+    });
+
+    const tagTable = createTable({
+      name: 'Tag',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      query: { all: 'tags', one: 'tag', create: 'createTag', update: null, delete: 'deleteTag' },
+    });
+
+    const postTagTable = createTable({
+      name: 'PostTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+      ],
+      query: { all: 'postTags', one: null, create: 'createPostTag', update: null, delete: 'deletePostTag' },
+    });
+
+    const postFeaturedTagTable = createTable({
+      name: 'PostFeaturedTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+      ],
+      query: { all: 'postFeaturedTags', one: null, create: 'createPostFeaturedTag', update: null, delete: 'deletePostFeaturedTag' },
+    });
+
+    const result = generateModelFile(postTable, false, {
+      allTables: [postTable, tagTable, postTagTable, postFeaturedTagTable],
+    });
+
+    // Should use Via{JunctionTable} disambiguation
+    expect(result.content).toContain('addTagViaPostTag');
+    expect(result.content).toContain('removeTagViaPostTag');
+    expect(result.content).toContain('addFeaturedTagViaPostFeaturedTag');
+    expect(result.content).toContain('removeFeaturedTagViaPostFeaturedTag');
+  });
+
+  it('skips junction methods when junction table is missing from allTables', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      relations: {
+        ...emptyRelations,
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+            junctionLeftKeys: [{ name: 'postId', type: fieldTypes.uuid }],
+            junctionRightKeys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: { all: 'posts', one: 'post', create: 'createPost', update: null, delete: null },
+    });
+
+    // No junction table in allTables
+    const result = generateModelFile(postTable, false, {
+      allTables: [postTable],
+    });
+
+    expect(result.content).not.toContain('addTag');
+    expect(result.content).not.toContain('removeTag');
+  });
+
+  it('skips junction methods when junction table lacks delete mutation', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      relations: {
+        ...emptyRelations,
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+            junctionLeftKeys: [{ name: 'postId', type: fieldTypes.uuid }],
+            junctionRightKeys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: { all: 'posts', one: 'post', create: 'createPost', update: null, delete: null },
+    });
+
+    const tagTable = createTable({
+      name: 'Tag',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      query: { all: 'tags', one: 'tag', create: 'createTag', update: null, delete: 'deleteTag' },
+    });
+
+    const postTagTable = createTable({
+      name: 'PostTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+      ],
+      query: { all: 'postTags', one: null, create: 'createPostTag', update: null, delete: null },
+    });
+
+    const result = generateModelFile(postTable, false, {
+      allTables: [postTable, tagTable, postTagTable],
+    });
+
+    // No delete mutation → can't generate remove → skip all junction methods
+    expect(result.content).not.toContain('addTag');
+    expect(result.content).not.toContain('removeTag');
+  });
+
+  it('resolves FK fields from junction belongsTo when junctionLeftKeys not available', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      relations: {
+        ...emptyRelations,
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+            // No junctionLeftKeys/junctionRightKeys (SDL mode)
+          },
+        ],
+      },
+      query: { all: 'posts', one: 'post', create: 'createPost', update: null, delete: null },
+    });
+
+    const tagTable = createTable({
+      name: 'Tag',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      query: { all: 'tags', one: 'tag', create: 'createTag', update: null, delete: 'deleteTag' },
+    });
+
+    const postTagTable = createTable({
+      name: 'PostTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+      ],
+      relations: {
+        ...emptyRelations,
+        belongsTo: [
+          {
+            fieldName: 'post',
+            isUnique: false,
+            referencesTable: 'Post',
+            type: null,
+            keys: [{ name: 'postId', type: fieldTypes.uuid }],
+          },
+          {
+            fieldName: 'tag',
+            isUnique: false,
+            referencesTable: 'Tag',
+            type: null,
+            keys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: { all: 'postTags', one: null, create: 'createPostTag', update: null, delete: 'deletePostTag' },
+    });
+
+    const result = generateModelFile(postTable, false, {
+      allTables: [postTable, tagTable, postTagTable],
+    });
+
+    // Should still generate junction methods using belongsTo FK info
+    expect(result.content).toContain('addTag(postId: string, tagId: string)');
+    expect(result.content).toContain('removeTag(postId: string, tagId: string)');
+  });
+
   it('imports and wires Condition type for findMany and findFirst', () => {
     const table = createTable({
       name: 'Contact',
