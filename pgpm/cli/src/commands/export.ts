@@ -1,5 +1,4 @@
-import { exportMigrations, exportGraphQL, GraphQLClient, PgpmPackage } from '@pgpmjs/core';
-import { graphqlRowToPostgresRow } from '@pgpmjs/core';
+import { exportMigrations, exportGraphQL, GraphQLClient, PgpmPackage, graphqlRowToPostgresRow } from '@pgpmjs/core';
 import { getEnvOptions } from '@pgpmjs/env';
 import { getGitConfigInfo } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer } from 'inquirerer';
@@ -17,6 +16,7 @@ Options:
   --help, -h              Show this help message
   --graphql-endpoint <url>   GraphQL endpoint for meta/services data (enables GraphQL mode)
   --migrate-endpoint <url>   GraphQL endpoint for db_migrate data (optional, for sql_actions)
+  --migrate-host <host>      Host header for migrate endpoint (e.g. db_migrate.localhost:3000)
   --token <token>            Bearer token for GraphQL authentication
   --author <name>         Project author (default: from git config)
   --extensionName <name>  Extension name
@@ -25,7 +25,7 @@ Options:
 
 Examples:
   pgpm export              Export migrations from selected database (SQL mode)
-  pgpm export --graphql-endpoint http://private.localhost:3002/graphql --migrate-endpoint http://db_migrate.localhost:3000/graphql
+  pgpm export --graphql-endpoint 'http://[::1]:3002/graphql' --migrate-endpoint 'http://[::1]:3000/graphql' --migrate-host db_migrate.localhost:3000
 `;
 
 export default async (
@@ -47,6 +47,7 @@ export default async (
 
   const graphqlEndpoint = argv['graphql-endpoint'] || argv.graphqlEndpoint;
   const migrateEndpoint = argv['migrate-endpoint'] || argv.migrateEndpoint;
+  const migrateHost = argv['migrate-host'] || argv.migrateHost;
   const token = argv.token;
 
   if (graphqlEndpoint) {
@@ -55,7 +56,11 @@ export default async (
     // =========================================================================
     console.log(`GraphQL export mode: ${graphqlEndpoint}`);
 
-    const metaClient = new GraphQLClient({ endpoint: graphqlEndpoint, token });
+    const metaClient = new GraphQLClient({
+      endpoint: graphqlEndpoint,
+      token,
+      headers: { 'X-Meta-Schema': 'true' }
+    });
 
     // Fetch databases via GraphQL
     const dbRows = await metaClient.fetchAllNodes<{ id: string; name: string }>(
@@ -144,7 +149,9 @@ export default async (
       project,
       metaEndpoint: graphqlEndpoint,
       migrateEndpoint,
+      migrateHeaders: migrateHost ? { Host: migrateHost } : undefined,
       token,
+      headers: { 'X-Meta-Schema': 'true' },
       databaseId,
       databaseName: selectedDatabaseName,
       schema_names,

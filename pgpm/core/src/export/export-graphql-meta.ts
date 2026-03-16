@@ -952,7 +952,7 @@ export const exportGraphQLMeta = async ({
         message.includes('Cannot query field') ||
         message.includes('is not defined by type') ||
         message.includes('Unknown field') ||
-        message.includes('Field') && message.includes('not found')
+        (message.includes('Field') && message.includes('not found'))
       ) {
         // Field/table not available in the GraphQL schema — skip
         return;
@@ -1020,6 +1020,7 @@ export const exportGraphQLMeta = async ({
   await queryAndParse('crypto_addresses_module');
   await queryAndParse('crypto_auth_module');
   await queryAndParse('field_module');
+  await queryAndParse('table_module');
   await queryAndParse('table_template_module');
   await queryAndParse('secure_table_provision');
   await queryAndParse('uuid_module');

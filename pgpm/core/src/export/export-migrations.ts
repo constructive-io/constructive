@@ -295,52 +295,59 @@ const exportMigrationsToDisk = async ({
 
     writePgpmPlan(results.rows, opts);
     writePgpmFiles(results.rows, opts);
+  } else {
+    console.log('No sql_actions found — skipping database module. Meta/service module will still be exported.');
+  }
 
-    const metaResult = await exportMeta({
-      opts: options,
-      dbname: database,
-      database_id: databaseId
-    });
+  // =========================================================================
+  // Meta/service module export — runs independently of sql_actions
+  // =========================================================================
 
-    // Build description for the meta/service extension package
-    const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
+  const metaResult = await exportMeta({
+    opts: options,
+    dbname: database,
+    database_id: databaseId
+  });
 
-    // Detect missing modules at workspace level and prompt user
-    const svcMissingResult = await detectMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter, argv);
+  // Build description for the meta/service extension package
+  const metaDesc = metaExtensionDesc || `${metaExtensionName} service utilities for managing domains, APIs, and services`;
 
-    // Create/prepare the module directory (use serviceOutdir if provided)
-    const svcModuleDir = await preparePackage({
-      project,
-      author,
-      outdir: svcOutdir,
-      name: metaExtensionName,
-      description: metaDesc,
-      extensions: [...SERVICE_REQUIRED_EXTENSIONS],
-      prompter,
-      repoName,
-      username
-    });
+  // Detect missing modules at workspace level and prompt user
+  const svcMissingResult = await detectMissingModules(project, [...SERVICE_REQUIRED_EXTENSIONS], prompter, argv);
 
-    // Install missing modules if user confirmed (now that module exists)
-    if (svcMissingResult.shouldInstall) {
-      await installMissingModules(svcModuleDir, svcMissingResult.missingModules);
-    }
+  // Create/prepare the module directory (use serviceOutdir if provided)
+  const svcModuleDir = await preparePackage({
+    project,
+    author,
+    outdir: svcOutdir,
+    name: metaExtensionName,
+    description: metaDesc,
+    extensions: [...SERVICE_REQUIRED_EXTENSIONS],
+    prompter,
+    repoName,
+    username
+  });
 
-    // Use same skipSchemaRenaming logic for meta replacer
-    const metaSchemasForReplacement = skipSchemaRenaming
-      ? []
-      : schemas.rows.filter((schema: any) => schema_names.includes(schema.schema_name));
+  // Install missing modules if user confirmed (now that module exists)
+  if (svcMissingResult.shouldInstall) {
+    await installMissingModules(svcModuleDir, svcMissingResult.missingModules);
+  }
 
-    const metaReplacer = makeReplacer({
-      schemas: metaSchemasForReplacement,
-      name: metaExtensionName
-    });
+  // Use same skipSchemaRenaming logic for meta replacer
+  const metaSchemasForReplacement = skipSchemaRenaming
+    ? []
+    : schemas.rows.filter((schema: any) => schema_names.includes(schema.schema_name));
 
-    // Create separate files for each table type
-    const metaPackage: PgpmRow[] = [];
+  const metaReplacer = makeReplacer({
+    schemas: metaSchemasForReplacement,
+    name: metaExtensionName
+  });
 
-    // Common header for all meta files
-    const commonHeader = `SET session_replication_role TO replica;
+  // Create separate files for each table type
+  const metaPackage: PgpmRow[] = [];
+
+  // Common header for all meta files
+  const commonHeader = `SET session_replication_role TO replica;
 -- using replica in case we are deploying triggers to metaschema_public
 
 -- unaccent, postgis affected and require grants
@@ -356,107 +363,107 @@ DO $LQLMIGRATION$
   END;
 $LQLMIGRATION$;`;
 
-    const commonFooter = `
+  const commonFooter = `
 SET session_replication_role TO DEFAULT;`;
 
-    // Define table ordering with dependencies
-    // Tables that depend on 'database' being inserted first
-    const tableOrder = [
-      'database',
-      'schema',
-      'table',
-      'field',
-      'policy',
-      'index',
-      'trigger',
-      'trigger_function',
-      'rls_function',
-      'foreign_key_constraint',
-      'primary_key_constraint',
-      'unique_constraint',
-      'check_constraint',
-      'full_text_search',
-      'schema_grant',
-      'table_grant',
-      'default_privilege',
-      'domains',
-      'sites',
-      'apis',
-      'apps',
-      'site_modules',
-      'site_themes',
-      'site_metadata',
-      'api_modules',
-      'api_schemas',
-      'rls_module',
-      'user_auth_module',
-      'memberships_module',
-      'permissions_module',
-      'limits_module',
-      'levels_module',
-      'users_module',
-      'hierarchy_module',
-      'membership_types_module',
-      'invites_module',
-      'emails_module',
-      'sessions_module',
-      'secrets_module',
-      'profiles_module',
-      'encrypted_secrets_module',
-      'connected_accounts_module',
-      'phone_numbers_module',
-      'crypto_addresses_module',
-      'crypto_auth_module',
-      'field_module',
-      'table_module',
-      'secure_table_provision',
-      'user_profiles_module',
-      'user_settings_module',
-      'organization_settings_module',
-      'uuid_module',
-      'default_ids_module',
-      'denormalized_table_field'
-    ];
+  // Define table ordering with dependencies
+  // Tables that depend on 'database' being inserted first
+  const tableOrder = [
+    'database',
+    'schema',
+    'table',
+    'field',
+    'policy',
+    'index',
+    'trigger',
+    'trigger_function',
+    'rls_function',
+    'foreign_key_constraint',
+    'primary_key_constraint',
+    'unique_constraint',
+    'check_constraint',
+    'full_text_search',
+    'schema_grant',
+    'table_grant',
+    'default_privilege',
+    'domains',
+    'sites',
+    'apis',
+    'apps',
+    'site_modules',
+    'site_themes',
+    'site_metadata',
+    'api_modules',
+    'api_extensions',
+    'api_schemas',
+    'rls_module',
+    'user_auth_module',
+    'memberships_module',
+    'permissions_module',
+    'limits_module',
+    'levels_module',
+    'users_module',
+    'hierarchy_module',
+    'membership_types_module',
+    'invites_module',
+    'emails_module',
+    'sessions_module',
+    'secrets_module',
+    'profiles_module',
+    'encrypted_secrets_module',
+    'connected_accounts_module',
+    'phone_numbers_module',
+    'crypto_addresses_module',
+    'crypto_auth_module',
+    'field_module',
+    'table_module',
+    'secure_table_provision',
+    'user_profiles_module',
+    'user_settings_module',
+    'organization_settings_module',
+    'uuid_module',
+    'default_ids_module',
+    'denormalized_table_field'
+  ];
 
-    // Track which tables have content for dependency resolution
-    const tablesWithContent: string[] = [];
+  // Track which tables have content for dependency resolution
+  const tablesWithContent: string[] = [];
 
-    // Create a file for each table type that has content
-    for (const tableName of tableOrder) {
-      const tableSql = metaResult[tableName];
-      if (tableSql) {
-        const replacedSql = metaReplacer.replacer(tableSql);
-        
-        // Determine dependencies - each table depends on the previous tables that have content
-        // This ensures proper ordering during deployment
-        const deps = tableName === 'database' 
-          ? [] 
-          : tablesWithContent.length > 0 
-            ? [`migrate/${tablesWithContent[tablesWithContent.length - 1]}`]
-            : [];
+  // Create a file for each table type that has content
+  for (const tableName of tableOrder) {
+    const tableSql = metaResult[tableName];
+    if (tableSql) {
+      const replacedSql = metaReplacer.replacer(tableSql);
+      
+      // Determine dependencies - each table depends on the previous tables that have content
+      // This ensures proper ordering during deployment
+      const deps = tableName === 'database' 
+        ? [] 
+        : tablesWithContent.length > 0 
+          ? [`migrate/${tablesWithContent[tablesWithContent.length - 1]}`]
+          : [];
 
-        metaPackage.push({
-          deps,
-          deploy: `migrate/${tableName}`,
-          content: `${commonHeader}
+      metaPackage.push({
+        deps,
+        deploy: `migrate/${tableName}`,
+        content: `${commonHeader}
 
 ${replacedSql}
 
 ${commonFooter}
 `
-        });
+      });
 
-        tablesWithContent.push(tableName);
-      }
+      tablesWithContent.push(tableName);
     }
-
-    opts.replacer = metaReplacer.replacer;
-    opts.name = metaExtensionName;
-    opts.outdir = svcOutdir;
-
-    writePgpmPlan(metaPackage, opts);
-    writePgpmFiles(metaPackage, opts);
   }
+
+  opts.replacer = metaReplacer.replacer;
+  opts.name = metaExtensionName;
+  opts.outdir = svcOutdir;
+
+  writePgpmPlan(metaPackage, opts);
+  writePgpmFiles(metaPackage, opts);
 
   pgPool.end();
 };
@@ -556,56 +563,58 @@ const preparePackage = async ({
   mkdirSync(pgpmDir, { recursive: true });
   process.chdir(pgpmDir);
 
-  const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
-  if (!plan.length) {
-    const { fullName, email } = parseAuthor(author);
+  try {
+    const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
+    if (!plan.length) {
+      const { fullName, email } = parseAuthor(author);
 
-    // Always run non-interactively — all answers are pre-filled
-    const effectiveUsername = username || fullName || 'export';
+      // Always run non-interactively — all answers are pre-filled
+      const effectiveUsername = username || fullName || 'export';
 
-    await project.initModule({
-      name,
-      description,
-      author,
-      extensions,
-      // Use outputDir to create module directly in the specified location
-      outputDir: outdir,
-      noTty: true,
-      prompter,
-      answers: {
-        moduleName: name,
-        moduleDesc: description,
-        access: 'restricted',
-        license: 'CLOSED',
-        fullName,
-        ...(email && { email }),
-        // Use provided values or sensible defaults
-        repoName: repoName || name,
-        username: effectiveUsername
-      }
-    });
-  } else {
-    if (prompter) {
-      const { overwrite } = await prompter.prompt({} as Record<string, any>, [
-        {
-          type: 'confirm',
-          name: 'overwrite',
-          message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
-          default: true,
-          useDefault: true
+      await project.initModule({
+        name,
+        description,
+        author,
+        extensions,
+        // Use outputDir to create module directly in the specified location
+        outputDir: outdir,
+        noTty: true,
+        prompter,
+        answers: {
+          moduleName: name,
+          moduleDesc: description,
+          access: 'restricted',
+          license: 'CLOSED',
+          fullName,
+          ...(email && { email }),
+          // Use provided values or sensible defaults
+          repoName: repoName || name,
+          username: effectiveUsername
         }
-      ]);
-      if (!overwrite) {
-        process.chdir(curDir);
-        throw new Error(`Export cancelled: Module "${name}" already exists.`);
+      });
+    } else {
+      if (prompter) {
+        const { overwrite } = await prompter.prompt({} as Record<string, any>, [
+          {
+            type: 'confirm',
+            name: 'overwrite',
+            message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
+            default: true,
+            useDefault: true
+          }
+        ]);
+        if (!overwrite) {
+          throw new Error(`Export cancelled: Module "${name}" already exists.`);
+        }
       }
+      rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
+      rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
+      rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
     }
-    rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
-    rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
-    rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
+  } finally {
+    process.chdir(curDir);
   }
 
-  process.chdir(curDir);
   return pgpmDir;
 };
 

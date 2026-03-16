@@ -30,9 +30,13 @@ const DB_REQUIRED_EXTENSIONS = [
   'uuid-ossp',
   'citext',
   'pgcrypto',
+  'btree_gin',
   'btree_gist',
+  'pg_textsearch',
+  'pg_trgm',
   'postgis',
   'hstore',
+  'vector',
   'metaschema-schema',
   'pgpm-inflection',
   'pgpm-uuid',
@@ -174,55 +178,57 @@ const preparePackage = async ({
   mkdirSync(pgpmDir, { recursive: true });
   process.chdir(pgpmDir);
 
-  const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
-  if (!plan.length) {
-    const { fullName, email } = parseAuthor(author);
+  try {
+    const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
+    if (!plan.length) {
+      const { fullName, email } = parseAuthor(author);
 
-    // If username is provided, run non-interactively with all answers pre-filled.
-    // Otherwise, let the prompter ask for it.
-    const knownUsername = username || undefined;
+      // If username is provided, run non-interactively with all answers pre-filled.
+      // Otherwise, let the prompter ask for it.
+      const knownUsername = username || undefined;
 
-    await project.initModule({
-      name,
-      description,
-      author,
-      extensions,
-      outputDir: outdir,
-      noTty: !prompter || !!knownUsername,
-      prompter,
-      answers: {
-        moduleName: name,
-        moduleDesc: description,
-        access: 'restricted',
-        license: 'CLOSED',
-        fullName,
-        ...(email && { email }),
-        repoName: repoName || name,
-        ...(knownUsername && { username: knownUsername })
-      }
-    });
-  } else {
-    if (prompter) {
-      const { overwrite } = await prompter.prompt({} as Record<string, any>, [
-        {
-          type: 'confirm',
-          name: 'overwrite',
-          message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
-          default: true,
-          useDefault: true
+      await project.initModule({
+        name,
+        description,
+        author,
+        extensions,
+        outputDir: outdir,
+        noTty: !prompter || !!knownUsername,
+        prompter,
+        answers: {
+          moduleName: name,
+          moduleDesc: description,
+          access: 'restricted',
+          license: 'CLOSED',
+          fullName,
+          ...(email && { email }),
+          repoName: repoName || name,
+          ...(knownUsername && { username: knownUsername })
         }
-      ]);
-      if (!overwrite) {
-        process.chdir(curDir);
-        throw new Error(`Export cancelled: Module "${name}" already exists.`);
+      });
+    } else {
+      if (prompter) {
+        const { overwrite } = await prompter.prompt({} as Record<string, any>, [
+          {
+            type: 'confirm',
+            name: 'overwrite',
+            message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
+            default: true,
+            useDefault: true
+          }
+        ]);
+        if (!overwrite) {
+          throw new Error(`Export cancelled: Module "${name}" already exists.`);
+        }
       }
+      rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
+      rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
+      rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
     }
-    rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
-    rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
-    rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
+  } finally {
+    process.chdir(curDir);
   }
 
-  process.chdir(curDir);
   return pgpmDir;
 };
 
@@ -236,8 +242,12 @@ export interface ExportGraphQLOptions {
   metaEndpoint: string;
   /** GraphQL endpoint for db_migrate data (e.g. http://db_migrate.localhost:3000/graphql) */
   migrateEndpoint?: string;
+  /** Extra headers for the migrate endpoint (e.g. Host header for subdomain routing) */
+  migrateHeaders?: Record<string, string>;
   /** Bearer token for authentication */
   token?: string;
+  /** Extra headers to send with GraphQL requests (e.g. X-Meta-Schema) */
+  headers?: Record<string, string>;
   /** Database ID to export */
   databaseId: string;
   /** Database display name */
@@ -271,6 +281,8 @@ export const exportGraphQL = async ({
   metaEndpoint,
   migrateEndpoint,
   token,
+  headers,
+  migrateHeaders,
   databaseId,
   databaseName,
   schema_names,
@@ -309,7 +321,7 @@ export const exportGraphQL = async ({
 
   if (migrateEndpoint) {
     console.log(`Fetching sql_actions from ${migrateEndpoint}...`);
-    const migrateClient = new GraphQLClient({ endpoint: migrateEndpoint, token });
+    const migrateClient = new GraphQLClient({ endpoint: migrateEndpoint, token, headers: migrateHeaders });
 
     try {
       const rawRows = await migrateClient.fetchAllNodes(
@@ -365,7 +377,7 @@ export const exportGraphQL = async ({
   // 2. Fetch meta/services data via GraphQL
   // =========================================================================
   console.log(`Fetching metadata from ${metaEndpoint}...`);
-  const metaClient = new GraphQLClient({ endpoint: metaEndpoint, token });
+  const metaClient = new GraphQLClient({ endpoint: metaEndpoint, token, headers });
 
   const metaResult = await exportGraphQLMeta({
     client: metaClient,
@@ -452,6 +464,7 @@ SET session_replication_role TO DEFAULT;`;
       'site_themes',
       'site_metadata',
       'api_modules',
+      'api_extensions',
       'api_schemas',
       'rls_module',
       'user_auth_module',

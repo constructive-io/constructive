@@ -67,9 +67,12 @@ export class GraphQLClient {
           json = (await response.json()) as GraphQLResponse<T>;
         } catch {
           if (!response.ok) {
-            throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`);
+            const hint = response.status === 404
+              ? `\n  Hint: Check that the API is configured for this endpoint and required headers (e.g. X-Meta-Schema) are set.`
+              : '';
+            throw new Error(`GraphQL request failed: ${response.status} ${response.statusText} at ${this.endpoint}${hint}`);
           }
-          throw new Error('GraphQL response is not valid JSON');
+          throw new Error(`GraphQL response is not valid JSON (got ${response.headers.get('content-type') || 'unknown content-type'}) from ${this.endpoint}.\n  Hint: The endpoint may be serving a different app (e.g. Next.js dashboard). Try using http://[::1]:<port>/graphql to target the GraphQL server directly.`);
         }
 
         if (json.errors?.length) {
@@ -78,7 +81,10 @@ export class GraphQLClient {
         }
 
         if (!response.ok) {
-          throw new Error(`GraphQL request failed: ${response.status} ${response.statusText}`);
+          const hint = response.status === 404
+            ? `\n  Hint: Check that the API is configured for this endpoint and required headers (e.g. X-Meta-Schema) are set.`
+            : '';
+          throw new Error(`GraphQL request failed: ${response.status} ${response.statusText} at ${this.endpoint}${hint}`);
         }
 
         if (!json.data) {
