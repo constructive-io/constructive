@@ -339,6 +339,31 @@ export type CommentSelect = {
     select: UserSelect;
   };
 };
+// ============ ToMany Relational Filter Types ============
+export interface UserToManyPostFilter {
+  /** Every related item must match this filter */
+  every?: PostFilter;
+  /** At least one related item must match this filter */
+  some?: PostFilter;
+  /** No related items may match this filter */
+  none?: PostFilter;
+}
+export interface UserToManyCommentFilter {
+  /** Every related item must match this filter */
+  every?: CommentFilter;
+  /** At least one related item must match this filter */
+  some?: CommentFilter;
+  /** No related items may match this filter */
+  none?: CommentFilter;
+}
+export interface PostToManyCommentFilter {
+  /** Every related item must match this filter */
+  every?: CommentFilter;
+  /** At least one related item must match this filter */
+  some?: CommentFilter;
+  /** No related items may match this filter */
+  none?: CommentFilter;
+}
 // ============ Table Filter Types ============
 export interface UserFilter {
   id?: UUIDFilter;
@@ -348,6 +373,8 @@ export interface UserFilter {
   isActive?: BooleanFilter;
   createdAt?: DatetimeFilter;
   metadata?: JSONFilter;
+  posts?: UserToManyPostFilter;
+  comments?: UserToManyCommentFilter;
   and?: UserFilter[];
   or?: UserFilter[];
   not?: UserFilter;
@@ -359,6 +386,8 @@ export interface PostFilter {
   authorId?: UUIDFilter;
   publishedAt?: DatetimeFilter;
   tags?: StringFilter;
+  author?: UserFilter;
+  comments?: PostToManyCommentFilter;
   and?: PostFilter[];
   or?: PostFilter[];
   not?: PostFilter;
@@ -369,6 +398,8 @@ export interface CommentFilter {
   postId?: UUIDFilter;
   authorId?: UUIDFilter;
   createdAt?: DatetimeFilter;
+  post?: PostFilter;
+  author?: UserFilter;
   and?: CommentFilter[];
   or?: CommentFilter[];
   not?: CommentFilter;
@@ -1793,6 +1824,15 @@ export type ProfileSelect = {
     select: UserSelect;
   };
 };
+// ============ ToMany Relational Filter Types ============
+export interface UserToManyPostFilter {
+  /** Every related item must match this filter */
+  every?: PostFilter;
+  /** At least one related item must match this filter */
+  some?: PostFilter;
+  /** No related items may match this filter */
+  none?: PostFilter;
+}
 // ============ Table Filter Types ============
 export interface UserFilter {
   id?: UUIDFilter;
@@ -1802,6 +1842,8 @@ export interface UserFilter {
   isActive?: BooleanFilter;
   createdAt?: DatetimeFilter;
   metadata?: JSONFilter;
+  profile?: ProfileFilter;
+  posts?: UserToManyPostFilter;
   and?: UserFilter[];
   or?: UserFilter[];
   not?: UserFilter;
@@ -1811,6 +1853,7 @@ export interface ProfileFilter {
   bio?: StringFilter;
   userId?: UUIDFilter;
   avatarUrl?: StringFilter;
+  user?: UserFilter;
   and?: ProfileFilter[];
   or?: ProfileFilter[];
   not?: ProfileFilter;
@@ -2190,6 +2233,15 @@ export type CategorySelect = {
     orderBy?: PostsOrderBy[];
   };
 };
+// ============ ToMany Relational Filter Types ============
+export interface PostToManyCommentFilter {
+  /** Every related item must match this filter */
+  every?: CommentFilter;
+  /** At least one related item must match this filter */
+  some?: CommentFilter;
+  /** No related items may match this filter */
+  none?: CommentFilter;
+}
 // ============ Table Filter Types ============
 export interface PostFilter {
   id?: UUIDFilter;
@@ -2198,6 +2250,8 @@ export interface PostFilter {
   authorId?: UUIDFilter;
   publishedAt?: DatetimeFilter;
   tags?: StringFilter;
+  author?: UserFilter;
+  comments?: PostToManyCommentFilter;
   and?: PostFilter[];
   or?: PostFilter[];
   not?: PostFilter;

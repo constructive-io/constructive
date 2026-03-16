@@ -74,6 +74,15 @@ export const postWithM2NTable: CleanTable = {
   ],
   relations: {
     ...emptyRelations,
+    hasMany: [
+      {
+        fieldName: 'postTags',
+        isUnique: false,
+        referencedByTable: 'PostTag',
+        type: 'PostTagsConnection',
+        keys: [{ name: 'postId', type: fieldTypes.uuid }],
+      },
+    ],
     manyToMany: [
       {
         fieldName: 'tags',

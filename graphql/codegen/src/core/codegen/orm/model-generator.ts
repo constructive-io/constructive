@@ -6,6 +6,7 @@
  * Each method uses function overloads for IDE autocompletion of select objects.
  */
 import * as t from '@babel/types';
+import { singularize } from 'inflekt';
 
 import type { CleanManyToManyRelation, CleanTable } from '../../../types/schema';
 import { asConst, generateCode } from '../babel-ast';
@@ -198,6 +199,222 @@ function buildExtraFieldsType(info: JunctionInfo): t.TSType {
   );
 }
 
+// ============================================================================
+// Static Filter Helpers
+// ============================================================================
+
+/**
+ * Resolve a related table's filter type name using O(1) Map lookup.
+ */
+function resolveRelatedFilterName(
+  tableName: string,
+  tableByName: Map<string, CleanTable>,
+): string {
+  const relatedTable = tableByName.get(tableName);
+  if (relatedTable) return getFilterTypeName(relatedTable);
+  return `${tableName}Filter`;
+}
+
+/** Quantifier descriptors for hasMany/manyToMany filter helpers. */
+const FILTER_QUANTIFIERS = [
+  { prefix: 'has', quantifier: 'some' as const },
+  { prefix: 'hasEvery', quantifier: 'every' as const },
+  { prefix: 'hasNo', quantifier: 'none' as const },
+];
+
+/** Resolved junction filter path for M:N relations. */
+interface JunctionFilterPath {
+  junctionFieldName: string;
+  rightFieldName: string;
+}
+
+/**
+ * Resolve the junction table filter path for an M:N relation.
+ * Returns null if the path cannot be resolved (junction table missing,
+ * hasMany to junction missing, or belongsTo from junction to right missing).
+ */
+function resolveJunctionFilterPath(
+  table: CleanTable,
+  relation: { junctionTable: string; rightTable: string },
+  tableByName: Map<string, CleanTable>,
+): JunctionFilterPath | null {
+  const junctionTable = tableByName.get(relation.junctionTable);
+  if (!junctionTable) return null;
+
+  const hasManyToJunction = table.relations.hasMany.find(
+    (hm) => hm.referencedByTable === relation.junctionTable,
+  );
+  if (!hasManyToJunction?.fieldName) return null;
+
+  const junctionBelongsToRight = junctionTable.relations.belongsTo.find(
+    (bt) => bt.referencesTable === relation.rightTable,
+  );
+  if (!junctionBelongsToRight?.fieldName) return null;
+
+  return {
+    junctionFieldName: hasManyToJunction.fieldName,
+    rightFieldName: junctionBelongsToRight.fieldName,
+  };
+}
+
+/**
+ * Build a static `filters` class property with relational filter helper methods.
+ *
+ * For belongsTo/hasOne relations: `has{Entity}: (filter) => ({ fieldName: filter })`
+ * For hasMany/manyToMany relations: `has{Entity}`, `hasEvery{Entity}`, `hasNo{Entity}`
+ *
+ * Returns null if the table has no relations with named fields.
+ */
+function buildStaticFiltersProperty(
+  table: CleanTable,
+  whereTypeName: string,
+  tableByName: Map<string, CleanTable>,
+): t.ClassProperty | null {
+  const filterMethods: t.ObjectProperty[] = [];
+
+  // Singular relations (belongsTo + hasOne): has{Entity}
+  const singularRelations = [
+    ...table.relations.belongsTo.map((r) => ({ fieldName: r.fieldName, relatedTable: r.referencesTable })),
+    ...table.relations.hasOne.map((r) => ({ fieldName: r.fieldName, relatedTable: r.referencedByTable })),
+  ];
+  for (const { fieldName, relatedTable } of singularRelations) {
+    if (!fieldName) continue;
+    const childFilterName = resolveRelatedFilterName(relatedTable, tableByName);
+    filterMethods.push(
+      buildFilterHelperProperty({
+        methodName: `has${ucFirst(singularize(fieldName))}`,
+        childFilterName,
+        parentFilterName: whereTypeName,
+        fieldName,
+      }),
+    );
+  }
+
+  // hasMany relations: has{Entity}, hasEvery{Entity}, hasNo{Entity}
+  for (const relation of table.relations.hasMany) {
+    if (!relation.fieldName) continue;
+    const childFilterName = resolveRelatedFilterName(relation.referencedByTable, tableByName);
+    const singularField = ucFirst(singularize(relation.fieldName));
+    for (const { prefix, quantifier } of FILTER_QUANTIFIERS) {
+      filterMethods.push(
+        buildFilterHelperProperty({
+          methodName: `${prefix}${singularField}`,
+          childFilterName,
+          parentFilterName: whereTypeName,
+          fieldName: relation.fieldName,
+          quantifier,
+        }),
+      );
+    }
+  }
+
+  // manyToMany relations: has{Entity}, hasEvery{Entity}, hasNo{Entity}
+  // Uses junction table path for runtime correctness:
+  //   hasTag(filter) => ({ postTags: { some: { tag: filter } } })
+  for (const relation of table.relations.manyToMany) {
+    if (!relation.fieldName) continue;
+    const junctionPath = resolveJunctionFilterPath(table, relation, tableByName);
+    if (!junctionPath) continue;
+
+    const childFilterName = resolveRelatedFilterName(relation.rightTable, tableByName);
+    const singularField = ucFirst(singularize(relation.fieldName));
+    for (const { prefix, quantifier } of FILTER_QUANTIFIERS) {
+      filterMethods.push(
+        buildFilterHelperProperty({
+          methodName: `${prefix}${singularField}`,
+          childFilterName,
+          parentFilterName: whereTypeName,
+          fieldName: relation.fieldName,
+          quantifier,
+          junctionPath,
+        }),
+      );
+    }
+  }
+
+  if (filterMethods.length === 0) return null;
+
+  const filtersProp = t.classProperty(
+    t.identifier('filters'),
+    t.objectExpression(filterMethods),
+  );
+  filtersProp.static = true;
+
+  return filtersProp;
+}
+
+/**
+ * Build a single filter helper property (arrow function).
+ *
+ * belongsTo/hasOne (no quantifier):
+ *   `has{Entity}: (filter: ChildFilter): ParentFilter => ({ fieldName: filter })`
+ *
+ * hasMany (with quantifier):
+ *   `has{Entity}: (filter: ChildFilter): ParentFilter => ({ fieldName: { some: filter } })`
+ *
+ * manyToMany (quantifier + junction path):
+ *   `has{Entity}: (filter: ChildFilter): ParentFilter => ({ junctionField: { some: { rightField: filter } } })`
+ */
+function buildFilterHelperProperty(opts: {
+  methodName: string;
+  childFilterName: string;
+  parentFilterName: string;
+  fieldName: string;
+  quantifier?: 'some' | 'every' | 'none';
+  junctionPath?: JunctionFilterPath;
+}): t.ObjectProperty {
+  const { methodName, childFilterName, parentFilterName, fieldName, quantifier, junctionPath } = opts;
+
+  const filterParam = t.identifier('filter');
+  filterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier(childFilterName)),
+  );
+
+  // Build the return expression based on relation type
+  let returnExpr: t.Expression;
+  if (junctionPath && quantifier) {
+    // M:N via junction: { junctionFieldName: { quantifier: { rightFieldName: filter } } }
+    returnExpr = t.objectExpression([
+      t.objectProperty(
+        t.identifier(junctionPath.junctionFieldName),
+        t.objectExpression([
+          t.objectProperty(
+            t.identifier(quantifier),
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier(junctionPath.rightFieldName),
+                t.identifier('filter'),
+              ),
+            ]),
+          ),
+        ]),
+      ),
+    ]);
+  } else if (quantifier) {
+    // hasMany: { fieldName: { quantifier: filter } }
+    returnExpr = t.objectExpression([
+      t.objectProperty(
+        t.identifier(fieldName),
+        t.objectExpression([
+          t.objectProperty(t.identifier(quantifier), t.identifier('filter')),
+        ]),
+      ),
+    ]);
+  } else {
+    // belongsTo/hasOne: { fieldName: filter }
+    returnExpr = t.objectExpression([
+      t.objectProperty(t.identifier(fieldName), t.identifier('filter')),
+    ]);
+  }
+
+  const arrowFn = t.arrowFunctionExpression([filterParam], returnExpr);
+  arrowFn.returnType = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier(parentFilterName)),
+  );
+
+  return t.objectProperty(t.identifier(methodName), arrowFn);
+}
+
 export function generateModelFile(
   table: CleanTable,
   _useSharedTypes: boolean,
@@ -266,6 +483,36 @@ export function generateModelFile(
       true,
     ),
   );
+  // Build a Map for O(1) table lookups (used by filter helpers and imports)
+  const tableByName = new Map(
+    (options?.allTables ?? []).map((t) => [t.name, t]),
+  );
+
+  // Collect related filter type names for imports (needed by static filters)
+  const relatedFilterImports = new Set<string>();
+  // Singular relations (belongsTo + hasOne)
+  const singularImportRelations = [
+    ...table.relations.belongsTo.map((r) => ({ fieldName: r.fieldName, relatedTable: r.referencesTable })),
+    ...table.relations.hasOne.map((r) => ({ fieldName: r.fieldName, relatedTable: r.referencedByTable })),
+  ];
+  for (const { fieldName, relatedTable } of singularImportRelations) {
+    if (!fieldName) continue;
+    relatedFilterImports.add(resolveRelatedFilterName(relatedTable, tableByName));
+  }
+  // hasMany relations
+  for (const relation of table.relations.hasMany) {
+    if (!relation.fieldName) continue;
+    relatedFilterImports.add(resolveRelatedFilterName(relation.referencedByTable, tableByName));
+  }
+  // manyToMany relations — only import if junction path can be resolved
+  for (const relation of table.relations.manyToMany) {
+    if (!relation.fieldName) continue;
+    if (!resolveJunctionFilterPath(table, relation, tableByName)) continue;
+    relatedFilterImports.add(resolveRelatedFilterName(relation.rightTable, tableByName));
+  }
+  // Remove the table's own filter type (already imported)
+  relatedFilterImports.delete(whereTypeName);
+
   const inputTypeImports = [
     typeName,
     relationTypeName,
@@ -276,6 +523,7 @@ export function generateModelFile(
     createInputTypeName,
     updateInputTypeName,
     patchTypeName,
+    ...relatedFilterImports,
   ];
   statements.push(
     createImportDeclaration(
@@ -305,6 +553,16 @@ export function generateModelFile(
       t.blockStatement([]),
     ),
   );
+
+  // Static filters property (relational filter helpers)
+  const filtersProp = buildStaticFiltersProperty(
+    table,
+    whereTypeName,
+    tableByName,
+  );
+  if (filtersProp) {
+    classBody.push(filtersProp);
+  }
 
   // Reusable type reference factories
   const sRef = () => t.tsTypeReference(t.identifier('S'));

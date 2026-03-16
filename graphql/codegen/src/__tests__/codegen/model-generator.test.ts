@@ -620,4 +620,458 @@ describe('model-generator', () => {
     // conditionTypeName should be passed as a string literal to the document builder
     expect(result.content).toContain('"ContactCondition"');
   });
+
+  // ============================================================================
+  // Static Filter Helpers
+  // ============================================================================
+
+  it('generates static filters property for belongsTo relations', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+        { name: 'authorId', type: fieldTypes.uuid },
+      ],
+      relations: {
+        ...emptyRelations,
+        belongsTo: [
+          {
+            fieldName: 'author',
+            isUnique: false,
+            referencesTable: 'User',
+            type: null,
+            keys: [{ name: 'authorId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: {
+        all: 'posts',
+        one: 'post',
+        create: 'createPost',
+        update: 'updatePost',
+        delete: 'deletePost',
+      },
+    });
+
+    const result = generateModelFile(postTable, false);
+
+    // Should have a static filters property
+    expect(result.content).toContain('static filters = {');
+
+    // Should have hasAuthor helper
+    expect(result.content).toContain('hasAuthor: (filter: UserFilter): PostFilter =>');
+    expect(result.content).toContain('author: filter');
+
+    // Should import UserFilter
+    expect(result.content).toContain('UserFilter');
+  });
+
+  it('generates static filters property for hasMany relations', () => {
+    const userTable = createTable({
+      name: 'User',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'email', type: fieldTypes.string },
+      ],
+      relations: {
+        ...emptyRelations,
+        hasMany: [
+          {
+            fieldName: 'posts',
+            isUnique: false,
+            referencedByTable: 'Post',
+            type: null,
+            keys: [],
+          },
+        ],
+      },
+      query: {
+        all: 'users',
+        one: 'user',
+        create: 'createUser',
+        update: 'updateUser',
+        delete: 'deleteUser',
+      },
+    });
+
+    const result = generateModelFile(userTable, false);
+
+    // Should generate has/hasEvery/hasNo methods for hasMany
+    expect(result.content).toContain('hasPost: (filter: PostFilter): UserFilter =>');
+    expect(result.content).toContain('some: filter');
+
+    expect(result.content).toContain('hasEveryPost: (filter: PostFilter): UserFilter =>');
+    expect(result.content).toContain('every: filter');
+
+    expect(result.content).toContain('hasNoPost: (filter: PostFilter): UserFilter =>');
+    expect(result.content).toContain('none: filter');
+
+    // Should import PostFilter
+    expect(result.content).toContain('PostFilter');
+  });
+
+  it('generates static filters property for manyToMany relations with junction path', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+      ],
+      relations: {
+        ...emptyRelations,
+        hasMany: [
+          {
+            fieldName: 'postTags',
+            isUnique: false,
+            referencedByTable: 'PostTag',
+            type: null,
+            keys: [],
+          },
+        ],
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+          },
+        ],
+      },
+      query: {
+        all: 'posts',
+        one: 'post',
+        create: 'createPost',
+        update: 'updatePost',
+        delete: 'deletePost',
+      },
+    });
+
+    const postTagTable = createTable({
+      name: 'PostTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+      ],
+      relations: {
+        ...emptyRelations,
+        belongsTo: [
+          {
+            fieldName: 'post',
+            isUnique: false,
+            referencesTable: 'Post',
+            type: null,
+            keys: [{ name: 'postId', type: fieldTypes.uuid }],
+          },
+          {
+            fieldName: 'tag',
+            isUnique: false,
+            referencesTable: 'Tag',
+            type: null,
+            keys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: {
+        all: 'postTags',
+        one: 'postTag',
+        create: 'createPostTag',
+        update: null,
+        delete: 'deletePostTag',
+      },
+    });
+
+    const tagTable = createTable({
+      name: 'Tag',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'name', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'tags',
+        one: 'tag',
+        create: 'createTag',
+        update: 'updateTag',
+        delete: 'deleteTag',
+      },
+    });
+
+    const allTables = [postTable, postTagTable, tagTable];
+    const result = generateModelFile(postTable, false, { allTables });
+
+    // Should generate has/hasEvery/hasNo methods that go through junction path
+    expect(result.content).toContain('hasTag: (filter: TagFilter): PostFilter =>');
+    expect(result.content).toContain('hasEveryTag: (filter: TagFilter): PostFilter =>');
+    expect(result.content).toContain('hasNoTag: (filter: TagFilter): PostFilter =>');
+
+    // Should use junction path: postTags → { some: { tag: filter } }
+    expect(result.content).toContain('postTags');
+    expect(result.content).toContain('tag: filter');
+
+    // Should import TagFilter
+    expect(result.content).toContain('TagFilter');
+  });
+
+  it('skips manyToMany filter helpers when junction path cannot be resolved', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+      ],
+      relations: {
+        ...emptyRelations,
+        // No hasMany to junction — junction path unresolvable
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+          },
+        ],
+      },
+      query: {
+        all: 'posts',
+        one: 'post',
+        create: 'createPost',
+        update: 'updatePost',
+        delete: 'deletePost',
+      },
+    });
+
+    // Without allTables, junction path can't be resolved
+    const result = generateModelFile(postTable, false);
+
+    // Should NOT have M:N filter helpers
+    expect(result.content).not.toContain('hasTag');
+    expect(result.content).not.toContain('static filters');
+  });
+
+  it('generates static filters property for hasOne relations', () => {
+    const userTable = createTable({
+      name: 'User',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'email', type: fieldTypes.string },
+      ],
+      relations: {
+        ...emptyRelations,
+        hasOne: [
+          {
+            fieldName: 'profile',
+            isUnique: true,
+            referencedByTable: 'Profile',
+            type: null,
+            keys: [],
+          },
+        ],
+      },
+      query: {
+        all: 'users',
+        one: 'user',
+        create: 'createUser',
+        update: 'updateUser',
+        delete: 'deleteUser',
+      },
+    });
+
+    const result = generateModelFile(userTable, false);
+
+    // Should have hasProfile helper (no quantifier for hasOne)
+    expect(result.content).toContain('hasProfile: (filter: ProfileFilter): UserFilter =>');
+    expect(result.content).toContain('profile: filter');
+
+    // Should import ProfileFilter
+    expect(result.content).toContain('ProfileFilter');
+  });
+
+  it('does not generate static filters when table has no named relations', () => {
+    const table = createTable({
+      name: 'Setting',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'key', type: fieldTypes.string },
+        { name: 'value', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'settings',
+        one: 'setting',
+        create: 'createSetting',
+        update: 'updateSetting',
+        delete: 'deleteSetting',
+      },
+    });
+
+    const result = generateModelFile(table, false);
+
+    // Should NOT have a static filters property
+    expect(result.content).not.toContain('static filters');
+  });
+
+  it('skips relations with fieldName: null in static filters', () => {
+    const table = createTable({
+      name: 'Article',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+      ],
+      relations: {
+        belongsTo: [
+          {
+            fieldName: null,
+            isUnique: false,
+            referencesTable: 'User',
+            type: null,
+            keys: [],
+          },
+        ],
+        hasOne: [],
+        hasMany: [
+          {
+            fieldName: null,
+            isUnique: false,
+            referencedByTable: 'Comment',
+            type: null,
+            keys: [],
+          },
+        ],
+        manyToMany: [],
+      },
+      query: {
+        all: 'articles',
+        one: 'article',
+        create: 'createArticle',
+        update: 'updateArticle',
+        delete: 'deleteArticle',
+      },
+    });
+
+    const result = generateModelFile(table, false);
+
+    // Should NOT have a static filters property (all relations have null fieldNames)
+    expect(result.content).not.toContain('static filters');
+  });
+
+  it('generates combined filters for mixed relation types', () => {
+    const postTable = createTable({
+      name: 'Post',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+        { name: 'authorId', type: fieldTypes.uuid },
+      ],
+      relations: {
+        belongsTo: [
+          {
+            fieldName: 'author',
+            isUnique: false,
+            referencesTable: 'User',
+            type: null,
+            keys: [{ name: 'authorId', type: fieldTypes.uuid }],
+          },
+        ],
+        hasOne: [],
+        hasMany: [
+          {
+            fieldName: 'comments',
+            isUnique: false,
+            referencedByTable: 'Comment',
+            type: null,
+            keys: [],
+          },
+          {
+            fieldName: 'postTags',
+            isUnique: false,
+            referencedByTable: 'PostTag',
+            type: null,
+            keys: [],
+          },
+        ],
+        manyToMany: [
+          {
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'PostTag',
+            type: null,
+          },
+        ],
+      },
+      query: {
+        all: 'posts',
+        one: 'post',
+        create: 'createPost',
+        update: 'updatePost',
+        delete: 'deletePost',
+      },
+    });
+
+    const postTagTable = createTable({
+      name: 'PostTag',
+      fields: [
+        { name: 'postId', type: fieldTypes.uuid },
+        { name: 'tagId', type: fieldTypes.uuid },
+      ],
+      relations: {
+        ...emptyRelations,
+        belongsTo: [
+          {
+            fieldName: 'post',
+            isUnique: false,
+            referencesTable: 'Post',
+            type: null,
+            keys: [{ name: 'postId', type: fieldTypes.uuid }],
+          },
+          {
+            fieldName: 'tag',
+            isUnique: false,
+            referencesTable: 'Tag',
+            type: null,
+            keys: [{ name: 'tagId', type: fieldTypes.uuid }],
+          },
+        ],
+      },
+      query: {
+        all: 'postTags',
+        one: 'postTag',
+        create: 'createPostTag',
+        update: null,
+        delete: 'deletePostTag',
+      },
+    });
+
+    const tagTable = createTable({
+      name: 'Tag',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'name', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'tags',
+        one: 'tag',
+        create: 'createTag',
+        update: 'updateTag',
+        delete: 'deleteTag',
+      },
+    });
+
+    const allTables = [postTable, postTagTable, tagTable];
+    const result = generateModelFile(postTable, false, { allTables });
+
+    // Should have belongsTo helper
+    expect(result.content).toContain('hasAuthor: (filter: UserFilter): PostFilter =>');
+
+    // Should have hasMany helpers
+    expect(result.content).toContain('hasComment: (filter: CommentFilter): PostFilter =>');
+    expect(result.content).toContain('hasEveryComment: (filter: CommentFilter): PostFilter =>');
+    expect(result.content).toContain('hasNoComment: (filter: CommentFilter): PostFilter =>');
+
+    // Should have manyToMany helpers using junction path
+    expect(result.content).toContain('hasTag: (filter: TagFilter): PostFilter =>');
+    expect(result.content).toContain('hasEveryTag: (filter: TagFilter): PostFilter =>');
+    expect(result.content).toContain('hasNoTag: (filter: TagFilter): PostFilter =>');
+    // Verify junction path structure
+    expect(result.content).toContain('postTags');
+    expect(result.content).toContain('tag: filter');
+  });
 });

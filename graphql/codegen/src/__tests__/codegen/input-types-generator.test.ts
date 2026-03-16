@@ -583,6 +583,185 @@ describe('table filter types', () => {
 });
 
 // ============================================================================
+// Tests - Relational Filter Types (ToMany + belongsTo/hasOne on XxxFilter)
+// ============================================================================
+
+describe('relational filter types', () => {
+  it('generates ToMany filter types for hasMany relations', () => {
+    const tables = [userTableWithRelations, postTable, commentTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // ToMany filter types should be generated
+    expect(result.content).toContain('export interface UserToManyPostFilter {');
+    expect(result.content).toContain('every?: PostFilter;');
+    expect(result.content).toContain('some?: PostFilter;');
+    expect(result.content).toContain('none?: PostFilter;');
+
+    expect(result.content).toContain('export interface UserToManyCommentFilter {');
+    expect(result.content).toContain('every?: CommentFilter;');
+    expect(result.content).toContain('some?: CommentFilter;');
+    expect(result.content).toContain('none?: CommentFilter;');
+  });
+
+  it('does NOT generate ToMany filter types for manyToMany relations', () => {
+    const tables = [postTable, categoryTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // M:N filter types are NOT generated — PostGraphile connection-filter doesn't
+    // support direct M:N filter fields. Use static filter helpers on the model instead.
+    expect(result.content).not.toContain('CategoryToManyPostFilter');
+  });
+
+  it('adds belongsTo relational fields on table filter', () => {
+    const tables = [postTable, userTable, commentTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // PostFilter should include belongsTo relation to author (User)
+    expect(result.content).toContain('export interface PostFilter {');
+    expect(result.content).toContain('author?: UserFilter;');
+  });
+
+  it('adds hasOne relational fields on table filter', () => {
+    const tables = [userTableWithProfile, profileTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // UserFilter should include hasOne relation to profile
+    expect(result.content).toContain('export interface UserFilter {');
+    expect(result.content).toContain('profile?: ProfileFilter;');
+  });
+
+  it('adds hasMany relational fields on table filter using ToMany type', () => {
+    const tables = [userTableWithRelations, postTable, commentTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // UserFilter should include hasMany relation fields
+    expect(result.content).toContain('posts?: UserToManyPostFilter;');
+    expect(result.content).toContain('comments?: UserToManyCommentFilter;');
+  });
+
+  it('does NOT add manyToMany relational fields on table filter', () => {
+    const tables = [postTable, categoryTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // M:N fields are NOT added to filter types — they would fail at runtime.
+    // Use Post.filters.hasCategory(...) static helpers instead.
+    expect(result.content).not.toContain('posts?: CategoryToManyPostFilter;');
+    expect(result.content).not.toContain('CategoryToManyPostFilter');
+  });
+
+  it('skips relations with fieldName: null', () => {
+    const tableWithNullRelation = createTable({
+      name: 'Article',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'title', type: fieldTypes.string },
+      ],
+      relations: {
+        belongsTo: [
+          {
+            fieldName: null,
+            isUnique: false,
+            referencesTable: 'User',
+            type: null,
+            keys: [],
+          },
+        ],
+        hasOne: [],
+        hasMany: [
+          {
+            fieldName: null,
+            isUnique: false,
+            referencedByTable: 'Comment',
+            type: null,
+            keys: [],
+          },
+        ],
+        manyToMany: [],
+      },
+    });
+
+    const tables = [tableWithNullRelation, userTable, commentTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // ArticleFilter should NOT have relational fields (they have null fieldNames)
+    const filterMatch = result.content.match(
+      /export interface ArticleFilter \{([^}]*)\}/s,
+    );
+    expect(filterMatch).toBeTruthy();
+    const filterBody = filterMatch![1];
+
+    // Should have scalar fields and logical operators only
+    expect(filterBody).toContain('id?: UUIDFilter;');
+    expect(filterBody).toContain('title?: StringFilter;');
+    expect(filterBody).toContain('and?: ArticleFilter[];');
+    expect(filterBody).not.toContain('UserFilter');
+    expect(filterBody).not.toContain('CommentFilter');
+
+    // No ToMany filter types should be generated for null fieldName relations
+    expect(result.content).not.toContain('ArticleToManyCommentFilter');
+  });
+
+  it('generates ToMany filter types before table filter types', () => {
+    const tables = [userTableWithRelations, postTable, commentTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // ToMany types should appear BEFORE table filter types
+    const toManyPos = result.content.indexOf('ToMany Relational Filter Types');
+    const tableFilterPos = result.content.indexOf('Table Filter Types');
+    expect(toManyPos).toBeGreaterThan(-1);
+    expect(tableFilterPos).toBeGreaterThan(-1);
+    expect(toManyPos).toBeLessThan(tableFilterPos);
+  });
+
+  it('does not generate duplicate ToMany types', () => {
+    // Two tables both have hasMany to the same target
+    const table1 = createTable({
+      name: 'Author',
+      fields: [{ name: 'id', type: fieldTypes.uuid }],
+      relations: {
+        belongsTo: [],
+        hasOne: [],
+        hasMany: [
+          {
+            fieldName: 'posts',
+            isUnique: false,
+            referencedByTable: 'Post',
+            type: null,
+            keys: [],
+          },
+        ],
+        manyToMany: [],
+      },
+    });
+
+    const tables = [table1, postTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // AuthorToManyPostFilter should appear exactly once
+    const matches = result.content.match(/export interface AuthorToManyPostFilter/g);
+    expect(matches).toHaveLength(1);
+  });
+
+  it('does not generate ToMany types when table has no multi-value relations', () => {
+    const result = generateInputTypesFile(new Map(), new Set(), [userTable]);
+
+    // No ToMany filter types should appear
+    expect(result.content).not.toContain('ToManyFilter');
+    expect(result.content).not.toContain('ToMany Relational Filter Types');
+  });
+
+  it('handles belongsTo in CommentFilter referencing PostFilter and UserFilter', () => {
+    const tables = [userTableWithRelations, postTable, commentTable];
+    const result = generateInputTypesFile(new Map(), new Set(), tables);
+
+    // CommentFilter should reference both parent filters
+    expect(result.content).toContain('export interface CommentFilter {');
+    expect(result.content).toContain('post?: PostFilter;');
+    expect(result.content).toContain('author?: UserFilter;');
+  });
+});
+
+// ============================================================================
 // Tests - OrderBy Types
 // ============================================================================
 

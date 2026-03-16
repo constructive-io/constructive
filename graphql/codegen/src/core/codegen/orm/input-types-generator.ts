@@ -1073,12 +1073,81 @@ function getFilterTypeForField(fieldType: string): string {
 }
 
 /**
- * Build properties for a table filter interface
+ * Get the ToMany filter type name for a relation.
+ * Convention: `{ParentType}ToMany{ChildType}Filter`
  */
-function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
+function getToManyFilterTypeName(
+  parentTypeName: string,
+  childTypeName: string,
+): string {
+  return `${parentTypeName}ToMany${childTypeName}Filter`;
+}
+
+/**
+ * Generate ToMany filter interfaces for hasMany relations.
+ * Each interface has `every`, `some`, and `none` fields referencing the child's filter type.
+ *
+ * Note: M:N relations do NOT get their own ToMany filter types because PostGraphile's
+ * connection-filter plugin doesn't support direct M:N filter fields. M:N filtering
+ * goes through the junction table's hasMany relation instead. Use static filter
+ * helpers on the model class for ergonomic M:N filtering.
+ *
+ * Must be generated BEFORE table filter types since table filters reference them.
+ */
+function generateToManyFilterTypes(
+  tables: CleanTable[],
+  tableByName: Map<string, CleanTable>,
+): t.Statement[] {
+  const statements: t.Statement[] = [];
+  const generatedTypes = new Set<string>();
+
+  for (const table of tables) {
+    const { typeName: parentTypeName } = getTableNames(table);
+
+    // hasMany relations only (not manyToMany — those use junction table path)
+    for (const relation of table.relations.hasMany) {
+      if (!relation.fieldName) continue;
+      const childTypeName = getRelatedTypeName(
+        relation.referencedByTable,
+        tableByName,
+      );
+      const toManyFilterName = getToManyFilterTypeName(parentTypeName, childTypeName);
+      if (generatedTypes.has(toManyFilterName)) continue;
+      generatedTypes.add(toManyFilterName);
+
+      const childFilterName = getRelatedFilterName(
+        relation.referencedByTable,
+        tableByName,
+      );
+      statements.push(
+        createExportedInterface(toManyFilterName, [
+          { name: 'every', type: childFilterName, optional: true, description: 'Every related item must match this filter' },
+          { name: 'some', type: childFilterName, optional: true, description: 'At least one related item must match this filter' },
+          { name: 'none', type: childFilterName, optional: true, description: 'No related items may match this filter' },
+        ]),
+      );
+    }
+  }
+
+  if (statements.length > 0) {
+    addSectionComment(statements, 'ToMany Relational Filter Types');
+  }
+  return statements;
+}
+
+/**
+ * Build properties for a table filter interface.
+ * Includes scalar filter fields, relational filter fields, and logical operators.
+ */
+function buildTableFilterProperties(
+  table: CleanTable,
+  tableByName: Map<string, CleanTable>,
+): InterfaceProperty[] {
+  const { typeName: parentTypeName } = getTableNames(table);
   const filterName = getFilterTypeName(table);
   const properties: InterfaceProperty[] = [];
 
+  // Scalar filter fields
   for (const field of table.fields) {
     const fieldType =
       typeof field.type === 'string' ? field.type : field.type.gqlType;
@@ -1087,6 +1156,53 @@ function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
     const filterType = getFilterTypeForField(fieldType);
     properties.push({ name: field.name, type: filterType, optional: true });
   }
+
+  // Relational filter fields — belongsTo (direct reference to child filter)
+  for (const relation of table.relations.belongsTo) {
+    if (!relation.fieldName) continue;
+    const childFilterName = getRelatedFilterName(
+      relation.referencesTable,
+      tableByName,
+    );
+    properties.push({
+      name: relation.fieldName,
+      type: childFilterName,
+      optional: true,
+    });
+  }
+
+  // Relational filter fields — hasOne (direct reference to child filter)
+  for (const relation of table.relations.hasOne) {
+    if (!relation.fieldName) continue;
+    const childFilterName = getRelatedFilterName(
+      relation.referencedByTable,
+      tableByName,
+    );
+    properties.push({
+      name: relation.fieldName,
+      type: childFilterName,
+      optional: true,
+    });
+  }
+
+  // Relational filter fields — hasMany (reference to ToMany filter)
+  for (const relation of table.relations.hasMany) {
+    if (!relation.fieldName) continue;
+    const childTypeName = getRelatedTypeName(
+      relation.referencedByTable,
+      tableByName,
+    );
+    const toManyFilterName = getToManyFilterTypeName(parentTypeName, childTypeName);
+    properties.push({
+      name: relation.fieldName,
+      type: toManyFilterName,
+      optional: true,
+    });
+  }
+
+  // Note: manyToMany relations are NOT added to filter types because PostGraphile's
+  // connection-filter plugin doesn't support direct M:N filter fields. Use static
+  // filter helpers on the model class (e.g., Post.filters.hasTag(...)) instead.
 
   // Add logical operators
   properties.push({ name: 'and', type: `${filterName}[]`, optional: true });
@@ -1099,13 +1215,19 @@ function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
 /**
  * Generate table filter type statements
  */
-function generateTableFilterTypes(tables: CleanTable[]): t.Statement[] {
+function generateTableFilterTypes(
+  tables: CleanTable[],
+  tableByName: Map<string, CleanTable>,
+): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
     const filterName = getFilterTypeName(table);
     statements.push(
-      createExportedInterface(filterName, buildTableFilterProperties(table)),
+      createExportedInterface(
+        filterName,
+        buildTableFilterProperties(table, tableByName),
+      ),
     );
   }
 
@@ -2003,8 +2125,9 @@ export function generateInputTypesFile(
     statements.push(...generateEntityWithRelations(tablesList));
     statements.push(...generateEntitySelectTypes(tablesList, tableByName));
 
-    // 4. Table filter types
-    statements.push(...generateTableFilterTypes(tablesList));
+    // 4. Table filter types (ToMany filters first, then table filters that reference them)
+    statements.push(...generateToManyFilterTypes(tablesList, tableByName));
+    statements.push(...generateTableFilterTypes(tablesList, tableByName));
 
     // 4b. Table condition types (simple equality filter)
     // Pass typeRegistry to merge plugin-injected condition fields
