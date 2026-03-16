@@ -7,230 +7,26 @@
  * Per Dan's guidance: "I would NOT do branching in those existing files.
  * I would make the GraphQL flow its entire own flow at first."
  */
-import { toSnakeCase } from 'komoji';
-import { mkdirSync, rmSync } from 'fs';
-import { sync as glob } from 'glob';
-import path from 'path';
-
 import { Inquirerer } from 'inquirerer';
 
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
-import { getMissingInstallableModules } from '../modules/modules';
-import { parseAuthor } from '../utils/author';
 import { GraphQLClient } from './graphql-client';
 import { exportGraphQLMeta } from './export-graphql-meta';
 import { graphqlRowToPostgresRow } from './graphql-naming';
-
-/**
- * Required extensions for database schema exports.
- */
-const DB_REQUIRED_EXTENSIONS = [
-  'plpgsql',
-  'uuid-ossp',
-  'citext',
-  'pgcrypto',
-  'btree_gin',
-  'btree_gist',
-  'pg_textsearch',
-  'pg_trgm',
-  'postgis',
-  'hstore',
-  'vector',
-  'metaschema-schema',
-  'pgpm-inflection',
-  'pgpm-uuid',
-  'pgpm-utils',
-  'pgpm-database-jobs',
-  'pgpm-jwt-claims',
-  'pgpm-stamps',
-  'pgpm-base32',
-  'pgpm-totp',
-  'pgpm-types'
-] as const;
-
-/**
- * Required extensions for service/meta exports.
- */
-const SERVICE_REQUIRED_EXTENSIONS = [
-  'plpgsql',
-  'metaschema-schema',
-  'metaschema-modules',
-  'services'
-] as const;
-
-
-interface MissingModulesResult {
-  missingModules: { controlName: string; npmName: string }[];
-  shouldInstall: boolean;
-}
-
-const detectMissingModules = async (
-  project: PgpmPackage,
-  extensions: string[],
-  prompter?: Inquirerer,
-  argv?: Record<string, any>
-): Promise<MissingModulesResult> => {
-  const installed = project.getWorkspaceInstalledModules();
-  const missingModules = getMissingInstallableModules(extensions, installed);
-
-  if (missingModules.length === 0) {
-    return { missingModules: [], shouldInstall: false };
-  }
-
-  const missingNames = missingModules.map(m => m.npmName);
-  console.log(`\nMissing pgpm modules detected: ${missingNames.join(', ')}`);
-
-  if (prompter) {
-    const { install } = await prompter.prompt(argv || {} as Record<string, any>, [
-      {
-        type: 'confirm',
-        name: 'install',
-        message: `Install missing modules (${missingNames.join(', ')})?`,
-        default: true,
-        useDefault: true
-      }
-    ]);
-
-    return { missingModules, shouldInstall: install };
-  }
-
-  return { missingModules, shouldInstall: false };
-};
-
-const installMissingModules = async (
-  moduleDir: string,
-  missingModules: { controlName: string; npmName: string }[]
-): Promise<void> => {
-  if (missingModules.length === 0) return;
-
-  const missingNames = missingModules.map(m => m.npmName);
-  console.log('Installing missing modules...');
-
-  const moduleProject = new PgpmPackage(moduleDir);
-  await moduleProject.installModules(...missingNames);
-
-  console.log('Modules installed successfully.');
-};
-
-interface Schema {
-  name: string;
-  schema_name: string;
-}
-
-interface MakeReplacerOptions {
-  schemas: Schema[];
-  name: string;
-}
-
-interface ReplacerResult {
-  replacer: (str: string, n?: number) => string;
-  replace: [RegExp, string][];
-}
-
-const makeReplacer = ({ schemas, name }: MakeReplacerOptions): ReplacerResult => {
-  const replacements: [string, string] = ['constructive-extension-name', name];
-  const schemaReplacers: [string, string][] = schemas.map((schema) => [
-    schema.schema_name,
-    toSnakeCase(`${name}_${schema.name}`)
-  ]);
-
-  const replace: [RegExp, string][] = [...schemaReplacers, replacements].map(
-    ([from, to]) => [new RegExp(from, 'g'), to]
-  );
-
-  const replacer = (str: string, n = 0): string => {
-    if (!str) return '';
-    if (replace[n] && replace[n].length === 2) {
-      return replacer(str.replace(replace[n][0], replace[n][1]), n + 1);
-    }
-    return str;
-  };
-
-  return { replacer, replace };
-};
-
-interface PreparePackageOptions {
-  project: PgpmPackage;
-  author: string;
-  outdir: string;
-  name: string;
-  description: string;
-  extensions: string[];
-  prompter?: Inquirerer;
-  repoName?: string;
-  username?: string;
-}
-
-const preparePackage = async ({
-  project,
-  author,
-  outdir,
-  name,
-  description,
-  extensions,
-  prompter,
-  repoName,
-  username
-}: PreparePackageOptions): Promise<string> => {
-  const curDir = process.cwd();
-  const pgpmDir = path.resolve(path.join(outdir, name));
-  mkdirSync(pgpmDir, { recursive: true });
-  process.chdir(pgpmDir);
-
-  try {
-    const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
-    if (!plan.length) {
-      const { fullName, email } = parseAuthor(author);
-
-      // If username is provided, run non-interactively with all answers pre-filled.
-      // Otherwise, let the prompter ask for it.
-      const knownUsername = username || undefined;
-
-      await project.initModule({
-        name,
-        description,
-        author,
-        extensions,
-        outputDir: outdir,
-        noTty: !prompter || !!knownUsername,
-        prompter,
-        answers: {
-          moduleName: name,
-          moduleDesc: description,
-          access: 'restricted',
-          license: 'CLOSED',
-          fullName,
-          ...(email && { email }),
-          repoName: repoName || name,
-          ...(knownUsername && { username: knownUsername })
-        }
-      });
-    } else {
-      if (prompter) {
-        const { overwrite } = await prompter.prompt({} as Record<string, any>, [
-          {
-            type: 'confirm',
-            name: 'overwrite',
-            message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
-            default: true,
-            useDefault: true
-          }
-        ]);
-        if (!overwrite) {
-          throw new Error(`Export cancelled: Module "${name}" already exists.`);
-        }
-      }
-      rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
-      rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
-      rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
-    }
-  } finally {
-    process.chdir(curDir);
-  }
-
-  return pgpmDir;
-};
+import {
+  DB_REQUIRED_EXTENSIONS,
+  SERVICE_REQUIRED_EXTENSIONS,
+  META_COMMON_HEADER,
+  META_COMMON_FOOTER,
+  META_TABLE_ORDER,
+  Schema,
+  detectMissingModules,
+  installMissingModules,
+  makeReplacer,
+  preparePackage,
+  normalizeOutdir
+} from './export-utils';
 
 // =============================================================================
 // Public API
@@ -300,8 +96,8 @@ export const exportGraphQL = async ({
   serviceOutdir,
   skipSchemaRenaming = false
 }: ExportGraphQLOptions): Promise<void> => {
-  outdir = outdir + '/';
-  const svcOutdir = (serviceOutdir || outdir.slice(0, -1)) + '/';
+  const normalizedOutdir = normalizeOutdir(outdir);
+  const svcOutdir = normalizeOutdir(serviceOutdir || outdir);
 
   const name = extensionName;
 
@@ -342,7 +138,7 @@ export const exportGraphQL = async ({
   const opts: SqlWriteOptions = {
     name,
     replacer,
-    outdir,
+    outdir: normalizedOutdir,
     author
   };
 
@@ -354,7 +150,7 @@ export const exportGraphQL = async ({
     const dbModuleDir = await preparePackage({
       project,
       author,
-      outdir,
+      outdir: normalizedOutdir,
       name,
       description: dbExtensionDesc,
       extensions: [...DB_REQUIRED_EXTENSIONS],
@@ -419,86 +215,9 @@ export const exportGraphQL = async ({
 
     const metaPackage: PgpmRow[] = [];
 
-    const commonHeader = `SET session_replication_role TO replica;
--- using replica in case we are deploying triggers to metaschema_public
-
--- unaccent, postgis affected and require grants
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to public;
-
-DO $LQLMIGRATION$
-  DECLARE
-  BEGIN
-
-    EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_user');
-    EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_admin');
-
-  END;
-$LQLMIGRATION$;`;
-
-    const commonFooter = `
-SET session_replication_role TO DEFAULT;`;
-
-    const tableOrder = [
-      'database',
-      'schema',
-      'table',
-      'field',
-      'policy',
-      'index',
-      'trigger',
-      'trigger_function',
-      'rls_function',
-      'foreign_key_constraint',
-      'primary_key_constraint',
-      'unique_constraint',
-      'check_constraint',
-      'full_text_search',
-      'schema_grant',
-      'table_grant',
-      'default_privilege',
-      'domains',
-      'sites',
-      'apis',
-      'apps',
-      'site_modules',
-      'site_themes',
-      'site_metadata',
-      'api_modules',
-      'api_extensions',
-      'api_schemas',
-      'rls_module',
-      'user_auth_module',
-      'memberships_module',
-      'permissions_module',
-      'limits_module',
-      'levels_module',
-      'users_module',
-      'hierarchy_module',
-      'membership_types_module',
-      'invites_module',
-      'emails_module',
-      'sessions_module',
-      'secrets_module',
-      'profiles_module',
-      'encrypted_secrets_module',
-      'connected_accounts_module',
-      'phone_numbers_module',
-      'crypto_addresses_module',
-      'crypto_auth_module',
-      'field_module',
-      'table_module',
-      'secure_table_provision',
-      'user_profiles_module',
-      'user_settings_module',
-      'organization_settings_module',
-      'uuid_module',
-      'default_ids_module',
-      'denormalized_table_field'
-    ];
-
     const tablesWithContent: string[] = [];
 
-    for (const tableName of tableOrder) {
+    for (const tableName of META_TABLE_ORDER) {
       const tableSql = metaResult[tableName];
       if (tableSql) {
         const replacedSql = metaReplacer.replacer(tableSql);
@@ -512,11 +231,11 @@ SET session_replication_role TO DEFAULT;`;
         metaPackage.push({
           deps,
           deploy: `migrate/${tableName}`,
-          content: `${commonHeader}
+          content: `${META_COMMON_HEADER}
 
 ${replacedSql}
 
-${commonFooter}
+${META_COMMON_FOOTER}
 `
         });
 

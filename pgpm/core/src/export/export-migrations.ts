@@ -1,134 +1,22 @@
 import { PgpmOptions } from '@pgpmjs/types';
-import { mkdirSync, rmSync } from 'fs';
-import { sync as glob } from 'glob';
 import { Inquirerer } from 'inquirerer';
-import { toSnakeCase } from 'komoji';
-import path from 'path';
 import { getPgPool } from 'pg-cache';
 
 import { PgpmPackage } from '../core/class/pgpm';
 import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
-import { getMissingInstallableModules } from '../modules/modules';
-import { parseAuthor } from '../utils/author';
 import { exportMeta } from './export-meta';
-
-/**
- * Required extensions for database schema exports.
- * Includes native PostgreSQL extensions and pgpm modules.
- */
-const DB_REQUIRED_EXTENSIONS = [
-  'plpgsql',
-  'uuid-ossp',
-  'citext',
-  'pgcrypto',
-  'btree_gin',
-  'btree_gist',
-  'pg_textsearch',
-  'pg_trgm',
-  'postgis',
-  'hstore',
-  'vector',
-  'metaschema-schema',
-  'pgpm-inflection',
-  'pgpm-uuid',
-  'pgpm-utils',
-  'pgpm-database-jobs',
-  'pgpm-jwt-claims',
-  'pgpm-stamps',
-  'pgpm-base32',
-  'pgpm-totp',
-  'pgpm-types'
-] as const;
-
-/**
- * Required extensions for service/meta exports.
- * Includes native PostgreSQL extensions and pgpm modules for metadata management.
- */
-const SERVICE_REQUIRED_EXTENSIONS = [
-  'plpgsql',
-  'metaschema-schema',
-  'metaschema-modules',
-  'services'
-] as const;
-
-
-/**
- * Result of checking for missing modules at workspace level.
- */
-interface MissingModulesResult {
-  missingModules: { controlName: string; npmName: string }[];
-  shouldInstall: boolean;
-}
-
-/**
- * Checks which pgpm modules from the extensions list are missing from the workspace
- * and prompts the user if they want to install them.
- *
- * This function only does detection and prompting - it does NOT install.
- * Use installMissingModules() after the module is created to do the actual installation.
- *
- * @param project - The PgpmPackage instance (only needs workspace context)
- * @param extensions - List of extension names (control file names)
- * @param prompter - Optional prompter for interactive confirmation
- * @returns Object with missing modules and whether user wants to install them
- */
-const detectMissingModules = async (
-  project: PgpmPackage,
-  extensions: string[],
-  prompter?: Inquirerer,
-  argv?: Record<string, any>
-): Promise<MissingModulesResult> => {
-  // Use workspace-level check - doesn't require being inside a module
-  const installed = project.getWorkspaceInstalledModules();
-  const missingModules = getMissingInstallableModules(extensions, installed);
-
-  if (missingModules.length === 0) {
-    return { missingModules: [], shouldInstall: false };
-  }
-
-  const missingNames = missingModules.map(m => m.npmName);
-  console.log(`\nMissing pgpm modules detected: ${missingNames.join(', ')}`);
-
-  if (prompter) {
-    const { install } = await prompter.prompt(argv || {}, [
-      {
-        type: 'confirm',
-        name: 'install',
-        message: `Install missing modules (${missingNames.join(', ')})?`,
-        default: true
-      }
-    ]);
-
-    return { missingModules, shouldInstall: install };
-  }
-
-  return { missingModules, shouldInstall: false };
-};
-
-/**
- * Installs missing modules into a specific module directory.
- * Must be called after the module has been created.
- *
- * @param moduleDir - The directory of the module to install into
- * @param missingModules - Array of missing modules to install
- */
-const installMissingModules = async (
-  moduleDir: string,
-  missingModules: { controlName: string; npmName: string }[]
-): Promise<void> => {
-  if (missingModules.length === 0) {
-    return;
-  }
-
-  const missingNames = missingModules.map(m => m.npmName);
-  console.log('Installing missing modules...');
-
-  // Create a new PgpmPackage instance pointing to the module directory
-  const moduleProject = new PgpmPackage(moduleDir);
-  await moduleProject.installModules(...missingNames);
-
-  console.log('Modules installed successfully.');
-};
+import {
+  DB_REQUIRED_EXTENSIONS,
+  SERVICE_REQUIRED_EXTENSIONS,
+  META_COMMON_HEADER,
+  META_COMMON_FOOTER,
+  META_TABLE_ORDER,
+  detectMissingModules,
+  installMissingModules,
+  makeReplacer,
+  preparePackage,
+  normalizeOutdir
+} from './export-utils';
 
 interface ExportMigrationsToDiskOptions {
   project: PgpmPackage;
@@ -210,9 +98,9 @@ const exportMigrationsToDisk = async ({
   serviceOutdir,
   skipSchemaRenaming = false
 }: ExportMigrationsToDiskOptions): Promise<void> => {
-  outdir = outdir + '/';
+  const normalizedOutdir = normalizeOutdir(outdir);
   // Use serviceOutdir for service module, defaulting to outdir if not provided
-  const svcOutdir = (serviceOutdir || outdir.slice(0, -1)) + '/';
+  const svcOutdir = normalizeOutdir(serviceOutdir || outdir);
 
   const pgPool = getPgPool({
     ...options.pg,
@@ -264,7 +152,7 @@ const exportMigrationsToDisk = async ({
   const opts: SqlWriteOptions = {
     name,
     replacer,
-    outdir,
+    outdir: normalizedOutdir,
     author
   };
 
@@ -279,7 +167,7 @@ const exportMigrationsToDisk = async ({
     const dbModuleDir = await preparePackage({
       project,
       author,
-      outdir,
+      outdir: normalizedOutdir,
       name,
       description: dbExtensionDesc,
       extensions: [...DB_REQUIRED_EXTENSIONS],
@@ -350,91 +238,12 @@ const exportMigrationsToDisk = async ({
   // Create separate files for each table type
   const metaPackage: PgpmRow[] = [];
 
-  // Common header for all meta files
-  const commonHeader = `SET session_replication_role TO replica;
--- using replica in case we are deploying triggers to metaschema_public
-
--- unaccent, postgis affected and require grants
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to public;
-
-DO $LQLMIGRATION$
-  DECLARE
-  BEGIN
-
-    EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_user');
-    EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_admin');
-
-  END;
-$LQLMIGRATION$;`;
-
-  const commonFooter = `
-SET session_replication_role TO DEFAULT;`;
-
-  // Define table ordering with dependencies
-  // Tables that depend on 'database' being inserted first
-  const tableOrder = [
-    'database',
-    'schema',
-    'table',
-    'field',
-    'policy',
-    'index',
-    'trigger',
-    'trigger_function',
-    'rls_function',
-    'foreign_key_constraint',
-    'primary_key_constraint',
-    'unique_constraint',
-    'check_constraint',
-    'full_text_search',
-    'schema_grant',
-    'table_grant',
-    'default_privilege',
-    'domains',
-    'sites',
-    'apis',
-    'apps',
-    'site_modules',
-    'site_themes',
-    'site_metadata',
-    'api_modules',
-    'api_extensions',
-    'api_schemas',
-    'rls_module',
-    'user_auth_module',
-    'memberships_module',
-    'permissions_module',
-    'limits_module',
-    'levels_module',
-    'users_module',
-    'hierarchy_module',
-    'membership_types_module',
-    'invites_module',
-    'emails_module',
-    'sessions_module',
-    'secrets_module',
-    'profiles_module',
-    'encrypted_secrets_module',
-    'connected_accounts_module',
-    'phone_numbers_module',
-    'crypto_addresses_module',
-    'crypto_auth_module',
-    'field_module',
-    'table_module',
-    'secure_table_provision',
-    'user_profiles_module',
-    'user_settings_module',
-    'organization_settings_module',
-    'uuid_module',
-    'default_ids_module',
-    'denormalized_table_field'
-  ];
 
   // Track which tables have content for dependency resolution
   const tablesWithContent: string[] = [];
 
   // Create a file for each table type that has content
-  for (const tableName of tableOrder) {
+  for (const tableName of META_TABLE_ORDER) {
     const tableSql = metaResult[tableName];
     if (tableSql) {
       const replacedSql = metaReplacer.replacer(tableSql);
@@ -450,11 +259,11 @@ SET session_replication_role TO DEFAULT;`;
       metaPackage.push({
         deps,
         deploy: `migrate/${tableName}`,
-        content: `${commonHeader}
+        content: `${META_COMMON_HEADER}
 
 ${replacedSql}
 
-${commonFooter}
+${META_COMMON_FOOTER}
 `
       });
 
@@ -513,145 +322,4 @@ export const exportMigrations = async ({
       skipSchemaRenaming
     });
   }
-};
-
-
-interface PreparePackageOptions {
-  project: PgpmPackage;
-  author: string;
-  outdir: string;
-  name: string;
-  description: string;
-  extensions: string[];
-  prompter?: Inquirerer;
-  /** Repository name for module scaffolding. Defaults to module name if not provided. */
-  repoName?: string;
-  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
-  username?: string;
-}
-
-interface Schema {
-  name: string;
-  schema_name: string;
-}
-
-interface MakeReplacerOptions {
-  schemas: Schema[];
-  name: string;
-  /**
-   * Optional prefix for schema name replacement.
-   * When provided, schema names are replaced using this prefix instead of `name`.
-   * This is needed for the services/meta package where `name` is the services
-   * extension name (e.g. "agent-db-services") but schemas should use the
-   * application extension prefix (e.g. "agent-db" → "agent_db_auth_public").
-   */
-  schemaPrefix?: string;
-}
-
-interface ReplacerResult {
-  replacer: (str: string, n?: number) => string;
-  replace: [RegExp, string][];
-}
-
-/**
- * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
- * If the module already exists and a prompter is provided, prompts the user for confirmation.
- *
- * @returns The absolute path to the created/prepared module directory
- */
-const preparePackage = async ({
-  project,
-  author,
-  outdir,
-  name,
-  description,
-  extensions,
-  prompter,
-  repoName,
-  username
-}: PreparePackageOptions): Promise<string> => {
-  const curDir = process.cwd();
-  const pgpmDir = path.resolve(path.join(outdir, name));
-  mkdirSync(pgpmDir, { recursive: true });
-  process.chdir(pgpmDir);
-
-  try {
-    const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
-    if (!plan.length) {
-      const { fullName, email } = parseAuthor(author);
-
-      // Always run non-interactively — all answers are pre-filled
-      const effectiveUsername = username || fullName || 'export';
-
-      await project.initModule({
-        name,
-        description,
-        author,
-        extensions,
-        // Use outputDir to create module directly in the specified location
-        outputDir: outdir,
-        noTty: true,
-        prompter,
-        answers: {
-          moduleName: name,
-          moduleDesc: description,
-          access: 'restricted',
-          license: 'CLOSED',
-          fullName,
-          ...(email && { email }),
-          // Use provided values or sensible defaults
-          repoName: repoName || name,
-          username: effectiveUsername
-        }
-      });
-    } else {
-      if (prompter) {
-        const { overwrite } = await prompter.prompt({} as Record<string, any>, [
-          {
-            type: 'confirm',
-            name: 'overwrite',
-            message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
-            default: true,
-            useDefault: true
-          }
-        ]);
-        if (!overwrite) {
-          throw new Error(`Export cancelled: Module "${name}" already exists.`);
-        }
-      }
-      rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
-      rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
-      rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
-    }
-  } finally {
-    process.chdir(curDir);
-  }
-
-  return pgpmDir;
-};
-
-/**
- * Generates a function for replacing schema names and extension names in strings.
- */
-const makeReplacer = ({ schemas, name, schemaPrefix }: MakeReplacerOptions): ReplacerResult => {
-  const replacements: [string, string] = ['constructive-extension-name', name];
-  const prefix = schemaPrefix || name;
-  const schemaReplacers: [string, string][] = schemas.map((schema) => [
-    schema.schema_name,
-    toSnakeCase(`${prefix}_${schema.name}`)
-  ]);
-
-  const replace: [RegExp, string][] = [...schemaReplacers, replacements].map(
-    ([from, to]) => [new RegExp(from, 'g'), to]
-  );
-
-  const replacer = (str: string, n = 0): string => {
-    if (!str) return '';
-    if (replace[n] && replace[n].length === 2) {
-      return replacer(str.replace(replace[n][0], replace[n][1]), n + 1);
-    }
-    return str;
-  };
-
-  return { replacer, replace };
 };
