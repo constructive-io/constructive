@@ -64,6 +64,7 @@ interface AstNodeValidationResult {
 export const DEFAULT_ALLOWED_FUNCTIONS = [
   'uuid_generate_v4',
   'gen_random_uuid',
+  'uuidv7',
   'now',
   'clock_timestamp',
   'statement_timestamp',
