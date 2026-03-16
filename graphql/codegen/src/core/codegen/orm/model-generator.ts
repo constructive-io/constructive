@@ -6,20 +6,20 @@
  * Each method uses function overloads for IDE autocompletion of select objects.
  */
 import * as t from '@babel/types';
-import { singularize } from 'inflekt';
 
-import type { CleanField, CleanManyToManyRelation, CleanTable } from '../../../types/schema';
+import type { CleanManyToManyRelation, CleanTable } from '../../../types/schema';
 import { asConst, generateCode } from '../babel-ast';
 import {
-  fieldTypeToTs,
+  getDisambiguationSet,
+  resolveJunctionInfo,
+} from '../junction-utils';
+import type { JunctionInfo } from '../junction-utils';
+import {
   getCreateInputTypeName,
-  getCreateMutationName,
-  getDeleteInputTypeName,
   getFilterTypeName,
   getGeneratedFileHeader,
   getOrderByTypeName,
   getPrimaryKeyInfo,
-  getScalarFields,
   getSingleRowQueryName,
   getTableNames,
   hasValidPrimaryKey,
@@ -172,119 +172,6 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
 // ============================================================================
 // M:N Junction Method Support
 // ============================================================================
-
-interface JunctionInfo {
-  junctionTypeName: string;
-  junctionSingularName: string;
-  junctionCreateMutation: string;
-  junctionDeleteMutation: string;
-  junctionCreateInputType: string;
-  junctionDeleteInputType: string;
-  leftFkField: { name: string; tsType: string };
-  rightFkField: { name: string; tsType: string };
-  hasExtraFields: boolean;
-  addMethodName: string;
-  removeMethodName: string;
-}
-
-/**
- * Resolve junction table metadata needed to generate add/remove/set methods.
- * Returns null if the junction table is missing, lacks mutations, or FK fields can't be resolved.
- */
-function resolveJunctionInfo(
-  table: CleanTable,
-  relation: CleanManyToManyRelation,
-  allTables: CleanTable[],
-  needsDisambiguation: boolean,
-): JunctionInfo | null {
-  const junctionTable = allTables.find((t) => t.name === relation.junctionTable);
-  if (!junctionTable) return null;
-
-  const junctionNames = getTableNames(junctionTable);
-  const junctionDeleteMutation = junctionTable.query?.delete;
-  if (!junctionDeleteMutation) return null;
-
-  const junctionCreateMutation = getCreateMutationName(junctionTable);
-
-  const rightTable = allTables.find((t) => t.name === relation.rightTable);
-  if (!rightTable) return null;
-
-  const rightNames = getTableNames(rightTable);
-
-  // Resolve FK fields — prefer _meta data, fall back to junction's belongsTo relations
-  let leftFk: CleanField | undefined;
-  let rightFk: CleanField | undefined;
-
-  if (relation.junctionLeftKeys?.length && relation.junctionRightKeys?.length) {
-    leftFk = relation.junctionLeftKeys[0];
-    rightFk = relation.junctionRightKeys[0];
-  } else {
-    const leftBelongsTo = junctionTable.relations.belongsTo.find(
-      (r) => r.referencesTable === table.name,
-    );
-    const rightBelongsTo = junctionTable.relations.belongsTo.find(
-      (r) => r.referencesTable === relation.rightTable && r !== leftBelongsTo,
-    );
-    if (!leftBelongsTo?.keys?.[0] || !rightBelongsTo?.keys?.[0]) return null;
-    leftFk = leftBelongsTo.keys[0];
-    rightFk = rightBelongsTo.keys[0];
-  }
-
-  // Determine method names from relation fieldName or right table name
-  const fieldName = relation.fieldName;
-  const singularRight = fieldName
-    ? ucFirst(singularize(fieldName))
-    : rightNames.typeName;
-
-  const suffix = needsDisambiguation ? `Via${junctionNames.typeName}` : '';
-
-  // Check if junction has extra fields (non-FK scalar fields)
-  const junctionScalarFields = getScalarFields(junctionTable);
-  const fkFieldNames = new Set([leftFk.name, rightFk.name]);
-  const hasExtraFields = junctionScalarFields.some(
-    (f) => !fkFieldNames.has(f.name),
-  );
-
-  return {
-    junctionTypeName: junctionNames.typeName,
-    junctionSingularName: junctionNames.singularName,
-    junctionCreateMutation,
-    junctionDeleteMutation,
-    junctionCreateInputType: getCreateInputTypeName(junctionTable),
-    junctionDeleteInputType: getDeleteInputTypeName(junctionTable),
-    leftFkField: {
-      name: leftFk.name,
-      tsType: fieldTypeToTs(leftFk.type),
-    },
-    rightFkField: {
-      name: rightFk.name,
-      tsType: fieldTypeToTs(rightFk.type),
-    },
-    hasExtraFields,
-    addMethodName: `add${singularRight}${suffix}`,
-    removeMethodName: `remove${singularRight}${suffix}`,
-  };
-}
-
-/**
- * Determine which M:N relations need disambiguation (multiple to same right table).
- */
-function getDisambiguationSet(relations: CleanManyToManyRelation[]): Set<number> {
-  const rightTableCounts = new Map<string, number>();
-  for (const rel of relations) {
-    rightTableCounts.set(
-      rel.rightTable,
-      (rightTableCounts.get(rel.rightTable) ?? 0) + 1,
-    );
-  }
-  const needsDisambiguation = new Set<number>();
-  relations.forEach((rel, i) => {
-    if ((rightTableCounts.get(rel.rightTable) ?? 0) > 1) {
-      needsDisambiguation.add(i);
-    }
-  });
-  return needsDisambiguation;
-}
 
 /**
  * Build `Partial<Omit<CreateXInput["entity"], "leftFk" | "rightFk">>` AST type.

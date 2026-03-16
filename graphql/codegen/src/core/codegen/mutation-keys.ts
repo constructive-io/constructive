@@ -18,12 +18,14 @@ import {
   generateCode,
   typedParam,
 } from './babel-ast';
-import { getGeneratedFileHeader, getTableNames, lcFirst } from './utils';
+import type { JunctionMutationMeta } from './junction-utils';
+import { getGeneratedFileHeader, getTableNames, lcFirst, ucFirst } from './utils';
 
 export interface MutationKeyGeneratorOptions {
   tables: CleanTable[];
   customMutations: CleanOperation[];
   config: QueryKeyConfig;
+  junctionMutations?: JunctionMutationMeta[];
 }
 
 export interface GeneratedMutationKeysFile {
@@ -37,12 +39,16 @@ export interface GeneratedMutationKeysFile {
 function generateEntityMutationKeysDeclaration(
   table: CleanTable,
   relationships: Record<string, EntityRelationship>,
+  junctionMutations: JunctionMutationMeta[] = [],
 ): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
   const entityKey = typeName.toLowerCase();
   const keysName = `${lcFirst(typeName)}MutationKeys`;
 
   const relationship = relationships[entityKey];
+  const entityJunctions = junctionMutations.filter(
+    (jm) => jm.leftTable.name === table.name,
+  );
 
   const properties: t.ObjectProperty[] = [];
 
@@ -139,6 +145,43 @@ function generateEntityMutationKeysDeclaration(
   const deleteProp = t.objectProperty(t.identifier('delete'), deleteArrowFn);
   addJSDocComment(deleteProp, [`Delete ${singularName} mutation key`]);
   properties.push(deleteProp);
+
+  // M:N junction mutation keys (add/remove)
+  for (const jm of entityJunctions) {
+    const addArrowFn = t.arrowFunctionExpression(
+      [],
+      constArray([
+        t.stringLiteral('mutation'),
+        t.stringLiteral(entityKey),
+        t.stringLiteral(jm.info.addMethodName),
+      ]),
+    );
+    const addProp = t.objectProperty(
+      t.identifier(jm.info.addMethodName),
+      addArrowFn,
+    );
+    addJSDocComment(addProp, [
+      `${ucFirst(jm.info.addMethodName)} mutation key`,
+    ]);
+    properties.push(addProp);
+
+    const removeArrowFn = t.arrowFunctionExpression(
+      [],
+      constArray([
+        t.stringLiteral('mutation'),
+        t.stringLiteral(entityKey),
+        t.stringLiteral(jm.info.removeMethodName),
+      ]),
+    );
+    const removeProp = t.objectProperty(
+      t.identifier(jm.info.removeMethodName),
+      removeArrowFn,
+    );
+    addJSDocComment(removeProp, [
+      `${ucFirst(jm.info.removeMethodName)} mutation key`,
+    ]);
+    properties.push(removeProp);
+  }
 
   return t.exportNamedDeclaration(
     t.variableDeclaration('const', [
@@ -269,7 +312,7 @@ function generateUnifiedMutationStoreDeclaration(
 export function generateMutationKeysFile(
   options: MutationKeyGeneratorOptions,
 ): GeneratedMutationKeysFile {
-  const { tables, customMutations, config } = options;
+  const { tables, customMutations, config, junctionMutations = [] } = options;
   const { relationships } = config;
 
   const statements: t.Statement[] = [];
@@ -277,7 +320,7 @@ export function generateMutationKeysFile(
   // Generate entity mutation keys
   for (const table of tables) {
     statements.push(
-      generateEntityMutationKeysDeclaration(table, relationships),
+      generateEntityMutationKeysDeclaration(table, relationships, junctionMutations),
     );
   }
 

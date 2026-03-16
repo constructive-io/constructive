@@ -15,6 +15,7 @@ import {
   generateCode,
   typedParam,
 } from './babel-ast';
+import type { JunctionMutationMeta } from './junction-utils';
 import {
   getGeneratedFileHeader,
   getTableNames,
@@ -25,6 +26,7 @@ import {
 export interface InvalidationGeneratorOptions {
   tables: CleanTable[];
   config: QueryKeyConfig;
+  junctionMutations?: JunctionMutationMeta[];
 }
 
 export interface GeneratedInvalidationFile {
@@ -81,6 +83,7 @@ function buildEntityInvalidateProperty(
   relationships: Record<string, EntityRelationship>,
   childrenMap: Map<string, string[]>,
   allTables: CleanTable[],
+  junctionMutations: JunctionMutationMeta[] = [],
 ): t.ObjectProperty {
   const { typeName, singularName } = getTableNames(table);
   const entityKey = typeName.toLowerCase();
@@ -90,6 +93,9 @@ function buildEntityInvalidateProperty(
   const hasDescendants = descendants.length > 0;
   const relationship = relationships[entityKey];
   const hasParent = !!relationship;
+  const entityJunctions = junctionMutations.filter(
+    (jm) => jm.leftTable.name === table.name,
+  );
 
   const innerProperties: t.ObjectProperty[] = [];
 
@@ -296,6 +302,81 @@ function buildEntityInvalidateProperty(
     innerProperties.push(withChildrenProp);
   }
 
+  // M:N manyToMany invalidation helpers
+  if (entityJunctions.length > 0) {
+    const m2mProperties: t.ObjectProperty[] = [];
+
+    for (const jm of entityJunctions) {
+      const rightNames = getTableNames(jm.rightTable);
+      const rightKeysName = `${lcFirst(rightNames.typeName)}Keys`;
+
+      // Invalidates left entity detail + lists, and right entity lists
+      const m2mStatements: t.Statement[] = [];
+
+      // Invalidate this entity's detail
+      const selfDetailStmt = t.expressionStatement(
+        invalidateCall(
+          t.callExpression(
+            t.memberExpression(t.identifier(keysName), t.identifier('detail')),
+            [t.identifier('id')],
+          ),
+        ),
+      );
+      addLineComment(selfDetailStmt, `Invalidate this ${singularName}`);
+      m2mStatements.push(selfDetailStmt);
+
+      // Invalidate this entity's lists
+      m2mStatements.push(
+        t.expressionStatement(
+          invalidateCall(
+            t.callExpression(
+              t.memberExpression(t.identifier(keysName), t.identifier('lists')),
+              [],
+            ),
+          ),
+        ),
+      );
+
+      // Invalidate right entity's lists
+      const rightListStmt = t.expressionStatement(
+        invalidateCall(
+          t.callExpression(
+            t.memberExpression(t.identifier(rightKeysName), t.identifier('lists')),
+            [],
+          ),
+        ),
+      );
+      addLineComment(rightListStmt, `Invalidate related ${rightNames.singularName} lists`);
+      m2mStatements.push(rightListStmt);
+
+      const m2mArrowFn = t.arrowFunctionExpression(
+        [
+          typedParam('queryClient', queryClientTypeRef()),
+          typedParam('id', stringOrNumberType()),
+        ],
+        t.blockStatement(m2mStatements),
+      );
+
+      const m2mProp = t.objectProperty(
+        t.identifier(lcFirst(rightNames.typeName)),
+        m2mArrowFn,
+      );
+      addJSDocComment(m2mProp, [
+        `Invalidate ${singularName} and related ${rightNames.singularName} caches after junction mutation`,
+      ]);
+      m2mProperties.push(m2mProp);
+    }
+
+    const manyToManyProp = t.objectProperty(
+      t.identifier('manyToMany'),
+      t.objectExpression(m2mProperties),
+    );
+    addJSDocComment(manyToManyProp, [
+      `M:N relation invalidation helpers for ${singularName}`,
+    ]);
+    innerProperties.push(manyToManyProp);
+  }
+
   const entityProp = t.objectProperty(
     t.identifier(singularName),
     t.objectExpression(innerProperties),
@@ -397,7 +478,7 @@ function buildEntityRemoveProperty(
 export function generateInvalidationFile(
   options: InvalidationGeneratorOptions,
 ): GeneratedInvalidationFile {
-  const { tables, config } = options;
+  const { tables, config, junctionMutations = [] } = options;
   const { relationships, generateCascadeHelpers } = config;
 
   const childrenMap = buildChildrenMap(relationships);
@@ -455,7 +536,7 @@ export function generateInvalidationFile(
   const invalidateProperties: t.ObjectProperty[] = [];
   for (const table of tables) {
     invalidateProperties.push(
-      buildEntityInvalidateProperty(table, relationships, childrenMap, tables),
+      buildEntityInvalidateProperty(table, relationships, childrenMap, tables, junctionMutations),
     );
   }
 

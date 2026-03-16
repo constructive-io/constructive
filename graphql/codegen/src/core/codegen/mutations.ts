@@ -38,6 +38,8 @@ import {
   useMutationResultType,
   voidStatement,
 } from './hooks-ast';
+import type { JunctionMutationMeta } from './junction-utils';
+import { getJunctionHookName } from './junction-utils';
 import {
   getCreateMutationFileName,
   getCreateMutationHookName,
@@ -848,6 +850,363 @@ export function generateAllMutationHooks(
     if (deleteHook) {
       files.push(deleteHook);
     }
+  }
+
+  return files;
+}
+
+// ============================================================================
+// M:N Junction Mutation Hooks
+// ============================================================================
+
+/**
+ * Generate a junction mutation hook (add or remove) for an M:N relationship.
+ *
+ * Generated hooks call the ORM model's addX/removeX method and invalidate
+ * both sides of the relationship on success.
+ */
+export function generateJunctionMutationHook(
+  jm: JunctionMutationMeta,
+  kind: 'add' | 'remove',
+  options: MutationGeneratorOptions = {},
+): GeneratedMutationFile | null {
+  const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
+  if (!reactQueryEnabled) return null;
+
+  const { info } = jm;
+  const leftNames = getTableNames(jm.leftTable);
+  const rightNames = getTableNames(jm.rightTable);
+
+  const methodName = kind === 'add' ? info.addMethodName : info.removeMethodName;
+  const hookName = getJunctionHookName(jm, kind);
+  const fileName = `${hookName}.ts`;
+
+  const leftKeysName = `${lcFirst(leftNames.typeName)}Keys`;
+  const rightKeysName = `${lcFirst(rightNames.typeName)}Keys`;
+  const mutationKeysName = `${lcFirst(leftNames.typeName)}MutationKeys`;
+
+  const mutationFieldName = kind === 'add' ? info.junctionCreateMutation : info.junctionDeleteMutation;
+
+  // FK field types
+  const leftTsType = info.leftFkField.tsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+  const rightTsType = info.rightFkField.tsType === 'string' ? t.tsStringKeyword() : t.tsNumberKeyword();
+
+  // Variable type: { leftFk: type; rightFk: type }
+  const varType = t.tsTypeLiteral([
+    t.tsPropertySignature(
+      t.identifier(info.leftFkField.name),
+      t.tsTypeAnnotation(leftTsType),
+    ),
+    t.tsPropertySignature(
+      t.identifier(info.rightFkField.name),
+      t.tsTypeAnnotation(rightTsType),
+    ),
+  ]);
+
+  // Result type: { createPostTag: { postTag: PostTag } } or { deletePostTag: { postTag: PostTag } }
+  const resultType = typeLiteralWithProps([{
+    name: mutationFieldName,
+    type: typeLiteralWithProps([{
+      name: info.junctionSingularName,
+      type: typeRef(info.junctionTypeName),
+    }]),
+  }]);
+
+  const statements: t.Statement[] = [];
+
+  // Imports
+  statements.push(
+    createImportDeclaration('@tanstack/react-query', [
+      'useMutation',
+      'useQueryClient',
+    ]),
+  );
+  statements.push(
+    createImportDeclaration(
+      '@tanstack/react-query',
+      ['UseMutationOptions'],
+      true,
+    ),
+  );
+  statements.push(createImportDeclaration('../client', ['getClient']));
+
+  if (useCentralizedKeys) {
+    // Import both left and right keys (may be same import source)
+    const keyImports = [leftKeysName];
+    if (rightKeysName !== leftKeysName) {
+      keyImports.push(rightKeysName);
+    }
+    statements.push(createImportDeclaration('../query-keys', keyImports));
+    statements.push(
+      createImportDeclaration('../mutation-keys', [mutationKeysName]),
+    );
+  }
+
+  statements.push(
+    createImportDeclaration(
+      '../../orm/input-types',
+      [info.junctionTypeName],
+      true,
+    ),
+  );
+
+  // mutationFn: ({ leftFk, rightFk }) => getClient().left.addTag(leftFk, rightFk).unwrap()
+  const destructParam = t.objectPattern([
+    shorthandProp(info.leftFkField.name),
+    shorthandProp(info.rightFkField.name),
+  ]);
+  destructParam.typeAnnotation = t.tsTypeAnnotation(varType);
+
+  const clientCallExpr = t.callExpression(
+    t.memberExpression(
+      t.callExpression(
+        t.memberExpression(
+          t.memberExpression(
+            callExpr('getClient', []),
+            t.identifier(leftNames.singularName),
+          ),
+          t.identifier(methodName),
+        ),
+        [
+          t.identifier(info.leftFkField.name),
+          t.identifier(info.rightFkField.name),
+        ],
+      ),
+      t.identifier('unwrap'),
+    ),
+    [],
+  );
+
+  const mutationFnExpr = t.arrowFunctionExpression(
+    [destructParam],
+    clientCallExpr,
+  );
+
+  // onSuccess: bidirectional invalidation
+  const onSuccessStatements: t.Statement[] = [];
+
+  if (useCentralizedKeys) {
+    // Invalidate left entity detail (its relations changed)
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(
+            t.identifier('queryClient'),
+            t.identifier('invalidateQueries'),
+          ),
+          [t.objectExpression([
+            objectProp('queryKey', callExpr(
+              t.memberExpression(t.identifier(leftKeysName), t.identifier('detail')),
+              [t.memberExpression(t.identifier('variables'), t.identifier(info.leftFkField.name))],
+            )),
+          ])],
+        ),
+      ),
+    );
+
+    // Invalidate left entity lists
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(
+            t.identifier('queryClient'),
+            t.identifier('invalidateQueries'),
+          ),
+          [t.objectExpression([
+            objectProp('queryKey', callExpr(
+              t.memberExpression(t.identifier(leftKeysName), t.identifier('lists')),
+              [],
+            )),
+          ])],
+        ),
+      ),
+    );
+
+    // Invalidate right entity detail (its relations changed)
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(
+            t.identifier('queryClient'),
+            t.identifier('invalidateQueries'),
+          ),
+          [t.objectExpression([
+            objectProp('queryKey', callExpr(
+              t.memberExpression(t.identifier(rightKeysName), t.identifier('detail')),
+              [t.memberExpression(t.identifier('variables'), t.identifier(info.rightFkField.name))],
+            )),
+          ])],
+        ),
+      ),
+    );
+
+    // Invalidate right entity lists
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(
+            t.identifier('queryClient'),
+            t.identifier('invalidateQueries'),
+          ),
+          [t.objectExpression([
+            objectProp('queryKey', callExpr(
+              t.memberExpression(t.identifier(rightKeysName), t.identifier('lists')),
+              [],
+            )),
+          ])],
+        ),
+      ),
+    );
+  } else {
+    // Fallback: raw key arrays
+    const leftKey = leftNames.typeName.toLowerCase();
+    const rightKey = rightNames.typeName.toLowerCase();
+
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([
+            objectProp('queryKey', t.arrayExpression([
+              t.stringLiteral(leftKey),
+              t.stringLiteral('detail'),
+              t.memberExpression(t.identifier('variables'), t.identifier(info.leftFkField.name)),
+            ])),
+          ])],
+        ),
+      ),
+    );
+
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([
+            objectProp('queryKey', t.arrayExpression([
+              t.stringLiteral(leftKey), t.stringLiteral('list'),
+            ])),
+          ])],
+        ),
+      ),
+    );
+
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([
+            objectProp('queryKey', t.arrayExpression([
+              t.stringLiteral(rightKey),
+              t.stringLiteral('detail'),
+              t.memberExpression(t.identifier('variables'), t.identifier(info.rightFkField.name)),
+            ])),
+          ])],
+        ),
+      ),
+    );
+
+    onSuccessStatements.push(
+      t.expressionStatement(
+        callExpr(
+          t.memberExpression(t.identifier('queryClient'), t.identifier('invalidateQueries')),
+          [t.objectExpression([
+            objectProp('queryKey', t.arrayExpression([
+              t.stringLiteral(rightKey), t.stringLiteral('list'),
+            ])),
+          ])],
+        ),
+      ),
+    );
+  }
+
+  const onSuccessFn = t.arrowFunctionExpression(
+    [t.identifier('_'), t.identifier('variables')],
+    t.blockStatement(onSuccessStatements),
+  );
+
+  // Build the mutation options parameter type
+  const mutationOptionsType = omitType(
+    typeRef('UseMutationOptions', [resultType, typeRef('Error'), varType]),
+    ['mutationFn'],
+  );
+
+  const mutationOptionsParam = createFunctionParam(
+    'mutationOptions',
+    mutationOptionsType,
+    true,
+  );
+
+  // Function body
+  const body: t.Statement[] = [];
+  body.push(constDecl('queryClient', callExpr('useQueryClient', [])));
+
+  const mutationKeyExpr = useCentralizedKeys
+    ? callExpr(
+        t.memberExpression(
+          t.identifier(mutationKeysName),
+          t.identifier(methodName),
+        ),
+        [],
+      )
+    : undefined;
+
+  body.push(
+    returnUseMutation(
+      mutationFnExpr,
+      [
+        objectProp('onSuccess', onSuccessFn),
+        spreadObj(t.identifier('mutationOptions')),
+      ],
+      mutationKeyExpr,
+    ),
+  );
+
+  // Build the function
+  const func = exportFunction(
+    hookName,
+    null,
+    [mutationOptionsParam],
+    body,
+  );
+
+  addJSDocComment(func, [
+    `Junction mutation hook: ${kind} ${rightNames.singularName} ${kind === 'add' ? 'to' : 'from'} ${leftNames.singularName}`,
+    '',
+    `Calls \`getClient().${leftNames.singularName}.${methodName}()\` and invalidates both sides.`,
+    '',
+    '@example',
+    '```tsx',
+    `const { mutate } = ${hookName}();`,
+    `mutate({ ${info.leftFkField.name}: '...', ${info.rightFkField.name}: '...' });`,
+    '```',
+  ]);
+
+  statements.push(func);
+
+  return {
+    fileName,
+    content: generateHookFileCode(
+      `Junction mutation hook: ${leftNames.typeName}.${methodName}`,
+      statements,
+    ),
+  };
+}
+
+/**
+ * Generate all junction mutation hooks for all M:N relationships.
+ */
+export function generateAllJunctionMutationHooks(
+  junctionMutations: JunctionMutationMeta[],
+  options: MutationGeneratorOptions = {},
+): GeneratedMutationFile[] {
+  const files: GeneratedMutationFile[] = [];
+
+  for (const jm of junctionMutations) {
+    const addHook = generateJunctionMutationHook(jm, 'add', options);
+    if (addHook) files.push(addHook);
+
+    const removeHook = generateJunctionMutationHook(jm, 'remove', options);
+    if (removeHook) files.push(removeHook);
   }
 
   return files;

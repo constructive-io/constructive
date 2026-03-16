@@ -43,8 +43,9 @@ import { generateClientFile } from './client';
 import { generateAllCustomMutationHooks } from './custom-mutations';
 import { generateAllCustomQueryHooks } from './custom-queries';
 import { generateInvalidationFile } from './invalidation';
+import { collectJunctionMutations } from './junction-utils';
 import { generateMutationKeysFile } from './mutation-keys';
-import { generateAllMutationHooks } from './mutations';
+import { generateAllJunctionMutationHooks, generateAllMutationHooks } from './mutations';
 import { generateAllQueryHooks } from './queries';
 import { generateQueryKeysFile } from './query-keys';
 import { generateSelectionFile } from './selection';
@@ -127,6 +128,9 @@ export function generate(options: GenerateOptions): GenerateResult {
   const useCentralizedKeys = queryKeyConfig.generateScopedKeys;
   const hasRelationships = Object.keys(queryKeyConfig.relationships).length > 0;
 
+  // Pre-compute M:N junction mutation metadata (used by mutation-keys, invalidation, hooks)
+  const junctionMutations = collectJunctionMutations(tables);
+
   // 1. Generate client.ts (ORM client wrapper)
   files.push({
     path: 'client.ts',
@@ -168,6 +172,7 @@ export function generate(options: GenerateOptions): GenerateResult {
       tables,
       customMutations: customOperations?.mutations ?? [],
       config: queryKeyConfig,
+      junctionMutations,
     });
     files.push({
       path: mutationKeysResult.fileName,
@@ -182,6 +187,7 @@ export function generate(options: GenerateOptions): GenerateResult {
     const invalidationResult = generateInvalidationFile({
       tables,
       config: queryKeyConfig,
+      junctionMutations,
     });
     files.push({
       path: invalidationResult.fileName,
@@ -255,6 +261,18 @@ export function generate(options: GenerateOptions): GenerateResult {
     });
   }
 
+  // 6b. Generate junction mutation hooks for M:N relations
+  const junctionHooks = generateAllJunctionMutationHooks(junctionMutations, {
+    reactQueryEnabled,
+    useCentralizedKeys,
+  });
+  for (const hook of junctionHooks) {
+    files.push({
+      path: `mutations/${hook.fileName}`,
+      content: hook.content,
+    });
+  }
+
   // 7. Generate custom mutation hooks if available
   let customMutationHooks: Array<{
     fileName: string;
@@ -282,7 +300,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   // 8. Generate mutations/index.ts barrel (only if React Query is enabled)
   // When reactQuery is disabled, no mutation hooks are generated, so skip the barrel
   const hasMutations =
-    mutationHooks.length > 0 || customMutationHooks.length > 0;
+    mutationHooks.length > 0 || junctionHooks.length > 0 || customMutationHooks.length > 0;
   if (hasMutations) {
     files.push({
       path: 'mutations/index.ts',
@@ -291,8 +309,9 @@ export function generate(options: GenerateOptions): GenerateResult {
           ? generateCustomMutationsBarrel(
               tables,
               customMutationHooks.map((h) => h.operationName),
+              junctionMutations,
             )
-          : generateMutationsBarrel(tables),
+          : generateMutationsBarrel(tables, junctionMutations),
     });
   }
 
@@ -313,7 +332,7 @@ export function generate(options: GenerateOptions): GenerateResult {
     stats: {
       tables: tables.length,
       queryHooks: queryHooks.length,
-      mutationHooks: mutationHooks.length,
+      mutationHooks: mutationHooks.length + junctionHooks.length,
       customQueryHooks: customQueryHooks.length,
       customMutationHooks: customMutationHooks.length,
       totalFiles: files.length,
@@ -344,9 +363,11 @@ export {
 export { generateInvalidationFile } from './invalidation';
 export { generateMutationKeysFile } from './mutation-keys';
 export {
+  generateAllJunctionMutationHooks,
   generateAllMutationHooks,
   generateCreateMutationHook,
   generateDeleteMutationHook,
+  generateJunctionMutationHook,
   generateUpdateMutationHook,
 } from './mutations';
 export {

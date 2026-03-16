@@ -18,11 +18,14 @@ import {
 } from '../../core/codegen/barrel';
 import { generateCustomMutationHook } from '../../core/codegen/custom-mutations';
 import { generateCustomQueryHook } from '../../core/codegen/custom-queries';
+import { collectJunctionMutations } from '../../core/codegen/junction-utils';
 import {
   generateCreateMutationHook,
   generateDeleteMutationHook,
+  generateJunctionMutationHook,
   generateUpdateMutationHook,
 } from '../../core/codegen/mutations';
+import { postTagTable, postWithM2NTable as postWithM2N, tagTable } from './fixtures/m2n-tables';
 import {
   generateListQueryHook,
   generateSingleQueryHook,
@@ -714,5 +717,52 @@ describe('Regression: VectorFilter in types.ts', () => {
     // distinct operators
     expect(result).toMatch(/distinctFrom\?:\s*number\[\]/);
     expect(result).toMatch(/notDistinctFrom\?:\s*number\[\]/);
+  });
+});
+
+// ============================================================================
+// Junction Mutation Hooks (M:N)
+// ============================================================================
+
+describe('Junction mutation hooks', () => {
+  const tables = [postWithM2N, tagTable, postTagTable];
+  const junctionMutations = collectJunctionMutations(tables);
+
+  it('generates add junction mutation hook', () => {
+    const result = generateJunctionMutationHook(junctionMutations[0], 'add');
+    expect(result).not.toBeNull();
+    expect(result!.fileName).toBe('usePostAddTagMutation.ts');
+    expect(result!.content).toMatchSnapshot();
+  });
+
+  it('generates remove junction mutation hook', () => {
+    const result = generateJunctionMutationHook(junctionMutations[0], 'remove');
+    expect(result).not.toBeNull();
+    expect(result!.fileName).toBe('usePostRemoveTagMutation.ts');
+    expect(result!.content).toMatchSnapshot();
+  });
+
+  it('generates junction hooks with bidirectional invalidation', () => {
+    const result = generateJunctionMutationHook(junctionMutations[0], 'add');
+    expect(result!.content).toContain('postKeys.detail(variables.postId)');
+    expect(result!.content).toContain('postKeys.lists()');
+    expect(result!.content).toContain('tagKeys.detail(variables.tagId)');
+    expect(result!.content).toContain('tagKeys.lists()');
+  });
+
+  it('generates junction hooks without centralized keys', () => {
+    const result = generateJunctionMutationHook(junctionMutations[0], 'add', {
+      useCentralizedKeys: false,
+    });
+    expect(result!.content).not.toContain('postKeys');
+    expect(result!.content).toContain('"post"');
+    expect(result!.content).toContain('"tag"');
+  });
+
+  it('returns null when reactQuery is disabled', () => {
+    const result = generateJunctionMutationHook(junctionMutations[0], 'add', {
+      reactQueryEnabled: false,
+    });
+    expect(result).toBeNull();
   });
 });

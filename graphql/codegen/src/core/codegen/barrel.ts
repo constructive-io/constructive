@@ -7,6 +7,8 @@ import * as t from '@babel/types';
 
 import type { CleanTable } from '../../types/schema';
 import { addJSDocComment, generateCode } from './babel-ast';
+import { getJunctionHookName } from './junction-utils';
+import type { JunctionMutationMeta } from './junction-utils';
 import { getOperationHookName } from './type-resolver';
 import {
   getCreateMutationHookName,
@@ -57,23 +59,46 @@ export function generateQueriesBarrel(tables: CleanTable[]): string {
 /**
  * Generate the mutations/index.ts barrel file
  */
-export function generateMutationsBarrel(tables: CleanTable[]): string {
+export function generateMutationsBarrel(
+  tables: CleanTable[],
+  junctionMutations: JunctionMutationMeta[] = [],
+): string {
   const statements: t.Statement[] = [];
+  const exportedHooks = new Set<string>();
 
   // Export all mutation hooks
   for (const table of tables) {
     const createHookName = getCreateMutationHookName(table);
-
-    statements.push(exportAllFrom(`./${createHookName}`));
+    if (!exportedHooks.has(createHookName)) {
+      statements.push(exportAllFrom(`./${createHookName}`));
+      exportedHooks.add(createHookName);
+    }
 
     // Only add update/delete if they exist AND table has valid PK
     if (table.query?.update !== null && hasValidPrimaryKey(table)) {
       const updateHookName = getUpdateMutationHookName(table);
-      statements.push(exportAllFrom(`./${updateHookName}`));
+      if (!exportedHooks.has(updateHookName)) {
+        statements.push(exportAllFrom(`./${updateHookName}`));
+        exportedHooks.add(updateHookName);
+      }
     }
     if (table.query?.delete !== null && hasValidPrimaryKey(table)) {
       const deleteHookName = getDeleteMutationHookName(table);
-      statements.push(exportAllFrom(`./${deleteHookName}`));
+      if (!exportedHooks.has(deleteHookName)) {
+        statements.push(exportAllFrom(`./${deleteHookName}`));
+        exportedHooks.add(deleteHookName);
+      }
+    }
+  }
+
+  // Export junction mutation hooks (add/remove for M:N relations)
+  for (const jm of junctionMutations) {
+    for (const kind of ['add', 'remove'] as const) {
+      const hookName = getJunctionHookName(jm, kind);
+      if (!exportedHooks.has(hookName)) {
+        statements.push(exportAllFrom(`./${hookName}`));
+        exportedHooks.add(hookName);
+      }
     }
   }
 
@@ -289,6 +314,7 @@ export function generateCustomQueriesBarrel(
 export function generateCustomMutationsBarrel(
   tables: CleanTable[],
   customMutationNames: string[],
+  junctionMutations: JunctionMutationMeta[] = [],
 ): string {
   const statements: t.Statement[] = [];
   const exportedHooks = new Set<string>();
@@ -314,6 +340,17 @@ export function generateCustomMutationsBarrel(
       if (!exportedHooks.has(deleteHookName)) {
         statements.push(exportAllFrom(`./${deleteHookName}`));
         exportedHooks.add(deleteHookName);
+      }
+    }
+  }
+
+  // Export junction mutation hooks (add/remove for M:N relations)
+  for (const jm of junctionMutations) {
+    for (const kind of ['add', 'remove'] as const) {
+      const hookName = getJunctionHookName(jm, kind);
+      if (!exportedHooks.has(hookName)) {
+        statements.push(exportAllFrom(`./${hookName}`));
+        exportedHooks.add(hookName);
       }
     }
   }

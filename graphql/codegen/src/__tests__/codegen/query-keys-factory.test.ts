@@ -7,6 +7,7 @@
  * - Cache invalidation helpers (invalidation.ts)
  */
 import { generateInvalidationFile } from '../../core/codegen/invalidation';
+import { collectJunctionMutations } from '../../core/codegen/junction-utils';
 import { generateMutationKeysFile } from '../../core/codegen/mutation-keys';
 import { generateQueryKeysFile } from '../../core/codegen/query-keys';
 import type { EntityRelationship, QueryKeyConfig } from '../../types/config';
@@ -17,6 +18,7 @@ import type {
   CleanTable,
   CleanTypeRef,
 } from '../../types/schema';
+import { postTagTable, postWithM2NTable, tagTable } from './fixtures/m2n-tables';
 
 const fieldTypes = {
   uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
@@ -409,6 +411,47 @@ describe('generateInvalidationFile', () => {
         relationships: simpleRelationships,
         generateCascadeHelpers: false,
       },
+    });
+    expect(result.content).toMatchSnapshot();
+  });
+
+  it('generates invalidation helpers with M:N manyToMany helpers', () => {
+    const tables = [postWithM2NTable, tagTable, postTagTable];
+    const junctionMutations = collectJunctionMutations(tables);
+
+    const result = generateInvalidationFile({
+      tables,
+      config: simpleConfig,
+      junctionMutations,
+    });
+    expect(result.content).toMatchSnapshot();
+  });
+});
+
+describe('M:N mutation keys', () => {
+  it('generates mutation keys with M:N add/remove entries', () => {
+    const tables = [postWithM2NTable, tagTable, postTagTable];
+    const junctionMutations = collectJunctionMutations(tables);
+
+    const result = generateMutationKeysFile({
+      tables,
+      customMutations: [],
+      config: simpleConfig,
+      junctionMutations,
+    });
+    expect(result.content).toMatchSnapshot();
+  });
+});
+
+describe('M:N invalidation', () => {
+  it('generates invalidation helpers with manyToMany property', () => {
+    const tables = [postWithM2NTable, tagTable, postTagTable];
+    const junctionMutations = collectJunctionMutations(tables);
+
+    const result = generateInvalidationFile({
+      tables,
+      config: simpleConfig,
+      junctionMutations,
     });
     expect(result.content).toMatchSnapshot();
   });
