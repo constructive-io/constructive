@@ -192,6 +192,66 @@ export interface CleanManyToManyRelation {
   rightTable: string;
   junctionTable: string;
   type: string | null;
+  /** FK fields on the junction table pointing to the left (source) table */
+  junctionLeftKeys?: CleanField[];
+  /** FK fields on the junction table pointing to the right (target) table */
+  junctionRightKeys?: CleanField[];
+  /** PK fields on the left (source) table */
+  leftKeys?: CleanField[];
+  /** PK fields on the right (target) table */
+  rightKeys?: CleanField[];
+  /** Non-FK scalar fields on the junction table (e.g., position, createdAt) */
+  junctionExtraFields?: CleanField[];
+}
+
+// ============================================================================
+// Table Meta Input (from _meta query / MetaSchemaPlugin)
+// ============================================================================
+
+/**
+ * Minimal relation metadata input from PostGraphile's _meta query.
+ * Used to enrich relation detection beyond what introspection alone can provide.
+ * Structurally compatible with graphile-misc-plugins TableMeta.
+ */
+export interface TableMetaInput {
+  name: string;
+  relations: {
+    belongsTo: Array<{
+      fieldName: string | null;
+      isUnique: boolean;
+      type: string | null;
+      keys: Array<{ name: string; type: { pgType: string; gqlType: string; isArray: boolean } }>;
+      references: { name: string };
+    }>;
+    hasOne: Array<{
+      fieldName: string | null;
+      isUnique: boolean;
+      type: string | null;
+      keys: Array<{ name: string; type: { pgType: string; gqlType: string; isArray: boolean } }>;
+      referencedBy: { name: string };
+    }>;
+    hasMany: Array<{
+      fieldName: string | null;
+      isUnique: boolean;
+      type: string | null;
+      keys: Array<{ name: string; type: { pgType: string; gqlType: string; isArray: boolean } }>;
+      referencedBy: { name: string };
+    }>;
+    manyToMany: Array<{
+      fieldName: string | null;
+      type: string | null;
+      junctionTable: { name: string };
+      junctionLeftConstraint: {
+        fields: Array<{ name: string; type: { pgType: string; gqlType: string; isArray: boolean } }>;
+      };
+      junctionRightConstraint: {
+        fields: Array<{ name: string; type: { pgType: string; gqlType: string; isArray: boolean } }>;
+      };
+      leftKeyAttributes: Array<{ name: string; type: { pgType: string; gqlType: string; isArray: boolean } }>;
+      rightKeyAttributes: Array<{ name: string; type: { pgType: string; gqlType: string; isArray: boolean } }>;
+      rightTable: { name: string };
+    }>;
+  };
 }
 
 // ============================================================================

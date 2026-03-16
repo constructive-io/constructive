@@ -29,12 +29,14 @@ import type {
   CleanField,
   CleanFieldType,
   CleanHasManyRelation,
+  CleanHasOneRelation,
   CleanManyToManyRelation,
   CleanRelations,
   CleanTable,
   ConstraintInfo,
   TableConstraints,
   TableInflection,
+  TableMetaInput,
   TableQueryNames,
 } from '../types/schema';
 
@@ -116,6 +118,16 @@ export interface InferTablesOptions {
    * @default true
    */
   comments?: boolean;
+  /**
+   * Table metadata from PostGraphile's MetaSchemaPlugin (_meta query).
+   * When available, provides accurate relation detection:
+   * - Correct M:N classification (not dependent on field naming heuristics)
+   * - hasOne vs hasMany distinction
+   * - Junction table FK details for M:N mutations
+   *
+   * When not available (SDL file sources), falls back to cross-referencing heuristic.
+   */
+  tablesMeta?: TableMetaInput[];
 }
 
 /**
@@ -132,6 +144,7 @@ export function inferTablesFromIntrospection(
   const { __schema: schema } = introspection;
   const { types, queryType, mutationType } = schema;
   const commentsEnabled = options.comments !== false;
+  const tablesMeta = options.tablesMeta;
 
   // Build lookup maps for efficient access
   const typeMap = buildTypeMap(types);
@@ -141,6 +154,11 @@ export function inferTablesFromIntrospection(
   const mutationFields = mutationType
     ? getTypeFields(typeMap.get(mutationType.name))
     : [];
+
+  // Build _meta lookup map if available
+  const metaMap = tablesMeta
+    ? buildTableMetaMap(tablesMeta)
+    : null;
 
   // Step 1: Build CleanTable for each inferred entity
   const tables: CleanTable[] = [];
@@ -165,6 +183,13 @@ export function inferTablesFromIntrospection(
     if (hasRealOperation) {
       tables.push(table);
     }
+  }
+
+  // Step 2: Enrich relations with _meta data or cross-referencing heuristic
+  if (metaMap) {
+    enrichRelationsFromMeta(tables, metaMap);
+  } else {
+    enrichRelationsFromCrossReference(tables);
   }
 
   return tables;
@@ -942,6 +967,244 @@ function findOrderByType(
   }
 
   return null;
+}
+
+// ============================================================================
+// Relation Enrichment — Path A: _meta data available
+// ============================================================================
+
+/**
+ * Build a lookup map from table name → TableMetaInput
+ */
+function buildTableMetaMap(
+  tablesMeta: TableMetaInput[],
+): Map<string, TableMetaInput> {
+  const map = new Map<string, TableMetaInput>();
+  for (const meta of tablesMeta) {
+    map.set(meta.name, meta);
+  }
+  return map;
+}
+
+/**
+ * Convert a _meta field to a CleanField
+ */
+function metaFieldToCleanField(
+  metaField: { name: string; type: { pgType: string; gqlType: string; isArray: boolean } },
+): CleanField {
+  return {
+    name: metaField.name,
+    type: {
+      gqlType: metaField.type.gqlType,
+      isArray: metaField.type.isArray,
+      pgType: metaField.type.pgType,
+    },
+  };
+}
+
+/**
+ * Find a matching relation in an array. Prefers exact fieldName match;
+ * falls back to matching by table name only when fieldName is null.
+ */
+function findMatchingRelation<T extends { fieldName: string | null }>(
+  relations: T[],
+  fieldName: string | null,
+  tableNameKey: keyof T,
+  tableName: string,
+): T | undefined {
+  // Prefer exact fieldName match
+  if (fieldName) {
+    const byFieldName = relations.find((r) => r.fieldName === fieldName);
+    if (byFieldName) return byFieldName;
+  }
+  // Fall back to table name only when no fieldName match
+  return relations.find((r) => (r[tableNameKey] as string) === tableName);
+}
+
+/**
+ * Enrich relation data using accurate _meta information from MetaSchemaPlugin.
+ * Replaces the heuristic-based detection with authoritative data:
+ * - Correct M:N classification with junction table FK details
+ * - Proper hasOne vs hasMany distinction
+ * - FK key fields on belongsTo relations
+ */
+function enrichRelationsFromMeta(
+  tables: CleanTable[],
+  metaMap: Map<string, TableMetaInput>,
+): void {
+  for (const table of tables) {
+    const meta = metaMap.get(table.name);
+    if (!meta) continue;
+
+    const metaRelations = meta.relations;
+
+    // Rebuild belongsTo with FK key details from _meta
+    const enrichedBelongsTo: CleanBelongsToRelation[] = metaRelations.belongsTo.map((bt) => {
+      const existing = findMatchingRelation(
+        table.relations.belongsTo, bt.fieldName, 'referencesTable', bt.references.name,
+      );
+      return {
+        fieldName: bt.fieldName ?? existing?.fieldName ?? null,
+        isUnique: bt.isUnique,
+        referencesTable: existing?.referencesTable ?? bt.references.name,
+        type: existing?.type ?? bt.type,
+        keys: bt.keys.map(metaFieldToCleanField),
+      };
+    });
+
+    // Use _meta for hasOne (introspection can't distinguish from hasMany)
+    const enrichedHasOne: CleanHasOneRelation[] = metaRelations.hasOne.map((ho) => {
+      const existing = findMatchingRelation(
+        table.relations.hasMany, ho.fieldName, 'referencedByTable', ho.referencedBy.name,
+      );
+      return {
+        fieldName: ho.fieldName ?? existing?.fieldName ?? null,
+        isUnique: ho.isUnique,
+        referencedByTable: existing?.referencedByTable ?? ho.referencedBy.name,
+        type: existing?.type ?? ho.type,
+        keys: ho.keys.map(metaFieldToCleanField),
+      };
+    });
+
+    // Use _meta for hasMany
+    const enrichedHasMany: CleanHasManyRelation[] = metaRelations.hasMany.map((hm) => {
+      const existing = findMatchingRelation(
+        table.relations.hasMany, hm.fieldName, 'referencedByTable', hm.referencedBy.name,
+      );
+      return {
+        fieldName: hm.fieldName ?? existing?.fieldName ?? null,
+        isUnique: hm.isUnique,
+        referencedByTable: existing?.referencedByTable ?? hm.referencedBy.name,
+        type: existing?.type ?? hm.type,
+        keys: hm.keys.map(metaFieldToCleanField),
+      };
+    });
+
+    // Use _meta for M:N — this is the critical fix
+    const enrichedManyToMany: CleanManyToManyRelation[] = metaRelations.manyToMany.map((m2m) => {
+      // Find matching introspection-based relation (may have been misclassified as hasMany)
+      const existingM2M = findMatchingRelation(
+        table.relations.manyToMany, m2m.fieldName, 'rightTable', m2m.rightTable.name,
+      );
+      const existingHasMany = m2m.fieldName
+        ? table.relations.hasMany.find((r) => r.fieldName === m2m.fieldName)
+        : undefined;
+      return {
+        fieldName: m2m.fieldName ?? existingM2M?.fieldName ?? existingHasMany?.fieldName ?? null,
+        rightTable: existingM2M?.rightTable ?? m2m.rightTable.name,
+        junctionTable: existingM2M?.junctionTable ?? m2m.junctionTable.name,
+        type: existingM2M?.type ?? existingHasMany?.type ?? m2m.type,
+        junctionLeftKeys: m2m.junctionLeftConstraint.fields.map(metaFieldToCleanField),
+        junctionRightKeys: m2m.junctionRightConstraint.fields.map(metaFieldToCleanField),
+        leftKeys: m2m.leftKeyAttributes.map(metaFieldToCleanField),
+        rightKeys: m2m.rightKeyAttributes.map(metaFieldToCleanField),
+      };
+    });
+
+    // Remove hasMany entries that are actually M:N or hasOne (reclassified by _meta)
+    const excludeFieldNames = new Set([
+      ...enrichedManyToMany.map((r) => r.fieldName),
+      ...enrichedHasOne.map((r) => r.fieldName),
+    ]);
+    const finalHasMany = enrichedHasMany.filter((r) => !excludeFieldNames.has(r.fieldName));
+
+    table.relations = {
+      belongsTo: enrichedBelongsTo,
+      hasOne: enrichedHasOne,
+      hasMany: finalHasMany,
+      manyToMany: enrichedManyToMany,
+    };
+  }
+}
+
+// ============================================================================
+// Relation Enrichment — Path B: Cross-referencing heuristic (SDL mode)
+// ============================================================================
+
+/**
+ * Cross-reference tables to detect M:N relations that were misclassified as hasMany.
+ * Works when _meta is not available (SDL file sources).
+ *
+ * Algorithm:
+ * 1. Find junction table candidates: entities with 2+ belongsTo to distinct entities
+ * 2. For junction J with belongsTo(A) and belongsTo(B):
+ *    - If A has a connection field to B (not to J), mark A→B as M:N through J
+ *    - If B has a connection field to A (not to B), mark B→A as M:N through J
+ */
+function enrichRelationsFromCrossReference(tables: CleanTable[]): void {
+  const tableMap = new Map<string, CleanTable>();
+  for (const table of tables) {
+    tableMap.set(table.name, table);
+  }
+
+  // Step 1: Find junction candidates — tables with 2+ distinct belongsTo targets
+  const junctionCandidates: Array<{
+    junction: CleanTable;
+    belongsToPairs: Array<[string, string]>; // pairs of referenced table names
+  }> = [];
+
+  for (const table of tables) {
+    const belongsToTargets = table.relations.belongsTo.map((r) => r.referencesTable);
+    const uniqueTargets = [...new Set(belongsToTargets)];
+
+    if (uniqueTargets.length >= 2) {
+      // Generate all pairs of distinct belongsTo targets
+      const pairs: Array<[string, string]> = [];
+      for (let i = 0; i < uniqueTargets.length; i++) {
+        for (let j = i + 1; j < uniqueTargets.length; j++) {
+          pairs.push([uniqueTargets[i], uniqueTargets[j]]);
+        }
+      }
+      junctionCandidates.push({ junction: table, belongsToPairs: pairs });
+    }
+  }
+
+  if (junctionCandidates.length === 0) return;
+
+  // Step 2: For each junction candidate, check if parent tables have cross-connections
+  for (const { junction, belongsToPairs } of junctionCandidates) {
+    for (const [tableAName, tableBName] of belongsToPairs) {
+      const tableA = tableMap.get(tableAName);
+      const tableB = tableMap.get(tableBName);
+      if (!tableA || !tableB) continue;
+
+      // Check if A has a hasMany to B (not to junction) — this would be the M:N field
+      reclassifyIfManyToMany(tableA, tableBName, junction.name);
+      // Check if B has a hasMany to A (not to junction)
+      reclassifyIfManyToMany(tableB, tableAName, junction.name);
+    }
+  }
+}
+
+/**
+ * Check if a table has a hasMany relation to a target that is actually M:N through a junction.
+ * If found, reclassify it from hasMany to manyToMany.
+ */
+function reclassifyIfManyToMany(
+  sourceTable: CleanTable,
+  targetTableName: string,
+  junctionTableName: string,
+): void {
+  // Find hasMany relations to the target table (not to the junction)
+  const hasManyToTarget = sourceTable.relations.hasMany.filter(
+    (r) => r.referencedByTable === targetTableName,
+  );
+
+  for (const relation of hasManyToTarget) {
+    // This hasMany to the target is actually M:N through the junction
+    const m2mRelation: CleanManyToManyRelation = {
+      fieldName: relation.fieldName,
+      rightTable: targetTableName,
+      junctionTable: junctionTableName,
+      type: relation.type,
+    };
+
+    // Move from hasMany to manyToMany
+    sourceTable.relations.manyToMany.push(m2mRelation);
+    sourceTable.relations.hasMany = sourceTable.relations.hasMany.filter(
+      (r) => r !== relation,
+    );
+  }
 }
 
 // ============================================================================
