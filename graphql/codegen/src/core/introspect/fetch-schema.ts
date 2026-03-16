@@ -71,14 +71,54 @@ export interface FetchSchemaResult {
   statusCode?: number;
 }
 
-/**
- * Fetch the full schema introspection from a GraphQL endpoint
- */
-export async function fetchSchema(
-  options: FetchSchemaOptions,
-): Promise<FetchSchemaResult> {
-  const { endpoint, authorization, headers = {}, timeout = 30000 } = options;
+export interface FetchGraphqlQueryOptions {
+  /** GraphQL endpoint URL */
+  endpoint: string;
+  /** The GraphQL query string */
+  query: string;
+  /** Optional variables */
+  variables?: Record<string, unknown>;
+  /** Optional authorization header value */
+  authorization?: string;
+  /** Optional additional headers */
+  headers?: Record<string, string>;
+  /** Request timeout in milliseconds (default: 30000) */
+  timeout?: number;
+}
 
+export interface FetchGraphqlQueryResult {
+  success: boolean;
+  data?: Record<string, unknown>;
+  error?: string;
+  statusCode?: number;
+}
+
+interface GraphqlRequestSuccess {
+  success: true;
+  data: Record<string, unknown>;
+  statusCode: number;
+}
+
+interface GraphqlRequestFailure {
+  success: false;
+  error: string;
+  statusCode?: number;
+}
+
+type GraphqlRequestResult = GraphqlRequestSuccess | GraphqlRequestFailure;
+
+/**
+ * Shared core: execute a GraphQL request and return the parsed response.
+ * Both fetchSchema and fetchGraphqlQuery delegate to this.
+ */
+async function executeGraphqlRequest(
+  endpoint: string,
+  query: string,
+  variables: Record<string, unknown>,
+  authorization: string | undefined,
+  headers: Record<string, string>,
+  timeout: number,
+): Promise<GraphqlRequestResult> {
   const url = new URL(endpoint);
 
   const requestHeaders: Record<string, string> = {
@@ -86,16 +126,11 @@ export async function fetchSchema(
     Accept: 'application/json',
     ...headers,
   };
-
   if (authorization) {
     requestHeaders['Authorization'] = authorization;
   }
 
-  const body = JSON.stringify({
-    query: SCHEMA_INTROSPECTION_QUERY,
-    variables: {},
-  });
-
+  const body = JSON.stringify({ query, variables });
   const requestOptions: http.RequestOptions = {
     method: 'POST',
     headers: requestHeaders,
@@ -113,7 +148,7 @@ export async function fetchSchema(
     }
 
     const json = JSON.parse(response.data) as {
-      data?: IntrospectionQueryResponse;
+      data?: Record<string, unknown>;
       errors?: Array<{ message: string }>;
     };
 
@@ -126,58 +161,75 @@ export async function fetchSchema(
       };
     }
 
-    if (!json.data?.__schema) {
+    if (!json.data) {
       return {
         success: false,
-        error:
-          'No __schema field in response. Introspection may be disabled on this endpoint.',
+        error: 'No data in response',
         statusCode: response.statusCode,
       };
     }
 
-    return {
-      success: true,
-      data: json.data,
-      statusCode: response.statusCode,
-    };
+    return { success: true, data: json.data, statusCode: response.statusCode };
   } catch (err) {
     if (err instanceof Error) {
       if (err.message.includes('timeout')) {
-        return {
-          success: false,
-          error: `Request timeout after ${timeout}ms`,
-        };
+        return { success: false, error: `Request timeout after ${timeout}ms` };
       }
-
       const errorCode = (err as NodeJS.ErrnoException).code;
       if (errorCode === 'ECONNREFUSED') {
-        return {
-          success: false,
-          error: `Connection refused - is the server running at ${endpoint}?`,
-        };
+        return { success: false, error: `Connection refused - is the server running at ${endpoint}?` };
       }
       if (errorCode === 'ENOTFOUND') {
-        return {
-          success: false,
-          error: `DNS lookup failed for ${url.hostname} - check the endpoint URL`,
-        };
+        return { success: false, error: `DNS lookup failed for ${url.hostname} - check the endpoint URL` };
       }
       if (errorCode === 'ECONNRESET') {
-        return {
-          success: false,
-          error: `Connection reset by server at ${endpoint}`,
-        };
+        return { success: false, error: `Connection reset by server at ${endpoint}` };
       }
-
-      return {
-        success: false,
-        error: err.message,
-      };
+      return { success: false, error: err.message };
     }
+    return { success: false, error: 'Unknown error occurred' };
+  }
+}
 
+/**
+ * Execute an arbitrary GraphQL query against an endpoint
+ */
+export async function fetchGraphqlQuery(
+  options: FetchGraphqlQueryOptions,
+): Promise<FetchGraphqlQueryResult> {
+  const { endpoint, query, variables = {}, authorization, headers = {}, timeout = 30000 } = options;
+  return executeGraphqlRequest(endpoint, query, variables, authorization, headers, timeout);
+}
+
+/**
+ * Fetch the full schema introspection from a GraphQL endpoint
+ */
+export async function fetchSchema(
+  options: FetchSchemaOptions,
+): Promise<FetchSchemaResult> {
+  const { endpoint, authorization, headers = {}, timeout = 30000 } = options;
+
+  const result = await executeGraphqlRequest(
+    endpoint, SCHEMA_INTROSPECTION_QUERY, {}, authorization, headers, timeout,
+  );
+
+  if (!result.success) {
+    const failure = result as GraphqlRequestFailure;
+    return { success: false, error: failure.error, statusCode: failure.statusCode };
+  }
+
+  const introspection = result.data as unknown as IntrospectionQueryResponse;
+  if (!introspection?.__schema) {
     return {
       success: false,
-      error: 'Unknown error occurred',
+      error: 'No __schema field in response. Introspection may be disabled on this endpoint.',
+      statusCode: result.statusCode,
     };
   }
+
+  return {
+    success: true,
+    data: introspection,
+    statusCode: result.statusCode,
+  };
 }

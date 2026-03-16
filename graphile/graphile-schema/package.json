@@ -32,6 +32,7 @@
     "deepmerge": "^4.3.1",
     "graphile-build": "5.0.0-rc.6",
     "graphile-config": "1.0.0-rc.6",
+    "graphile-misc-plugins": "workspace:^",
     "graphile-settings": "workspace:^",
     "graphql": "16.13.0",
     "pg-cache": "workspace:^",

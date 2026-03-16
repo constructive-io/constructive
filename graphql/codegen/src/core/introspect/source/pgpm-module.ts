@@ -13,7 +13,7 @@ import { getPgPool } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
-import { buildSchemaSDL } from 'graphile-schema';
+import { buildSchemaWithMeta } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import { resolveApiSchemas, validateServicesSchemas } from './api-schemas';
@@ -197,13 +197,16 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         schemas = this.getSchemas();
       }
 
-      // Build SDL from the deployed database
+      // Build SDL and table metadata from the deployed database
       let sdl: string;
+      let tablesMeta;
       try {
-        sdl = await buildSchemaSDL({
+        const result = await buildSchemaWithMeta({
           database: dbConfig.database,
           schemas,
         });
+        sdl = result.sdl;
+        tablesMeta = result.tablesMeta;
       } catch (err) {
         throw new SchemaSourceError(
           `Failed to introspect database: ${err instanceof Error ? err.message : 'Unknown error'}`,
@@ -249,7 +252,7 @@ export class PgpmModuleSchemaSource implements SchemaSource {
         JSON.stringify(introspectionResult),
       ) as IntrospectionQueryResponse;
 
-      return { introspection };
+      return { introspection, tablesMeta };
     } finally {
       // Clean up the ephemeral database
       teardown({ keepDb });

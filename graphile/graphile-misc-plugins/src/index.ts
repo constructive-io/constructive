@@ -54,7 +54,9 @@ export type { UniqueLookupOptions } from './primary-key-only';
 export {
   MetaSchemaPlugin,
   MetaSchemaPreset,
+  getCachedTablesMeta,
 } from './meta-schema';
+export type { TableMeta } from './meta-schema';
 
 // PG type mappings for custom PostgreSQL types (email, url, etc.)
 export {

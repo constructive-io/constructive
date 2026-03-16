@@ -5,6 +5,7 @@
  * to work with both live GraphQL endpoints and static schema files.
  */
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
+import type { TableMeta } from 'graphile-schema';
 
 /**
  * Result from fetching a schema source
@@ -14,6 +15,13 @@ export interface SchemaSourceResult {
    * The GraphQL introspection data
    */
   introspection: IntrospectionQueryResponse;
+
+  /**
+   * Table metadata from PostGraphile's MetaSchemaPlugin (_meta query).
+   * Available for database, pgpm, and endpoint sources. Not available for SDL file sources.
+   * Used for accurate relation detection (M:N, hasOne vs hasMany).
+   */
+  tablesMeta?: TableMeta[];
 }
 
 /**

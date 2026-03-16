@@ -110,14 +110,17 @@ export async function runCodegenPipeline(
   } = options;
   const log = verbose ? console.log : () => {};
 
-  // 1. Fetch introspection from source
+  // 1. Fetch introspection from source (and optional _meta table metadata)
   log(`Fetching schema from ${source.describe()}...`);
-  const { introspection } = await source.fetch();
+  const { introspection, tablesMeta } = await source.fetch();
 
-  // 2. Infer tables from introspection (replaces _meta)
+  // 2. Infer tables from introspection, enriched by _meta when available
   log('Inferring table metadata from schema...');
+  if (tablesMeta?.length) {
+    log(`  Using _meta data (${tablesMeta.length} tables) for accurate relation detection`);
+  }
   const commentsEnabled = config.codegen?.comments !== false;
-  let tables = inferTablesFromIntrospection(introspection, { comments: commentsEnabled });
+  let tables = inferTablesFromIntrospection(introspection, { comments: commentsEnabled, tablesMeta });
   const totalTables = tables.length;
   log(`  Found ${totalTables} tables`);
 

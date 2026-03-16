@@ -6,11 +6,13 @@
  */
 
 import type { GraphileConfig } from 'graphile-config';
-import { cachedTablesMeta } from './meta-schema/cache';
+import { cachedTablesMeta, getCachedTablesMeta } from './meta-schema/cache';
 import { MetaSchemaPlugin } from './meta-schema/plugin';
 import { buildFieldMeta, pgTypeToGqlType } from './meta-schema/type-mappings';
 
 export { MetaSchemaPlugin };
+export { getCachedTablesMeta };
+export type { TableMeta } from './meta-schema/types';
 
 export const MetaSchemaPreset: GraphileConfig.Preset = {
   plugins: [MetaSchemaPlugin],

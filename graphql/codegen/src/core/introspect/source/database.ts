@@ -6,7 +6,7 @@
  */
 import { buildSchema, introspectionFromSchema } from 'graphql';
 
-import { buildSchemaSDL } from 'graphile-schema';
+import { buildSchemaWithMeta } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import {
@@ -78,13 +78,16 @@ export class DatabaseSchemaSource implements SchemaSource {
       schemas = this.options.schemas ?? ['public'];
     }
 
-    // Build SDL from database
+    // Build SDL and table metadata from database
     let sdl: string;
+    let tablesMeta;
     try {
-      sdl = await buildSchemaSDL({
+      const result = await buildSchemaWithMeta({
         database,
         schemas,
       });
+      sdl = result.sdl;
+      tablesMeta = result.tablesMeta;
     } catch (err) {
       throw new SchemaSourceError(
         `Failed to introspect database: ${err instanceof Error ? err.message : 'Unknown error'}`,
@@ -130,7 +133,7 @@ export class DatabaseSchemaSource implements SchemaSource {
       JSON.stringify(introspectionResult),
     ) as IntrospectionQueryResponse;
 
-    return { introspection };
+    return { introspection, tablesMeta };
   }
 
   describe(): string {
