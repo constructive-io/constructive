@@ -666,16 +666,6 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
-
-  """
-  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
-  """
-  similarTo: TrgmSearchInput
-
-  """
-  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
-  """
-  wordSimilarTo: TrgmSearchInput
 }
 
 """
