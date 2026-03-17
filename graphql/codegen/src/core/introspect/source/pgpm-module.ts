@@ -9,7 +9,7 @@
  */
 import { PgpmPackage } from '@pgpmjs/core';
 import { buildSchema, introspectionFromSchema } from 'graphql';
-import { getPgPool } from 'pg-cache';
+import { getPgPool, pgCache } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
@@ -251,6 +251,11 @@ export class PgpmModuleSchemaSource implements SchemaSource {
 
       return { introspection };
     } finally {
+      // Release pg-cache pool for this ephemeral database before dropping
+      // deployPgpm() and getPgPool() cache connections that must be closed first
+      pgCache.delete(dbConfig.database);
+      await pgCache.waitForDisposals();
+
       // Clean up the ephemeral database
       teardown({ keepDb });
 
