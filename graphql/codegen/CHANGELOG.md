@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.15.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.2...@constructive-io/graphql-codegen@4.15.3) (2026-03-17)
+
+### Bug Fixes
+
+- terminate backends before dropping databases and close pg-cache pools in codegen ([2604533](https://github.com/constructive-io/constructive/commit/2604533e3e99937c10264f71b6173026bf32addc))
+
 ## [4.15.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.1...@constructive-io/graphql-codegen@4.15.2) (2026-03-17)
 
 ### Bug Fixes
