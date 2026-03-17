@@ -41,7 +41,7 @@ describe('PublicKeySignature plugin factory', () => {
   });
 
   it('default export matches named export', async () => {
-    const mod = await import('../src/PublicKeySignature');
+    const mod = await import('../src/plugins/PublicKeySignature');
     expect(mod.default).toBe(mod.PublicKeySignature);
   });
 });
