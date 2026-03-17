@@ -78,25 +78,18 @@ CRUD operations for SqlAction records.
 | `action` | String | Yes |
 | `actionId` | UUID | Yes |
 | `actorId` | UUID | Yes |
-| `nameTrgmSimilarity` | Float | Yes |
-| `deployTrgmSimilarity` | Float | Yes |
-| `contentTrgmSimilarity` | Float | Yes |
-| `revertTrgmSimilarity` | Float | Yes |
-| `verifyTrgmSimilarity` | Float | Yes |
-| `actionTrgmSimilarity` | Float | Yes |
-| `searchScore` | Float | Yes |
 
 **Operations:**
 
 ```typescript
 // List all sqlAction records
-const items = await db.sqlAction.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, nameTrgmSimilarity: true, deployTrgmSimilarity: true, contentTrgmSimilarity: true, revertTrgmSimilarity: true, verifyTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
+const items = await db.sqlAction.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Get one by id
-const item = await db.sqlAction.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true, nameTrgmSimilarity: true, deployTrgmSimilarity: true, contentTrgmSimilarity: true, revertTrgmSimilarity: true, verifyTrgmSimilarity: true, actionTrgmSimilarity: true, searchScore: true } }).execute();
+const item = await db.sqlAction.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Create
-const created = await db.sqlAction.create({ data: { name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>', nameTrgmSimilarity: '<value>', deployTrgmSimilarity: '<value>', contentTrgmSimilarity: '<value>', revertTrgmSimilarity: '<value>', verifyTrgmSimilarity: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute();
+const created = await db.sqlAction.create({ data: { name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.sqlAction.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();

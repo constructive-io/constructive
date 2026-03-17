@@ -243,7 +243,7 @@ export interface SqlAction {
   name?: string | null;
   databaseId?: string | null;
   deploy?: string | null;
-  deps?: string | null;
+  deps?: string[] | null;
   payload?: Record<string, unknown> | null;
   content?: string | null;
   revert?: string | null;
@@ -252,20 +252,6 @@ export interface SqlAction {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deploy`. Returns null when no trgm search filter is active. */
-  deployTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `content`. Returns null when no trgm search filter is active. */
-  contentTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `revert`. Returns null when no trgm search filter is active. */
-  revertTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `verify`. Returns null when no trgm search filter is active. */
-  verifyTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `action`. Returns null when no trgm search filter is active. */
-  actionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -305,13 +291,6 @@ export type SqlActionSelect = {
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
-  nameTrgmSimilarity?: boolean;
-  deployTrgmSimilarity?: boolean;
-  contentTrgmSimilarity?: boolean;
-  revertTrgmSimilarity?: boolean;
-  verifyTrgmSimilarity?: boolean;
-  actionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 // ============ Table Filter Types ============
 export interface MigrateFileFilter {
@@ -327,7 +306,7 @@ export interface SqlActionFilter {
   name?: StringFilter;
   databaseId?: UUIDFilter;
   deploy?: StringFilter;
-  deps?: StringFilter;
+  deps?: StringListFilter;
   payload?: JSONFilter;
   content?: StringFilter;
   revert?: StringFilter;
@@ -336,72 +315,27 @@ export interface SqlActionFilter {
   action?: StringFilter;
   actionId?: UUIDFilter;
   actorId?: UUIDFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  deployTrgmSimilarity?: FloatFilter;
-  contentTrgmSimilarity?: FloatFilter;
-  revertTrgmSimilarity?: FloatFilter;
-  verifyTrgmSimilarity?: FloatFilter;
-  actionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SqlActionFilter[];
   or?: SqlActionFilter[];
   not?: SqlActionFilter;
 }
 // ============ OrderBy Types ============
 export type MigrateFileOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'UPLOAD_ASC'
-  | 'UPLOAD_DESC';
+  | 'ID_DESC';
 export type SqlActionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC'
-  | 'DEPS_ASC'
-  | 'DEPS_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
-  | 'CONTENT_ASC'
-  | 'CONTENT_DESC'
-  | 'REVERT_ASC'
-  | 'REVERT_DESC'
-  | 'VERIFY_ASC'
-  | 'VERIFY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'ACTION_ASC'
-  | 'ACTION_DESC'
-  | 'ACTION_ID_ASC'
-  | 'ACTION_ID_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DEPLOY_TRGM_SIMILARITY_ASC'
-  | 'DEPLOY_TRGM_SIMILARITY_DESC'
-  | 'CONTENT_TRGM_SIMILARITY_ASC'
-  | 'CONTENT_TRGM_SIMILARITY_DESC'
-  | 'REVERT_TRGM_SIMILARITY_ASC'
-  | 'REVERT_TRGM_SIMILARITY_DESC'
-  | 'VERIFY_TRGM_SIMILARITY_ASC'
-  | 'VERIFY_TRGM_SIMILARITY_DESC'
-  | 'ACTION_TRGM_SIMILARITY_ASC'
-  | 'ACTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DEPLOY_DESC';
 // ============ CRUD Input Types ============
 export interface CreateMigrateFileInput {
   clientMutationId?: string;
@@ -413,6 +347,7 @@ export interface CreateMigrateFileInput {
 export interface MigrateFilePatch {
   databaseId?: string | null;
   upload?: ConstructiveInternalTypeUpload | null;
+  uploadUpload?: File | null;
 }
 export interface UpdateMigrateFileInput {
   clientMutationId?: string;
@@ -443,7 +378,7 @@ export interface SqlActionPatch {
   name?: string | null;
   databaseId?: string | null;
   deploy?: string | null;
-  deps?: string | null;
+  deps?: string[] | null;
   payload?: Record<string, unknown> | null;
   content?: string | null;
   revert?: string | null;
@@ -451,13 +386,6 @@ export interface SqlActionPatch {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  nameTrgmSimilarity?: number | null;
-  deployTrgmSimilarity?: number | null;
-  contentTrgmSimilarity?: number | null;
-  revertTrgmSimilarity?: number | null;
-  verifyTrgmSimilarity?: number | null;
-  actionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSqlActionInput {
   clientMutationId?: string;

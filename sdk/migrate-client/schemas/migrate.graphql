@@ -283,41 +283,6 @@ type SqlAction {
   action: String
   actionId: UUID
   actorId: UUID
-
-  """
-  TRGM similarity when searching `name`. Returns null when no trgm search filter is active.
-  """
-  nameTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `deploy`. Returns null when no trgm search filter is active.
-  """
-  deployTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `content`. Returns null when no trgm search filter is active.
-  """
-  contentTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `revert`. Returns null when no trgm search filter is active.
-  """
-  revertTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `verify`. Returns null when no trgm search filter is active.
-  """
-  verifyTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `action`. Returns null when no trgm search filter is active.
-  """
-  actionTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """
@@ -392,31 +357,6 @@ input SqlActionFilter {
   """Negates the expression."""
   not: SqlActionFilter
 
-  """TRGM search on the `name` column."""
-  trgmName: TrgmSearchInput
-
-  """TRGM search on the `deploy` column."""
-  trgmDeploy: TrgmSearchInput
-
-  """TRGM search on the `content` column."""
-  trgmContent: TrgmSearchInput
-
-  """TRGM search on the `revert` column."""
-  trgmRevert: TrgmSearchInput
-
-  """TRGM search on the `verify` column."""
-  trgmVerify: TrgmSearchInput
-
-  """TRGM search on the `action` column."""
-  trgmAction: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -592,28 +532,6 @@ input StringFilter {
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
 
-  """
-  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
-  """
-  similarTo: TrgmSearchInput
-
-  """
-  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
-  """
-  wordSimilarTo: TrgmSearchInput
-}
-
-"""
-Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
-"""
-input TrgmSearchInput {
-  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
-  value: String!
-
-  """
-  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
-  """
-  threshold: Float
 }
 
 """
@@ -732,20 +650,6 @@ enum SqlActionOrderBy {
   DATABASE_ID_DESC
   DEPLOY_ASC
   DEPLOY_DESC
-  NAME_TRGM_SIMILARITY_ASC
-  NAME_TRGM_SIMILARITY_DESC
-  DEPLOY_TRGM_SIMILARITY_ASC
-  DEPLOY_TRGM_SIMILARITY_DESC
-  CONTENT_TRGM_SIMILARITY_ASC
-  CONTENT_TRGM_SIMILARITY_DESC
-  REVERT_TRGM_SIMILARITY_ASC
-  REVERT_TRGM_SIMILARITY_DESC
-  VERIFY_TRGM_SIMILARITY_ASC
-  VERIFY_TRGM_SIMILARITY_DESC
-  ACTION_TRGM_SIMILARITY_ASC
-  ACTION_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """Root meta schema type"""
