@@ -582,19 +582,13 @@ export interface UserFilter {
 }
 // ============ OrderBy Types ============
 export type CryptoAddressOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
   | 'ADDRESS_ASC'
   | 'ADDRESS_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_PRIMARY_ASC'
-  | 'IS_PRIMARY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -604,29 +598,21 @@ export type CryptoAddressOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type RoleTypeOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
 export type PhoneNumberOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'CC_ASC'
-  | 'CC_DESC'
   | 'NUMBER_ASC'
   | 'NUMBER_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_PRIMARY_ASC'
-  | 'IS_PRIMARY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -638,21 +624,15 @@ export type PhoneNumberOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type ConnectedAccountOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
   | 'SERVICE_ASC'
   | 'SERVICE_DESC'
   | 'IDENTIFIER_ASC'
   | 'IDENTIFIER_DESC'
-  | 'DETAILS_ASC'
-  | 'DETAILS_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -664,63 +644,37 @@ export type ConnectedAccountOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type AuditLogOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EVENT_ASC'
   | 'EVENT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ORIGIN_ASC'
-  | 'ORIGIN_DESC'
-  | 'USER_AGENT_ASC'
-  | 'USER_AGENT_DESC'
-  | 'IP_ADDRESS_ASC'
-  | 'IP_ADDRESS_DESC'
-  | 'SUCCESS_ASC'
-  | 'SUCCESS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
   | 'USER_AGENT_TRGM_SIMILARITY_ASC'
   | 'USER_AGENT_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type EmailOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
   | 'EMAIL_ASC'
   | 'EMAIL_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_PRIMARY_ASC'
-  | 'IS_PRIMARY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type UserOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'USERNAME_ASC'
   | 'USERNAME_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'PROFILE_PICTURE_ASC'
-  | 'PROFILE_PICTURE_DESC'
-  | 'SEARCH_TSV_ASC'
-  | 'SEARCH_TSV_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -746,8 +700,6 @@ export interface CryptoAddressPatch {
   address?: string | null;
   isVerified?: boolean | null;
   isPrimary?: boolean | null;
-  addressTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateCryptoAddressInput {
   clientMutationId?: string;
@@ -792,9 +744,6 @@ export interface PhoneNumberPatch {
   number?: string | null;
   isVerified?: boolean | null;
   isPrimary?: boolean | null;
-  ccTrgmSimilarity?: number | null;
-  numberTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdatePhoneNumberInput {
   clientMutationId?: string;
@@ -821,9 +770,6 @@ export interface ConnectedAccountPatch {
   identifier?: string | null;
   details?: Record<string, unknown> | null;
   isVerified?: boolean | null;
-  serviceTrgmSimilarity?: number | null;
-  identifierTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateConnectedAccountInput {
   clientMutationId?: string;
@@ -852,8 +798,6 @@ export interface AuditLogPatch {
   userAgent?: string | null;
   ipAddress?: string | null;
   success?: boolean | null;
-  userAgentTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateAuditLogInput {
   clientMutationId?: string;
@@ -901,11 +845,8 @@ export interface UserPatch {
   username?: string | null;
   displayName?: string | null;
   profilePicture?: ConstructiveInternalTypeImage | null;
-  searchTsv?: string | null;
   type?: number | null;
-  searchTsvRank?: number | null;
-  displayNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  profilePictureUpload?: File | null;
 }
 export interface UpdateUserInput {
   clientMutationId?: string;
