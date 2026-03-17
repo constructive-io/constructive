@@ -10,7 +10,8 @@ import {
   ManyToManyOptInPreset,
   MetaSchemaPreset,
   PgTypeMappingsPreset,
-} from 'graphile-misc-plugins';
+  RequiredInputPreset,
+} from '../plugins';
 import { UnifiedSearchPreset, createMatchesOperatorFactory, createTrgmOperatorFactories } from 'graphile-search';
 import { GraphilePostgisPreset, createPostgisOperatorFactory } from 'graphile-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
@@ -88,6 +89,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     }),
     SqlExpressionValidatorPreset(),
     PgTypeMappingsPreset,
+    RequiredInputPreset,
   ],
   /**
    * Disable PostGraphile core's condition argument entirely.
