@@ -1,8 +1,8 @@
 {
-  "name": "@constructive-io/sdk",
-  "version": "0.7.7",
+  "name": "@pgpmjs/migrate-client",
+  "version": "0.0.1",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Constructive SDK - Auto-generated GraphQL types and ORM client",
+  "description": "Typed GraphQL ORM client for the Constructive Migrate API (db_migrate schema)",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -24,8 +24,7 @@
     "prepack": "npm run build",
     "build": "makage build",
     "build:dev": "makage build --dev",
-    "generate": "tsx scripts/generate-sdk.ts",
-    "generate:migrate-client": "tsx scripts/generate-migrate-client.ts",
+    "generate": "pnpm --filter @constructive-io/sdk run generate:migrate-client",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
@@ -35,20 +34,19 @@
     "sdk",
     "orm",
     "constructive",
-    "postgraphile",
-    "schema-dir"
+    "migrate",
+    "db_migrate",
+    "pgpm"
   ],
   "dependencies": {
     "@0no-co/graphql.web": "^1.1.2",
     "@constructive-io/graphql-types": "workspace:^",
     "gql-ast": "workspace:^",
-    "graphql": "16.13.0"
+    "graphql": "^16.13.0"
   },
   "devDependencies": {
-    "@constructive-io/graphql-codegen": "workspace:^",
     "@types/node": "^22.19.11",
     "makage": "^0.1.12",
-    "tsx": "^4.19.0",
     "typescript": "^5.9.3"
   }
 }
