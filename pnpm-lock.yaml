@@ -1973,6 +1973,9 @@ importers:
       glob:
         specifier: ^13.0.6
         version: 13.0.6
+      inflekt:
+        specifier: ^0.3.3
+        version: 0.3.3
       komoji:
         specifier: ^0.8.1
         version: 0.8.1
