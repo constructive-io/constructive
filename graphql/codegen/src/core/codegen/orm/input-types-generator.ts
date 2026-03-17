@@ -27,6 +27,7 @@ import {
   getFilterTypeName,
   getGeneratedFileHeader,
   getOrderByTypeName,
+  getPatchTypeName,
   getPrimaryKeyInfo,
   getTableNames,
   isRelationField,
@@ -604,7 +605,10 @@ function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
 
     const fieldType =
       typeof field.type === 'string' ? field.type : field.type.gqlType;
-    const tsType = scalarToInputTs(fieldType);
+    const isArray =
+      typeof field.type !== 'string' && field.type.isArray;
+    const baseTsType = scalarToInputTs(fieldType);
+    const tsType = isArray ? `${baseTsType}[]` : baseTsType;
     const isNullable = field.name !== 'id' && field.name !== 'nodeId';
 
     properties.push({
@@ -1068,8 +1072,8 @@ function generateEntitySelectTypes(
 /**
  * Map field type to filter type
  */
-function getFilterTypeForField(fieldType: string): string {
-  return scalarToFilterType(fieldType) ?? 'StringFilter';
+function getFilterTypeForField(fieldType: string, isArray = false): string {
+  return scalarToFilterType(fieldType, isArray) ?? 'StringFilter';
 }
 
 /**
@@ -1082,9 +1086,11 @@ function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
   for (const field of table.fields) {
     const fieldType =
       typeof field.type === 'string' ? field.type : field.type.gqlType;
+    const isArray =
+      typeof field.type !== 'string' && field.type.isArray;
     if (isRelationField(field.name, table)) continue;
 
-    const filterType = getFilterTypeForField(fieldType);
+    const filterType = getFilterTypeForField(fieldType, isArray);
     properties.push({ name: field.name, type: filterType, optional: true });
   }
 
@@ -1215,6 +1221,17 @@ function buildOrderByValues(
   table: CleanTable,
   typeRegistry?: TypeRegistry,
 ): string[] {
+  // When the schema's orderBy enum is available, use it as the source of truth
+  // instead of naively generating values for every field.
+  if (typeRegistry) {
+    const orderByTypeName = getOrderByTypeName(table);
+    const orderByType = typeRegistry.get(orderByTypeName);
+    if (orderByType?.kind === 'ENUM' && orderByType.enumValues) {
+      return [...orderByType.enumValues];
+    }
+  }
+
+  // Fallback: derive from table fields when schema enum is not available
   const values: string[] = ['PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'NATURAL'];
 
   for (const field of table.fields) {
@@ -1222,21 +1239,6 @@ function buildOrderByValues(
     const upperSnake = field.name.replace(/([A-Z])/g, '_$1').toUpperCase();
     values.push(`${upperSnake}_ASC`);
     values.push(`${upperSnake}_DESC`);
-  }
-
-  // Merge any additional values from the schema's orderBy enum type
-  // (e.g., plugin-added values like EMBEDDING_DISTANCE_ASC/DESC)
-  if (typeRegistry) {
-    const orderByTypeName = getOrderByTypeName(table);
-    const orderByType = typeRegistry.get(orderByTypeName);
-    if (orderByType?.kind === 'ENUM' && orderByType.enumValues) {
-      const existingValues = new Set(values);
-      for (const value of orderByType.enumValues) {
-        if (!existingValues.has(value)) {
-          values.push(value);
-        }
-      }
-    }
   }
 
   return values;
@@ -1292,7 +1294,10 @@ function buildCreateDataFieldsFromTable(
 
     const fieldType =
       typeof field.type === 'string' ? field.type : field.type.gqlType;
-    const tsType = scalarToInputTs(fieldType);
+    const isArray =
+      typeof field.type !== 'string' && field.type.isArray;
+    const baseTsType = scalarToInputTs(fieldType);
+    const tsType = isArray ? `${baseTsType}[]` : baseTsType;
     const isOptional = !field.name.endsWith('Id');
 
     fields.push({ name: field.name, type: tsType, optional: isOptional });
@@ -1423,9 +1428,45 @@ function buildCreateInputInterface(
 }
 
 /**
- * Build Patch type properties
+ * Build Patch type properties.
+ *
+ * Prefers reading from the GraphQL schema's Patch input type when available
+ * (via typeRegistry), which correctly excludes computed/virtual fields.
+ * Falls back to deriving from table fields if the schema type is not found.
  */
-function buildPatchProperties(table: CleanTable): InterfaceProperty[] {
+function buildPatchProperties(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): InterfaceProperty[] {
+  // Try to read from the schema's Patch input type first
+  if (typeRegistry) {
+    const patchTypeName = getPatchTypeName(table);
+    const patchType = typeRegistry.get(patchTypeName);
+    if (
+      patchType?.kind === 'INPUT_OBJECT' &&
+      patchType.inputFields
+    ) {
+      const properties: InterfaceProperty[] = [];
+      for (const field of patchType.inputFields) {
+        if (
+          EXCLUDED_MUTATION_FIELDS.includes(
+            field.name as (typeof EXCLUDED_MUTATION_FIELDS)[number],
+          )
+        )
+          continue;
+
+        const tsType = typeRefToTs(field.type);
+        properties.push({
+          name: field.name,
+          type: `${tsType} | null`,
+          optional: true,
+        });
+      }
+      return properties;
+    }
+  }
+
+  // Fallback: derive from table fields
   const properties: InterfaceProperty[] = [];
 
   for (const field of table.fields) {
@@ -1439,7 +1480,10 @@ function buildPatchProperties(table: CleanTable): InterfaceProperty[] {
 
     const fieldType =
       typeof field.type === 'string' ? field.type : field.type.gqlType;
-    const tsType = scalarToInputTs(fieldType);
+    const isArray =
+      typeof field.type !== 'string' && field.type.isArray;
+    const baseTsType = scalarToInputTs(fieldType);
+    const tsType = isArray ? `${baseTsType}[]` : baseTsType;
 
     properties.push({
       name: field.name,
@@ -1472,7 +1516,7 @@ function generateCrudInputTypes(
 
   // Patch interface
   statements.push(
-    createExportedInterface(patchName, buildPatchProperties(table)),
+    createExportedInterface(patchName, buildPatchProperties(table, typeRegistry)),
   );
 
   // Update input - v5 uses entity-specific patch field names (e.g., "userPatch")

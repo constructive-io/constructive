@@ -232,15 +232,15 @@ export interface UUIDListFilter {
 }
 // ============ Entity Types ============
 export interface GetAllRecord {
-  path?: string | null;
+  path?: string[] | null;
   data?: Record<string, unknown> | null;
 }
 export interface Object {
   hashUuid?: string | null;
   id: string;
   databaseId?: string | null;
-  kids?: string | null;
-  ktree?: string | null;
+  kids?: string[] | null;
+  ktree?: string[] | null;
   data?: Record<string, unknown> | null;
   frzn?: boolean | null;
   createdAt?: string | null;
@@ -285,7 +285,7 @@ export interface Commit {
   databaseId?: string | null;
   storeId?: string | null;
   /** Parent commits */
-  parentIds?: string | null;
+  parentIds?: string[] | null;
   /** The author of the commit */
   authorId?: string | null;
   /** The committer of the commit */
@@ -370,7 +370,7 @@ export type CommitSelect = {
 };
 // ============ Table Filter Types ============
 export interface GetAllRecordFilter {
-  path?: StringFilter;
+  path?: StringListFilter;
   data?: JSONFilter;
   and?: GetAllRecordFilter[];
   or?: GetAllRecordFilter[];
@@ -380,8 +380,8 @@ export interface ObjectFilter {
   hashUuid?: UUIDFilter;
   id?: UUIDFilter;
   databaseId?: UUIDFilter;
-  kids?: UUIDFilter;
-  ktree?: StringFilter;
+  kids?: UUIDListFilter;
+  ktree?: StringListFilter;
   data?: JSONFilter;
   frzn?: BooleanFilter;
   createdAt?: DatetimeFilter;
@@ -418,7 +418,7 @@ export interface CommitFilter {
   message?: StringFilter;
   databaseId?: UUIDFilter;
   storeId?: UUIDFilter;
-  parentIds?: UUIDFilter;
+  parentIds?: UUIDListFilter;
   authorId?: UUIDFilter;
   committerId?: UUIDFilter;
   treeId?: UUIDFilter;
@@ -439,83 +439,49 @@ export type GetAllRecordsOrderBy =
   | 'DATA_ASC'
   | 'DATA_DESC';
 export type ObjectOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'HASH_UUID_ASC'
-  | 'HASH_UUID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'FRZN_ASC'
-  | 'FRZN_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
+  | 'FRZN_DESC';
 export type RefOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'STORE_ID_ASC'
   | 'STORE_ID_DESC'
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
   | 'NAME_TRGM_SIMILARITY_ASC'
   | 'NAME_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type StoreOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
   | 'NAME_TRGM_SIMILARITY_ASC'
   | 'NAME_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type CommitOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
   | 'MESSAGE_TRGM_SIMILARITY_ASC'
   | 'MESSAGE_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
@@ -524,12 +490,12 @@ export type CommitOrderBy =
 export interface CreateGetAllRecordInput {
   clientMutationId?: string;
   getAllRecord: {
-    path?: string;
+    path?: string[];
     data?: Record<string, unknown>;
   };
 }
 export interface GetAllRecordPatch {
-  path?: string | null;
+  path?: string[] | null;
   data?: Record<string, unknown> | null;
 }
 export interface UpdateGetAllRecordInput {
@@ -552,10 +518,9 @@ export interface CreateObjectInput {
   };
 }
 export interface ObjectPatch {
-  hashUuid?: string | null;
   databaseId?: string | null;
-  kids?: string | null;
-  ktree?: string | null;
+  kids?: string[] | null;
+  ktree?: string[] | null;
   data?: Record<string, unknown> | null;
   frzn?: boolean | null;
 }
@@ -582,8 +547,6 @@ export interface RefPatch {
   databaseId?: string | null;
   storeId?: string | null;
   commitId?: string | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateRefInput {
   clientMutationId?: string;
@@ -606,8 +569,6 @@ export interface StorePatch {
   name?: string | null;
   databaseId?: string | null;
   hash?: string | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateStoreInput {
   clientMutationId?: string;
@@ -635,13 +596,11 @@ export interface CommitPatch {
   message?: string | null;
   databaseId?: string | null;
   storeId?: string | null;
-  parentIds?: string | null;
+  parentIds?: string[] | null;
   authorId?: string | null;
   committerId?: string | null;
   treeId?: string | null;
   date?: string | null;
-  messageTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateCommitInput {
   clientMutationId?: string;
