@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.6.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.6.4...graphql-server-test@2.6.5) (2026-03-17)
+
+### Bug Fixes
+
+- correct typo in server-test snapshot (extra period) ([0b77a70](https://github.com/constructive-io/constructive/commit/0b77a70843939388a3d5e526891c3e4179dd267b))
+- remove TrgmSearchInput type from snapshots (no longer registered without intentional search) ([63e5593](https://github.com/constructive-io/constructive/commit/63e5593e03a3fd9df0431a70d0ea48c6ec188a1c))
+- update snapshots to reflect trgm operators removed from StringFilter ([f08a328](https://github.com/constructive-io/constructive/commit/f08a328bf4c3d0e0a59ac9253d1ecb9f7772a355))
+- use unicode smart quotes in BooleanFilter snapshot description ([f47c0c5](https://github.com/constructive-io/constructive/commit/f47c0c5399b4b3cb7f6d98be01c90ff47a4f229c))
+
 ## [2.6.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.6.3...graphql-server-test@2.6.4) (2026-03-16)
 
 **Note:** Version bump only for package graphql-server-test

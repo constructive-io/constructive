@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.8](https://github.com/constructive-io/constructive/compare/@constructive-io/react@0.6.7...@constructive-io/react@0.6.8) (2026-03-17)
+
+### Bug Fixes
+
+- add pregenerate cleanup to SDK packages to remove stale files ([9adb0ee](https://github.com/constructive-io/constructive/commit/9adb0ee50702d6efbb2bc5cae17ee1e0b947ce6c))
+
 ## [0.6.7](https://github.com/constructive-io/constructive/compare/@constructive-io/react@0.6.6...@constructive-io/react@0.6.7) (2026-03-16)
 
 **Note:** Version bump only for package @constructive-io/react

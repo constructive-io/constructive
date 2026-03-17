@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.6.3...@constructive-io/graphql-test@4.6.4) (2026-03-17)
+
+### Bug Fixes
+
+- remove TrgmSearchInput type from snapshots (no longer registered without intentional search) ([63e5593](https://github.com/constructive-io/constructive/commit/63e5593e03a3fd9df0431a70d0ea48c6ec188a1c))
+- update snapshots to reflect trgm operators removed from StringFilter ([f08a328](https://github.com/constructive-io/constructive/commit/f08a328bf4c3d0e0a59ac9253d1ecb9f7772a355))
+
 ## [4.6.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.6.2...@constructive-io/graphql-test@4.6.3) (2026-03-16)
 
 **Note:** Version bump only for package @constructive-io/graphql-test
