@@ -32,8 +32,13 @@ jest.doMock(_graphqlClientPath, () => ({
   }))
 }));
 
-// Mock @pgpmjs/migrate-client so the ORM-based sql_actions fetch uses our test data
-const _migrateClientPath = '@pgpmjs/migrate-client';
+// Mock @pgpmjs/migrate-client so the ORM-based sql_actions fetch uses our test data.
+// Use an absolute path (same pattern as GraphQLClient above) so Jest can resolve
+// the module from pgpm/cli even though it is only a dependency of pgpm/core.
+const _migrateClientPath = path.resolve(
+  __dirname,
+  '../../../sdk/migrate-client/dist/index'
+);
 let _mockMigrateClientFindMany: jest.Mock = jest.fn();
 jest.doMock(_migrateClientPath, () => ({
   createClient: jest.fn().mockImplementation(() => ({
