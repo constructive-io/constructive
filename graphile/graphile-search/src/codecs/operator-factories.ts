@@ -49,6 +49,12 @@ export function createMatchesOperatorFactory(
  * Creates the `similarTo` and `wordSimilarTo` filter operator factories
  * for pg_trgm fuzzy text matching. Declared here so they're registered
  * via the declarative `connectionFilterOperatorFactories` API.
+ *
+ * These operators target 'StringTrgm' (resolved to 'StringTrgmFilter'),
+ * NOT the global 'String' type. The unified search plugin registers
+ * 'StringTrgmFilter' and selectively assigns it to string columns on
+ * tables that qualify for trgm (via intentional search or @trgmSearch tag).
+ * This prevents trgm operators from appearing on every string field.
  */
 export function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
   return (build) => {
@@ -56,7 +62,7 @@ export function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
 
     return [
       {
-        typeNames: 'String',
+        typeNames: 'StringTrgm',
         operatorName: 'similarTo',
         spec: {
           description:
@@ -81,7 +87,7 @@ export function createTrgmOperatorFactories(): ConnectionFilterOperatorFactory {
         },
       },
       {
-        typeNames: 'String',
+        typeNames: 'StringTrgm',
         operatorName: 'wordSimilarTo',
         spec: {
           description:
