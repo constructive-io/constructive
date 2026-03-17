@@ -67,6 +67,8 @@ CREATE TABLE files_store_public.files (
   source_id     uuid,
   processing_started_at timestamptz,
   created_by    uuid,
+  origin_id     uuid,
+  mime_type     text,
   created_at    timestamptz   NOT NULL DEFAULT now(),
   updated_at    timestamptz   NOT NULL DEFAULT now(),
 
@@ -100,6 +102,22 @@ COMMENT ON COLUMN files_store_public.files.source_column IS
   'Column name on the source table (e.g. profile_picture). NULL until domain trigger populates it.';
 COMMENT ON COLUMN files_store_public.files.source_id IS
   'Primary key of the row in the source table. NULL until domain trigger populates it.';
+COMMENT ON COLUMN files_store_public.files.origin_id IS
+  'Self-referential FK to the origin file. NULL for origin rows, set for version rows (thumbnail, medium).';
+COMMENT ON COLUMN files_store_public.files.mime_type IS
+  'Detected MIME type of the file. Set at upload time for origins, at processing time for versions.';
+
+-- Self-referential FK (version -> origin, same table)
+-- ON DELETE CASCADE: DB-level safety net. The primary deletion path is
+-- per-row delete-s3-object jobs (each row gets its own job via trigger).
+-- CASCADE only fires if an origin row is directly DELETEd before its
+-- version rows -- in that case, version DB rows are removed but version
+-- S3 objects are still cleaned up by their already-enqueued jobs.
+ALTER TABLE files_store_public.files
+  ADD CONSTRAINT files_origin_fk
+  FOREIGN KEY (origin_id, database_id)
+  REFERENCES files_store_public.files (id, database_id)
+  ON DELETE CASCADE;
 
 -- ---------------------------------------------------------------------------
 -- 3. Buckets Table
@@ -163,6 +181,11 @@ CREATE INDEX files_deleting_idx
 -- Time-range scans on large tables
 CREATE INDEX files_created_at_brin_idx
   ON files_store_public.files USING brin (created_at);
+
+-- Version lookups: "find all versions of this origin"
+CREATE INDEX files_origin_id_idx
+  ON files_store_public.files (origin_id, database_id)
+  WHERE origin_id IS NOT NULL;
 
 -- ---------------------------------------------------------------------------
 -- 5. Triggers
@@ -397,8 +420,10 @@ DECLARE
   old_val jsonb;
   new_key text;
   old_key text;
-  base_key text;
   db_id integer;
+  origin_file_id uuid;
+  old_origin_file_id uuid;
+  versions_json json;
 BEGIN
   -- Get the database_id from session context
   db_id := current_setting('app.database_id')::integer;
@@ -418,29 +443,75 @@ BEGIN
 
   -- Handle file replacement: mark old files as deleting
   IF old_key IS NOT NULL AND old_key <> '' THEN
-    -- Derive base key for the old file (strip version suffix)
-    base_key := regexp_replace(old_key, '_[^_]+$', '');
+    -- Find old origin by exact key match
+    SELECT id INTO old_origin_file_id
+    FROM files_store_public.files
+    WHERE key = old_key AND database_id = db_id;
 
-    -- Mark old origin + all versions as deleting
-    UPDATE files_store_public.files
-    SET status = 'deleting', status_reason = 'replaced by new file'
-    WHERE database_id = db_id
-      AND (key = old_key OR key LIKE base_key || '_%')
-      AND status NOT IN ('deleting');
+    IF old_origin_file_id IS NOT NULL THEN
+      -- Mark old origin as deleting
+      UPDATE files_store_public.files
+      SET status = 'deleting', status_reason = 'replaced by new file'
+      WHERE id = old_origin_file_id AND database_id = db_id
+        AND status NOT IN ('deleting');
+
+      -- Mark old versions as deleting (index hit on origin_id)
+      UPDATE files_store_public.files
+      SET status = 'deleting', status_reason = 'replaced by new file'
+      WHERE origin_id = old_origin_file_id AND database_id = db_id
+        AND status NOT IN ('deleting');
+    END IF;
   END IF;
 
   -- Populate back-reference on new file (origin + versions)
   IF new_key IS NOT NULL AND new_key <> '' THEN
-    -- Derive base key for the new file
-    base_key := regexp_replace(new_key, '_[^_]+$', '');
+    -- Find origin by exact key match
+    SELECT id INTO origin_file_id
+    FROM files_store_public.files
+    WHERE key = new_key AND database_id = db_id;
 
-    -- Set back-reference on origin + all version rows
-    UPDATE files_store_public.files
-    SET source_table = table_name,
-        source_column = col_name,
-        source_id = NEW.id
-    WHERE database_id = db_id
-      AND (key = new_key OR key LIKE base_key || '_%');
+    IF origin_file_id IS NOT NULL THEN
+      -- Update origin row
+      UPDATE files_store_public.files
+      SET source_table = table_name, source_column = col_name, source_id = NEW.id
+      WHERE id = origin_file_id AND database_id = db_id;
+
+      -- Update version rows (index hit on origin_id)
+      UPDATE files_store_public.files
+      SET source_table = table_name, source_column = col_name, source_id = NEW.id
+      WHERE origin_id = origin_file_id AND database_id = db_id;
+
+      -- Backfill versions into domain JSONB if process-image already completed.
+      -- This fixes the race condition where process-image runs before domain
+      -- association (two-step upload path) and can't write back versions.
+      -- Uses mime_type column for accurate MIME (not hardcoded).
+      SELECT json_agg(json_build_object(
+        'key', f.key,
+        'mime', COALESCE(f.mime_type, 'image/jpeg'),
+        'width', 0,
+        'height', 0
+      ))
+      INTO versions_json
+      FROM files_store_public.files f
+      WHERE f.origin_id = origin_file_id
+        AND f.database_id = db_id
+        AND f.status = 'ready';
+
+      IF versions_json IS NOT NULL THEN
+        -- RECURSION GUARD: This UPDATE re-fires the current trigger on the
+        -- domain table. It is safe because only the 'versions' subfield of
+        -- the JSONB column is modified -- the 'key' field is unchanged.
+        -- The IS NOT DISTINCT FROM check at the top of this function
+        -- compares old_key vs new_key (both extracted via ->> 'key'),
+        -- detects they are equal, and returns early.
+        -- DO NOT change the early-return comparison to use the full JSONB
+        -- value instead of just the 'key' field, or this will infinite-loop.
+        EXECUTE format(
+          'UPDATE %s SET %I = jsonb_set(COALESCE(%I, ''{}''::jsonb), ''{versions}'', $1::jsonb) WHERE id = $2',
+          table_name, col_name, col_name
+        ) USING versions_json, NEW.id;
+      END IF;
+    END IF;
   END IF;
 
   RETURN NEW;
@@ -479,7 +550,32 @@ $$ LANGUAGE plpgsql;
 COMMENT ON FUNCTION files_store_public.mark_files_deleting_on_source_delete() IS
   'Generic trigger function for domain tables. Marks all associated files as deleting when a domain row is deleted.';
 
--- 7c. CREATE TRIGGER statements for all 6 tables, 9 columns
+-- 7c. Propagate deleting status from origin to version rows.
+-- When an origin transitions to 'deleting', mark all its versions as 'deleting' too.
+-- Each version row's AFTER UPDATE trigger then enqueues its own delete-s3-object job.
+
+CREATE OR REPLACE FUNCTION files_store_public.files_propagate_deleting_to_versions()
+RETURNS trigger AS $$
+BEGIN
+  UPDATE files_store_public.files
+  SET status = 'deleting', status_reason = COALESCE(NEW.status_reason, 'origin marked deleting')
+  WHERE origin_id = NEW.id
+    AND database_id = NEW.database_id
+    AND status NOT IN ('deleting');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER files_after_update_propagate_deleting
+  AFTER UPDATE ON files_store_public.files
+  FOR EACH ROW
+  WHEN (NEW.status = 'deleting' AND OLD.status <> 'deleting' AND NEW.origin_id IS NULL)
+  EXECUTE FUNCTION files_store_public.files_propagate_deleting_to_versions();
+
+COMMENT ON TRIGGER files_after_update_propagate_deleting ON files_store_public.files IS
+  'When an origin file transitions to deleting, propagate that status to all version rows via origin_id. Each version then gets its own delete-s3-object job via the existing files_after_update_queue_deletion trigger. The WHEN clause filters to origin rows only (origin_id IS NULL).';
+
+-- 7d. CREATE TRIGGER statements for all 6 tables, 9 columns
 --
 -- Each domain column gets two triggers:
 --   - AFTER UPDATE: back-reference population + file replacement

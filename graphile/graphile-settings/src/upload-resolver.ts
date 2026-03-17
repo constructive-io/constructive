@@ -119,13 +119,14 @@ async function insertFileRecord(
 	key: string,
 	etag: string,
 	createdBy: string | null,
+	contentType: string | null,
 ): Promise<void> {
 	const pool = getPgPool();
 	await pool.query(
 		`INSERT INTO files_store_public.files
-		   (id, database_id, bucket_key, key, etag, created_by)
-		 VALUES ($1, $2, $3, $4, $5, $6)`,
-		[fileId, Number(databaseId), bucketKey, key, etag, createdBy],
+		   (id, database_id, bucket_key, key, etag, created_by, mime_type)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+		[fileId, Number(databaseId), bucketKey, key, etag, createdBy, contentType],
 	);
 }
 
@@ -165,7 +166,7 @@ export async function streamToStorage(
 
 	const result = await storage.upload(key, detected.stream, { contentType });
 
-	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, opts?.userId || null);
+	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, opts?.userId || null, contentType);
 
 	const url = await storage.presignGet(key, 3600);
 	return { key, url, filename, mime: contentType };
@@ -244,7 +245,7 @@ async function uploadResolver(
 		contentType: detectedContentType,
 	});
 
-	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, userId);
+	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, userId, detectedContentType);
 
 	const url = await storage.presignGet(key, 3600);
 
