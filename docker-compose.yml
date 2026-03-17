@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: postgres
-    image: ghcr.io/constructive-io/docker/postgres-plus:18
+    image: docker.io/constructiveio/postgres-plus:18
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
