@@ -1,5 +1,5 @@
-import { PublicKeySignature } from '../src/PublicKeySignature';
-import type { PublicKeyChallengeConfig } from '../src/PublicKeySignature';
+import { PublicKeySignature } from '../src/plugins/PublicKeySignature';
+import type { PublicKeyChallengeConfig } from '../src/plugins/PublicKeySignature';
 
 const defaultConfig: PublicKeyChallengeConfig = {
   schema: 'app_private',
