@@ -356,7 +356,6 @@ input SqlActionFilter {
 
   """Negates the expression."""
   not: SqlActionFilter
-
 }
 
 """
@@ -531,7 +530,6 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
-
 }
 
 """
