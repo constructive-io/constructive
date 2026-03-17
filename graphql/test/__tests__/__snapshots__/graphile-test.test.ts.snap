@@ -1128,51 +1128,6 @@ based pagination. May not be used with \`last\`.",
           "possibleTypes": null,
         },
         {
-          "description": "Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.",
-          "enumValues": null,
-          "fields": null,
-          "inputFields": [
-            {
-              "defaultValue": null,
-              "description": "The text to fuzzy-match against. Typos and misspellings are tolerated.",
-              "name": "value",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null,
-                },
-              },
-            },
-            {
-              "defaultValue": null,
-              "description": "Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.",
-              "name": "threshold",
-              "type": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null,
-              },
-            },
-          ],
-          "interfaces": null,
-          "kind": "INPUT_OBJECT",
-          "name": "TrgmSearchInput",
-          "possibleTypes": null,
-        },
-        {
-          "description": "The \`Float\` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).",
-          "enumValues": null,
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "kind": "SCALAR",
-          "name": "Float",
-          "possibleTypes": null,
-        },
-        {
           "description": "Methods to use when ordering \`User\`.",
           "enumValues": [
             {

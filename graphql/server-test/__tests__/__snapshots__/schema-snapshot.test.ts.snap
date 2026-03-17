@@ -669,20 +669,7 @@ input StringFilter {
 }
 
 """
-Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
-"""
-input TrgmSearchInput {
-  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
-  value: String!
-
-  """
-  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
-  """
-  threshold: Float
-}
-
-"""
-A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
+A filter to be used against Boolean fields. All fields are combined with a logical 'and.'.’
 """
 input BooleanFilter {
   """
