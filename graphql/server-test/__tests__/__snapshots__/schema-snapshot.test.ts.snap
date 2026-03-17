@@ -669,7 +669,7 @@ input StringFilter {
 }
 
 """
-A filter to be used against Boolean fields. All fields are combined with a logical 'and.'
+A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
 """
 input BooleanFilter {
   """
