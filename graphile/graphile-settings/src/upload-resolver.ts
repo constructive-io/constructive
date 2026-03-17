@@ -4,8 +4,16 @@
  * Reads CDN/S3/MinIO configuration from environment variables (via getEnvOptions)
  * and streams uploaded files to the configured storage backend.
  *
- * Lazily initializes the S3 streamer on first upload to avoid requiring
+ * Lazily initializes the S3 storage provider on first upload to avoid requiring
  * env vars at module load time.
+ *
+ * Key format: {database_id}/{bucket_key}/{uuid}_origin
+ * INSERTs into files_store_public.files after S3 upload.
+ * The AFTER INSERT trigger enqueues a process-image job automatically.
+ *
+ * Callers must associate the returned metadata with a domain table row via a
+ * GraphQL mutation; the domain trigger automatically populates source_* fields;
+ * files not associated within 7 days are cleaned up by unattached_cleanup cron.
  *
  * ENV VARS:
  *   BUCKET_PROVIDER  - 'minio' | 's3' (default: 'minio')
@@ -16,11 +24,13 @@
  *   MINIO_ENDPOINT   - MinIO endpoint (default: 'http://localhost:9000')
  */
 
-import Streamer from '@constructive-io/s3-streamer';
+import { S3StorageProvider, streamContentType } from '@constructive-io/s3-streamer';
+import type { StorageProvider } from '@constructive-io/s3-streamer';
 import uploadNames from '@constructive-io/upload-names';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import { randomBytes } from 'crypto';
+import { randomUUID } from 'crypto';
+import { Pool } from 'pg';
 import type { Readable } from 'stream';
 import type {
 	FileUpload,
@@ -31,51 +41,104 @@ import type {
 const log = new Logger('upload-resolver');
 const DEFAULT_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml'];
 
-let streamer: Streamer | null = null;
+let storageProvider: StorageProvider | null = null;
 let bucketName: string;
+let pgPool: Pool | null = null;
 
-function getStreamer(): Streamer {
-	if (streamer) return streamer;
-
+function getCdnConfig() {
 	const opts = getEnvOptions();
 	const cdn = opts.cdn || {};
+	return {
+		provider: (cdn.provider || 'minio') as 'minio' | 's3',
+		bucketName: cdn.bucketName || 'test-bucket',
+		awsRegion: cdn.awsRegion || 'us-east-1',
+		awsAccessKey: cdn.awsAccessKey || 'minioadmin',
+		awsSecretKey: cdn.awsSecretKey || 'minioadmin',
+		minioEndpoint: cdn.minioEndpoint || 'http://localhost:9000',
+	};
+}
 
-	const provider = cdn.provider || 'minio';
-	bucketName = cdn.bucketName || 'test-bucket';
-	const awsRegion = cdn.awsRegion || 'us-east-1';
-	const awsAccessKey = cdn.awsAccessKey || 'minioadmin';
-	const awsSecretKey = cdn.awsSecretKey || 'minioadmin';
-	const minioEndpoint = cdn.minioEndpoint || 'http://localhost:9000';
+function getStorageProvider(): StorageProvider {
+	if (storageProvider) return storageProvider;
+
+	const cdn = getCdnConfig();
+	bucketName = cdn.bucketName;
 
 	if (process.env.NODE_ENV === 'production') {
-		if (!cdn.awsAccessKey || !cdn.awsSecretKey) {
+		if (cdn.awsAccessKey === 'minioadmin' || cdn.awsSecretKey === 'minioadmin') {
 			log.warn('[upload-resolver] WARNING: Using default credentials in production.');
 		}
 	}
 
 	log.info(
-		`[upload-resolver] Initializing: provider=${provider} bucket=${bucketName}`,
+		`[upload-resolver] Initializing: provider=${cdn.provider} bucket=${bucketName}`,
 	);
 
-	streamer = new Streamer({
-		defaultBucket: bucketName,
-		awsRegion,
-		awsSecretKey,
-		awsAccessKey,
-		minioEndpoint,
-		provider,
+	storageProvider = new S3StorageProvider({
+		bucket: cdn.bucketName,
+		awsRegion: cdn.awsRegion,
+		awsAccessKey: cdn.awsAccessKey,
+		awsSecretKey: cdn.awsSecretKey,
+		minioEndpoint: cdn.minioEndpoint,
+		provider: cdn.provider,
 	});
 
-	return streamer;
+	return storageProvider;
+}
+
+function getPgPool(): Pool {
+	if (pgPool) return pgPool;
+	pgPool = new Pool({
+		host: process.env.PGHOST || 'localhost',
+		port: Number(process.env.PGPORT || 5432),
+		database: process.env.PGDATABASE || 'constructive',
+		user: process.env.PGUSER || 'postgres',
+		password: process.env.PGPASSWORD || 'password',
+		max: 3,
+	});
+	return pgPool;
 }
 
 /**
- * Generates a randomized storage key from a filename.
- * Format: {random10chars}-{sanitized-filename}
+ * Generates a v2 storage key.
+ * Format: {database_id}/{bucket_key}/{uuid}_origin
  */
-function generateKey(filename: string): string {
-	const rand = randomBytes(12).toString('hex');
-	return `${rand}-${uploadNames(filename)}`;
+function generateV2Key(databaseId: string, bucketKey: string): { key: string; fileId: string } {
+	const fileId = randomUUID();
+	return { key: `${databaseId}/${bucketKey}/${fileId}_origin`, fileId };
+}
+
+/**
+ * INSERTs a row into files_store_public.files.
+ * Fires the AFTER INSERT trigger which enqueues a process-image job.
+ */
+async function insertFileRecord(
+	fileId: string,
+	databaseId: string,
+	bucketKey: string,
+	key: string,
+	etag: string,
+	createdBy: string | null,
+	contentType: string | null,
+): Promise<void> {
+	const pool = getPgPool();
+	await pool.query(
+		`INSERT INTO files_store_public.files
+		   (id, database_id, bucket_key, key, etag, created_by, mime_type)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+		[fileId, Number(databaseId), bucketKey, key, etag, createdBy, contentType],
+	);
+}
+
+/**
+ * Extracts databaseId and userId from the GraphQL context.
+ * In PostGraphile, context contains the Express request.
+ */
+function extractContextInfo(context: any): { databaseId: string | null; userId: string | null } {
+	const req = context?.req || context?.request;
+	const databaseId = req?.api?.databaseId || req?.databaseId || null;
+	const userId = req?.token?.user_id || null;
+	return { databaseId, userId };
 }
 
 /**
@@ -86,27 +149,49 @@ function generateKey(filename: string): string {
 export async function streamToStorage(
 	readStream: Readable,
 	filename: string,
-): Promise<{ url: string; filename: string; mime: string }> {
-	const s3 = getStreamer();
-	const key = generateKey(filename);
-	const result = await s3.upload({
-		readStream,
-		filename,
-		key,
-		bucket: bucketName,
-	});
-	return {
-		url: result.upload.Location,
-		filename,
-		mime: result.contentType,
-	};
+	opts?: { databaseId?: string; userId?: string; bucketKey?: string },
+): Promise<{ url: string; filename: string; mime: string; key?: string }> {
+	const storage = getStorageProvider();
+	const bucketKey = opts?.bucketKey || 'default';
+	const databaseId = opts?.databaseId;
+
+	if (!databaseId) {
+		throw new Error('[upload-resolver] databaseId is required for file uploads');
+	}
+
+	const { key, fileId } = generateV2Key(databaseId, bucketKey);
+
+	const detected = await streamContentType({ readStream, filename });
+	const contentType = detected.contentType;
+
+	const result = await storage.upload(key, detected.stream, { contentType });
+
+	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, opts?.userId || null, contentType);
+
+	const url = await storage.presignGet(key, 3600);
+	return { key, url, filename, mime: contentType };
+}
+
+export async function __resetUploadResolverForTests(): Promise<void> {
+	if (
+		storageProvider
+		&& typeof (storageProvider as StorageProvider & { destroy?: () => void }).destroy === 'function'
+	) {
+		(storageProvider as StorageProvider & { destroy: () => void }).destroy();
+	}
+	storageProvider = null;
+
+	if (pgPool) {
+		await pgPool.end();
+	}
+	pgPool = null;
 }
 
 /**
  * Upload resolver that streams files to S3/MinIO.
  *
  * Returns different shapes based on the column's type hint:
- * - 'image' / 'upload' → { filename, mime, url } (for jsonb domain columns)
+ * - 'image' / 'upload' → { key, url, mime, filename }
  * - 'attachment' / default → url string (for text domain columns)
  *
  * MIME validation happens before persistence: content type is detected from
@@ -119,9 +204,7 @@ async function uploadResolver(
 	info: { uploadPlugin: UploadPluginInfo },
 ): Promise<unknown> {
 	const { tags, type } = info.uploadPlugin;
-	const s3 = getStreamer();
 	const { filename } = upload;
-	const key = generateKey(filename);
 
 	// MIME type validation from smart tags
 	const typ = type || tags?.type;
@@ -136,7 +219,7 @@ async function uploadResolver(
 			? DEFAULT_IMAGE_MIME_TYPES
 			: [];
 
-	const detected = await s3.detectContentType({
+	const detected = await streamContentType({
 		readStream: upload.createReadStream(),
 		filename,
 	});
@@ -147,21 +230,29 @@ async function uploadResolver(
 		throw new Error('UPLOAD_MIMETYPE');
 	}
 
-	const result = await s3.uploadWithContentType({
-		readStream: detected.stream,
+	const { databaseId, userId } = extractContextInfo(_context);
+
+	if (!databaseId) {
+		detected.stream.destroy();
+		throw new Error('[upload-resolver] databaseId is required for file uploads');
+	}
+
+	const storage = getStorageProvider();
+	const bucketKey = 'default';
+	const { key, fileId } = generateV2Key(databaseId, bucketKey);
+
+	const result = await storage.upload(key, detected.stream, {
 		contentType: detectedContentType,
-		magic: detected.magic,
-		key,
-		bucket: bucketName,
 	});
 
-	const url = result.upload.Location;
-	const { contentType } = result;
+	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, userId, detectedContentType);
+
+	const url = await storage.presignGet(key, 3600);
 
 	switch (typ) {
 		case 'image':
 		case 'upload':
-			return { filename, mime: contentType, url };
+			return { key, filename, mime: detectedContentType, url };
 		case 'attachment':
 		default:
 			return url;

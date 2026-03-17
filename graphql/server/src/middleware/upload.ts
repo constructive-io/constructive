@@ -266,8 +266,11 @@ export const createUploadAuthenticateMiddleware = (
  * Accepts a single file via multipart/form-data, streams it to S3/MinIO,
  * and returns file metadata. The frontend uses this in a two-step flow:
  *
- * 1. POST /upload  -> { url, filename, mime, size }
+ * 1. POST /upload  -> { key?, url, filename, mime, size }
  * 2. GraphQL mutation -> patch row with the returned metadata
+ *
+ * When UPLOAD_V2_ENABLED=true, passes databaseId and userId to streamToStorage
+ * so it can use the new key format and INSERT into files_store_public.files.
  */
 export const uploadRoute: RequestHandler[] = [
   parseFileWithErrors,
@@ -287,13 +290,18 @@ export const uploadRoute: RequestHandler[] = [
 
     try {
       const readStream = fs.createReadStream(req.file.path);
-      const result = await streamToStorage(readStream, req.file.originalname);
+      const result = await streamToStorage(readStream, req.file.originalname, {
+        databaseId: req.api?.databaseId,
+        userId: req.token.user_id,
+        bucketKey: 'default',
+      });
 
       uploadLog.debug(
         `[upload] Uploaded file for user=${req.token.user_id} filename=${req.file.originalname} mime=${result.mime} size=${req.file.size}`,
       );
 
       res.json({
+        ...(result.key ? { key: result.key } : {}),
         url: result.url,
         filename: result.filename,
         mime: result.mime,

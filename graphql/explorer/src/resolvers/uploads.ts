@@ -1,4 +1,4 @@
-import Streamer from '@constructive-io/s3-streamer';
+import { S3StorageProvider, streamContentType } from '@constructive-io/s3-streamer';
 import uploadNames from '@constructive-io/upload-names';
 import { ReadStream } from 'fs';
 import type { GraphQLResolveInfo } from 'graphql';
@@ -26,16 +26,18 @@ interface UploadPluginInfo {
 }
 
 export class UploadHandler {
-  private streamer: Streamer;
+  private storage: S3StorageProvider;
+  private bucketName: string;
 
   constructor(private options: UploaderOptions) {
-    this.streamer = new Streamer({
-      defaultBucket: options.bucketName,
+    this.bucketName = options.bucketName;
+    this.storage = new S3StorageProvider({
+      bucket: options.bucketName,
       awsRegion: options.awsRegion,
       awsSecretKey: options.awsSecretKey,
       awsAccessKey: options.awsAccessKey,
       minioEndpoint: options.minioEndpoint,
-      provider: options.provider
+      provider: options.provider,
     });
   }
 
@@ -50,25 +52,15 @@ export class UploadHandler {
     } = info;
 
     const readStream = upload.createReadStream() as ReadStream;
-    const { filename, mimetype } = upload;
+    const { filename } = upload;
 
     const rand =
       Math.random().toString(36).substring(2, 7) +
       Math.random().toString(36).substring(2, 7);
     const key = rand + '-' + uploadNames(filename);
 
-    const result = await this.streamer.upload({
-      readStream,
-      filename,
-      key,
-      bucket: this.options.bucketName
-    });
-
-    const url = result.upload.Location;
-    const {
-      contentType,
-      magic: { charset }
-    } = result;
+    const detected = await streamContentType({ readStream, filename });
+    const { contentType } = detected;
 
     const typ = type || tags.type;
 
@@ -79,8 +71,12 @@ export class UploadHandler {
         : [];
 
     if (mim.length && !mim.includes(contentType)) {
+      detected.stream.destroy();
       throw new Error(`UPLOAD_MIMETYPE ${mim.join(',')}`);
     }
+
+    await this.storage.upload(key, detected.stream, { contentType });
+    const url = await this.storage.presignGet(key, 3600);
 
     switch (typ) {
     case 'image':
