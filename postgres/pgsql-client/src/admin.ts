@@ -58,9 +58,22 @@ export class DbAdmin {
     try {
       this.run(`dropdb "${name}"`);
     } catch (err: any) {
-      if (!err.message.includes('does not exist')) {
-        log.warn(`Could not drop database ${name}: ${err.message}`);
+      if (err.message.includes('does not exist')) {
+        return;
       }
+      if (err.message.includes('is being accessed by other users')) {
+        log.warn(`Database ${name} has active sessions, terminating backends and retrying drop...`);
+        try {
+          this.run(
+            `psql -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${name}' AND pid <> pg_backend_pid();"`
+          );
+          this.run(`dropdb "${name}"`);
+        } catch (retryErr: any) {
+          log.warn(`Could not drop database ${name} after terminating backends: ${retryErr.message}`);
+        }
+        return;
+      }
+      log.warn(`Could not drop database ${name}: ${err.message}`);
     }
   }
 

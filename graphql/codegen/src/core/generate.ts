@@ -10,6 +10,7 @@ import path from 'node:path';
 import { buildClientSchema, printSchema } from 'graphql';
 
 import { PgpmPackage } from '@pgpmjs/core';
+import { pgCache } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
@@ -840,6 +841,10 @@ export async function generateMulti(
   } finally {
     for (const shared of sharedSources.values()) {
       const keepDb = Object.values(configs).some((c) => c.db?.keepDb);
+      // Release pg-cache pool for this ephemeral database before dropping
+      // deployPgpm() caches connections that must be closed first
+      pgCache.delete(shared.ephemeralDb.config.database);
+      await pgCache.waitForDisposals();
       shared.ephemeralDb.teardown({ keepDb });
     }
   }
