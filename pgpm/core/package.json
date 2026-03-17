@@ -50,6 +50,7 @@
   "dependencies": {
     "@pgpmjs/env": "workspace:^",
     "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/migrate-client": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",

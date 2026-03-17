@@ -1,0 +1,1281 @@
+"""The root query type which gives access points into the data universe."""
+type Query {
+  """Reads and enables pagination through a set of `MigrateFile`."""
+  migrateFiles(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MigrateFileFilter
+
+    """The method to use when ordering `MigrateFile`."""
+    orderBy: [MigrateFileOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MigrateFileConnection
+
+  """Reads and enables pagination through a set of `SqlAction`."""
+  sqlActions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SqlActionFilter
+
+    """The method to use when ordering `SqlAction`."""
+    orderBy: [SqlActionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SqlActionConnection
+
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+}
+
+"""A connection to a list of `MigrateFile` values."""
+type MigrateFileConnection {
+  """A list of `MigrateFile` objects."""
+  nodes: [MigrateFile]!
+
+  """
+  A list of edges which contains the `MigrateFile` and cursor to aid in pagination.
+  """
+  edges: [MigrateFileEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MigrateFile` you could get from the connection."""
+  totalCount: Int!
+}
+
+type MigrateFile {
+  id: UUID!
+  databaseId: UUID
+  upload: ConstructiveInternalTypeUpload
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+scalar ConstructiveInternalTypeUpload
+
+"""A `MigrateFile` edge in the connection."""
+type MigrateFileEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MigrateFile` at the end of the edge."""
+  node: MigrateFile
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""
+A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’
+"""
+input MigrateFileFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `upload` field."""
+  upload: ConstructiveInternalTypeUploadFilter
+
+  """Checks for all expressions in this list."""
+  and: [MigrateFileFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [MigrateFileFilter!]
+
+  """Negates the expression."""
+  not: MigrateFileFilter
+}
+
+"""
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
+"""
+input UUIDFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: UUID
+
+  """Not equal to the specified value."""
+  notEqualTo: UUID
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: UUID
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: UUID
+
+  """Included in the specified list."""
+  in: [UUID!]
+
+  """Not included in the specified list."""
+  notIn: [UUID!]
+
+  """Less than the specified value."""
+  lessThan: UUID
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: UUID
+
+  """Greater than the specified value."""
+  greaterThan: UUID
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: UUID
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeUploadFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: ConstructiveInternalTypeUpload
+
+  """Not equal to the specified value."""
+  notEqualTo: ConstructiveInternalTypeUpload
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ConstructiveInternalTypeUpload
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ConstructiveInternalTypeUpload
+
+  """Included in the specified list."""
+  in: [ConstructiveInternalTypeUpload!]
+
+  """Not included in the specified list."""
+  notIn: [ConstructiveInternalTypeUpload!]
+
+  """Less than the specified value."""
+  lessThan: ConstructiveInternalTypeUpload
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ConstructiveInternalTypeUpload
+
+  """Greater than the specified value."""
+  greaterThan: ConstructiveInternalTypeUpload
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ConstructiveInternalTypeUpload
+
+  """Contains the specified JSON."""
+  contains: ConstructiveInternalTypeUpload
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: ConstructiveInternalTypeUpload
+}
+
+"""Methods to use when ordering `MigrateFile`."""
+enum MigrateFileOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""A connection to a list of `SqlAction` values."""
+type SqlActionConnection {
+  """A list of `SqlAction` objects."""
+  nodes: [SqlAction]!
+
+  """
+  A list of edges which contains the `SqlAction` and cursor to aid in pagination.
+  """
+  edges: [SqlActionEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `SqlAction` you could get from the connection."""
+  totalCount: Int!
+}
+
+type SqlAction {
+  id: Int!
+  name: String
+  databaseId: UUID
+  deploy: String
+  deps: [String]
+  payload: JSON
+  content: String
+  revert: String
+  verify: String
+  createdAt: Datetime
+  action: String
+  actionId: UUID
+  actorId: UUID
+
+  """
+  TRGM similarity when searching `name`. Returns null when no trgm search filter is active.
+  """
+  nameTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `deploy`. Returns null when no trgm search filter is active.
+  """
+  deployTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `content`. Returns null when no trgm search filter is active.
+  """
+  contentTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `revert`. Returns null when no trgm search filter is active.
+  """
+  revertTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `verify`. Returns null when no trgm search filter is active.
+  """
+  verifyTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `action`. Returns null when no trgm search filter is active.
+  """
+  actionTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""A `SqlAction` edge in the connection."""
+type SqlActionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SqlAction` at the end of the edge."""
+  node: SqlAction
+}
+
+"""
+A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’
+"""
+input SqlActionFilter {
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `deploy` field."""
+  deploy: StringFilter
+
+  """Filter by the object’s `deps` field."""
+  deps: StringListFilter
+
+  """Filter by the object’s `content` field."""
+  content: StringFilter
+
+  """Filter by the object’s `revert` field."""
+  revert: StringFilter
+
+  """Filter by the object’s `verify` field."""
+  verify: StringFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `action` field."""
+  action: StringFilter
+
+  """Filter by the object’s `actionId` field."""
+  actionId: UUIDFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [SqlActionFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [SqlActionFilter!]
+
+  """Negates the expression."""
+  not: SqlActionFilter
+
+  """TRGM search on the `name` column."""
+  trgmName: TrgmSearchInput
+
+  """TRGM search on the `deploy` column."""
+  trgmDeploy: TrgmSearchInput
+
+  """TRGM search on the `content` column."""
+  trgmContent: TrgmSearchInput
+
+  """TRGM search on the `revert` column."""
+  trgmRevert: TrgmSearchInput
+
+  """TRGM search on the `verify` column."""
+  trgmVerify: TrgmSearchInput
+
+  """TRGM search on the `action` column."""
+  trgmAction: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
+}
+
+"""
+A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+"""
+input IntFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Int
+
+  """Not equal to the specified value."""
+  notEqualTo: Int
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Int
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Int
+
+  """Included in the specified list."""
+  in: [Int!]
+
+  """Not included in the specified list."""
+  notIn: [Int!]
+
+  """Less than the specified value."""
+  lessThan: Int
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Int
+
+  """Greater than the specified value."""
+  greaterThan: Int
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Int
+}
+
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+
+  """
+  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
+  """
+  similarTo: TrgmSearchInput
+
+  """
+  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
+  """
+  wordSimilarTo: TrgmSearchInput
+}
+
+"""
+Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
+"""
+input TrgmSearchInput {
+  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
+  value: String!
+
+  """
+  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
+  """
+  threshold: Float
+}
+
+"""
+A filter to be used against String List fields. All fields are combined with a logical ‘and.’
+"""
+input StringListFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: [String]
+
+  """Not equal to the specified value."""
+  notEqualTo: [String]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [String]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [String]
+
+  """Less than the specified value."""
+  lessThan: [String]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [String]
+
+  """Greater than the specified value."""
+  greaterThan: [String]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [String]
+
+  """Contains the specified list of values."""
+  contains: [String]
+
+  """Contained by the specified list of values."""
+  containedBy: [String]
+
+  """Overlaps the specified list of values."""
+  overlaps: [String]
+
+  """Any array item is equal to the specified value."""
+  anyEqualTo: String
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: String
+
+  """Any array item is less than the specified value."""
+  anyLessThan: String
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: String
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: String
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: String
+}
+
+"""
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+}
+
+"""Methods to use when ordering `SqlAction`."""
+enum SqlActionOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  DEPLOY_ASC
+  DEPLOY_DESC
+  NAME_TRGM_SIMILARITY_ASC
+  NAME_TRGM_SIMILARITY_DESC
+  DEPLOY_TRGM_SIMILARITY_ASC
+  DEPLOY_TRGM_SIMILARITY_DESC
+  CONTENT_TRGM_SIMILARITY_ASC
+  CONTENT_TRGM_SIMILARITY_DESC
+  REVERT_TRGM_SIMILARITY_ASC
+  REVERT_TRGM_SIMILARITY_DESC
+  VERIFY_TRGM_SIMILARITY_ASC
+  VERIFY_TRGM_SIMILARITY_DESC
+  ACTION_TRGM_SIMILARITY_ASC
+  ACTION_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+}
+
+"""Root meta schema type"""
+type MetaSchema {
+  tables: [MetaTable!]!
+}
+
+"""Information about a database table"""
+type MetaTable {
+  name: String!
+  schemaName: String!
+  fields: [MetaField!]!
+  indexes: [MetaIndex!]!
+  constraints: MetaConstraints!
+  foreignKeyConstraints: [MetaForeignKeyConstraint!]!
+  primaryKeyConstraints: [MetaPrimaryKeyConstraint!]!
+  uniqueConstraints: [MetaUniqueConstraint!]!
+  relations: MetaRelations!
+  inflection: MetaInflection!
+  query: MetaQuery!
+}
+
+"""Information about a table field/column"""
+type MetaField {
+  name: String!
+  type: MetaType!
+  isNotNull: Boolean!
+  hasDefault: Boolean!
+}
+
+"""Information about a PostgreSQL type"""
+type MetaType {
+  pgType: String!
+  gqlType: String!
+  isArray: Boolean!
+  isNotNull: Boolean
+  hasDefault: Boolean
+}
+
+"""Information about a database index"""
+type MetaIndex {
+  name: String!
+  isUnique: Boolean!
+  isPrimary: Boolean!
+  columns: [String!]!
+  fields: [MetaField!]
+}
+
+"""Table constraints"""
+type MetaConstraints {
+  primaryKey: MetaPrimaryKeyConstraint
+  unique: [MetaUniqueConstraint!]!
+  foreignKey: [MetaForeignKeyConstraint!]!
+}
+
+"""Information about a primary key constraint"""
+type MetaPrimaryKeyConstraint {
+  name: String!
+  fields: [MetaField!]!
+}
+
+"""Information about a unique constraint"""
+type MetaUniqueConstraint {
+  name: String!
+  fields: [MetaField!]!
+}
+
+"""Information about a foreign key constraint"""
+type MetaForeignKeyConstraint {
+  name: String!
+  fields: [MetaField!]!
+  referencedTable: String!
+  referencedFields: [String!]!
+  refFields: [MetaField!]
+  refTable: MetaRefTable
+}
+
+"""Reference to a related table"""
+type MetaRefTable {
+  name: String!
+}
+
+"""Table relations"""
+type MetaRelations {
+  belongsTo: [MetaBelongsToRelation!]!
+  has: [MetaHasRelation!]!
+  hasOne: [MetaHasRelation!]!
+  hasMany: [MetaHasRelation!]!
+  manyToMany: [MetaManyToManyRelation!]!
+}
+
+"""A belongs-to (forward FK) relation"""
+type MetaBelongsToRelation {
+  fieldName: String
+  isUnique: Boolean!
+  type: String
+  keys: [MetaField!]!
+  references: MetaRefTable!
+}
+
+"""A has-one or has-many (reverse FK) relation"""
+type MetaHasRelation {
+  fieldName: String
+  isUnique: Boolean!
+  type: String
+  keys: [MetaField!]!
+  referencedBy: MetaRefTable!
+}
+
+"""A many-to-many relation via junction table"""
+type MetaManyToManyRelation {
+  fieldName: String
+  type: String
+  junctionTable: MetaRefTable!
+  junctionLeftConstraint: MetaForeignKeyConstraint!
+  junctionLeftKeyAttributes: [MetaField!]!
+  junctionRightConstraint: MetaForeignKeyConstraint!
+  junctionRightKeyAttributes: [MetaField!]!
+  leftKeyAttributes: [MetaField!]!
+  rightKeyAttributes: [MetaField!]!
+  rightTable: MetaRefTable!
+}
+
+"""Table inflection names"""
+type MetaInflection {
+  tableType: String!
+  allRows: String!
+  connection: String!
+  edge: String!
+  filterType: String
+  orderByType: String!
+  conditionType: String!
+  patchType: String
+  createInputType: String!
+  createPayloadType: String!
+  updatePayloadType: String
+  deletePayloadType: String!
+}
+
+"""Table query/mutation names"""
+type MetaQuery {
+  all: String!
+  one: String
+  create: String
+  update: String
+  delete: String
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  executeSql(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ExecuteSqlInput!
+  ): ExecuteSqlPayload
+  runMigration(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RunMigrationInput!
+  ): RunMigrationPayload
+
+  """Creates a single `MigrateFile`."""
+  createMigrateFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMigrateFileInput!
+  ): CreateMigrateFilePayload
+
+  """Creates a single `SqlAction`."""
+  createSqlAction(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSqlActionInput!
+  ): CreateSqlActionPayload
+
+  """Updates a single `MigrateFile` using a unique key and a patch."""
+  updateMigrateFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMigrateFileInput!
+  ): UpdateMigrateFilePayload
+
+  """Updates a single `SqlAction` using a unique key and a patch."""
+  updateSqlAction(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSqlActionInput!
+  ): UpdateSqlActionPayload
+
+  """Deletes a single `MigrateFile` using a unique key."""
+  deleteMigrateFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMigrateFileInput!
+  ): DeleteMigrateFilePayload
+
+  """Deletes a single `SqlAction` using a unique key."""
+  deleteSqlAction(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSqlActionInput!
+  ): DeleteSqlActionPayload
+}
+
+"""The output of our `executeSql` mutation."""
+type ExecuteSqlPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `executeSql` mutation."""
+input ExecuteSqlInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  stmt: String
+}
+
+"""The output of our `runMigration` mutation."""
+type RunMigrationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `runMigration` mutation."""
+input RunMigrationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  migration: Int
+  kind: String
+}
+
+"""The output of our create `MigrateFile` mutation."""
+type CreateMigrateFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MigrateFile` that was created by this mutation."""
+  migrateFile: MigrateFile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MigrateFile`. May be used by Relay 1."""
+  migrateFileEdge(
+    """The method to use when ordering `MigrateFile`."""
+    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MigrateFileEdge
+}
+
+"""All input for the create `MigrateFile` mutation."""
+input CreateMigrateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MigrateFile` to be created by this mutation."""
+  migrateFile: MigrateFileInput!
+}
+
+"""An input for mutations affecting `MigrateFile`"""
+input MigrateFileInput {
+  id: UUID
+  databaseId: UUID
+  upload: ConstructiveInternalTypeUpload
+}
+
+"""The output of our create `SqlAction` mutation."""
+type CreateSqlActionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SqlAction` that was created by this mutation."""
+  sqlAction: SqlAction
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SqlAction`. May be used by Relay 1."""
+  sqlActionEdge(
+    """The method to use when ordering `SqlAction`."""
+    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SqlActionEdge
+}
+
+"""All input for the create `SqlAction` mutation."""
+input CreateSqlActionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SqlAction` to be created by this mutation."""
+  sqlAction: SqlActionInput!
+}
+
+"""An input for mutations affecting `SqlAction`"""
+input SqlActionInput {
+  id: Int
+  name: String
+  databaseId: UUID
+  deploy: String
+  deps: [String]
+  payload: JSON
+  content: String
+  revert: String
+  verify: String
+  createdAt: Datetime
+  action: String
+  actionId: UUID
+  actorId: UUID
+}
+
+"""The output of our update `MigrateFile` mutation."""
+type UpdateMigrateFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MigrateFile` that was updated by this mutation."""
+  migrateFile: MigrateFile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MigrateFile`. May be used by Relay 1."""
+  migrateFileEdge(
+    """The method to use when ordering `MigrateFile`."""
+    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MigrateFileEdge
+}
+
+"""All input for the `updateMigrateFile` mutation."""
+input UpdateMigrateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `MigrateFile` being updated.
+  """
+  migrateFilePatch: MigrateFilePatch!
+}
+
+"""
+Represents an update to a `MigrateFile`. Fields that are set will be updated.
+"""
+input MigrateFilePatch {
+  id: UUID
+  databaseId: UUID
+  upload: ConstructiveInternalTypeUpload
+
+  """File upload for the `upload` field."""
+  uploadUpload: Upload
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+"""The output of our update `SqlAction` mutation."""
+type UpdateSqlActionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SqlAction` that was updated by this mutation."""
+  sqlAction: SqlAction
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SqlAction`. May be used by Relay 1."""
+  sqlActionEdge(
+    """The method to use when ordering `SqlAction`."""
+    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SqlActionEdge
+}
+
+"""All input for the `updateSqlAction` mutation."""
+input UpdateSqlActionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `SqlAction` being updated.
+  """
+  sqlActionPatch: SqlActionPatch!
+}
+
+"""
+Represents an update to a `SqlAction`. Fields that are set will be updated.
+"""
+input SqlActionPatch {
+  id: Int
+  name: String
+  databaseId: UUID
+  deploy: String
+  deps: [String]
+  payload: JSON
+  content: String
+  revert: String
+  verify: String
+  createdAt: Datetime
+  action: String
+  actionId: UUID
+  actorId: UUID
+}
+
+"""The output of our delete `MigrateFile` mutation."""
+type DeleteMigrateFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MigrateFile` that was deleted by this mutation."""
+  migrateFile: MigrateFile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MigrateFile`. May be used by Relay 1."""
+  migrateFileEdge(
+    """The method to use when ordering `MigrateFile`."""
+    orderBy: [MigrateFileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MigrateFileEdge
+}
+
+"""All input for the `deleteMigrateFile` mutation."""
+input DeleteMigrateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `SqlAction` mutation."""
+type DeleteSqlActionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SqlAction` that was deleted by this mutation."""
+  sqlAction: SqlAction
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SqlAction`. May be used by Relay 1."""
+  sqlActionEdge(
+    """The method to use when ordering `SqlAction`."""
+    orderBy: [SqlActionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SqlActionEdge
+}
+
+"""All input for the `deleteSqlAction` mutation."""
+input DeleteSqlActionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
