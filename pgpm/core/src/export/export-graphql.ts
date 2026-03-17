@@ -210,7 +210,11 @@ export const exportGraphQL = async ({
 
     const metaReplacer = makeReplacer({
       schemas: metaSchemasForReplacement,
-      name: metaExtensionName
+      name: metaExtensionName,
+      // Use extensionName for schema prefix — the services metadata references
+      // schemas owned by the application package (e.g. agent_db_auth_public),
+      // not the services package (agent_db_services_auth_public)
+      schemaPrefix: name
     });
 
     const metaPackage: PgpmRow[] = [];
