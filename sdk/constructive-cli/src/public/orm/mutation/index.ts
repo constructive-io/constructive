@@ -17,23 +17,23 @@ import type {
   ConfirmDeleteAccountInput,
   SetPasswordInput,
   VerifyEmailInput,
-  ResetPasswordInput,
   RemoveNodeAtPathInput,
+  ResetPasswordInput,
   BootstrapUserInput,
+  SetFieldOrderInput,
   SetDataAtPathInput,
   SetPropsAndCommitInput,
   ProvisionDatabaseWithUserInput,
+  InsertNodeAtPathInput,
+  UpdateNodeAtPathInput,
+  SetAndCommitInput,
+  ApplyRlsInput,
   SignInOneTimeTokenInput,
   CreateUserDatabaseInput,
   ExtendTokenExpiresInput,
   SignInInput,
   SignUpInput,
-  SetFieldOrderInput,
   OneTimeTokenInput,
-  InsertNodeAtPathInput,
-  UpdateNodeAtPathInput,
-  SetAndCommitInput,
-  ApplyRlsInput,
   ForgotPasswordInput,
   SendVerificationEmailInput,
   VerifyPasswordInput,
@@ -48,23 +48,23 @@ import type {
   ConfirmDeleteAccountPayload,
   SetPasswordPayload,
   VerifyEmailPayload,
-  ResetPasswordPayload,
   RemoveNodeAtPathPayload,
+  ResetPasswordPayload,
   BootstrapUserPayload,
+  SetFieldOrderPayload,
   SetDataAtPathPayload,
   SetPropsAndCommitPayload,
   ProvisionDatabaseWithUserPayload,
+  InsertNodeAtPathPayload,
+  UpdateNodeAtPathPayload,
+  SetAndCommitPayload,
+  ApplyRlsPayload,
   SignInOneTimeTokenPayload,
   CreateUserDatabasePayload,
   ExtendTokenExpiresPayload,
   SignInPayload,
   SignUpPayload,
-  SetFieldOrderPayload,
   OneTimeTokenPayload,
-  InsertNodeAtPathPayload,
-  UpdateNodeAtPathPayload,
-  SetAndCommitPayload,
-  ApplyRlsPayload,
   ForgotPasswordPayload,
   SendVerificationEmailPayload,
   VerifyPasswordPayload,
@@ -79,23 +79,23 @@ import type {
   ConfirmDeleteAccountPayloadSelect,
   SetPasswordPayloadSelect,
   VerifyEmailPayloadSelect,
-  ResetPasswordPayloadSelect,
   RemoveNodeAtPathPayloadSelect,
+  ResetPasswordPayloadSelect,
   BootstrapUserPayloadSelect,
+  SetFieldOrderPayloadSelect,
   SetDataAtPathPayloadSelect,
   SetPropsAndCommitPayloadSelect,
   ProvisionDatabaseWithUserPayloadSelect,
+  InsertNodeAtPathPayloadSelect,
+  UpdateNodeAtPathPayloadSelect,
+  SetAndCommitPayloadSelect,
+  ApplyRlsPayloadSelect,
   SignInOneTimeTokenPayloadSelect,
   CreateUserDatabasePayloadSelect,
   ExtendTokenExpiresPayloadSelect,
   SignInPayloadSelect,
   SignUpPayloadSelect,
-  SetFieldOrderPayloadSelect,
   OneTimeTokenPayloadSelect,
-  InsertNodeAtPathPayloadSelect,
-  UpdateNodeAtPathPayloadSelect,
-  SetAndCommitPayloadSelect,
-  ApplyRlsPayloadSelect,
   ForgotPasswordPayloadSelect,
   SendVerificationEmailPayloadSelect,
   VerifyPasswordPayloadSelect,
@@ -132,14 +132,17 @@ export interface SetPasswordVariables {
 export interface VerifyEmailVariables {
   input: VerifyEmailInput;
 }
-export interface ResetPasswordVariables {
-  input: ResetPasswordInput;
-}
 export interface RemoveNodeAtPathVariables {
   input: RemoveNodeAtPathInput;
 }
+export interface ResetPasswordVariables {
+  input: ResetPasswordInput;
+}
 export interface BootstrapUserVariables {
   input: BootstrapUserInput;
+}
+export interface SetFieldOrderVariables {
+  input: SetFieldOrderInput;
 }
 export interface SetDataAtPathVariables {
   input: SetDataAtPathInput;
@@ -149,6 +152,18 @@ export interface SetPropsAndCommitVariables {
 }
 export interface ProvisionDatabaseWithUserVariables {
   input: ProvisionDatabaseWithUserInput;
+}
+export interface InsertNodeAtPathVariables {
+  input: InsertNodeAtPathInput;
+}
+export interface UpdateNodeAtPathVariables {
+  input: UpdateNodeAtPathInput;
+}
+export interface SetAndCommitVariables {
+  input: SetAndCommitInput;
+}
+export interface ApplyRlsVariables {
+  input: ApplyRlsInput;
 }
 export interface SignInOneTimeTokenVariables {
   input: SignInOneTimeTokenInput;
@@ -184,23 +199,8 @@ export interface SignInVariables {
 export interface SignUpVariables {
   input: SignUpInput;
 }
-export interface SetFieldOrderVariables {
-  input: SetFieldOrderInput;
-}
 export interface OneTimeTokenVariables {
   input: OneTimeTokenInput;
-}
-export interface InsertNodeAtPathVariables {
-  input: InsertNodeAtPathInput;
-}
-export interface UpdateNodeAtPathVariables {
-  input: UpdateNodeAtPathInput;
-}
-export interface SetAndCommitVariables {
-  input: SetAndCommitInput;
-}
-export interface ApplyRlsVariables {
-  input: ApplyRlsInput;
 }
 export interface ForgotPasswordVariables {
   input: ForgotPasswordInput;
@@ -506,35 +506,6 @@ export function createMutationOperations(client: OrmClient) {
           'VerifyEmailPayload'
         ),
       }),
-    resetPassword: <S extends ResetPasswordPayloadSelect>(
-      args: ResetPasswordVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ResetPasswordPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        resetPassword: InferSelectResult<ResetPasswordPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ResetPassword',
-        fieldName: 'resetPassword',
-        ...buildCustomDocument(
-          'mutation',
-          'ResetPassword',
-          'resetPassword',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ResetPasswordInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ResetPasswordPayload'
-        ),
-      }),
     removeNodeAtPath: <S extends RemoveNodeAtPathPayloadSelect>(
       args: RemoveNodeAtPathVariables,
       options: {
@@ -564,6 +535,35 @@ export function createMutationOperations(client: OrmClient) {
           'RemoveNodeAtPathPayload'
         ),
       }),
+    resetPassword: <S extends ResetPasswordPayloadSelect>(
+      args: ResetPasswordVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ResetPasswordPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        resetPassword: InferSelectResult<ResetPasswordPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ResetPassword',
+        fieldName: 'resetPassword',
+        ...buildCustomDocument(
+          'mutation',
+          'ResetPassword',
+          'resetPassword',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ResetPasswordInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ResetPasswordPayload'
+        ),
+      }),
     bootstrapUser: <S extends BootstrapUserPayloadSelect>(
       args: BootstrapUserVariables,
       options: {
@@ -591,6 +591,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'BootstrapUserPayload'
+        ),
+      }),
+    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
+      args: SetFieldOrderVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetFieldOrderPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetFieldOrder',
+        fieldName: 'setFieldOrder',
+        ...buildCustomDocument(
+          'mutation',
+          'SetFieldOrder',
+          'setFieldOrder',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetFieldOrderInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetFieldOrderPayload'
         ),
       }),
     setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
@@ -678,6 +707,122 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionDatabaseWithUserPayload'
+        ),
+      }),
+    insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
+      args: InsertNodeAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InsertNodeAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        insertNodeAtPath: InferSelectResult<InsertNodeAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InsertNodeAtPath',
+        fieldName: 'insertNodeAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'InsertNodeAtPath',
+          'insertNodeAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InsertNodeAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InsertNodeAtPathPayload'
+        ),
+      }),
+    updateNodeAtPath: <S extends UpdateNodeAtPathPayloadSelect>(
+      args: UpdateNodeAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, UpdateNodeAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        updateNodeAtPath: InferSelectResult<UpdateNodeAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'UpdateNodeAtPath',
+        fieldName: 'updateNodeAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'UpdateNodeAtPath',
+          'updateNodeAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'UpdateNodeAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'UpdateNodeAtPathPayload'
+        ),
+      }),
+    setAndCommit: <S extends SetAndCommitPayloadSelect>(
+      args: SetAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setAndCommit: InferSelectResult<SetAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetAndCommit',
+        fieldName: 'setAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'SetAndCommit',
+          'setAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetAndCommitPayload'
+        ),
+      }),
+    applyRls: <S extends ApplyRlsPayloadSelect>(
+      args: ApplyRlsVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ApplyRlsPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        applyRls: InferSelectResult<ApplyRlsPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ApplyRls',
+        fieldName: 'applyRls',
+        ...buildCustomDocument(
+          'mutation',
+          'ApplyRls',
+          'applyRls',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ApplyRlsInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ApplyRlsPayload'
         ),
       }),
     signInOneTimeToken: <S extends SignInOneTimeTokenPayloadSelect>(
@@ -825,35 +970,6 @@ export function createMutationOperations(client: OrmClient) {
           'SignUpPayload'
         ),
       }),
-    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
-      args: SetFieldOrderVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetFieldOrderPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetFieldOrder',
-        fieldName: 'setFieldOrder',
-        ...buildCustomDocument(
-          'mutation',
-          'SetFieldOrder',
-          'setFieldOrder',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetFieldOrderInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetFieldOrderPayload'
-        ),
-      }),
     oneTimeToken: <S extends OneTimeTokenPayloadSelect>(
       args: OneTimeTokenVariables,
       options: {
@@ -881,122 +997,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'OneTimeTokenPayload'
-        ),
-      }),
-    insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
-      args: InsertNodeAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, InsertNodeAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        insertNodeAtPath: InferSelectResult<InsertNodeAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'InsertNodeAtPath',
-        fieldName: 'insertNodeAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'InsertNodeAtPath',
-          'insertNodeAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'InsertNodeAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'InsertNodeAtPathPayload'
-        ),
-      }),
-    updateNodeAtPath: <S extends UpdateNodeAtPathPayloadSelect>(
-      args: UpdateNodeAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, UpdateNodeAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        updateNodeAtPath: InferSelectResult<UpdateNodeAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'UpdateNodeAtPath',
-        fieldName: 'updateNodeAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'UpdateNodeAtPath',
-          'updateNodeAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'UpdateNodeAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'UpdateNodeAtPathPayload'
-        ),
-      }),
-    setAndCommit: <S extends SetAndCommitPayloadSelect>(
-      args: SetAndCommitVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetAndCommitPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setAndCommit: InferSelectResult<SetAndCommitPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetAndCommit',
-        fieldName: 'setAndCommit',
-        ...buildCustomDocument(
-          'mutation',
-          'SetAndCommit',
-          'setAndCommit',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetAndCommitInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetAndCommitPayload'
-        ),
-      }),
-    applyRls: <S extends ApplyRlsPayloadSelect>(
-      args: ApplyRlsVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ApplyRlsPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        applyRls: InferSelectResult<ApplyRlsPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ApplyRls',
-        fieldName: 'applyRls',
-        ...buildCustomDocument(
-          'mutation',
-          'ApplyRls',
-          'applyRls',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ApplyRlsInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ApplyRlsPayload'
         ),
       }),
     forgotPassword: <S extends ForgotPasswordPayloadSelect>(

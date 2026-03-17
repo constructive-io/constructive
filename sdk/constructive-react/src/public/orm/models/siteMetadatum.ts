@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SiteMetadatumModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SiteMetadatumSelect>(
-    args: FindManyArgs<S, SiteMetadatumFilter, SiteMetadatumOrderBy> & {
+    args: FindManyArgs<S, SiteMetadatumFilter, never, SiteMetadatumOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteMetadatumSelect>
   ): QueryBuilder<{

@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppAchievementModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppAchievementSelect>(
-    args: FindManyArgs<S, AppAchievementFilter, AppAchievementOrderBy> & {
+    args: FindManyArgs<S, AppAchievementFilter, never, AppAchievementOrderBy> & {
       select: S;
     } & StrictSelect<S, AppAchievementSelect>
   ): QueryBuilder<{

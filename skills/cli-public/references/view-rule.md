@@ -9,8 +9,8 @@ CRUD operations for ViewRule records via csdk CLI
 ```bash
 csdk view-rule list
 csdk view-rule get --id <value>
-csdk view-rule create --databaseId <value> --viewId <value> --name <value> --event <value> --action <value>
-csdk view-rule update --id <value> [--databaseId <value>] [--viewId <value>] [--name <value>] [--event <value>] [--action <value>]
+csdk view-rule create --viewId <value> --name <value> --event <value> --nameTrgmSimilarity <value> --eventTrgmSimilarity <value> --actionTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--action <value>]
+csdk view-rule update --id <value> [--databaseId <value>] [--viewId <value>] [--name <value>] [--event <value>] [--action <value>] [--nameTrgmSimilarity <value>] [--eventTrgmSimilarity <value>] [--actionTrgmSimilarity <value>] [--searchScore <value>]
 csdk view-rule delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk view-rule list
 ### Create a viewRule
 
 ```bash
-csdk view-rule create --databaseId "value" --viewId "value" --name "value" --event "value" --action "value"
+csdk view-rule create --viewId <value> --name <value> --event <value> --nameTrgmSimilarity <value> --eventTrgmSimilarity <value> --actionTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--action <value>]
 ```
 
 ### Get a viewRule by id

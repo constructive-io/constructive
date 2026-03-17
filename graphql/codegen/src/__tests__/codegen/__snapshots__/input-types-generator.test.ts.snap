@@ -166,6 +166,13 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];
@@ -242,7 +249,7 @@ export interface Post {
   content?: string | null;
   authorId?: string | null;
   publishedAt?: string | null;
-  tags?: string | null;
+  tags?: string[] | null;
 }
 export interface Comment {
   id: string;
@@ -351,7 +358,7 @@ export interface PostFilter {
   content?: StringFilter;
   authorId?: UUIDFilter;
   publishedAt?: DatetimeFilter;
-  tags?: StringFilter;
+  tags?: StringListFilter;
   and?: PostFilter[];
   or?: PostFilter[];
   not?: PostFilter;
@@ -429,7 +436,7 @@ export interface CreatePostInput {
     content?: string;
     authorId: string;
     publishedAt?: string;
-    tags?: string;
+    tags?: string[];
   };
 }
 export interface PostPatch {
@@ -437,7 +444,7 @@ export interface PostPatch {
   content?: string | null;
   authorId?: string | null;
   publishedAt?: string | null;
-  tags?: string | null;
+  tags?: string[] | null;
 }
 export interface UpdatePostInput {
   clientMutationId?: string;
@@ -647,6 +654,13 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
 }
 export interface StringListFilter {
   isNull?: boolean;
@@ -965,6 +979,13 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
 }
 export interface StringListFilter {
   isNull?: boolean;
@@ -1295,6 +1316,13 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
 }
 export interface StringListFilter {
   isNull?: boolean;
@@ -1630,6 +1658,13 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
 }
 export interface StringListFilter {
   isNull?: boolean;
@@ -2022,6 +2057,13 @@ export interface InternetAddressFilter {
 export interface FullTextFilter {
   matches?: string;
 }
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
+}
 export interface StringListFilter {
   isNull?: boolean;
   equalTo?: string[];
@@ -2089,7 +2131,7 @@ export interface Post {
   content?: string | null;
   authorId?: string | null;
   publishedAt?: string | null;
-  tags?: string | null;
+  tags?: string[] | null;
 }
 export interface Category {
   id: string;
@@ -2155,7 +2197,7 @@ export interface PostFilter {
   content?: StringFilter;
   authorId?: UUIDFilter;
   publishedAt?: DatetimeFilter;
-  tags?: StringFilter;
+  tags?: StringListFilter;
   and?: PostFilter[];
   or?: PostFilter[];
   not?: PostFilter;
@@ -2193,7 +2235,7 @@ export interface CreatePostInput {
     content?: string;
     authorId: string;
     publishedAt?: string;
-    tags?: string;
+    tags?: string[];
   };
 }
 export interface PostPatch {
@@ -2201,7 +2243,7 @@ export interface PostPatch {
   content?: string | null;
   authorId?: string | null;
   publishedAt?: string | null;
-  tags?: string | null;
+  tags?: string[] | null;
 }
 export interface UpdatePostInput {
   clientMutationId?: string;
@@ -2408,6 +2450,13 @@ export interface InternetAddressFilter {
 }
 export interface FullTextFilter {
   matches?: string;
+}
+export interface VectorFilter {
+  isNull?: boolean;
+  equalTo?: number[];
+  notEqualTo?: number[];
+  distinctFrom?: number[];
+  notDistinctFrom?: number[];
 }
 export interface StringListFilter {
   isNull?: boolean;

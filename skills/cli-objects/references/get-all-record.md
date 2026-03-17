@@ -25,7 +25,7 @@ csdk get-all-record list
 ### Create a getAllRecord
 
 ```bash
-csdk get-all-record create --path "value" --data "value"
+csdk get-all-record create --path <value> --data <value>
 ```
 
 ### Get a getAllRecord by id

@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.6.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.6.4...@pgpmjs/core@6.6.5) (2026-03-16)
+
+### Bug Fixes
+
+- **export:** use extensionName for services schema prefix instead of metaExtensionName ([4a0bf76](https://github.com/constructive-io/constructive/commit/4a0bf767a3c73effea111882f3fad4a5b3cc895e))
+
+## [6.6.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.6.3...@pgpmjs/core@6.6.4) (2026-03-15)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.6.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.6.2...@pgpmjs/core@6.6.3) (2026-03-15)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.6.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.6.1...@pgpmjs/core@6.6.2) (2026-03-12)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.6.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.5.0...@pgpmjs/core@6.6.1) (2026-03-12)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.6.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.5.0...@pgpmjs/core@6.6.0) (2026-03-12)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.4.3...@pgpmjs/core@6.5.0) (2026-03-12)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.4.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.4.2...@pgpmjs/core@6.4.3) (2026-03-12)
+
+**Note:** Version bump only for package @pgpmjs/core
+
 ## [6.4.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.4.1...@pgpmjs/core@6.4.2) (2026-03-04)
 
 **Note:** Version bump only for package @pgpmjs/core

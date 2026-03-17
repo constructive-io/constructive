@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/react",
-  "version": "0.3.2",
+  "version": "0.6.7",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive React - Auto-generated React Query hooks and ORM client",
   "main": "index.js",
@@ -24,7 +24,8 @@
     "prepack": "npm run build",
     "build": "makage build",
     "build:dev": "makage build --dev",
-    "generate": "tsx scripts/generate-react.ts",
+    "pregenerate": "rimraf src/admin src/auth src/objects src/public src/index.ts",
+    "generate": "pnpm run pregenerate && tsx scripts/generate-react.ts",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
@@ -44,7 +45,7 @@
     "@constructive-io/graphql-types": "workspace:^",
     "@tanstack/react-query": "^5.90.21",
     "gql-ast": "workspace:^",
-    "graphql": "^16.13.0"
+    "graphql": "16.13.0"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

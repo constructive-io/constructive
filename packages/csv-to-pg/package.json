@@ -1,6 +1,6 @@
 {
   "name": "csv-to-pg",
-  "version": "3.8.2",
+  "version": "3.10.4",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "description": "csv to pg statements",
   "main": "index.js",
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "makage": "^0.1.12",
-    "pgsql-parser": "^17.9.12"
+    "pgsql-parser": "^17.9.13"
   },
   "keywords": [
     "csv",
@@ -44,10 +44,10 @@
   ],
   "dependencies": {
     "@pgsql/types": "^17.6.2",
-    "@pgsql/utils": "^17.8.13",
+    "@pgsql/utils": "^17.8.14",
     "csv-parser": "^3.2.0",
-    "inquirerer": "^4.5.2",
+    "inquirerer": "^4.7.0",
     "js-yaml": "^4.1.0",
-    "pgsql-deparser": "^17.18.0"
+    "pgsql-deparser": "^17.18.1"
   }
 }

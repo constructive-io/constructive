@@ -1,9 +1,12 @@
 import type { BuiltinNames, GraphQLSDKConfigTarget } from '../../../types/config';
 import type { CleanOperation, CleanTable, TypeRegistry } from '../../../types/schema';
 import { generateCommandMap, generateMultiTargetCommandMap } from './command-map-generator';
+import { generateConfigCommand } from './config-command-generator';
 import { generateCustomCommand } from './custom-command-generator';
 import { generateExecutorFile, generateMultiTargetExecutorFile } from './executor-generator';
 import type { GeneratedFile, MultiTargetExecutorInput } from './executor-generator';
+import { generateHelpersFile } from './helpers-generator';
+import type { HelpersGeneratorInput } from './helpers-generator';
 import {
   generateAuthCommand,
   generateAuthCommandWithName,
@@ -137,9 +140,10 @@ export interface GenerateMultiTargetCliOptions {
 export function resolveBuiltinNames(
   targetNames: string[],
   userOverrides?: BuiltinNames,
-): { auth: string; context: string } {
+): { auth: string; context: string; config: string } {
   let authName = userOverrides?.auth ?? 'auth';
   let contextName = userOverrides?.context ?? 'context';
+  let configName = userOverrides?.config ?? 'config';
 
   if (targetNames.includes(authName) && !userOverrides?.auth) {
     authName = 'credentials';
@@ -147,8 +151,11 @@ export function resolveBuiltinNames(
   if (targetNames.includes(contextName) && !userOverrides?.context) {
     contextName = 'env';
   }
+  if (targetNames.includes(configName) && !userOverrides?.config) {
+    configName = 'vars';
+  }
 
-  return { auth: authName, context: contextName };
+  return { auth: authName, context: contextName, config: configName };
 }
 
 export function generateMultiTargetCli(
@@ -187,6 +194,16 @@ export function generateMultiTargetCli(
 
   const authFile = generateAuthCommandWithName(toolName, builtinNames.auth);
   files.push(authFile);
+
+  const configFile = generateConfigCommand(toolName, builtinNames.config);
+  files.push(configFile);
+
+  const helpersInputs: HelpersGeneratorInput[] = targets.map((t) => ({
+    name: t.name,
+    ormImportPath: t.ormImportPath,
+  }));
+  const helpersFile = generateHelpersFile(toolName, helpersInputs);
+  files.push(helpersFile);
 
   let totalTables = 0;
   let totalQueries = 0;
@@ -252,7 +269,7 @@ export function generateMultiTargetCli(
       tables: totalTables,
       customQueries: totalQueries,
       customMutations: totalMutations,
-      infraFiles: 4,
+      infraFiles: 6,
       totalFiles: files.length,
     },
   };
@@ -262,6 +279,9 @@ export { generateExecutorFile, generateMultiTargetExecutorFile } from './executo
 export { generateTableCommand } from './table-command-generator';
 export { generateCustomCommand } from './custom-command-generator';
 export { generateCommandMap, generateMultiTargetCommandMap } from './command-map-generator';
+export { generateConfigCommand } from './config-command-generator';
+export { generateHelpersFile } from './helpers-generator';
+export type { HelpersGeneratorInput } from './helpers-generator';
 export {
   generateContextCommand,
   generateAuthCommand,

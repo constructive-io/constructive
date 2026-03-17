@@ -9,8 +9,8 @@ CRUD operations for View records via csdk CLI
 ```bash
 csdk view list
 csdk view get --id <value>
-csdk view create --databaseId <value> --schemaId <value> --name <value> --tableId <value> --viewType <value> --data <value> --filterType <value> --filterData <value> --securityInvoker <value> --isReadOnly <value> --smartTags <value> --category <value> --module <value> --scope <value> --tags <value>
-csdk view update --id <value> [--databaseId <value>] [--schemaId <value>] [--name <value>] [--tableId <value>] [--viewType <value>] [--data <value>] [--filterType <value>] [--filterData <value>] [--securityInvoker <value>] [--isReadOnly <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
+csdk view create --schemaId <value> --name <value> --viewType <value> --nameTrgmSimilarity <value> --viewTypeTrgmSimilarity <value> --filterTypeTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--tableId <value>] [--data <value>] [--filterType <value>] [--filterData <value>] [--securityInvoker <value>] [--isReadOnly <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
+csdk view update --id <value> [--databaseId <value>] [--schemaId <value>] [--name <value>] [--tableId <value>] [--viewType <value>] [--data <value>] [--filterType <value>] [--filterData <value>] [--securityInvoker <value>] [--isReadOnly <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--nameTrgmSimilarity <value>] [--viewTypeTrgmSimilarity <value>] [--filterTypeTrgmSimilarity <value>] [--moduleTrgmSimilarity <value>] [--searchScore <value>]
 csdk view delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk view list
 ### Create a view
 
 ```bash
-csdk view create --databaseId "value" --schemaId "value" --name "value" --tableId "value" --viewType "value" --data "value" --filterType "value" --filterData "value" --securityInvoker "value" --isReadOnly "value" --smartTags "value" --category "value" --module "value" --scope "value" --tags "value"
+csdk view create --schemaId <value> --name <value> --viewType <value> --nameTrgmSimilarity <value> --viewTypeTrgmSimilarity <value> --filterTypeTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--databaseId <value>] [--tableId <value>] [--data <value>] [--filterType <value>] [--filterData <value>] [--securityInvoker <value>] [--isReadOnly <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
 ```
 
 ### Get a view by id

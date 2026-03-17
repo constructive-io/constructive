@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.3](https://github.com/constructive-io/constructive/compare/introspectron@4.6.2...introspectron@4.6.3) (2026-03-16)
+
+**Note:** Version bump only for package introspectron
+
+## [4.6.2](https://github.com/constructive-io/constructive/compare/introspectron@4.6.1...introspectron@4.6.2) (2026-03-15)
+
+**Note:** Version bump only for package introspectron
+
+## [4.6.1](https://github.com/constructive-io/constructive/compare/introspectron@4.6.0...introspectron@4.6.1) (2026-03-15)
+
+**Note:** Version bump only for package introspectron
+
+# [4.6.0](https://github.com/constructive-io/constructive/compare/introspectron@4.5.4...introspectron@4.6.0) (2026-03-14)
+
+**Note:** Version bump only for package introspectron
+
+## [4.5.4](https://github.com/constructive-io/constructive/compare/introspectron@4.5.3...introspectron@4.5.4) (2026-03-13)
+
+**Note:** Version bump only for package introspectron
+
+## [4.5.3](https://github.com/constructive-io/constructive/compare/introspectron@4.5.2...introspectron@4.5.3) (2026-03-13)
+
+**Note:** Version bump only for package introspectron
+
+## [4.5.2](https://github.com/constructive-io/constructive/compare/introspectron@4.5.1...introspectron@4.5.2) (2026-03-12)
+
+**Note:** Version bump only for package introspectron
+
+## [4.5.1](https://github.com/constructive-io/constructive/compare/introspectron@4.4.0...introspectron@4.5.1) (2026-03-12)
+
+**Note:** Version bump only for package introspectron
+
+# [4.5.0](https://github.com/constructive-io/constructive/compare/introspectron@4.4.0...introspectron@4.5.0) (2026-03-12)
+
+**Note:** Version bump only for package introspectron
+
+# [4.4.0](https://github.com/constructive-io/constructive/compare/introspectron@4.3.5...introspectron@4.4.0) (2026-03-12)
+
+**Note:** Version bump only for package introspectron
+
+## [4.3.5](https://github.com/constructive-io/constructive/compare/introspectron@4.3.4...introspectron@4.3.5) (2026-03-12)
+
+**Note:** Version bump only for package introspectron
+
 ## [4.3.4](https://github.com/constructive-io/constructive/compare/introspectron@4.3.3...introspectron@4.3.4) (2026-03-04)
 
 **Note:** Version bump only for package introspectron

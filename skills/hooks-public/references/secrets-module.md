@@ -7,8 +7,8 @@ React Query hooks for SecretsModule data operations
 ## Usage
 
 ```typescript
-useSecretsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
-useSecretsModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
+useSecretsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } } })
+useSecretsModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } } })
 useCreateSecretsModuleMutation({ selection: { fields: { id: true } } })
 useUpdateSecretsModuleMutation({ selection: { fields: { id: true } } })
 useDeleteSecretsModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteSecretsModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useSecretsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, tableNameTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useSecretsModulesQuery({
 const { mutate } = useCreateSecretsModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>' });
+mutate({ databaseId: '<value>', schemaId: '<value>', tableId: '<value>', tableName: '<value>', tableNameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

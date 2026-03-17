@@ -27,6 +27,16 @@ const fieldSchema: FieldSchema = {
   membershipType: 'int',
   entityTableId: 'uuid',
   actorTableId: 'uuid',
+  tableNameTrgmSimilarity: 'float',
+  defaultTableNameTrgmSimilarity: 'float',
+  limitIncrementFunctionTrgmSimilarity: 'float',
+  limitDecrementFunctionTrgmSimilarity: 'float',
+  limitIncrementTriggerTrgmSimilarity: 'float',
+  limitDecrementTriggerTrgmSimilarity: 'float',
+  limitUpdateTriggerTrgmSimilarity: 'float',
+  limitCheckFunctionTrgmSimilarity: 'float',
+  prefixTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nlimits-module <command>\n\nCommands:\n  list                  List all limitsModule records\n  get                   Get a limitsModule by ID\n  create                Create a new limitsModule\n  update                Update an existing limitsModule\n  delete                Delete a limitsModule\n\n  --help, -h            Show this help message\n';

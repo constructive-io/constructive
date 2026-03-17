@@ -1,6 +1,6 @@
 {
   "name": "pg-codegen",
-  "version": "4.3.2",
+  "version": "4.5.5",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Codegen",
   "main": "index.js",
@@ -44,7 +44,7 @@
     "@pgpmjs/logger": "workspace:^",
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-test": "workspace:^"

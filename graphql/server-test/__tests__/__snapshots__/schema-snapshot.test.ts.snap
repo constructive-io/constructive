@@ -24,14 +24,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostTagCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: PostTagFilter
+    where: PostTagFilter
 
     """The method to use when ordering \`PostTag\`."""
     orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
@@ -58,14 +53,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: TagCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: TagFilter
+    where: TagFilter
 
     """The method to use when ordering \`Tag\`."""
     orderBy: [TagOrderBy!] = [PRIMARY_KEY_ASC]
@@ -92,14 +82,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: UserCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: UserFilter
+    where: UserFilter
 
     """The method to use when ordering \`User\`."""
     orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
@@ -126,14 +111,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CommentCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: CommentFilter
+    where: CommentFilter
 
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
@@ -160,14 +140,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: PostFilter
+    where: PostFilter
 
     """The method to use when ordering \`Post\`."""
     orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
@@ -257,14 +232,9 @@ type Post {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: TagCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: TagFilter
+    where: TagFilter
 
     """The method to use when ordering \`Tag\`."""
     orderBy: [TagOrderBy!] = [PRIMARY_KEY_ASC]
@@ -294,14 +264,9 @@ type Post {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostTagCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: PostTagFilter
+    where: PostTagFilter
 
     """The method to use when ordering \`PostTag\`."""
     orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
@@ -328,14 +293,9 @@ type Post {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CommentCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: CommentFilter
+    where: CommentFilter
 
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
@@ -388,14 +348,9 @@ type Tag {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: PostFilter
+    where: PostFilter
 
     """The method to use when ordering \`Post\`."""
     orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
@@ -422,14 +377,9 @@ type Tag {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostTagCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: PostTagFilter
+    where: PostTagFilter
 
     """The method to use when ordering \`PostTag\`."""
     orderBy: [PostTagOrderBy!] = [PRIMARY_KEY_ASC]
@@ -483,44 +433,6 @@ type PageInfo {
 }
 
 """
-A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PostCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: UUID
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: UUID
-
-  """Checks for equality with the object’s \`title\` field."""
-  title: String
-
-  """Checks for equality with the object’s \`slug\` field."""
-  slug: String
-
-  """Checks for equality with the object’s \`content\` field."""
-  content: String
-
-  """Checks for equality with the object’s \`excerpt\` field."""
-  excerpt: String
-
-  """Checks for equality with the object’s \`isPublished\` field."""
-  isPublished: Boolean
-
-  """Checks for equality with the object’s \`publishedAt\` field."""
-  publishedAt: Datetime
-
-  """Checks for equality with the object’s \`viewCount\` field."""
-  viewCount: Int
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against \`Post\` object types. All fields are combined with a logical ‘and.’
 """
 input PostFilter {
@@ -565,6 +477,21 @@ input PostFilter {
 
   """Negates the expression."""
   not: PostFilter
+
+  """Filter by the object’s \`author\` relation."""
+  author: UserFilter
+
+  """Filter by the object’s \`postTags\` relation."""
+  postTags: PostToManyPostTagFilter
+
+  """\`postTags\` exist."""
+  postTagsExist: Boolean
+
+  """Filter by the object’s \`comments\` relation."""
+  comments: PostToManyCommentFilter
+
+  """\`comments\` exist."""
+  commentsExist: Boolean
 }
 
 """
@@ -867,38 +794,172 @@ input IntFilter {
   greaterThanOrEqualTo: Int
 }
 
-"""Methods to use when ordering \`Post\`."""
-enum PostOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  SLUG_ASC
-  SLUG_DESC
-  PUBLISHED_AT_ASC
-  PUBLISHED_AT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
+"""
+A filter to be used against \`User\` object types. All fields are combined with a logical ‘and.’
+"""
+input UserFilter {
+  """Filter by the object’s \`id\` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s \`email\` field."""
+  email: StringFilter
+
+  """Filter by the object’s \`username\` field."""
+  username: StringFilter
+
+  """Filter by the object’s \`displayName\` field."""
+  displayName: StringFilter
+
+  """Filter by the object’s \`bio\` field."""
+  bio: StringFilter
+
+  """Filter by the object’s \`isActive\` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s \`role\` field."""
+  role: StringFilter
+
+  """Filter by the object’s \`createdAt\` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s \`updatedAt\` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [UserFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [UserFilter!]
+
+  """Negates the expression."""
+  not: UserFilter
+
+  """Filter by the object’s \`authoredPosts\` relation."""
+  authoredPosts: UserToManyPostFilter
+
+  """\`authoredPosts\` exist."""
+  authoredPostsExist: Boolean
+
+  """Filter by the object’s \`authoredComments\` relation."""
+  authoredComments: UserToManyCommentFilter
+
+  """\`authoredComments\` exist."""
+  authoredCommentsExist: Boolean
 }
 
 """
-A condition to be used against \`PostTag\` object types. All fields are tested for equality and combined with a logical ‘and.’
+A filter to be used against many \`Post\` object types. All fields are combined with a logical ‘and.’
 """
-input PostTagCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: UUID
+input UserToManyPostFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PostFilter
 
-  """Checks for equality with the object’s \`postId\` field."""
-  postId: UUID
+  """Filters to entities where every related entity matches."""
+  every: PostFilter
 
-  """Checks for equality with the object’s \`tagId\` field."""
-  tagId: UUID
+  """Filters to entities where no related entity matches."""
+  none: PostFilter
+}
 
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
+"""
+A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyCommentFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: CommentFilter
+
+  """Filters to entities where every related entity matches."""
+  every: CommentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: CommentFilter
+}
+
+"""
+A filter to be used against \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input CommentFilter {
+  """Filter by the object’s \`id\` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s \`postId\` field."""
+  postId: UUIDFilter
+
+  """Filter by the object’s \`authorId\` field."""
+  authorId: UUIDFilter
+
+  """Filter by the object’s \`parentId\` field."""
+  parentId: UUIDFilter
+
+  """Filter by the object’s \`content\` field."""
+  content: StringFilter
+
+  """Filter by the object’s \`isApproved\` field."""
+  isApproved: BooleanFilter
+
+  """Filter by the object’s \`likesCount\` field."""
+  likesCount: IntFilter
+
+  """Filter by the object’s \`createdAt\` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s \`updatedAt\` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [CommentFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [CommentFilter!]
+
+  """Negates the expression."""
+  not: CommentFilter
+
+  """Filter by the object’s \`author\` relation."""
+  author: UserFilter
+
+  """Filter by the object’s \`parent\` relation."""
+  parent: CommentFilter
+
+  """A related \`parent\` exists."""
+  parentExists: Boolean
+
+  """Filter by the object’s \`post\` relation."""
+  post: PostFilter
+
+  """Filter by the object’s \`childComments\` relation."""
+  childComments: CommentToManyCommentFilter
+
+  """\`childComments\` exist."""
+  childCommentsExist: Boolean
+}
+
+"""
+A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input CommentToManyCommentFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: CommentFilter
+
+  """Filters to entities where every related entity matches."""
+  every: CommentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: CommentFilter
+}
+
+"""
+A filter to be used against many \`PostTag\` object types. All fields are combined with a logical ‘and.’
+"""
+input PostToManyPostTagFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PostTagFilter
+
+  """Filters to entities where every related entity matches."""
+  every: PostTagFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PostTagFilter
 }
 
 """
@@ -925,53 +986,12 @@ input PostTagFilter {
 
   """Negates the expression."""
   not: PostTagFilter
-}
 
-"""Methods to use when ordering \`PostTag\`."""
-enum PostTagOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  POST_ID_ASC
-  POST_ID_DESC
-  TAG_ID_ASC
-  TAG_ID_DESC
-}
+  """Filter by the object’s \`post\` relation."""
+  post: PostFilter
 
-"""A \`Tag\` edge in the connection, with data from \`PostTag\`."""
-type PostTagsManyToManyEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Tag\` at the end of the edge."""
-  node: Tag
-  id: UUID!
-  createdAt: Datetime
-}
-
-"""
-A condition to be used against \`Tag\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input TagCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: UUID
-
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
-
-  """Checks for equality with the object’s \`slug\` field."""
-  slug: String
-
-  """Checks for equality with the object’s \`description\` field."""
-  description: String
-
-  """Checks for equality with the object’s \`color\` field."""
-  color: String
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
+  """Filter by the object’s \`tag\` relation."""
+  tag: TagFilter
 }
 
 """
@@ -1004,6 +1024,81 @@ input TagFilter {
 
   """Negates the expression."""
   not: TagFilter
+
+  """Filter by the object’s \`postTags\` relation."""
+  postTags: TagToManyPostTagFilter
+
+  """\`postTags\` exist."""
+  postTagsExist: Boolean
+}
+
+"""
+A filter to be used against many \`PostTag\` object types. All fields are combined with a logical ‘and.’
+"""
+input TagToManyPostTagFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PostTagFilter
+
+  """Filters to entities where every related entity matches."""
+  every: PostTagFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PostTagFilter
+}
+
+"""
+A filter to be used against many \`Comment\` object types. All fields are combined with a logical ‘and.’
+"""
+input PostToManyCommentFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: CommentFilter
+
+  """Filters to entities where every related entity matches."""
+  every: CommentFilter
+
+  """Filters to entities where no related entity matches."""
+  none: CommentFilter
+}
+
+"""Methods to use when ordering \`Post\`."""
+enum PostOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  SLUG_ASC
+  SLUG_DESC
+  PUBLISHED_AT_ASC
+  PUBLISHED_AT_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+}
+
+"""Methods to use when ordering \`PostTag\`."""
+enum PostTagOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  POST_ID_ASC
+  POST_ID_DESC
+  TAG_ID_ASC
+  TAG_ID_DESC
+}
+
+"""A \`Tag\` edge in the connection, with data from \`PostTag\`."""
+type PostTagsManyToManyEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Tag\` at the end of the edge."""
+  node: Tag
+  id: UUID!
+  createdAt: Datetime
 }
 
 """Methods to use when ordering \`Tag\`."""
@@ -1051,14 +1146,9 @@ type User {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: PostFilter
+    where: PostFilter
 
     """The method to use when ordering \`Post\`."""
     orderBy: [PostOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1085,14 +1175,9 @@ type User {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CommentCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: CommentFilter
+    where: CommentFilter
 
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
@@ -1183,91 +1268,13 @@ type Comment {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CommentCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: CommentFilter
+    where: CommentFilter
 
     """The method to use when ordering \`Comment\`."""
     orderBy: [CommentOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommentConnection!
-}
-
-"""
-A condition to be used against \`Comment\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input CommentCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: UUID
-
-  """Checks for equality with the object’s \`postId\` field."""
-  postId: UUID
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: UUID
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: UUID
-
-  """Checks for equality with the object’s \`content\` field."""
-  content: String
-
-  """Checks for equality with the object’s \`isApproved\` field."""
-  isApproved: Boolean
-
-  """Checks for equality with the object’s \`likesCount\` field."""
-  likesCount: Int
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-}
-
-"""
-A filter to be used against \`Comment\` object types. All fields are combined with a logical ‘and.’
-"""
-input CommentFilter {
-  """Filter by the object’s \`id\` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s \`postId\` field."""
-  postId: UUIDFilter
-
-  """Filter by the object’s \`authorId\` field."""
-  authorId: UUIDFilter
-
-  """Filter by the object’s \`parentId\` field."""
-  parentId: UUIDFilter
-
-  """Filter by the object’s \`content\` field."""
-  content: StringFilter
-
-  """Filter by the object’s \`isApproved\` field."""
-  isApproved: BooleanFilter
-
-  """Filter by the object’s \`likesCount\` field."""
-  likesCount: IntFilter
-
-  """Filter by the object’s \`createdAt\` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s \`updatedAt\` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [CommentFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [CommentFilter!]
-
-  """Negates the expression."""
-  not: CommentFilter
 }
 
 """Methods to use when ordering \`Comment\`."""
@@ -1355,79 +1362,6 @@ type UserEdge {
 
   """The \`User\` at the end of the edge."""
   node: User
-}
-
-"""
-A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input UserCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: UUID
-
-  """Checks for equality with the object’s \`email\` field."""
-  email: String
-
-  """Checks for equality with the object’s \`username\` field."""
-  username: String
-
-  """Checks for equality with the object’s \`displayName\` field."""
-  displayName: String
-
-  """Checks for equality with the object’s \`bio\` field."""
-  bio: String
-
-  """Checks for equality with the object’s \`isActive\` field."""
-  isActive: Boolean
-
-  """Checks for equality with the object’s \`role\` field."""
-  role: String
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-}
-
-"""
-A filter to be used against \`User\` object types. All fields are combined with a logical ‘and.’
-"""
-input UserFilter {
-  """Filter by the object’s \`id\` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s \`email\` field."""
-  email: StringFilter
-
-  """Filter by the object’s \`username\` field."""
-  username: StringFilter
-
-  """Filter by the object’s \`displayName\` field."""
-  displayName: StringFilter
-
-  """Filter by the object’s \`bio\` field."""
-  bio: StringFilter
-
-  """Filter by the object’s \`isActive\` field."""
-  isActive: BooleanFilter
-
-  """Filter by the object’s \`role\` field."""
-  role: StringFilter
-
-  """Filter by the object’s \`createdAt\` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s \`updatedAt\` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [UserFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [UserFilter!]
-
-  """Negates the expression."""
-  not: UserFilter
 }
 
 """Methods to use when ordering \`User\`."""

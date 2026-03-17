@@ -7,8 +7,8 @@ Append-only audit log of authentication events (sign-in, sign-up, password chang
 ## Usage
 
 ```typescript
-useAuditLogsQuery({ selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } } })
-useAuditLogQuery({ id: '<value>', selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } } })
+useAuditLogsQuery({ selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } } })
+useAuditLogQuery({ id: '<value>', selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } } })
 useCreateAuditLogMutation({ selection: { fields: { id: true } } })
 useUpdateAuditLogMutation({ selection: { fields: { id: true } } })
 useDeleteAuditLogMutation({})
@@ -20,7 +20,7 @@ useDeleteAuditLogMutation({})
 
 ```typescript
 const { data, isLoading } = useAuditLogsQuery({
-  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true } },
+  selection: { fields: { id: true, event: true, actorId: true, origin: true, userAgent: true, ipAddress: true, success: true, createdAt: true, userAgentTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAuditLogsQuery({
 const { mutate } = useCreateAuditLogMutation({
   selection: { fields: { id: true } },
 });
-mutate({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>' });
+mutate({ event: '<value>', actorId: '<value>', origin: '<value>', userAgent: '<value>', ipAddress: '<value>', success: '<value>', userAgentTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

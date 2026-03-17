@@ -9,7 +9,7 @@ ORM operations for Field records
 ```typescript
 db.field.findMany({ select: { id: true } }).execute()
 db.field.findOne({ id: '<value>', select: { id: true } }).execute()
-db.field.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', isRequired: '<value>', defaultValue: '<value>', defaultValueAst: '<value>', isHidden: '<value>', type: '<value>', fieldOrder: '<value>', regexp: '<value>', chk: '<value>', chkExpr: '<value>', min: '<value>', max: '<value>', tags: '<value>', category: '<value>', module: '<value>', scope: '<value>' }, select: { id: true } }).execute()
+db.field.create({ data: { databaseId: '<value>', tableId: '<value>', name: '<value>', label: '<value>', description: '<value>', smartTags: '<value>', isRequired: '<value>', defaultValue: '<value>', defaultValueAst: '<value>', isHidden: '<value>', type: '<value>', fieldOrder: '<value>', regexp: '<value>', chk: '<value>', chkExpr: '<value>', min: '<value>', max: '<value>', tags: '<value>', category: '<value>', module: '<value>', scope: '<value>', nameTrgmSimilarity: '<value>', labelTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', defaultValueTrgmSimilarity: '<value>', regexpTrgmSimilarity: '<value>', moduleTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.field.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.field.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.field.findMany({
 
 ```typescript
 const item = await db.field.create({
-  data: { databaseId: 'value', tableId: 'value', name: 'value', label: 'value', description: 'value', smartTags: 'value', isRequired: 'value', defaultValue: 'value', defaultValueAst: 'value', isHidden: 'value', type: 'value', fieldOrder: 'value', regexp: 'value', chk: 'value', chkExpr: 'value', min: 'value', max: 'value', tags: 'value', category: 'value', module: 'value', scope: 'value' },
+  data: { databaseId: 'value', tableId: 'value', name: 'value', label: 'value', description: 'value', smartTags: 'value', isRequired: 'value', defaultValue: 'value', defaultValueAst: 'value', isHidden: 'value', type: 'value', fieldOrder: 'value', regexp: 'value', chk: 'value', chkExpr: 'value', min: 'value', max: 'value', tags: 'value', category: 'value', module: 'value', scope: 'value', nameTrgmSimilarity: 'value', labelTrgmSimilarity: 'value', descriptionTrgmSimilarity: 'value', defaultValueTrgmSimilarity: 'value', regexpTrgmSimilarity: 'value', moduleTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

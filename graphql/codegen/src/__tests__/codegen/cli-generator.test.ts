@@ -1,11 +1,9 @@
 import { generateCli, generateMultiTargetCli, resolveBuiltinNames } from '../../core/codegen/cli';
 import {
   generateReadme as generateCliReadme,
-  generateAgentsDocs as generateCliAgentsDocs,
   getCliMcpTools,
   generateSkills as generateCliSkills,
   generateMultiTargetReadme,
-  generateMultiTargetAgentsDocs,
   getMultiTargetCliMcpTools,
   generateMultiTargetSkills,
 } from '../../core/codegen/cli/docs-generator';
@@ -13,13 +11,11 @@ import type { MultiTargetDocsInput } from '../../core/codegen/cli/docs-generator
 import { resolveDocsConfig } from '../../core/codegen/docs-utils';
 import {
   generateOrmReadme,
-  generateOrmAgentsDocs,
   getOrmMcpTools,
   generateOrmSkills,
 } from '../../core/codegen/orm/docs-generator';
 import {
   generateHooksReadme,
-  generateHooksAgentsDocs,
   getHooksMcpTools,
   generateHooksSkills,
 } from '../../core/codegen/hooks-docs-generator';
@@ -268,12 +264,6 @@ describe('cli docs generator', () => {
     expect(readme.content).toMatchSnapshot();
   });
 
-  it('generates CLI AGENTS.md', () => {
-    const agents = generateCliAgentsDocs([carTable, driverTable], allCustomOps, 'myapp');
-    expect(agents.fileName).toBe('AGENTS.md');
-    expect(agents.content).toMatchSnapshot();
-  });
-
   it('generates CLI MCP tools', () => {
     const tools = getCliMcpTools([carTable, driverTable], allCustomOps, 'myapp');
     expect(tools.length).toBeGreaterThan(0);
@@ -300,12 +290,6 @@ describe('orm docs generator', () => {
     expect(readme.content).toMatchSnapshot();
   });
 
-  it('generates ORM AGENTS.md', () => {
-    const agents = generateOrmAgentsDocs([carTable, driverTable], allCustomOps);
-    expect(agents.fileName).toBe('AGENTS.md');
-    expect(agents.content).toMatchSnapshot();
-  });
-
   it('generates ORM MCP tools', () => {
     const tools = getOrmMcpTools([carTable, driverTable], allCustomOps);
     expect(tools.length).toBeGreaterThan(0);
@@ -330,12 +314,6 @@ describe('hooks docs generator', () => {
     const readme = generateHooksReadme([carTable, driverTable], allCustomOps);
     expect(readme.fileName).toBe('README.md');
     expect(readme.content).toMatchSnapshot();
-  });
-
-  it('generates hooks AGENTS.md', () => {
-    const agents = generateHooksAgentsDocs([carTable, driverTable], allCustomOps);
-    expect(agents.fileName).toBe('AGENTS.md');
-    expect(agents.content).toMatchSnapshot();
   });
 
   it('generates hooks MCP tools', () => {
@@ -421,6 +399,7 @@ describe('resolveBuiltinNames', () => {
     expect(resolveBuiltinNames(['app', 'members'])).toEqual({
       auth: 'auth',
       context: 'context',
+      config: 'config',
     });
   });
 
@@ -428,6 +407,7 @@ describe('resolveBuiltinNames', () => {
     expect(resolveBuiltinNames(['auth', 'members', 'app'])).toEqual({
       auth: 'credentials',
       context: 'context',
+      config: 'config',
     });
   });
 
@@ -435,6 +415,7 @@ describe('resolveBuiltinNames', () => {
     expect(resolveBuiltinNames(['context', 'app'])).toEqual({
       auth: 'auth',
       context: 'env',
+      config: 'config',
     });
   });
 
@@ -442,6 +423,7 @@ describe('resolveBuiltinNames', () => {
     expect(resolveBuiltinNames(['auth', 'context', 'app'])).toEqual({
       auth: 'credentials',
       context: 'env',
+      config: 'config',
     });
   });
 
@@ -451,6 +433,7 @@ describe('resolveBuiltinNames', () => {
     ).toEqual({
       auth: 'auth',
       context: 'context',
+      config: 'config',
     });
   });
 
@@ -460,6 +443,33 @@ describe('resolveBuiltinNames', () => {
     ).toEqual({
       auth: 'creds',
       context: 'profile',
+      config: 'config',
+    });
+  });
+
+  it('renames config to vars on collision', () => {
+    expect(resolveBuiltinNames(['config', 'app'])).toEqual({
+      auth: 'auth',
+      context: 'context',
+      config: 'vars',
+    });
+  });
+
+  it('renames all three on collision', () => {
+    expect(resolveBuiltinNames(['auth', 'context', 'config', 'app'])).toEqual({
+      auth: 'credentials',
+      context: 'env',
+      config: 'vars',
+    });
+  });
+
+  it('respects user config override even with collision', () => {
+    expect(
+      resolveBuiltinNames(['config', 'app'], { config: 'config' }),
+    ).toEqual({
+      auth: 'auth',
+      context: 'context',
+      config: 'config',
     });
   });
 });
@@ -538,8 +548,8 @@ describe('multi-target cli generator', () => {
       tables: 3,
       customQueries: 1,
       customMutations: 1,
-      infraFiles: 4,
-      totalFiles: 10,
+      infraFiles: 6,
+      totalFiles: 12,
     });
   });
 
@@ -557,10 +567,12 @@ describe('multi-target cli generator', () => {
       'commands/auth/current-user.ts',
       'commands/auth/login.ts',
       'commands/auth/user.ts',
+      'commands/config.ts',
       'commands/context.ts',
       'commands/credentials.ts',
       'commands/members/member.ts',
       'executor.ts',
+      'helpers.ts',
       'utils.ts',
     ]);
   });
@@ -625,6 +637,32 @@ describe('multi-target cli generator', () => {
     expect(file!.content).toContain('app:car');
     expect(file!.content).toContain('credentials');
     expect(file!.content).toContain('context');
+    expect(file!.content).toContain('config');
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates config command', () => {
+    const file = multiResult.files.find(
+      (f) => f.fileName === 'commands/config.ts',
+    );
+    expect(file).toBeDefined();
+    expect(file!.content).toContain('getStore');
+    expect(file!.content).toContain('getVar');
+    expect(file!.content).toContain('setVar');
+    expect(file!.content).toContain('deleteVar');
+    expect(file!.content).toContain('listVars');
+    expect(file!.content).toMatchSnapshot();
+  });
+
+  it('generates helpers.ts with typed client factories', () => {
+    const file = multiResult.files.find((f) => f.fileName === 'helpers.ts');
+    expect(file).toBeDefined();
+    expect(file!.content).toContain('createConfigStore');
+    expect(file!.content).toContain('getClientConfig');
+    expect(file!.content).toContain('createAuthClient');
+    expect(file!.content).toContain('createMembersClient');
+    expect(file!.content).toContain('createAppClient');
+    expect(file!.content).toContain('ClientConfig');
     expect(file!.content).toMatchSnapshot();
   });
 
@@ -639,7 +677,7 @@ describe('multi-target cli generator', () => {
 describe('multi-target cli docs', () => {
   const docsInput: MultiTargetDocsInput = {
     toolName: 'myapp',
-    builtinNames: { auth: 'credentials', context: 'context' },
+    builtinNames: { auth: 'credentials', context: 'context', config: 'config' },
     targets: [
       {
         name: 'auth',
@@ -675,15 +713,6 @@ describe('multi-target cli docs', () => {
     expect(readme.content).toMatchSnapshot();
   });
 
-  it('generates multi-target AGENTS.md', () => {
-    const agents = generateMultiTargetAgentsDocs(docsInput);
-    expect(agents.fileName).toBe('AGENTS.md');
-    expect(agents.content).toContain('auth:user');
-    expect(agents.content).toContain('members:member');
-    expect(agents.content).toContain('app:car');
-    expect(agents.content).toMatchSnapshot();
-  });
-
   it('generates multi-target MCP tools', () => {
     const tools = getMultiTargetCliMcpTools(docsInput);
     expect(tools.length).toBeGreaterThan(0);
@@ -710,7 +739,7 @@ describe('multi-target cli docs', () => {
   it('handles collision-renamed infra in docs', () => {
     const collisionInput: MultiTargetDocsInput = {
       toolName: 'myapp',
-      builtinNames: { auth: 'credentials', context: 'env' },
+      builtinNames: { auth: 'credentials', context: 'env', config: 'config' },
       targets: docsInput.targets,
     };
     const readme = generateMultiTargetReadme(collisionInput);

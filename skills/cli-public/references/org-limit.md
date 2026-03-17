@@ -9,7 +9,7 @@ CRUD operations for OrgLimit records via csdk CLI
 ```bash
 csdk org-limit list
 csdk org-limit get --id <value>
-csdk org-limit create --name <value> --actorId <value> --num <value> --max <value> --entityId <value>
+csdk org-limit create --actorId <value> --entityId <value> [--name <value>] [--num <value>] [--max <value>]
 csdk org-limit update --id <value> [--name <value>] [--actorId <value>] [--num <value>] [--max <value>] [--entityId <value>]
 csdk org-limit delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk org-limit list
 ### Create a orgLimit
 
 ```bash
-csdk org-limit create --name "value" --actorId "value" --num "value" --max "value" --entityId "value"
+csdk org-limit create --actorId <value> --entityId <value> [--name <value>] [--num <value>] [--max <value>]
 ```
 
 ### Get a orgLimit by id

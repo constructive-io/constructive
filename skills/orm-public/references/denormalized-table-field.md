@@ -9,7 +9,7 @@ ORM operations for DenormalizedTableField records
 ```typescript
 db.denormalizedTableField.findMany({ select: { id: true } }).execute()
 db.denormalizedTableField.findOne({ id: '<value>', select: { id: true } }).execute()
-db.denormalizedTableField.create({ data: { databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>' }, select: { id: true } }).execute()
+db.denormalizedTableField.create({ data: { databaseId: '<value>', tableId: '<value>', fieldId: '<value>', setIds: '<value>', refTableId: '<value>', refFieldId: '<value>', refIds: '<value>', useUpdates: '<value>', updateDefaults: '<value>', funcName: '<value>', funcOrder: '<value>', funcNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.denormalizedTableField.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.denormalizedTableField.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.denormalizedTableField.findMany({
 
 ```typescript
 const item = await db.denormalizedTableField.create({
-  data: { databaseId: 'value', tableId: 'value', fieldId: 'value', setIds: 'value', refTableId: 'value', refFieldId: 'value', refIds: 'value', useUpdates: 'value', updateDefaults: 'value', funcName: 'value', funcOrder: 'value' },
+  data: { databaseId: 'value', tableId: 'value', fieldId: 'value', setIds: 'value', refTableId: 'value', refFieldId: 'value', refIds: 'value', useUpdates: 'value', updateDefaults: 'value', funcName: 'value', funcOrder: 'value', funcNameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

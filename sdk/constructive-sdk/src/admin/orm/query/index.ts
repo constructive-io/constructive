@@ -24,15 +24,15 @@ export interface OrgIsManagerOfVariables {
   pUserId?: string;
   pMaxDepth?: number;
 }
-export interface StepsAchievedVariables {
-  vlevel?: string;
-  vroleId?: string;
-}
 export interface AppPermissionsGetMaskVariables {
   ids?: string[];
 }
 export interface OrgPermissionsGetMaskVariables {
   ids?: string[];
+}
+export interface StepsAchievedVariables {
+  vlevel?: string;
+  vroleId?: string;
 }
 export interface AppPermissionsGetMaskByNamesVariables {
   names?: string[];
@@ -178,39 +178,6 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    stepsAchieved: (
-      args: StepsAchievedVariables,
-      options?: {
-        select?: Record<string, unknown>;
-      }
-    ) =>
-      new QueryBuilder<{
-        stepsAchieved: boolean | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'StepsAchieved',
-        fieldName: 'stepsAchieved',
-        ...buildCustomDocument(
-          'query',
-          'StepsAchieved',
-          'stepsAchieved',
-          options?.select,
-          args,
-          [
-            {
-              name: 'vlevel',
-              type: 'String',
-            },
-            {
-              name: 'vroleId',
-              type: 'UUID',
-            },
-          ],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
     appPermissionsGetMask: (
       args: AppPermissionsGetMaskVariables,
       options?: {
@@ -263,6 +230,39 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'ids',
               type: '[UUID]',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    stepsAchieved: (
+      args: StepsAchievedVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        stepsAchieved: boolean | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'StepsAchieved',
+        fieldName: 'stepsAchieved',
+        ...buildCustomDocument(
+          'query',
+          'StepsAchieved',
+          'stepsAchieved',
+          options?.select,
+          args,
+          [
+            {
+              name: 'vlevel',
+              type: 'String',
+            },
+            {
+              name: 'vroleId',
+              type: 'UUID',
             },
           ],
           connectionFieldsMap,

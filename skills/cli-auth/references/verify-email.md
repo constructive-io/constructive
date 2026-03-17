@@ -7,7 +7,7 @@ Execute the verifyEmail mutation
 ## Usage
 
 ```bash
-csdk verify-email --input <value>
+csdk verify-email --input.clientMutationId <value> --input.emailId <value> --input.token <value>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk verify-email --input <value>
 ### Run verifyEmail
 
 ```bash
-csdk verify-email --input <value>
+csdk verify-email --input.clientMutationId <value> --input.emailId <value> --input.token <value>
 ```

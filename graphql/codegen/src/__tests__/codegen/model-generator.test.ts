@@ -232,4 +232,42 @@ describe('model-generator', () => {
     expect(result.content).toContain('UpdateProductInput');
     expect(result.content).toContain('ProductPatch');
   });
+
+  it('imports and wires Condition type for findMany and findFirst', () => {
+    const table = createTable({
+      name: 'Contact',
+      fields: [
+        { name: 'id', type: fieldTypes.uuid },
+        { name: 'name', type: fieldTypes.string },
+      ],
+      query: {
+        all: 'contacts',
+        one: 'contact',
+        create: 'createContact',
+        update: 'updateContact',
+        delete: 'deleteContact',
+      },
+    });
+
+    const result = generateModelFile(table, false);
+
+    // Condition type should be imported
+    expect(result.content).toContain('ContactCondition');
+
+    // findMany should include condition in its args type
+    expect(result.content).toContain(
+      'FindManyArgs<S, ContactFilter, ContactCondition, ContactsOrderBy>',
+    );
+
+    // findFirst should include condition in its args type
+    expect(result.content).toContain(
+      'FindFirstArgs<S, ContactFilter, ContactCondition>',
+    );
+
+    // condition should be forwarded in the body args object
+    expect(result.content).toContain('condition: args?.condition');
+
+    // conditionTypeName should be passed as a string literal to the document builder
+    expect(result.content).toContain('"ContactCondition"');
+  });
 });

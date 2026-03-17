@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SecureTableProvisionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SecureTableProvisionSelect>(
-    args: FindManyArgs<S, SecureTableProvisionFilter, SecureTableProvisionOrderBy> & {
+    args: FindManyArgs<S, SecureTableProvisionFilter, never, SecureTableProvisionOrderBy> & {
       select: S;
     } & StrictSelect<S, SecureTableProvisionSelect>
   ): QueryBuilder<{

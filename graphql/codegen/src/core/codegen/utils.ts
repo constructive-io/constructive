@@ -7,6 +7,7 @@ import type {
   CleanField,
   CleanFieldType,
   CleanTable,
+  TypeRegistry,
 } from '../../types/schema';
 import { scalarToFilterType, scalarToTsType } from './scalars';
 
@@ -333,6 +334,68 @@ export function isRelationField(fieldName: string, table: CleanTable): boolean {
  */
 export function getScalarFields(table: CleanTable): CleanField[] {
   return table.fields.filter((f) => !isRelationField(f.name, table));
+}
+
+/**
+ * Resolve the inner input type from a CreateXInput.
+ * PostGraphile create inputs wrap the actual field definitions in an inner type
+ * (e.g. CreateUserInput -> { user: UserInput }) — this resolves that inner type
+ * and returns the set of field names it contains.
+ */
+export function resolveInnerInputType(
+  inputTypeName: string,
+  typeRegistry: TypeRegistry,
+): { name: string; fields: Set<string> } | null {
+  const inputType = typeRegistry.get(inputTypeName);
+  if (!inputType?.inputFields) return null;
+
+  for (const inputField of inputType.inputFields) {
+    const innerTypeName = inputField.type.name
+      || inputField.type.ofType?.name
+      || inputField.type.ofType?.ofType?.name;
+    if (!innerTypeName) continue;
+
+    const innerType = typeRegistry.get(innerTypeName);
+    if (!innerType?.inputFields) continue;
+
+    const fields = new Set(innerType.inputFields.map((f) => f.name));
+    return { name: innerTypeName, fields };
+  }
+  return null;
+}
+
+/**
+ * Get the set of field names that actually exist in the create input type.
+ * Fields not in this set (e.g. computed fields like searchTsvRank, hashUuid)
+ * are plugin-added computed fields that don't correspond to real database columns.
+ * Returns null when no typeRegistry is provided (caller should treat as "no filtering").
+ */
+export function getWritableFieldNames(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): Set<string> | null {
+  if (!typeRegistry) return null;
+
+  const createInputTypeName = getCreateInputTypeName(table);
+  const resolved = resolveInnerInputType(createInputTypeName, typeRegistry);
+  return resolved?.fields ?? null;
+}
+
+/**
+ * Get scalar fields that represent actual database columns (not computed/plugin-added).
+ * When a TypeRegistry is provided, filters out fields that don't exist in the
+ * create input type — these are computed fields added by plugins (e.g. search scores,
+ * hash UUIDs) that aren't real columns and shouldn't appear in default selections.
+ * Without a TypeRegistry, falls back to all scalar fields.
+ */
+export function getSelectableScalarFields(
+  table: CleanTable,
+  typeRegistry?: TypeRegistry,
+): CleanField[] {
+  const writableFields = getWritableFieldNames(table, typeRegistry);
+  return getScalarFields(table).filter(
+    (f) => writableFields === null || writableFields.has(f.name),
+  );
 }
 
 /**

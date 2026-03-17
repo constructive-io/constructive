@@ -9,8 +9,8 @@ CRUD operations for SiteMetadatum records via csdk CLI
 ```bash
 csdk site-metadatum list
 csdk site-metadatum get --id <value>
-csdk site-metadatum create --databaseId <value> --siteId <value> --title <value> --description <value> --ogImage <value>
-csdk site-metadatum update --id <value> [--databaseId <value>] [--siteId <value>] [--title <value>] [--description <value>] [--ogImage <value>]
+csdk site-metadatum create --databaseId <value> --siteId <value> --titleTrgmSimilarity <value> --descriptionTrgmSimilarity <value> --searchScore <value> [--title <value>] [--description <value>] [--ogImage <value>]
+csdk site-metadatum update --id <value> [--databaseId <value>] [--siteId <value>] [--title <value>] [--description <value>] [--ogImage <value>] [--titleTrgmSimilarity <value>] [--descriptionTrgmSimilarity <value>] [--searchScore <value>]
 csdk site-metadatum delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk site-metadatum list
 ### Create a siteMetadatum
 
 ```bash
-csdk site-metadatum create --databaseId "value" --siteId "value" --title "value" --description "value" --ogImage "value"
+csdk site-metadatum create --databaseId <value> --siteId <value> --titleTrgmSimilarity <value> --descriptionTrgmSimilarity <value> --searchScore <value> [--title <value>] [--description <value>] [--ogImage <value>]
 ```
 
 ### Get a siteMetadatum by id

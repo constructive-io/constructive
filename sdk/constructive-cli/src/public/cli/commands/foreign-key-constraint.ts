@@ -30,6 +30,13 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
+  nameTrgmSimilarity: 'float',
+  descriptionTrgmSimilarity: 'float',
+  typeTrgmSimilarity: 'float',
+  deleteActionTrgmSimilarity: 'float',
+  updateActionTrgmSimilarity: 'float',
+  moduleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nforeign-key-constraint <command>\n\nCommands:\n  list                  List all foreignKeyConstraint records\n  get                   Get a foreignKeyConstraint by ID\n  create                Create a new foreignKeyConstraint\n  update                Update an existing foreignKeyConstraint\n  delete                Delete a foreignKeyConstraint\n\n  --help, -h            Show this help message\n';

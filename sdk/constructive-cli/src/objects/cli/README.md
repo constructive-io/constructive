@@ -25,6 +25,7 @@ csdk auth set-token <your-token>
 |---------|-------------|
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
+| `config` | Manage config key-value store (per-context) |
 | `get-all-record` | getAllRecord CRUD operations |
 | `object` | object CRUD operations |
 | `ref` | ref CRUD operations |
@@ -69,6 +70,19 @@ Manage authentication tokens per context.
 | `status` | Show auth status across all contexts |
 | `logout` | Remove credentials for current context |
 
+### `config`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| `get <key>` | Get a config value |
+| `set <key> <value>` | Set a config value |
+| `list` | List all config values |
+| `delete <key>` | Delete a config value |
+
+Variables are scoped to the active context and stored at `~/.csdk/config/`.
+
 ## Table Commands
 
 ### `get-all-record`
@@ -90,7 +104,7 @@ CRUD operations for GetAllRecord records.
 | `path` | String |
 | `data` | JSON |
 
-**Create fields:** `path`, `data`
+**Required create fields:** `path`, `data`
 
 ### `object`
 
@@ -117,7 +131,8 @@ CRUD operations for Object records.
 | `frzn` | Boolean |
 | `createdAt` | Datetime |
 
-**Create fields:** `hashUuid`, `databaseId`, `kids`, `ktree`, `data`, `frzn`
+**Required create fields:** `hashUuid`, `databaseId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
 
 ### `ref`
 
@@ -140,8 +155,11 @@ CRUD operations for Ref records.
 | `databaseId` | UUID |
 | `storeId` | UUID |
 | `commitId` | UUID |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `name`, `databaseId`, `storeId`, `commitId`
+**Required create fields:** `name`, `databaseId`, `storeId`, `nameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `commitId`
 
 ### `store`
 
@@ -164,8 +182,11 @@ CRUD operations for Store records.
 | `databaseId` | UUID |
 | `hash` | UUID |
 | `createdAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `name`, `databaseId`, `hash`
+**Required create fields:** `name`, `databaseId`, `nameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `hash`
 
 ### `commit`
 
@@ -192,8 +213,11 @@ CRUD operations for Commit records.
 | `committerId` | UUID |
 | `treeId` | UUID |
 | `date` | Datetime |
+| `messageTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `message`, `databaseId`, `storeId`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
+**Required create fields:** `databaseId`, `storeId`, `messageTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ## Custom Operations
 
@@ -206,9 +230,9 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `refname` | String |
+  | `--dbId` | UUID |
+  | `--storeId` | UUID |
+  | `--refname` | String |
 
 ### `get-all-objects-from-root`
 
@@ -219,11 +243,11 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--databaseId` | UUID |
+  | `--id` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `get-path-objects-from-root`
 
@@ -234,12 +258,12 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `path` | [String] |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--databaseId` | UUID |
+  | `--id` | UUID |
+  | `--path` | String |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `get-object-at-path`
 
@@ -250,10 +274,10 @@ getObjectAtPath
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `path` | [String] |
-  | `refname` | String |
+  | `--dbId` | UUID |
+  | `--storeId` | UUID |
+  | `--path` | String |
+  | `--refname` | String |
 
 ### `freeze-objects`
 
@@ -264,7 +288,9 @@ freezeObjects
 
   | Argument | Type |
   |----------|------|
-  | `input` | FreezeObjectsInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.id` | UUID |
 
 ### `init-empty-repo`
 
@@ -275,7 +301,9 @@ initEmptyRepo
 
   | Argument | Type |
   |----------|------|
-  | `input` | InitEmptyRepoInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `remove-node-at-path`
 
@@ -286,7 +314,10 @@ removeNodeAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | RemoveNodeAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
 
 ### `set-data-at-path`
 
@@ -297,7 +328,11 @@ setDataAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetDataAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
 
 ### `set-props-and-commit`
 
@@ -308,7 +343,12 @@ setPropsAndCommit
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetPropsAndCommitInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
+  | `--input.refname` | String |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
 
 ### `insert-node-at-path`
 
@@ -319,7 +359,13 @@ insertNodeAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | InsertNodeAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
 
 ### `update-node-at-path`
 
@@ -330,7 +376,13 @@ updateNodeAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | UpdateNodeAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
 
 ### `set-and-commit`
 
@@ -341,7 +393,14 @@ setAndCommit
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetAndCommitInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
+  | `--input.refname` | String |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
 
 ## Output
 
@@ -350,6 +409,14 @@ All commands output JSON to stdout. Pipe to `jq` for formatting:
 ```bash
 csdk car list | jq '.[]'
 csdk car get --id <uuid> | jq '.'
+```
+
+## Non-Interactive Mode
+
+Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):
+
+```bash
+csdk --no-tty car create --name "Sedan" --year 2024
 ```
 
 ---

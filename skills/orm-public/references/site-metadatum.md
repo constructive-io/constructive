@@ -9,7 +9,7 @@ SEO and social sharing metadata for a site: page title, description, and Open Gr
 ```typescript
 db.siteMetadatum.findMany({ select: { id: true } }).execute()
 db.siteMetadatum.findOne({ id: '<value>', select: { id: true } }).execute()
-db.siteMetadatum.create({ data: { databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>' }, select: { id: true } }).execute()
+db.siteMetadatum.create({ data: { databaseId: '<value>', siteId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.siteMetadatum.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.siteMetadatum.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.siteMetadatum.findMany({
 
 ```typescript
 const item = await db.siteMetadatum.create({
-  data: { databaseId: 'value', siteId: 'value', title: 'value', description: 'value', ogImage: 'value' },
+  data: { databaseId: 'value', siteId: 'value', title: 'value', description: 'value', ogImage: 'value', titleTrgmSimilarity: 'value', descriptionTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

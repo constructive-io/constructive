@@ -16,6 +16,11 @@ const fieldSchema: FieldSchema = {
   roleName: 'string',
   anonRole: 'string',
   isPublic: 'boolean',
+  nameTrgmSimilarity: 'float',
+  dbnameTrgmSimilarity: 'float',
+  roleNameTrgmSimilarity: 'float',
+  anonRoleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\napi <command>\n\nCommands:\n  list                  List all api records\n  get                   Get a api by ID\n  create                Create a new api\n  update                Update an existing api\n  delete                Delete a api\n\n  --help, -h            Show this help message\n';

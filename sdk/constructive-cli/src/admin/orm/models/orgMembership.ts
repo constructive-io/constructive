@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgMembershipModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgMembershipSelect>(
-    args: FindManyArgs<S, OrgMembershipFilter, OrgMembershipOrderBy> & {
+    args: FindManyArgs<S, OrgMembershipFilter, never, OrgMembershipOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgMembershipSelect>
   ): QueryBuilder<{

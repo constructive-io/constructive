@@ -9,7 +9,7 @@ ORM operations for LimitsModule records
 ```typescript
 db.limitsModule.findMany({ select: { id: true } }).execute()
 db.limitsModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.limitsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', limitIncrementFunction: '<value>', limitDecrementFunction: '<value>', limitIncrementTrigger: '<value>', limitDecrementTrigger: '<value>', limitUpdateTrigger: '<value>', limitCheckFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>' }, select: { id: true } }).execute()
+db.limitsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', tableId: '<value>', tableName: '<value>', defaultTableId: '<value>', defaultTableName: '<value>', limitIncrementFunction: '<value>', limitDecrementFunction: '<value>', limitIncrementTrigger: '<value>', limitDecrementTrigger: '<value>', limitUpdateTrigger: '<value>', limitCheckFunction: '<value>', prefix: '<value>', membershipType: '<value>', entityTableId: '<value>', actorTableId: '<value>', tableNameTrgmSimilarity: '<value>', defaultTableNameTrgmSimilarity: '<value>', limitIncrementFunctionTrgmSimilarity: '<value>', limitDecrementFunctionTrgmSimilarity: '<value>', limitIncrementTriggerTrgmSimilarity: '<value>', limitDecrementTriggerTrgmSimilarity: '<value>', limitUpdateTriggerTrgmSimilarity: '<value>', limitCheckFunctionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.limitsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.limitsModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.limitsModule.findMany({
 
 ```typescript
 const item = await db.limitsModule.create({
-  data: { databaseId: 'value', schemaId: 'value', privateSchemaId: 'value', tableId: 'value', tableName: 'value', defaultTableId: 'value', defaultTableName: 'value', limitIncrementFunction: 'value', limitDecrementFunction: 'value', limitIncrementTrigger: 'value', limitDecrementTrigger: 'value', limitUpdateTrigger: 'value', limitCheckFunction: 'value', prefix: 'value', membershipType: 'value', entityTableId: 'value', actorTableId: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', privateSchemaId: 'value', tableId: 'value', tableName: 'value', defaultTableId: 'value', defaultTableName: 'value', limitIncrementFunction: 'value', limitDecrementFunction: 'value', limitIncrementTrigger: 'value', limitDecrementTrigger: 'value', limitUpdateTrigger: 'value', limitCheckFunction: 'value', prefix: 'value', membershipType: 'value', entityTableId: 'value', actorTableId: 'value', tableNameTrgmSimilarity: 'value', defaultTableNameTrgmSimilarity: 'value', limitIncrementFunctionTrgmSimilarity: 'value', limitDecrementFunctionTrgmSimilarity: 'value', limitIncrementTriggerTrgmSimilarity: 'value', limitDecrementTriggerTrgmSimilarity: 'value', limitUpdateTriggerTrgmSimilarity: 'value', limitCheckFunctionTrgmSimilarity: 'value', prefixTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

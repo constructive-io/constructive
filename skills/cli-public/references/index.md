@@ -9,8 +9,8 @@ CRUD operations for Index records via csdk CLI
 ```bash
 csdk index list
 csdk index get --id <value>
-csdk index create --databaseId <value> --tableId <value> --name <value> --fieldIds <value> --includeFieldIds <value> --accessMethod <value> --indexParams <value> --whereClause <value> --isUnique <value> --smartTags <value> --category <value> --module <value> --scope <value> --tags <value>
-csdk index update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--fieldIds <value>] [--includeFieldIds <value>] [--accessMethod <value>] [--indexParams <value>] [--whereClause <value>] [--isUnique <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
+csdk index create --databaseId <value> --tableId <value> --nameTrgmSimilarity <value> --accessMethodTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--name <value>] [--fieldIds <value>] [--includeFieldIds <value>] [--accessMethod <value>] [--indexParams <value>] [--whereClause <value>] [--isUnique <value>] [--options <value>] [--opClasses <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
+csdk index update --id <value> [--databaseId <value>] [--tableId <value>] [--name <value>] [--fieldIds <value>] [--includeFieldIds <value>] [--accessMethod <value>] [--indexParams <value>] [--whereClause <value>] [--isUnique <value>] [--options <value>] [--opClasses <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>] [--nameTrgmSimilarity <value>] [--accessMethodTrgmSimilarity <value>] [--moduleTrgmSimilarity <value>] [--searchScore <value>]
 csdk index delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk index list
 ### Create a index
 
 ```bash
-csdk index create --databaseId "value" --tableId "value" --name "value" --fieldIds "value" --includeFieldIds "value" --accessMethod "value" --indexParams "value" --whereClause "value" --isUnique "value" --smartTags "value" --category "value" --module "value" --scope "value" --tags "value"
+csdk index create --databaseId <value> --tableId <value> --nameTrgmSimilarity <value> --accessMethodTrgmSimilarity <value> --moduleTrgmSimilarity <value> --searchScore <value> [--name <value>] [--fieldIds <value>] [--includeFieldIds <value>] [--accessMethod <value>] [--indexParams <value>] [--whereClause <value>] [--isUnique <value>] [--options <value>] [--opClasses <value>] [--smartTags <value>] [--category <value>] [--module <value>] [--scope <value>] [--tags <value>]
 ```
 
 ### Get a index by id

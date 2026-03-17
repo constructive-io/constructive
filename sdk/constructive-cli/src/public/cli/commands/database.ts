@@ -17,6 +17,10 @@ const fieldSchema: FieldSchema = {
   hash: 'uuid',
   createdAt: 'string',
   updatedAt: 'string',
+  schemaHashTrgmSimilarity: 'float',
+  nameTrgmSimilarity: 'float',
+  labelTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ndatabase <command>\n\nCommands:\n  list                  List all database records\n  get                   Get a database by ID\n  create                Create a new database\n  update                Update an existing database\n  delete                Delete a database\n\n  --help, -h            Show this help message\n';

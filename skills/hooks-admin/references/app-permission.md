@@ -7,8 +7,8 @@ Defines available permissions as named bits within a bitmask, used by the RBAC s
 ## Usage
 
 ```typescript
-useAppPermissionsQuery({ selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } } })
-useAppPermissionQuery({ id: '<value>', selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } } })
+useAppPermissionsQuery({ selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } } })
+useAppPermissionQuery({ id: '<value>', selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } } })
 useCreateAppPermissionMutation({ selection: { fields: { id: true } } })
 useUpdateAppPermissionMutation({ selection: { fields: { id: true } } })
 useDeleteAppPermissionMutation({})
@@ -20,7 +20,7 @@ useDeleteAppPermissionMutation({})
 
 ```typescript
 const { data, isLoading } = useAppPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useAppPermissionsQuery({
 const { mutate } = useCreateAppPermissionMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>' });
+mutate({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

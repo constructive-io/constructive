@@ -9,7 +9,7 @@ CRUD operations for AppAdminGrant records via csdk CLI
 ```bash
 csdk app-admin-grant list
 csdk app-admin-grant get --id <value>
-csdk app-admin-grant create --isGrant <value> --actorId <value> --grantorId <value>
+csdk app-admin-grant create --actorId <value> [--isGrant <value>] [--grantorId <value>]
 csdk app-admin-grant update --id <value> [--isGrant <value>] [--actorId <value>] [--grantorId <value>]
 csdk app-admin-grant delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk app-admin-grant list
 ### Create a appAdminGrant
 
 ```bash
-csdk app-admin-grant create --isGrant "value" --actorId "value" --grantorId "value"
+csdk app-admin-grant create --actorId <value> [--isGrant <value>] [--grantorId <value>]
 ```
 
 ### Get a appAdminGrant by id

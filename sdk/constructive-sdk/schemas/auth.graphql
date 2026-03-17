@@ -5,40 +5,6 @@ type Query {
   currentUserId: UUID
   currentUser: User
 
-  """Reads and enables pagination through a set of `RoleType`."""
-  roleTypes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RoleTypeCondition
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    filter: RoleTypeFilter
-
-    """The method to use when ordering `RoleType`."""
-    orderBy: [RoleTypeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RoleTypeConnection
-
   """Reads and enables pagination through a set of `CryptoAddress`."""
   cryptoAddresses(
     """Only read the first `n` values of the set."""
@@ -60,18 +26,42 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CryptoAddressCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: CryptoAddressFilter
+    where: CryptoAddressFilter
 
     """The method to use when ordering `CryptoAddress`."""
     orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
   ): CryptoAddressConnection
+
+  """Reads and enables pagination through a set of `RoleType`."""
+  roleTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RoleTypeFilter
+
+    """The method to use when ordering `RoleType`."""
+    orderBy: [RoleTypeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RoleTypeConnection
 
   """Reads and enables pagination through a set of `PhoneNumber`."""
   phoneNumbers(
@@ -94,14 +84,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PhoneNumberCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: PhoneNumberFilter
+    where: PhoneNumberFilter
 
     """The method to use when ordering `PhoneNumber`."""
     orderBy: [PhoneNumberOrderBy!] = [PRIMARY_KEY_ASC]
@@ -128,14 +113,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ConnectedAccountCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: ConnectedAccountFilter
+    where: ConnectedAccountFilter
 
     """The method to use when ordering `ConnectedAccount`."""
     orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
@@ -162,14 +142,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: AuditLogCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: AuditLogFilter
+    where: AuditLogFilter
 
     """The method to use when ordering `AuditLog`."""
     orderBy: [AuditLogOrderBy!] = [PRIMARY_KEY_ASC]
@@ -196,14 +171,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: EmailCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: EmailFilter
+    where: EmailFilter
 
     """The method to use when ordering `Email`."""
     orderBy: [EmailOrderBy!] = [PRIMARY_KEY_ASC]
@@ -230,14 +200,9 @@ type Query {
     after: Cursor
 
     """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: UserCondition
-
-    """
     A filter to be used in determining which values should be returned by the collection.
     """
-    filter: UserFilter
+    where: UserFilter
 
     """The method to use when ordering `User`."""
     orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
@@ -267,13 +232,23 @@ type User {
   createdAt: Datetime
   updatedAt: Datetime
 
+  """Reads a single `RoleType` that is related to this `User`."""
+  roleType: RoleType
+
   """
-  Full-text search ranking when filtered by `searchTsv`. Returns null when no search condition is active.
+  TSV rank when searching `searchTsv`. Returns null when no tsv search filter is active.
   """
   searchTsvRank: Float
 
-  """Reads a single `RoleType` that is related to this `User`."""
-  roleType: RoleType
+  """
+  TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active.
+  """
+  displayNameTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 scalar ConstructiveInternalTypeImage
@@ -295,30 +270,64 @@ type RoleType {
   name: String!
 }
 
-"""A connection to a list of `RoleType` values."""
-type RoleTypeConnection {
-  """A list of `RoleType` objects."""
-  nodes: [RoleType]!
+"""A connection to a list of `CryptoAddress` values."""
+type CryptoAddressConnection {
+  """A list of `CryptoAddress` objects."""
+  nodes: [CryptoAddress]!
 
   """
-  A list of edges which contains the `RoleType` and cursor to aid in pagination.
+  A list of edges which contains the `CryptoAddress` and cursor to aid in pagination.
   """
-  edges: [RoleTypeEdge]!
+  edges: [CryptoAddressEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `RoleType` you could get from the connection."""
+  """The count of *all* `CryptoAddress` you could get from the connection."""
   totalCount: Int!
 }
 
-"""A `RoleType` edge in the connection."""
-type RoleTypeEdge {
+"""
+Cryptocurrency wallet addresses owned by users, with network-specific validation and verification
+"""
+type CryptoAddress {
+  id: UUID!
+  ownerId: UUID!
+
+  """
+  The cryptocurrency wallet address, validated against network-specific patterns
+  """
+  address: String!
+
+  """Whether ownership of this address has been cryptographically verified"""
+  isVerified: Boolean!
+
+  """Whether this is the user's primary cryptocurrency address"""
+  isPrimary: Boolean!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Reads a single `User` that is related to this `CryptoAddress`."""
+  owner: User
+
+  """
+  TRGM similarity when searching `address`. Returns null when no trgm search filter is active.
+  """
+  addressTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
+}
+
+"""A `CryptoAddress` edge in the connection."""
+type CryptoAddressEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `RoleType` at the end of the edge."""
-  node: RoleType
+  """The `CryptoAddress` at the end of the edge."""
+  node: CryptoAddress
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -340,77 +349,94 @@ type PageInfo {
 }
 
 """
-A condition to be used against `RoleType` object types. All fields are tested
-for equality and combined with a logical ‘and.’
+A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’
 """
-input RoleTypeCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-}
-
-"""
-A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’
-"""
-input RoleTypeFilter {
+input CryptoAddressFilter {
   """Filter by the object’s `id` field."""
-  id: IntFilter
+  id: UUIDFilter
 
-  """Filter by the object’s `name` field."""
-  name: StringFilter
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `address` field."""
+  address: StringFilter
+
+  """Filter by the object’s `isVerified` field."""
+  isVerified: BooleanFilter
+
+  """Filter by the object’s `isPrimary` field."""
+  isPrimary: BooleanFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [RoleTypeFilter!]
+  and: [CryptoAddressFilter!]
 
   """Checks for any expressions in this list."""
-  or: [RoleTypeFilter!]
+  or: [CryptoAddressFilter!]
 
   """Negates the expression."""
-  not: RoleTypeFilter
+  not: CryptoAddressFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """TRGM search on the `address` column."""
+  trgmAddress: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """
-A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
 """
-input IntFilter {
+input UUIDFilter {
   """
   Is null (if `true` is specified) or is not null (if `false` is specified).
   """
   isNull: Boolean
 
   """Equal to the specified value."""
-  equalTo: Int
+  equalTo: UUID
 
   """Not equal to the specified value."""
-  notEqualTo: Int
+  notEqualTo: UUID
 
   """
   Not equal to the specified value, treating null like an ordinary value.
   """
-  distinctFrom: Int
+  distinctFrom: UUID
 
   """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Int
+  notDistinctFrom: UUID
 
   """Included in the specified list."""
-  in: [Int!]
+  in: [UUID!]
 
   """Not included in the specified list."""
-  notIn: [Int!]
+  notIn: [UUID!]
 
   """Less than the specified value."""
-  lessThan: Int
+  lessThan: UUID
 
   """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Int
+  lessThanOrEqualTo: UUID
 
   """Greater than the specified value."""
-  greaterThan: Int
+  greaterThan: UUID
 
   """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Int
+  greaterThanOrEqualTo: UUID
 }
 
 """
@@ -543,171 +569,29 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
-}
-
-"""Methods to use when ordering `RoleType`."""
-enum RoleTypeOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
-"""A connection to a list of `CryptoAddress` values."""
-type CryptoAddressConnection {
-  """A list of `CryptoAddress` objects."""
-  nodes: [CryptoAddress]!
 
   """
-  A list of edges which contains the `CryptoAddress` and cursor to aid in pagination.
+  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
   """
-  edges: [CryptoAddressEdge]!
+  similarTo: TrgmSearchInput
 
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `CryptoAddress` you could get from the connection."""
-  totalCount: Int!
+  """
+  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
+  """
+  wordSimilarTo: TrgmSearchInput
 }
 
 """
-Cryptocurrency wallet addresses owned by users, with network-specific validation and verification
+Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
 """
-type CryptoAddress {
-  id: UUID!
-  ownerId: UUID!
+input TrgmSearchInput {
+  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
+  value: String!
 
   """
-  The cryptocurrency wallet address, validated against network-specific patterns
+  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
   """
-  address: String!
-
-  """Whether ownership of this address has been cryptographically verified"""
-  isVerified: Boolean!
-
-  """Whether this is the user's primary cryptocurrency address"""
-  isPrimary: Boolean!
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single `User` that is related to this `CryptoAddress`."""
-  owner: User
-}
-
-"""A `CryptoAddress` edge in the connection."""
-type CryptoAddressEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `CryptoAddress` at the end of the edge."""
-  node: CryptoAddress
-}
-
-"""
-A condition to be used against `CryptoAddress` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input CryptoAddressCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `ownerId` field."""
-  ownerId: UUID
-
-  """Checks for equality with the object’s `address` field."""
-  address: String
-
-  """Checks for equality with the object’s `isVerified` field."""
-  isVerified: Boolean
-
-  """Checks for equality with the object’s `isPrimary` field."""
-  isPrimary: Boolean
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
-A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’
-"""
-input CryptoAddressFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
-
-  """Filter by the object’s `address` field."""
-  address: StringFilter
-
-  """Filter by the object’s `isVerified` field."""
-  isVerified: BooleanFilter
-
-  """Filter by the object’s `isPrimary` field."""
-  isPrimary: BooleanFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [CryptoAddressFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [CryptoAddressFilter!]
-
-  """Negates the expression."""
-  not: CryptoAddressFilter
-}
-
-"""
-A filter to be used against UUID fields. All fields are combined with a logical ‘and.’
-"""
-input UUIDFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: UUID
-
-  """Not equal to the specified value."""
-  notEqualTo: UUID
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: UUID
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: UUID
-
-  """Included in the specified list."""
-  in: [UUID!]
-
-  """Not included in the specified list."""
-  notIn: [UUID!]
-
-  """Less than the specified value."""
-  lessThan: UUID
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: UUID
-
-  """Greater than the specified value."""
-  greaterThan: UUID
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: UUID
+  threshold: Float
 }
 
 """
@@ -794,6 +678,213 @@ input DatetimeFilter {
   greaterThanOrEqualTo: Datetime
 }
 
+"""
+A filter to be used against `User` object types. All fields are combined with a logical ‘and.’
+"""
+input UserFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `username` field."""
+  username: StringFilter
+
+  """Filter by the object’s `displayName` field."""
+  displayName: StringFilter
+
+  """Filter by the object’s `profilePicture` field."""
+  profilePicture: ConstructiveInternalTypeImageFilter
+
+  """Filter by the object’s `searchTsv` field."""
+  searchTsv: FullTextFilter
+
+  """Filter by the object’s `type` field."""
+  type: IntFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [UserFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [UserFilter!]
+
+  """Negates the expression."""
+  not: UserFilter
+
+  """Filter by the object’s `roleType` relation."""
+  roleType: RoleTypeFilter
+
+  """TSV search on the `search_tsv` column."""
+  tsvSearchTsv: String
+
+  """TRGM search on the `display_name` column."""
+  trgmDisplayName: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeImageFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: ConstructiveInternalTypeImage
+
+  """Not equal to the specified value."""
+  notEqualTo: ConstructiveInternalTypeImage
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ConstructiveInternalTypeImage
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ConstructiveInternalTypeImage
+
+  """Included in the specified list."""
+  in: [ConstructiveInternalTypeImage!]
+
+  """Not included in the specified list."""
+  notIn: [ConstructiveInternalTypeImage!]
+
+  """Less than the specified value."""
+  lessThan: ConstructiveInternalTypeImage
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Greater than the specified value."""
+  greaterThan: ConstructiveInternalTypeImage
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Contains the specified JSON."""
+  contains: ConstructiveInternalTypeImage
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: ConstructiveInternalTypeImage
+}
+
+"""
+A filter to be used against FullText fields. All fields are combined with a logical ‘and.’
+"""
+input FullTextFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: FullText
+
+  """Not equal to the specified value."""
+  notEqualTo: FullText
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: FullText
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: FullText
+
+  """Included in the specified list."""
+  in: [FullText!]
+
+  """Not included in the specified list."""
+  notIn: [FullText!]
+
+  """Performs a full text search on the field."""
+  matches: String
+}
+
+"""
+A filter to be used against Int fields. All fields are combined with a logical ‘and.’
+"""
+input IntFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Int
+
+  """Not equal to the specified value."""
+  notEqualTo: Int
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Int
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Int
+
+  """Included in the specified list."""
+  in: [Int!]
+
+  """Not included in the specified list."""
+  notIn: [Int!]
+
+  """Less than the specified value."""
+  lessThan: Int
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Int
+
+  """Greater than the specified value."""
+  greaterThan: Int
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Int
+}
+
+"""
+A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’
+"""
+input RoleTypeFilter {
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [RoleTypeFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [RoleTypeFilter!]
+
+  """Negates the expression."""
+  not: RoleTypeFilter
+}
+
 """Methods to use when ordering `CryptoAddress`."""
 enum CryptoAddressOrderBy {
   NATURAL
@@ -807,6 +898,47 @@ enum CryptoAddressOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  ADDRESS_TRGM_SIMILARITY_ASC
+  ADDRESS_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
+}
+
+"""A connection to a list of `RoleType` values."""
+type RoleTypeConnection {
+  """A list of `RoleType` objects."""
+  nodes: [RoleType]!
+
+  """
+  A list of edges which contains the `RoleType` and cursor to aid in pagination.
+  """
+  edges: [RoleTypeEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RoleType` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RoleType` edge in the connection."""
+type RoleTypeEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RoleType` at the end of the edge."""
+  node: RoleType
+}
+
+"""Methods to use when ordering `RoleType`."""
+enum RoleTypeOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
 }
 
 """A connection to a list of `PhoneNumber` values."""
@@ -849,6 +981,21 @@ type PhoneNumber {
 
   """Reads a single `User` that is related to this `PhoneNumber`."""
   owner: User
+
+  """
+  TRGM similarity when searching `cc`. Returns null when no trgm search filter is active.
+  """
+  ccTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `number`. Returns null when no trgm search filter is active.
+  """
+  numberTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """A `PhoneNumber` edge in the connection."""
@@ -858,36 +1005,6 @@ type PhoneNumberEdge {
 
   """The `PhoneNumber` at the end of the edge."""
   node: PhoneNumber
-}
-
-"""
-A condition to be used against `PhoneNumber` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input PhoneNumberCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `ownerId` field."""
-  ownerId: UUID
-
-  """Checks for equality with the object’s `cc` field."""
-  cc: String
-
-  """Checks for equality with the object’s `number` field."""
-  number: String
-
-  """Checks for equality with the object’s `isVerified` field."""
-  isVerified: Boolean
-
-  """Checks for equality with the object’s `isPrimary` field."""
-  isPrimary: Boolean
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
 }
 
 """
@@ -926,6 +1043,23 @@ input PhoneNumberFilter {
 
   """Negates the expression."""
   not: PhoneNumberFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """TRGM search on the `cc` column."""
+  trgmCc: TrgmSearchInput
+
+  """TRGM search on the `number` column."""
+  trgmNumber: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """Methods to use when ordering `PhoneNumber`."""
@@ -941,6 +1075,12 @@ enum PhoneNumberOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  CC_TRGM_SIMILARITY_ASC
+  CC_TRGM_SIMILARITY_DESC
+  NUMBER_TRGM_SIMILARITY_ASC
+  NUMBER_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `ConnectedAccount` values."""
@@ -985,6 +1125,21 @@ type ConnectedAccount {
 
   """Reads a single `User` that is related to this `ConnectedAccount`."""
   owner: User
+
+  """
+  TRGM similarity when searching `service`. Returns null when no trgm search filter is active.
+  """
+  serviceTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `identifier`. Returns null when no trgm search filter is active.
+  """
+  identifierTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """
@@ -999,36 +1154,6 @@ type ConnectedAccountEdge {
 
   """The `ConnectedAccount` at the end of the edge."""
   node: ConnectedAccount
-}
-
-"""
-A condition to be used against `ConnectedAccount` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input ConnectedAccountCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `ownerId` field."""
-  ownerId: UUID
-
-  """Checks for equality with the object’s `service` field."""
-  service: String
-
-  """Checks for equality with the object’s `identifier` field."""
-  identifier: String
-
-  """Checks for equality with the object’s `details` field."""
-  details: JSON
-
-  """Checks for equality with the object’s `isVerified` field."""
-  isVerified: Boolean
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
 }
 
 """
@@ -1067,6 +1192,23 @@ input ConnectedAccountFilter {
 
   """Negates the expression."""
   not: ConnectedAccountFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+
+  """TRGM search on the `service` column."""
+  trgmService: TrgmSearchInput
+
+  """TRGM search on the `identifier` column."""
+  trgmIdentifier: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """
@@ -1141,6 +1283,12 @@ enum ConnectedAccountOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  SERVICE_TRGM_SIMILARITY_ASC
+  SERVICE_TRGM_SIMILARITY_DESC
+  IDENTIFIER_TRGM_SIMILARITY_ASC
+  IDENTIFIER_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `AuditLog` values."""
@@ -1191,6 +1339,16 @@ type AuditLog {
 
   """Reads a single `User` that is related to this `AuditLog`."""
   actor: User
+
+  """
+  TRGM similarity when searching `userAgent`. Returns null when no trgm search filter is active.
+  """
+  userAgentTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 scalar ConstructiveInternalTypeOrigin
@@ -1202,36 +1360,6 @@ type AuditLogEdge {
 
   """The `AuditLog` at the end of the edge."""
   node: AuditLog
-}
-
-"""
-A condition to be used against `AuditLog` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input AuditLogCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `event` field."""
-  event: String
-
-  """Checks for equality with the object’s `actorId` field."""
-  actorId: UUID
-
-  """Checks for equality with the object’s `origin` field."""
-  origin: ConstructiveInternalTypeOrigin
-
-  """Checks for equality with the object’s `userAgent` field."""
-  userAgent: String
-
-  """Checks for equality with the object’s `ipAddress` field."""
-  ipAddress: InternetAddress
-
-  """Checks for equality with the object’s `success` field."""
-  success: Boolean
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
 }
 
 """
@@ -1270,6 +1398,20 @@ input AuditLogFilter {
 
   """Negates the expression."""
   not: AuditLogFilter
+
+  """Filter by the object’s `actor` relation."""
+  actor: UserFilter
+
+  """TRGM search on the `user_agent` column."""
+  trgmUserAgent: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
 }
 
 """
@@ -1470,6 +1612,10 @@ enum AuditLogOrderBy {
   ID_DESC
   EVENT_ASC
   EVENT_DESC
+  USER_AGENT_TRGM_SIMILARITY_ASC
+  USER_AGENT_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `Email` values."""
@@ -1521,32 +1667,6 @@ type EmailEdge {
 }
 
 """
-A condition to be used against `Email` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input EmailCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `ownerId` field."""
-  ownerId: UUID
-
-  """Checks for equality with the object’s `email` field."""
-  email: ConstructiveInternalTypeEmail
-
-  """Checks for equality with the object’s `isVerified` field."""
-  isVerified: Boolean
-
-  """Checks for equality with the object’s `isPrimary` field."""
-  isPrimary: Boolean
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-}
-
-"""
 A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’
 """
 input EmailFilter {
@@ -1579,6 +1699,9 @@ input EmailFilter {
 
   """Negates the expression."""
   not: EmailFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
 }
 
 """
@@ -1754,168 +1877,6 @@ type UserEdge {
   node: User
 }
 
-"""
-A condition to be used against `User` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input UserCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: UUID
-
-  """Checks for equality with the object’s `username` field."""
-  username: String
-
-  """Checks for equality with the object’s `displayName` field."""
-  displayName: String
-
-  """Checks for equality with the object’s `profilePicture` field."""
-  profilePicture: ConstructiveInternalTypeImage
-
-  """Checks for equality with the object’s `searchTsv` field."""
-  searchTsv: FullText
-
-  """Checks for equality with the object’s `type` field."""
-  type: Int
-
-  """Checks for equality with the object’s `createdAt` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s `updatedAt` field."""
-  updatedAt: Datetime
-
-  """
-  Full-text search on the `search_tsv` tsvector column using `websearch_to_tsquery`.
-  """
-  fullTextSearchTsv: String
-}
-
-"""
-A filter to be used against `User` object types. All fields are combined with a logical ‘and.’
-"""
-input UserFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `username` field."""
-  username: StringFilter
-
-  """Filter by the object’s `displayName` field."""
-  displayName: StringFilter
-
-  """Filter by the object’s `profilePicture` field."""
-  profilePicture: ConstructiveInternalTypeImageFilter
-
-  """Filter by the object’s `searchTsv` field."""
-  searchTsv: FullTextFilter
-
-  """Filter by the object’s `type` field."""
-  type: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [UserFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [UserFilter!]
-
-  """Negates the expression."""
-  not: UserFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeImageFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: ConstructiveInternalTypeImage
-
-  """Not equal to the specified value."""
-  notEqualTo: ConstructiveInternalTypeImage
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: ConstructiveInternalTypeImage
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: ConstructiveInternalTypeImage
-
-  """Included in the specified list."""
-  in: [ConstructiveInternalTypeImage!]
-
-  """Not included in the specified list."""
-  notIn: [ConstructiveInternalTypeImage!]
-
-  """Less than the specified value."""
-  lessThan: ConstructiveInternalTypeImage
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Greater than the specified value."""
-  greaterThan: ConstructiveInternalTypeImage
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Contains the specified JSON."""
-  contains: ConstructiveInternalTypeImage
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: ConstructiveInternalTypeImage
-}
-
-"""
-A filter to be used against FullText fields. All fields are combined with a logical ‘and.’
-"""
-input FullTextFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: FullText
-
-  """Not equal to the specified value."""
-  notEqualTo: FullText
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: FullText
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: FullText
-
-  """Included in the specified list."""
-  in: [FullText!]
-
-  """Not included in the specified list."""
-  notIn: [FullText!]
-
-  """Performs a full text search on the field."""
-  matches: String
-}
-
 """Methods to use when ordering `User`."""
 enum UserOrderBy {
   NATURAL
@@ -1925,14 +1886,16 @@ enum UserOrderBy {
   ID_DESC
   USERNAME_ASC
   USERNAME_DESC
-  SEARCH_TSV_ASC
-  SEARCH_TSV_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
   SEARCH_TSV_RANK_ASC
   SEARCH_TSV_RANK_DESC
+  DISPLAY_NAME_TRGM_SIMILARITY_ASC
+  DISPLAY_NAME_TRGM_SIMILARITY_DESC
+  SEARCH_SCORE_ASC
+  SEARCH_SCORE_DESC
 }
 
 """Root meta schema type"""
@@ -2182,14 +2145,6 @@ type Mutation {
     input: VerifyTotpInput!
   ): VerifyTotpPayload
 
-  """Creates a single `RoleType`."""
-  createRoleType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateRoleTypeInput!
-  ): CreateRoleTypePayload
-
   """Creates a single `CryptoAddress`."""
   createCryptoAddress(
     """
@@ -2197,6 +2152,14 @@ type Mutation {
     """
     input: CreateCryptoAddressInput!
   ): CreateCryptoAddressPayload
+
+  """Creates a single `RoleType`."""
+  createRoleType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRoleTypeInput!
+  ): CreateRoleTypePayload
 
   """Creates a single `PhoneNumber`."""
   createPhoneNumber(
@@ -2238,14 +2201,6 @@ type Mutation {
     input: CreateUserInput!
   ): CreateUserPayload
 
-  """Updates a single `RoleType` using a unique key and a patch."""
-  updateRoleType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateRoleTypeInput!
-  ): UpdateRoleTypePayload
-
   """Updates a single `CryptoAddress` using a unique key and a patch."""
   updateCryptoAddress(
     """
@@ -2253,6 +2208,14 @@ type Mutation {
     """
     input: UpdateCryptoAddressInput!
   ): UpdateCryptoAddressPayload
+
+  """Updates a single `RoleType` using a unique key and a patch."""
+  updateRoleType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRoleTypeInput!
+  ): UpdateRoleTypePayload
 
   """Updates a single `PhoneNumber` using a unique key and a patch."""
   updatePhoneNumber(
@@ -2294,14 +2257,6 @@ type Mutation {
     input: UpdateUserInput!
   ): UpdateUserPayload
 
-  """Deletes a single `RoleType` using a unique key."""
-  deleteRoleType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteRoleTypeInput!
-  ): DeleteRoleTypePayload
-
   """Deletes a single `CryptoAddress` using a unique key."""
   deleteCryptoAddress(
     """
@@ -2309,6 +2264,14 @@ type Mutation {
     """
     input: DeleteCryptoAddressInput!
   ): DeleteCryptoAddressPayload
+
+  """Deletes a single `RoleType` using a unique key."""
+  deleteRoleType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRoleTypeInput!
+  ): DeleteRoleTypePayload
 
   """Deletes a single `PhoneNumber` using a unique key."""
   deletePhoneNumber(
@@ -2549,6 +2512,16 @@ type SignInOneTimeTokenRecord {
   accessTokenExpiresAt: Datetime
   isVerified: Boolean
   totpEnabled: Boolean
+
+  """
+  TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active.
+  """
+  accessTokenTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """All input for the `signInOneTimeToken` mutation."""
@@ -2584,6 +2557,16 @@ type SignInRecord {
   accessTokenExpiresAt: Datetime
   isVerified: Boolean
   totpEnabled: Boolean
+
+  """
+  TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active.
+  """
+  accessTokenTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """All input for the `signIn` mutation."""
@@ -2622,6 +2605,16 @@ type SignUpRecord {
   accessTokenExpiresAt: Datetime
   isVerified: Boolean
   totpEnabled: Boolean
+
+  """
+  TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active.
+  """
+  accessTokenTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """All input for the `signUp` mutation."""
@@ -2840,6 +2833,26 @@ type Session {
   csrfSecret: String
   createdAt: Datetime
   updatedAt: Datetime
+
+  """
+  TRGM similarity when searching `uagent`. Returns null when no trgm search filter is active.
+  """
+  uagentTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `fingerprintMode`. Returns null when no trgm search filter is active.
+  """
+  fingerprintModeTrgmSimilarity: Float
+
+  """
+  TRGM similarity when searching `csrfSecret`. Returns null when no trgm search filter is active.
+  """
+  csrfSecretTrgmSimilarity: Float
+
+  """
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  """
+  searchScore: Float
 }
 
 """All input for the `verifyPassword` mutation."""
@@ -2875,47 +2888,6 @@ input VerifyTotpInput {
   """
   clientMutationId: String
   totpValue: String!
-}
-
-"""The output of our create `RoleType` mutation."""
-type CreateRoleTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `RoleType` that was created by this mutation."""
-  roleType: RoleType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `RoleType`. May be used by Relay 1."""
-  roleTypeEdge(
-    """The method to use when ordering `RoleType`."""
-    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RoleTypeEdge
-}
-
-"""All input for the create `RoleType` mutation."""
-input CreateRoleTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `RoleType` to be created by this mutation."""
-  roleType: RoleTypeInput!
-}
-
-"""An input for mutations affecting `RoleType`"""
-input RoleTypeInput {
-  id: Int!
-  name: String!
 }
 
 """The output of our create `CryptoAddress` mutation."""
@@ -2970,6 +2942,47 @@ input CryptoAddressInput {
   isPrimary: Boolean
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our create `RoleType` mutation."""
+type CreateRoleTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RoleType` that was created by this mutation."""
+  roleType: RoleType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RoleType`. May be used by Relay 1."""
+  roleTypeEdge(
+    """The method to use when ordering `RoleType`."""
+    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RoleTypeEdge
+}
+
+"""All input for the create `RoleType` mutation."""
+input CreateRoleTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RoleType` to be created by this mutation."""
+  roleType: RoleTypeInput!
+}
+
+"""An input for mutations affecting `RoleType`"""
+input RoleTypeInput {
+  id: Int!
+  name: String!
 }
 
 """The output of our create `PhoneNumber` mutation."""
@@ -3238,56 +3251,9 @@ input UserInput {
   username: String
   displayName: String
   profilePicture: ConstructiveInternalTypeImage
-  searchTsv: FullText
   type: Int
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our update `RoleType` mutation."""
-type UpdateRoleTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `RoleType` that was updated by this mutation."""
-  roleType: RoleType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `RoleType`. May be used by Relay 1."""
-  roleTypeEdge(
-    """The method to use when ordering `RoleType`."""
-    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RoleTypeEdge
-}
-
-"""All input for the `updateRoleType` mutation."""
-input UpdateRoleTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `RoleType` being updated.
-  """
-  roleTypePatch: RoleTypePatch!
-}
-
-"""
-Represents an update to a `RoleType`. Fields that are set will be updated.
-"""
-input RoleTypePatch {
-  id: Int
-  name: String
 }
 
 """The output of our update `CryptoAddress` mutation."""
@@ -3347,6 +3313,52 @@ input CryptoAddressPatch {
   isPrimary: Boolean
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our update `RoleType` mutation."""
+type UpdateRoleTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RoleType` that was updated by this mutation."""
+  roleType: RoleType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RoleType`. May be used by Relay 1."""
+  roleTypeEdge(
+    """The method to use when ordering `RoleType`."""
+    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RoleTypeEdge
+}
+
+"""All input for the `updateRoleType` mutation."""
+input UpdateRoleTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RoleType` being updated.
+  """
+  roleTypePatch: RoleTypePatch!
+}
+
+"""
+Represents an update to a `RoleType`. Fields that are set will be updated.
+"""
+input RoleTypePatch {
+  id: Int
+  name: String
 }
 
 """The output of our update `PhoneNumber` mutation."""
@@ -3638,7 +3650,6 @@ input UserPatch {
   username: String
   displayName: String
   profilePicture: ConstructiveInternalTypeImage
-  searchTsv: FullText
   type: Int
   createdAt: Datetime
   updatedAt: Datetime
@@ -3649,39 +3660,6 @@ input UserPatch {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
-
-"""The output of our delete `RoleType` mutation."""
-type DeleteRoleTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `RoleType` that was deleted by this mutation."""
-  roleType: RoleType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `RoleType`. May be used by Relay 1."""
-  roleTypeEdge(
-    """The method to use when ordering `RoleType`."""
-    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RoleTypeEdge
-}
-
-"""All input for the `deleteRoleType` mutation."""
-input DeleteRoleTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
 
 """The output of our delete `CryptoAddress` mutation."""
 type DeleteCryptoAddressPayload {
@@ -3714,6 +3692,39 @@ input DeleteCryptoAddressInput {
   """
   clientMutationId: String
   id: UUID!
+}
+
+"""The output of our delete `RoleType` mutation."""
+type DeleteRoleTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RoleType` that was deleted by this mutation."""
+  roleType: RoleType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RoleType`. May be used by Relay 1."""
+  roleTypeEdge(
+    """The method to use when ordering `RoleType`."""
+    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RoleTypeEdge
+}
+
+"""All input for the `deleteRoleType` mutation."""
+input DeleteRoleTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
 }
 
 """The output of our delete `PhoneNumber` mutation."""

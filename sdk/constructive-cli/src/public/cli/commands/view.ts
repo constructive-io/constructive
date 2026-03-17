@@ -25,6 +25,11 @@ const fieldSchema: FieldSchema = {
   module: 'string',
   scope: 'int',
   tags: 'string',
+  nameTrgmSimilarity: 'float',
+  viewTypeTrgmSimilarity: 'float',
+  filterTypeTrgmSimilarity: 'float',
+  moduleTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nview <command>\n\nCommands:\n  list                  List all view records\n  get                   Get a view by ID\n  create                Create a new view\n  update                Update an existing view\n  delete                Delete a view\n\n  --help, -h            Show this help message\n';

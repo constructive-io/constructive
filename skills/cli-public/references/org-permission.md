@@ -9,8 +9,8 @@ CRUD operations for OrgPermission records via csdk CLI
 ```bash
 csdk org-permission list
 csdk org-permission get --id <value>
-csdk org-permission create --name <value> --bitnum <value> --bitstr <value> --description <value>
-csdk org-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
+csdk org-permission create --descriptionTrgmSimilarity <value> --searchScore <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
+csdk org-permission update --id <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>] [--descriptionTrgmSimilarity <value>] [--searchScore <value>]
 csdk org-permission delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk org-permission list
 ### Create a orgPermission
 
 ```bash
-csdk org-permission create --name "value" --bitnum "value" --bitstr "value" --description "value"
+csdk org-permission create --descriptionTrgmSimilarity <value> --searchScore <value> [--name <value>] [--bitnum <value>] [--bitstr <value>] [--description <value>]
 ```
 
 ### Get a orgPermission by id

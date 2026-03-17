@@ -10,7 +10,9 @@ import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { buildConnectionString } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
+import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
+import { observeGraphileBuild } from './observability/graphile-build-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -188,6 +190,8 @@ const buildPreset = (
 });
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
+  const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
     try {
@@ -267,7 +271,15 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       // Create promise and store in in-flight map BEFORE try block
       const preset = buildPreset(connectionString, schema || [], anonRole, roleName);
-      const creationPromise = createGraphileInstance({ preset, cacheKey: key });
+      const creationPromise = observeGraphileBuild(
+        {
+          cacheKey: key,
+          serviceKey: key,
+          databaseId: api.databaseId ?? null,
+        },
+        () => createGraphileInstance({ preset, cacheKey: key }),
+        { enabled: observabilityEnabled },
+      );
       creating.set(key, creationPromise);
 
       try {

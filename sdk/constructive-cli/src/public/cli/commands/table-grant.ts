@@ -18,6 +18,9 @@ const fieldSchema: FieldSchema = {
   isGrant: 'boolean',
   createdAt: 'string',
   updatedAt: 'string',
+  privilegeTrgmSimilarity: 'float',
+  granteeNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\ntable-grant <command>\n\nCommands:\n  list                  List all tableGrant records\n  get                   Get a tableGrant by ID\n  create                Create a new tableGrant\n  update                Update an existing tableGrant\n  delete                Delete a tableGrant\n\n  --help, -h            Show this help message\n';

@@ -9,8 +9,8 @@ CRUD operations for ConnectedAccount records via csdk CLI
 ```bash
 csdk connected-account list
 csdk connected-account get --id <value>
-csdk connected-account create --ownerId <value> --service <value> --identifier <value> --details <value> --isVerified <value>
-csdk connected-account update --id <value> [--ownerId <value>] [--service <value>] [--identifier <value>] [--details <value>] [--isVerified <value>]
+csdk connected-account create --service <value> --identifier <value> --details <value> --serviceTrgmSimilarity <value> --identifierTrgmSimilarity <value> --searchScore <value> [--ownerId <value>] [--isVerified <value>]
+csdk connected-account update --id <value> [--ownerId <value>] [--service <value>] [--identifier <value>] [--details <value>] [--isVerified <value>] [--serviceTrgmSimilarity <value>] [--identifierTrgmSimilarity <value>] [--searchScore <value>]
 csdk connected-account delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk connected-account list
 ### Create a connectedAccount
 
 ```bash
-csdk connected-account create --ownerId "value" --service "value" --identifier "value" --details "value" --isVerified "value"
+csdk connected-account create --service <value> --identifier <value> --details <value> --serviceTrgmSimilarity <value> --identifierTrgmSimilarity <value> --searchScore <value> [--ownerId <value>] [--isVerified <value>]
 ```
 
 ### Get a connectedAccount by id

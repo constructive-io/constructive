@@ -9,7 +9,7 @@ ORM operations for DefaultPrivilege records
 ```typescript
 db.defaultPrivilege.findMany({ select: { id: true } }).execute()
 db.defaultPrivilege.findOne({ id: '<value>', select: { id: true } }).execute()
-db.defaultPrivilege.create({ data: { databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>' }, select: { id: true } }).execute()
+db.defaultPrivilege.create({ data: { databaseId: '<value>', schemaId: '<value>', objectType: '<value>', privilege: '<value>', granteeName: '<value>', isGrant: '<value>', objectTypeTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', granteeNameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.defaultPrivilege.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.defaultPrivilege.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.defaultPrivilege.findMany({
 
 ```typescript
 const item = await db.defaultPrivilege.create({
-  data: { databaseId: 'value', schemaId: 'value', objectType: 'value', privilege: 'value', granteeName: 'value', isGrant: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', objectType: 'value', privilege: 'value', granteeName: 'value', isGrant: 'value', objectTypeTrgmSimilarity: 'value', privilegeTrgmSimilarity: 'value', granteeNameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

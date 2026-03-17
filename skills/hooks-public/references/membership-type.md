@@ -7,8 +7,8 @@ Defines the different scopes of membership (e.g. App Member, Organization Member
 ## Usage
 
 ```typescript
-useMembershipTypesQuery({ selection: { fields: { id: true, name: true, description: true, prefix: true } } })
-useMembershipTypeQuery({ id: '<value>', selection: { fields: { id: true, name: true, description: true, prefix: true } } })
+useMembershipTypesQuery({ selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } } })
+useMembershipTypeQuery({ id: '<value>', selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } } })
 useCreateMembershipTypeMutation({ selection: { fields: { id: true } } })
 useUpdateMembershipTypeMutation({ selection: { fields: { id: true } } })
 useDeleteMembershipTypeMutation({})
@@ -20,7 +20,7 @@ useDeleteMembershipTypeMutation({})
 
 ```typescript
 const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
+  selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useMembershipTypesQuery({
 const { mutate } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<value>', description: '<value>', prefix: '<value>' });
+mutate({ name: '<value>', description: '<value>', prefix: '<value>', descriptionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

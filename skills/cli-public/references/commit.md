@@ -9,8 +9,8 @@ CRUD operations for Commit records via csdk CLI
 ```bash
 csdk commit list
 csdk commit get --id <value>
-csdk commit create --message <value> --databaseId <value> --storeId <value> --parentIds <value> --authorId <value> --committerId <value> --treeId <value> --date <value>
-csdk commit update --id <value> [--message <value>] [--databaseId <value>] [--storeId <value>] [--parentIds <value>] [--authorId <value>] [--committerId <value>] [--treeId <value>] [--date <value>]
+csdk commit create --databaseId <value> --storeId <value> --messageTrgmSimilarity <value> --searchScore <value> [--message <value>] [--parentIds <value>] [--authorId <value>] [--committerId <value>] [--treeId <value>] [--date <value>]
+csdk commit update --id <value> [--message <value>] [--databaseId <value>] [--storeId <value>] [--parentIds <value>] [--authorId <value>] [--committerId <value>] [--treeId <value>] [--date <value>] [--messageTrgmSimilarity <value>] [--searchScore <value>]
 csdk commit delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk commit list
 ### Create a commit
 
 ```bash
-csdk commit create --message "value" --databaseId "value" --storeId "value" --parentIds "value" --authorId "value" --committerId "value" --treeId "value" --date "value"
+csdk commit create --databaseId <value> --storeId <value> --messageTrgmSimilarity <value> --searchScore <value> [--message <value>] [--parentIds <value>] [--authorId <value>] [--committerId <value>] [--treeId <value>] [--date <value>]
 ```
 
 ### Get a commit by id

@@ -23,6 +23,9 @@ export { PostgisExtensionDetectionPlugin } from './plugins/detect-extension';
 export { PostgisRegisterTypesPlugin } from './plugins/register-types';
 export { PostgisGeometryFieldsPlugin } from './plugins/geometry-fields';
 
+// Connection filter operator factory (spatial operators for graphile-connection-filter)
+export { createPostgisOperatorFactory } from './plugins/connection-filter-operators';
+
 // Constants and utilities
 export { GisSubtype, SUBTYPE_STRING_BY_SUBTYPE, GIS_SUBTYPE_NAME, CONCRETE_SUBTYPES } from './constants';
 export { getGISTypeDetails, getGISTypeModifier, getGISTypeName } from './utils';

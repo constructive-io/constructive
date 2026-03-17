@@ -66,6 +66,7 @@ export interface GenerateOrmResult {
 export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   const { tables, customOperations, sharedTypesPath } = options;
   const commentsEnabled = options.config.codegen?.comments !== false;
+  const conditionEnabled = options.config.codegen?.condition !== false;
   const files: GeneratedFile[] = [];
 
   // Use shared types when a sharedTypesPath is provided (unified output mode)
@@ -91,7 +92,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   });
 
   // 2. Generate model files
-  const modelFiles = generateAllModelFiles(tables, useSharedTypes);
+  const modelFiles = generateAllModelFiles(tables, useSharedTypes, { condition: conditionEnabled });
   for (const modelFile of modelFiles) {
     files.push({
       path: `models/${modelFile.fileName}`,
@@ -140,6 +141,7 @@ export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
       tables,
       usedPayloadTypes,
       commentsEnabled,
+      { condition: conditionEnabled },
     );
     files.push({
       path: inputTypesFile.fileName,

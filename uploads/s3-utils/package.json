@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/s3-utils",
-  "version": "2.7.1",
+  "version": "2.9.3",
   "author": "Constructive <developers@constructive.io>",
   "description": "s3 utils",
   "main": "index.js",
@@ -30,8 +30,8 @@
   },
   "keywords": [],
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1001.0",
-    "@aws-sdk/lib-storage": "^3.1001.0"
+    "@aws-sdk/client-s3": "^3.1009.0",
+    "@aws-sdk/lib-storage": "^3.1009.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",

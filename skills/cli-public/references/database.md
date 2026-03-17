@@ -9,8 +9,8 @@ CRUD operations for Database records via csdk CLI
 ```bash
 csdk database list
 csdk database get --id <value>
-csdk database create --ownerId <value> --schemaHash <value> --name <value> --label <value> --hash <value>
-csdk database update --id <value> [--ownerId <value>] [--schemaHash <value>] [--name <value>] [--label <value>] [--hash <value>]
+csdk database create --schemaHashTrgmSimilarity <value> --nameTrgmSimilarity <value> --labelTrgmSimilarity <value> --searchScore <value> [--ownerId <value>] [--schemaHash <value>] [--name <value>] [--label <value>] [--hash <value>]
+csdk database update --id <value> [--ownerId <value>] [--schemaHash <value>] [--name <value>] [--label <value>] [--hash <value>] [--schemaHashTrgmSimilarity <value>] [--nameTrgmSimilarity <value>] [--labelTrgmSimilarity <value>] [--searchScore <value>]
 csdk database delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk database list
 ### Create a database
 
 ```bash
-csdk database create --ownerId "value" --schemaHash "value" --name "value" --label "value" --hash "value"
+csdk database create --schemaHashTrgmSimilarity <value> --nameTrgmSimilarity <value> --labelTrgmSimilarity <value> --searchScore <value> [--ownerId <value>] [--schemaHash <value>] [--name <value>] [--label <value>] [--hash <value>]
 ```
 
 ### Get a database by id

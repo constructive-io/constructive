@@ -96,7 +96,7 @@ exports[`delete 1`] = `
 exports[`delete 2`] = `"deleteActionMutation"`;
 
 exports[`expands further selections of custom ast fields in nested selection 1`] = `
-"query getActionGoalsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionGoalCondition, $filter: ActionGoalFilter, $orderBy: [ActionGoalsOrderBy!]) {
+"query getActionGoalsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionGoalCondition, $where: ActionGoalFilter, $orderBy: [ActionGoalsOrderBy!]) {
   actionGoals(
     first: $first
     last: $last
@@ -104,7 +104,7 @@ exports[`expands further selections of custom ast fields in nested selection 1`]
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount
@@ -196,7 +196,7 @@ exports[`getAll 1`] = `
 exports[`getAll 2`] = `"getActionsQueryAll"`;
 
 exports[`getMany edges 1`] = `
-"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $filter: ActionFilter, $orderBy: [ActionsOrderBy!]) {
+"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $where: ActionFilter, $orderBy: [ActionsOrderBy!]) {
   actions(
     first: $first
     last: $last
@@ -204,7 +204,7 @@ exports[`getMany edges 1`] = `
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount
@@ -230,7 +230,7 @@ exports[`getMany edges 1`] = `
 exports[`getMany edges 2`] = `"getActionsQuery"`;
 
 exports[`getMany should select only scalar fields by default 1`] = `
-"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $filter: ActionFilter, $orderBy: [ActionsOrderBy!]) {
+"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $where: ActionFilter, $orderBy: [ActionsOrderBy!]) {
   actions(
     first: $first
     last: $last
@@ -238,7 +238,7 @@ exports[`getMany should select only scalar fields by default 1`] = `
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount
@@ -312,7 +312,7 @@ exports[`getMany should select only scalar fields by default 1`] = `
 exports[`getMany should select only scalar fields by default 2`] = `"getActionsQuery"`;
 
 exports[`getMany should whitelist selected fields 1`] = `
-"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $filter: ActionFilter, $orderBy: [ActionsOrderBy!]) {
+"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $where: ActionFilter, $orderBy: [ActionsOrderBy!]) {
   actions(
     first: $first
     last: $last
@@ -320,7 +320,7 @@ exports[`getMany should whitelist selected fields 1`] = `
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount
@@ -356,7 +356,7 @@ exports[`getOne 1`] = `
 exports[`getOne 2`] = `"getActionQuery"`;
 
 exports[`selects all scalar fields of junction table by default 1`] = `
-"query getActionGoalsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionGoalCondition, $filter: ActionGoalFilter, $orderBy: [ActionGoalsOrderBy!]) {
+"query getActionGoalsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionGoalCondition, $where: ActionGoalFilter, $orderBy: [ActionGoalsOrderBy!]) {
   actionGoals(
     first: $first
     last: $last
@@ -364,7 +364,7 @@ exports[`selects all scalar fields of junction table by default 1`] = `
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount
@@ -387,7 +387,7 @@ exports[`selects all scalar fields of junction table by default 1`] = `
 `;
 
 exports[`selects belongsTo relation field 1`] = `
-"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $filter: ActionFilter, $orderBy: [ActionsOrderBy!]) {
+"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $where: ActionFilter, $orderBy: [ActionsOrderBy!]) {
   actions(
     first: $first
     last: $last
@@ -395,7 +395,7 @@ exports[`selects belongsTo relation field 1`] = `
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount
@@ -421,7 +421,7 @@ exports[`selects belongsTo relation field 1`] = `
 exports[`selects non-scalar custom types 1`] = `"getActionsQuery"`;
 
 exports[`selects relation field 1`] = `
-"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $filter: ActionFilter, $orderBy: [ActionsOrderBy!]) {
+"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $where: ActionFilter, $orderBy: [ActionsOrderBy!]) {
   actions(
     first: $first
     last: $last
@@ -429,7 +429,7 @@ exports[`selects relation field 1`] = `
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount
@@ -468,7 +468,7 @@ exports[`selects relation field 1`] = `
 `;
 
 exports[`should select totalCount in subfields by default 1`] = `
-"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $filter: ActionFilter, $orderBy: [ActionsOrderBy!]) {
+"query getActionsQuery($first: Int, $last: Int, $after: Cursor, $before: Cursor, $offset: Int, $condition: ActionCondition, $where: ActionFilter, $orderBy: [ActionsOrderBy!]) {
   actions(
     first: $first
     last: $last
@@ -476,7 +476,7 @@ exports[`should select totalCount in subfields by default 1`] = `
     after: $after
     before: $before
     condition: $condition
-    filter: $filter
+    where: $where
     orderBy: $orderBy
   ) {
     totalCount

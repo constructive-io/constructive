@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RoleTypeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RoleTypeSelect>(
-    args: FindManyArgs<S, RoleTypeFilter, RoleTypeOrderBy> & {
+    args: FindManyArgs<S, RoleTypeFilter, never, RoleTypeOrderBy> & {
       select: S;
     } & StrictSelect<S, RoleTypeSelect>
   ): QueryBuilder<{

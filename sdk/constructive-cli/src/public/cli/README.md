@@ -25,12 +25,13 @@ csdk auth set-token <your-token>
 |---------|-------------|
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
+| `config` | Manage config key-value store (per-context) |
 | `org-get-managers-record` | orgGetManagersRecord CRUD operations |
 | `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
 | `get-all-record` | getAllRecord CRUD operations |
+| `object` | object CRUD operations |
 | `app-permission` | appPermission CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
-| `object` | object CRUD operations |
 | `app-level-requirement` | appLevelRequirement CRUD operations |
 | `database` | database CRUD operations |
 | `schema` | schema CRUD operations |
@@ -49,7 +50,6 @@ csdk auth set-token <your-token>
 | `view-table` | viewTable CRUD operations |
 | `view-grant` | viewGrant CRUD operations |
 | `view-rule` | viewRule CRUD operations |
-| `table-module` | tableModule CRUD operations |
 | `table-template-module` | tableTemplateModule CRUD operations |
 | `secure-table-provision` | secureTableProvision CRUD operations |
 | `relation-provision` | relationProvision CRUD operations |
@@ -81,7 +81,6 @@ csdk auth set-token <your-token>
 | `permissions-module` | permissionsModule CRUD operations |
 | `phone-numbers-module` | phoneNumbersModule CRUD operations |
 | `profiles-module` | profilesModule CRUD operations |
-| `rls-module` | rlsModule CRUD operations |
 | `secrets-module` | secretsModule CRUD operations |
 | `sessions-module` | sessionsModule CRUD operations |
 | `user-auth-module` | userAuthModule CRUD operations |
@@ -109,24 +108,25 @@ csdk auth set-token <your-token>
 | `ref` | ref CRUD operations |
 | `store` | store CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
+| `crypto-address` | cryptoAddress CRUD operations |
 | `role-type` | roleType CRUD operations |
 | `org-permission-default` | orgPermissionDefault CRUD operations |
-| `crypto-address` | cryptoAddress CRUD operations |
+| `phone-number` | phoneNumber CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `connected-account` | connectedAccount CRUD operations |
-| `phone-number` | phoneNumber CRUD operations |
-| `membership-type` | membershipType CRUD operations |
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
-| `app-membership-default` | appMembershipDefault CRUD operations |
+| `membership-type` | membershipType CRUD operations |
 | `commit` | commit CRUD operations |
+| `app-membership-default` | appMembershipDefault CRUD operations |
+| `rls-module` | rlsModule CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `audit-log` | auditLog CRUD operations |
 | `app-level` | appLevel CRUD operations |
-| `email` | email CRUD operations |
 | `sql-migration` | sqlMigration CRUD operations |
-| `ast-migration` | astMigration CRUD operations |
+| `email` | email CRUD operations |
 | `user` | user CRUD operations |
+| `ast-migration` | astMigration CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `hierarchy-module` | hierarchyModule CRUD operations |
 | `current-user-id` | currentUserId |
@@ -141,11 +141,11 @@ csdk auth set-token <your-token>
 | `org-permissions-get-mask` | orgPermissionsGetMask |
 | `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
 | `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
-| `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
-| `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `get-all-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-path-objects-from-root` | Reads and enables pagination through a set of `Object`. |
 | `get-object-at-path` | getObjectAtPath |
+| `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
+| `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `steps-required` | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `current-user` | currentUser |
 | `sign-out` | signOut |
@@ -158,12 +158,17 @@ csdk auth set-token <your-token>
 | `confirm-delete-account` | confirmDeleteAccount |
 | `set-password` | setPassword |
 | `verify-email` | verifyEmail |
-| `reset-password` | resetPassword |
 | `remove-node-at-path` | removeNodeAtPath |
+| `reset-password` | resetPassword |
 | `bootstrap-user` | bootstrapUser |
+| `set-field-order` | setFieldOrder |
 | `set-data-at-path` | setDataAtPath |
 | `set-props-and-commit` | setPropsAndCommit |
 | `provision-database-with-user` | provisionDatabaseWithUser |
+| `insert-node-at-path` | insertNodeAtPath |
+| `update-node-at-path` | updateNodeAtPath |
+| `set-and-commit` | setAndCommit |
+| `apply-rls` | applyRls |
 | `sign-in-one-time-token` | signInOneTimeToken |
 | `create-user-database` | Creates a new user database with all required modules, permissions, and RLS policies.
 
@@ -185,12 +190,7 @@ Example usage:
 | `extend-token-expires` | extendTokenExpires |
 | `sign-in` | signIn |
 | `sign-up` | signUp |
-| `set-field-order` | setFieldOrder |
 | `one-time-token` | oneTimeToken |
-| `insert-node-at-path` | insertNodeAtPath |
-| `update-node-at-path` | updateNodeAtPath |
-| `set-and-commit` | setAndCommit |
-| `apply-rls` | applyRls |
 | `forgot-password` | forgotPassword |
 | `send-verification-email` | sendVerificationEmail |
 | `verify-password` | verifyPassword |
@@ -222,6 +222,19 @@ Manage authentication tokens per context.
 | `status` | Show auth status across all contexts |
 | `logout` | Remove credentials for current context |
 
+### `config`
+
+Manage per-context key-value configuration variables.
+
+| Subcommand | Description |
+|------------|-------------|
+| `get <key>` | Get a config value |
+| `set <key> <value>` | Set a config value |
+| `list` | List all config values |
+| `delete <key>` | Delete a config value |
+
+Variables are scoped to the active context and stored at `~/.csdk/config/`.
+
 ## Table Commands
 
 ### `org-get-managers-record`
@@ -243,7 +256,7 @@ CRUD operations for OrgGetManagersRecord records.
 | `userId` | UUID |
 | `depth` | Int |
 
-**Create fields:** `userId`, `depth`
+**Required create fields:** `userId`, `depth`
 
 ### `org-get-subordinates-record`
 
@@ -264,7 +277,7 @@ CRUD operations for OrgGetSubordinatesRecord records.
 | `userId` | UUID |
 | `depth` | Int |
 
-**Create fields:** `userId`, `depth`
+**Required create fields:** `userId`, `depth`
 
 ### `get-all-record`
 
@@ -285,55 +298,7 @@ CRUD operations for GetAllRecord records.
 | `path` | String |
 | `data` | JSON |
 
-**Create fields:** `path`, `data`
-
-### `app-permission`
-
-CRUD operations for AppPermission records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appPermission records |
-| `get` | Get a appPermission by id |
-| `create` | Create a new appPermission |
-| `update` | Update an existing appPermission |
-| `delete` | Delete a appPermission |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `bitnum` | Int |
-| `bitstr` | BitString |
-| `description` | String |
-
-**Create fields:** `name`, `bitnum`, `bitstr`, `description`
-
-### `org-permission`
-
-CRUD operations for OrgPermission records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgPermission records |
-| `get` | Get a orgPermission by id |
-| `create` | Create a new orgPermission |
-| `update` | Update an existing orgPermission |
-| `delete` | Delete a orgPermission |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `bitnum` | Int |
-| `bitstr` | BitString |
-| `description` | String |
-
-**Create fields:** `name`, `bitnum`, `bitstr`, `description`
+**Required create fields:** `path`, `data`
 
 ### `object`
 
@@ -360,7 +325,62 @@ CRUD operations for Object records.
 | `frzn` | Boolean |
 | `createdAt` | Datetime |
 
-**Create fields:** `hashUuid`, `databaseId`, `kids`, `ktree`, `data`, `frzn`
+**Required create fields:** `hashUuid`, `databaseId`
+**Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
+
+### `app-permission`
+
+CRUD operations for AppPermission records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appPermission records |
+| `get` | Get a appPermission by id |
+| `create` | Create a new appPermission |
+| `update` | Update an existing appPermission |
+| `delete` | Delete a appPermission |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `bitnum` | Int |
+| `bitstr` | BitString |
+| `description` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `descriptionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
+
+### `org-permission`
+
+CRUD operations for OrgPermission records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgPermission records |
+| `get` | Get a orgPermission by id |
+| `create` | Create a new orgPermission |
+| `update` | Update an existing orgPermission |
+| `delete` | Delete a orgPermission |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `bitnum` | Int |
+| `bitstr` | BitString |
+| `description` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `descriptionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `app-level-requirement`
 
@@ -386,8 +406,11 @@ CRUD operations for AppLevelRequirement records.
 | `priority` | Int |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `name`, `level`, `description`, `requiredCount`, `priority`
+**Required create fields:** `name`, `level`, `descriptionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
 ### `database`
 
@@ -413,8 +436,13 @@ CRUD operations for Database records.
 | `hash` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `schemaHashTrgmSimilarity` | Float |
+| `nameTrgmSimilarity` | Float |
+| `labelTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `ownerId`, `schemaHash`, `name`, `label`, `hash`
+**Required create fields:** `schemaHashTrgmSimilarity`, `nameTrgmSimilarity`, `labelTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `ownerId`, `schemaHash`, `name`, `label`, `hash`
 
 ### `schema`
 
@@ -446,8 +474,15 @@ CRUD operations for Schema records.
 | `isPublic` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `schemaNameTrgmSimilarity` | Float |
+| `labelTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `name`, `schemaName`, `label`, `description`, `smartTags`, `category`, `module`, `scope`, `tags`, `isPublic`
+**Required create fields:** `databaseId`, `name`, `schemaName`, `nameTrgmSimilarity`, `schemaNameTrgmSimilarity`, `labelTrgmSimilarity`, `descriptionTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `label`, `description`, `smartTags`, `category`, `module`, `scope`, `tags`, `isPublic`
 
 ### `table`
 
@@ -484,8 +519,16 @@ CRUD operations for Table records.
 | `inheritsId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `labelTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `pluralNameTrgmSimilarity` | Float |
+| `singularNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `name`, `label`, `description`, `smartTags`, `category`, `module`, `scope`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `inheritsId`
+**Required create fields:** `schemaId`, `name`, `nameTrgmSimilarity`, `labelTrgmSimilarity`, `descriptionTrgmSimilarity`, `moduleTrgmSimilarity`, `pluralNameTrgmSimilarity`, `singularNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `category`, `module`, `scope`, `useRls`, `timestamps`, `peoplestamps`, `pluralName`, `singularName`, `tags`, `inheritsId`
 
 ### `check-constraint`
 
@@ -517,8 +560,13 @@ CRUD operations for CheckConstraint records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `typeTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `type`, `fieldIds`, `expr`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`, `nameTrgmSimilarity`, `typeTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `expr`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `field`
 
@@ -560,8 +608,16 @@ CRUD operations for Field records.
 | `scope` | Int |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `labelTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `defaultValueTrgmSimilarity` | Float |
+| `regexpTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `label`, `description`, `smartTags`, `isRequired`, `defaultValue`, `defaultValueAst`, `isHidden`, `type`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`, `module`, `scope`
+**Required create fields:** `tableId`, `name`, `type`, `nameTrgmSimilarity`, `labelTrgmSimilarity`, `descriptionTrgmSimilarity`, `defaultValueTrgmSimilarity`, `regexpTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `defaultValue`, `defaultValueAst`, `isHidden`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`, `module`, `scope`
 
 ### `foreign-key-constraint`
 
@@ -597,8 +653,16 @@ CRUD operations for ForeignKeyConstraint records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `typeTrgmSimilarity` | Float |
+| `deleteActionTrgmSimilarity` | Float |
+| `updateActionTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `description`, `smartTags`, `type`, `fieldIds`, `refTableId`, `refFieldIds`, `deleteAction`, `updateAction`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`, `refTableId`, `refFieldIds`, `nameTrgmSimilarity`, `descriptionTrgmSimilarity`, `typeTrgmSimilarity`, `deleteActionTrgmSimilarity`, `updateActionTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `deleteAction`, `updateAction`, `category`, `module`, `scope`, `tags`
 
 ### `full-text-search`
 
@@ -626,7 +690,8 @@ CRUD operations for FullTextSearch records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `databaseId`, `tableId`, `fieldId`, `fieldIds`, `weights`, `langs`
+**Required create fields:** `tableId`, `fieldId`, `fieldIds`, `weights`, `langs`
+**Optional create fields (backend defaults):** `databaseId`
 
 ### `index`
 
@@ -654,6 +719,8 @@ CRUD operations for Index records.
 | `indexParams` | JSON |
 | `whereClause` | JSON |
 | `isUnique` | Boolean |
+| `options` | JSON |
+| `opClasses` | String |
 | `smartTags` | JSON |
 | `category` | ObjectCategory |
 | `module` | String |
@@ -661,8 +728,13 @@ CRUD operations for Index records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `accessMethodTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `fieldIds`, `includeFieldIds`, `accessMethod`, `indexParams`, `whereClause`, `isUnique`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `databaseId`, `tableId`, `nameTrgmSimilarity`, `accessMethodTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `name`, `fieldIds`, `includeFieldIds`, `accessMethod`, `indexParams`, `whereClause`, `isUnique`, `options`, `opClasses`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `policy`
 
@@ -697,8 +769,15 @@ CRUD operations for Policy records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `granteeNameTrgmSimilarity` | Float |
+| `privilegeTrgmSimilarity` | Float |
+| `policyTypeTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `nameTrgmSimilarity`, `granteeNameTrgmSimilarity`, `privilegeTrgmSimilarity`, `policyTypeTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `granteeName`, `privilege`, `permissive`, `disabled`, `policyType`, `data`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `primary-key-constraint`
 
@@ -729,8 +808,13 @@ CRUD operations for PrimaryKeyConstraint records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `typeTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `type`, `fieldIds`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`, `nameTrgmSimilarity`, `typeTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `type`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `table-grant`
 
@@ -757,8 +841,12 @@ CRUD operations for TableGrant records.
 | `isGrant` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `privilegeTrgmSimilarity` | Float |
+| `granteeNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `privilege`, `granteeName`, `fieldIds`, `isGrant`
+**Required create fields:** `tableId`, `privilege`, `granteeName`, `privilegeTrgmSimilarity`, `granteeNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `fieldIds`, `isGrant`
 
 ### `trigger`
 
@@ -789,8 +877,14 @@ CRUD operations for Trigger records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `eventTrgmSimilarity` | Float |
+| `functionNameTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `event`, `functionName`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `name`, `nameTrgmSimilarity`, `eventTrgmSimilarity`, `functionNameTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `event`, `functionName`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `unique-constraint`
 
@@ -822,8 +916,14 @@ CRUD operations for UniqueConstraint records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `typeTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `name`, `description`, `smartTags`, `type`, `fieldIds`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `tableId`, `fieldIds`, `nameTrgmSimilarity`, `descriptionTrgmSimilarity`, `typeTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `description`, `smartTags`, `type`, `category`, `module`, `scope`, `tags`
 
 ### `view`
 
@@ -857,8 +957,14 @@ CRUD operations for View records.
 | `module` | String |
 | `scope` | Int |
 | `tags` | String |
+| `nameTrgmSimilarity` | Float |
+| `viewTypeTrgmSimilarity` | Float |
+| `filterTypeTrgmSimilarity` | Float |
+| `moduleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `name`, `tableId`, `viewType`, `data`, `filterType`, `filterData`, `securityInvoker`, `isReadOnly`, `smartTags`, `category`, `module`, `scope`, `tags`
+**Required create fields:** `schemaId`, `name`, `viewType`, `nameTrgmSimilarity`, `viewTypeTrgmSimilarity`, `filterTypeTrgmSimilarity`, `moduleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `tableId`, `data`, `filterType`, `filterData`, `securityInvoker`, `isReadOnly`, `smartTags`, `category`, `module`, `scope`, `tags`
 
 ### `view-table`
 
@@ -881,7 +987,8 @@ CRUD operations for ViewTable records.
 | `tableId` | UUID |
 | `joinOrder` | Int |
 
-**Create fields:** `viewId`, `tableId`, `joinOrder`
+**Required create fields:** `viewId`, `tableId`
+**Optional create fields (backend defaults):** `joinOrder`
 
 ### `view-grant`
 
@@ -906,8 +1013,12 @@ CRUD operations for ViewGrant records.
 | `privilege` | String |
 | `withGrantOption` | Boolean |
 | `isGrant` | Boolean |
+| `granteeNameTrgmSimilarity` | Float |
+| `privilegeTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `viewId`, `granteeName`, `privilege`, `withGrantOption`, `isGrant`
+**Required create fields:** `viewId`, `granteeName`, `privilege`, `granteeNameTrgmSimilarity`, `privilegeTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `withGrantOption`, `isGrant`
 
 ### `view-rule`
 
@@ -931,36 +1042,13 @@ CRUD operations for ViewRule records.
 | `name` | String |
 | `event` | String |
 | `action` | String |
+| `nameTrgmSimilarity` | Float |
+| `eventTrgmSimilarity` | Float |
+| `actionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `viewId`, `name`, `event`, `action`
-
-### `table-module`
-
-CRUD operations for TableModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all tableModule records |
-| `get` | Get a tableModule by id |
-| `create` | Create a new tableModule |
-| `update` | Update an existing tableModule |
-| `delete` | Delete a tableModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `schemaId` | UUID |
-| `tableId` | UUID |
-| `tableName` | String |
-| `nodeType` | String |
-| `useRls` | Boolean |
-| `data` | JSON |
-| `fields` | UUID |
-
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`, `nodeType`, `useRls`, `data`, `fields`
+**Required create fields:** `viewId`, `name`, `event`, `nameTrgmSimilarity`, `eventTrgmSimilarity`, `actionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `action`
 
 ### `table-template-module`
 
@@ -987,8 +1075,12 @@ CRUD operations for TableTemplateModule records.
 | `tableName` | String |
 | `nodeType` | String |
 | `data` | JSON |
+| `tableNameTrgmSimilarity` | Float |
+| `nodeTypeTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`, `nodeType`, `data`
+**Required create fields:** `databaseId`, `tableName`, `nodeType`, `tableNameTrgmSimilarity`, `nodeTypeTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `data`
 
 ### `secure-table-provision`
 
@@ -1014,6 +1106,7 @@ CRUD operations for SecureTableProvision records.
 | `nodeType` | String |
 | `useRls` | Boolean |
 | `nodeData` | JSON |
+| `fields` | JSON |
 | `grantRoles` | String |
 | `grantPrivileges` | JSON |
 | `policyType` | String |
@@ -1023,8 +1116,15 @@ CRUD operations for SecureTableProvision records.
 | `policyName` | String |
 | `policyData` | JSON |
 | `outFields` | UUID |
+| `tableNameTrgmSimilarity` | Float |
+| `nodeTypeTrgmSimilarity` | Float |
+| `policyTypeTrgmSimilarity` | Float |
+| `policyRoleTrgmSimilarity` | Float |
+| `policyNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`, `nodeType`, `useRls`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFields`
+**Required create fields:** `databaseId`, `tableNameTrgmSimilarity`, `nodeTypeTrgmSimilarity`, `policyTypeTrgmSimilarity`, `policyRoleTrgmSimilarity`, `policyNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `nodeType`, `useRls`, `nodeData`, `fields`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFields`
 
 ### `relation-provision`
 
@@ -1070,8 +1170,20 @@ CRUD operations for RelationProvision records.
 | `outJunctionTableId` | UUID |
 | `outSourceFieldId` | UUID |
 | `outTargetFieldId` | UUID |
+| `relationTypeTrgmSimilarity` | Float |
+| `fieldNameTrgmSimilarity` | Float |
+| `deleteActionTrgmSimilarity` | Float |
+| `junctionTableNameTrgmSimilarity` | Float |
+| `sourceFieldNameTrgmSimilarity` | Float |
+| `targetFieldNameTrgmSimilarity` | Float |
+| `nodeTypeTrgmSimilarity` | Float |
+| `policyTypeTrgmSimilarity` | Float |
+| `policyRoleTrgmSimilarity` | Float |
+| `policyNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `relationType`, `sourceTableId`, `targetTableId`, `fieldName`, `deleteAction`, `isRequired`, `junctionTableId`, `junctionTableName`, `junctionSchemaId`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`, `nodeType`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`
+**Required create fields:** `databaseId`, `relationType`, `sourceTableId`, `targetTableId`, `relationTypeTrgmSimilarity`, `fieldNameTrgmSimilarity`, `deleteActionTrgmSimilarity`, `junctionTableNameTrgmSimilarity`, `sourceFieldNameTrgmSimilarity`, `targetFieldNameTrgmSimilarity`, `nodeTypeTrgmSimilarity`, `policyTypeTrgmSimilarity`, `policyRoleTrgmSimilarity`, `policyNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `fieldName`, `deleteAction`, `isRequired`, `junctionTableId`, `junctionTableName`, `junctionSchemaId`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`, `nodeType`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`
 
 ### `schema-grant`
 
@@ -1095,8 +1207,11 @@ CRUD operations for SchemaGrant records.
 | `granteeName` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `granteeNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `granteeName`
+**Required create fields:** `schemaId`, `granteeName`, `granteeNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`
 
 ### `default-privilege`
 
@@ -1121,8 +1236,13 @@ CRUD operations for DefaultPrivilege records.
 | `privilege` | String |
 | `granteeName` | String |
 | `isGrant` | Boolean |
+| `objectTypeTrgmSimilarity` | Float |
+| `privilegeTrgmSimilarity` | Float |
+| `granteeNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `objectType`, `privilege`, `granteeName`, `isGrant`
+**Required create fields:** `schemaId`, `objectType`, `privilege`, `granteeName`, `objectTypeTrgmSimilarity`, `privilegeTrgmSimilarity`, `granteeNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `isGrant`
 
 ### `api-schema`
 
@@ -1145,7 +1265,7 @@ CRUD operations for ApiSchema records.
 | `schemaId` | UUID |
 | `apiId` | UUID |
 
-**Create fields:** `databaseId`, `schemaId`, `apiId`
+**Required create fields:** `databaseId`, `schemaId`, `apiId`
 
 ### `api-module`
 
@@ -1168,8 +1288,10 @@ CRUD operations for ApiModule records.
 | `apiId` | UUID |
 | `name` | String |
 | `data` | JSON |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `apiId`, `name`, `data`
+**Required create fields:** `databaseId`, `apiId`, `name`, `data`, `nameTrgmSimilarity`, `searchScore`
 
 ### `domain`
 
@@ -1191,10 +1313,11 @@ CRUD operations for Domain records.
 | `databaseId` | UUID |
 | `apiId` | UUID |
 | `siteId` | UUID |
-| `subdomain` | ConstructiveInternalTypeHostname |
-| `domain` | ConstructiveInternalTypeHostname |
+| `subdomain` | Hostname |
+| `domain` | Hostname |
 
-**Create fields:** `databaseId`, `apiId`, `siteId`, `subdomain`, `domain`
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `apiId`, `siteId`, `subdomain`, `domain`
 
 ### `site-metadatum`
 
@@ -1217,9 +1340,13 @@ CRUD operations for SiteMetadatum records.
 | `siteId` | UUID |
 | `title` | String |
 | `description` | String |
-| `ogImage` | ConstructiveInternalTypeImage |
+| `ogImage` | Image |
+| `titleTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `siteId`, `title`, `description`, `ogImage`
+**Required create fields:** `databaseId`, `siteId`, `titleTrgmSimilarity`, `descriptionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `title`, `description`, `ogImage`
 
 ### `site-module`
 
@@ -1242,8 +1369,10 @@ CRUD operations for SiteModule records.
 | `siteId` | UUID |
 | `name` | String |
 | `data` | JSON |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `siteId`, `name`, `data`
+**Required create fields:** `databaseId`, `siteId`, `name`, `data`, `nameTrgmSimilarity`, `searchScore`
 
 ### `site-theme`
 
@@ -1266,7 +1395,7 @@ CRUD operations for SiteTheme records.
 | `siteId` | UUID |
 | `theme` | JSON |
 
-**Create fields:** `databaseId`, `siteId`, `theme`
+**Required create fields:** `databaseId`, `siteId`, `theme`
 
 ### `trigger-function`
 
@@ -1290,8 +1419,12 @@ CRUD operations for TriggerFunction records.
 | `code` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `codeTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `name`, `code`
+**Required create fields:** `databaseId`, `name`, `nameTrgmSimilarity`, `codeTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `code`
 
 ### `api`
 
@@ -1316,8 +1449,14 @@ CRUD operations for Api records.
 | `roleName` | String |
 | `anonRole` | String |
 | `isPublic` | Boolean |
+| `nameTrgmSimilarity` | Float |
+| `dbnameTrgmSimilarity` | Float |
+| `roleNameTrgmSimilarity` | Float |
+| `anonRoleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `name`, `dbname`, `roleName`, `anonRole`, `isPublic`
+**Required create fields:** `databaseId`, `name`, `nameTrgmSimilarity`, `dbnameTrgmSimilarity`, `roleNameTrgmSimilarity`, `anonRoleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `dbname`, `roleName`, `anonRole`, `isPublic`
 
 ### `site`
 
@@ -1339,13 +1478,18 @@ CRUD operations for Site records.
 | `databaseId` | UUID |
 | `title` | String |
 | `description` | String |
-| `ogImage` | ConstructiveInternalTypeImage |
-| `favicon` | ConstructiveInternalTypeAttachment |
-| `appleTouchIcon` | ConstructiveInternalTypeImage |
-| `logo` | ConstructiveInternalTypeImage |
+| `ogImage` | Image |
+| `favicon` | Attachment |
+| `appleTouchIcon` | Image |
+| `logo` | Image |
 | `dbname` | String |
+| `titleTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `dbnameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `title`, `description`, `ogImage`, `favicon`, `appleTouchIcon`, `logo`, `dbname`
+**Required create fields:** `databaseId`, `titleTrgmSimilarity`, `descriptionTrgmSimilarity`, `dbnameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `title`, `description`, `ogImage`, `favicon`, `appleTouchIcon`, `logo`, `dbname`
 
 ### `app`
 
@@ -1367,13 +1511,18 @@ CRUD operations for App records.
 | `databaseId` | UUID |
 | `siteId` | UUID |
 | `name` | String |
-| `appImage` | ConstructiveInternalTypeImage |
-| `appStoreLink` | ConstructiveInternalTypeUrl |
+| `appImage` | Image |
+| `appStoreLink` | Url |
 | `appStoreId` | String |
 | `appIdPrefix` | String |
-| `playStoreLink` | ConstructiveInternalTypeUrl |
+| `playStoreLink` | Url |
+| `nameTrgmSimilarity` | Float |
+| `appStoreIdTrgmSimilarity` | Float |
+| `appIdPrefixTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `siteId`, `name`, `appImage`, `appStoreLink`, `appStoreId`, `appIdPrefix`, `playStoreLink`
+**Required create fields:** `databaseId`, `siteId`, `nameTrgmSimilarity`, `appStoreIdTrgmSimilarity`, `appIdPrefixTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `name`, `appImage`, `appStoreLink`, `appStoreId`, `appIdPrefix`, `playStoreLink`
 
 ### `connected-accounts-module`
 
@@ -1398,8 +1547,11 @@ CRUD operations for ConnectedAccountsModule records.
 | `tableId` | UUID |
 | `ownerTableId` | UUID |
 | `tableName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`
+**Required create fields:** `databaseId`, `tableName`, `tableNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`
 
 ### `crypto-addresses-module`
 
@@ -1425,8 +1577,12 @@ CRUD operations for CryptoAddressesModule records.
 | `ownerTableId` | UUID |
 | `tableName` | String |
 | `cryptoNetwork` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `cryptoNetworkTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`, `cryptoNetwork`
+**Required create fields:** `databaseId`, `tableName`, `tableNameTrgmSimilarity`, `cryptoNetworkTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `cryptoNetwork`
 
 ### `crypto-auth-module`
 
@@ -1458,8 +1614,16 @@ CRUD operations for CryptoAuthModule records.
 | `signInRecordFailure` | String |
 | `signUpWithKey` | String |
 | `signInWithChallenge` | String |
+| `userFieldTrgmSimilarity` | Float |
+| `cryptoNetworkTrgmSimilarity` | Float |
+| `signInRequestChallengeTrgmSimilarity` | Float |
+| `signInRecordFailureTrgmSimilarity` | Float |
+| `signUpWithKeyTrgmSimilarity` | Float |
+| `signInWithChallengeTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `usersTableId`, `secretsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `addressesTableId`, `userField`, `cryptoNetwork`, `signInRequestChallenge`, `signInRecordFailure`, `signUpWithKey`, `signInWithChallenge`
+**Required create fields:** `databaseId`, `userField`, `userFieldTrgmSimilarity`, `cryptoNetworkTrgmSimilarity`, `signInRequestChallengeTrgmSimilarity`, `signInRecordFailureTrgmSimilarity`, `signUpWithKeyTrgmSimilarity`, `signInWithChallengeTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `usersTableId`, `secretsTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `addressesTableId`, `cryptoNetwork`, `signInRequestChallenge`, `signInRecordFailure`, `signUpWithKey`, `signInWithChallenge`
 
 ### `default-ids-module`
 
@@ -1480,7 +1644,7 @@ CRUD operations for DefaultIdsModule records.
 | `id` | UUID |
 | `databaseId` | UUID |
 
-**Create fields:** `databaseId`
+**Required create fields:** `databaseId`
 
 ### `denormalized-table-field`
 
@@ -1510,8 +1674,11 @@ CRUD operations for DenormalizedTableField records.
 | `updateDefaults` | Boolean |
 | `funcName` | String |
 | `funcOrder` | Int |
+| `funcNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `tableId`, `fieldId`, `setIds`, `refTableId`, `refFieldId`, `refIds`, `useUpdates`, `updateDefaults`, `funcName`, `funcOrder`
+**Required create fields:** `databaseId`, `tableId`, `fieldId`, `refTableId`, `refFieldId`, `funcNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `setIds`, `refIds`, `useUpdates`, `updateDefaults`, `funcName`, `funcOrder`
 
 ### `emails-module`
 
@@ -1536,8 +1703,11 @@ CRUD operations for EmailsModule records.
 | `tableId` | UUID |
 | `ownerTableId` | UUID |
 | `tableName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`
+**Required create fields:** `databaseId`, `tableName`, `tableNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`
 
 ### `encrypted-secrets-module`
 
@@ -1560,8 +1730,11 @@ CRUD operations for EncryptedSecretsModule records.
 | `schemaId` | UUID |
 | `tableId` | UUID |
 | `tableName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`
+**Required create fields:** `databaseId`, `tableNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
 
 ### `field-module`
 
@@ -1588,8 +1761,11 @@ CRUD operations for FieldModule records.
 | `data` | JSON |
 | `triggers` | String |
 | `functions` | String |
+| `nodeTypeTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `privateSchemaId`, `tableId`, `fieldId`, `nodeType`, `data`, `triggers`, `functions`
+**Required create fields:** `databaseId`, `nodeType`, `nodeTypeTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `privateSchemaId`, `tableId`, `fieldId`, `data`, `triggers`, `functions`
 
 ### `invites-module`
 
@@ -1621,8 +1797,14 @@ CRUD operations for InvitesModule records.
 | `prefix` | String |
 | `membershipType` | Int |
 | `entityTableId` | UUID |
+| `invitesTableNameTrgmSimilarity` | Float |
+| `claimedInvitesTableNameTrgmSimilarity` | Float |
+| `submitInviteCodeFunctionTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `emailsTableId`, `usersTableId`, `invitesTableId`, `claimedInvitesTableId`, `invitesTableName`, `claimedInvitesTableName`, `submitInviteCodeFunction`, `prefix`, `membershipType`, `entityTableId`
+**Required create fields:** `databaseId`, `membershipType`, `invitesTableNameTrgmSimilarity`, `claimedInvitesTableNameTrgmSimilarity`, `submitInviteCodeFunctionTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `emailsTableId`, `usersTableId`, `invitesTableId`, `claimedInvitesTableId`, `invitesTableName`, `claimedInvitesTableName`, `submitInviteCodeFunction`, `prefix`, `entityTableId`
 
 ### `levels-module`
 
@@ -1666,8 +1848,25 @@ CRUD operations for LevelsModule records.
 | `membershipType` | Int |
 | `entityTableId` | UUID |
 | `actorTableId` | UUID |
+| `stepsTableNameTrgmSimilarity` | Float |
+| `achievementsTableNameTrgmSimilarity` | Float |
+| `levelsTableNameTrgmSimilarity` | Float |
+| `levelRequirementsTableNameTrgmSimilarity` | Float |
+| `completedStepTrgmSimilarity` | Float |
+| `incompletedStepTrgmSimilarity` | Float |
+| `tgAchievementTrgmSimilarity` | Float |
+| `tgAchievementToggleTrgmSimilarity` | Float |
+| `tgAchievementToggleBooleanTrgmSimilarity` | Float |
+| `tgAchievementBooleanTrgmSimilarity` | Float |
+| `upsertAchievementTrgmSimilarity` | Float |
+| `tgUpdateAchievementsTrgmSimilarity` | Float |
+| `stepsRequiredTrgmSimilarity` | Float |
+| `levelAchievedTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `stepsTableId`, `stepsTableName`, `achievementsTableId`, `achievementsTableName`, `levelsTableId`, `levelsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `completedStep`, `incompletedStep`, `tgAchievement`, `tgAchievementToggle`, `tgAchievementToggleBoolean`, `tgAchievementBoolean`, `upsertAchievement`, `tgUpdateAchievements`, `stepsRequired`, `levelAchieved`, `prefix`, `membershipType`, `entityTableId`, `actorTableId`
+**Required create fields:** `databaseId`, `membershipType`, `stepsTableNameTrgmSimilarity`, `achievementsTableNameTrgmSimilarity`, `levelsTableNameTrgmSimilarity`, `levelRequirementsTableNameTrgmSimilarity`, `completedStepTrgmSimilarity`, `incompletedStepTrgmSimilarity`, `tgAchievementTrgmSimilarity`, `tgAchievementToggleTrgmSimilarity`, `tgAchievementToggleBooleanTrgmSimilarity`, `tgAchievementBooleanTrgmSimilarity`, `upsertAchievementTrgmSimilarity`, `tgUpdateAchievementsTrgmSimilarity`, `stepsRequiredTrgmSimilarity`, `levelAchievedTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `stepsTableId`, `stepsTableName`, `achievementsTableId`, `achievementsTableName`, `levelsTableId`, `levelsTableName`, `levelRequirementsTableId`, `levelRequirementsTableName`, `completedStep`, `incompletedStep`, `tgAchievement`, `tgAchievementToggle`, `tgAchievementToggleBoolean`, `tgAchievementBoolean`, `upsertAchievement`, `tgUpdateAchievements`, `stepsRequired`, `levelAchieved`, `prefix`, `entityTableId`, `actorTableId`
 
 ### `limits-module`
 
@@ -1703,8 +1902,19 @@ CRUD operations for LimitsModule records.
 | `membershipType` | Int |
 | `entityTableId` | UUID |
 | `actorTableId` | UUID |
+| `tableNameTrgmSimilarity` | Float |
+| `defaultTableNameTrgmSimilarity` | Float |
+| `limitIncrementFunctionTrgmSimilarity` | Float |
+| `limitDecrementFunctionTrgmSimilarity` | Float |
+| `limitIncrementTriggerTrgmSimilarity` | Float |
+| `limitDecrementTriggerTrgmSimilarity` | Float |
+| `limitUpdateTriggerTrgmSimilarity` | Float |
+| `limitCheckFunctionTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `prefix`, `membershipType`, `entityTableId`, `actorTableId`
+**Required create fields:** `databaseId`, `membershipType`, `tableNameTrgmSimilarity`, `defaultTableNameTrgmSimilarity`, `limitIncrementFunctionTrgmSimilarity`, `limitDecrementFunctionTrgmSimilarity`, `limitIncrementTriggerTrgmSimilarity`, `limitDecrementTriggerTrgmSimilarity`, `limitUpdateTriggerTrgmSimilarity`, `limitCheckFunctionTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `limitIncrementFunction`, `limitDecrementFunction`, `limitIncrementTrigger`, `limitDecrementTrigger`, `limitUpdateTrigger`, `limitCheckFunction`, `prefix`, `entityTableId`, `actorTableId`
 
 ### `membership-types-module`
 
@@ -1727,8 +1937,11 @@ CRUD operations for MembershipTypesModule records.
 | `schemaId` | UUID |
 | `tableId` | UUID |
 | `tableName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`
+**Required create fields:** `databaseId`, `tableNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
 
 ### `memberships-module`
 
@@ -1777,8 +1990,22 @@ CRUD operations for MembershipsModule records.
 | `entityIdsByMask` | String |
 | `entityIdsByPerm` | String |
 | `entityIdsFunction` | String |
+| `membershipsTableNameTrgmSimilarity` | Float |
+| `membersTableNameTrgmSimilarity` | Float |
+| `membershipDefaultsTableNameTrgmSimilarity` | Float |
+| `grantsTableNameTrgmSimilarity` | Float |
+| `adminGrantsTableNameTrgmSimilarity` | Float |
+| `ownerGrantsTableNameTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `actorMaskCheckTrgmSimilarity` | Float |
+| `actorPermCheckTrgmSimilarity` | Float |
+| `entityIdsByMaskTrgmSimilarity` | Float |
+| `entityIdsByPermTrgmSimilarity` | Float |
+| `entityIdsFunctionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `membershipsTableId`, `membershipsTableName`, `membersTableId`, `membersTableName`, `membershipDefaultsTableId`, `membershipDefaultsTableName`, `grantsTableId`, `grantsTableName`, `actorTableId`, `limitsTableId`, `defaultLimitsTableId`, `permissionsTableId`, `defaultPermissionsTableId`, `sprtTableId`, `adminGrantsTableId`, `adminGrantsTableName`, `ownerGrantsTableId`, `ownerGrantsTableName`, `membershipType`, `entityTableId`, `entityTableOwnerId`, `prefix`, `actorMaskCheck`, `actorPermCheck`, `entityIdsByMask`, `entityIdsByPerm`, `entityIdsFunction`
+**Required create fields:** `databaseId`, `membershipType`, `membershipsTableNameTrgmSimilarity`, `membersTableNameTrgmSimilarity`, `membershipDefaultsTableNameTrgmSimilarity`, `grantsTableNameTrgmSimilarity`, `adminGrantsTableNameTrgmSimilarity`, `ownerGrantsTableNameTrgmSimilarity`, `prefixTrgmSimilarity`, `actorMaskCheckTrgmSimilarity`, `actorPermCheckTrgmSimilarity`, `entityIdsByMaskTrgmSimilarity`, `entityIdsByPermTrgmSimilarity`, `entityIdsFunctionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `membershipsTableId`, `membershipsTableName`, `membersTableId`, `membersTableName`, `membershipDefaultsTableId`, `membershipDefaultsTableName`, `grantsTableId`, `grantsTableName`, `actorTableId`, `limitsTableId`, `defaultLimitsTableId`, `permissionsTableId`, `defaultPermissionsTableId`, `sprtTableId`, `adminGrantsTableId`, `adminGrantsTableName`, `ownerGrantsTableId`, `ownerGrantsTableName`, `entityTableId`, `entityTableOwnerId`, `prefix`, `actorMaskCheck`, `actorPermCheck`, `entityIdsByMask`, `entityIdsByPerm`, `entityIdsFunction`
 
 ### `permissions-module`
 
@@ -1813,8 +2040,17 @@ CRUD operations for PermissionsModule records.
 | `getMask` | String |
 | `getByMask` | String |
 | `getMaskByName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `defaultTableNameTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `getPaddedMaskTrgmSimilarity` | Float |
+| `getMaskTrgmSimilarity` | Float |
+| `getByMaskTrgmSimilarity` | Float |
+| `getMaskByNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `bitlen`, `membershipType`, `entityTableId`, `actorTableId`, `prefix`, `getPaddedMask`, `getMask`, `getByMask`, `getMaskByName`
+**Required create fields:** `databaseId`, `membershipType`, `tableNameTrgmSimilarity`, `defaultTableNameTrgmSimilarity`, `prefixTrgmSimilarity`, `getPaddedMaskTrgmSimilarity`, `getMaskTrgmSimilarity`, `getByMaskTrgmSimilarity`, `getMaskByNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `defaultTableId`, `defaultTableName`, `bitlen`, `entityTableId`, `actorTableId`, `prefix`, `getPaddedMask`, `getMask`, `getByMask`, `getMaskByName`
 
 ### `phone-numbers-module`
 
@@ -1839,8 +2075,11 @@ CRUD operations for PhoneNumbersModule records.
 | `tableId` | UUID |
 | `ownerTableId` | UUID |
 | `tableName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`, `tableName`
+**Required create fields:** `databaseId`, `tableName`, `tableNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `ownerTableId`
 
 ### `profiles-module`
 
@@ -1876,39 +2115,15 @@ CRUD operations for ProfilesModule records.
 | `permissionsTableId` | UUID |
 | `membershipsTableId` | UUID |
 | `prefix` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `profilePermissionsTableNameTrgmSimilarity` | Float |
+| `profileGrantsTableNameTrgmSimilarity` | Float |
+| `profileDefinitionGrantsTableNameTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `profilePermissionsTableId`, `profilePermissionsTableName`, `profileGrantsTableId`, `profileGrantsTableName`, `profileDefinitionGrantsTableId`, `profileDefinitionGrantsTableName`, `membershipType`, `entityTableId`, `actorTableId`, `permissionsTableId`, `membershipsTableId`, `prefix`
-
-### `rls-module`
-
-CRUD operations for RlsModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all rlsModule records |
-| `get` | Get a rlsModule by id |
-| `create` | Create a new rlsModule |
-| `update` | Update an existing rlsModule |
-| `delete` | Delete a rlsModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `apiId` | UUID |
-| `schemaId` | UUID |
-| `privateSchemaId` | UUID |
-| `sessionCredentialsTableId` | UUID |
-| `sessionsTableId` | UUID |
-| `usersTableId` | UUID |
-| `authenticate` | String |
-| `authenticateStrict` | String |
-| `currentRole` | String |
-| `currentRoleId` | String |
-
-**Create fields:** `databaseId`, `apiId`, `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
+**Required create fields:** `databaseId`, `membershipType`, `tableNameTrgmSimilarity`, `profilePermissionsTableNameTrgmSimilarity`, `profileGrantsTableNameTrgmSimilarity`, `profileDefinitionGrantsTableNameTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `tableId`, `tableName`, `profilePermissionsTableId`, `profilePermissionsTableName`, `profileGrantsTableId`, `profileGrantsTableName`, `profileDefinitionGrantsTableId`, `profileDefinitionGrantsTableName`, `entityTableId`, `actorTableId`, `permissionsTableId`, `membershipsTableId`, `prefix`
 
 ### `secrets-module`
 
@@ -1931,8 +2146,11 @@ CRUD operations for SecretsModule records.
 | `schemaId` | UUID |
 | `tableId` | UUID |
 | `tableName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`
+**Required create fields:** `databaseId`, `tableNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
 
 ### `sessions-module`
 
@@ -1961,8 +2179,13 @@ CRUD operations for SessionsModule records.
 | `sessionsTable` | String |
 | `sessionCredentialsTable` | String |
 | `authSettingsTable` | String |
+| `sessionsTableTrgmSimilarity` | Float |
+| `sessionCredentialsTableTrgmSimilarity` | Float |
+| `authSettingsTableTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `sessionsTableId`, `sessionCredentialsTableId`, `authSettingsTableId`, `usersTableId`, `sessionsDefaultExpiration`, `sessionsTable`, `sessionCredentialsTable`, `authSettingsTable`
+**Required create fields:** `databaseId`, `sessionsTableTrgmSimilarity`, `sessionCredentialsTableTrgmSimilarity`, `authSettingsTableTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `sessionsTableId`, `sessionCredentialsTableId`, `authSettingsTableId`, `usersTableId`, `sessionsDefaultExpiration`, `sessionsTable`, `sessionCredentialsTable`, `authSettingsTable`
 
 ### `user-auth-module`
 
@@ -2006,8 +2229,26 @@ CRUD operations for UserAuthModule records.
 | `signInOneTimeTokenFunction` | String |
 | `oneTimeTokenFunction` | String |
 | `extendTokenExpires` | String |
+| `auditsTableNameTrgmSimilarity` | Float |
+| `signInFunctionTrgmSimilarity` | Float |
+| `signUpFunctionTrgmSimilarity` | Float |
+| `signOutFunctionTrgmSimilarity` | Float |
+| `setPasswordFunctionTrgmSimilarity` | Float |
+| `resetPasswordFunctionTrgmSimilarity` | Float |
+| `forgotPasswordFunctionTrgmSimilarity` | Float |
+| `sendVerificationEmailFunctionTrgmSimilarity` | Float |
+| `verifyEmailFunctionTrgmSimilarity` | Float |
+| `verifyPasswordFunctionTrgmSimilarity` | Float |
+| `checkPasswordFunctionTrgmSimilarity` | Float |
+| `sendAccountDeletionEmailFunctionTrgmSimilarity` | Float |
+| `deleteAccountFunctionTrgmSimilarity` | Float |
+| `signInOneTimeTokenFunctionTrgmSimilarity` | Float |
+| `oneTimeTokenFunctionTrgmSimilarity` | Float |
+| `extendTokenExpiresTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `emailsTableId`, `usersTableId`, `secretsTableId`, `encryptedTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `auditsTableId`, `auditsTableName`, `signInFunction`, `signUpFunction`, `signOutFunction`, `setPasswordFunction`, `resetPasswordFunction`, `forgotPasswordFunction`, `sendVerificationEmailFunction`, `verifyEmailFunction`, `verifyPasswordFunction`, `checkPasswordFunction`, `sendAccountDeletionEmailFunction`, `deleteAccountFunction`, `signInOneTimeTokenFunction`, `oneTimeTokenFunction`, `extendTokenExpires`
+**Required create fields:** `databaseId`, `auditsTableNameTrgmSimilarity`, `signInFunctionTrgmSimilarity`, `signUpFunctionTrgmSimilarity`, `signOutFunctionTrgmSimilarity`, `setPasswordFunctionTrgmSimilarity`, `resetPasswordFunctionTrgmSimilarity`, `forgotPasswordFunctionTrgmSimilarity`, `sendVerificationEmailFunctionTrgmSimilarity`, `verifyEmailFunctionTrgmSimilarity`, `verifyPasswordFunctionTrgmSimilarity`, `checkPasswordFunctionTrgmSimilarity`, `sendAccountDeletionEmailFunctionTrgmSimilarity`, `deleteAccountFunctionTrgmSimilarity`, `signInOneTimeTokenFunctionTrgmSimilarity`, `oneTimeTokenFunctionTrgmSimilarity`, `extendTokenExpiresTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `emailsTableId`, `usersTableId`, `secretsTableId`, `encryptedTableId`, `sessionsTableId`, `sessionCredentialsTableId`, `auditsTableId`, `auditsTableName`, `signInFunction`, `signUpFunction`, `signOutFunction`, `setPasswordFunction`, `resetPasswordFunction`, `forgotPasswordFunction`, `sendVerificationEmailFunction`, `verifyEmailFunction`, `verifyPasswordFunction`, `checkPasswordFunction`, `sendAccountDeletionEmailFunction`, `deleteAccountFunction`, `signInOneTimeTokenFunction`, `oneTimeTokenFunction`, `extendTokenExpires`
 
 ### `users-module`
 
@@ -2032,8 +2273,12 @@ CRUD operations for UsersModule records.
 | `tableName` | String |
 | `typeTableId` | UUID |
 | `typeTableName` | String |
+| `tableNameTrgmSimilarity` | Float |
+| `typeTableNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `tableId`, `tableName`, `typeTableId`, `typeTableName`
+**Required create fields:** `databaseId`, `tableNameTrgmSimilarity`, `typeTableNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `typeTableId`, `typeTableName`
 
 ### `uuid-module`
 
@@ -2056,8 +2301,12 @@ CRUD operations for UuidModule records.
 | `schemaId` | UUID |
 | `uuidFunction` | String |
 | `uuidSeed` | String |
+| `uuidFunctionTrgmSimilarity` | Float |
+| `uuidSeedTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `uuidFunction`, `uuidSeed`
+**Required create fields:** `databaseId`, `uuidSeed`, `uuidFunctionTrgmSimilarity`, `uuidSeedTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `uuidFunction`
 
 ### `database-provision-module`
 
@@ -2089,8 +2338,15 @@ CRUD operations for DatabaseProvisionModule records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `completedAt` | Datetime |
+| `databaseNameTrgmSimilarity` | Float |
+| `subdomainTrgmSimilarity` | Float |
+| `domainTrgmSimilarity` | Float |
+| `statusTrgmSimilarity` | Float |
+| `errorMessageTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseName`, `ownerId`, `subdomain`, `domain`, `modules`, `options`, `bootstrapUser`, `status`, `errorMessage`, `databaseId`, `completedAt`
+**Required create fields:** `databaseName`, `ownerId`, `domain`, `databaseNameTrgmSimilarity`, `subdomainTrgmSimilarity`, `domainTrgmSimilarity`, `statusTrgmSimilarity`, `errorMessageTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `subdomain`, `modules`, `options`, `bootstrapUser`, `status`, `errorMessage`, `databaseId`, `completedAt`
 
 ### `app-admin-grant`
 
@@ -2115,7 +2371,8 @@ CRUD operations for AppAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `app-owner-grant`
 
@@ -2140,7 +2397,8 @@ CRUD operations for AppOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `app-grant`
 
@@ -2166,7 +2424,8 @@ CRUD operations for AppGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `permissions`, `isGrant`, `actorId`, `grantorId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
 
 ### `org-membership`
 
@@ -2201,7 +2460,8 @@ CRUD operations for OrgMembership records.
 | `entityId` | UUID |
 | `profileId` | UUID |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `actorId`, `entityId`, `profileId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `org-member`
 
@@ -2224,7 +2484,8 @@ CRUD operations for OrgMember records.
 | `actorId` | UUID |
 | `entityId` | UUID |
 
-**Create fields:** `isAdmin`, `actorId`, `entityId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isAdmin`
 
 ### `org-admin-grant`
 
@@ -2250,7 +2511,8 @@ CRUD operations for OrgAdminGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `org-owner-grant`
 
@@ -2276,7 +2538,8 @@ CRUD operations for OrgOwnerGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
 ### `org-grant`
 
@@ -2303,7 +2566,8 @@ CRUD operations for OrgGrant records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `permissions`, `isGrant`, `actorId`, `entityId`, `grantorId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `permissions`, `isGrant`, `grantorId`
 
 ### `org-chart-edge`
 
@@ -2329,8 +2593,11 @@ CRUD operations for OrgChartEdge records.
 | `parentId` | UUID |
 | `positionTitle` | String |
 | `positionLevel` | Int |
+| `positionTitleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `entityId`, `childId`, `parentId`, `positionTitle`, `positionLevel`
+**Required create fields:** `entityId`, `childId`, `positionTitleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `parentId`, `positionTitle`, `positionLevel`
 
 ### `org-chart-edge-grant`
 
@@ -2357,8 +2624,11 @@ CRUD operations for OrgChartEdgeGrant records.
 | `positionTitle` | String |
 | `positionLevel` | Int |
 | `createdAt` | Datetime |
+| `positionTitleTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `entityId`, `childId`, `parentId`, `grantorId`, `isGrant`, `positionTitle`, `positionLevel`
+**Required create fields:** `entityId`, `childId`, `grantorId`, `positionTitleTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `parentId`, `isGrant`, `positionTitle`, `positionLevel`
 
 ### `app-limit`
 
@@ -2382,7 +2652,8 @@ CRUD operations for AppLimit records.
 | `num` | Int |
 | `max` | Int |
 
-**Create fields:** `name`, `actorId`, `num`, `max`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`
 
 ### `org-limit`
 
@@ -2407,7 +2678,8 @@ CRUD operations for OrgLimit records.
 | `max` | Int |
 | `entityId` | UUID |
 
-**Create fields:** `name`, `actorId`, `num`, `max`, `entityId`
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`
 
 ### `app-step`
 
@@ -2432,7 +2704,8 @@ CRUD operations for AppStep records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `actorId`, `name`, `count`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `actorId`, `count`
 
 ### `app-achievement`
 
@@ -2457,7 +2730,8 @@ CRUD operations for AppAchievement records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `actorId`, `name`, `count`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `actorId`, `count`
 
 ### `invite`
 
@@ -2476,7 +2750,7 @@ CRUD operations for Invite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `inviteToken` | String |
 | `inviteValid` | Boolean |
@@ -2487,8 +2761,11 @@ CRUD operations for Invite records.
 | `expiresAt` | Datetime |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `inviteTokenTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+**Required create fields:** `inviteTokenTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ### `claimed-invite`
 
@@ -2513,7 +2790,7 @@ CRUD operations for ClaimedInvite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Create fields:** `data`, `senderId`, `receiverId`
+**Optional create fields (backend defaults):** `data`, `senderId`, `receiverId`
 
 ### `org-invite`
 
@@ -2532,7 +2809,7 @@ CRUD operations for OrgInvite records.
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
+| `email` | Email |
 | `senderId` | UUID |
 | `receiverId` | UUID |
 | `inviteToken` | String |
@@ -2545,8 +2822,11 @@ CRUD operations for OrgInvite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
+| `inviteTokenTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`, `entityId`
+**Required create fields:** `entityId`, `inviteTokenTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ### `org-claimed-invite`
 
@@ -2572,7 +2852,8 @@ CRUD operations for OrgClaimedInvite records.
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
 
-**Create fields:** `data`, `senderId`, `receiverId`, `entityId`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `data`, `senderId`, `receiverId`
 
 ### `ref`
 
@@ -2595,8 +2876,11 @@ CRUD operations for Ref records.
 | `databaseId` | UUID |
 | `storeId` | UUID |
 | `commitId` | UUID |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `name`, `databaseId`, `storeId`, `commitId`
+**Required create fields:** `name`, `databaseId`, `storeId`, `nameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `commitId`
 
 ### `store`
 
@@ -2619,8 +2903,11 @@ CRUD operations for Store records.
 | `databaseId` | UUID |
 | `hash` | UUID |
 | `createdAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `name`, `databaseId`, `hash`
+**Required create fields:** `name`, `databaseId`, `nameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `hash`
 
 ### `app-permission-default`
 
@@ -2641,50 +2928,7 @@ CRUD operations for AppPermissionDefault records.
 | `id` | UUID |
 | `permissions` | BitString |
 
-**Create fields:** `permissions`
-
-### `role-type`
-
-CRUD operations for RoleType records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all roleType records |
-| `get` | Get a roleType by id |
-| `create` | Create a new roleType |
-| `update` | Update an existing roleType |
-| `delete` | Delete a roleType |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-
-**Create fields:** `name`
-
-### `org-permission-default`
-
-CRUD operations for OrgPermissionDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgPermissionDefault records |
-| `get` | Get a orgPermissionDefault by id |
-| `create` | Create a new orgPermissionDefault |
-| `update` | Update an existing orgPermissionDefault |
-| `delete` | Delete a orgPermissionDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `permissions` | BitString |
-| `entityId` | UUID |
-
-**Create fields:** `permissions`, `entityId`
+**Optional create fields (backend defaults):** `permissions`
 
 ### `crypto-address`
 
@@ -2709,79 +2953,55 @@ CRUD operations for CryptoAddress records.
 | `isPrimary` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `addressTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `ownerId`, `address`, `isVerified`, `isPrimary`
+**Required create fields:** `address`, `addressTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
-### `app-limit-default`
+### `role-type`
 
-CRUD operations for AppLimitDefault records.
+CRUD operations for RoleType records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all appLimitDefault records |
-| `get` | Get a appLimitDefault by id |
-| `create` | Create a new appLimitDefault |
-| `update` | Update an existing appLimitDefault |
-| `delete` | Delete a appLimitDefault |
+| `list` | List all roleType records |
+| `get` | Get a roleType by id |
+| `create` | Create a new roleType |
+| `update` | Update an existing roleType |
+| `delete` | Delete a roleType |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
+| `id` | Int |
 | `name` | String |
-| `max` | Int |
 
-**Create fields:** `name`, `max`
+**Required create fields:** `name`
 
-### `org-limit-default`
+### `org-permission-default`
 
-CRUD operations for OrgLimitDefault records.
+CRUD operations for OrgPermissionDefault records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all orgLimitDefault records |
-| `get` | Get a orgLimitDefault by id |
-| `create` | Create a new orgLimitDefault |
-| `update` | Update an existing orgLimitDefault |
-| `delete` | Delete a orgLimitDefault |
+| `list` | List all orgPermissionDefault records |
+| `get` | Get a orgPermissionDefault by id |
+| `create` | Create a new orgPermissionDefault |
+| `update` | Update an existing orgPermissionDefault |
+| `delete` | Delete a orgPermissionDefault |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
 | `id` | UUID |
-| `name` | String |
-| `max` | Int |
+| `permissions` | BitString |
+| `entityId` | UUID |
 
-**Create fields:** `name`, `max`
-
-### `connected-account`
-
-CRUD operations for ConnectedAccount records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all connectedAccount records |
-| `get` | Get a connectedAccount by id |
-| `create` | Create a new connectedAccount |
-| `update` | Update an existing connectedAccount |
-| `delete` | Delete a connectedAccount |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `ownerId` | UUID |
-| `service` | String |
-| `identifier` | String |
-| `details` | JSON |
-| `isVerified` | Boolean |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Create fields:** `ownerId`, `service`, `identifier`, `details`, `isVerified`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `permissions`
 
 ### `phone-number`
 
@@ -2807,31 +3027,89 @@ CRUD operations for PhoneNumber records.
 | `isPrimary` | Boolean |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `ccTrgmSimilarity` | Float |
+| `numberTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `ownerId`, `cc`, `number`, `isVerified`, `isPrimary`
+**Required create fields:** `cc`, `number`, `ccTrgmSimilarity`, `numberTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
-### `membership-type`
+### `app-limit-default`
 
-CRUD operations for MembershipType records.
+CRUD operations for AppLimitDefault records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all membershipType records |
-| `get` | Get a membershipType by id |
-| `create` | Create a new membershipType |
-| `update` | Update an existing membershipType |
-| `delete` | Delete a membershipType |
+| `list` | List all appLimitDefault records |
+| `get` | Get a appLimitDefault by id |
+| `create` | Create a new appLimitDefault |
+| `update` | Update an existing appLimitDefault |
+| `delete` | Delete a appLimitDefault |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | Int |
+| `id` | UUID |
 | `name` | String |
-| `description` | String |
-| `prefix` | String |
+| `max` | Int |
 
-**Create fields:** `name`, `description`, `prefix`
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
+### `org-limit-default`
+
+CRUD operations for OrgLimitDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitDefault records |
+| `get` | Get a orgLimitDefault by id |
+| `create` | Create a new orgLimitDefault |
+| `update` | Update an existing orgLimitDefault |
+| `delete` | Delete a orgLimitDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `max` | Int |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
+### `connected-account`
+
+CRUD operations for ConnectedAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all connectedAccount records |
+| `get` | Get a connectedAccount by id |
+| `create` | Create a new connectedAccount |
+| `update` | Update an existing connectedAccount |
+| `delete` | Delete a connectedAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `ownerId` | UUID |
+| `service` | String |
+| `identifier` | String |
+| `details` | JSON |
+| `isVerified` | Boolean |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `serviceTrgmSimilarity` | Float |
+| `identifierTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `service`, `identifier`, `details`, `serviceTrgmSimilarity`, `identifierTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`
 
 ### `node-type-registry`
 
@@ -2858,34 +3136,41 @@ CRUD operations for NodeTypeRegistry records.
 | `tags` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `nameTrgmSimilarity` | Float |
+| `slugTrgmSimilarity` | Float |
+| `categoryTrgmSimilarity` | Float |
+| `displayNameTrgmSimilarity` | Float |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `slug`, `category`, `displayName`, `description`, `parameterSchema`, `tags`
+**Required create fields:** `slug`, `category`, `nameTrgmSimilarity`, `slugTrgmSimilarity`, `categoryTrgmSimilarity`, `displayNameTrgmSimilarity`, `descriptionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `displayName`, `description`, `parameterSchema`, `tags`
 
-### `app-membership-default`
+### `membership-type`
 
-CRUD operations for AppMembershipDefault records.
+CRUD operations for MembershipType records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all appMembershipDefault records |
-| `get` | Get a appMembershipDefault by id |
-| `create` | Create a new appMembershipDefault |
-| `update` | Update an existing appMembershipDefault |
-| `delete` | Delete a appMembershipDefault |
+| `list` | List all membershipType records |
+| `get` | Get a membershipType by id |
+| `create` | Create a new membershipType |
+| `update` | Update an existing membershipType |
+| `delete` | Delete a membershipType |
 
 **Fields:**
 
 | Field | Type |
 |-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `isVerified` | Boolean |
+| `id` | Int |
+| `name` | String |
+| `description` | String |
+| `prefix` | String |
+| `descriptionTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
+**Required create fields:** `name`, `description`, `prefix`, `descriptionTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
 
 ### `commit`
 
@@ -2912,8 +3197,73 @@ CRUD operations for Commit records.
 | `committerId` | UUID |
 | `treeId` | UUID |
 | `date` | Datetime |
+| `messageTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `message`, `databaseId`, `storeId`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
+**Required create fields:** `databaseId`, `storeId`, `messageTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
+
+### `app-membership-default`
+
+CRUD operations for AppMembershipDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appMembershipDefault records |
+| `get` | Get a appMembershipDefault by id |
+| `create` | Create a new appMembershipDefault |
+| `update` | Update an existing appMembershipDefault |
+| `delete` | Delete a appMembershipDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `isVerified` | Boolean |
+
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
+
+### `rls-module`
+
+CRUD operations for RlsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all rlsModule records |
+| `get` | Get a rlsModule by id |
+| `create` | Create a new rlsModule |
+| `update` | Update an existing rlsModule |
+| `delete` | Delete a rlsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `sessionCredentialsTableId` | UUID |
+| `sessionsTableId` | UUID |
+| `usersTableId` | UUID |
+| `authenticate` | String |
+| `authenticateStrict` | String |
+| `currentRole` | String |
+| `currentRoleId` | String |
+| `authenticateTrgmSimilarity` | Float |
+| `authenticateStrictTrgmSimilarity` | Float |
+| `currentRoleTrgmSimilarity` | Float |
+| `currentRoleIdTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `databaseId`, `authenticateTrgmSimilarity`, `authenticateStrictTrgmSimilarity`, `currentRoleTrgmSimilarity`, `currentRoleIdTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
 
 ### `org-membership-default`
 
@@ -2941,7 +3291,8 @@ CRUD operations for OrgMembershipDefault records.
 | `deleteMemberCascadeGroups` | Boolean |
 | `createGroupsCascadeMembers` | Boolean |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `entityId`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
 ### `audit-log`
 
@@ -2962,13 +3313,16 @@ CRUD operations for AuditLog records.
 | `id` | UUID |
 | `event` | String |
 | `actorId` | UUID |
-| `origin` | ConstructiveInternalTypeOrigin |
+| `origin` | Origin |
 | `userAgent` | String |
 | `ipAddress` | InternetAddress |
 | `success` | Boolean |
 | `createdAt` | Datetime |
+| `userAgentTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `event`, `actorId`, `origin`, `userAgent`, `ipAddress`, `success`
+**Required create fields:** `event`, `success`, `userAgentTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
 ### `app-level`
 
@@ -2989,38 +3343,15 @@ CRUD operations for AppLevel records.
 | `id` | UUID |
 | `name` | String |
 | `description` | String |
-| `image` | ConstructiveInternalTypeImage |
+| `image` | Image |
 | `ownerId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
+| `descriptionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `name`, `description`, `image`, `ownerId`
-
-### `email`
-
-CRUD operations for Email records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all email records |
-| `get` | Get a email by id |
-| `create` | Create a new email |
-| `update` | Update an existing email |
-| `delete` | Delete a email |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `ownerId` | UUID |
-| `email` | ConstructiveInternalTypeEmail |
-| `isVerified` | Boolean |
-| `isPrimary` | Boolean |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Create fields:** `ownerId`, `email`, `isVerified`, `isPrimary`
+**Required create fields:** `name`, `descriptionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
 
 ### `sql-migration`
 
@@ -3051,8 +3382,74 @@ CRUD operations for SqlMigration records.
 | `action` | String |
 | `actionId` | UUID |
 | `actorId` | UUID |
+| `nameTrgmSimilarity` | Float |
+| `deployTrgmSimilarity` | Float |
+| `contentTrgmSimilarity` | Float |
+| `revertTrgmSimilarity` | Float |
+| `verifyTrgmSimilarity` | Float |
+| `actionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `name`, `databaseId`, `deploy`, `deps`, `payload`, `content`, `revert`, `verify`, `action`, `actionId`, `actorId`
+**Required create fields:** `nameTrgmSimilarity`, `deployTrgmSimilarity`, `contentTrgmSimilarity`, `revertTrgmSimilarity`, `verifyTrgmSimilarity`, `actionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `name`, `databaseId`, `deploy`, `deps`, `payload`, `content`, `revert`, `verify`, `action`, `actionId`, `actorId`
+
+### `email`
+
+CRUD operations for Email records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all email records |
+| `get` | Get a email by id |
+| `create` | Create a new email |
+| `update` | Update an existing email |
+| `delete` | Delete a email |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `ownerId` | UUID |
+| `email` | Email |
+| `isVerified` | Boolean |
+| `isPrimary` | Boolean |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `email`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+
+### `user`
+
+CRUD operations for User records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all user records |
+| `get` | Get a user by id |
+| `create` | Create a new user |
+| `update` | Update an existing user |
+| `delete` | Delete a user |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `username` | String |
+| `displayName` | String |
+| `profilePicture` | Image |
+| `searchTsv` | FullText |
+| `type` | Int |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `searchTsvRank` | Float |
+| `displayNameTrgmSimilarity` | Float |
+| `searchScore` | Float |
+
+**Required create fields:** `searchTsv`, `searchTsvRank`, `displayNameTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `type`
 
 ### `ast-migration`
 
@@ -3083,36 +3480,11 @@ CRUD operations for AstMigration records.
 | `action` | String |
 | `actionId` | UUID |
 | `actorId` | UUID |
+| `actionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
-
-### `user`
-
-CRUD operations for User records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all user records |
-| `get` | Get a user by id |
-| `create` | Create a new user |
-| `update` | Update an existing user |
-| `delete` | Delete a user |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `username` | String |
-| `displayName` | String |
-| `profilePicture` | ConstructiveInternalTypeImage |
-| `searchTsv` | FullText |
-| `type` | Int |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `searchTsvRank` | Float |
-
-**Create fields:** `username`, `displayName`, `profilePicture`, `searchTsv`, `type`, `searchTsvRank`
+**Required create fields:** `actionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `databaseId`, `name`, `requires`, `payload`, `deploys`, `deploy`, `revert`, `verify`, `action`, `actionId`, `actorId`
 
 ### `app-membership`
 
@@ -3147,7 +3519,8 @@ CRUD operations for AppMembership records.
 | `actorId` | UUID |
 | `profileId` | UUID |
 
-**Create fields:** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `actorId`, `profileId`
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
 
 ### `hierarchy-module`
 
@@ -3185,8 +3558,20 @@ CRUD operations for HierarchyModule records.
 | `getManagersFunction` | String |
 | `isManagerOfFunction` | String |
 | `createdAt` | Datetime |
+| `chartEdgesTableNameTrgmSimilarity` | Float |
+| `hierarchySprtTableNameTrgmSimilarity` | Float |
+| `chartEdgeGrantsTableNameTrgmSimilarity` | Float |
+| `prefixTrgmSimilarity` | Float |
+| `privateSchemaNameTrgmSimilarity` | Float |
+| `sprtTableNameTrgmSimilarity` | Float |
+| `rebuildHierarchyFunctionTrgmSimilarity` | Float |
+| `getSubordinatesFunctionTrgmSimilarity` | Float |
+| `getManagersFunctionTrgmSimilarity` | Float |
+| `isManagerOfFunctionTrgmSimilarity` | Float |
+| `searchScore` | Float |
 
-**Create fields:** `databaseId`, `schemaId`, `privateSchemaId`, `chartEdgesTableId`, `chartEdgesTableName`, `hierarchySprtTableId`, `hierarchySprtTableName`, `chartEdgeGrantsTableId`, `chartEdgeGrantsTableName`, `entityTableId`, `usersTableId`, `prefix`, `privateSchemaName`, `sprtTableName`, `rebuildHierarchyFunction`, `getSubordinatesFunction`, `getManagersFunction`, `isManagerOfFunction`
+**Required create fields:** `databaseId`, `entityTableId`, `usersTableId`, `chartEdgesTableNameTrgmSimilarity`, `hierarchySprtTableNameTrgmSimilarity`, `chartEdgeGrantsTableNameTrgmSimilarity`, `prefixTrgmSimilarity`, `privateSchemaNameTrgmSimilarity`, `sprtTableNameTrgmSimilarity`, `rebuildHierarchyFunctionTrgmSimilarity`, `getSubordinatesFunctionTrgmSimilarity`, `getManagersFunctionTrgmSimilarity`, `isManagerOfFunctionTrgmSimilarity`, `searchScore`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `chartEdgesTableId`, `chartEdgesTableName`, `hierarchySprtTableId`, `hierarchySprtTableName`, `chartEdgeGrantsTableId`, `chartEdgeGrantsTableName`, `prefix`, `privateSchemaName`, `sprtTableName`, `rebuildHierarchyFunction`, `getSubordinatesFunction`, `getManagersFunction`, `isManagerOfFunction`
 
 ## Custom Operations
 
@@ -3220,7 +3605,7 @@ appPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `org-permissions-get-padded-mask`
 
@@ -3231,7 +3616,7 @@ orgPermissionsGetPaddedMask
 
   | Argument | Type |
   |----------|------|
-  | `mask` | BitString |
+  | `--mask` | BitString |
 
 ### `steps-achieved`
 
@@ -3242,8 +3627,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
 
 ### `rev-parse`
 
@@ -3254,9 +3639,9 @@ revParse
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `refname` | String |
+  | `--dbId` | UUID |
+  | `--storeId` | UUID |
+  | `--refname` | String |
 
 ### `org-is-manager-of`
 
@@ -3267,10 +3652,10 @@ orgIsManagerOf
 
   | Argument | Type |
   |----------|------|
-  | `pEntityId` | UUID |
-  | `pManagerId` | UUID |
-  | `pUserId` | UUID |
-  | `pMaxDepth` | Int |
+  | `--pEntityId` | UUID |
+  | `--pManagerId` | UUID |
+  | `--pUserId` | UUID |
+  | `--pMaxDepth` | Int |
 
 ### `app-permissions-get-mask`
 
@@ -3281,7 +3666,7 @@ appPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `org-permissions-get-mask`
 
@@ -3292,7 +3677,7 @@ orgPermissionsGetMask
 
   | Argument | Type |
   |----------|------|
-  | `ids` | [UUID] |
+  | `--ids` | UUID |
 
 ### `app-permissions-get-mask-by-names`
 
@@ -3303,7 +3688,7 @@ appPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
+  | `--names` | String |
 
 ### `org-permissions-get-mask-by-names`
 
@@ -3314,35 +3699,7 @@ orgPermissionsGetMaskByNames
 
   | Argument | Type |
   |----------|------|
-  | `names` | [String] |
-
-### `app-permissions-get-by-mask`
-
-Reads and enables pagination through a set of `AppPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
-
-### `org-permissions-get-by-mask`
-
-Reads and enables pagination through a set of `OrgPermission`.
-
-- **Type:** query
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `mask` | BitString |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--names` | String |
 
 ### `get-all-objects-from-root`
 
@@ -3353,11 +3710,11 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--databaseId` | UUID |
+  | `--id` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `get-path-objects-from-root`
 
@@ -3368,12 +3725,12 @@ Reads and enables pagination through a set of `Object`.
 
   | Argument | Type |
   |----------|------|
-  | `databaseId` | UUID |
-  | `id` | UUID |
-  | `path` | [String] |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--databaseId` | UUID |
+  | `--id` | UUID |
+  | `--path` | String |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `get-object-at-path`
 
@@ -3384,10 +3741,38 @@ getObjectAtPath
 
   | Argument | Type |
   |----------|------|
-  | `dbId` | UUID |
-  | `storeId` | UUID |
-  | `path` | [String] |
-  | `refname` | String |
+  | `--dbId` | UUID |
+  | `--storeId` | UUID |
+  | `--path` | String |
+  | `--refname` | String |
+
+### `app-permissions-get-by-mask`
+
+Reads and enables pagination through a set of `AppPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
+
+### `org-permissions-get-by-mask`
+
+Reads and enables pagination through a set of `OrgPermission`.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--mask` | BitString |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `steps-required`
 
@@ -3398,11 +3783,11 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
-  | `first` | Int |
-  | `offset` | Int |
-  | `after` | Cursor |
+  | `--vlevel` | String |
+  | `--vroleId` | UUID |
+  | `--first` | Int |
+  | `--offset` | Int |
+  | `--after` | Cursor |
 
 ### `current-user`
 
@@ -3420,7 +3805,7 @@ signOut
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignOutInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `send-account-deletion-email`
 
@@ -3431,7 +3816,7 @@ sendAccountDeletionEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendAccountDeletionEmailInput (required) |
+  | `--input.clientMutationId` | String |
 
 ### `check-password`
 
@@ -3442,7 +3827,8 @@ checkPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | CheckPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String |
 
 ### `submit-invite-code`
 
@@ -3453,7 +3839,8 @@ submitInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ### `submit-org-invite-code`
 
@@ -3464,7 +3851,8 @@ submitOrgInviteCode
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitOrgInviteCodeInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
 
 ### `freeze-objects`
 
@@ -3475,7 +3863,9 @@ freezeObjects
 
   | Argument | Type |
   |----------|------|
-  | `input` | FreezeObjectsInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.id` | UUID |
 
 ### `init-empty-repo`
 
@@ -3486,7 +3876,9 @@ initEmptyRepo
 
   | Argument | Type |
   |----------|------|
-  | `input` | InitEmptyRepoInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
 
 ### `confirm-delete-account`
 
@@ -3497,7 +3889,9 @@ confirmDeleteAccount
 
   | Argument | Type |
   |----------|------|
-  | `input` | ConfirmDeleteAccountInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.userId` | UUID |
+  | `--input.token` | String |
 
 ### `set-password`
 
@@ -3508,7 +3902,9 @@ setPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.currentPassword` | String |
+  | `--input.newPassword` | String |
 
 ### `verify-email`
 
@@ -3519,18 +3915,9 @@ verifyEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyEmailInput (required) |
-
-### `reset-password`
-
-resetPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ResetPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.emailId` | UUID |
+  | `--input.token` | String |
 
 ### `remove-node-at-path`
 
@@ -3541,7 +3928,24 @@ removeNodeAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | RemoveNodeAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+
+### `reset-password`
+
+resetPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.roleId` | UUID |
+  | `--input.resetToken` | String |
+  | `--input.newPassword` | String |
 
 ### `bootstrap-user`
 
@@ -3552,7 +3956,26 @@ bootstrapUser
 
   | Argument | Type |
   |----------|------|
-  | `input` | BootstrapUserInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.targetDatabaseId` | UUID |
+  | `--input.password` | String |
+  | `--input.isAdmin` | Boolean |
+  | `--input.isOwner` | Boolean |
+  | `--input.username` | String |
+  | `--input.displayName` | String |
+  | `--input.returnApiKey` | Boolean |
+
+### `set-field-order`
+
+setFieldOrder
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.fieldIds` | UUID |
 
 ### `set-data-at-path`
 
@@ -3563,7 +3986,11 @@ setDataAtPath
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetDataAtPathInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
 
 ### `set-props-and-commit`
 
@@ -3574,7 +4001,12 @@ setPropsAndCommit
 
   | Argument | Type |
   |----------|------|
-  | `input` | SetPropsAndCommitInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
+  | `--input.refname` | String |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
 
 ### `provision-database-with-user`
 
@@ -3585,7 +4017,82 @@ provisionDatabaseWithUser
 
   | Argument | Type |
   |----------|------|
-  | `input` | ProvisionDatabaseWithUserInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.pDatabaseName` | String |
+  | `--input.pDomain` | String |
+  | `--input.pSubdomain` | String |
+  | `--input.pModules` | String |
+  | `--input.pOptions` | JSON |
+
+### `insert-node-at-path`
+
+insertNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+
+### `update-node-at-path`
+
+updateNodeAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.root` | UUID |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+
+### `set-and-commit`
+
+setAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.dbId` | UUID |
+  | `--input.storeId` | UUID |
+  | `--input.refname` | String |
+  | `--input.path` | String |
+  | `--input.data` | JSON |
+  | `--input.kids` | UUID |
+  | `--input.ktree` | String |
+
+### `apply-rls`
+
+applyRls
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.tableId` | UUID |
+  | `--input.grants` | JSON |
+  | `--input.policyType` | String |
+  | `--input.vars` | JSON |
+  | `--input.fieldIds` | UUID |
+  | `--input.permissive` | Boolean |
+  | `--input.name` | String |
 
 ### `sign-in-one-time-token`
 
@@ -3596,7 +4103,9 @@ signInOneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.token` | String |
+  | `--input.credentialKind` | String |
 
 ### `create-user-database`
 
@@ -3623,7 +4132,14 @@ Example usage:
 
   | Argument | Type |
   |----------|------|
-  | `input` | CreateUserDatabaseInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.databaseName` | String |
+  | `--input.ownerId` | UUID |
+  | `--input.includeInvites` | Boolean |
+  | `--input.includeGroups` | Boolean |
+  | `--input.includeLevels` | Boolean |
+  | `--input.bitlen` | Int |
+  | `--input.tokensExpiration` | IntervalInput |
 
 ### `extend-token-expires`
 
@@ -3634,7 +4150,8 @@ extendTokenExpires
 
   | Argument | Type |
   |----------|------|
-  | `input` | ExtendTokenExpiresInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.amount` | IntervalInput |
 
 ### `sign-in`
 
@@ -3645,7 +4162,12 @@ signIn
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `sign-up`
 
@@ -3656,18 +4178,12 @@ signUp
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignUpInput (required) |
-
-### `set-field-order`
-
-setFieldOrder
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetFieldOrderInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `one-time-token`
 
@@ -3678,51 +4194,11 @@ oneTimeToken
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
-
-### `insert-node-at-path`
-
-insertNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | InsertNodeAtPathInput (required) |
-
-### `update-node-at-path`
-
-updateNodeAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | UpdateNodeAtPathInput (required) |
-
-### `set-and-commit`
-
-setAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetAndCommitInput (required) |
-
-### `apply-rls`
-
-applyRls
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ApplyRlsInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.origin` | Origin |
+  | `--input.rememberMe` | Boolean |
 
 ### `forgot-password`
 
@@ -3733,7 +4209,8 @@ forgotPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | ForgotPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | Email |
 
 ### `send-verification-email`
 
@@ -3744,7 +4221,8 @@ sendVerificationEmail
 
   | Argument | Type |
   |----------|------|
-  | `input` | SendVerificationEmailInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.email` | Email |
 
 ### `verify-password`
 
@@ -3755,7 +4233,8 @@ verifyPassword
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyPasswordInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String (required) |
 
 ### `verify-totp`
 
@@ -3766,7 +4245,8 @@ verifyTotp
 
   | Argument | Type |
   |----------|------|
-  | `input` | VerifyTotpInput (required) |
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
 
 ## Output
 
@@ -3775,6 +4255,14 @@ All commands output JSON to stdout. Pipe to `jq` for formatting:
 ```bash
 csdk car list | jq '.[]'
 csdk car get --id <uuid> | jq '.'
+```
+
+## Non-Interactive Mode
+
+Use `--no-tty` to skip all interactive prompts (useful for scripts and CI):
+
+```bash
+csdk --no-tty car create --name "Sedan" --year 2024
 ```
 
 ---

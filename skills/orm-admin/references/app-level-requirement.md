@@ -9,7 +9,7 @@ Defines the specific requirements that must be met to achieve a level
 ```typescript
 db.appLevelRequirement.findMany({ select: { id: true } }).execute()
 db.appLevelRequirement.findOne({ id: '<value>', select: { id: true } }).execute()
-db.appLevelRequirement.create({ data: { name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>' }, select: { id: true } }).execute()
+db.appLevelRequirement.create({ data: { name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.appLevelRequirement.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
 db.appLevelRequirement.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.appLevelRequirement.findMany({
 
 ```typescript
 const item = await db.appLevelRequirement.create({
-  data: { name: 'value', level: 'value', description: 'value', requiredCount: 'value', priority: 'value' },
+  data: { name: 'value', level: 'value', description: 'value', requiredCount: 'value', priority: 'value', descriptionTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

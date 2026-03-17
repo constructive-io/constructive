@@ -7,8 +7,8 @@ React Query hooks for FieldModule data operations
 ## Usage
 
 ```typescript
-useFieldModulesQuery({ selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } } })
-useFieldModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } } })
+useFieldModulesQuery({ selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true, nodeTypeTrgmSimilarity: true, searchScore: true } } })
+useFieldModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true, nodeTypeTrgmSimilarity: true, searchScore: true } } })
 useCreateFieldModuleMutation({ selection: { fields: { id: true } } })
 useUpdateFieldModuleMutation({ selection: { fields: { id: true } } })
 useDeleteFieldModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteFieldModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useFieldModulesQuery({
-  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } },
+  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true, nodeTypeTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useFieldModulesQuery({
 const { mutate } = useCreateFieldModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', fieldId: '<value>', nodeType: '<value>', data: '<value>', triggers: '<value>', functions: '<value>' });
+mutate({ databaseId: '<value>', privateSchemaId: '<value>', tableId: '<value>', fieldId: '<value>', nodeType: '<value>', data: '<value>', triggers: '<value>', functions: '<value>', nodeTypeTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

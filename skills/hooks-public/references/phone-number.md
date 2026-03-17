@@ -7,8 +7,8 @@ User phone numbers with country code, verification, and primary-number managemen
 ## Usage
 
 ```typescript
-usePhoneNumbersQuery({ selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
-usePhoneNumberQuery({ id: '<value>', selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
+usePhoneNumbersQuery({ selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } } })
+usePhoneNumberQuery({ id: '<value>', selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } } })
 useCreatePhoneNumberMutation({ selection: { fields: { id: true } } })
 useUpdatePhoneNumberMutation({ selection: { fields: { id: true } } })
 useDeletePhoneNumberMutation({})
@@ -20,7 +20,7 @@ useDeletePhoneNumberMutation({})
 
 ```typescript
 const { data, isLoading } = usePhoneNumbersQuery({
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true, ccTrgmSimilarity: true, numberTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePhoneNumbersQuery({
 const { mutate } = useCreatePhoneNumberMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>' });
+mutate({ ownerId: '<value>', cc: '<value>', number: '<value>', isVerified: '<value>', isPrimary: '<value>', ccTrgmSimilarity: '<value>', numberTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

@@ -181,6 +181,7 @@ export interface DocsConfig {
 export interface BuiltinNames {
   auth?: string;
   context?: string;
+  config?: string;
 }
 
 /**
@@ -329,6 +330,14 @@ export interface GraphQLSDKConfigTarget {
      * @default true
      */
     comments?: boolean;
+    /**
+     * Generate condition types and condition arguments on findMany/findFirst.
+     * PostGraphile's native `condition` argument provides simple equality filtering.
+     * Set to `true` to include condition types and arguments in generated code.
+     * Set to `false` to omit them (e.g., when using connection-filter's `filter` argument exclusively).
+     * @default false
+     */
+    condition?: boolean;
   };
 
   /**
@@ -524,6 +533,7 @@ export const DEFAULT_CONFIG: GraphQLSDKConfigTarget = {
   codegen: {
     skipQueryField: true,
     comments: true,
+    condition: false,
   },
   orm: false,
   reactQuery: false,

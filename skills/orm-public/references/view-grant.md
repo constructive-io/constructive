@@ -9,7 +9,7 @@ ORM operations for ViewGrant records
 ```typescript
 db.viewGrant.findMany({ select: { id: true } }).execute()
 db.viewGrant.findOne({ id: '<value>', select: { id: true } }).execute()
-db.viewGrant.create({ data: { databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>' }, select: { id: true } }).execute()
+db.viewGrant.create({ data: { databaseId: '<value>', viewId: '<value>', granteeName: '<value>', privilege: '<value>', withGrantOption: '<value>', isGrant: '<value>', granteeNameTrgmSimilarity: '<value>', privilegeTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.viewGrant.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.viewGrant.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.viewGrant.findMany({
 
 ```typescript
 const item = await db.viewGrant.create({
-  data: { databaseId: 'value', viewId: 'value', granteeName: 'value', privilege: 'value', withGrantOption: 'value', isGrant: 'value' },
+  data: { databaseId: 'value', viewId: 'value', granteeName: 'value', privilege: 'value', withGrantOption: 'value', isGrant: 'value', granteeNameTrgmSimilarity: 'value', privilegeTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

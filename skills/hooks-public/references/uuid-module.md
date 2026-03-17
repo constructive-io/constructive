@@ -7,8 +7,8 @@ React Query hooks for UuidModule data operations
 ## Usage
 
 ```typescript
-useUuidModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } } })
-useUuidModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } } })
+useUuidModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true, uuidFunctionTrgmSimilarity: true, uuidSeedTrgmSimilarity: true, searchScore: true } } })
+useUuidModuleQuery({ id: '<value>', selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true, uuidFunctionTrgmSimilarity: true, uuidSeedTrgmSimilarity: true, searchScore: true } } })
 useCreateUuidModuleMutation({ selection: { fields: { id: true } } })
 useUpdateUuidModuleMutation({ selection: { fields: { id: true } } })
 useDeleteUuidModuleMutation({})
@@ -20,7 +20,7 @@ useDeleteUuidModuleMutation({})
 
 ```typescript
 const { data, isLoading } = useUuidModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, uuidFunction: true, uuidSeed: true, uuidFunctionTrgmSimilarity: true, uuidSeedTrgmSimilarity: true, searchScore: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useUuidModulesQuery({
 const { mutate } = useCreateUuidModuleMutation({
   selection: { fields: { id: true } },
 });
-mutate({ databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>' });
+mutate({ databaseId: '<value>', schemaId: '<value>', uuidFunction: '<value>', uuidSeed: '<value>', uuidFunctionTrgmSimilarity: '<value>', uuidSeedTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```

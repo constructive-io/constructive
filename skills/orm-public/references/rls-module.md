@@ -9,7 +9,7 @@ ORM operations for RlsModule records
 ```typescript
 db.rlsModule.findMany({ select: { id: true } }).execute()
 db.rlsModule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.rlsModule.create({ data: { databaseId: '<value>', apiId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>' }, select: { id: true } }).execute()
+db.rlsModule.create({ data: { databaseId: '<value>', schemaId: '<value>', privateSchemaId: '<value>', sessionCredentialsTableId: '<value>', sessionsTableId: '<value>', usersTableId: '<value>', authenticate: '<value>', authenticateStrict: '<value>', currentRole: '<value>', currentRoleId: '<value>', authenticateTrgmSimilarity: '<value>', authenticateStrictTrgmSimilarity: '<value>', currentRoleTrgmSimilarity: '<value>', currentRoleIdTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.rlsModule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.rlsModule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.rlsModule.findMany({
 
 ```typescript
 const item = await db.rlsModule.create({
-  data: { databaseId: 'value', apiId: 'value', schemaId: 'value', privateSchemaId: 'value', sessionCredentialsTableId: 'value', sessionsTableId: 'value', usersTableId: 'value', authenticate: 'value', authenticateStrict: 'value', currentRole: 'value', currentRoleId: 'value' },
+  data: { databaseId: 'value', schemaId: 'value', privateSchemaId: 'value', sessionCredentialsTableId: 'value', sessionsTableId: 'value', usersTableId: 'value', authenticate: 'value', authenticateStrict: 'value', currentRole: 'value', currentRoleId: 'value', authenticateTrgmSimilarity: 'value', authenticateStrictTrgmSimilarity: 'value', currentRoleTrgmSimilarity: 'value', currentRoleIdTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

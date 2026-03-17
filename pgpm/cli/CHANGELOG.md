@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.7.4](https://github.com/constructive-io/constructive/compare/pgpm@4.7.3...pgpm@4.7.4) (2026-03-16)
+
+**Note:** Version bump only for package pgpm
+
+## [4.7.3](https://github.com/constructive-io/constructive/compare/pgpm@4.7.2...pgpm@4.7.3) (2026-03-15)
+
+**Note:** Version bump only for package pgpm
+
+## [4.7.2](https://github.com/constructive-io/constructive/compare/pgpm@4.7.1...pgpm@4.7.2) (2026-03-15)
+
+**Note:** Version bump only for package pgpm
+
+## [4.7.1](https://github.com/constructive-io/constructive/compare/pgpm@4.7.0...pgpm@4.7.1) (2026-03-13)
+
+**Note:** Version bump only for package pgpm
+
+# [4.7.0](https://github.com/constructive-io/constructive/compare/pgpm@4.6.2...pgpm@4.7.0) (2026-03-13)
+
+### Features
+
+- **codegen:** add config command, helpers.ts generation, and collision handling ([4273a61](https://github.com/constructive-io/constructive/commit/4273a618989f6eb55ae120221b97167074de04ff)), closes [constructive-io/dev-utils#70](https://github.com/constructive-io/dev-utils/issues/70)
+
+## [4.6.2](https://github.com/constructive-io/constructive/compare/pgpm@4.6.1...pgpm@4.6.2) (2026-03-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.6.1](https://github.com/constructive-io/constructive/compare/pgpm@4.5.0...pgpm@4.6.1) (2026-03-12)
+
+**Note:** Version bump only for package pgpm
+
+# [4.6.0](https://github.com/constructive-io/constructive/compare/pgpm@4.5.0...pgpm@4.6.0) (2026-03-12)
+
+**Note:** Version bump only for package pgpm
+
+# [4.5.0](https://github.com/constructive-io/constructive/compare/pgpm@4.4.2...pgpm@4.5.0) (2026-03-12)
+
+**Note:** Version bump only for package pgpm
+
+## [4.4.2](https://github.com/constructive-io/constructive/compare/pgpm@4.4.1...pgpm@4.4.2) (2026-03-12)
+
+### Bug Fixes
+
+- **cli:** fix --no-tty flag not being recognized in init command ([e4682da](https://github.com/constructive-io/constructive/commit/e4682da94e08085142b38ecb0cf8bdac8c693efe))
+
 ## [4.4.1](https://github.com/constructive-io/constructive/compare/pgpm@4.4.0...pgpm@4.4.1) (2026-03-04)
 
 **Note:** Version bump only for package pgpm

@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.6.3](https://github.com/constructive-io/constructive/compare/graphile-query@4.6.2...graphile-query@4.6.3) (2026-03-16)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.6.2](https://github.com/constructive-io/constructive/compare/graphile-query@4.6.1...graphile-query@4.6.2) (2026-03-15)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.6.1](https://github.com/constructive-io/constructive/compare/graphile-query@4.6.0...graphile-query@4.6.1) (2026-03-15)
+
+### Bug Fixes
+
+- align all graphile ecosystem deps to latest compatible pinned RC versions ([d3f7761](https://github.com/constructive-io/constructive/commit/d3f7761182e0470cf992028155d1a5fa00cf9211))
+
+# [4.6.0](https://github.com/constructive-io/constructive/compare/graphile-query@4.5.4...graphile-query@4.6.0) (2026-03-14)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.5.4](https://github.com/constructive-io/constructive/compare/graphile-query@4.5.3...graphile-query@4.5.4) (2026-03-13)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.5.3](https://github.com/constructive-io/constructive/compare/graphile-query@4.5.2...graphile-query@4.5.3) (2026-03-13)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.5.2](https://github.com/constructive-io/constructive/compare/graphile-query@4.5.1...graphile-query@4.5.2) (2026-03-12)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.5.1](https://github.com/constructive-io/constructive/compare/graphile-query@4.4.0...graphile-query@4.5.1) (2026-03-12)
+
+**Note:** Version bump only for package graphile-query
+
+# [4.5.0](https://github.com/constructive-io/constructive/compare/graphile-query@4.4.0...graphile-query@4.5.0) (2026-03-12)
+
+**Note:** Version bump only for package graphile-query
+
+# [4.4.0](https://github.com/constructive-io/constructive/compare/graphile-query@4.3.5...graphile-query@4.4.0) (2026-03-12)
+
+**Note:** Version bump only for package graphile-query
+
+## [4.3.5](https://github.com/constructive-io/constructive/compare/graphile-query@4.3.4...graphile-query@4.3.5) (2026-03-12)
+
+**Note:** Version bump only for package graphile-query
+
 ## [4.3.4](https://github.com/constructive-io/constructive/compare/graphile-query@4.3.3...graphile-query@4.3.4) (2026-03-04)
 
 **Note:** Version bump only for package graphile-query

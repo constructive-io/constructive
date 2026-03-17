@@ -9,7 +9,7 @@ CRUD operations for AppLimit records via csdk CLI
 ```bash
 csdk app-limit list
 csdk app-limit get --id <value>
-csdk app-limit create --name <value> --actorId <value> --num <value> --max <value>
+csdk app-limit create --actorId <value> [--name <value>] [--num <value>] [--max <value>]
 csdk app-limit update --id <value> [--name <value>] [--actorId <value>] [--num <value>] [--max <value>]
 csdk app-limit delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk app-limit list
 ### Create a appLimit
 
 ```bash
-csdk app-limit create --name "value" --actorId "value" --num "value" --max "value"
+csdk app-limit create --actorId <value> [--name <value>] [--num <value>] [--max <value>]
 ```
 
 ### Get a appLimit by id

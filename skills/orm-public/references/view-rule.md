@@ -9,7 +9,7 @@ DO INSTEAD rules for views (e.g., read-only enforcement)
 ```typescript
 db.viewRule.findMany({ select: { id: true } }).execute()
 db.viewRule.findOne({ id: '<value>', select: { id: true } }).execute()
-db.viewRule.create({ data: { databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>' }, select: { id: true } }).execute()
+db.viewRule.create({ data: { databaseId: '<value>', viewId: '<value>', name: '<value>', event: '<value>', action: '<value>', nameTrgmSimilarity: '<value>', eventTrgmSimilarity: '<value>', actionTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.viewRule.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.viewRule.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.viewRule.findMany({
 
 ```typescript
 const item = await db.viewRule.create({
-  data: { databaseId: 'value', viewId: 'value', name: 'value', event: 'value', action: 'value' },
+  data: { databaseId: 'value', viewId: 'value', name: 'value', event: 'value', action: 'value', nameTrgmSimilarity: 'value', eventTrgmSimilarity: 'value', actionTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

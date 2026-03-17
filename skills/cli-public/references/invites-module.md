@@ -9,8 +9,8 @@ CRUD operations for InvitesModule records via csdk CLI
 ```bash
 csdk invites-module list
 csdk invites-module get --id <value>
-csdk invites-module create --databaseId <value> --schemaId <value> --privateSchemaId <value> --emailsTableId <value> --usersTableId <value> --invitesTableId <value> --claimedInvitesTableId <value> --invitesTableName <value> --claimedInvitesTableName <value> --submitInviteCodeFunction <value> --prefix <value> --membershipType <value> --entityTableId <value>
-csdk invites-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--emailsTableId <value>] [--usersTableId <value>] [--invitesTableId <value>] [--claimedInvitesTableId <value>] [--invitesTableName <value>] [--claimedInvitesTableName <value>] [--submitInviteCodeFunction <value>] [--prefix <value>] [--membershipType <value>] [--entityTableId <value>]
+csdk invites-module create --databaseId <value> --membershipType <value> --invitesTableNameTrgmSimilarity <value> --claimedInvitesTableNameTrgmSimilarity <value> --submitInviteCodeFunctionTrgmSimilarity <value> --prefixTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--privateSchemaId <value>] [--emailsTableId <value>] [--usersTableId <value>] [--invitesTableId <value>] [--claimedInvitesTableId <value>] [--invitesTableName <value>] [--claimedInvitesTableName <value>] [--submitInviteCodeFunction <value>] [--prefix <value>] [--entityTableId <value>]
+csdk invites-module update --id <value> [--databaseId <value>] [--schemaId <value>] [--privateSchemaId <value>] [--emailsTableId <value>] [--usersTableId <value>] [--invitesTableId <value>] [--claimedInvitesTableId <value>] [--invitesTableName <value>] [--claimedInvitesTableName <value>] [--submitInviteCodeFunction <value>] [--prefix <value>] [--membershipType <value>] [--entityTableId <value>] [--invitesTableNameTrgmSimilarity <value>] [--claimedInvitesTableNameTrgmSimilarity <value>] [--submitInviteCodeFunctionTrgmSimilarity <value>] [--prefixTrgmSimilarity <value>] [--searchScore <value>]
 csdk invites-module delete --id <value>
 ```
 
@@ -25,7 +25,7 @@ csdk invites-module list
 ### Create a invitesModule
 
 ```bash
-csdk invites-module create --databaseId "value" --schemaId "value" --privateSchemaId "value" --emailsTableId "value" --usersTableId "value" --invitesTableId "value" --claimedInvitesTableId "value" --invitesTableName "value" --claimedInvitesTableName "value" --submitInviteCodeFunction "value" --prefix "value" --membershipType "value" --entityTableId "value"
+csdk invites-module create --databaseId <value> --membershipType <value> --invitesTableNameTrgmSimilarity <value> --claimedInvitesTableNameTrgmSimilarity <value> --submitInviteCodeFunctionTrgmSimilarity <value> --prefixTrgmSimilarity <value> --searchScore <value> [--schemaId <value>] [--privateSchemaId <value>] [--emailsTableId <value>] [--usersTableId <value>] [--invitesTableId <value>] [--claimedInvitesTableId <value>] [--invitesTableName <value>] [--claimedInvitesTableName <value>] [--submitInviteCodeFunction <value>] [--prefix <value>] [--entityTableId <value>]
 ```
 
 ### Get a invitesModule by id

@@ -18,6 +18,8 @@ const fieldSchema: FieldSchema = {
   createdAt: 'string',
   updatedAt: 'string',
   searchTsvRank: 'float',
+  displayNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nuser <command>\n\nCommands:\n  list                  List all user records\n  get                   Get a user by ID\n  create                Create a new user\n  update                Update an existing user\n  delete                Delete a user\n\n  --help, -h            Show this help message\n';
@@ -75,11 +77,9 @@ async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: In
           username: true,
           displayName: true,
           profilePicture: true,
-          searchTsv: true,
           type: true,
           createdAt: true,
           updatedAt: true,
-          searchTsvRank: true,
         },
       })
       .execute();
@@ -111,11 +111,9 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           username: true,
           displayName: true,
           profilePicture: true,
-          searchTsv: true,
           type: true,
           createdAt: true,
           updatedAt: true,
-          searchTsvRank: true,
         },
       })
       .execute();
@@ -154,13 +152,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'searchTsv',
-        message: 'searchTsv',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'type',
         message: 'type',
         required: false,
@@ -176,7 +167,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           username: cleanedData.username,
           displayName: cleanedData.displayName,
           profilePicture: cleanedData.profilePicture,
-          searchTsv: cleanedData.searchTsv,
           type: cleanedData.type,
         },
         select: {
@@ -184,11 +174,9 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           username: true,
           displayName: true,
           profilePicture: true,
-          searchTsv: true,
           type: true,
           createdAt: true,
           updatedAt: true,
-          searchTsvRank: true,
         },
       })
       .execute();
@@ -233,13 +221,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'searchTsv',
-        message: 'searchTsv',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'text',
         name: 'type',
         message: 'type',
         required: false,
@@ -258,7 +239,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           username: cleanedData.username,
           displayName: cleanedData.displayName,
           profilePicture: cleanedData.profilePicture,
-          searchTsv: cleanedData.searchTsv,
           type: cleanedData.type,
         },
         select: {
@@ -266,11 +246,9 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           username: true,
           displayName: true,
           profilePicture: true,
-          searchTsv: true,
           type: true,
           createdAt: true,
           updatedAt: true,
-          searchTsvRank: true,
         },
       })
       .execute();

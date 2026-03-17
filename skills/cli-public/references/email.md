@@ -9,7 +9,7 @@ CRUD operations for Email records via csdk CLI
 ```bash
 csdk email list
 csdk email get --id <value>
-csdk email create --ownerId <value> --email <value> --isVerified <value> --isPrimary <value>
+csdk email create --email <value> [--ownerId <value>] [--isVerified <value>] [--isPrimary <value>]
 csdk email update --id <value> [--ownerId <value>] [--email <value>] [--isVerified <value>] [--isPrimary <value>]
 csdk email delete --id <value>
 ```
@@ -25,7 +25,7 @@ csdk email list
 ### Create a email
 
 ```bash
-csdk email create --ownerId "value" --email "value" --isVerified "value" --isPrimary "value"
+csdk email create --email <value> [--ownerId <value>] [--isVerified <value>] [--isPrimary <value>]
 ```
 
 ### Get a email by id

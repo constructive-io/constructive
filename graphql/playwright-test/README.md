@@ -1,5 +1,17 @@
 # @constructive-io/playwright-test
 
+<p align="center" width="100%">
+  <img height="250" src="https://raw.githubusercontent.com/constructive-io/constructive/refs/heads/main/assets/outline-logo.svg" />
+</p>
+
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
+   <a href="https://www.npmjs.com/package/@constructive-io/playwright-test"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphql%2Fplaywright-test%2Fpackage.json"/></a>
+</p>
+
 Constructive Playwright Testing with HTTP server support for end-to-end testing.
 
 This package extends `@constructive-io/graphql-test` to provide an actual HTTP server for Playwright and other E2E testing frameworks. It creates isolated test databases and starts a GraphQL server that bypasses domain routing, making it perfect for integration testing.

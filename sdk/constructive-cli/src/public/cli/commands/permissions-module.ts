@@ -26,6 +26,14 @@ const fieldSchema: FieldSchema = {
   getMask: 'string',
   getByMask: 'string',
   getMaskByName: 'string',
+  tableNameTrgmSimilarity: 'float',
+  defaultTableNameTrgmSimilarity: 'float',
+  prefixTrgmSimilarity: 'float',
+  getPaddedMaskTrgmSimilarity: 'float',
+  getMaskTrgmSimilarity: 'float',
+  getByMaskTrgmSimilarity: 'float',
+  getMaskByNameTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\npermissions-module <command>\n\nCommands:\n  list                  List all permissionsModule records\n  get                   Get a permissionsModule by ID\n  create                Create a new permissionsModule\n  update                Update an existing permissionsModule\n  delete                Delete a permissionsModule\n\n  --help, -h            Show this help message\n';

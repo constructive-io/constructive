@@ -110,20 +110,20 @@ create({ hashUuid: '<value>', databaseId: '<value>', kids: '<value>', ktree: '<v
 ```typescript
 // List all refs
 const { data, isLoading } = useRefsQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one ref
 const { data: item } = useRefQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, storeId: true, commitId: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a ref
 const { mutate: create } = useCreateRefMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>' });
+create({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Store
@@ -131,20 +131,20 @@ create({ name: '<value>', databaseId: '<value>', storeId: '<value>', commitId: '
 ```typescript
 // List all stores
 const { data, isLoading } = useStoresQuery({
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one store
 const { data: item } = useStoreQuery({
   id: '<value>',
-  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true } },
+  selection: { fields: { id: true, name: true, databaseId: true, hash: true, createdAt: true, nameTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a store
 const { mutate: create } = useCreateStoreMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', databaseId: '<value>', hash: '<value>' });
+create({ name: '<value>', databaseId: '<value>', hash: '<value>', nameTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ### Commit
@@ -152,20 +152,20 @@ create({ name: '<value>', databaseId: '<value>', hash: '<value>' });
 ```typescript
 // List all commits
 const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
 });
 
 // Get one commit
 const { data: item } = useCommitQuery({
   id: '<value>',
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true, messageTrgmSimilarity: true, searchScore: true } },
 });
 
 // Create a commit
 const { mutate: create } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-create({ message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>' });
+create({ message: '<value>', databaseId: '<value>', storeId: '<value>', parentIds: '<value>', authorId: '<value>', committerId: '<value>', treeId: '<value>', date: '<value>', messageTrgmSimilarity: '<value>', searchScore: '<value>' });
 ```
 
 ## Custom Operation Hooks

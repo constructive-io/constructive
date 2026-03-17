@@ -18,6 +18,8 @@ const fieldSchema: FieldSchema = {
   data: 'json',
   triggers: 'string',
   functions: 'string',
+  nodeTypeTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\nfield-module <command>\n\nCommands:\n  list                  List all fieldModule records\n  get                   Get a fieldModule by ID\n  create                Create a new fieldModule\n  update                Update an existing fieldModule\n  delete                Delete a fieldModule\n\n  --help, -h            Show this help message\n';

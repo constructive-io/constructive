@@ -9,7 +9,7 @@ Top-level site configuration: branding assets, title, and description for a depl
 ```typescript
 db.site.findMany({ select: { id: true } }).execute()
 db.site.findOne({ id: '<value>', select: { id: true } }).execute()
-db.site.create({ data: { databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>' }, select: { id: true } }).execute()
+db.site.create({ data: { databaseId: '<value>', title: '<value>', description: '<value>', ogImage: '<value>', favicon: '<value>', appleTouchIcon: '<value>', logo: '<value>', dbname: '<value>', titleTrgmSimilarity: '<value>', descriptionTrgmSimilarity: '<value>', dbnameTrgmSimilarity: '<value>', searchScore: '<value>' }, select: { id: true } }).execute()
 db.site.update({ where: { id: '<value>' }, data: { databaseId: '<new>' }, select: { id: true } }).execute()
 db.site.delete({ where: { id: '<value>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.site.findMany({
 
 ```typescript
 const item = await db.site.create({
-  data: { databaseId: 'value', title: 'value', description: 'value', ogImage: 'value', favicon: 'value', appleTouchIcon: 'value', logo: 'value', dbname: 'value' },
+  data: { databaseId: 'value', title: 'value', description: 'value', ogImage: 'value', favicon: 'value', appleTouchIcon: 'value', logo: 'value', dbname: 'value', titleTrgmSimilarity: 'value', descriptionTrgmSimilarity: 'value', dbnameTrgmSimilarity: 'value', searchScore: 'value' },
   select: { id: true }
 }).execute();
 ```

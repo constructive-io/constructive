@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DefaultPrivilegeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DefaultPrivilegeSelect>(
-    args: FindManyArgs<S, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy> & {
+    args: FindManyArgs<S, DefaultPrivilegeFilter, never, DefaultPrivilegeOrderBy> & {
       select: S;
     } & StrictSelect<S, DefaultPrivilegeSelect>
   ): QueryBuilder<{

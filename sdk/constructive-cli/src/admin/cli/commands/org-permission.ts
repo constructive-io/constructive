@@ -14,6 +14,8 @@ const fieldSchema: FieldSchema = {
   bitnum: 'int',
   bitstr: 'string',
   description: 'string',
+  descriptionTrgmSimilarity: 'float',
+  searchScore: 'float',
 };
 const usage =
   '\norg-permission <command>\n\nCommands:\n  list                  List all orgPermission records\n  get                   Get a orgPermission by ID\n  create                Create a new orgPermission\n  update                Update an existing orgPermission\n  delete                Delete a orgPermission\n\n  --help, -h            Show this help message\n';
