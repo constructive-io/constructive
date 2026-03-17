@@ -48,7 +48,7 @@ pgpm install @pgpm/faker
 # 4. Deploy everything
 pgpm deploy --createdb --database mydb1
 psql -d mydb1 -c "SELECT faker.city('MI');"
->  Ann Arbor
+>  Ann Arbor 
 ```
 
 ### Starting a New Project and Adding a Change
