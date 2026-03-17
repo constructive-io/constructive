@@ -10,6 +10,7 @@ describe('DEFAULT_ALLOWED_FUNCTIONS', () => {
     expect(DEFAULT_ALLOWED_FUNCTIONS).toEqual([
       'uuid_generate_v4',
       'gen_random_uuid',
+      'uuidv7',
       'now',
       'clock_timestamp',
       'statement_timestamp',
@@ -20,8 +21,8 @@ describe('DEFAULT_ALLOWED_FUNCTIONS', () => {
     ]);
   });
 
-  it('should have exactly 9 functions', () => {
-    expect(DEFAULT_ALLOWED_FUNCTIONS).toHaveLength(9);
+  it('should have exactly 10 functions', () => {
+    expect(DEFAULT_ALLOWED_FUNCTIONS).toHaveLength(10);
   });
 
   it('should NOT contain setseed (makes random() predictable)', () => {

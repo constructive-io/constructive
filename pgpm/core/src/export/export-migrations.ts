@@ -29,7 +29,6 @@ const DB_REQUIRED_EXTENSIONS = [
   'vector',
   'metaschema-schema',
   'pgpm-inflection',
-  'pgpm-uuid',
   'pgpm-utils',
   'pgpm-database-jobs',
   'pgpm-jwt-claims',
