@@ -1504,55 +1504,43 @@ export type OrgGetSubordinatesRecordsOrderBy =
   | 'DEPTH_ASC'
   | 'DEPTH_DESC';
 export type AppPermissionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
   | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
   | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type OrgPermissionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
   | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
   | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type AppLevelRequirementOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'LEVEL_ASC'
   | 'LEVEL_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'REQUIRED_COUNT_ASC'
-  | 'REQUIRED_COUNT_DESC'
   | 'PRIORITY_ASC'
   | 'PRIORITY_DESC'
   | 'CREATED_AT_ASC'
@@ -1564,9 +1552,9 @@ export type AppLevelRequirementOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type OrgMemberOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'IS_ADMIN_ASC'
@@ -1576,33 +1564,23 @@ export type OrgMemberOrderBy =
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
 export type AppPermissionDefaultOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
-  | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC';
+  | 'ID_DESC';
 export type OrgPermissionDefaultOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
-  | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
+  | 'ID_DESC';
 export type AppAdminGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1610,15 +1588,11 @@ export type AppAdminGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppOwnerGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1626,15 +1600,11 @@ export type AppOwnerGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgAdminGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -1644,15 +1614,11 @@ export type OrgAdminGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgOwnerGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -1662,29 +1628,25 @@ export type OrgOwnerGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppLimitDefaultOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
+  | 'NAME_DESC';
 export type OrgLimitDefaultOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
+  | 'NAME_DESC';
 export type OrgChartEdgeGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -1695,30 +1657,18 @@ export type OrgChartEdgeGrantOrderBy =
   | 'PARENT_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
   | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
   | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type MembershipTypeOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
   | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
   | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
   | 'PREFIX_TRGM_SIMILARITY_ASC'
@@ -1726,59 +1676,49 @@ export type MembershipTypeOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type AppLimitOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
+  | 'ACTOR_ID_DESC';
 export type AppAchievementOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'COUNT_ASC'
-  | 'COUNT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppStepOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'COUNT_ASC'
-  | 'COUNT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type ClaimedInviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
   | 'RECEIVER_ID_ASC'
@@ -1788,17 +1728,11 @@ export type ClaimedInviteOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1806,9 +1740,9 @@ export type AppGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppMembershipDefaultOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1818,35 +1752,25 @@ export type AppMembershipDefaultOrderBy =
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC';
+  | 'UPDATED_BY_DESC';
 export type OrgLimitOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
 export type OrgClaimedInviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
   | 'RECEIVER_ID_ASC'
@@ -1854,21 +1778,13 @@ export type OrgClaimedInviteOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
+  | 'UPDATED_AT_DESC';
 export type OrgGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -1878,9 +1794,9 @@ export type OrgGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgChartEdgeOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1893,18 +1809,14 @@ export type OrgChartEdgeOrderBy =
   | 'CHILD_ID_DESC'
   | 'PARENT_ID_ASC'
   | 'PARENT_ID_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
   | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
   | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type OrgMembershipDefaultOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1915,18 +1827,12 @@ export type OrgMembershipDefaultOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
   | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_ASC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
+  | 'ENTITY_ID_DESC';
 export type AppMembershipOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1937,32 +1843,18 @@ export type AppMembershipOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
   | 'IS_ADMIN_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
 export type OrgMembershipOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1973,22 +1865,10 @@ export type OrgMembershipOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
   | 'IS_ADMIN_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -1996,9 +1876,9 @@ export type OrgMembershipOrderBy =
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
 export type InviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EMAIL_ASC'
@@ -2009,14 +1889,6 @@ export type InviteOrderBy =
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
   | 'INVITE_VALID_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
@@ -2028,19 +1900,13 @@ export type InviteOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type AppLevelOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -2050,29 +1916,19 @@ export type AppLevelOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type OrgInviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EMAIL_ASC'
   | 'EMAIL_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
   | 'INVITE_TOKEN_ASC'
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
   | 'INVITE_VALID_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
@@ -2140,8 +1996,6 @@ export interface AppPermissionPatch {
   bitnum?: number | null;
   bitstr?: string | null;
   description?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateAppPermissionInput {
   clientMutationId?: string;
@@ -2166,8 +2020,6 @@ export interface OrgPermissionPatch {
   bitnum?: number | null;
   bitstr?: string | null;
   description?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgPermissionInput {
   clientMutationId?: string;
@@ -2194,8 +2046,6 @@ export interface AppLevelRequirementPatch {
   description?: string | null;
   requiredCount?: number | null;
   priority?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateAppLevelRequirementInput {
   clientMutationId?: string;
@@ -2418,8 +2268,6 @@ export interface OrgChartEdgeGrantPatch {
   isGrant?: boolean | null;
   positionTitle?: string | null;
   positionLevel?: number | null;
-  positionTitleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgChartEdgeGrantInput {
   clientMutationId?: string;
@@ -2442,9 +2290,6 @@ export interface MembershipTypePatch {
   name?: string | null;
   description?: string | null;
   prefix?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateMembershipTypeInput {
   clientMutationId?: string;
@@ -2685,8 +2530,6 @@ export interface OrgChartEdgePatch {
   parentId?: string | null;
   positionTitle?: string | null;
   positionLevel?: number | null;
-  positionTitleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgChartEdgeInput {
   clientMutationId?: string;
@@ -2833,8 +2676,6 @@ export interface InvitePatch {
   multiple?: boolean | null;
   data?: Record<string, unknown> | null;
   expiresAt?: string | null;
-  inviteTokenTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateInviteInput {
   clientMutationId?: string;
@@ -2859,8 +2700,7 @@ export interface AppLevelPatch {
   description?: string | null;
   image?: ConstructiveInternalTypeImage | null;
   ownerId?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  imageUpload?: File | null;
 }
 export interface UpdateAppLevelInput {
   clientMutationId?: string;
@@ -2899,8 +2739,6 @@ export interface OrgInvitePatch {
   data?: Record<string, unknown> | null;
   expiresAt?: string | null;
   entityId?: string | null;
-  inviteTokenTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgInviteInput {
   clientMutationId?: string;
