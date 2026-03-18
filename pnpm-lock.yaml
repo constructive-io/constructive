@@ -1920,18 +1920,27 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
+      '@pgpmjs/migrate-client':
+        specifier: workspace:^
+        version: link:../../sdk/migrate-client/dist
       '@pgpmjs/server-utils':
         specifier: workspace:^
         version: link:../../packages/server-utils/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
+      csv-to-pg:
+        specifier: workspace:^
+        version: link:../../packages/csv-to-pg/dist
       genomic:
         specifier: ^5.3.8
         version: 5.3.8
       glob:
         specifier: ^13.0.6
         version: 13.0.6
+      komoji:
+        specifier: ^0.8.1
+        version: 0.8.1
       minimatch:
         specifier: ^10.2.4
         version: 10.2.4
