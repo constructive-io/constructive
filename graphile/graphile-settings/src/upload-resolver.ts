@@ -126,7 +126,7 @@ async function insertFileRecord(
 		`INSERT INTO files_store_public.files
 		   (id, database_id, bucket_key, key, etag, created_by, mime_type)
 		 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-		[fileId, Number(databaseId), bucketKey, key, etag, createdBy, contentType],
+		[fileId, databaseId, bucketKey, key, etag, createdBy, contentType],
 	);
 }
 

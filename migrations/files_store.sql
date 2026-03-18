@@ -56,7 +56,7 @@ COMMENT ON TYPE files_store_public.file_status IS
 
 CREATE TABLE files_store_public.files (
   id            uuid          NOT NULL DEFAULT gen_random_uuid(),
-  database_id   integer       NOT NULL,
+  database_id   uuid          NOT NULL,
   bucket_key    text          NOT NULL DEFAULT 'default',
   key           text          NOT NULL,
   status        files_store_public.file_status NOT NULL DEFAULT 'pending',
@@ -125,7 +125,7 @@ ALTER TABLE files_store_public.files
 
 CREATE TABLE files_store_public.buckets (
   id            uuid          NOT NULL DEFAULT gen_random_uuid(),
-  database_id   integer       NOT NULL,
+  database_id   uuid          NOT NULL,
   key           text          NOT NULL,
   name          text          NOT NULL,
   is_public     boolean       NOT NULL DEFAULT false,
@@ -200,6 +200,7 @@ CREATE OR REPLACE FUNCTION files_store_public.files_after_insert_queue_processin
 RETURNS trigger AS $$
 BEGIN
   PERFORM app_jobs.add_job(
+    NEW.database_id,
     'process-image',
     json_build_object(
       'file_id', NEW.id,
@@ -265,6 +266,7 @@ CREATE OR REPLACE FUNCTION files_store_public.files_after_update_queue_deletion(
 RETURNS trigger AS $$
 BEGIN
   PERFORM app_jobs.add_job(
+    NEW.database_id,
     'delete-s3-object',
     json_build_object(
       'file_id', NEW.id,
@@ -292,6 +294,7 @@ CREATE OR REPLACE FUNCTION files_store_public.files_after_update_queue_retry()
 RETURNS trigger AS $$
 BEGIN
   PERFORM app_jobs.add_job(
+    NEW.database_id,
     'process-image',
     json_build_object(
       'file_id', NEW.id,
@@ -325,8 +328,8 @@ ALTER TABLE files_store_public.files FORCE ROW LEVEL SECURITY;
 CREATE POLICY files_tenant_isolation ON files_store_public.files
   AS RESTRICTIVE
   FOR ALL
-  USING (database_id = current_setting('app.database_id')::integer)
-  WITH CHECK (database_id = current_setting('app.database_id')::integer);
+  USING (database_id = current_setting('app.database_id')::uuid)
+  WITH CHECK (database_id = current_setting('app.database_id')::uuid);
 
 -- Policy 2: Visibility for SELECT (authenticated + service_role only)
 -- Non-ready files visible only to the uploader. Uses NULLIF for safe uuid handling
@@ -426,7 +429,7 @@ DECLARE
   versions_json json;
 BEGIN
   -- Get the database_id from session context
-  db_id := current_setting('app.database_id')::integer;
+  db_id := current_setting('app.database_id')::uuid;
 
   -- Extract the jsonb value from the specified column (dynamic)
   EXECUTE format('SELECT ($1).%I::jsonb', col_name) INTO new_val USING NEW;
@@ -532,7 +535,7 @@ DECLARE
   table_name text := TG_ARGV[1];
   db_id integer;
 BEGIN
-  db_id := current_setting('app.database_id')::integer;
+  db_id := current_setting('app.database_id')::uuid;
 
   -- Mark all files for this source row + column as deleting
   UPDATE files_store_public.files
