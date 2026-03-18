@@ -49,7 +49,7 @@ export type {
 } from './selection';
 
 // Config types
-export type { GraphQLSDKConfig, GraphQLSDKConfigTarget } from './config';
+export type { GraphQLSDKConfig, GraphQLSDKConfigTarget, SchemaConfig } from './config';
 export {
   DEFAULT_CONFIG,
   defineConfig,

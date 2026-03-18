@@ -9,7 +9,7 @@ const EXAMPLE_SCHEMA = path.resolve(
   '../../../examples/example.schema.graphql',
 );
 
-describe('generate() with schemaOnly', () => {
+describe('generate() with schema.enabled', () => {
   let tempDir: string;
 
   beforeEach(() => {
@@ -23,8 +23,7 @@ describe('generate() with schemaOnly', () => {
   it('writes SDL to file from schemaFile source', async () => {
     const result = await generate({
       schemaFile: EXAMPLE_SCHEMA,
-      schemaOnly: true,
-      schemaOnlyOutput: tempDir,
+      schema: { enabled: true, output: tempDir },
     });
 
     expect(result.success).toBe(true);
@@ -38,12 +37,10 @@ describe('generate() with schemaOnly', () => {
     expect(sdl).toContain('type User');
   });
 
-  it('uses custom filename when schemaOnlyFilename is set', async () => {
+  it('uses custom filename when schema.filename is set', async () => {
     const result = await generate({
       schemaFile: EXAMPLE_SCHEMA,
-      schemaOnly: true,
-      schemaOnlyOutput: tempDir,
-      schemaOnlyFilename: 'app.graphql',
+      schema: { enabled: true, output: tempDir, filename: 'app.graphql' },
     });
 
     expect(result.success).toBe(true);
@@ -54,8 +51,7 @@ describe('generate() with schemaOnly', () => {
   it('succeeds without any generators enabled', async () => {
     const result = await generate({
       schemaFile: EXAMPLE_SCHEMA,
-      schemaOnly: true,
-      schemaOnlyOutput: tempDir,
+      schema: { enabled: true, output: tempDir },
     });
 
     expect(result.success).toBe(true);
@@ -64,8 +60,7 @@ describe('generate() with schemaOnly', () => {
 
   it('fails when no source is specified', async () => {
     const result = await generate({
-      schemaOnly: true,
-      schemaOnlyOutput: tempDir,
+      schema: { enabled: true, output: tempDir },
     });
 
     expect(result.success).toBe(false);
@@ -77,8 +72,7 @@ describe('generate() with schemaOnly', () => {
 
     const result = await generate({
       schemaFile: EXAMPLE_SCHEMA,
-      schemaOnly: true,
-      schemaOnlyOutput: nestedDir,
+      schema: { enabled: true, output: nestedDir },
     });
 
     expect(result.success).toBe(true);

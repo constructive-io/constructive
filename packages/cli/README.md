@@ -107,26 +107,32 @@ cnc codegen --api-names my_api --output ./codegen --orm
 - `--dry-run` - Preview without writing files
 - `--verbose` - Verbose output
 
-### `cnc codegen --schema-only`
+### `cnc codegen --schema-enabled`
 
 Export GraphQL schema SDL without running full code generation. Works with any source (endpoint, file, database, PGPM).
 
 ```bash
 # From database schemas
-cnc codegen --schema-only --schemas myapp,public --output ./schemas
+cnc codegen --schema-enabled --schemas myapp,public --schema-output ./schemas
 
 # From running server
-cnc codegen --schema-only --endpoint http://localhost:3000/graphql --output ./schemas
+cnc codegen --schema-enabled --endpoint http://localhost:3000/graphql --schema-output ./schemas
 
 # From schema file (useful for converting/validating)
-cnc codegen --schema-only --schema-file ./input.graphql --output ./schemas
+cnc codegen --schema-enabled --schema-file ./input.graphql --schema-output ./schemas
 
 # From a directory of .graphql files (multi-target)
-cnc codegen --schema-only --schema-dir ./schemas --output ./exported
+cnc codegen --schema-enabled --schema-dir ./schemas --schema-output ./exported
+
+# Custom filename
+cnc codegen --schema-enabled --endpoint http://localhost:3000/graphql --schema-output ./schemas --schema-filename public.graphql
 ```
 
 **Options:**
 
+- `--schema-enabled` - Enable schema SDL export
+- `--schema-output <dir>` - Output directory for the exported schema file
+- `--schema-filename <name>` - Filename for the exported schema (default: schema.graphql)
 - `--endpoint <url>` - GraphQL endpoint URL
 - `--schema-file <path>` - Path to GraphQL schema file
 - `--schemas <list>` - Comma-separated PostgreSQL schemas
