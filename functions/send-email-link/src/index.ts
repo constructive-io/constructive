@@ -361,13 +361,11 @@ app.post('/', async (req: any, res: any, next: any) => {
       ...(schemata && { schemata }),
     });
 
-    // For GetDatabaseInfo query - uses same API routing as client
-    // The private API exposes both user and database queries
+    // For GetDatabaseInfo query - uses X-Meta-Schema to access platform data
+    // (databases, sites, domains, siteThemes, siteModules are platform-level data)
     const meta = createGraphQLClient(metaGraphqlUrl, {
       hostHeaderEnvVar: 'META_GRAPHQL_HOST_HEADER',
-      databaseId,
-      ...(apiName && { apiName }),
-      ...(schemata && { schemata }),
+      useMetaSchema: true,
     });
 
     const result = await sendEmailLink(params, {
