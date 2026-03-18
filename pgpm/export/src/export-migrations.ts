@@ -2,8 +2,7 @@ import { PgpmOptions } from '@pgpmjs/types';
 import { Inquirerer } from 'inquirerer';
 import { getPgPool } from 'pg-cache';
 
-import { PgpmPackage } from '../core/class/pgpm';
-import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
+import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { exportMeta } from './export-meta';
 import {
   DB_REQUIRED_EXTENSIONS,

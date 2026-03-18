@@ -17,30 +17,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // ---------------------------------------------------------------------------
-// Mock only the GraphQLClient (used by the GraphQL flow).
-// We register this BEFORE requiring @pgpmjs/core so the internal
-// require('./graphql-client') inside export-graphql.js picks it up.
+// Mock the GraphQLClient (used by the GraphQL flow).
 // ---------------------------------------------------------------------------
-const _graphqlClientPath = path.resolve(
-  __dirname,
-  '../../core/dist/export/graphql-client'
-);
-
-jest.doMock(_graphqlClientPath, () => ({
+jest.mock('../src/graphql-client', () => ({
   GraphQLClient: jest.fn().mockImplementation(() => ({
     fetchAllNodes: jest.fn().mockResolvedValue([])
   }))
 }));
 
 // Mock @pgpmjs/migrate-client so the ORM-based sql_actions fetch uses our test data.
-// Use an absolute path (same pattern as GraphQLClient above) so Jest can resolve
-// the module from pgpm/cli even though it is only a dependency of pgpm/core.
-const _migrateClientPath = path.resolve(
-  __dirname,
-  '../../../sdk/migrate-client/dist/index'
-);
 let _mockMigrateClientFindMany: jest.Mock = jest.fn();
-jest.doMock(_migrateClientPath, () => ({
+jest.mock('@pgpmjs/migrate-client', () => ({
   createClient: jest.fn().mockImplementation(() => ({
     sqlAction: {
       findMany: _mockMigrateClientFindMany,
@@ -49,30 +36,19 @@ jest.doMock(_migrateClientPath, () => ({
 }));
 
 // Mock exportGraphQLMeta so we can make it delegate to the real SQL exportMeta
-const _exportGraphQLMetaPath = path.resolve(
-  __dirname,
-  '../../core/dist/export/export-graphql-meta'
-);
-
-jest.doMock(_exportGraphQLMetaPath, () => ({
+jest.mock('../src/export-graphql-meta', () => ({
   exportGraphQLMeta: jest.fn()
 }));
 
-// NOW load everything — core exports, etc.
-const {
-  PgpmPackage,
-  exportGraphQL,
-  exportMigrations,
-  exportMeta
-} = require('@pgpmjs/core');
-const { PgpmMigrate } = require('@pgpmjs/core');
-const { camelize } = require('inflekt');
-const { getConnections, seed } = require('pgsql-test');
-
-// Mocked modules we need to configure per-test
-const { GraphQLClient } = require(_graphqlClientPath);
-const { exportGraphQLMeta } = require(_exportGraphQLMetaPath);
-const { createClient: createMigrateClient } = require(_migrateClientPath);
+import { PgpmPackage, PgpmMigrate } from '@pgpmjs/core';
+import { exportGraphQL } from '../src/export-graphql';
+import { exportMigrations } from '../src/export-migrations';
+import { exportMeta } from '../src/export-meta';
+import { GraphQLClient } from '../src/graphql-client';
+import { exportGraphQLMeta } from '../src/export-graphql-meta';
+import { createClient as createMigrateClient } from '@pgpmjs/migrate-client';
+import { camelize } from 'inflekt';
+import { getConnections, seed } from 'pgsql-test';
 
 import type { PgpmPackage as PgpmPackageType } from '@pgpmjs/core';
 

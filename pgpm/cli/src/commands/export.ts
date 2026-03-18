@@ -1,4 +1,5 @@
-import { exportMigrations, exportGraphQL, GraphQLClient, PgpmPackage, graphqlRowToPostgresRow } from '@pgpmjs/core';
+import { PgpmPackage } from '@pgpmjs/core';
+import { exportMigrations, exportGraphQL, GraphQLClient, graphqlRowToPostgresRow } from '@pgpmjs/export';
 import { getEnvOptions } from '@pgpmjs/env';
 import { getGitConfigInfo } from '@pgpmjs/types';
 import { CLIOptions, Inquirerer } from 'inquirerer';

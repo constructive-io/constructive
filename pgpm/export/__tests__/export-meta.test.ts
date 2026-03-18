@@ -8,7 +8,7 @@
  * Uses actual imports instead of string-matching source files.
  */
 
-import { META_TABLE_CONFIG, META_TABLE_ORDER } from '../../src/export/export-utils';
+import { META_TABLE_CONFIG, META_TABLE_ORDER } from '../src/export-utils';
 
 describe('Export Meta Config Validation', () => {
   describe('metaschema_public tables', () => {

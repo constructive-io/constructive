@@ -1,10 +1,4 @@
 export * from './core/class/pgpm';
-export * from './export/export-meta';
-export * from './export/export-migrations';
-export * from './export/export-graphql';
-export * from './export/export-graphql-meta';
-export { GraphQLClient } from './export/graphql-client';
-export { getGraphQLQueryName, graphqlRowToPostgresRow, buildFieldsFragment, intervalToPostgres } from './export/graphql-naming';
 export * from './slice';
 export * from './extensions/extensions';
 export * from './modules/modules';
@@ -24,6 +18,7 @@ export { cleanSql } from './migrate/clean';
 export { PgpmMigrate } from './migrate/client';
 export { PgpmInit } from './init/client';
 export * from './roles';
+export { parseAuthor } from './utils/author';
 export {
   DeployOptions, 
   DeployResult, 

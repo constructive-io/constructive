@@ -17,11 +17,11 @@ import type { PgTestClient } from 'pgsql-test';
 import type { PgConfig } from 'pg-env';
 import { camelize } from 'inflekt';
 
-import { exportMeta } from '../../src/export/export-meta';
-import { exportGraphQLMeta } from '../../src/export/export-graphql-meta';
-import { GraphQLClient } from '../../src/export/graphql-client';
-import { META_TABLE_CONFIG } from '../../src/export/export-utils';
-import { getGraphQLQueryName } from '../../src/export/graphql-naming';
+import { exportMeta } from '../src/export-meta';
+import { exportGraphQLMeta } from '../src/export-graphql-meta';
+import { GraphQLClient } from '../src/graphql-client';
+import { META_TABLE_CONFIG } from '../src/export-utils';
+import { getGraphQLQueryName } from '../src/graphql-naming';
 
 jest.setTimeout(60000);
 

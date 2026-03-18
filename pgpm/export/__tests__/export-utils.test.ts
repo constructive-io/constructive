@@ -19,7 +19,7 @@ import {
   META_COMMON_FOOTER,
   makeReplacer,
   normalizeOutdir
-} from '../../src/export/export-utils';
+} from '../src/export-utils';
 
 // =============================================================================
 // Config / Order consistency
@@ -111,14 +111,14 @@ describe('SQL and GraphQL flow table parity', () => {
   beforeAll(() => {
     // Extract queryAndParse keys from export-meta.ts
     const sqlSource = readFileSync(
-      join(__dirname, '../../src/export/export-meta.ts'),
+      join(__dirname, '../src/export-meta.ts'),
       'utf-8'
     );
     sqlFlowTables = [...sqlSource.matchAll(/queryAndParse\('(\w+)'/g)].map(m => m[1]);
 
     // Extract queryAndParse keys from export-graphql-meta.ts
     const gqlSource = readFileSync(
-      join(__dirname, '../../src/export/export-graphql-meta.ts'),
+      join(__dirname, '../src/export-graphql-meta.ts'),
       'utf-8'
     );
     graphqlFlowTables = [...gqlSource.matchAll(/queryAndParse\('(\w+)'/g)].map(m => m[1]);

@@ -11,7 +11,7 @@ import {
   graphqlRowToPostgresRow,
   intervalToPostgres,
   buildFieldsFragment
-} from '../../src/export/graphql-naming';
+} from '../src/graphql-naming';
 
 describe('getGraphQLQueryName', () => {
   it('should convert simple table names to pluralized camelCase', () => {

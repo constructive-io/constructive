@@ -1,8 +1,8 @@
 {
-  "name": "@pgpmjs/core",
-  "version": "6.7.1",
+  "name": "@pgpmjs/export",
+  "version": "0.0.1",
   "author": "Constructive <developers@constructive.io>",
-  "description": "PGPM Package and Migration Tools",
+  "description": "PGPM export tools for SQL and GraphQL database migration extraction",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -20,12 +20,9 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "scripts": {
-    "copy": "npm run copy:pkg; npm run copy:sql",
-    "copy:pkg": "makage assets",
-    "copy:sql": "copyfiles -f src/migrate/sql/* dist/migrate/sql && copyfiles -f src/migrate/sql/* dist/esm/migrate/sql",
     "clean": "makage clean",
     "prepack": "npm run build",
-    "build": "makage build && npm run copy",
+    "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
     "test": "jest",
@@ -34,36 +31,29 @@
   "keywords": [
     "database",
     "migration",
+    "export",
     "postgresql",
     "pgpm",
     "pgpmjs",
-    "schema",
-    "sqitch"
+    "graphql"
   ],
   "devDependencies": {
     "@pgsql/types": "^17.6.2",
     "@types/pg": "^8.18.0",
-    "copyfiles": "^2.4.1",
-    "inquirerer": "^4.7.0",
-    "makage": "^0.1.12"
+    "makage": "^0.1.12",
+    "pgsql-test": "workspace:^"
   },
   "dependencies": {
-    "@pgpmjs/env": "workspace:^",
-    "@pgpmjs/logger": "workspace:^",
+    "@pgpmjs/core": "workspace:^",
     "@pgpmjs/migrate-client": "workspace:^",
-    "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",
-    "genomic": "^5.3.8",
     "glob": "^13.0.6",
+    "inflekt": "^0.3.3",
+    "inquirerer": "^4.7.0",
     "komoji": "^0.8.1",
-    "minimatch": "^10.2.4",
-    "parse-package-name": "^1.0.0",
     "pg": "^8.20.0",
     "pg-cache": "workspace:^",
-    "pg-env": "workspace:^",
-    "pgsql-deparser": "^17.18.1",
-    "pgsql-parser": "^17.9.13",
-    "yanse": "^0.2.1"
+    "pg-env": "workspace:^"
   }
 }

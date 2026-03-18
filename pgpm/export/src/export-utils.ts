@@ -4,9 +4,7 @@ import { Inquirerer } from 'inquirerer';
 import { toSnakeCase } from 'komoji';
 import path from 'path';
 
-import { PgpmPackage } from '../core/class/pgpm';
-import { getMissingInstallableModules } from '../modules/modules';
-import { parseAuthor } from '../utils/author';
+import { PgpmPackage, getMissingInstallableModules, parseAuthor } from '@pgpmjs/core';
 
 // =============================================================================
 // Shared constants

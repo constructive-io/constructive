@@ -20,9 +20,8 @@ import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test';
 import type { PgConfig } from 'pg-env';
 
-import { PgpmPackage } from '../../src/core/class/pgpm';
-import { PgpmMigrate } from '../../src/migrate/client';
-import { exportMigrations } from '../../src/export/export-migrations';
+import { PgpmPackage, PgpmMigrate } from '@pgpmjs/core';
+import { exportMigrations } from '../src/export-migrations';
 
 // Increase timeout for this test as it involves workspace setup and deployment
 jest.setTimeout(120000);

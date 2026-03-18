@@ -11,8 +11,7 @@ import { Inquirerer } from 'inquirerer';
 
 import { createClient as createMigrateClient } from '@pgpmjs/migrate-client';
 
-import { PgpmPackage } from '../core/class/pgpm';
-import { PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '../files';
+import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { GraphQLClient } from './graphql-client';
 import { exportGraphQLMeta } from './export-graphql-meta';
 import { graphqlRowToPostgresRow } from './graphql-naming';
