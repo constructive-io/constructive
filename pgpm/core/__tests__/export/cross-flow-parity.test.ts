@@ -12,9 +12,9 @@
  * - A running PostgreSQL instance accessible via standard PG* env vars
  */
 
-import { Pool } from 'pg';
-import { getPgPool, teardownPgPools } from 'pg-cache';
-import { getPgEnvOptions, PgConfig } from 'pg-env';
+import { getConnections, seed } from 'pgsql-test';
+import type { PgTestClient } from 'pgsql-test';
+import type { PgConfig } from 'pg-env';
 import { camelize } from 'inflekt';
 
 import { exportMeta } from '../../src/export/export-meta';
@@ -48,7 +48,7 @@ const API_SCHEMA_ID = 'c3000001-0000-0000-0000-000000000001';
 // and returns data in the same shape as PostGraphile would
 // =============================================================================
 
-function createMockGraphQLClient(pool: Pool): GraphQLClient {
+function createMockGraphQLClient(pgClient: PgTestClient): GraphQLClient {
   const client = new GraphQLClient({ endpoint: 'http://mock' });
 
   // Override fetchAllNodes to query the real database and return camelCase rows
@@ -90,7 +90,7 @@ function createMockGraphQLClient(pool: Pool): GraphQLClient {
     }
 
     try {
-      const result = await pool.query(`SELECT * FROM ${schemaTable} ${whereClause}`, params);
+      const result = await pgClient.query(`SELECT * FROM ${schemaTable} ${whereClause}`, params);
 
       // Convert snake_case PG rows to camelCase (simulating PostGraphile)
       return result.rows.map(row => {
@@ -118,173 +118,156 @@ function createMockGraphQLClient(pool: Pool): GraphQLClient {
 // =============================================================================
 
 describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
-  let dbName: string;
-  let pgConfig: PgConfig;
-  let pool: Pool;
+  let pg: PgTestClient;
+  let dbConfig: PgConfig;
+  let teardown: () => Promise<void>;
 
   beforeAll(async () => {
-    // Create a fresh test database
-    dbName = `test_parity_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    const baseConfig = getPgEnvOptions({ database: 'postgres' });
-    const adminPool = getPgPool(baseConfig);
-    await adminPool.query(`CREATE DATABASE "${dbName}"`);
+    ({ pg, teardown } = await getConnections({}, [
+      seed.fn(async ({ pg, config }) => {
+        dbConfig = config;
 
-    pgConfig = getPgEnvOptions({ database: dbName });
-    pool = getPgPool(pgConfig);
+        // Create schemas and tables
+        await pg.query(`
+          CREATE SCHEMA IF NOT EXISTS metaschema_public;
+          CREATE SCHEMA IF NOT EXISTS services_public;
+          CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
 
-    // Create schemas and tables
-    await pool.query(`
-      CREATE SCHEMA IF NOT EXISTS metaschema_public;
-      CREATE SCHEMA IF NOT EXISTS services_public;
-      CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
+          -- metaschema_public tables
+          CREATE TABLE metaschema_public.database (
+            id uuid PRIMARY KEY,
+            owner_id uuid,
+            name text,
+            hash uuid
+          );
+          CREATE TABLE metaschema_public.database_extension (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            name text,
+            schema_id uuid
+          );
+          CREATE TABLE metaschema_public.schema (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            name text,
+            schema_name text,
+            description text,
+            is_public boolean
+          );
+          CREATE TABLE metaschema_public."table" (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            schema_id uuid,
+            name text,
+            description text
+          );
+          CREATE TABLE metaschema_public.field (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            table_id uuid,
+            name text,
+            type text,
+            description text
+          );
 
-      -- metaschema_public tables
-      CREATE TABLE metaschema_public.database (
-        id uuid PRIMARY KEY,
-        owner_id uuid,
-        name text,
-        hash uuid
-      );
-      CREATE TABLE metaschema_public.database_extension (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        name text,
-        schema_id uuid
-      );
-      CREATE TABLE metaschema_public.schema (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        name text,
-        schema_name text,
-        description text,
-        is_public boolean
-      );
-      CREATE TABLE metaschema_public."table" (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        schema_id uuid,
-        name text,
-        description text
-      );
-      CREATE TABLE metaschema_public.field (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        table_id uuid,
-        name text,
-        type text,
-        description text
-      );
+          -- services_public tables
+          CREATE TABLE services_public.domains (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            site_id uuid,
+            api_id uuid,
+            domain text,
+            subdomain text
+          );
+          CREATE TABLE services_public.sites (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            title text,
+            description text,
+            og_image text,
+            favicon text,
+            apple_touch_icon text,
+            logo text
+          );
+          CREATE TABLE services_public.apis (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            name text,
+            is_public boolean,
+            role_name text,
+            anon_role text
+          );
+          CREATE TABLE services_public.api_schemas (
+            id uuid PRIMARY KEY,
+            database_id uuid,
+            schema_id uuid,
+            api_id uuid
+          );
+        `);
 
-      -- services_public tables
-      CREATE TABLE services_public.domains (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        site_id uuid,
-        api_id uuid,
-        domain text,
-        subdomain text
-      );
-      CREATE TABLE services_public.sites (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        title text,
-        description text,
-        og_image text,
-        favicon text,
-        apple_touch_icon text,
-        logo text
-      );
-      CREATE TABLE services_public.apis (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        name text,
-        is_public boolean,
-        role_name text,
-        anon_role text
-      );
-      CREATE TABLE services_public.api_schemas (
-        id uuid PRIMARY KEY,
-        database_id uuid,
-        schema_id uuid,
-        api_id uuid
-      );
-    `);
+        // Seed data
+        await pg.query(`
+          INSERT INTO metaschema_public.database (id, owner_id, name, hash)
+          VALUES ($1, $2, 'testapp', $3)
+        `, [DATABASE_ID, OWNER_ID, 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee']);
 
-    // Seed data
-    await pool.query(`
-      INSERT INTO metaschema_public.database (id, owner_id, name, hash)
-      VALUES ($1, $2, 'testapp', $3)
-    `, [DATABASE_ID, OWNER_ID, 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee']);
+        await pg.query(`
+          INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)
+          VALUES
+            ($1, $2, 'public', 'testapp_public', 'Public schema', true),
+            ($3, $2, 'private', 'testapp_private', 'Private schema', false)
+        `, [SCHEMA_ID_PUB, DATABASE_ID, SCHEMA_ID_PRI]);
 
-    await pool.query(`
-      INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description, is_public)
-      VALUES
-        ($1, $2, 'public', 'testapp_public', 'Public schema', true),
-        ($3, $2, 'private', 'testapp_private', 'Private schema', false)
-    `, [SCHEMA_ID_PUB, DATABASE_ID, SCHEMA_ID_PRI]);
+        await pg.query(`
+          INSERT INTO metaschema_public."table" (id, database_id, schema_id, name, description)
+          VALUES
+            ($1, $2, $3, 'users', 'User accounts'),
+            ($4, $2, $3, 'posts', 'Blog posts')
+        `, [TABLE_ID_USERS, DATABASE_ID, SCHEMA_ID_PUB, TABLE_ID_POSTS]);
 
-    await pool.query(`
-      INSERT INTO metaschema_public."table" (id, database_id, schema_id, name, description)
-      VALUES
-        ($1, $2, $3, 'users', 'User accounts'),
-        ($4, $2, $3, 'posts', 'Blog posts')
-    `, [TABLE_ID_USERS, DATABASE_ID, SCHEMA_ID_PUB, TABLE_ID_POSTS]);
+        await pg.query(`
+          INSERT INTO metaschema_public.field (id, database_id, table_id, name, type, description)
+          VALUES
+            ($1, $2, $3, 'id', 'uuid', 'Primary key'),
+            ($4, $2, $3, 'name', 'text', 'User name'),
+            ($5, $2, $6, 'id', 'uuid', 'Primary key')
+        `, [FIELD_ID_1, DATABASE_ID, TABLE_ID_USERS, FIELD_ID_2, FIELD_ID_3, TABLE_ID_POSTS]);
 
-    await pool.query(`
-      INSERT INTO metaschema_public.field (id, database_id, table_id, name, type, description)
-      VALUES
-        ($1, $2, $3, 'id', 'uuid', 'Primary key'),
-        ($4, $2, $3, 'name', 'text', 'User name'),
-        ($5, $2, $6, 'id', 'uuid', 'Primary key')
-    `, [FIELD_ID_1, DATABASE_ID, TABLE_ID_USERS, FIELD_ID_2, FIELD_ID_3, TABLE_ID_POSTS]);
+        await pg.query(`
+          INSERT INTO services_public.apis (id, database_id, name, is_public, role_name, anon_role)
+          VALUES ($1, $2, 'public-api', true, 'authenticated', 'anonymous')
+        `, [API_ID, DATABASE_ID]);
 
-    await pool.query(`
-      INSERT INTO services_public.apis (id, database_id, name, is_public, role_name, anon_role)
-      VALUES ($1, $2, 'public-api', true, 'authenticated', 'anonymous')
-    `, [API_ID, DATABASE_ID]);
+        await pg.query(`
+          INSERT INTO services_public.sites (id, database_id, title, description)
+          VALUES ($1, $2, 'Test App', 'A test application')
+        `, [SITE_ID, DATABASE_ID]);
 
-    await pool.query(`
-      INSERT INTO services_public.sites (id, database_id, title, description)
-      VALUES ($1, $2, 'Test App', 'A test application')
-    `, [SITE_ID, DATABASE_ID]);
+        await pg.query(`
+          INSERT INTO services_public.domains (id, database_id, domain, subdomain)
+          VALUES ($1, $2, 'example.com', 'app')
+        `, [DOMAIN_ID, DATABASE_ID]);
 
-    await pool.query(`
-      INSERT INTO services_public.domains (id, database_id, domain, subdomain)
-      VALUES ($1, $2, 'example.com', 'app')
-    `, [DOMAIN_ID, DATABASE_ID]);
-
-    await pool.query(`
-      INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id)
-      VALUES ($1, $2, $3, $4)
-    `, [API_SCHEMA_ID, DATABASE_ID, SCHEMA_ID_PUB, API_ID]);
+        await pg.query(`
+          INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id)
+          VALUES ($1, $2, $3, $4)
+        `, [API_SCHEMA_ID, DATABASE_ID, SCHEMA_ID_PUB, API_ID]);
+      })
+    ]));
   });
 
-  afterAll(async () => {
-    try {
-      await teardownPgPools();
-    } catch (e) {
-      // ignore
-    }
-    try {
-      const adminConfig = getPgEnvOptions({ database: 'postgres' });
-      const adminPool = getPgPool(adminConfig);
-      await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
-      await teardownPgPools();
-    } catch (e) {
-      // ignore
-    }
-  });
+  afterAll(() => teardown());
 
   it('both flows should produce the same set of table keys', async () => {
     // SQL flow
     const sqlResult = await exportMeta({
-      opts: { pg: pgConfig },
-      dbname: dbName,
+      opts: { pg: dbConfig },
+      dbname: dbConfig.database,
       database_id: DATABASE_ID
     });
 
     // GraphQL flow (mocked client reading from same DB)
-    const mockClient = createMockGraphQLClient(pool);
+    const mockClient = createMockGraphQLClient(pg);
     const gqlResult = await exportGraphQLMeta({
       client: mockClient,
       database_id: DATABASE_ID
@@ -299,13 +282,13 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
   it('both flows should produce identical SQL INSERT output for each table', async () => {
     // SQL flow
     const sqlResult = await exportMeta({
-      opts: { pg: pgConfig },
-      dbname: dbName,
+      opts: { pg: dbConfig },
+      dbname: dbConfig.database,
       database_id: DATABASE_ID
     });
 
     // GraphQL flow (mocked client reading from same DB)
-    const mockClient = createMockGraphQLClient(pool);
+    const mockClient = createMockGraphQLClient(pg);
     const gqlResult = await exportGraphQLMeta({
       client: mockClient,
       database_id: DATABASE_ID
@@ -333,8 +316,8 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
 
   it('SQL output for database table should contain the seeded database name', async () => {
     const sqlResult = await exportMeta({
-      opts: { pg: pgConfig },
-      dbname: dbName,
+      opts: { pg: dbConfig },
+      dbname: dbConfig.database,
       database_id: DATABASE_ID
     });
 
@@ -344,8 +327,8 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
 
   it('SQL output for schema table should contain both schemas', async () => {
     const sqlResult = await exportMeta({
-      opts: { pg: pgConfig },
-      dbname: dbName,
+      opts: { pg: dbConfig },
+      dbname: dbConfig.database,
       database_id: DATABASE_ID
     });
 
@@ -355,8 +338,8 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
 
   it('SQL output for field table should contain all seeded fields', async () => {
     const sqlResult = await exportMeta({
-      opts: { pg: pgConfig },
-      dbname: dbName,
+      opts: { pg: dbConfig },
+      dbname: dbConfig.database,
       database_id: DATABASE_ID
     });
 
@@ -367,8 +350,8 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
 
   it('SQL output for services tables should contain seeded data', async () => {
     const sqlResult = await exportMeta({
-      opts: { pg: pgConfig },
-      dbname: dbName,
+      opts: { pg: dbConfig },
+      dbname: dbConfig.database,
       database_id: DATABASE_ID
     });
 
@@ -379,7 +362,7 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
   });
 
   it('GraphQL flow output should also contain the seeded data', async () => {
-    const mockClient = createMockGraphQLClient(pool);
+    const mockClient = createMockGraphQLClient(pg);
     const gqlResult = await exportGraphQLMeta({
       client: mockClient,
       database_id: DATABASE_ID
@@ -393,12 +376,12 @@ describe('Cross-flow parity: exportMeta vs exportGraphQLMeta', () => {
 
   it('tables with no data should be absent from both results', async () => {
     const sqlResult = await exportMeta({
-      opts: { pg: pgConfig },
-      dbname: dbName,
+      opts: { pg: dbConfig },
+      dbname: dbConfig.database,
       database_id: DATABASE_ID
     });
 
-    const mockClient = createMockGraphQLClient(pool);
+    const mockClient = createMockGraphQLClient(pg);
     const gqlResult = await exportGraphQLMeta({
       client: mockClient,
       database_id: DATABASE_ID

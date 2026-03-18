@@ -525,7 +525,6 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      api_id: 'uuid',
       schema_id: 'uuid',
       private_schema_id: 'uuid',
       session_credentials_table_id: 'uuid',
@@ -811,7 +810,6 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       profile_grants_table_name: 'text',
       profile_definition_grants_table_id: 'uuid',
       profile_definition_grants_table_name: 'text',
-      bitlen: 'int',
       membership_type: 'int',
       entity_table_id: 'uuid',
       actor_table_id: 'uuid',

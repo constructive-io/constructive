@@ -58,17 +58,16 @@ jest.doMock(_exportGraphQLMetaPath, () => ({
   exportGraphQLMeta: jest.fn()
 }));
 
-// NOW load everything — pg-cache, core exports, etc.
+// NOW load everything — core exports, etc.
 const {
   PgpmPackage,
   exportGraphQL,
   exportMigrations,
   exportMeta
 } = require('@pgpmjs/core');
-const { getPgPool, teardownPgPools } = require('pg-cache');
-const { getPgEnvOptions } = require('pg-env');
 const { PgpmMigrate } = require('@pgpmjs/core');
 const { camelize } = require('inflekt');
+const { getConnections, seed } = require('pgsql-test');
 
 // Mocked modules we need to configure per-test
 const { GraphQLClient } = require(_graphqlClientPath);
@@ -246,10 +245,10 @@ const SEED_SQL = `
 
 describe('export parity — SQL vs GraphQL (integration)', () => {
   let tempDir: string;
-  let dbName: string;
   let dbConfig: any;
   let sqlWorkspaceDir: string;
   let graphqlWorkspaceDir: string;
+  let teardown: () => Promise<void>;
 
   // Pre-fetched from the real DB in beforeAll (before exportMigrations ends the pool)
   let schemaNames: string[];
@@ -270,24 +269,37 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
   beforeAll(async () => {
     tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'pgpm-parity-int-'));
 
-    // Create temp database
-    dbName = `test_parity_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    const baseConfig = getPgEnvOptions({ database: 'postgres' });
-    const adminPool = getPgPool(baseConfig);
-    await adminPool.query(`CREATE DATABASE "${dbName}"`);
+    ({ teardown } = await getConnections({}, [
+      seed.fn(async ({ pg: pgClient, config }: any) => {
+        dbConfig = config;
 
-    const pgConfig = getPgEnvOptions({ database: dbName });
-    dbConfig = {
-      host: pgConfig.host,
-      port: pgConfig.port,
-      user: pgConfig.user,
-      password: pgConfig.password,
-      database: pgConfig.database
-    };
+        // Initialize pgpm_migrate schema
+        const migrate = new PgpmMigrate(config);
+        await migrate.initialize();
 
-    // Initialize pgpm_migrate schema
-    const migrate = new PgpmMigrate(dbConfig);
-    await migrate.initialize();
+        // Create shim schemas + tables
+        await pgClient.query(SCHEMA_SHIMS_SQL);
+
+        // Seed data
+        await pgClient.query(SEED_SQL);
+
+        const schemaResult = await pgClient.query(
+          'SELECT * FROM metaschema_public.schema WHERE database_id = $1',
+          [DATABASE_ID]
+        );
+        schemas = schemaResult.rows;
+        schemaNames = schemas.map((r: any) => r.schema_name);
+
+        const sqlActionsResult = await pgClient.query(
+          'SELECT * FROM db_migrate.sql_actions WHERE database_id = $1 ORDER BY id',
+          [DATABASE_ID]
+        );
+        camelActions = sqlActionsResult.rows.map(pgRowToCamel);
+
+        // Run the real SQL-based exportMeta to get the meta result that both flows will use
+        metaResult = await exportMeta({ opts: { pg: config }, dbname: config.database, database_id: DATABASE_ID });
+      })
+    ]));
 
     // ---- Prepare two isolated workspaces for the exports ----
     for (const label of ['sql-flow', 'graphql-flow']) {
@@ -310,41 +322,11 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
 
     sqlWorkspaceDir = path.join(tempDir, 'sql-flow');
     graphqlWorkspaceDir = path.join(tempDir, 'graphql-flow');
-
-    // Pre-fetch everything we need from the DB BEFORE any export runs
-    // (exportMigrations calls pgPool.end() internally, killing the pool)
-    const dbPool = getPgPool(pgConfig);
-
-    // Create shim schemas + tables
-    await dbPool.query(SCHEMA_SHIMS_SQL);
-
-    // Seed data
-    await dbPool.query(SEED_SQL);
-
-    const schemaResult = await dbPool.query(
-      'SELECT * FROM metaschema_public.schema WHERE database_id = $1',
-      [DATABASE_ID]
-    );
-    schemas = schemaResult.rows;
-    schemaNames = schemas.map((r: any) => r.schema_name);
-
-    const sqlActionsResult = await dbPool.query(
-      'SELECT * FROM db_migrate.sql_actions WHERE database_id = $1 ORDER BY id',
-      [DATABASE_ID]
-    );
-    camelActions = sqlActionsResult.rows.map(pgRowToCamel);
-
-    // Run the real SQL-based exportMeta to get the meta result that both flows will use
-    metaResult = await exportMeta({ opts: { pg: dbConfig }, dbname: dbName, database_id: DATABASE_ID });
   });
 
   afterAll(async () => {
-    try { await teardownPgPools(); } catch (_) { /* */ }
-    try {
-      const adminPool = getPgPool(getPgEnvOptions({ database: 'postgres' }));
-      await adminPool.query(`DROP DATABASE IF EXISTS "${dbName}"`);
-    } catch (_) { /* */ }
-    try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (_) { /* */ }
+    await teardown();
+    fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
   // =========================================================================
@@ -358,7 +340,7 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
       project: sqlProject,
       options: { pg: dbConfig },
       dbInfo: {
-        dbname: dbName,
+        dbname: dbConfig.database,
         databaseName: DATABASE_NAME,
         database_ids: [DATABASE_ID]
       },
