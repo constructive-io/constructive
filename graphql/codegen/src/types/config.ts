@@ -174,6 +174,32 @@ export interface DocsConfig {
 }
 
 /**
+ * Schema export configuration
+ * Controls SDL schema export behavior.
+ */
+export interface SchemaConfig {
+  /**
+   * Enable schema SDL export
+   * When true, fetches the schema and writes it as a .graphql SDL file.
+   * If no generators are enabled (orm, reactQuery, cli), only the schema is exported.
+   * @default false
+   */
+  enabled?: boolean;
+
+  /**
+   * Output directory for the exported schema file
+   * @default same as the target's output directory
+   */
+  output?: string;
+
+  /**
+   * Filename for the exported schema file
+   * @default 'schema.graphql'
+   */
+  filename?: string;
+}
+
+/**
  * Infrastructure command name overrides for collision handling.
  * When a target name collides with a default infra command name,
  * the infra command is auto-renamed. These allow user overrides.
@@ -389,6 +415,13 @@ export interface GraphQLSDKConfigTarget {
    * @default { readme: true, agents: true, mcp: false }
    */
   docs?: DocsConfig | boolean;
+
+  /**
+   * Schema export configuration
+   * When enabled, exports the GraphQL SDL to a file.
+   * If no generators are also enabled, this acts as a schema-only export.
+   */
+  schema?: SchemaConfig;
 
   /**
    * Custom path for generated skill files.

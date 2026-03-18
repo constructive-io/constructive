@@ -19,7 +19,7 @@ The CLI provides GraphQL-focused commands:
 
 - `packages/cli/src/commands/server.ts` – start the Constructive GraphQL server
 - `packages/cli/src/commands/explorer.ts` – start the Constructive GraphQL explorer
-- `packages/cli/src/commands/codegen.ts` – run GraphQL codegen (`@constructive-io/graphql-codegen`), including `--schema-only` for SDL export
+- `packages/cli/src/commands/codegen.ts` – run GraphQL codegen (`@constructive-io/graphql-codegen`), including `--schema-enabled` for SDL export
 
 ## Debugging Tips
 

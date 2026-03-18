@@ -26,9 +26,11 @@ Generator Options:
   --verbose                  Verbose output
 
 Schema Export:
-  --schema-only              Export GraphQL SDL instead of running full codegen.
+  --schema-enabled           Export GraphQL SDL instead of running full codegen.
                              Works with any source (endpoint, file, database, PGPM).
                              With multiple apiNames, writes one .graphql per API.
+  --schema-output <dir>      Output directory for the exported schema file
+  --schema-filename <name>   Filename for the exported schema (default: schema.graphql)
 
   --help, -h                 Show this help message
 `;
