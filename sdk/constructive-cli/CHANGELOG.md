@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.9](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.8.8...@constructive-sdk/cli@0.8.9) (2026-03-17)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [0.8.8](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.8.7...@constructive-sdk/cli@0.8.8) (2026-03-17)
+
+### Bug Fixes
+
+- add pregenerate cleanup to SDK packages to remove stale files ([9adb0ee](https://github.com/constructive-io/constructive/commit/9adb0ee50702d6efbb2bc5cae17ee1e0b947ce6c))
+
 ## [0.8.7](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.8.6...@constructive-sdk/cli@0.8.7) (2026-03-16)
 
 **Note:** Version bump only for package @constructive-sdk/cli

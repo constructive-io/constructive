@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.5.0](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@2.4.4...graphile-sql-expression-validator@2.5.0) (2026-03-17)
+
+### Features
+
+- add uuidv7 to SQL expression validator, remove pgpm-uuid references ([e5755ec](https://github.com/constructive-io/constructive/commit/e5755ecb10c7b7b9dd3202d925878eca0719329c)), closes [constructive-db#589](https://github.com/constructive-db/issues/589)
+
 ## [2.4.4](https://github.com/constructive-io/constructive/compare/graphile-sql-expression-validator@2.4.3...graphile-sql-expression-validator@2.4.4) (2026-03-15)
 
 **Note:** Version bump only for package graphile-sql-expression-validator

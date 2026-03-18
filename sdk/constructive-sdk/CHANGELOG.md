@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.8.0...@constructive-io/sdk@0.8.1) (2026-03-17)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
+# [0.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.7...@constructive-io/sdk@0.8.0) (2026-03-17)
+
+### Bug Fixes
+
+- add pregenerate cleanup to SDK packages to remove stale files ([9adb0ee](https://github.com/constructive-io/constructive/commit/9adb0ee50702d6efbb2bc5cae17ee1e0b947ce6c))
+
+### Features
+
+- add @pgpmjs/migrate-client workspace package with zero codegen deps ([b0c38ce](https://github.com/constructive-io/constructive/commit/b0c38ce2979c8fb47b4c06a0efdfa1ea72cb8ff5))
+
 ## [0.7.7](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.7.6...@constructive-io/sdk@0.7.7) (2026-03-16)
 
 **Note:** Version bump only for package @constructive-io/sdk

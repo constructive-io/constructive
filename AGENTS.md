@@ -62,8 +62,83 @@ This guide helps AI agents quickly navigate the Constructive monorepo. Construct
 - Generate types/SDK: `cnc codegen`
 - Export schema SDL: `cnc get-graphql-schema`
 
+## Best Practices
+
+### Environment Configuration
+
+Always use the unified environment configuration system — never read `process.env` directly for config values.
+
+- **PGPM packages** (`pgpm/*`): `import { getEnvOptions } from '@pgpmjs/env'`
+- **GraphQL/Constructive packages** (`graphql/*`, `packages/cli`): `import { getEnvOptions } from '@constructive-io/graphql-env'`
+- **PostgreSQL tools** (`postgres/*`): `import { getPgEnvOptions } from 'pg-env'` or `@pgpmjs/env`
+
+The system provides typed defaults, config file discovery (`pgpm.json`), env var parsing, and a clean merge hierarchy: **defaults → config file → env vars → runtime overrides**.
+
+```typescript
+// GOOD
+import { getEnvOptions } from '@pgpmjs/env';
+const opts = getEnvOptions({ pg: { database: 'mydb' } });
+
+// BAD — scattered, untyped, no defaults
+const host = process.env.PGHOST || 'localhost';
+const port = parseInt(process.env.PGPORT || '5432');
+```
+
+### Testing
+
+Constructive provides a layered testing framework stack. **Always use the appropriate framework** — never manually create `pg.Pool` or `pg.Client` instances in tests.
+
+#### Which Framework to Use
+
+| Scenario | Framework | Import |
+|----------|-----------|--------|
+| Raw SQL, RLS policies, database functions | `pgsql-test` | `import { getConnections } from 'pgsql-test'` |
+| PostGraphile schema, basic GraphQL queries | `graphile-test` | `import { getConnections } from 'graphile-test'` |
+| GraphQL with Constructive plugins (search, pgvector, etc.) | `@constructive-io/graphql-test` | `import { getConnections } from '@constructive-io/graphql-test'` |
+| HTTP endpoints, auth headers, middleware | `@constructive-io/graphql-server-test` | `import { getConnections } from '@constructive-io/graphql-server-test'` |
+
+Each layer builds on `pgsql-test` underneath — they all create isolated test databases with proper teardown.
+
+#### Required Test Hooks
+
+Always include `beforeEach`/`afterEach` hooks to ensure test isolation via savepoints:
+
+```typescript
+import { getConnections, PgTestClient } from 'pgsql-test';
+
+let pg: PgTestClient;
+let db: PgTestClient;
+let teardown: () => Promise<void>;
+
+beforeAll(async () => {
+  ({ pg, db, teardown } = await getConnections());
+});
+
+afterAll(async () => {
+  await teardown();
+});
+
+beforeEach(async () => {
+  await pg.beforeEach();
+  await db.beforeEach();
+});
+
+afterEach(async () => {
+  await db.afterEach();
+  await pg.afterEach();
+});
+```
+
+#### Anti-Patterns to Avoid
+
+- **Never** create `new pg.Pool()` or `new pg.Client()` in tests — use `getConnections()` from the appropriate framework
+- **Never** use `getPgPool()` from `pg-cache` in tests — that's for production connection pooling
+- **Never** manually create/drop databases in tests — `pgsql-test` handles this automatically
+- **Never** skip `beforeEach`/`afterEach` hooks — tests will leak state to each other
+- **Never** construct connection strings manually — use the env configuration system
+
 ## Tips
 
 1. Start with `pgpm/core/AGENTS.md` to understand the migration and plan model.
-2. Use `packages/cli/AGENTS.md` to understand Constructive’s command routing.
+2. Use `packages/cli/AGENTS.md` to understand Constructive's command routing.
 3. Use `postgres/pgsql-test/AGENTS.md` for patterns around isolated test DBs and seeding.

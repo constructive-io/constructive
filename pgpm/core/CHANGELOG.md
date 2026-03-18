@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.7.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.7.0...@pgpmjs/core@6.7.1) (2026-03-17)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.7.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.6.5...@pgpmjs/core@6.7.0) (2026-03-17)
+
+### Features
+
+- add @pgpmjs/migrate-client workspace package with zero codegen deps ([b0c38ce](https://github.com/constructive-io/constructive/commit/b0c38ce2979c8fb47b4c06a0efdfa1ea72cb8ff5))
+- add uuidv7 to SQL expression validator, remove pgpm-uuid references ([e5755ec](https://github.com/constructive-io/constructive/commit/e5755ecb10c7b7b9dd3202d925878eca0719329c)), closes [constructive-db#589](https://github.com/constructive-db/issues/589)
+
 ## [6.6.5](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.6.4...@pgpmjs/core@6.6.5) (2026-03-16)
 
 ### Bug Fixes

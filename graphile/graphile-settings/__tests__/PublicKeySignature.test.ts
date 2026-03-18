@@ -1,5 +1,5 @@
-import { PublicKeySignature } from '../src/PublicKeySignature';
-import type { PublicKeyChallengeConfig } from '../src/PublicKeySignature';
+import { PublicKeySignature } from '../src/plugins/PublicKeySignature';
+import type { PublicKeyChallengeConfig } from '../src/plugins/PublicKeySignature';
 
 const defaultConfig: PublicKeyChallengeConfig = {
   schema: 'app_private',
@@ -41,7 +41,7 @@ describe('PublicKeySignature plugin factory', () => {
   });
 
   it('default export matches named export', async () => {
-    const mod = await import('../src/PublicKeySignature');
+    const mod = await import('../src/plugins/PublicKeySignature');
     expect(mod.default).toBe(mod.PublicKeySignature);
   });
 });

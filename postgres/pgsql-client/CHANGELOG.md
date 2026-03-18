@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.7](https://github.com/constructive-io/constructive/compare/pgsql-client@3.5.6...pgsql-client@3.5.7) (2026-03-17)
+
+### Bug Fixes
+
+- terminate backends before dropping databases and close pg-cache pools in codegen ([2604533](https://github.com/constructive-io/constructive/commit/2604533e3e99937c10264f71b6173026bf32addc))
+
+## [3.5.6](https://github.com/constructive-io/constructive/compare/pgsql-client@3.5.5...pgsql-client@3.5.6) (2026-03-17)
+
+**Note:** Version bump only for package pgsql-client
+
 ## [3.5.5](https://github.com/constructive-io/constructive/compare/pgsql-client@3.5.4...pgsql-client@3.5.5) (2026-03-16)
 
 **Note:** Version bump only for package pgsql-client

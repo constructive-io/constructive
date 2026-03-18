@@ -122,10 +122,18 @@ export function createUnifiedSearchPlugin(
       }
     }
 
-    // Phase 2: Only run supplementary adapters if at least one primary
-    // adapter with isIntentionalSearch found columns on this codec.
+    // Phase 2: Run supplementary adapters if intentional search exists
+    // OR if the table/column has a @trgmSearch smart tag.
     // pgvector (isIntentionalSearch: false) alone won't trigger trgm.
-    if (hasIntentionalSearch) {
+    const hasTrgmSearchTag =
+      // Table-level tag
+      (codec.extensions as any)?.tags?.trgmSearch ||
+      // Column-level tag
+      (codec.attributes && Object.values(codec.attributes as Record<string, any>).some(
+        (attr: any) => attr?.extensions?.tags?.trgmSearch
+      ));
+
+    if (hasIntentionalSearch || hasTrgmSearchTag) {
       for (const adapter of supplementaryAdapters) {
         const columns = adapter.detectColumns(codec, build);
         if (columns.length > 0) {
@@ -149,6 +157,8 @@ export function createUnifiedSearchPlugin(
       'PgConnectionArgFilterAttributesPlugin',
       'PgConnectionArgFilterOperatorsPlugin',
       'AddConnectionFilterOperatorPlugin',
+      'ConnectionFilterTypesPlugin',
+      'ConnectionFilterCustomOperatorsPlugin',
       // Allow individual codec plugins to load first (e.g. Bm25CodecPlugin)
       'Bm25CodecPlugin',
       'VectorCodecPlugin',
@@ -229,6 +239,34 @@ export function createUnifiedSearchPlugin(
           for (const adapter of adapters) {
             adapter.registerTypes(build);
           }
+
+          // Register StringTrgmFilter — a variant of StringFilter that includes
+          // trgm operators (similarTo, wordSimilarTo). Only string columns on
+          // tables that qualify for trgm will use this type instead of StringFilter.
+          const hasTrgmAdapter = adapters.some((a) => a.name === 'trgm');
+          if (hasTrgmAdapter) {
+            const DPTYPES = (build as any).dataplanPg?.TYPES;
+            const textCodec = DPTYPES?.text ?? TYPES.text;
+            build.registerInputObjectType(
+              'StringTrgmFilter',
+              {
+                pgConnectionFilterOperators: {
+                  isList: false,
+                  pgCodecs: [textCodec],
+                  inputTypeName: 'String',
+                  rangeElementInputTypeName: null,
+                  domainBaseTypeName: null,
+                },
+              },
+              () => ({
+                description:
+                  'A filter to be used against String fields with pg_trgm support. ' +
+                  'All fields are combined with a logical \u2018and.\u2019',
+              }),
+              'UnifiedSearchPlugin (StringTrgmFilter)'
+            );
+          }
+
           return _;
         },
 
@@ -609,6 +647,26 @@ export function createUnifiedSearchPlugin(
           }
 
           let newFields = fields;
+
+          // ── StringFilter → StringTrgmFilter type swapping ──
+          // For tables that qualify for trgm, swap the type of string attribute
+          // filter fields so they get similarTo/wordSimilarTo operators.
+          const hasTrgm = adapterColumns.some((ac) => ac.adapter.name === 'trgm');
+          if (hasTrgm) {
+            const StringTrgmFilterType = build.getTypeByName('StringTrgmFilter');
+            const StringFilterType = build.getTypeByName('StringFilter');
+            if (StringTrgmFilterType && StringFilterType) {
+              const swapped: Record<string, any> = {};
+              for (const [key, field] of Object.entries(newFields)) {
+                if (field && typeof field === 'object' && (field as any).type === StringFilterType) {
+                  swapped[key] = Object.assign({}, field, { type: StringTrgmFilterType });
+                } else {
+                  swapped[key] = field;
+                }
+              }
+              newFields = swapped;
+            }
+          }
 
           for (const { adapter, columns } of adapterColumns) {
             for (const column of columns) {

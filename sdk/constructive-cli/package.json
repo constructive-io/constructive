@@ -1,6 +1,6 @@
 {
   "name": "@constructive-sdk/cli",
-  "version": "0.8.7",
+  "version": "0.8.9",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive CLI SDK - Auto-generated GraphQL CLI with ORM client, context management, and interactive prompts",
   "main": "index.js",
@@ -27,7 +27,8 @@
     "prepack": "npm run build",
     "build": "makage build",
     "build:dev": "makage build --dev",
-    "generate": "tsx scripts/generate-sdk.ts",
+    "pregenerate": "rimraf src/admin src/auth src/objects src/public src/index.ts",
+    "generate": "pnpm run pregenerate && tsx scripts/generate-sdk.ts",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.2.0...graphile-search@1.2.1) (2026-03-17)
+
+**Note:** Version bump only for package graphile-search
+
+# [1.2.0](https://github.com/constructive-io/constructive/compare/graphile-search@1.1.3...graphile-search@1.2.0) (2026-03-17)
+
+### Features
+
+- scope trgm operators to tables with intentional search ([af00b1e](https://github.com/constructive-io/constructive/commit/af00b1eb99a5888924c5d51b736eef9f142f1ebf))
+
 ## [1.1.3](https://github.com/constructive-io/constructive/compare/graphile-search@1.1.2...graphile-search@1.1.3) (2026-03-16)
 
 **Note:** Version bump only for package graphile-search

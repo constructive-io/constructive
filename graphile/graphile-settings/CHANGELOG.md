@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.10.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.10.0...graphile-settings@4.10.1) (2026-03-17)
+
+**Note:** Version bump only for package graphile-settings
+
+# [4.10.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.9.3...graphile-settings@4.10.0) (2026-03-17)
+
+### Bug Fixes
+
+- update dynamic import path in PublicKeySignature test ([b7465b0](https://github.com/constructive-io/constructive/commit/b7465b0a9bcc0d538808c9a87a918e98eee02250))
+
+### Features
+
+- consolidate graphile-misc-plugins into graphile-settings and add [@required](https://github.com/required)Input plugin ([77118e1](https://github.com/constructive-io/constructive/commit/77118e114e87bf96035ae3c5ff6b16a401ba800c))
+
 ## [4.9.3](https://github.com/constructive-io/constructive/compare/graphile-settings@4.9.2...graphile-settings@4.9.3) (2026-03-16)
 
 **Note:** Version bump only for package graphile-settings
