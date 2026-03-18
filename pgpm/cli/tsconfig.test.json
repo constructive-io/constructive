@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "pgsql-test": ["../../postgres/pgsql-test/src"]
+    }
+  },
+  "include": ["src", "__tests__"]
+}

@@ -7,12 +7,15 @@ module.exports = {
       'ts-jest',
       {
         babelConfig: false,
-        tsconfig: 'tsconfig.json',
+        tsconfig: 'tsconfig.test.json',
       },
     ],
   },
   transformIgnorePatterns: [`/node_modules/*`],
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    '^pgsql-test$': '<rootDir>/../../postgres/pgsql-test/src',
+  },
   modulePathIgnorePatterns: ['dist/*']
 };

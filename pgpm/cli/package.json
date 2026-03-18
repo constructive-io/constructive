@@ -42,7 +42,6 @@
     "glob": "^13.0.6",
     "makage": "^0.1.12",
     "pg": "^8.20.0",
-    "pgsql-test": "workspace:^",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
