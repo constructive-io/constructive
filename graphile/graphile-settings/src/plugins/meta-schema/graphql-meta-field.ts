@@ -190,6 +190,27 @@ function createMetaSchemaType(): GraphQLObjectType {
     }),
   });
 
+  const MetaAuthzGrantType = new GraphQLObjectType({
+    name: 'MetaAuthzGrant',
+    description: 'A privilege/role grant pair for an authorization policy',
+    fields: () => ({
+      privilege: { type: nn(GraphQLString) },
+      role: { type: nn(GraphQLString) },
+    }),
+  });
+
+  const MetaAuthzPolicyType = new GraphQLObjectType({
+    name: 'MetaAuthzPolicy',
+    description: 'Authorization policy applied to a table',
+    fields: () => ({
+      policyType: { type: nn(GraphQLString) },
+      description: { type: nn(GraphQLString) },
+      grants: { type: nnList(MetaAuthzGrantType) },
+      permissive: { type: nn(GraphQLBoolean) },
+      name: { type: GraphQLString },
+    }),
+  });
+
   const MetaTableType = new GraphQLObjectType({
     name: 'MetaTable',
     description: 'Information about a database table',
@@ -205,6 +226,7 @@ function createMetaSchemaType(): GraphQLObjectType {
       relations: { type: nn(MetaRelationsType) },
       inflection: { type: nn(MetaInflectionType) },
       query: { type: nn(MetaQueryType) },
+      authz: { type: new GraphQLList(nn(MetaAuthzPolicyType)) },
     }),
   });
 
