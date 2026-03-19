@@ -181,6 +181,18 @@ function isSearchComputedField(f: CleanField): boolean {
 }
 
 /**
+ * Check whether the schema's VectorNearbyInput type includes an
+ * `includeChunks` field.  When present, tables with embedding columns
+ * support transparent chunk-aware vector search.
+ */
+function hasIncludeChunksCapability(registry?: TypeRegistry): boolean {
+  if (!registry) return false;
+  const vectorInput = registry.get('VectorNearbyInput');
+  if (!vectorInput || vectorInput.kind !== 'INPUT_OBJECT') return false;
+  return !!vectorInput.inputFields?.some((f) => f.name === 'includeChunks');
+}
+
+/**
  * Categorize "special" fields on a table into PostGIS, pgvector, and
  * Unified Search groups.  Returns only non-empty groups.
  *
@@ -225,11 +237,17 @@ export function categorizeSpecialFields(
   }
 
   if (embedding.length > 0) {
+    const chunkAware = hasIncludeChunksCapability(typeRegistry);
+    const baseDesc =
+      'High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.';
+    const chunkDesc = chunkAware
+      ? baseDesc +
+        ' Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.'
+      : baseDesc;
     groups.push({
       category: 'embedding',
       label: 'pgvector embedding fields',
-      description:
-        'High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.',
+      description: chunkDesc,
       fields: embedding,
     });
   }

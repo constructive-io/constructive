@@ -489,9 +489,19 @@ export function createUnifiedSearchPlugin(
             // Resolve normalization strategy: per-table > default 'linear'
             const normalizationStrategy = tableSearchConfig?.normalization ?? 'linear';
             // Recency boost config from per-table smart tag
-            const boostRecent = tableSearchConfig?.boost_recent ?? false;
+            let boostRecent = tableSearchConfig?.boost_recent ?? false;
             const boostRecencyField = tableSearchConfig?.boost_recency_field ?? 'updated_at';
             const boostRecencyDecay = tableSearchConfig?.boost_recency_decay ?? 0.95;
+
+            // Phase I: Validate that the recency field actually exists on the table.
+            // If it doesn't, disable recency boost gracefully instead of crashing at query time.
+            if (boostRecent && boostRecencyField && !codec.attributes[boostRecencyField]) {
+              console.warn(
+                `[graphile-search] @searchConfig.boost_recency_field "${boostRecencyField}" ` +
+                `not found on table "${codec.name}". Recency boost disabled for this table.`
+              );
+              boostRecent = false;
+            }
 
             newFields = build.extend(
               newFields,
