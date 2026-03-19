@@ -11,6 +11,7 @@ import {
   buildReverseRelations,
 } from './relation-meta-builders';
 import { buildFieldMeta } from './type-mappings';
+import { buildAuthzMeta } from './authz-meta-builder';
 import {
   createBuildContext,
   type BuildContext,
@@ -74,6 +75,8 @@ function buildTableMeta(
 
   const tableType = resolveTableType(context.build, codec);
 
+  const authz = buildAuthzMeta(codec);
+
   return {
     name: tableType,
     schemaName,
@@ -86,6 +89,7 @@ function buildTableMeta(
     relations: relationsMeta,
     inflection: buildInflectionMeta(resource, tableType, context.build),
     query: buildQueryMeta(resource, uniques, tableType, context.build),
+    ...(authz ? { authz } : {}),
   };
 }
 
