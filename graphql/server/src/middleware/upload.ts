@@ -309,13 +309,14 @@ export const uploadRoute: RequestHandler[] = [
             password: process.env.PGPASSWORD || 'password',
           });
           // Look up PG schema.table from metaschema.
+          // s.schema_name is the physical PG schema (e.g. "testdb-31d39e18-app-public").
           // Try exact match on lowercase plural (Photo → photos), then singular.
           const candidates = [
             gqlTableName.toLowerCase() + 's',  // Photo → photos
             gqlTableName.toLowerCase(),         // Photo → photo
           ];
           const { rows } = await pool.query(
-            `SELECT s.name AS schema_name, t.name AS table_name
+            `SELECT s.schema_name AS pg_schema, t.name AS table_name
              FROM metaschema_public."table" t
              JOIN metaschema_public.schema s ON s.id = t.schema_id
              WHERE s.database_id = $1
@@ -323,27 +324,12 @@ export const uploadRoute: RequestHandler[] = [
              LIMIT 1`,
             [req.api.databaseId, candidates]
           );
-          if (rows.length > 0) {
+          if (rows.length > 0 && rows[0].pg_schema) {
             source = {
-              table: `${rows[0].schema_name}.${rows[0].table_name}`,
+              table: `${rows[0].pg_schema}.${rows[0].table_name}`,
               column: gqlColumnName,
               id: sourceId,
             };
-          } else {
-            // Fallback: search information_schema for matching table name
-            const fallback = await pool.query(
-              `SELECT table_schema, table_name FROM information_schema.tables
-               WHERE table_name = ANY($1) AND table_schema NOT IN ('pg_catalog', 'information_schema')
-               LIMIT 1`,
-              [candidates]
-            );
-            if (fallback.rows.length > 0) {
-              source = {
-                table: `${fallback.rows[0].table_schema}.${fallback.rows[0].table_name}`,
-                column: gqlColumnName,
-                id: sourceId,
-              };
-            }
           }
         } catch (resolveErr) {
           uploadLog.debug('[upload] Failed to resolve source back-reference', resolveErr);
