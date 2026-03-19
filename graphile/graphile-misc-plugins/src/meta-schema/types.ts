@@ -210,6 +210,7 @@ export interface MetaBuild extends GqlTypeResolverBuild {
   input: {
     pgRegistry: {
       pgResources: Record<string, PgTableResource>;
+      pgRelations?: Record<string, Record<string, PgRelation>>;
     };
   };
   inflection: MetaInflection;

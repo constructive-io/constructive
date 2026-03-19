@@ -94,7 +94,7 @@ export function buildForeignKeyConstraints(
   const constraints: ForeignKeyConstraintMeta[] = [];
 
   for (const [relationName, relation] of Object.entries(relations)) {
-    if (relation.isReferencee !== false) continue;
+    if (relation.isReferencee === true) continue;
 
     const remoteCodec = relation.remoteResource?.codec;
     const remoteAttributes = remoteCodec?.attributes || {};

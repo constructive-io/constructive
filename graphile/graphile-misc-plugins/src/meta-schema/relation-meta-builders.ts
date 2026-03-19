@@ -36,7 +36,7 @@ export function buildBelongsToRelations(
   const belongsTo: BelongsToRelation[] = [];
 
   for (const [relationName, relation] of Object.entries(relations)) {
-    if (relation.isReferencee !== false) continue;
+    if (relation.isReferencee === true) continue;
 
     const localAttributes = relation.localAttributes || [];
     const isUnique = uniques.some((unique) =>

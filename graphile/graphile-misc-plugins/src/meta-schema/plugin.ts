@@ -14,6 +14,7 @@ export const MetaSchemaPlugin: GraphileConfig.Plugin = {
   name: 'MetaSchemaPlugin',
   version: '1.0.0',
   description: 'Exposes _meta query for database schema introspection',
+  after: ['PgManyToManyRelationPlugin'],
   schema: {
     hooks: {
       init(input, rawBuild) {

@@ -39,7 +39,7 @@ function buildTableMeta(
   const codec = resource.codec;
   const attributes = codec.attributes;
   const uniques = getUniques(resource);
-  const relations = getRelations(resource);
+  const relations = getRelations(resource, context.build.input.pgRegistry.pgRelations);
 
   const fields = Object.entries(attributes).map(([attrName, attr]) =>
     buildFieldMeta(context.inflectAttr(attrName, codec), attr, context.build),

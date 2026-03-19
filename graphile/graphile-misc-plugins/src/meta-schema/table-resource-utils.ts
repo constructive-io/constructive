@@ -35,8 +35,21 @@ export function getUniques(resource: PgTableResource): PgUnique[] {
   return Array.isArray(resource.uniques) ? resource.uniques : [];
 }
 
-export function getRelations(resource: PgTableResource): Record<string, PgRelation> {
-  return resource.relations || resource.getRelations?.() || {};
+export function getRelations(
+  resource: PgTableResource,
+  pgRelations?: Record<string, Record<string, PgRelation>>,
+): Record<string, PgRelation> {
+  const fromMethod = resource.getRelations?.();
+  if (fromMethod && Object.keys(fromMethod).length > 0) return fromMethod;
+
+  // Direct registry lookup by codec name
+  const codecName = resource.codec?.name;
+  if (codecName && pgRelations?.[codecName]) {
+    const fromRegistry = pgRelations[codecName];
+    if (Object.keys(fromRegistry).length > 0) return fromRegistry;
+  }
+
+  return resource.relations || {};
 }
 
 export function getRelation(resource: PgTableResource, relationName: string): PgRelation | null {
