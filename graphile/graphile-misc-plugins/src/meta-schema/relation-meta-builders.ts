@@ -2,6 +2,7 @@ import { safeInflection } from './inflection-utils';
 import {
   buildForeignKeyConstraint,
 } from './constraint-meta-builders';
+import { resolveTableType } from './name-meta-builders';
 import { buildFieldList, type BuildContext } from './table-meta-context';
 import {
   getRelation,
@@ -21,6 +22,15 @@ import type {
   PgTableResource,
   PgUnique,
 } from './types';
+
+function resolveRemoteTableName(
+  remoteResource: PgTableResource | null | undefined,
+  context: BuildContext,
+): string {
+  const codec = remoteResource?.codec;
+  if (!codec) return 'unknown';
+  return resolveTableType(context.build, codec);
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -43,12 +53,14 @@ export function buildBelongsToRelations(
       sameAttributes(unique.attributes, localAttributes),
     );
 
+    const remoteTableName = resolveRemoteTableName(relation.remoteResource, context);
+
     belongsTo.push({
       fieldName: relationName,
       isUnique,
-      type: relation.remoteResource?.codec?.name || null,
+      type: remoteTableName,
       keys: buildFieldList(localAttributes, codec, attributes, context),
-      references: { name: relation.remoteResource?.codec?.name || 'unknown' },
+      references: { name: remoteTableName },
     });
   }
 
@@ -73,12 +85,14 @@ export function buildReverseRelations(
       sameAttributes(unique.attributes, remoteAttributes),
     );
 
+    const remoteTableName = resolveRemoteTableName(relation.remoteResource, context);
+
     const meta: HasRelation = {
       fieldName: relationName,
       isUnique,
-      type: relation.remoteResource?.codec?.name || null,
+      type: remoteTableName,
       keys: buildFieldList(relation.localAttributes || [], codec, attributes, context),
-      referencedBy: { name: relation.remoteResource?.codec?.name || 'unknown' },
+      referencedBy: { name: remoteTableName },
     };
 
     if (isUnique) {
@@ -174,10 +188,13 @@ function buildManyToManyRelation(
     context,
   );
 
+  const rightTableType = resolveTableType(context.build, rightCodec);
+  const junctionTableType = resolveTableType(context.build, junctionCodec);
+
   return {
     fieldName: relationFieldName,
-    type: rightCodec.name || null,
-    junctionTable: { name: junctionCodec.name || 'unknown' },
+    type: rightTableType,
+    junctionTable: { name: junctionTableType },
     junctionLeftConstraint,
     junctionLeftKeyAttributes: buildFieldList(
       leftJunctionAttributes,
@@ -204,7 +221,7 @@ function buildManyToManyRelation(
       rightCodec.attributes,
       context,
     ),
-    rightTable: { name: rightCodec.name || 'unknown' },
+    rightTable: { name: rightTableType },
   };
 }
 

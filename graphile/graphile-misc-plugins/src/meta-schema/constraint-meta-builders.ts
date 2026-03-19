@@ -1,3 +1,4 @@
+import { resolveTableType } from './name-meta-builders';
 import { buildFieldMeta } from './type-mappings';
 import { buildFieldList, type BuildContext } from './table-meta-context';
 import type {
@@ -20,7 +21,9 @@ export function buildForeignKeyConstraint(
   remoteAttributeNames: string[],
   context: BuildContext,
 ): ForeignKeyConstraintMeta {
-  const referencedTable = remoteCodec?.name || 'unknown';
+  const referencedTable = remoteCodec
+    ? resolveTableType(context.build, remoteCodec)
+    : 'unknown';
   const referencedFields = remoteAttributeNames.map((attrName) =>
     remoteCodec ? context.inflectAttr(attrName, remoteCodec) : attrName,
   );
