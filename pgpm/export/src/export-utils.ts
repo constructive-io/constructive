@@ -50,26 +50,6 @@ export const SERVICE_REQUIRED_EXTENSIONS = [
 ] as const;
 
 /**
- * GraphQL fields to request when fetching sql_actions from the db_migrate endpoint.
- * Mirrors the columns available in db_migrate.sql_actions so the GraphQL flow
- * fetches the same data as `SELECT * FROM db_migrate.sql_actions` in the SQL flow.
- */
-export const SQL_ACTION_FIELDS = [
-  'id',
-  'databaseId',
-  'name',
-  'deploy',
-  'revert',
-  'verify',
-  'content',
-  'deps',
-  'action',
-  'actionId',
-  'actorId',
-  'payload'
-] as const;
-
-/**
  * Common SQL header for meta export files.
  * Sets session_replication_role and grants necessary permissions.
  */

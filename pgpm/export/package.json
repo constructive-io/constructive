@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@pgpmjs/core": "workspace:^",
+    "@pgpmjs/migrate-client": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",
     "glob": "^13.0.6",

@@ -18,6 +18,7 @@ Options:
   --graphql-endpoint <url>   GraphQL endpoint for meta/services data (enables GraphQL mode)
   --migrate-endpoint <url>   GraphQL endpoint for db_migrate data (optional, for sql_actions)
   --migrate-host <host>      Host header for migrate endpoint (e.g. db_migrate.localhost:3000)
+  --migrate-headers <json>   Extra headers for migrate endpoint as JSON (e.g. '{"X-Schemata":"db_migrate"}')
   --token <token>            Bearer token for GraphQL authentication
   --author <name>         Project author (default: from git config)
   --extensionName <name>  Extension name
@@ -49,6 +50,7 @@ export default async (
   const graphqlEndpoint = argv['graphql-endpoint'] || argv.graphqlEndpoint;
   const migrateEndpoint = argv['migrate-endpoint'] || argv.migrateEndpoint;
   const migrateHost = argv['migrate-host'] || argv.migrateHost;
+  const migrateHeadersRaw = argv['migrate-headers'] || argv.migrateHeaders;
   const token = argv.token;
 
   if (graphqlEndpoint) {
@@ -150,7 +152,10 @@ export default async (
       project,
       metaEndpoint: graphqlEndpoint,
       migrateEndpoint,
-      migrateHeaders: migrateHost ? { Host: migrateHost } : undefined,
+      migrateHeaders: {
+        ...(migrateHost ? { Host: migrateHost } : {}),
+        ...(migrateHeadersRaw ? JSON.parse(migrateHeadersRaw) : {})
+      },
       token,
       headers: { 'X-Meta-Schema': 'true' },
       databaseId,

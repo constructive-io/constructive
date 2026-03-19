@@ -10,13 +10,13 @@
 import { Inquirerer } from 'inquirerer';
 
 import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
+import { createClient } from '@pgpmjs/migrate-client';
 import { GraphQLClient } from './graphql-client';
 import { exportGraphQLMeta } from './export-graphql-meta';
 import { graphqlRowToPostgresRow } from './graphql-naming';
 import {
   DB_REQUIRED_EXTENSIONS,
   SERVICE_REQUIRED_EXTENSIONS,
-  SQL_ACTION_FIELDS,
   META_COMMON_HEADER,
   META_COMMON_FOOTER,
   META_TABLE_ORDER,
@@ -111,28 +111,63 @@ export const exportGraphQL = async ({
   });
 
   // =========================================================================
-  // 1. Fetch sql_actions via GraphQL (db_migrate endpoint)
+  // 1. Fetch sql_actions via @pgpmjs/migrate-client ORM (db_migrate endpoint)
   // =========================================================================
   let sqlActionRows: Record<string, unknown>[] = [];
 
   if (migrateEndpoint) {
     console.log(`Fetching sql_actions from ${migrateEndpoint}...`);
-    const migrateClient = new GraphQLClient({
+    const db = createClient({
       endpoint: migrateEndpoint,
-      token,
-      headers: migrateHeaders
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...migrateHeaders
+      }
     });
 
     try {
-      const camelRows = await migrateClient.fetchAllNodes(
-        'sqlActions',
-        SQL_ACTION_FIELDS.join('\n'),
-        { databaseId }
-      );
+      // Paginate through all sql_actions for this database using the ORM.
+      // The ORM generates `where: SqlActionFilter` which uses the filter plugin's
+      // `equalTo` operator — the correct approach for Constructive's PostGraphile APIs.
+      let hasNextPage = true;
+      let afterCursor: string | undefined;
+      const PAGE_SIZE = 100;
 
-      sqlActionRows = camelRows.map(node =>
-        graphqlRowToPostgresRow(node as Record<string, unknown>)
-      );
+      while (hasNextPage) {
+        const result = await db.sqlAction.findMany({
+          select: {
+            id: true,
+            databaseId: true,
+            name: true,
+            deploy: true,
+            revert: true,
+            verify: true,
+            content: true,
+            deps: true,
+            action: true,
+            actionId: true,
+            actorId: true,
+            payload: true
+          },
+          where: {
+            databaseId: { equalTo: databaseId }
+          },
+          orderBy: ['ID_ASC'],
+          first: PAGE_SIZE,
+          ...(afterCursor ? { after: afterCursor } : {})
+        }).unwrap();
+
+        const connection = result.sqlActions;
+        for (const node of connection.nodes) {
+          sqlActionRows.push(
+            graphqlRowToPostgresRow(node as unknown as Record<string, unknown>)
+          );
+        }
+
+        hasNextPage = connection.pageInfo?.hasNextPage ?? false;
+        afterCursor = connection.pageInfo?.endCursor ?? undefined;
+      }
+
       console.log(`  Found ${sqlActionRows.length} sql_actions`);
     } catch (err) {
       console.warn(`  Warning: Could not fetch sql_actions: ${err instanceof Error ? err.message : err}`);

@@ -172,15 +172,15 @@ export class GraphQLClient {
       parts.push(`after: "${after}"`);
     }
     if (condition && Object.keys(condition).length > 0) {
-      const condParts = Object.entries(condition)
+      const filterParts = Object.entries(condition)
         .map(([k, v]) => {
-          if (typeof v === 'string') return `${k}: "${v}"`;
-          if (typeof v === 'boolean') return `${k}: ${v}`;
-          if (typeof v === 'number') return `${k}: ${v}`;
-          return `${k}: "${v}"`;
+          if (typeof v === 'string') return `${k}: { equalTo: "${v}" }`;
+          if (typeof v === 'boolean') return `${k}: { equalTo: ${v} }`;
+          if (typeof v === 'number') return `${k}: { equalTo: ${v} }`;
+          return `${k}: { equalTo: "${v}" }`;
         })
         .join(', ');
-      parts.push(`condition: { ${condParts} }`);
+      parts.push(`where: { ${filterParts} }`);
     }
     if (orderBy) {
       parts.push(`orderBy: ${orderBy}`);
