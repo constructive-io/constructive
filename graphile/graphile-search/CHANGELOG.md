@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/constructive-io/constructive/compare/graphile-search@1.2.1...graphile-search@1.3.0) (2026-03-19)
+
+### Bug Fixes
+
+- address review feedback - sql ref, schema qualification, PK field, recency boost ([6b13584](https://github.com/constructive-io/constructive/commit/6b135847bcdbdda7589c07223ed0cba70af4751e))
+
+### Features
+
+- **graphile-search:** per-table [@search](https://github.com/search)Config smart tag & transparent chunk querying ([44fac9b](https://github.com/constructive-io/constructive/commit/44fac9b064932d8df18b5569d1bdb8d8aa065241))
+- schema-time validation, integration tests, chunk-aware codegen docs (Phases I+J+H) ([49f0e33](https://github.com/constructive-io/constructive/commit/49f0e333bff3f6805f3a0321efd68431246f8272))
+
 ## [1.2.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.2.0...graphile-search@1.2.1) (2026-03-17)
 
 **Note:** Version bump only for package graphile-search

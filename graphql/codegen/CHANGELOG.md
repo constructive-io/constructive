@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.4...@constructive-io/graphql-codegen@4.16.0) (2026-03-19)
+
+### Features
+
+- schema-time validation, integration tests, chunk-aware codegen docs (Phases I+J+H) ([49f0e33](https://github.com/constructive-io/constructive/commit/49f0e333bff3f6805f3a0321efd68431246f8272))
+
 ## [4.15.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.3...@constructive-io/graphql-codegen@4.15.4) (2026-03-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
