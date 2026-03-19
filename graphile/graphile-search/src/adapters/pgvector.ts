@@ -26,15 +26,23 @@ function isVectorCodec(codec: any): boolean {
  * Chunks table info detected from @hasChunks smart tag.
  */
 interface ChunksInfo {
+  chunksSchema: string | null;
   chunksTableName: string;
   parentFkField: string;
+  parentPkField: string;
   embeddingField: string;
 }
 
 /**
  * Read @hasChunks smart tag from codec extensions.
  * The tag value is a JSON object like:
- * { "chunksTable": "documents_chunks", "parentFk": "document_id", "embeddingField": "embedding" }
+ * {
+ *   "chunksTable": "documents_chunks",
+ *   "chunksSchema": "app_private",    // optional, defaults to parent table's schema
+ *   "parentFk": "document_id",         // optional, defaults to "parent_id"
+ *   "parentPk": "id",                  // optional, defaults to "id"
+ *   "embeddingField": "embedding"       // optional, defaults to "embedding"
+ * }
  */
 function getChunksInfo(codec: any): ChunksInfo | undefined {
   const tags = codec?.extensions?.tags;
@@ -59,9 +67,17 @@ function getChunksInfo(codec: any): ChunksInfo | undefined {
   }
 
   if (!parsed.chunksTable) return undefined;
+
+  // Resolve schema: explicit chunksSchema > parent codec schema > null
+  const chunksSchema = parsed.chunksSchema
+    || codec?.extensions?.pg?.schemaName
+    || null;
+
   return {
+    chunksSchema,
     chunksTableName: parsed.chunksTable,
     parentFkField: parsed.parentFk || 'parent_id',
+    parentPkField: parsed.parentPk || 'id',
     embeddingField: parsed.embeddingField || 'embedding',
   };
 }
@@ -237,16 +253,21 @@ export function createPgvectorAdapter(
       if (chunksInfo && (includeChunks !== false)) {
         // Chunk-aware query: find the closest chunk for each parent row
         // Uses a lateral subquery to get the minimum distance across all chunks
-        const chunksTable = sql.identifier(chunksInfo.chunksTableName);
+        const chunksTableRef = chunksInfo.chunksSchema
+          ? sql`${sql.identifier(chunksInfo.chunksSchema)}.${sql.identifier(chunksInfo.chunksTableName)}`
+          : sql`${sql.identifier(chunksInfo.chunksTableName)}`;
         const parentFk = sql.identifier(chunksInfo.parentFkField);
         const chunkEmbedding = sql.identifier(chunksInfo.embeddingField);
-        const parentId = sql`${alias}.${sql.identifier('id')}`;
+        // Use the configured PK field (defaults to 'id', but can be overridden via @hasChunks tag)
+        const parentId = sql`${alias}.${sql.identifier(chunksInfo.parentPkField)}`;
+        // Alias to avoid ambiguity when the chunks table name might collide
+        const chunksAlias = sql.identifier('__chunks');
 
-        // Subquery: SELECT MIN(distance) FROM chunks WHERE chunks.parent_fk = parent.id
+        // Subquery: SELECT MIN(distance) FROM chunks WHERE chunks.parent_fk = parent.pk
         const chunkDistanceSubquery = sql`(
-          SELECT MIN(${chunksTable}.${chunkEmbedding} ${sql.raw(operator)} ${vectorExpr})
-          FROM ${chunksTable}
-          WHERE ${chunksTable}.${parentFk} = ${parentId}
+          SELECT MIN(${chunksAlias}.${chunkEmbedding} ${sql.raw(operator)} ${vectorExpr})
+          FROM ${chunksTableRef} AS ${chunksAlias}
+          WHERE ${chunksAlias}.${parentFk} = ${parentId}
         )`;
 
         // Also compute direct parent distance if the parent has an embedding

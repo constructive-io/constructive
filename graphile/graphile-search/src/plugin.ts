@@ -101,6 +101,11 @@ function getSearchConfig(codec: PgCodecWithAttributes): SearchConfig | undefined
 
 /**
  * Normalize a raw score to 0..1 using the specified strategy.
+ *
+ * When strategy is 'sigmoid', sigmoid normalization is used for ALL adapters
+ * (both bounded and unbounded). When strategy is 'linear' (default),
+ * known-range adapters use linear normalization and unbounded adapters
+ * use sigmoid normalization as fallback.
  */
 function normalizeScore(
   score: number,
@@ -111,18 +116,18 @@ function normalizeScore(
   let normalized: number;
 
   if (range && strategy === 'linear') {
-    // Known range: linear normalization
+    // Known range + linear strategy: linear normalization
     const [min, max] = range;
     normalized = lowerIsBetter
       ? 1 - (score - min) / (max - min)
       : (score - min) / (max - min);
   } else {
-    // Unbounded or sigmoid strategy: sigmoid normalization
+    // Unbounded range, or explicit sigmoid strategy: sigmoid normalization
     if (lowerIsBetter) {
       // BM25: negative scores, more negative = better
       normalized = 1 / (1 + Math.abs(score));
     } else {
-      // Hypothetical unbounded higher-is-better
+      // Higher-is-better: map via sigmoid
       normalized = score / (1 + score);
     }
   }
@@ -133,18 +138,19 @@ function normalizeScore(
 /**
  * Apply recency boost to a normalized score.
  * Uses exponential decay based on age in days.
+ *
+ * @param normalizedScore - The already-normalized score (0..1)
+ * @param recencyValue - The raw recency field value (timestamp string from SQL row)
+ * @param decay - Decay factor per day (e.g. 0.95 means 5% penalty per day)
  */
 function applyRecencyBoost(
   normalizedScore: number,
-  row: any,
-  recencyField: string,
+  recencyValue: any,
   decay: number,
 ): number {
-  // Try to find the recency field in the row by common column naming patterns
-  const fieldValue = row[recencyField];
-  if (fieldValue == null) return normalizedScore;
+  if (recencyValue == null) return normalizedScore;
 
-  const fieldDate = new Date(fieldValue);
+  const fieldDate = new Date(recencyValue);
   if (isNaN(fieldDate.getTime())) return normalizedScore;
 
   const now = new Date();
@@ -367,6 +373,7 @@ export function createUnifiedSearchPlugin(
         GraphQLObjectType_fields(fields, build, context) {
           const {
             inflection,
+            sql,
             graphql: { GraphQLFloat },
             grafast: { lambda },
           } = build;
@@ -515,6 +522,17 @@ export function createUnifiedSearchPlugin(
                       // Collect all meta steps for all adapters
                       const $metaSteps = allMetaKeys.map((mk) => $select.getMeta(mk.metaKey));
 
+                      // If recency boost is configured, inject the recency field into
+                      // the SQL SELECT so we can read it by numeric index at runtime.
+                      let recencySelectIndex: number | null = null;
+                      if (boostRecent && boostRecencyField) {
+                        const recencyColumnSql = sql`${$select.alias}.${sql.identifier(boostRecencyField)}::text`;
+                        recencySelectIndex = $select.selectAndReturnIndex(recencyColumnSql);
+                      }
+
+                      // Capture the index in a local const for the lambda closure
+                      const capturedRecencyIndex = recencySelectIndex;
+
                       return lambda(
                         [...$metaSteps, $row],
                         (args: readonly any[]) => {
@@ -523,6 +541,11 @@ export function createUnifiedSearchPlugin(
 
                           let weightedSum = 0;
                           let totalWeight = 0;
+
+                          // Read recency value from the injected SELECT column
+                          const recencyValue = (boostRecent && capturedRecencyIndex != null)
+                            ? row[capturedRecencyIndex]
+                            : null;
 
                           for (let i = 0; i < allMetaKeys.length; i++) {
                             const details = args[i] as SearchScoreDetails | null;
@@ -546,11 +569,10 @@ export function createUnifiedSearchPlugin(
                             );
 
                             // Apply recency boost if configured
-                            if (boostRecent) {
+                            if (boostRecent && recencyValue != null) {
                               normalized = applyRecencyBoost(
                                 normalized,
-                                row,
-                                boostRecencyField,
+                                recencyValue,
                                 boostRecencyDecay,
                               );
                             }

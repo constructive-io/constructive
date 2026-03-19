@@ -50,6 +50,7 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
               embeddingField: 'embedding',
             },
           },
+          pg: { schemaName: 'app_public' },
         },
       };
 
@@ -58,8 +59,10 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       expect(columns[0].attributeName).toBe('embedding');
       expect(columns[0].adapterData).toEqual({
         chunksInfo: {
+          chunksSchema: 'app_public',
           chunksTableName: 'documents_chunks',
           parentFkField: 'document_id',
+          parentPkField: 'id',
           embeddingField: 'embedding',
         },
       });
@@ -75,7 +78,9 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
           tags: {
             hasChunks: JSON.stringify({
               chunksTable: 'doc_chunks',
+              chunksSchema: 'private_schema',
               parentFk: 'doc_id',
+              parentPk: 'doc_uuid',
               embeddingField: 'vec',
             }),
           },
@@ -86,14 +91,16 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       expect(columns).toHaveLength(1);
       expect(columns[0].adapterData).toEqual({
         chunksInfo: {
+          chunksSchema: 'private_schema',
           chunksTableName: 'doc_chunks',
           parentFkField: 'doc_id',
+          parentPkField: 'doc_uuid',
           embeddingField: 'vec',
         },
       });
     });
 
-    it('uses default parentFk and embeddingField when not specified', () => {
+    it('uses default parentFk, parentPk, and embeddingField when not specified', () => {
       const codec = {
         name: 'documents',
         attributes: {
@@ -109,8 +116,36 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       const columns = adapter.detectColumns(codec, {});
       expect(columns[0].adapterData).toEqual({
         chunksInfo: {
+          chunksSchema: null,
           chunksTableName: 'my_chunks',
           parentFkField: 'parent_id',
+          parentPkField: 'id',
+          embeddingField: 'embedding',
+        },
+      });
+    });
+
+    it('inherits schema from parent codec when not explicitly set', () => {
+      const codec = {
+        name: 'documents',
+        attributes: {
+          embedding: { codec: { name: 'vector' } },
+        },
+        extensions: {
+          tags: {
+            hasChunks: { chunksTable: 'my_chunks' },
+          },
+          pg: { schemaName: 'my_schema' },
+        },
+      };
+
+      const columns = adapter.detectColumns(codec, {});
+      expect(columns[0].adapterData).toEqual({
+        chunksInfo: {
+          chunksSchema: 'my_schema',
+          chunksTableName: 'my_chunks',
+          parentFkField: 'parent_id',
+          parentPkField: 'id',
           embeddingField: 'embedding',
         },
       });
@@ -223,8 +258,10 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
           attributeName: 'embedding',
           adapterData: {
             chunksInfo: {
+              chunksSchema: null,
               chunksTableName: 'documents_chunks',
               parentFkField: 'document_id',
+              parentPkField: 'id',
               embeddingField: 'embedding',
             },
           },
@@ -248,8 +285,10 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
           attributeName: 'embedding',
           adapterData: {
             chunksInfo: {
+              chunksSchema: null,
               chunksTableName: 'documents_chunks',
               parentFkField: 'document_id',
+              parentPkField: 'id',
               embeddingField: 'embedding',
             },
           },
@@ -263,6 +302,34 @@ describe('pgvector adapter — chunk querying (Phase E)', () => {
       const scoreStr = String(result!.scoreExpression);
       expect(scoreStr).not.toContain('LEAST');
       expect(scoreStr).not.toContain('documents_chunks');
+    });
+
+    it('generates schema-qualified chunk query when chunksSchema is set', () => {
+      const result = adapter.buildFilterApply(
+        sql,
+        'tbl' as any,
+        {
+          attributeName: 'embedding',
+          adapterData: {
+            chunksInfo: {
+              chunksSchema: 'app_private',
+              chunksTableName: 'doc_chunks',
+              parentFkField: 'document_id',
+              parentPkField: 'row_id',
+              embeddingField: 'vec',
+            },
+          },
+        },
+        { vector: [1, 0, 0], metric: 'COSINE' },
+        {},
+      );
+
+      expect(result).not.toBeNull();
+      const scoreStr = String(result!.scoreExpression);
+      // Should contain both schema and table name
+      expect(scoreStr).toContain('app_private');
+      expect(scoreStr).toContain('doc_chunks');
+      expect(scoreStr).toContain('LEAST');
     });
   });
 });
