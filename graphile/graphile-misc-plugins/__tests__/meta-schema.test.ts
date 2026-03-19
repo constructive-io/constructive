@@ -1560,19 +1560,19 @@ describe('MetaSchemaPlugin', () => {
       expect(post.relations.manyToMany).toHaveLength(1);
       expect(post.relations.manyToMany[0]).toMatchObject({
         fieldName: 'tags',
-        type: 'tag',
-        junctionTable: { name: 'post_tag' },
+        type: 'Tag',
+        junctionTable: { name: 'PostTag' },
         junctionLeftConstraint: {
           name: 'post_post_tags',
-          referencedTable: 'post',
+          referencedTable: 'Post',
           referencedFields: ['id'],
         },
         junctionRightConstraint: {
           name: 'post_tag_tag_fkey',
-          referencedTable: 'tag',
+          referencedTable: 'Tag',
           referencedFields: ['id'],
         },
-        rightTable: { name: 'tag' },
+        rightTable: { name: 'Tag' },
       });
       expect(post.relations.manyToMany[0].junctionLeftKeyAttributes.map((f: any) => f.name)).toEqual([
         'postId',
@@ -1752,13 +1752,13 @@ describe('MetaSchemaPlugin', () => {
       const agentFk = agentCar.foreignKeyConstraints.find(
         (fk: any) => fk.name === 'agentsByMyAgentId',
       );
-      expect(agentFk.refTable.name).toBe('agent');
+      expect(agentFk.refTable.name).toBe('Agent');
       expect(agentFk.fields[0].name).toBe('agentId');
 
       const carFk = agentCar.foreignKeyConstraints.find(
         (fk: any) => fk.name === 'carsByMyCarId',
       );
-      expect(carFk.refTable.name).toBe('car');
+      expect(carFk.refTable.name).toBe('Car');
       expect(carFk.fields[0].name).toBe('carId');
     });
 
@@ -1908,10 +1908,10 @@ describe('MetaSchemaPlugin', () => {
       // Should resolve relation from registry fallback
       expect(child.relations.belongsTo).toHaveLength(1);
       expect(child.relations.belongsTo[0].fieldName).toBe('parentByMyParentId');
-      expect(child.relations.belongsTo[0].type).toBe('parent');
+      expect(child.relations.belongsTo[0].type).toBe('Parent');
 
       expect(child.foreignKeyConstraints).toHaveLength(1);
-      expect(child.foreignKeyConstraints[0].refTable.name).toBe('parent');
+      expect(child.foreignKeyConstraints[0].refTable.name).toBe('Parent');
     });
 
     it('M:N + junction belongsTo work together with isReferencee undefined', () => {
@@ -2031,9 +2031,9 @@ describe('MetaSchemaPlugin', () => {
       expect(agent.relations.manyToMany).toHaveLength(1);
       expect(agent.relations.manyToMany[0]).toMatchObject({
         fieldName: 'cars',
-        type: 'car',
-        junctionTable: { name: 'agent_car' },
-        rightTable: { name: 'car' },
+        type: 'Car',
+        junctionTable: { name: 'AgentCar' },
+        rightTable: { name: 'Car' },
       });
 
       // Car: hasMany + manyToMany
@@ -2041,9 +2041,9 @@ describe('MetaSchemaPlugin', () => {
       expect(car.relations.manyToMany).toHaveLength(1);
       expect(car.relations.manyToMany[0]).toMatchObject({
         fieldName: 'agents',
-        type: 'agent',
-        junctionTable: { name: 'agent_car' },
-        rightTable: { name: 'agent' },
+        type: 'Agent',
+        junctionTable: { name: 'AgentCar' },
+        rightTable: { name: 'Agent' },
       });
 
       // Junction: belongsTo (NOT empty!) + foreignKeyConstraints
