@@ -293,8 +293,12 @@ function getRelatedTableScalarFields(
     return {};
   }
 
-  // Find the related table in allTables
-  const relatedTable = allTables.find((t) => t.name === referencedTableName);
+  // Find the related table in allTables using fuzzy matching.
+  // PostGraphile v5 uses different inflections in different contexts:
+  // - table.name: PascalCase tableType (e.g., "CarUser")
+  // - relation referencedBy.name: camelCase source name (e.g., "carUsers")
+  // - query.all: merged lowercase (e.g., "carusers")
+  const relatedTable = findRelatedTableByName(referencedTableName, allTables);
   if (!relatedTable) {
     // Related table not found in schema - return empty selection
     return {};
@@ -352,6 +356,18 @@ function getRelatedTableScalarFields(
   const selection: Record<string, boolean> = {};
   for (const fieldName of included) selection[fieldName] = true;
   return selection;
+}
+
+/**
+ * Find a table by name. The _meta endpoint emits consistent inflected
+ * PascalCase names for both table.name and relation target names, so
+ * an exact match is sufficient.
+ */
+function findRelatedTableByName(
+  name: string,
+  allTables: readonly CleanTable[],
+): CleanTable | null {
+  return allTables.find((tbl) => tbl.name === name) ?? null;
 }
 
 /**

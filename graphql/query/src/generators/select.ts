@@ -594,6 +594,11 @@ function generateFieldSelectionsFromOptions(
         }
       });
 
+      // Guard: skip relation fields with empty nested selections (would generate invalid GraphQL)
+      if (nestedSelections.length === 0) {
+        return;
+      }
+
       // Check if this is a hasMany relation that uses Connection pattern
       const relationInfo = getRelationInfo(fieldName, table);
       if (
@@ -735,6 +740,18 @@ function getRelationInfo(
 }
 
 /**
+ * Find a table by name. The _meta endpoint emits consistent inflected
+ * PascalCase names for both table.name and relation target names, so
+ * an exact match is sufficient.
+ */
+function findTableByName(
+  name: string,
+  allTables: readonly CleanTable[],
+): CleanTable | null {
+  return allTables.find((tbl) => tbl.name === name) ?? null;
+}
+
+/**
  * Find the related table for a given relation field
  */
 function findRelatedTable(
@@ -787,8 +804,8 @@ function findRelatedTable(
     return null;
   }
 
-  // Find the related table in allTables
-  return allTables.find((tbl) => tbl.name === referencedTableName) || null;
+  // Find the related table using fuzzy matching
+  return findTableByName(referencedTableName, allTables);
 }
 
 /**
