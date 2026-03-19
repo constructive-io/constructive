@@ -290,10 +290,71 @@ export const uploadRoute: RequestHandler[] = [
 
     try {
       const readStream = fs.createReadStream(req.file.path);
+
+      // Source back-reference from form fields (optional).
+      // Dashboard sends GraphQL-level names; we resolve PG-level names via metaschema.
+      const gqlTableName = req.body?.source_table;   // GraphQL type, e.g. "Photo"
+      const gqlColumnName = req.body?.source_column;  // GraphQL field, e.g. "img"
+      const sourceId = req.body?.source_id;           // Row UUID
+      let source: { table: string; column: string; id: string } | null = null;
+
+      if (gqlTableName && gqlColumnName && sourceId && req.api?.databaseId) {
+        try {
+          const pgCacheModule = await import('pg-cache');
+          const pool = pgCacheModule.getPgPool({
+            host: process.env.PGHOST || 'localhost',
+            port: Number(process.env.PGPORT || 5432),
+            database: process.env.PGDATABASE || 'constructive',
+            user: process.env.PGUSER || 'postgres',
+            password: process.env.PGPASSWORD || 'password',
+          });
+          // Look up PG schema.table from metaschema.
+          // Try exact match on lowercase plural (Photo → photos), then singular.
+          const candidates = [
+            gqlTableName.toLowerCase() + 's',  // Photo → photos
+            gqlTableName.toLowerCase(),         // Photo → photo
+          ];
+          const { rows } = await pool.query(
+            `SELECT s.name AS schema_name, t.name AS table_name
+             FROM metaschema_public."table" t
+             JOIN metaschema_public.schema s ON s.id = t.schema_id
+             WHERE s.database_id = $1
+             AND t.name = ANY($2)
+             LIMIT 1`,
+            [req.api.databaseId, candidates]
+          );
+          if (rows.length > 0) {
+            source = {
+              table: `${rows[0].schema_name}.${rows[0].table_name}`,
+              column: gqlColumnName,
+              id: sourceId,
+            };
+          } else {
+            // Fallback: search information_schema for matching table name
+            const fallback = await pool.query(
+              `SELECT table_schema, table_name FROM information_schema.tables
+               WHERE table_name = ANY($1) AND table_schema NOT IN ('pg_catalog', 'information_schema')
+               LIMIT 1`,
+              [candidates]
+            );
+            if (fallback.rows.length > 0) {
+              source = {
+                table: `${fallback.rows[0].table_schema}.${fallback.rows[0].table_name}`,
+                column: gqlColumnName,
+                id: sourceId,
+              };
+            }
+          }
+        } catch (resolveErr) {
+          uploadLog.debug('[upload] Failed to resolve source back-reference', resolveErr);
+        }
+      }
+
       const result = await streamToStorage(readStream, req.file.originalname, {
         databaseId: req.api?.databaseId,
         userId: req.token.user_id,
         bucketKey: 'default',
+        source,
       });
 
       uploadLog.debug(

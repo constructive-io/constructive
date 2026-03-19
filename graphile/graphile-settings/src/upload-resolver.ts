@@ -120,13 +120,18 @@ async function insertFileRecord(
 	etag: string,
 	createdBy: string | null,
 	contentType: string | null,
+	source?: { table: string; column: string; id: string } | null,
 ): Promise<void> {
 	const pool = getPgPool();
 	await pool.query(
 		`INSERT INTO files_store_public.files
-		   (id, database_id, bucket_key, key, etag, created_by, mime_type)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-		[fileId, databaseId, bucketKey, key, etag, createdBy, contentType],
+		   (id, database_id, bucket_key, key, etag, created_by, mime_type,
+		    source_table, source_column, source_id)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+		[
+			fileId, databaseId, bucketKey, key, etag, createdBy, contentType,
+			source?.table || null, source?.column || null, source?.id || null,
+		],
 	);
 }
 
@@ -149,7 +154,12 @@ function extractContextInfo(context: any): { databaseId: string | null; userId: 
 export async function streamToStorage(
 	readStream: Readable,
 	filename: string,
-	opts?: { databaseId?: string; userId?: string; bucketKey?: string },
+	opts?: {
+		databaseId?: string;
+		userId?: string;
+		bucketKey?: string;
+		source?: { table: string; column: string; id: string } | null;
+	},
 ): Promise<{ url: string; filename: string; mime: string; key?: string }> {
 	const storage = getStorageProvider();
 	const bucketKey = opts?.bucketKey || 'default';
@@ -166,7 +176,7 @@ export async function streamToStorage(
 
 	const result = await storage.upload(key, detected.stream, { contentType });
 
-	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, opts?.userId || null, contentType);
+	await insertFileRecord(fileId, databaseId, bucketKey, key, result.etag, opts?.userId || null, contentType, opts?.source);
 
 	const url = await storage.presignGet(key, 3600);
 	return { key, url, filename, mime: contentType };
