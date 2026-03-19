@@ -67,7 +67,7 @@ CREATE TABLE files_store_public.files (
   source_id     uuid,
   processing_started_at timestamptz,
   created_by    uuid,
-  origin_id     uuid,
+  versions      jsonb,
   mime_type     text,
   created_at    timestamptz   NOT NULL DEFAULT now(),
   updated_at    timestamptz   NOT NULL DEFAULT now(),
@@ -87,7 +87,7 @@ CREATE TABLE files_store_public.files (
 );
 
 COMMENT ON TABLE files_store_public.files IS
-  'Operational index for S3 objects. Each row = one physical S3 object (including generated versions). NOT a source of truth for file metadata -- domain tables own that.';
+  'Operational index for S3 objects. One row per uploaded file. Generated versions (thumbnail, medium) stored inline in the versions JSONB column.';
 COMMENT ON COLUMN files_store_public.files.key IS
   'Full S3 object key. Format: {database_id}/{bucket_key}/{uuid}_{version_name}. Origin files use _origin suffix.';
 COMMENT ON COLUMN files_store_public.files.etag IS
@@ -102,22 +102,11 @@ COMMENT ON COLUMN files_store_public.files.source_column IS
   'Column name on the source table (e.g. profile_picture). NULL until domain trigger populates it.';
 COMMENT ON COLUMN files_store_public.files.source_id IS
   'Primary key of the row in the source table. NULL until domain trigger populates it.';
-COMMENT ON COLUMN files_store_public.files.origin_id IS
-  'Self-referential FK to the origin file. NULL for origin rows, set for version rows (thumbnail, medium).';
+COMMENT ON COLUMN files_store_public.files.versions IS
+  'JSONB array of generated versions. Each entry: { key, mime, width, height }. NULL until process-image completes. Non-image files remain NULL.';
 COMMENT ON COLUMN files_store_public.files.mime_type IS
   'Detected MIME type of the file. Set at upload time for origins, at processing time for versions.';
 
--- Self-referential FK (version -> origin, same table)
--- ON DELETE CASCADE: DB-level safety net. The primary deletion path is
--- per-row delete-s3-object jobs (each row gets its own job via trigger).
--- CASCADE only fires if an origin row is directly DELETEd before its
--- version rows -- in that case, version DB rows are removed but version
--- S3 objects are still cleaned up by their already-enqueued jobs.
-ALTER TABLE files_store_public.files
-  ADD CONSTRAINT files_origin_fk
-  FOREIGN KEY (origin_id, database_id)
-  REFERENCES files_store_public.files (id, database_id)
-  ON DELETE CASCADE;
 
 -- ---------------------------------------------------------------------------
 -- 3. Buckets Table
@@ -182,19 +171,12 @@ CREATE INDEX files_deleting_idx
 CREATE INDEX files_created_at_brin_idx
   ON files_store_public.files USING brin (created_at);
 
--- Version lookups: "find all versions of this origin"
-CREATE INDEX files_origin_id_idx
-  ON files_store_public.files (origin_id, database_id)
-  WHERE origin_id IS NOT NULL;
 
 -- ---------------------------------------------------------------------------
 -- 5. Triggers
 -- ---------------------------------------------------------------------------
 
 -- 5a. AFTER INSERT -- enqueue process-image job
--- NOTE: Version rows are inserted with status = 'ready', which intentionally
--- bypasses this trigger (condition: NEW.status = 'pending'). Only origin
--- uploads (status = 'pending') need processing.
 
 CREATE OR REPLACE FUNCTION files_store_public.files_after_insert_queue_processing()
 RETURNS trigger AS $$
@@ -219,7 +201,7 @@ CREATE TRIGGER files_after_insert_queue_processing
   EXECUTE FUNCTION files_store_public.files_after_insert_queue_processing();
 
 COMMENT ON TRIGGER files_after_insert_queue_processing ON files_store_public.files IS
-  'Enqueues process-image job for new origin uploads. Version rows inserted as ready intentionally bypass this trigger -- they do not need processing.';
+  'Enqueues process-image job for new uploads (status=pending).';
 
 -- 5b. BEFORE UPDATE -- timestamp + state machine
 
@@ -264,14 +246,25 @@ COMMENT ON TRIGGER files_before_update_timestamp ON files_store_public.files IS
 
 CREATE OR REPLACE FUNCTION files_store_public.files_after_update_queue_deletion()
 RETURNS trigger AS $$
+DECLARE
+  version_keys json;
 BEGIN
+  -- Collect version S3 keys from the versions JSONB column
+  IF NEW.versions IS NOT NULL THEN
+    SELECT json_agg(v->>'key')
+    INTO version_keys
+    FROM jsonb_array_elements(NEW.versions) v
+    WHERE v->>'key' IS NOT NULL;
+  END IF;
+
   PERFORM app_jobs.add_job(
     NEW.database_id,
     'delete-s3-object',
     json_build_object(
       'file_id', NEW.id,
       'database_id', NEW.database_id,
-      'key', NEW.key
+      'key', NEW.key,
+      'version_keys', COALESCE(version_keys, '[]'::json)
     ),
     job_key := 'delete:' || NEW.id::text
   );
@@ -286,7 +279,7 @@ CREATE TRIGGER files_after_update_queue_deletion
   EXECUTE FUNCTION files_store_public.files_after_update_queue_deletion();
 
 COMMENT ON TRIGGER files_after_update_queue_deletion ON files_store_public.files IS
-  'Enqueues delete-s3-object job when a file transitions to deleting status. Each version row gets its own deletion job.';
+  'Enqueues delete-s3-object job when a file transitions to deleting status. Version S3 keys from the versions JSONB column are included in the job payload.';
 
 -- 5d. AFTER UPDATE -- re-enqueue process-image on error->pending retry
 
@@ -423,10 +416,10 @@ DECLARE
   old_val jsonb;
   new_key text;
   old_key text;
-  db_id integer;
-  origin_file_id uuid;
-  old_origin_file_id uuid;
-  versions_json json;
+  db_id uuid;
+  file_id uuid;
+  old_file_id uuid;
+  versions_json jsonb;
 BEGIN
   -- Get the database_id from session context
   db_id := current_setting('app.database_id')::uuid;
@@ -444,71 +437,36 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  -- Handle file replacement: mark old files as deleting
+  -- Handle file replacement: mark old file as deleting
   IF old_key IS NOT NULL AND old_key <> '' THEN
-    -- Find old origin by exact key match
-    SELECT id INTO old_origin_file_id
+    SELECT id INTO old_file_id
     FROM files_store_public.files
     WHERE key = old_key AND database_id = db_id;
 
-    IF old_origin_file_id IS NOT NULL THEN
-      -- Mark old origin as deleting
+    IF old_file_id IS NOT NULL THEN
       UPDATE files_store_public.files
       SET status = 'deleting', status_reason = 'replaced by new file'
-      WHERE id = old_origin_file_id AND database_id = db_id
-        AND status NOT IN ('deleting');
-
-      -- Mark old versions as deleting (index hit on origin_id)
-      UPDATE files_store_public.files
-      SET status = 'deleting', status_reason = 'replaced by new file'
-      WHERE origin_id = old_origin_file_id AND database_id = db_id
+      WHERE id = old_file_id AND database_id = db_id
         AND status NOT IN ('deleting');
     END IF;
   END IF;
 
-  -- Populate back-reference on new file (origin + versions)
+  -- Populate back-reference on new file
   IF new_key IS NOT NULL AND new_key <> '' THEN
-    -- Find origin by exact key match
-    SELECT id INTO origin_file_id
+    SELECT id, versions INTO file_id, versions_json
     FROM files_store_public.files
     WHERE key = new_key AND database_id = db_id;
 
-    IF origin_file_id IS NOT NULL THEN
-      -- Update origin row
+    IF file_id IS NOT NULL THEN
+      -- Update file row with source back-reference
       UPDATE files_store_public.files
       SET source_table = table_name, source_column = col_name, source_id = NEW.id
-      WHERE id = origin_file_id AND database_id = db_id;
-
-      -- Update version rows (index hit on origin_id)
-      UPDATE files_store_public.files
-      SET source_table = table_name, source_column = col_name, source_id = NEW.id
-      WHERE origin_id = origin_file_id AND database_id = db_id;
+      WHERE id = file_id AND database_id = db_id;
 
       -- Backfill versions into domain JSONB if process-image already completed.
-      -- This fixes the race condition where process-image runs before domain
-      -- association (two-step upload path) and can't write back versions.
-      -- Uses mime_type column for accurate MIME (not hardcoded).
-      SELECT json_agg(json_build_object(
-        'key', f.key,
-        'mime', COALESCE(f.mime_type, 'image/jpeg'),
-        'width', 0,
-        'height', 0
-      ))
-      INTO versions_json
-      FROM files_store_public.files f
-      WHERE f.origin_id = origin_file_id
-        AND f.database_id = db_id
-        AND f.status = 'ready';
-
+      -- RECURSION GUARD: Only the 'versions' subfield is modified -- the 'key'
+      -- field is unchanged, so the IS NOT DISTINCT FROM check above returns early.
       IF versions_json IS NOT NULL THEN
-        -- RECURSION GUARD: This UPDATE re-fires the current trigger on the
-        -- domain table. It is safe because only the 'versions' subfield of
-        -- the JSONB column is modified -- the 'key' field is unchanged.
-        -- The IS NOT DISTINCT FROM check at the top of this function
-        -- compares old_key vs new_key (both extracted via ->> 'key'),
-        -- detects they are equal, and returns early.
-        -- DO NOT change the early-return comparison to use the full JSONB
-        -- value instead of just the 'key' field, or this will infinite-loop.
         EXECUTE format(
           'UPDATE %s SET %I = jsonb_set(COALESCE(%I, ''{}''::jsonb), ''{versions}'', $1::jsonb) WHERE id = $2',
           table_name, col_name, col_name
@@ -533,7 +491,7 @@ RETURNS trigger AS $$
 DECLARE
   col_name text := TG_ARGV[0];
   table_name text := TG_ARGV[1];
-  db_id integer;
+  db_id uuid;
 BEGIN
   db_id := current_setting('app.database_id')::uuid;
 
@@ -553,32 +511,7 @@ $$ LANGUAGE plpgsql;
 COMMENT ON FUNCTION files_store_public.mark_files_deleting_on_source_delete() IS
   'Generic trigger function for domain tables. Marks all associated files as deleting when a domain row is deleted.';
 
--- 7c. Propagate deleting status from origin to version rows.
--- When an origin transitions to 'deleting', mark all its versions as 'deleting' too.
--- Each version row's AFTER UPDATE trigger then enqueues its own delete-s3-object job.
-
-CREATE OR REPLACE FUNCTION files_store_public.files_propagate_deleting_to_versions()
-RETURNS trigger AS $$
-BEGIN
-  UPDATE files_store_public.files
-  SET status = 'deleting', status_reason = COALESCE(NEW.status_reason, 'origin marked deleting')
-  WHERE origin_id = NEW.id
-    AND database_id = NEW.database_id
-    AND status NOT IN ('deleting');
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER files_after_update_propagate_deleting
-  AFTER UPDATE ON files_store_public.files
-  FOR EACH ROW
-  WHEN (NEW.status = 'deleting' AND OLD.status <> 'deleting' AND NEW.origin_id IS NULL)
-  EXECUTE FUNCTION files_store_public.files_propagate_deleting_to_versions();
-
-COMMENT ON TRIGGER files_after_update_propagate_deleting ON files_store_public.files IS
-  'When an origin file transitions to deleting, propagate that status to all version rows via origin_id. Each version then gets its own delete-s3-object job via the existing files_after_update_queue_deletion trigger. The WHEN clause filters to origin rows only (origin_id IS NULL).';
-
--- 7d. CREATE TRIGGER statements for all 6 tables, 9 columns
+-- 7c. CREATE TRIGGER statements for all 6 tables, 9 columns
 --
 -- Each domain column gets two triggers:
 --   - AFTER UPDATE: back-reference population + file replacement
