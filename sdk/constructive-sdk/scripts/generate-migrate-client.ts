@@ -25,6 +25,9 @@ async function main() {
     orm: true,
     reactQuery: false,
     verbose: true,
+    codegen: {
+      condition: true,
+    },
     docs: {
       agents: false,
       mcp: false,

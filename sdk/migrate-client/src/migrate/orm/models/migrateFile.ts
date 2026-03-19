@@ -28,6 +28,7 @@ import type {
   MigrateFileWithRelations,
   MigrateFileSelect,
   MigrateFileFilter,
+  MigrateFileCondition,
   MigrateFileOrderBy,
   CreateMigrateFileInput,
   UpdateMigrateFileInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class MigrateFileModel {
   constructor(private client: OrmClient) {}
   findMany<S extends MigrateFileSelect>(
-    args: FindManyArgs<S, MigrateFileFilter, never, MigrateFileOrderBy> & {
+    args: FindManyArgs<S, MigrateFileFilter, MigrateFileCondition, MigrateFileOrderBy> & {
       select: S;
     } & StrictSelect<S, MigrateFileSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class MigrateFileModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class MigrateFileModel {
       },
       'MigrateFileFilter',
       'MigrateFileOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'MigrateFileCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class MigrateFileModel {
     });
   }
   findFirst<S extends MigrateFileSelect>(
-    args: FindFirstArgs<S, MigrateFileFilter> & {
+    args: FindFirstArgs<S, MigrateFileFilter, MigrateFileCondition> & {
       select: S;
     } & StrictSelect<S, MigrateFileSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class MigrateFileModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'MigrateFileFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'MigrateFileCondition'
     );
     return new QueryBuilder({
       client: this.client,

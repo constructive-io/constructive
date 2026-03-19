@@ -319,6 +319,27 @@ export interface SqlActionFilter {
   or?: SqlActionFilter[];
   not?: SqlActionFilter;
 }
+// ============ Table Condition Types ============
+export interface MigrateFileCondition {
+  id?: string | null;
+  databaseId?: string | null;
+  upload?: unknown | null;
+}
+export interface SqlActionCondition {
+  id?: number | null;
+  name?: string | null;
+  databaseId?: string | null;
+  deploy?: string | null;
+  deps?: string | null;
+  payload?: unknown | null;
+  content?: string | null;
+  revert?: string | null;
+  verify?: string | null;
+  createdAt?: string | null;
+  action?: string | null;
+  actionId?: string | null;
+  actorId?: string | null;
+}
 // ============ OrderBy Types ============
 export type MigrateFileOrderBy =
   | 'NATURAL'

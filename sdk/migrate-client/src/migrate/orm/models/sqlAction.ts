@@ -28,6 +28,7 @@ import type {
   SqlActionWithRelations,
   SqlActionSelect,
   SqlActionFilter,
+  SqlActionCondition,
   SqlActionOrderBy,
   CreateSqlActionInput,
   UpdateSqlActionInput,
@@ -37,7 +38,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SqlActionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SqlActionSelect>(
-    args: FindManyArgs<S, SqlActionFilter, never, SqlActionOrderBy> & {
+    args: FindManyArgs<S, SqlActionFilter, SqlActionCondition, SqlActionOrderBy> & {
       select: S;
     } & StrictSelect<S, SqlActionSelect>
   ): QueryBuilder<{
@@ -49,6 +50,7 @@ export class SqlActionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
         orderBy: args?.orderBy as string[] | undefined,
         first: args?.first,
         last: args?.last,
@@ -58,7 +60,8 @@ export class SqlActionModel {
       },
       'SqlActionFilter',
       'SqlActionOrderBy',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'SqlActionCondition'
     );
     return new QueryBuilder({
       client: this.client,
@@ -70,7 +73,7 @@ export class SqlActionModel {
     });
   }
   findFirst<S extends SqlActionSelect>(
-    args: FindFirstArgs<S, SqlActionFilter> & {
+    args: FindFirstArgs<S, SqlActionFilter, SqlActionCondition> & {
       select: S;
     } & StrictSelect<S, SqlActionSelect>
   ): QueryBuilder<{
@@ -84,9 +87,11 @@ export class SqlActionModel {
       args.select,
       {
         where: args?.where,
+        condition: args?.condition,
       },
       'SqlActionFilter',
-      connectionFieldsMap
+      connectionFieldsMap,
+      'SqlActionCondition'
     );
     return new QueryBuilder({
       client: this.client,
