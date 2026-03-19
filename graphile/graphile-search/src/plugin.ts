@@ -67,6 +67,96 @@ interface SearchScoreDetails {
 }
 
 /**
+ * Per-table search configuration read from the @searchConfig smart tag.
+ * Written by DataFullTextSearch, DataBm25, and DataSearch in constructive-db.
+ */
+interface SearchConfig {
+  weights?: Record<string, number>;
+  normalization?: 'linear' | 'sigmoid';
+  boost_recent?: boolean;
+  boost_recency_field?: string;
+  boost_recency_decay?: number;
+}
+
+/**
+ * Read the @searchConfig smart tag from a codec's extensions.
+ * Returns undefined if no searchConfig tag is present.
+ */
+function getSearchConfig(codec: PgCodecWithAttributes): SearchConfig | undefined {
+  const tags = (codec.extensions as any)?.tags;
+  if (!tags) return undefined;
+  const raw = tags.searchConfig;
+  if (!raw) return undefined;
+  // Smart tags can be strings (JSON-encoded) or already-parsed objects
+  if (typeof raw === 'string') {
+    try {
+      return JSON.parse(raw) as SearchConfig;
+    } catch {
+      return undefined;
+    }
+  }
+  if (typeof raw === 'object') return raw as SearchConfig;
+  return undefined;
+}
+
+/**
+ * Normalize a raw score to 0..1 using the specified strategy.
+ */
+function normalizeScore(
+  score: number,
+  lowerIsBetter: boolean,
+  range: [number, number] | null,
+  strategy: 'linear' | 'sigmoid' = 'linear',
+): number {
+  let normalized: number;
+
+  if (range && strategy === 'linear') {
+    // Known range: linear normalization
+    const [min, max] = range;
+    normalized = lowerIsBetter
+      ? 1 - (score - min) / (max - min)
+      : (score - min) / (max - min);
+  } else {
+    // Unbounded or sigmoid strategy: sigmoid normalization
+    if (lowerIsBetter) {
+      // BM25: negative scores, more negative = better
+      normalized = 1 / (1 + Math.abs(score));
+    } else {
+      // Hypothetical unbounded higher-is-better
+      normalized = score / (1 + score);
+    }
+  }
+
+  return Math.max(0, Math.min(1, normalized));
+}
+
+/**
+ * Apply recency boost to a normalized score.
+ * Uses exponential decay based on age in days.
+ */
+function applyRecencyBoost(
+  normalizedScore: number,
+  row: any,
+  recencyField: string,
+  decay: number,
+): number {
+  // Try to find the recency field in the row by common column naming patterns
+  const fieldValue = row[recencyField];
+  if (fieldValue == null) return normalizedScore;
+
+  const fieldDate = new Date(fieldValue);
+  if (isNaN(fieldDate.getTime())) return normalizedScore;
+
+  const now = new Date();
+  const ageInDays = (now.getTime() - fieldDate.getTime()) / (1000 * 60 * 60 * 24);
+  if (ageInDays < 0) return normalizedScore; // future dates get no penalty
+
+  // Exponential decay: boost = decay^ageInDays
+  const boost = Math.pow(decay, ageInDays);
+  return normalizedScore * boost;
+}
+
+/**
  * Cache key for discovered columns per adapter per codec.
  * Built during the first hook invocation and reused across hooks.
  */
@@ -383,6 +473,19 @@ export function createUnifiedSearchPlugin(
               }
             }
 
+            // Read per-table @searchConfig smart tag (written by DataSearch/DataFullTextSearch/DataBm25)
+            // Per-table config overrides global searchScoreWeights
+            const tableSearchConfig = getSearchConfig(codec);
+
+            // Resolve effective weights: per-table > global > equal (undefined)
+            const effectiveWeights = tableSearchConfig?.weights ?? options.searchScoreWeights;
+            // Resolve normalization strategy: per-table > default 'linear'
+            const normalizationStrategy = tableSearchConfig?.normalization ?? 'linear';
+            // Recency boost config from per-table smart tag
+            const boostRecent = tableSearchConfig?.boost_recent ?? false;
+            const boostRecencyField = tableSearchConfig?.boost_recency_field ?? 'updated_at';
+            const boostRecencyDecay = tableSearchConfig?.boost_recency_decay ?? 0.95;
+
             newFields = build.extend(
               newFields,
               {
@@ -395,6 +498,7 @@ export function createUnifiedSearchPlugin(
                     description:
                       'Composite search relevance score (0..1, higher = more relevant). ' +
                       'Computed by normalizing and averaging all active search signals. ' +
+                      'Supports per-table weight customization via @searchConfig smart tag. ' +
                       'Returns null when no search filters are active.',
                     type: GraphQLFloat,
                     plan($step: any) {
@@ -417,8 +521,8 @@ export function createUnifiedSearchPlugin(
                           const row = args[args.length - 1];
                           if (row == null) return null;
 
-                          let sum = 0;
-                          let count = 0;
+                          let weightedSum = 0;
+                          let totalWeight = 0;
 
                           for (let i = 0; i < allMetaKeys.length; i++) {
                             const details = args[i] as SearchScoreDetails | null;
@@ -431,78 +535,32 @@ export function createUnifiedSearchPlugin(
                             if (typeof score !== 'number' || isNaN(score)) continue;
 
                             const mk = allMetaKeys[i];
+                            const weight = effectiveWeights?.[mk.adapterName] ?? 1;
 
-                            // Normalize to 0..1 (higher = better)
-                            let normalized: number;
-                            if (mk.range) {
-                              // Known range: linear normalization
-                              const [min, max] = mk.range;
-                              normalized = mk.lowerIsBetter
-                                ? 1 - (score - min) / (max - min)
-                                : (score - min) / (max - min);
-                            } else {
-                              // Unbounded: sigmoid normalization
-                              if (mk.lowerIsBetter) {
-                                // BM25: negative scores, more negative = better
-                                // Map via 1 / (1 + abs(score))
-                                normalized = 1 / (1 + Math.abs(score));
-                              } else {
-                                // Hypothetical unbounded higher-is-better
-                                normalized = score / (1 + score);
-                              }
+                            // Normalize using the resolved strategy
+                            let normalized = normalizeScore(
+                              score,
+                              mk.lowerIsBetter,
+                              mk.range,
+                              normalizationStrategy,
+                            );
+
+                            // Apply recency boost if configured
+                            if (boostRecent) {
+                              normalized = applyRecencyBoost(
+                                normalized,
+                                row,
+                                boostRecencyField,
+                                boostRecencyDecay,
+                              );
                             }
 
-                            // Clamp to [0, 1]
-                            normalized = Math.max(0, Math.min(1, normalized));
-                            sum += normalized;
-                            count++;
+                            weightedSum += normalized * weight;
+                            totalWeight += weight;
                           }
 
-                          if (count === 0) return null;
-
-                          // Apply optional weights
-                          if (options.searchScoreWeights) {
-                            let weightedSum = 0;
-                            let totalWeight = 0;
-                            let weightIdx = 0;
-
-                            for (let i = 0; i < allMetaKeys.length; i++) {
-                              const details = args[i] as SearchScoreDetails | null;
-                              if (details == null || details.selectIndex == null) continue;
-
-                              const rawValue = row[details.selectIndex];
-                              if (rawValue == null) continue;
-
-                              const mk = allMetaKeys[i];
-                              const weight = options.searchScoreWeights[mk.adapterName] ?? 1;
-
-                              const score = TYPES.float.fromPg(rawValue as string);
-                              if (typeof score !== 'number' || isNaN(score)) continue;
-
-                              let normalized: number;
-                              if (mk.range) {
-                                const [min, max] = mk.range;
-                                normalized = mk.lowerIsBetter
-                                  ? 1 - (score - min) / (max - min)
-                                  : (score - min) / (max - min);
-                              } else {
-                                if (mk.lowerIsBetter) {
-                                  normalized = 1 / (1 + Math.abs(score));
-                                } else {
-                                  normalized = score / (1 + score);
-                                }
-                              }
-
-                              normalized = Math.max(0, Math.min(1, normalized));
-                              weightedSum += normalized * weight;
-                              totalWeight += weight;
-                              weightIdx++;
-                            }
-
-                            return totalWeight > 0 ? weightedSum / totalWeight : null;
-                          }
-
-                          return sum / count;
+                          if (totalWeight === 0) return null;
+                          return weightedSum / totalWeight;
                         }
                       );
                     },
