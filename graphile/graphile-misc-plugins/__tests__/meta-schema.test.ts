@@ -1684,6 +1684,375 @@ describe('MetaSchemaPlugin', () => {
       expect(post.relations.manyToMany[0].fieldName).toBe('tags');
     });
 
+    it('detects belongsTo and foreignKey on junction table when isReferencee is undefined', () => {
+      const agentCodec = createMockCodec('agent', {
+        id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
+      });
+      const carCodec = createMockCodec('car', {
+        id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
+      });
+      const agentCarCodec = createMockCodec('agent_car', {
+        agent_id: createMockAttribute('uuid', { notNull: true }),
+        car_id: createMockAttribute('uuid', { notNull: true }),
+      });
+
+      const agentUniques = [{ attributes: ['id'], isPrimary: true, tags: { name: 'agents_pkey' } }];
+      const carUniques = [{ attributes: ['id'], isPrimary: true, tags: { name: 'cars_pkey' } }];
+      const agentCarUniques = [
+        { attributes: ['agent_id', 'car_id'], isPrimary: true, tags: { name: 'agent_cars_pkey' } },
+      ];
+
+      // PostGraphile v5 omits isReferencee (leaves it undefined) on outgoing FK relations
+      const agentCarResource = createMockResource({
+        codec: agentCarCodec,
+        uniques: agentCarUniques,
+        relations: {
+          agentsByMyAgentId: {
+            // isReferencee intentionally omitted (undefined) — real PGv5 behavior
+            localAttributes: ['agent_id'],
+            remoteAttributes: ['id'],
+            remoteResource: { codec: agentCodec, uniques: agentUniques },
+          },
+          carsByMyCarId: {
+            // isReferencee intentionally omitted (undefined)
+            localAttributes: ['car_id'],
+            remoteAttributes: ['id'],
+            remoteResource: { codec: carCodec, uniques: carUniques },
+          },
+        },
+      });
+
+      const build = createMockBuild({
+        agent: { codec: agentCodec, uniques: agentUniques, relations: {} },
+        car: { codec: carCodec, uniques: carUniques, relations: {} },
+        agent_car: agentCarResource,
+      });
+
+      const tables = callInitHook(build);
+      const agentCar = tables.find((t: any) => t.name === 'AgentCar');
+
+      // belongsTo should include both FK relations despite isReferencee being undefined
+      expect(agentCar.relations.belongsTo).toHaveLength(2);
+      const belongsToNames = agentCar.relations.belongsTo
+        .map((r: any) => r.fieldName)
+        .sort();
+      expect(belongsToNames).toEqual(['agentsByMyAgentId', 'carsByMyCarId']);
+
+      // foreignKeyConstraints should also be populated
+      expect(agentCar.foreignKeyConstraints).toHaveLength(2);
+      const fkNames = agentCar.foreignKeyConstraints
+        .map((fk: any) => fk.name)
+        .sort();
+      expect(fkNames).toEqual(['agentsByMyAgentId', 'carsByMyCarId']);
+
+      // constraints.foreignKey should match
+      expect(agentCar.constraints.foreignKey).toHaveLength(2);
+
+      // Verify FK targets are correct
+      const agentFk = agentCar.foreignKeyConstraints.find(
+        (fk: any) => fk.name === 'agentsByMyAgentId',
+      );
+      expect(agentFk.refTable.name).toBe('agent');
+      expect(agentFk.fields[0].name).toBe('agentId');
+
+      const carFk = agentCar.foreignKeyConstraints.find(
+        (fk: any) => fk.name === 'carsByMyCarId',
+      );
+      expect(carFk.refTable.name).toBe('car');
+      expect(carFk.fields[0].name).toBe('carId');
+    });
+
+    it('excludes reverse relations (isReferencee: true) from belongsTo and foreignKey', () => {
+      const userCodec = createMockCodec('user', {
+        id: createMockAttribute('uuid', { notNull: true }),
+      });
+      const postCodec = createMockCodec('post', {
+        id: createMockAttribute('uuid', { notNull: true }),
+        author_id: createMockAttribute('uuid', { notNull: true }),
+      });
+
+      const build = createMockBuild({
+        user: {
+          codec: userCodec,
+          uniques: [{ attributes: ['id'], isPrimary: true }],
+          relations: {
+            user_posts: {
+              isReferencee: true,
+              localAttributes: ['id'],
+              remoteAttributes: ['author_id'],
+              remoteResource: { codec: postCodec, uniques: [] },
+            },
+          },
+        },
+      });
+
+      const user = callInitHook(build)[0];
+
+      // Reverse relation should NOT appear in belongsTo or foreignKey
+      expect(user.relations.belongsTo).toHaveLength(0);
+      expect(user.foreignKeyConstraints).toHaveLength(0);
+
+      // But should appear in hasMany
+      expect(user.relations.hasMany).toHaveLength(1);
+      expect(user.relations.hasMany[0].fieldName).toBe('user_posts');
+    });
+
+    it('handles mixed isReferencee values (true, false, undefined) on same resource', () => {
+      const userCodec = createMockCodec('user', {
+        id: createMockAttribute('uuid', { notNull: true }),
+      });
+      const orgCodec = createMockCodec('org', {
+        id: createMockAttribute('uuid', { notNull: true }),
+      });
+      const memberCodec = createMockCodec('member', {
+        id: createMockAttribute('uuid', { notNull: true }),
+        user_id: createMockAttribute('uuid', { notNull: true }),
+        org_id: createMockAttribute('uuid', { notNull: true }),
+      });
+      const noteCodec = createMockCodec('note', {
+        id: createMockAttribute('uuid', { notNull: true }),
+        member_id: createMockAttribute('uuid', { notNull: true }),
+      });
+
+      const build = createMockBuild({
+        user: { codec: userCodec, uniques: [{ attributes: ['id'], isPrimary: true }], relations: {} },
+        org: { codec: orgCodec, uniques: [{ attributes: ['id'], isPrimary: true }], relations: {} },
+        note: { codec: noteCodec, uniques: [{ attributes: ['id'], isPrimary: true }], relations: {} },
+        member: {
+          codec: memberCodec,
+          uniques: [{ attributes: ['id'], isPrimary: true }],
+          relations: {
+            usersByMyUserId: {
+              // undefined isReferencee — outgoing FK
+              localAttributes: ['user_id'],
+              remoteAttributes: ['id'],
+              remoteResource: { codec: userCodec, uniques: [{ attributes: ['id'], isPrimary: true }] },
+            },
+            orgsByMyOrgId: {
+              isReferencee: false, // explicit false — outgoing FK
+              localAttributes: ['org_id'],
+              remoteAttributes: ['id'],
+              remoteResource: { codec: orgCodec, uniques: [{ attributes: ['id'], isPrimary: true }] },
+            },
+            notesByTheirMemberId: {
+              isReferencee: true, // reverse relation
+              localAttributes: ['id'],
+              remoteAttributes: ['member_id'],
+              remoteResource: { codec: noteCodec, uniques: [{ attributes: ['id'], isPrimary: true }] },
+            },
+          },
+        },
+      });
+
+      const member = callInitHook(build).find((t: any) => t.name === 'Member');
+
+      // Both undefined and explicit false should appear in belongsTo
+      expect(member.relations.belongsTo).toHaveLength(2);
+      const belongsToNames = member.relations.belongsTo
+        .map((r: any) => r.fieldName)
+        .sort();
+      expect(belongsToNames).toEqual(['orgsByMyOrgId', 'usersByMyUserId']);
+
+      // Same for foreignKeyConstraints
+      expect(member.foreignKeyConstraints).toHaveLength(2);
+
+      // Reverse relation should be in hasMany, not belongsTo
+      expect(member.relations.hasMany).toHaveLength(1);
+      expect(member.relations.hasMany[0].fieldName).toBe('notesByTheirMemberId');
+    });
+
+    it('resolves relations from pgRelations registry when resource lacks getRelations method', () => {
+      const parentCodec = createMockCodec('parent', {
+        id: createMockAttribute('uuid', { notNull: true }),
+      });
+      const childCodec = createMockCodec('child', {
+        id: createMockAttribute('uuid', { notNull: true }),
+        parent_id: createMockAttribute('uuid', { notNull: true }),
+      });
+
+      const parentUniques = [{ attributes: ['id'], isPrimary: true }];
+
+      // Resource WITHOUT getRelations/getRelation methods and WITHOUT .relations property
+      const childResource = {
+        codec: childCodec,
+        uniques: [{ attributes: ['id'], isPrimary: true }],
+        // No relations property, no getRelations method
+      };
+
+      // Put relations in the pgRelations registry instead
+      const pgRelations: Record<string, Record<string, any>> = {
+        child: {
+          parentByMyParentId: {
+            localAttributes: ['parent_id'],
+            remoteAttributes: ['id'],
+            remoteResource: { codec: parentCodec, uniques: parentUniques },
+            // isReferencee omitted
+          },
+        },
+      };
+
+      const build = createMockBuild(
+        {
+          parent: { codec: parentCodec, uniques: parentUniques, relations: {} },
+          child: childResource,
+        },
+        ['app_public'],
+        {},
+      );
+      // Inject pgRelations into the registry
+      (build.input.pgRegistry as any).pgRelations = pgRelations;
+
+      const tables = callInitHook(build);
+      const child = tables.find((t: any) => t.name === 'Child');
+
+      // Should resolve relation from registry fallback
+      expect(child.relations.belongsTo).toHaveLength(1);
+      expect(child.relations.belongsTo[0].fieldName).toBe('parentByMyParentId');
+      expect(child.relations.belongsTo[0].type).toBe('parent');
+
+      expect(child.foreignKeyConstraints).toHaveLength(1);
+      expect(child.foreignKeyConstraints[0].refTable.name).toBe('parent');
+    });
+
+    it('M:N + junction belongsTo work together with isReferencee undefined', () => {
+      const agentCodec = createMockCodec('agent', {
+        id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
+      });
+      const carCodec = createMockCodec('car', {
+        id: createMockAttribute('uuid', { notNull: true, hasDefault: true }),
+      });
+      const agentCarCodec = createMockCodec('agent_car', {
+        agent_id: createMockAttribute('uuid', { notNull: true }),
+        car_id: createMockAttribute('uuid', { notNull: true }),
+      });
+
+      const agentUniques = [{ attributes: ['id'], isPrimary: true }];
+      const carUniques = [{ attributes: ['id'], isPrimary: true }];
+      const agentCarUniques = [{ attributes: ['agent_id', 'car_id'], isPrimary: true }];
+
+      const agentCarResource = createMockResource({
+        codec: agentCarCodec,
+        uniques: agentCarUniques,
+        relations: {
+          agentsByMyAgentId: {
+            // isReferencee undefined — PGv5 real behavior
+            localAttributes: ['agent_id'],
+            remoteAttributes: ['id'],
+            remoteResource: { codec: agentCodec, uniques: agentUniques },
+          },
+          carsByMyCarId: {
+            localAttributes: ['car_id'],
+            remoteAttributes: ['id'],
+            remoteResource: { codec: carCodec, uniques: carUniques },
+          },
+        },
+      });
+
+      const agentResource = createMockResource({
+        codec: agentCodec,
+        uniques: agentUniques,
+        relations: {
+          agentCarsByTheirAgentId: {
+            isReferencee: true,
+            localAttributes: ['id'],
+            remoteAttributes: ['agent_id'],
+            remoteResource: { codec: agentCarCodec, uniques: agentCarUniques },
+          },
+        },
+      });
+
+      const carResource = createMockResource({
+        codec: carCodec,
+        uniques: carUniques,
+        relations: {
+          agentCarsByTheirCarId: {
+            isReferencee: true,
+            localAttributes: ['id'],
+            remoteAttributes: ['car_id'],
+            remoteResource: { codec: agentCarCodec, uniques: agentCarUniques },
+          },
+        },
+      });
+
+      const pgManyToManyRealtionshipsByResource = new Map<any, any[]>([
+        [
+          agentResource,
+          [
+            {
+              leftTable: agentResource,
+              leftRelationName: 'agentCarsByTheirAgentId',
+              junctionTable: agentCarResource,
+              rightRelationName: 'carsByMyCarId',
+              rightTable: carResource,
+            },
+          ],
+        ],
+        [
+          carResource,
+          [
+            {
+              leftTable: carResource,
+              leftRelationName: 'agentCarsByTheirCarId',
+              junctionTable: agentCarResource,
+              rightRelationName: 'agentsByMyAgentId',
+              rightTable: agentResource,
+            },
+          ],
+        ],
+      ]);
+
+      const build = createMockBuild(
+        {
+          agent: agentResource,
+          car: carResource,
+          agent_car: agentCarResource,
+        },
+        ['app_public'],
+        {
+          pgManyToManyRealtionshipsByResource,
+          inflection: {
+            _manyToManyRelation: (details: any) => {
+              const rightName = details?.rightTable?.codec?.name;
+              if (rightName === 'car') return 'cars';
+              if (rightName === 'agent') return 'agents';
+              return null;
+            },
+          },
+        },
+      );
+
+      const tables = callInitHook(build);
+      const agent = tables.find((t: any) => t.name === 'Agent');
+      const car = tables.find((t: any) => t.name === 'Car');
+      const agentCar = tables.find((t: any) => t.name === 'AgentCar');
+
+      // Agent: hasMany + manyToMany
+      expect(agent.relations.hasMany).toHaveLength(1);
+      expect(agent.relations.manyToMany).toHaveLength(1);
+      expect(agent.relations.manyToMany[0]).toMatchObject({
+        fieldName: 'cars',
+        type: 'car',
+        junctionTable: { name: 'agent_car' },
+        rightTable: { name: 'car' },
+      });
+
+      // Car: hasMany + manyToMany
+      expect(car.relations.hasMany).toHaveLength(1);
+      expect(car.relations.manyToMany).toHaveLength(1);
+      expect(car.relations.manyToMany[0]).toMatchObject({
+        fieldName: 'agents',
+        type: 'agent',
+        junctionTable: { name: 'agent_car' },
+        rightTable: { name: 'agent' },
+      });
+
+      // Junction: belongsTo (NOT empty!) + foreignKeyConstraints
+      expect(agentCar.relations.belongsTo).toHaveLength(2);
+      expect(agentCar.foreignKeyConstraints).toHaveLength(2);
+      expect(agentCar.relations.hasMany).toHaveLength(0);
+      expect(agentCar.relations.manyToMany).toHaveLength(0);
+    });
+
     it('skips malformed many-to-many relation details', () => {
       const postCodec = createMockCodec('post', {
         id: createMockAttribute('uuid', { notNull: true }),
