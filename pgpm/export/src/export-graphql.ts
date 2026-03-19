@@ -9,8 +9,6 @@
  */
 import { Inquirerer } from 'inquirerer';
 
-import { createClient as createMigrateClient } from '@pgpmjs/migrate-client';
-
 import { PgpmPackage, PgpmRow, SqlWriteOptions, writePgpmFiles, writePgpmPlan } from '@pgpmjs/core';
 import { GraphQLClient } from './graphql-client';
 import { exportGraphQLMeta } from './export-graphql-meta';
@@ -18,6 +16,7 @@ import { graphqlRowToPostgresRow } from './graphql-naming';
 import {
   DB_REQUIRED_EXTENSIONS,
   SERVICE_REQUIRED_EXTENSIONS,
+  SQL_ACTION_FIELDS,
   META_COMMON_HEADER,
   META_COMMON_FOOTER,
   META_TABLE_ORDER,
@@ -118,50 +117,22 @@ export const exportGraphQL = async ({
 
   if (migrateEndpoint) {
     console.log(`Fetching sql_actions from ${migrateEndpoint}...`);
-    const migrateDb = createMigrateClient({
+    const migrateClient = new GraphQLClient({
       endpoint: migrateEndpoint,
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...migrateHeaders,
-      },
+      token,
+      headers: migrateHeaders
     });
 
     try {
-      const allNodes: Record<string, unknown>[] = [];
-      let hasNextPage = true;
-      let afterCursor: string | undefined;
+      const camelRows = await migrateClient.fetchAllNodes(
+        'sqlActions',
+        SQL_ACTION_FIELDS.join('\n'),
+        { databaseId }
+      );
 
-      while (hasNextPage) {
-        const result = await migrateDb.sqlAction.findMany({
-          select: {
-            id: true,
-            databaseId: true,
-            name: true,
-            deploy: true,
-            revert: true,
-            verify: true,
-            content: true,
-            deps: true,
-            action: true,
-            actionId: true,
-            actorId: true,
-            payload: true,
-          },
-          where: { databaseId: { equalTo: databaseId } },
-          first: 100,
-          ...(afterCursor ? { after: afterCursor } : {}),
-        }).unwrap();
-
-        allNodes.push(
-          ...result.sqlActions.nodes.map(node =>
-            graphqlRowToPostgresRow(node as Record<string, unknown>)
-          )
-        );
-        hasNextPage = result.sqlActions.pageInfo.hasNextPage;
-        afterCursor = result.sqlActions.pageInfo.endCursor ?? undefined;
-      }
-
-      sqlActionRows = allNodes;
+      sqlActionRows = camelRows.map(node =>
+        graphqlRowToPostgresRow(node as Record<string, unknown>)
+      );
       console.log(`  Found ${sqlActionRows.length} sql_actions`);
     } catch (err) {
       console.warn(`  Warning: Could not fetch sql_actions: ${err instanceof Error ? err.message : err}`);

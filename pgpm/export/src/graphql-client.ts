@@ -121,14 +121,15 @@ export class GraphQLClient {
     queryFieldName: string,
     fieldsFragment: string,
     condition?: Record<string, unknown>,
-    pageSize = 100
+    pageSize = 100,
+    orderBy = 'ID_ASC'
   ): Promise<T[]> {
     const allNodes: T[] = [];
     let hasNextPage = true;
     let afterCursor: string | null = null;
 
     while (hasNextPage) {
-      const args = this.buildConnectionArgs(condition, pageSize, afterCursor);
+      const args = this.buildConnectionArgs(condition, pageSize, afterCursor, orderBy);
       const queryString = `{
   ${queryFieldName}${args} {
     nodes {
@@ -159,7 +160,8 @@ export class GraphQLClient {
   private buildConnectionArgs(
     condition?: Record<string, unknown>,
     first?: number,
-    after?: string | null
+    after?: string | null,
+    orderBy?: string
   ): string {
     const parts: string[] = [];
 
@@ -179,6 +181,9 @@ export class GraphQLClient {
         })
         .join(', ');
       parts.push(`condition: { ${condParts} }`);
+    }
+    if (orderBy) {
+      parts.push(`orderBy: ${orderBy}`);
     }
 
     return parts.length > 0 ? `(${parts.join(', ')})` : '';

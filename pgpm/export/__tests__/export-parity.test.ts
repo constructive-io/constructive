@@ -17,22 +17,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // ---------------------------------------------------------------------------
-// Mock the GraphQLClient (used by the GraphQL flow).
+// Mock the GraphQLClient (used by the GraphQL flow for both sql_actions and meta).
 // ---------------------------------------------------------------------------
 jest.mock('../src/graphql-client', () => ({
   GraphQLClient: jest.fn().mockImplementation(() => ({
     fetchAllNodes: jest.fn().mockResolvedValue([])
   }))
-}));
-
-// Mock @pgpmjs/migrate-client so the ORM-based sql_actions fetch uses our test data.
-let _mockMigrateClientFindMany: jest.Mock = jest.fn();
-jest.mock('@pgpmjs/migrate-client', () => ({
-  createClient: jest.fn().mockImplementation(() => ({
-    sqlAction: {
-      findMany: _mockMigrateClientFindMany,
-    },
-  })),
 }));
 
 // Mock exportGraphQLMeta so we can make it delegate to the real SQL exportMeta
@@ -46,7 +36,6 @@ import { exportMigrations } from '../src/export-migrations';
 import { exportMeta } from '../src/export-meta';
 import { GraphQLClient } from '../src/graphql-client';
 import { exportGraphQLMeta } from '../src/export-graphql-meta';
-import { createClient as createMigrateClient } from '@pgpmjs/migrate-client';
 import { camelize } from 'inflekt';
 import { getConnections, seed } from 'pgsql-test';
 
@@ -327,24 +316,13 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
       metaExtensionName: META_EXTENSION_NAME
     });
 
-    // ---- GraphQL flow (mock GraphQLClient + exportGraphQLMeta + migrate-client) ----
+    // ---- GraphQL flow (mock GraphQLClient + exportGraphQLMeta) ----
 
-    // GraphQLClient.fetchAllNodes returns the pre-fetched camelCase rows (still used for meta)
+    // GraphQLClient is instantiated twice: once for migrate (sql_actions), once for meta.
+    // The migrate client's fetchAllNodes should return the pre-fetched camelCase actions.
+    // The meta client is unused because exportGraphQLMeta is separately mocked.
     (GraphQLClient as any).mockImplementation(() => ({
       fetchAllNodes: jest.fn().mockResolvedValue(camelActions)
-    }));
-
-    // Configure migrate-client mock to return camelCase rows via ORM pagination
-    _mockMigrateClientFindMany = jest.fn().mockReturnValue({
-      unwrap: jest.fn().mockResolvedValue({
-        sqlActions: {
-          nodes: camelActions,
-          pageInfo: { hasNextPage: false, endCursor: null },
-        },
-      }),
-    });
-    (createMigrateClient as any).mockImplementation(() => ({
-      sqlAction: { findMany: _mockMigrateClientFindMany },
     }));
 
     // exportGraphQLMeta returns the pre-fetched meta result (same as SQL flow used)
@@ -431,19 +409,6 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
     // GraphQLClient returns empty (no sql_actions)
     (GraphQLClient as any).mockImplementation(() => ({
       fetchAllNodes: jest.fn().mockResolvedValue([])
-    }));
-
-    // migrate-client mock returns empty (no sql_actions)
-    _mockMigrateClientFindMany = jest.fn().mockReturnValue({
-      unwrap: jest.fn().mockResolvedValue({
-        sqlActions: {
-          nodes: [],
-          pageInfo: { hasNextPage: false, endCursor: null },
-        },
-      }),
-    });
-    (createMigrateClient as any).mockImplementation(() => ({
-      sqlAction: { findMany: _mockMigrateClientFindMany },
     }));
 
     // exportGraphQLMeta returns the pre-fetched meta result

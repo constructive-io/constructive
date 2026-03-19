@@ -181,6 +181,32 @@ export default async (
         AND datname !~ '^pg_';
     `);
 
+    // If --database_ids is provided but --databases is not, auto-detect
+    // which postgres database contains the matching metaschema database name.
+    if (argv.database_ids && !argv.databases) {
+      const targetName = argv.database_ids;
+      for (const row of databasesResult.rows) {
+        try {
+          const candidatePool = await getPgPool({ database: row.datname });
+          const check = await candidatePool.query(
+            `SELECT name FROM metaschema_public.database WHERE name = $1 LIMIT 1`,
+            [targetName]
+          );
+          if (check.rows.length > 0) {
+            argv.databases = row.datname;
+            break;
+          }
+        } catch {
+          // Skip databases that don't have metaschema_public
+        }
+      }
+      if (!argv.databases) {
+        console.error(`Could not find database "${targetName}" in any postgres database.`);
+        prompter.close();
+        return;
+      }
+    }
+
     const { databases: dbname } = await prompter.prompt(argv, [
       {
         type: 'list',

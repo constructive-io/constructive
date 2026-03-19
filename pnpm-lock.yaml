@@ -2002,9 +2002,6 @@ importers:
       '@pgpmjs/core':
         specifier: workspace:^
         version: link:../core/dist
-      '@pgpmjs/migrate-client':
-        specifier: workspace:^
-        version: link:../../sdk/migrate-client/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../types/dist
