@@ -9,7 +9,7 @@
  */
 import { camelize, pluralize } from 'inflekt';
 
-import type { CleanTable } from '../types/schema';
+import type { Table } from '../types/schema';
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -41,7 +41,7 @@ export function normalizeInflectionValue(
  */
 export function toCamelCasePlural(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   const singular = camelize(tableName, true);
   const inflectedPlural = pluralize(singular);
@@ -76,7 +76,7 @@ export function toCamelCasePlural(
  */
 export function toCamelCaseSingular(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   const localSingular = camelize(tableName, true);
 
@@ -104,7 +104,7 @@ export function toCamelCaseSingular(
 
 export function toCreateMutationName(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   return (
     normalizeInflectionValue(table?.query?.create) ?? `create${tableName}`
@@ -113,7 +113,7 @@ export function toCreateMutationName(
 
 export function toUpdateMutationName(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   return (
     normalizeInflectionValue(table?.query?.update) ?? `update${tableName}`
@@ -122,7 +122,7 @@ export function toUpdateMutationName(
 
 export function toDeleteMutationName(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   return (
     normalizeInflectionValue(table?.query?.delete) ?? `delete${tableName}`
@@ -135,7 +135,7 @@ export function toDeleteMutationName(
 
 export function toCreateInputTypeName(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   return (
     normalizeInflectionValue(table?.inflection?.createInputType) ??
@@ -153,7 +153,7 @@ export function toDeleteInputTypeName(tableName: string): string {
 
 export function toFilterTypeName(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   return (
     normalizeInflectionValue(table?.inflection?.filterType) ??
@@ -173,7 +173,7 @@ export function toFilterTypeName(
  */
 export function toPatchFieldName(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   // First check the patch field name discovered from UpdateXxxInput
   const introspectedPatch = normalizeInflectionValue(
@@ -218,7 +218,7 @@ export function toOrderByEnumValue(
  */
 export function toOrderByTypeName(
   tableName: string,
-  table?: CleanTable | null,
+  table?: Table | null,
 ): string {
   if (table?.inflection?.orderByType) return table.inflection.orderByType;
   const plural = toCamelCasePlural(tableName, table);

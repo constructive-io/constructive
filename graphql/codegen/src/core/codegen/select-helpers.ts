@@ -3,7 +3,7 @@
  *
  * Used by custom-queries.ts, custom-mutations.ts, and orm/custom-ops-generator.ts
  */
-import type { CleanArgument } from '../../types/schema';
+import type { Argument } from '../../types/schema';
 import { SCALAR_NAMES } from './scalars';
 import { getTypeBaseName } from './type-resolver';
 
@@ -21,7 +21,7 @@ export const NON_SELECT_TYPES = new Set<string>([
  * Returns null for scalar types, Connection types, and root types.
  */
 export function getSelectTypeName(
-  returnType: CleanArgument['type'],
+  returnType: Argument['type'],
 ): string | null {
   const baseName = getTypeBaseName(returnType);
   if (
@@ -38,20 +38,20 @@ export function getSelectTypeName(
  * Wrap a type reference in InferSelectResult, handling NON_NULL and LIST wrappers.
  */
 export function wrapInferSelectResult(
-  typeRef: CleanArgument['type'],
+  typeRef: Argument['type'],
   payloadTypeName: string,
   selectType: string = 'S',
 ): string {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
     return wrapInferSelectResult(
-      typeRef.ofType as CleanArgument['type'],
+      typeRef.ofType as Argument['type'],
       payloadTypeName,
       selectType,
     );
   }
 
   if (typeRef.kind === 'LIST' && typeRef.ofType) {
-    return `${wrapInferSelectResult(typeRef.ofType as CleanArgument['type'], payloadTypeName, selectType)}[]`;
+    return `${wrapInferSelectResult(typeRef.ofType as Argument['type'], payloadTypeName, selectType)}[]`;
   }
 
   return `InferSelectResult<${payloadTypeName}, ${selectType}>`;

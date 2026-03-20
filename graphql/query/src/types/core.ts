@@ -5,7 +5,7 @@ import type {
   VariableDefinitionNode,
 } from 'graphql';
 
-import type { CleanField } from './schema';
+import type { Field } from './schema';
 
 // GraphQL AST types (re-export what we need from gql-ast)
 export type ASTNode =
@@ -67,7 +67,7 @@ export interface MetaField {
   type: MetaFieldType;
 }
 
-// Note: The codegen-style CleanField is in ./schema.ts
+// Note: The codegen-style Field is in ./schema.ts
 // This MetaField is for the QueryBuilder runtime API
 
 export interface MetaConstraint {
@@ -111,7 +111,7 @@ export interface GraphQLVariables {
 export interface QueryFieldSelection {
   name: string;
   isObject: boolean;
-  fieldDefn?: MetaField | CleanField;
+  fieldDefn?: MetaField | Field;
   selection?: QueryFieldSelection[];
   variables?: GraphQLVariables;
   isBelongTo?: boolean;

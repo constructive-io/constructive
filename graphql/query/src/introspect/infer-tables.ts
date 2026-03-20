@@ -25,13 +25,13 @@ import type {
 } from '../types/introspection';
 import { getBaseTypeName, isList, isNonNull, unwrapType } from '../types/introspection';
 import type {
-  CleanBelongsToRelation,
-  CleanField,
-  CleanFieldType,
-  CleanHasManyRelation,
-  CleanManyToManyRelation,
-  CleanRelations,
-  CleanTable,
+  BelongsToRelation,
+  Field,
+  FieldType,
+  HasManyRelation,
+  ManyToManyRelation,
+  Relations,
+  Table,
   ConstraintInfo,
   TableConstraints,
   TableInflection,
@@ -119,16 +119,16 @@ export interface InferTablesOptions {
 }
 
 /**
- * Infer CleanTable[] from GraphQL introspection by recognizing PostGraphile patterns
+ * Infer Table[] from GraphQL introspection by recognizing PostGraphile patterns
  *
  * @param introspection - Standard GraphQL introspection response
  * @param options - Optional configuration
- * @returns Array of CleanTable objects compatible with existing generators
+ * @returns Array of Table objects compatible with existing generators
  */
 export function inferTablesFromIntrospection(
   introspection: IntrospectionQueryResponse,
   options: InferTablesOptions = {},
-): CleanTable[] {
+): Table[] {
   const { __schema: schema } = introspection;
   const { types, queryType, mutationType } = schema;
   const commentsEnabled = options.comments !== false;
@@ -142,8 +142,8 @@ export function inferTablesFromIntrospection(
     ? getTypeFields(typeMap.get(mutationType.name))
     : [];
 
-  // Step 1: Build CleanTable for each inferred entity
-  const tables: CleanTable[] = [];
+  // Step 1: Build Table for each inferred entity
+  const tables: Table[] = [];
 
   for (const entityName of entityNames) {
     const entityType = typeMap.get(entityName);
@@ -259,12 +259,12 @@ function resolveEntityNameFromConnectionType(
 // ============================================================================
 
 interface BuildCleanTableResult {
-  table: CleanTable;
+  table: Table;
   hasRealOperation: boolean;
 }
 
 /**
- * Build a complete CleanTable from an entity type
+ * Build a complete Table from an entity type
  */
 function buildCleanTable(
   entityName: string,
@@ -349,8 +349,8 @@ function extractEntityFields(
   typeMap: Map<string, IntrospectionType>,
   entityToConnection: Map<string, string>,
   commentsEnabled: boolean,
-): CleanField[] {
-  const fields: CleanField[] = [];
+): Field[] {
+  const fields: Field[] = [];
 
   if (!entityType.fields) return fields;
 
@@ -445,11 +445,11 @@ function isEntityType(
 }
 
 /**
- * Convert IntrospectionTypeRef to CleanFieldType
+ * Convert IntrospectionTypeRef to FieldType
  */
 function convertToCleanFieldType(
   typeRef: IntrospectionTypeRef,
-): CleanFieldType {
+): FieldType {
   const baseType = unwrapType(typeRef);
   const isArray = isList(typeRef);
 
@@ -472,10 +472,10 @@ function inferRelations(
   entityType: IntrospectionType,
   entityToConnection: Map<string, string>,
   connectionToEntity: Map<string, string>,
-): CleanRelations {
-  const belongsTo: CleanBelongsToRelation[] = [];
-  const hasMany: CleanHasManyRelation[] = [];
-  const manyToMany: CleanManyToManyRelation[] = [];
+): Relations {
+  const belongsTo: BelongsToRelation[] = [];
+  const hasMany: HasManyRelation[] = [];
+  const manyToMany: ManyToManyRelation[] = [];
 
   if (!entityType.fields) {
     return { belongsTo, hasOne: [], hasMany, manyToMany };
@@ -493,9 +493,9 @@ function inferRelations(
         connectionToEntity,
       );
       if (resolvedRelation.type === 'manyToMany') {
-        manyToMany.push(resolvedRelation.relation as CleanManyToManyRelation);
+        manyToMany.push(resolvedRelation.relation as ManyToManyRelation);
       } else {
-        hasMany.push(resolvedRelation.relation as CleanHasManyRelation);
+        hasMany.push(resolvedRelation.relation as HasManyRelation);
       }
       continue;
     }
@@ -526,8 +526,8 @@ function inferHasManyOrManyToMany(
   connectionTypeName: string,
   connectionToEntity: Map<string, string>,
 ):
-  | { type: 'hasMany'; relation: CleanHasManyRelation }
-  | { type: 'manyToMany'; relation: CleanManyToManyRelation } {
+  | { type: 'hasMany'; relation: HasManyRelation }
+  | { type: 'manyToMany'; relation: ManyToManyRelation } {
   // Resolve the related entity from discovered connection mappings first.
   const relatedEntityName =
     connectionToEntity.get(connectionTypeName) ?? (() => {

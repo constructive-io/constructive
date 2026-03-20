@@ -15,8 +15,8 @@ import * as t from '@babel/types';
 
 import type { GraphQLSDKConfigTarget } from '../../../types/config';
 import type {
-  CleanOperation,
-  CleanTable,
+  Operation,
+  Table,
   TypeRegistry,
 } from '../../../types/schema';
 import { addJSDocComment, generateCode } from '../babel-ast';
@@ -37,10 +37,10 @@ export interface GeneratedFile {
 }
 
 export interface GenerateSharedOptions {
-  tables: CleanTable[];
+  tables: Table[];
   customOperations?: {
-    queries: CleanOperation[];
-    mutations: CleanOperation[];
+    queries: Operation[];
+    mutations: Operation[];
     typeRegistry: TypeRegistry;
   };
   config: GraphQLSDKConfigTarget;

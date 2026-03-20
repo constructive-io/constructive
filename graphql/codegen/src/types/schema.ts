@@ -6,12 +6,12 @@
 /**
  * Represents a database table with its fields and relations
  */
-export interface CleanTable {
+export interface Table {
   name: string;
   /** Description from PostgreSQL COMMENT (smart comments stripped) */
   description?: string;
-  fields: CleanField[];
-  relations: CleanRelations;
+  fields: Field[];
+  relations: Relations;
   /** PostGraphile inflection rules for this table */
   inflection?: TableInflection;
   /** Query operation names from introspection */
@@ -99,22 +99,22 @@ export interface TableConstraints {
 
 export interface ConstraintInfo {
   name: string;
-  fields: CleanField[];
+  fields: Field[];
 }
 
 export interface ForeignKeyConstraint extends ConstraintInfo {
   refTable: string;
-  refFields: CleanField[];
+  refFields: Field[];
 }
 
 /**
  * Represents a field/column in a table
  */
-export interface CleanField {
+export interface Field {
   name: string;
   /** Description from PostgreSQL COMMENT (smart comments stripped) */
   description?: string;
-  type: CleanFieldType;
+  type: FieldType;
   /** Whether the column has a NOT NULL constraint (inferred from NON_NULL wrapper on entity type field) */
   isNotNull?: boolean | null;
   /** Whether the column has a DEFAULT value (inferred by comparing entity vs CreateInput field nullability) */
@@ -124,7 +124,7 @@ export interface CleanField {
 /**
  * Field type information from PostGraphile introspection
  */
-export interface CleanFieldType {
+export interface FieldType {
   /** GraphQL type name (e.g., "String", "UUID", "Int") */
   gqlType: string;
   /** Whether this is an array type */
@@ -144,50 +144,50 @@ export interface CleanFieldType {
 /**
  * All relation types for a table
  */
-export interface CleanRelations {
-  belongsTo: CleanBelongsToRelation[];
-  hasOne: CleanHasOneRelation[];
-  hasMany: CleanHasManyRelation[];
-  manyToMany: CleanManyToManyRelation[];
+export interface Relations {
+  belongsTo: BelongsToRelation[];
+  hasOne: HasOneRelation[];
+  hasMany: HasManyRelation[];
+  manyToMany: ManyToManyRelation[];
 }
 
 /**
  * BelongsTo relation (foreign key on this table)
  */
-export interface CleanBelongsToRelation {
+export interface BelongsToRelation {
   fieldName: string | null;
   isUnique: boolean;
   referencesTable: string;
   type: string | null;
-  keys: CleanField[];
+  keys: Field[];
 }
 
 /**
  * HasOne relation (foreign key on other table, unique)
  */
-export interface CleanHasOneRelation {
+export interface HasOneRelation {
   fieldName: string | null;
   isUnique: boolean;
   referencedByTable: string;
   type: string | null;
-  keys: CleanField[];
+  keys: Field[];
 }
 
 /**
  * HasMany relation (foreign key on other table, not unique)
  */
-export interface CleanHasManyRelation {
+export interface HasManyRelation {
   fieldName: string | null;
   isUnique: boolean;
   referencedByTable: string;
   type: string | null;
-  keys: CleanField[];
+  keys: Field[];
 }
 
 /**
  * ManyToMany relation (through junction table)
  */
-export interface CleanManyToManyRelation {
+export interface ManyToManyRelation {
   fieldName: string | null;
   rightTable: string;
   junctionTable: string;
@@ -210,15 +210,15 @@ export interface CleanManyToManyRelation {
  * Clean representation of a GraphQL operation (query or mutation)
  * Derived from introspection data
  */
-export interface CleanOperation {
+export interface Operation {
   /** Operation name (e.g., "login", "currentUser", "cars") */
   name: string;
   /** Operation kind */
   kind: 'query' | 'mutation';
   /** Arguments/variables for the operation */
-  args: CleanArgument[];
+  args: Argument[];
   /** Return type */
-  returnType: CleanTypeRef;
+  returnType: TypeRef;
   /** Description from schema */
   description?: string;
   /** Whether this is deprecated */
@@ -230,11 +230,11 @@ export interface CleanOperation {
 /**
  * Clean representation of an operation argument
  */
-export interface CleanArgument {
+export interface Argument {
   /** Argument name */
   name: string;
   /** Argument type */
-  type: CleanTypeRef;
+  type: TypeRef;
   /** Default value (as string) */
   defaultValue?: string;
   /** Description from schema */
@@ -244,19 +244,19 @@ export interface CleanArgument {
 /**
  * Clean type reference - simplified from introspection TypeRef
  */
-export interface CleanTypeRef {
+export interface TypeRef {
   /** Type kind */
   kind: 'SCALAR' | 'OBJECT' | 'INPUT_OBJECT' | 'ENUM' | 'LIST' | 'NON_NULL';
   /** Type name (null for LIST and NON_NULL wrappers) */
   name: string | null;
   /** Inner type for LIST and NON_NULL wrappers */
-  ofType?: CleanTypeRef;
+  ofType?: TypeRef;
   /** Resolved TypeScript type string */
   tsType?: string;
   /** Fields for OBJECT types */
-  fields?: CleanObjectField[];
+  fields?: ObjectField[];
   /** Input fields for INPUT_OBJECT types */
-  inputFields?: CleanArgument[];
+  inputFields?: Argument[];
   /** Values for ENUM types */
   enumValues?: string[];
 }
@@ -264,11 +264,11 @@ export interface CleanTypeRef {
 /**
  * Field on an object type
  */
-export interface CleanObjectField {
+export interface ObjectField {
   /** Field name */
   name: string;
   /** Field type */
-  type: CleanTypeRef;
+  type: TypeRef;
   /** Description */
   description?: string;
 }
@@ -290,9 +290,9 @@ export interface ResolvedType {
   name: string;
   description?: string;
   /** Fields for OBJECT types */
-  fields?: CleanObjectField[];
+  fields?: ObjectField[];
   /** Input fields for INPUT_OBJECT types */
-  inputFields?: CleanArgument[];
+  inputFields?: Argument[];
   /** Values for ENUM types */
   enumValues?: string[];
   /** Possible types for UNION types */

@@ -2,19 +2,19 @@ import {
   generateCustomMutationOpsFile,
   generateCustomQueryOpsFile,
 } from '../../core/codegen/orm/custom-ops-generator';
-import type { CleanOperation, CleanTypeRef } from '../../types/schema';
+import type { Operation, TypeRef } from '../../types/schema';
 
 function createTypeRef(
-  kind: CleanTypeRef['kind'],
+  kind: TypeRef['kind'],
   name: string | null,
-  ofType?: CleanTypeRef,
-): CleanTypeRef {
+  ofType?: TypeRef,
+): TypeRef {
   return { kind, name, ofType };
 }
 
 describe('custom-ops-generator', () => {
   it('preserves nullable selected return types for custom queries', () => {
-    const operations: CleanOperation[] = [
+    const operations: Operation[] = [
       {
         name: 'maybeUser',
         kind: 'query',
@@ -31,7 +31,7 @@ describe('custom-ops-generator', () => {
   });
 
   it('preserves nullable selected return types for custom mutations', () => {
-    const operations: CleanOperation[] = [
+    const operations: Operation[] = [
       {
         name: 'signIn',
         kind: 'mutation',
@@ -57,7 +57,7 @@ describe('custom-ops-generator', () => {
   });
 
   it('preserves nullable raw scalar return types', () => {
-    const operations: CleanOperation[] = [
+    const operations: Operation[] = [
       {
         name: 'accessToken',
         kind: 'query',
@@ -72,7 +72,7 @@ describe('custom-ops-generator', () => {
   });
 
   it('preserves nested list item nullability for selected return types', () => {
-    const operations: CleanOperation[] = [
+    const operations: Operation[] = [
       {
         name: 'recentUsers',
         kind: 'query',

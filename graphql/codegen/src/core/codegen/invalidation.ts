@@ -7,7 +7,7 @@
 import * as t from '@babel/types';
 
 import type { EntityRelationship, QueryKeyConfig } from '../../types/config';
-import type { CleanTable } from '../../types/schema';
+import type { Table } from '../../types/schema';
 import {
   addJSDocComment,
   addLineComment,
@@ -23,7 +23,7 @@ import {
 } from './utils';
 
 export interface InvalidationGeneratorOptions {
-  tables: CleanTable[];
+  tables: Table[];
   config: QueryKeyConfig;
 }
 
@@ -77,10 +77,10 @@ function getAllDescendants(
  * Build the invalidate object property for a single entity
  */
 function buildEntityInvalidateProperty(
-  table: CleanTable,
+  table: Table,
   relationships: Record<string, EntityRelationship>,
   childrenMap: Map<string, string[]>,
-  allTables: CleanTable[],
+  allTables: Table[],
 ): t.ObjectProperty {
   const { typeName, singularName } = getTableNames(table);
   const entityKey = typeName.toLowerCase();
@@ -308,7 +308,7 @@ function buildEntityInvalidateProperty(
  * Build the remove object property for a single entity
  */
 function buildEntityRemoveProperty(
-  table: CleanTable,
+  table: Table,
   relationships: Record<string, EntityRelationship>,
 ): t.ObjectProperty {
   const { typeName, singularName } = getTableNames(table);

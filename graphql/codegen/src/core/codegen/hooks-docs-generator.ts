@@ -1,6 +1,6 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanOperation, CleanTable, TypeRegistry } from '../../types/schema';
+import type { Operation, Table, TypeRegistry } from '../../types/schema';
 import {
   buildSkillFile,
   buildSkillReference,
@@ -28,7 +28,7 @@ import {
   fieldTypeToTs,
 } from './utils';
 
-function getCustomHookName(op: CleanOperation): string {
+function getCustomHookName(op: Operation): string {
   if (op.kind === 'query') {
     return `use${ucFirst(op.name)}Query`;
   }
@@ -36,8 +36,8 @@ function getCustomHookName(op: CleanOperation): string {
 }
 
 export function generateHooksReadme(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
@@ -184,8 +184,8 @@ export function generateHooksReadme(
 }
 
 export function generateHooksAgentsDocs(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
 ): GeneratedDocFile {
   const lines: string[] = [];
   const tableCount = tables.length;
@@ -241,8 +241,8 @@ export function generateHooksAgentsDocs(
 }
 
 export function getHooksMcpTools(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
 ): McpTool[] {
   const tools: McpTool[] = [];
 
@@ -373,8 +373,8 @@ export function getHooksMcpTools(
 }
 
 export function generateHooksSkills(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   targetName: string,
   registry?: TypeRegistry,
 ): GeneratedDocFile[] {

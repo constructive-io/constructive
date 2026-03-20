@@ -15,7 +15,7 @@ import {
   getCreateInputTypeName,
   getPatchTypeName,
 } from '../utils';
-import type { CleanTable, TypeRegistry } from '../../../types/schema';
+import type { Table, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
 
 function createImportDeclaration(
@@ -118,7 +118,7 @@ function getQuestionTypeForField(field: { type: { gqlType: string } }): string {
   }
 }
 
-function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
+function buildFieldSchemaObject(table: Table): t.ObjectExpression {
   const fields = getScalarFields(table);
   return t.objectExpression(
     fields.map((f) => {
@@ -153,7 +153,7 @@ function buildFieldSchemaObject(table: CleanTable): t.ObjectExpression {
   );
 }
 
-function buildSelectObject(table: CleanTable, typeRegistry?: TypeRegistry): t.ObjectExpression {
+function buildSelectObject(table: Table, typeRegistry?: TypeRegistry): t.ObjectExpression {
   const fields = getSelectableScalarFields(table, typeRegistry);
   return t.objectExpression(
     fields.map((f) =>
@@ -308,7 +308,7 @@ function buildSubcommandSwitch(
   return t.switchStatement(t.identifier('subcommand'), cases);
 }
 
-function buildListHandler(table: CleanTable, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
+function buildListHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const selectObj = buildSelectObject(table, typeRegistry);
 
@@ -352,7 +352,7 @@ function buildListHandler(table: CleanTable, targetName?: string, typeRegistry?:
   );
 }
 
-function buildGetHandler(table: CleanTable, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
+function buildGetHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const pkFields = getPrimaryKeyInfo(table);
   const pk = pkFields[0];
@@ -427,7 +427,7 @@ function buildGetHandler(table: CleanTable, targetName?: string, typeRegistry?: 
 }
 
 export function getFieldsWithDefaults(
-  table: CleanTable,
+  table: Table,
   typeRegistry?: TypeRegistry,
 ): Set<string> {
   const fieldsWithDefaults = new Set<string>();
@@ -453,7 +453,7 @@ export function getFieldsWithDefaults(
 }
 
 function buildMutationHandler(
-  table: CleanTable,
+  table: Table,
   operation: 'create' | 'update' | 'delete',
   targetName?: string,
   typeRegistry?: TypeRegistry,
@@ -720,7 +720,7 @@ export interface TableCommandOptions {
   typeRegistry?: TypeRegistry;
 }
 
-export function generateTableCommand(table: CleanTable, options?: TableCommandOptions): GeneratedFile {
+export function generateTableCommand(table: Table, options?: TableCommandOptions): GeneratedFile {
   const { singularName } = getTableNames(table);
   const commandName = toKebabCase(singularName);
   const statements: t.Statement[] = [];

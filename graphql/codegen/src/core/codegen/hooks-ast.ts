@@ -6,7 +6,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanArgument } from '../../types/schema';
+import type { Argument } from '../../types/schema';
 import { commentBlock, generateCode } from './babel-ast';
 import { scalarToTsType } from './type-resolver';
 import { getGeneratedFileHeader } from './utils';
@@ -729,7 +729,7 @@ export function scopeTypeLiteral(scopeTypeName: string): t.TSTypeLiteral {
 // ============================================================================
 
 export function wrapInferSelectResultType(
-  typeRefNode: CleanArgument['type'],
+  typeRefNode: Argument['type'],
   payloadTypeName: string,
   selectType: t.TSType,
 ): t.TSType {
@@ -747,13 +747,13 @@ export function wrapInferSelectResultType(
 }
 
 function wrapInferSelectResultTypeNonNullable(
-  typeRefNode: CleanArgument['type'],
+  typeRefNode: Argument['type'],
   payloadTypeName: string,
   selectType: t.TSType,
 ): t.TSType {
   if (typeRefNode.kind === 'NON_NULL' && typeRefNode.ofType) {
     return wrapInferSelectResultTypeNonNullable(
-      typeRefNode.ofType as CleanArgument['type'],
+      typeRefNode.ofType as Argument['type'],
       payloadTypeName,
       selectType,
     );
@@ -761,7 +761,7 @@ function wrapInferSelectResultTypeNonNullable(
   if (typeRefNode.kind === 'LIST' && typeRefNode.ofType) {
     return t.tsArrayType(
       wrapInferSelectResultType(
-        typeRefNode.ofType as CleanArgument['type'],
+        typeRefNode.ofType as Argument['type'],
         payloadTypeName,
         selectType,
       ),
@@ -771,7 +771,7 @@ function wrapInferSelectResultTypeNonNullable(
 }
 
 export function typeRefToTsTypeAST(
-  typeRefNode: CleanArgument['type'],
+  typeRefNode: Argument['type'],
 ): t.TSType {
   const nonNullable = typeRefToTsTypeASTNonNullable(typeRefNode);
 
@@ -783,16 +783,16 @@ export function typeRefToTsTypeAST(
 }
 
 function typeRefToTsTypeASTNonNullable(
-  typeRefNode: CleanArgument['type'],
+  typeRefNode: Argument['type'],
 ): t.TSType {
   if (typeRefNode.kind === 'NON_NULL' && typeRefNode.ofType) {
     return typeRefToTsTypeASTNonNullable(
-      typeRefNode.ofType as CleanArgument['type'],
+      typeRefNode.ofType as Argument['type'],
     );
   }
   if (typeRefNode.kind === 'LIST' && typeRefNode.ofType) {
     return t.tsArrayType(
-      typeRefToTsTypeAST(typeRefNode.ofType as CleanArgument['type']),
+      typeRefToTsTypeAST(typeRefNode.ofType as Argument['type']),
     );
   }
   if (typeRefNode.kind === 'SCALAR') {
@@ -837,7 +837,7 @@ export function buildListSelectionArgsCall(
 
 export function customSelectResultTypeLiteral(
   opName: string,
-  returnType: CleanArgument['type'],
+  returnType: Argument['type'],
   payloadTypeName: string,
   selectType: t.TSType,
 ): t.TSTypeLiteral {

@@ -1,10 +1,10 @@
 /**
  * Type Resolver - Convert GraphQL types to TypeScript
  *
- * Utilities for converting CleanTypeRef and other GraphQL types
+ * Utilities for converting TypeRef and other GraphQL types
  * into TypeScript type strings and interface definitions.
  */
-import type { CleanTypeRef } from '../../types/schema';
+import type { TypeRef } from '../../types/schema';
 import { SCALAR_NAMES, scalarToTsType as resolveScalarToTs } from './scalars';
 
 // ============================================================================
@@ -100,18 +100,18 @@ export function scalarToTsType(scalarName: string): string {
 }
 
 // ============================================================================
-// CleanTypeRef to TypeScript
+// TypeRef to TypeScript
 // ============================================================================
 
 /**
- * Convert a CleanTypeRef to a TypeScript type string
+ * Convert a TypeRef to a TypeScript type string
  * Handles nested LIST and NON_NULL wrappers
  *
  * @param typeRef - The GraphQL type reference
  * @param tracker - Optional TypeTracker to collect referenced types
  */
 export function typeRefToTsType(
-  typeRef: CleanTypeRef,
+  typeRef: TypeRef,
   tracker?: TypeTracker,
 ): string {
   switch (typeRef.kind) {
@@ -155,14 +155,14 @@ export function typeRefToTsType(
 }
 
 /**
- * Convert a CleanTypeRef to a nullable TypeScript type string
+ * Convert a TypeRef to a nullable TypeScript type string
  * (for optional fields that can be null)
  *
  * @param typeRef - The GraphQL type reference
  * @param tracker - Optional TypeTracker to collect referenced types
  */
 export function typeRefToNullableTsType(
-  typeRef: CleanTypeRef,
+  typeRef: TypeRef,
   tracker?: TypeTracker,
 ): string {
   const baseType = typeRefToTsType(typeRef, tracker);
@@ -179,14 +179,14 @@ export function typeRefToNullableTsType(
 /**
  * Check if a type reference is required (wrapped in NON_NULL)
  */
-export function isTypeRequired(typeRef: CleanTypeRef): boolean {
+export function isTypeRequired(typeRef: TypeRef): boolean {
   return typeRef.kind === 'NON_NULL';
 }
 
 /**
  * Check if a type reference is a list
  */
-export function isTypeList(typeRef: CleanTypeRef): boolean {
+export function isTypeList(typeRef: TypeRef): boolean {
   if (typeRef.kind === 'LIST') return true;
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
     return typeRef.ofType.kind === 'LIST';
@@ -197,7 +197,7 @@ export function isTypeList(typeRef: CleanTypeRef): boolean {
 /**
  * Get the base type name from a type reference (unwrapping wrappers)
  */
-export function getTypeBaseName(typeRef: CleanTypeRef): string | null {
+export function getTypeBaseName(typeRef: TypeRef): string | null {
   if (typeRef.name) return typeRef.name;
   if (typeRef.ofType) return getTypeBaseName(typeRef.ofType);
   return null;
@@ -206,7 +206,7 @@ export function getTypeBaseName(typeRef: CleanTypeRef): string | null {
 /**
  * Get the base type kind (unwrapping LIST and NON_NULL)
  */
-export function getBaseTypeKind(typeRef: CleanTypeRef): CleanTypeRef['kind'] {
+export function getBaseTypeKind(typeRef: TypeRef): TypeRef['kind'] {
   if (typeRef.kind === 'LIST' || typeRef.kind === 'NON_NULL') {
     if (typeRef.ofType) {
       return getBaseTypeKind(typeRef.ofType);
