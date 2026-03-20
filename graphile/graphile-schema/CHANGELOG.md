@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.1](https://github.com/constructive-io/constructive/compare/graphile-schema@1.7.0...graphile-schema@1.7.1) (2026-03-20)
+
+### Bug Fixes
+
+- **graphile-schema:** route buildSchemaSDL pool through pg-cache for proper cleanup ([80e967e](https://github.com/constructive-io/constructive/commit/80e967eda2178e2ceefe96d22ad7366a380c6811))
+
 # [1.7.0](https://github.com/constructive-io/constructive/compare/graphile-schema@1.6.7...graphile-schema@1.7.0) (2026-03-20)
 
 ### Features
