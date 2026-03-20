@@ -11,6 +11,9 @@ describe('graphile-postgis exports', () => {
     expect(postgisExports.PostgisExtensionDetectionPlugin).toBeDefined();
     expect(postgisExports.PostgisRegisterTypesPlugin).toBeDefined();
     expect(postgisExports.PostgisGeometryFieldsPlugin).toBeDefined();
+    expect(postgisExports.PostgisMeasurementFieldsPlugin).toBeDefined();
+    expect(postgisExports.PostgisTransformationFieldsPlugin).toBeDefined();
+    expect(postgisExports.PostgisAggregatePlugin).toBeDefined();
   });
 
   it('should export constants', () => {
@@ -36,6 +39,9 @@ describe('graphile-postgis exports', () => {
       'PostgisExtensionDetectionPlugin',
       'PostgisRegisterTypesPlugin',
       'PostgisGeometryFieldsPlugin',
+      'PostgisMeasurementFieldsPlugin',
+      'PostgisTransformationFieldsPlugin',
+      'PostgisAggregatePlugin',
       // Constants
       'GisSubtype',
       'SUBTYPE_STRING_BY_SUBTYPE',
@@ -45,8 +51,9 @@ describe('graphile-postgis exports', () => {
       'getGISTypeDetails',
       'getGISTypeModifier',
       'getGISTypeName',
-      // Connection filter operator factory
-      'createPostgisOperatorFactory'
+      // Connection filter operator factories
+      'createPostgisOperatorFactory',
+      'createWithinDistanceOperatorFactory'
     ];
 
     const actualExports = Object.keys(postgisExports);

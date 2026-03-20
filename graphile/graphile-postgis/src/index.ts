@@ -22,9 +22,13 @@ export { PostgisInflectionPlugin } from './plugins/inflection';
 export { PostgisExtensionDetectionPlugin } from './plugins/detect-extension';
 export { PostgisRegisterTypesPlugin } from './plugins/register-types';
 export { PostgisGeometryFieldsPlugin } from './plugins/geometry-fields';
+export { PostgisMeasurementFieldsPlugin } from './plugins/measurement-fields';
+export { PostgisTransformationFieldsPlugin } from './plugins/transformation-functions';
+export { PostgisAggregatePlugin } from './plugins/aggregate-functions';
 
-// Connection filter operator factory (spatial operators for graphile-connection-filter)
+// Connection filter operator factories (spatial operators for graphile-connection-filter)
 export { createPostgisOperatorFactory } from './plugins/connection-filter-operators';
+export { createWithinDistanceOperatorFactory } from './plugins/within-distance-operator';
 
 // Constants and utilities
 export { GisSubtype, SUBTYPE_STRING_BY_SUBTYPE, GIS_SUBTYPE_NAME, CONCRETE_SUBTYPES } from './constants';
