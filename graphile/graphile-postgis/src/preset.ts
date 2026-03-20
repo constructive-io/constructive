@@ -4,7 +4,11 @@ import { PostgisInflectionPlugin } from './plugins/inflection';
 import { PostgisExtensionDetectionPlugin } from './plugins/detect-extension';
 import { PostgisRegisterTypesPlugin } from './plugins/register-types';
 import { PostgisGeometryFieldsPlugin } from './plugins/geometry-fields';
+import { PostgisMeasurementFieldsPlugin } from './plugins/measurement-fields';
+import { PostgisTransformationFieldsPlugin } from './plugins/transformation-functions';
+import { PostgisAggregatePlugin } from './plugins/aggregate-functions';
 import { createPostgisOperatorFactory } from './plugins/connection-filter-operators';
+import { createWithinDistanceOperatorFactory } from './plugins/within-distance-operator';
 
 /**
  * GraphilePostgisPreset
@@ -17,7 +21,10 @@ import { createPostgisOperatorFactory } from './plugins/connection-filter-operat
  * - PostGIS extension auto-detection
  * - PostGIS inflection (type names for subtypes, Z/M variants)
  * - Geometry field plugins (coordinates, GeoJSON output)
- * - Connection filter operators (26 spatial operators via declarative factory API)
+ * - Measurement fields (area, length, perimeter on geometry types)
+ * - Transformation fields (centroid, bbox, numPoints on geometry types)
+ * - Aggregate function definitions (ST_Extent, ST_Union, ST_Collect, ST_ConvexHull)
+ * - Connection filter operators (26 spatial operators + withinDistance via declarative factory API)
  *
  * @example
  * ```typescript
@@ -34,13 +41,18 @@ export const GraphilePostgisPreset: GraphileConfig.Preset = {
     PostgisInflectionPlugin,
     PostgisExtensionDetectionPlugin,
     PostgisRegisterTypesPlugin,
-    PostgisGeometryFieldsPlugin
+    PostgisGeometryFieldsPlugin,
+    PostgisMeasurementFieldsPlugin,
+    PostgisTransformationFieldsPlugin,
+    PostgisAggregatePlugin
   ],
   schema: {
+    // connectionFilterOperatorFactories is augmented by graphile-connection-filter
     connectionFilterOperatorFactories: [
       createPostgisOperatorFactory(),
+      createWithinDistanceOperatorFactory(),
     ],
-  },
+  } as GraphileConfig.Preset['schema'] & Record<string, unknown>,
 };
 
 export default GraphilePostgisPreset;
