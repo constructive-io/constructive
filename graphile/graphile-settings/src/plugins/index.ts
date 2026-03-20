@@ -110,3 +110,10 @@ export type {
   TrgmAdapterOptions,
   PgvectorAdapterOptions,
 } from 'graphile-search';
+
+// Blueprint types — @oneOf typed input types for blueprint definitions
+export {
+  createBlueprintTypesPlugin,
+  BlueprintTypesPreset,
+} from './blueprint-types';
+export type { NodeTypeRegistryEntry } from './blueprint-types';

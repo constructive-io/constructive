@@ -93,6 +93,8 @@ export interface IntrospectionType {
   enumValues: IntrospectionEnumValue[] | null;
   /** Interfaces implemented by OBJECT types */
   interfaces: Array<{ name: string }> | null;
+  /** Whether this INPUT_OBJECT type uses @oneOf (GraphQL 16+ discriminated union input) */
+  isOneOf?: boolean;
 }
 
 // ============================================================================
