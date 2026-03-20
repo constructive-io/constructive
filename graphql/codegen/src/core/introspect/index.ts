@@ -25,8 +25,8 @@ export {
 } from './source';
 
 // Schema fetching (still used by watch mode)
-export type { FetchSchemaOptions, FetchSchemaResult, FetchGraphqlQueryResult } from './fetch-schema';
-export { fetchSchema, fetchGraphqlQuery } from './fetch-schema';
+export type { FetchSchemaOptions, FetchSchemaResult } from './fetch-schema';
+export { fetchSchema } from './fetch-schema';
 
 // Transform utilities (only filterTables, getTableNames, findTable are still useful)
 export { filterTables, findTable, getTableNames } from './transform';
