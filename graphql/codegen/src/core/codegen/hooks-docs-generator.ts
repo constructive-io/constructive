@@ -1,10 +1,13 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanOperation, CleanTable } from '../../types/schema';
+import type { CleanOperation, CleanTable, TypeRegistry } from '../../types/schema';
 import {
   buildSkillFile,
   buildSkillReference,
   formatArgType,
+  fieldPlaceholder,
+  pkPlaceholder,
+  argPlaceholder,
   getReadmeHeader,
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
@@ -35,6 +38,7 @@ function getCustomHookName(op: CleanOperation): string {
 export function generateHooksReadme(
   tables: CleanTable[],
   customOperations: CleanOperation[],
+  registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
 
@@ -122,7 +126,7 @@ export function generateHooksReadme(
         lines.push(
           `const { data: item } = ${getSingleQueryHookName(table)}({`,
         );
-        lines.push(`  ${pk.name}: '<value>',`);
+        lines.push(`  ${pk.name}: ${pkPlaceholder(pk)},`);
         lines.push(
           `  selection: { fields: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } },`,
         );
@@ -139,7 +143,7 @@ export function generateHooksReadme(
       );
       lines.push('});');
       lines.push(
-        `create({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: '<value>'`).join(', ')} });`,
+        `create({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
       );
       lines.push('```');
       lines.push('');
@@ -372,6 +376,7 @@ export function generateHooksSkills(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   targetName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
   const skillName = `hooks-${targetName}`;
@@ -399,7 +404,7 @@ export function generateHooksSkills(
           `${getListQueryHookName(table)}({ selection: { fields: { ${selectFields} } } })`,
           ...(hasValidPrimaryKey(table)
             ? [
-                `${getSingleQueryHookName(table)}({ ${pk.name}: '<value>', selection: { fields: { ${selectFields} } } })`,
+                `${getSingleQueryHookName(table)}({ ${pk.name}: ${pkPlaceholder(pk)}, selection: { fields: { ${selectFields} } } })`,
               ]
             : []),
           `${getCreateMutationHookName(table)}({ selection: { fields: { ${pk.name}: true } } })`,
@@ -425,7 +430,7 @@ export function generateHooksSkills(
               `const { mutate } = ${getCreateMutationHookName(table)}({`,
               `  selection: { fields: { ${pk.name}: true } },`,
               '});',
-              `mutate({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: '<value>'`).join(', ')} });`,
+              `mutate({ ${scalarFields.filter((f) => f.name !== pk.name && f.name !== 'nodeId' && f.name !== 'createdAt' && f.name !== 'updatedAt').map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} });`,
             ],
           },
         ],
@@ -438,7 +443,7 @@ export function generateHooksSkills(
     const hookName = getCustomHookName(op);
     const callArgs =
       op.args.length > 0
-        ? `{ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }`
+        ? `{ ${op.args.map((a) => `${a.name}: ${argPlaceholder(a, registry)}`).join(', ')} }`
         : '';
 
     const refName = toKebabCase(op.name);
