@@ -2,11 +2,42 @@
  * Endpoint Schema Source
  *
  * Fetches GraphQL schema via introspection from a live endpoint.
- * Wraps the existing fetchSchema() function with the SchemaSource interface.
+ * Optionally fetches _meta query in parallel for M:N junction key metadata.
  */
-import { fetchSchema } from '../fetch-schema';
-import type { SchemaSource, SchemaSourceResult } from './types';
+import { fetchSchema, fetchGraphqlQuery } from '../fetch-schema';
+import type { MetaTableInfo, SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
+
+/**
+ * _meta GraphQL query — fetches M:N junction key metadata.
+ * Only the fields needed for enriching CleanManyToManyRelation are selected.
+ */
+const META_QUERY = `{
+  _meta {
+    tables {
+      name
+      schemaName
+      relations {
+        manyToMany {
+          fieldName
+          type
+          junctionTable { name }
+          junctionLeftKeyAttributes { name }
+          junctionRightKeyAttributes { name }
+          leftKeyAttributes { name }
+          rightKeyAttributes { name }
+          rightTable { name }
+        }
+      }
+    }
+  }
+}`;
+
+interface MetaQueryResponse {
+  _meta: {
+    tables: MetaTableInfo[];
+  };
+}
 
 export interface EndpointSchemaSourceOptions {
   /**
@@ -41,30 +72,45 @@ export class EndpointSchemaSource implements SchemaSource {
   }
 
   async fetch(): Promise<SchemaSourceResult> {
-    const result = await fetchSchema({
+    const fetchOpts = {
       endpoint: this.options.endpoint,
       authorization: this.options.authorization,
       headers: this.options.headers,
       timeout: this.options.timeout,
-    });
+    };
 
-    if (!result.success) {
+    // Run introspection and _meta query in parallel.
+    // _meta is best-effort: if the endpoint doesn't expose it, we proceed without.
+    const [introspectionResult, metaResult] = await Promise.all([
+      fetchSchema(fetchOpts),
+      fetchGraphqlQuery<MetaQueryResponse>({ ...fetchOpts, query: META_QUERY })
+        .catch((): null => null),
+    ]);
+
+    if (!introspectionResult.success) {
       throw new SchemaSourceError(
-        result.error ?? 'Unknown error fetching schema',
+        introspectionResult.error ?? 'Unknown error fetching schema',
         this.describe(),
       );
     }
 
-    if (!result.data) {
+    if (!introspectionResult.data) {
       throw new SchemaSourceError(
         'No introspection data returned',
         this.describe(),
       );
     }
 
-    return {
-      introspection: result.data,
+    const result: SchemaSourceResult = {
+      introspection: introspectionResult.data,
     };
+
+    // Attach _meta data if available
+    if (metaResult?.success && metaResult.data?._meta?.tables) {
+      result.tablesMeta = metaResult.data._meta.tables;
+    }
+
+    return result;
   }
 
   describe(): string {

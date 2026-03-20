@@ -71,6 +71,79 @@ export interface FetchSchemaResult {
   statusCode?: number;
 }
 
+export interface FetchGraphqlQueryResult<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  statusCode?: number;
+}
+
+/**
+ * Execute an arbitrary GraphQL query against an endpoint.
+ * Reuses the same HTTP plumbing as fetchSchema but accepts any query string.
+ */
+export async function fetchGraphqlQuery<T = unknown>(
+  options: FetchSchemaOptions & { query: string },
+): Promise<FetchGraphqlQueryResult<T>> {
+  const { endpoint, authorization, headers = {}, timeout = 30000, query } = options;
+
+  const url = new URL(endpoint);
+
+  const requestHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...headers,
+  };
+
+  if (authorization) {
+    requestHeaders['Authorization'] = authorization;
+  }
+
+  const body = JSON.stringify({ query, variables: {} });
+
+  const requestOptions: http.RequestOptions = {
+    method: 'POST',
+    headers: requestHeaders,
+  };
+
+  try {
+    const response = await makeRequest(url, requestOptions, body, timeout);
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      return {
+        success: false,
+        error: `HTTP ${response.statusCode}: ${response.statusMessage}`,
+        statusCode: response.statusCode,
+      };
+    }
+
+    const json = JSON.parse(response.data) as {
+      data?: T;
+      errors?: Array<{ message: string }>;
+    };
+
+    if (json.errors && json.errors.length > 0) {
+      const errorMessages = json.errors.map((e) => e.message).join('; ');
+      return {
+        success: false,
+        error: `GraphQL errors: ${errorMessages}`,
+        statusCode: response.statusCode,
+      };
+    }
+
+    return {
+      success: true,
+      data: json.data,
+      statusCode: response.statusCode,
+    };
+  } catch (err) {
+    if (err instanceof Error) {
+      return { success: false, error: err.message };
+    }
+    return { success: false, error: 'Unknown error occurred' };
+  }
+}
+
 /**
  * Fetch the full schema introspection from a GraphQL endpoint
  */

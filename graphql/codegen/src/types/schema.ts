@@ -192,6 +192,14 @@ export interface CleanManyToManyRelation {
   rightTable: string;
   junctionTable: string;
   type: string | null;
+  /** Junction FK field names pointing to the left table */
+  junctionLeftKeyFields?: string[];
+  /** Junction FK field names pointing to the right table */
+  junctionRightKeyFields?: string[];
+  /** Left table key fields (usually just 'id') */
+  leftKeyFields?: string[];
+  /** Right table key fields (usually just 'id') */
+  rightKeyFields?: string[];
 }
 
 // ============================================================================

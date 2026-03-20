@@ -3,10 +3,11 @@
  *
  * Loads GraphQL schema directly from a PostgreSQL database using PostGraphile
  * introspection and converts it to introspection format.
+ * Also returns _meta table metadata when available (via MetaSchemaPlugin cache).
  */
 import { buildSchema, introspectionFromSchema } from 'graphql';
 
-import { buildSchemaSDL } from 'graphile-schema';
+import { buildSchemaWithMeta } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import {
@@ -14,7 +15,7 @@ import {
   resolveApiSchemas,
   validateServicesSchemas,
 } from './api-schemas';
-import type { SchemaSource, SchemaSourceResult } from './types';
+import type { MetaTableInfo, SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 
 export interface DatabaseSchemaSourceOptions {
@@ -78,13 +79,16 @@ export class DatabaseSchemaSource implements SchemaSource {
       schemas = this.options.schemas ?? ['public'];
     }
 
-    // Build SDL from database
+    // Build SDL + _meta from database
     let sdl: string;
+    let tablesMeta: unknown[] = [];
     try {
-      sdl = await buildSchemaSDL({
+      const result = await buildSchemaWithMeta({
         database,
         schemas,
       });
+      sdl = result.sdl;
+      tablesMeta = result.tablesMeta;
     } catch (err) {
       throw new SchemaSourceError(
         `Failed to introspect database: ${err instanceof Error ? err.message : 'Unknown error'}`,
@@ -130,7 +134,10 @@ export class DatabaseSchemaSource implements SchemaSource {
       JSON.stringify(introspectionResult),
     ) as IntrospectionQueryResponse;
 
-    return { introspection };
+    return {
+      introspection,
+      tablesMeta: tablesMeta as MetaTableInfo[],
+    };
   }
 
   describe(): string {
