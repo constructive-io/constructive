@@ -11,6 +11,7 @@ import {
   MetaSchemaPreset,
   PgTypeMappingsPreset,
   RequiredInputPreset,
+  NodeTypeRegistryPreset,
 } from '../plugins';
 import { UnifiedSearchPreset, createMatchesOperatorFactory, createTrgmOperatorFactories } from 'graphile-search';
 import { GraphilePostgisPreset, createPostgisOperatorFactory } from 'graphile-postgis';
@@ -90,6 +91,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     SqlExpressionValidatorPreset(),
     PgTypeMappingsPreset,
     RequiredInputPreset,
+    NodeTypeRegistryPreset,
   ],
   /**
    * Disable PostGraphile core's condition argument entirely.

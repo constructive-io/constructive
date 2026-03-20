@@ -1,6 +1,6 @@
 import deepmerge from 'deepmerge'
 import { printSchema } from 'graphql'
-import { ConstructivePreset, makePgService, fetchNodeTypeRegistry, BlueprintTypesPreset } from 'graphile-settings'
+import { ConstructivePreset, makePgService } from 'graphile-settings'
 import { makeSchema } from 'graphile-build'
 import { buildConnectionString } from 'pg-cache'
 import { getPgEnvOptions } from 'pg-env'
@@ -25,10 +25,8 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
     config.database,
   )
 
-  const nodeTypes = await fetchNodeTypeRegistry(connectionString);
-
   const basePreset: GraphileConfig.Preset = {
-    extends: [ConstructivePreset, BlueprintTypesPreset(nodeTypes)],
+    extends: [ConstructivePreset],
     pgServices: [
       makePgService({
         connectionString,

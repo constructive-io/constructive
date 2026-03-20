@@ -6,7 +6,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
-import { ConstructivePreset, makePgService, fetchNodeTypeRegistry, BlueprintTypesPreset } from 'graphile-settings';
+import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { buildConnectionString } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
@@ -125,20 +125,15 @@ const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]`
 
 /**
  * Build a PostGraphile v5 preset for a tenant.
- *
- * Queries node_type_registry at build time to generate @oneOf typed
- * blueprint input types with SuperCase node type names as discriminant keys.
  */
-const buildPreset = async (
+const buildPreset = (
   connectionString: string,
   schemas: string[],
   anonRole: string,
   roleName: string,
-): Promise<GraphileConfig.Preset> => {
-  const nodeTypes = await fetchNodeTypeRegistry(connectionString);
-
+): GraphileConfig.Preset => {
   return {
-  extends: [ConstructivePreset, BlueprintTypesPreset(nodeTypes)],
+  extends: [ConstructivePreset],
   pgServices: [
     makePgService({
       connectionString,
@@ -277,7 +272,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       );
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = await buildPreset(connectionString, schema || [], anonRole, roleName);
+      const preset = buildPreset(connectionString, schema || [], anonRole, roleName);
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,
