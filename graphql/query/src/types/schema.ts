@@ -289,4 +289,6 @@ export interface ResolvedType {
   enumValues?: string[];
   /** Possible types for UNION types */
   possibleTypes?: string[];
+  /** Whether this INPUT_OBJECT uses @oneOf (GraphQL 16+ discriminated union input) */
+  isOneOf?: boolean;
 }

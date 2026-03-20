@@ -83,6 +83,10 @@ export function buildTypeRegistry(types: IntrospectionType[]): TypeRegistry {
       resolvedType.inputFields = type.inputFields.map((field) =>
         transformInputValueToCleanArgumentShallow(field),
       );
+      // Detect @oneOf directive (GraphQL 16+ discriminated union inputs)
+      if (type.isOneOf) {
+        resolvedType.isOneOf = true;
+      }
     }
   }
 
