@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.6.7...@constructive-io/graphql-query@3.7.0) (2026-03-20)
+
+### Features
+
+- [@one](https://github.com/one)Of typed blueprint definitions with SuperCase node type keys ([3d040b1](https://github.com/constructive-io/constructive/commit/3d040b1506a1f831ca7c9c9de7b872a49e42c9f3))
+- wire BlueprintTypesPlugin into production schema build ([7addba2](https://github.com/constructive-io/constructive/commit/7addba2168ff3b75ae54492f5c011aa3ca146d40)), closes [#857](https://github.com/constructive-io/constructive/issues/857)
+
 ## [3.6.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.6.6...@constructive-io/graphql-query@3.6.7) (2026-03-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-query

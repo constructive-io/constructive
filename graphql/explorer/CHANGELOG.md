@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.6.7...@constructive-io/graphql-explorer@4.7.0) (2026-03-20)
+
+### Features
+
+- wire BlueprintTypesPlugin into production schema build ([7addba2](https://github.com/constructive-io/constructive/commit/7addba2168ff3b75ae54492f5c011aa3ca146d40)), closes [#857](https://github.com/constructive-io/constructive/issues/857)
+
 ## [4.6.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.6.6...@constructive-io/graphql-explorer@4.6.7) (2026-03-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-explorer
