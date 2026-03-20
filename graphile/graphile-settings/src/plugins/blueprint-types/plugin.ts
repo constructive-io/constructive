@@ -530,7 +530,7 @@ export function createBlueprintTypesPlugin(
   nodeTypes: NodeTypeRegistryEntry[],
 ): GraphileConfig.Plugin {
   return {
-    name: 'NodeTypeRegistryPlugin',
+    name: 'BlueprintTypesPlugin',
     version: '1.0.0',
     description:
       'Generates @oneOf typed input types from static node_type_registry entries',
