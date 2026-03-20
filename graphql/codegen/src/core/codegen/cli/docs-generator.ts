@@ -1,6 +1,6 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
+import type { Table, Operation, TypeRegistry } from '../../../types/schema';
 import {
   flattenArgs,
   flattenedArgsToFlags,
@@ -28,8 +28,8 @@ export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile, McpTool } from '../docs-utils';
 
 export function generateReadme(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   registry?: TypeRegistry,
 ): GeneratedDocFile {
@@ -210,8 +210,8 @@ export function generateReadme(
 }
 
 export function generateAgentsDocs(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   _registry?: TypeRegistry,
 ): GeneratedDocFile {
@@ -265,8 +265,8 @@ export function generateAgentsDocs(
 }
 
 export function getCliMcpTools(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   registry?: TypeRegistry,
 ): McpTool[] {
@@ -520,8 +520,8 @@ export function getCliMcpTools(
 }
 
 export function generateSkills(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   targetName: string,
   registry?: TypeRegistry,
@@ -753,8 +753,8 @@ export interface MultiTargetDocsInput {
   targets: Array<{
     name: string;
     endpoint: string;
-    tables: CleanTable[];
-    customOperations: CleanOperation[];
+    tables: Table[];
+    customOperations: Operation[];
     isAuthTarget?: boolean;
   }>;
 }

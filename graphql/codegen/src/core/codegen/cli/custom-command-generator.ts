@@ -3,7 +3,7 @@ import { toKebabCase } from 'komoji';
 
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader, ucFirst } from '../utils';
-import type { CleanOperation, CleanTypeRef } from '../../../types/schema';
+import type { Operation, TypeRef } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
 import { buildQuestionsArray } from './arg-mapper';
 
@@ -103,7 +103,7 @@ function buildErrorCatch(errorMessage: string): t.CatchClause {
 /**
  * Unwrap NON_NULL / LIST wrappers to get the underlying named type.
  */
-function unwrapType(ref: CleanTypeRef): CleanTypeRef {
+function unwrapType(ref: TypeRef): TypeRef {
   if ((ref.kind === 'NON_NULL' || ref.kind === 'LIST') && ref.ofType) {
     return unwrapType(ref.ofType);
   }
@@ -113,7 +113,7 @@ function unwrapType(ref: CleanTypeRef): CleanTypeRef {
 /**
  * Check if the return type (after unwrapping) is an OBJECT type.
  */
-function hasObjectReturnType(returnType: CleanTypeRef): boolean {
+function hasObjectReturnType(returnType: TypeRef): boolean {
   const base = unwrapType(returnType);
   return base.kind === 'OBJECT';
 }
@@ -125,7 +125,7 @@ function hasObjectReturnType(returnType: CleanTypeRef): boolean {
  * Falls back to 'clientMutationId' for mutations without known fields.
  */
 function buildDefaultSelectString(
-  returnType: CleanTypeRef,
+  returnType: TypeRef,
   isMutation: boolean,
 ): string {
   const base = unwrapType(returnType);
@@ -203,7 +203,7 @@ export interface CustomCommandOptions {
   saveToken?: boolean;
 }
 
-export function generateCustomCommand(op: CleanOperation, options?: CustomCommandOptions): GeneratedFile {
+export function generateCustomCommand(op: Operation, options?: CustomCommandOptions): GeneratedFile {
   const commandName = toKebabCase(op.name);
   const opKind = op.kind === 'mutation' ? 'mutation' : 'query';
   const statements: t.Statement[] = [];

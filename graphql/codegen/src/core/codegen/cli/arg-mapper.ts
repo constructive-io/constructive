@@ -1,22 +1,22 @@
 import * as t from '@babel/types';
 
-import type { CleanArgument, CleanTypeRef } from '../../../types/schema';
+import type { Argument, TypeRef } from '../../../types/schema';
 
-function unwrapNonNull(typeRef: CleanTypeRef): { inner: CleanTypeRef; required: boolean } {
+function unwrapNonNull(typeRef: TypeRef): { inner: TypeRef; required: boolean } {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
     return { inner: typeRef.ofType, required: true };
   }
   return { inner: typeRef, required: false };
 }
 
-function resolveBaseType(typeRef: CleanTypeRef): CleanTypeRef {
+function resolveBaseType(typeRef: TypeRef): TypeRef {
   if ((typeRef.kind === 'NON_NULL' || typeRef.kind === 'LIST') && typeRef.ofType) {
     return resolveBaseType(typeRef.ofType);
   }
   return typeRef;
 }
 
-export function buildQuestionObject(arg: CleanArgument, namePrefix?: string): t.ObjectExpression {
+export function buildQuestionObject(arg: Argument, namePrefix?: string): t.ObjectExpression {
   const { inner, required } = unwrapNonNull(arg.type);
   const base = resolveBaseType(arg.type);
   const props: t.ObjectProperty[] = [];
@@ -102,7 +102,7 @@ export function buildQuestionObject(arg: CleanArgument, namePrefix?: string): t.
 
 function buildInputObjectQuestion(
   _name: string,
-  typeRef: CleanTypeRef,
+  typeRef: TypeRef,
   _required: boolean,
 ): t.ObjectExpression {
   if (typeRef.inputFields && typeRef.inputFields.length > 0) {
@@ -119,7 +119,7 @@ function buildInputObjectQuestion(
   ]);
 }
 
-export function buildQuestionsArray(args: CleanArgument[]): t.ArrayExpression {
+export function buildQuestionsArray(args: Argument[]): t.ArrayExpression {
   const questions: t.Expression[] = [];
   for (const arg of args) {
     const base = resolveBaseType(arg.type);

@@ -16,7 +16,7 @@ import { deployPgpm } from 'pgsql-seed';
 
 import type { CliConfig, DbConfig, GraphQLSDKConfigTarget, PgpmConfig, SchemaConfig } from '../types/config';
 import { getConfigOptions } from '../types/config';
-import type { CleanOperation, CleanTable, TypeRegistry } from '../types/schema';
+import type { Operation, Table, TypeRegistry } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
 import { generateRootBarrel } from './codegen/barrel';
 import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
@@ -74,10 +74,10 @@ export interface GenerateResult {
   filesWritten?: string[];
   errors?: string[];
   pipelineData?: {
-    tables: CleanTable[];
+    tables: Table[];
     customOperations: {
-      queries: CleanOperation[];
-      mutations: CleanOperation[];
+      queries: Operation[];
+      mutations: Operation[];
       typeRegistry?: TypeRegistry;
     };
   };
@@ -338,7 +338,7 @@ export async function generate(
 
   // Generate docs for each enabled generator
   const docsConfig = resolveDocsConfig(config.docs);
-  const allCustomOps: CleanOperation[] = [
+  const allCustomOps: Operation[] = [
     ...(customOperations.queries ?? []),
     ...(customOperations.mutations ?? []),
   ];

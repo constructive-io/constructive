@@ -8,7 +8,7 @@
 // Original QueryBuilder runtime types
 export * from './core';
 
-// Codegen-style schema types (CleanTable, CleanField, etc.)
+// Codegen-style schema types (Table, Field, etc.)
 export * from './schema';
 
 // Introspection types

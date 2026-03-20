@@ -14,7 +14,7 @@
 import * as t from '@babel/types';
 
 import type {
-  CleanArgument,
+  Argument,
   ResolvedType,
   TypeRegistry,
 } from '../../types/schema';
@@ -57,17 +57,17 @@ const SKIP_TYPES = new Set([
 
 const SKIP_TYPE_PATTERNS: RegExp[] = [];
 
-function typeRefToTs(typeRef: CleanArgument['type']): string {
+function typeRefToTs(typeRef: Argument['type']): string {
   if (typeRef.kind === 'NON_NULL') {
     if (typeRef.ofType) {
-      return typeRefToTs(typeRef.ofType as CleanArgument['type']);
+      return typeRefToTs(typeRef.ofType as Argument['type']);
     }
     return typeRef.name ?? 'unknown';
   }
 
   if (typeRef.kind === 'LIST') {
     if (typeRef.ofType) {
-      return `${typeRefToTs(typeRef.ofType as CleanArgument['type'])}[]`;
+      return `${typeRefToTs(typeRef.ofType as Argument['type'])}[]`;
     }
     return 'unknown[]';
   }
@@ -76,7 +76,7 @@ function typeRefToTs(typeRef: CleanArgument['type']): string {
   return scalarToTsType(name, { unknownScalar: 'name' });
 }
 
-function isRequired(typeRef: CleanArgument['type']): boolean {
+function isRequired(typeRef: Argument['type']): boolean {
   return typeRef.kind === 'NON_NULL';
 }
 

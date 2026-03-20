@@ -7,7 +7,7 @@ import * as t from '@babel/types';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import type { CleanTable } from '../../../types/schema';
+import type { Table } from '../../../types/schema';
 import { commentBlock, generateCode } from '../babel-ast';
 import { getGeneratedFileHeader, getTableNames, lcFirst } from '../utils';
 
@@ -119,7 +119,7 @@ function createImportDeclaration(
  * Generate the main index.ts with createClient factory
  */
 export function generateCreateClientFile(
-  tables: CleanTable[],
+  tables: Table[],
   hasCustomQueries: boolean,
   hasCustomMutations: boolean,
   options?: { nodeHttpAdapter?: boolean },

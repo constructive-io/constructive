@@ -12,6 +12,7 @@ export { pluralize, singularize } from 'inflekt';
 // Schema sources
 export type {
   CreateSchemaSourceOptions,
+  MetaTableInfo,
   SchemaSource,
   SchemaSourceResult,
 } from './source';

@@ -1,6 +1,6 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanOperation, CleanTable, TypeRegistry } from '../../../types/schema';
+import type { Operation, Table, TypeRegistry } from '../../../types/schema';
 import {
   buildSkillFile,
   buildSkillReference,
@@ -25,8 +25,8 @@ import {
 } from '../utils';
 
 export function generateOrmReadme(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
@@ -161,8 +161,8 @@ export function generateOrmReadme(
 }
 
 export function generateOrmAgentsDocs(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
 ): GeneratedDocFile {
   const lines: string[] = [];
   const tableCount = tables.length;
@@ -219,8 +219,8 @@ export function generateOrmAgentsDocs(
 }
 
 export function getOrmMcpTools(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
 ): McpTool[] {
   const tools: McpTool[] = [];
 
@@ -359,8 +359,8 @@ export function getOrmMcpTools(
 }
 
 export function generateOrmSkills(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   targetName: string,
   registry?: TypeRegistry,
 ): GeneratedDocFile[] {

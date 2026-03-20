@@ -4,14 +4,14 @@
 
 // Schema types
 export type {
-  CleanBelongsToRelation,
-  CleanField,
-  CleanFieldType,
-  CleanHasManyRelation,
-  CleanHasOneRelation,
-  CleanManyToManyRelation,
-  CleanRelations,
-  CleanTable,
+  BelongsToRelation,
+  Field,
+  FieldType,
+  HasManyRelation,
+  HasOneRelation,
+  ManyToManyRelation,
+  Relations,
+  Table,
   ConstraintInfo,
   ForeignKeyConstraint,
   TableConstraints,

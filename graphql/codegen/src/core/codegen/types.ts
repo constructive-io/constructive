@@ -3,7 +3,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanTable } from '../../types/schema';
+import type { Table } from '../../types/schema';
 import { SCALAR_NAMES } from './scalars';
 import { generateCode } from './babel-ast';
 import {
@@ -291,7 +291,7 @@ function createTypeAlias(
 }
 
 function collectCustomScalarTypes(
-  tables: CleanTable[],
+  tables: Table[],
   excludedTypeNames: Set<string>,
 ): string[] {
   const customScalarTypes = new Set<string>();
@@ -314,7 +314,7 @@ function collectCustomScalarTypes(
  * Generate types.ts content with all entity interfaces and base filter types
  */
 export function generateTypesFile(
-  tables: CleanTable[],
+  tables: Table[],
   options: GenerateTypesOptions = {},
 ): string {
   const { enumsFromSchemaTypes = [] } = options;

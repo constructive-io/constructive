@@ -14,9 +14,9 @@ import {
   toScreamingSnake,
   ucFirst,
 } from '../../core/codegen/utils';
-import type { CleanRelations, CleanTable } from '../../types/schema';
+import type { Relations, Table } from '../../types/schema';
 
-const emptyRelations: CleanRelations = {
+const emptyRelations: Relations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
@@ -27,13 +27,13 @@ const emptyRelations: CleanRelations = {
 function createTable(
   name: string,
   overrides: Record<string, unknown> = {},
-): CleanTable {
+): Table {
   return {
     name,
     fields: [],
     relations: emptyRelations,
     ...overrides,
-  } as CleanTable;
+  } as Table;
 }
 
 describe('utils', () => {

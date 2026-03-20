@@ -8,7 +8,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanTable } from '../../types/schema';
+import type { Table } from '../../types/schema';
 import { asConst } from './babel-ast';
 import {
   addJSDocComment,
@@ -80,7 +80,7 @@ export interface QueryGeneratorOptions {
 }
 
 export function generateListQueryHook(
-  table: CleanTable,
+  table: Table,
   options: QueryGeneratorOptions = {},
 ): GeneratedQueryFile {
   const {
@@ -573,7 +573,7 @@ export function generateListQueryHook(
 }
 
 export function generateSingleQueryHook(
-  table: CleanTable,
+  table: Table,
   options: QueryGeneratorOptions = {},
 ): GeneratedQueryFile | null {
   if (!hasValidPrimaryKey(table)) return null;
@@ -1033,7 +1033,7 @@ export function generateSingleQueryHook(
 }
 
 export function generateAllQueryHooks(
-  tables: CleanTable[],
+  tables: Table[],
   options: QueryGeneratorOptions = {},
 ): GeneratedQueryFile[] {
   const files: GeneratedQueryFile[] = [];

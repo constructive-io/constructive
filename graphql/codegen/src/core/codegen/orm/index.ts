@@ -6,8 +6,8 @@
  */
 import type { GraphQLSDKConfigTarget } from '../../../types/config';
 import type {
-  CleanOperation,
-  CleanTable,
+  Operation,
+  Table,
   TypeRegistry,
 } from '../../../types/schema';
 import { generateModelsBarrel, generateTypesBarrel } from './barrel';
@@ -34,10 +34,10 @@ export interface GeneratedFile {
 }
 
 export interface GenerateOrmOptions {
-  tables: CleanTable[];
+  tables: Table[];
   customOperations?: {
-    queries: CleanOperation[];
-    mutations: CleanOperation[];
+    queries: Operation[];
+    mutations: Operation[];
     typeRegistry?: TypeRegistry;
   };
   config: GraphQLSDKConfigTarget;

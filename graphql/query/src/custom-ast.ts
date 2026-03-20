@@ -2,7 +2,7 @@ import * as t from 'gql-ast';
 import { Kind } from 'graphql';
 import type { FieldNode, InlineFragmentNode } from 'graphql';
 
-import type { CleanField } from './types/schema';
+import type { Field } from './types/schema';
 import type { MetaField } from './types';
 
 /**
@@ -28,9 +28,9 @@ export function getCustomAst(fieldDefn?: MetaField): FieldNode | null {
 }
 
 /**
- * Generate custom AST for CleanField type - handles GraphQL types that need subfield selections
+ * Generate custom AST for Field type - handles GraphQL types that need subfield selections
  */
-export function getCustomAstForCleanField(field: CleanField): FieldNode {
+export function getCustomAstForCleanField(field: Field): FieldNode {
   const { name, type } = field;
   const { gqlType, pgType } = type;
 
@@ -63,9 +63,9 @@ export function getCustomAstForCleanField(field: CleanField): FieldNode {
 }
 
 /**
- * Check if a CleanField requires subfield selection based on its GraphQL type
+ * Check if a Field requires subfield selection based on its GraphQL type
  */
-export function requiresSubfieldSelection(field: CleanField): boolean {
+export function requiresSubfieldSelection(field: Field): boolean {
   const { gqlType } = field.type;
 
   // Complex GraphQL types that require subfield selection

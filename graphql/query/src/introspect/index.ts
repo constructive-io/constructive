@@ -1,7 +1,7 @@
 /**
  * Introspection barrel export
  *
- * Re-exports introspection utilities for converting GraphQL schemas to CleanTable format.
+ * Re-exports introspection utilities for converting GraphQL schemas to Table format.
  */
 
 export * from './infer-tables';

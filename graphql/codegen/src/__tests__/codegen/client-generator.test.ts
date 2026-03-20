@@ -10,9 +10,9 @@ import {
   generateSelectTypesFile,
 } from '../../core/codegen/orm/client-generator';
 import type {
-  CleanFieldType,
-  CleanRelations,
-  CleanTable,
+  FieldType,
+  Relations,
+  Table,
 } from '../../types/schema';
 
 // ============================================================================
@@ -20,11 +20,11 @@ import type {
 // ============================================================================
 
 const fieldTypes = {
-  uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
-  string: { gqlType: 'String', isArray: false } as CleanFieldType,
+  uuid: { gqlType: 'UUID', isArray: false } as FieldType,
+  string: { gqlType: 'String', isArray: false } as FieldType,
 };
 
-const emptyRelations: CleanRelations = {
+const emptyRelations: Relations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
@@ -32,8 +32,8 @@ const emptyRelations: CleanRelations = {
 };
 
 function createTable(
-  partial: Partial<CleanTable> & { name: string },
-): CleanTable {
+  partial: Partial<Table> & { name: string },
+): Table {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
