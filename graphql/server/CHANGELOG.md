@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.13.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.12.0...@constructive-io/graphql-server@4.13.0) (2026-03-20)
+
+### Bug Fixes
+
+- **graphql:** route makePgService pools through pg-cache in explorer and server ([ef2f40e](https://github.com/constructive-io/constructive/commit/ef2f40eb42729d9cca64f1f935b0f75fd046a143)), closes [#860](https://github.com/constructive-io/constructive/issues/860)
+
 # [4.12.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.11.6...@constructive-io/graphql-server@4.12.0) (2026-03-20)
 
 ### Features
