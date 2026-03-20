@@ -31,7 +31,7 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  * - Inflector logging for debugging (enable with INFLECTOR_LOG=1)
  * - Primary key only lookups (no *ByEmail, *ByUsername, etc.)
  * - Connection filter plugin with all columns filterable
- * - Many-to-many relationships (opt-in via @behavior +manyToMany)
+ * - Many-to-many relationships (enabled by default, opt-out via @behavior -manyToMany)
  * - Meta schema plugin (_meta query for introspection of tables, fields, indexes)
  * - PostGIS support (geometry/geography types, GeoJSON scalar — auto-detects PostGIS extension)
  * - PostGIS connection filter operators (spatial filtering on geometry/geography columns)
