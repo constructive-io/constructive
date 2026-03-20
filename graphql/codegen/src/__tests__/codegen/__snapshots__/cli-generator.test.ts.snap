@@ -281,10 +281,10 @@ CRUD operations for Car records via myapp CLI
 
 \`\`\`bash
 myapp car list
-myapp car get --id <value>
-myapp car create --make <value> --model <value> --year <value> --isElectric <value>
-myapp car update --id <value> [--make <value>] [--model <value>] [--year <value>] [--isElectric <value>]
-myapp car delete --id <value>
+myapp car get --id <UUID>
+myapp car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
+myapp car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
+myapp car delete --id <UUID>
 \`\`\`
 
 ## Examples
@@ -298,7 +298,7 @@ myapp car list
 ### Create a car
 
 \`\`\`bash
-myapp car create --make <value> --model <value> --year <value> --isElectric <value>
+myapp car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 \`\`\`
 
 ### Get a car by id
@@ -320,10 +320,10 @@ CRUD operations for Driver records via myapp CLI
 
 \`\`\`bash
 myapp driver list
-myapp driver get --id <value>
-myapp driver create --name <value> --licenseNumber <value>
-myapp driver update --id <value> [--name <value>] [--licenseNumber <value>]
-myapp driver delete --id <value>
+myapp driver get --id <UUID>
+myapp driver create --name <String> --licenseNumber <String>
+myapp driver update --id <UUID> [--name <String>] [--licenseNumber <String>]
+myapp driver delete --id <UUID>
 \`\`\`
 
 ## Examples
@@ -337,7 +337,7 @@ myapp driver list
 ### Create a driver
 
 \`\`\`bash
-myapp driver create --name <value> --licenseNumber <value>
+myapp driver create --name <String> --licenseNumber <String>
 \`\`\`
 
 ### Get a driver by id
@@ -381,7 +381,7 @@ Authenticate a user
 ## Usage
 
 \`\`\`bash
-myapp login --email <value> --password <value>
+myapp login --email <String> --password <String>
 \`\`\`
 
 ## Examples
@@ -389,7 +389,7 @@ myapp login --email <value> --password <value>
 ### Run login
 
 \`\`\`bash
-myapp login --email <value> --password <value>
+myapp login --email <String> --password <String>
 \`\`\`
 "
 `;
@@ -1409,7 +1409,7 @@ const { data, isLoading } = useCarsQuery({
 
 // Get one car
 const { data: item } = useCarQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } },
 });
 
@@ -1417,7 +1417,7 @@ const { data: item } = useCarQuery({
 const { mutate: create } = useCreateCarMutation({
   selection: { fields: { id: true } },
 });
-create({ make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' });
+create({ make: '<String>', model: '<String>', year: '<Int>', isElectric: '<Boolean>' });
 \`\`\`
 
 ### Driver
@@ -1430,7 +1430,7 @@ const { data, isLoading } = useDriversQuery({
 
 // Get one driver
 const { data: item } = useDriverQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, name: true, licenseNumber: true } },
 });
 
@@ -1438,7 +1438,7 @@ const { data: item } = useDriverQuery({
 const { mutate: create } = useCreateDriverMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', licenseNumber: '<value>' });
+create({ name: '<String>', licenseNumber: '<String>' });
 \`\`\`
 
 ## Custom Operation Hooks
@@ -1485,7 +1485,7 @@ React Query hooks for Car data operations
 
 \`\`\`typescript
 useCarsQuery({ selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } } })
-useCarQuery({ id: '<value>', selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } } })
+useCarQuery({ id: '<UUID>', selection: { fields: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } } })
 useCreateCarMutation({ selection: { fields: { id: true } } })
 useUpdateCarMutation({ selection: { fields: { id: true } } })
 useDeleteCarMutation({})
@@ -1507,7 +1507,7 @@ const { data, isLoading } = useCarsQuery({
 const { mutate } = useCreateCarMutation({
   selection: { fields: { id: true } },
 });
-mutate({ make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' });
+mutate({ make: '<String>', model: '<String>', year: '<Int>', isElectric: '<Boolean>' });
 \`\`\`
 "
 `;
@@ -1523,7 +1523,7 @@ React Query hooks for Driver data operations
 
 \`\`\`typescript
 useDriversQuery({ selection: { fields: { id: true, name: true, licenseNumber: true } } })
-useDriverQuery({ id: '<value>', selection: { fields: { id: true, name: true, licenseNumber: true } } })
+useDriverQuery({ id: '<UUID>', selection: { fields: { id: true, name: true, licenseNumber: true } } })
 useCreateDriverMutation({ selection: { fields: { id: true } } })
 useUpdateDriverMutation({ selection: { fields: { id: true } } })
 useDeleteDriverMutation({})
@@ -1545,7 +1545,7 @@ const { data, isLoading } = useDriversQuery({
 const { mutate } = useCreateDriverMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<value>', licenseNumber: '<value>' });
+mutate({ name: '<String>', licenseNumber: '<String>' });
 \`\`\`
 "
 `;
@@ -1583,7 +1583,7 @@ Authenticate a user
 ## Usage
 
 \`\`\`typescript
-const { mutate } = useLoginMutation(); mutate({ email: '<value>', password: '<value>' });
+const { mutate } = useLoginMutation(); mutate({ email: '<String>', password: '<String>' });
 \`\`\`
 
 ## Examples
@@ -1592,7 +1592,7 @@ const { mutate } = useLoginMutation(); mutate({ email: '<value>', password: '<va
 
 \`\`\`typescript
 const { mutate, isLoading } = useLoginMutation();
-mutate({ email: '<value>', password: '<value>' });
+mutate({ email: '<String>', password: '<String>' });
 \`\`\`
 "
 `;
@@ -2654,10 +2654,10 @@ CRUD operations for User records via myapp CLI (auth target)
 
 \`\`\`bash
 myapp auth:user list
-myapp auth:user get --id <value>
-myapp auth:user create --email <value> --name <value>
-myapp auth:user update --id <value> [--email <value>] [--name <value>]
-myapp auth:user delete --id <value>
+myapp auth:user get --id <UUID>
+myapp auth:user create --email <String> --name <String>
+myapp auth:user update --id <UUID> [--email <String>] [--name <String>]
+myapp auth:user delete --id <UUID>
 \`\`\`
 
 ## Examples
@@ -2671,7 +2671,7 @@ myapp auth:user list
 ### Create a user
 
 \`\`\`bash
-myapp auth:user create --email <value> --name <value>
+myapp auth:user create --email <String> --name <String>
 \`\`\`
 ",
     "fileName": "cli-auth/references/user.md",
@@ -2709,8 +2709,8 @@ Authenticate a user (auth target)
 ## Usage
 
 \`\`\`bash
-myapp auth:login --email <value> --password <value>
-myapp auth:login --email <value> --password <value> --save-token
+myapp auth:login --email <String> --password <String>
+myapp auth:login --email <String> --password <String> --save-token
 \`\`\`
 
 ## Examples
@@ -2718,7 +2718,7 @@ myapp auth:login --email <value> --password <value> --save-token
 ### Run login
 
 \`\`\`bash
-myapp auth:login --email <value> --password <value>
+myapp auth:login --email <String> --password <String>
 \`\`\`
 ",
     "fileName": "cli-auth/references/login.md",
@@ -2782,10 +2782,10 @@ CRUD operations for Member records via myapp CLI (members target)
 
 \`\`\`bash
 myapp members:member list
-myapp members:member get --id <value>
-myapp members:member create --role <value>
-myapp members:member update --id <value> [--role <value>]
-myapp members:member delete --id <value>
+myapp members:member get --id <UUID>
+myapp members:member create --role <String>
+myapp members:member update --id <UUID> [--role <String>]
+myapp members:member delete --id <UUID>
 \`\`\`
 
 ## Examples
@@ -2799,7 +2799,7 @@ myapp members:member list
 ### Create a member
 
 \`\`\`bash
-myapp members:member create --role <value>
+myapp members:member create --role <String>
 \`\`\`
 ",
     "fileName": "cli-members/references/member.md",
@@ -2861,10 +2861,10 @@ CRUD operations for Car records via myapp CLI (app target)
 
 \`\`\`bash
 myapp app:car list
-myapp app:car get --id <value>
-myapp app:car create --make <value> --model <value> --year <value> --isElectric <value>
-myapp app:car update --id <value> [--make <value>] [--model <value>] [--year <value>] [--isElectric <value>]
-myapp app:car delete --id <value>
+myapp app:car get --id <UUID>
+myapp app:car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
+myapp app:car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
+myapp app:car delete --id <UUID>
 \`\`\`
 
 ## Examples
@@ -2878,7 +2878,7 @@ myapp app:car list
 ### Create a car
 
 \`\`\`bash
-myapp app:car create --make <value> --model <value> --year <value> --isElectric <value>
+myapp app:car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 \`\`\`
 ",
     "fileName": "cli-app/references/car.md",
@@ -4254,16 +4254,16 @@ CRUD operations for Car records.
 const items = await db.car.findMany({ select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
 
 // Get one by id
-const item = await db.car.findOne({ id: '<value>', select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
+const item = await db.car.findOne({ id: '<UUID>', select: { id: true, make: true, model: true, year: true, isElectric: true, createdAt: true } }).execute();
 
 // Create
-const created = await db.car.create({ data: { make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' }, select: { id: true } }).execute();
+const created = await db.car.create({ data: { make: '<String>', model: '<String>', year: '<Int>', isElectric: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.car.update({ where: { id: '<value>' }, data: { make: '<new-value>' }, select: { id: true } }).execute();
+const updated = await db.car.update({ where: { id: '<UUID>' }, data: { make: '<String>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.car.delete({ where: { id: '<value>' } }).execute();
+const deleted = await db.car.delete({ where: { id: '<UUID>' } }).execute();
 \`\`\`
 
 ### \`db.driver\`
@@ -4285,16 +4285,16 @@ CRUD operations for Driver records.
 const items = await db.driver.findMany({ select: { id: true, name: true, licenseNumber: true } }).execute();
 
 // Get one by id
-const item = await db.driver.findOne({ id: '<value>', select: { id: true, name: true, licenseNumber: true } }).execute();
+const item = await db.driver.findOne({ id: '<UUID>', select: { id: true, name: true, licenseNumber: true } }).execute();
 
 // Create
-const created = await db.driver.create({ data: { name: '<value>', licenseNumber: '<value>' }, select: { id: true } }).execute();
+const created = await db.driver.create({ data: { name: '<String>', licenseNumber: '<String>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.driver.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+const updated = await db.driver.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.driver.delete({ where: { id: '<value>' } }).execute();
+const deleted = await db.driver.delete({ where: { id: '<UUID>' } }).execute();
 \`\`\`
 
 ## Custom Operations
@@ -4323,7 +4323,7 @@ Authenticate a user
   | \`password\` | String (required) |
 
 \`\`\`typescript
-const result = await db.mutation.login({ email: '<value>', password: '<value>' }).execute();
+const result = await db.mutation.login({ email: '<String>', password: '<String>' }).execute();
 \`\`\`
 
 ---
@@ -4349,10 +4349,10 @@ ORM operations for Car records
 
 \`\`\`typescript
 db.car.findMany({ select: { id: true } }).execute()
-db.car.findOne({ id: '<value>', select: { id: true } }).execute()
-db.car.create({ data: { make: '<value>', model: '<value>', year: '<value>', isElectric: '<value>' }, select: { id: true } }).execute()
-db.car.update({ where: { id: '<value>' }, data: { make: '<new>' }, select: { id: true } }).execute()
-db.car.delete({ where: { id: '<value>' } }).execute()
+db.car.findOne({ id: '<UUID>', select: { id: true } }).execute()
+db.car.create({ data: { make: '<String>', model: '<String>', year: '<Int>', isElectric: '<Boolean>' }, select: { id: true } }).execute()
+db.car.update({ where: { id: '<UUID>' }, data: { make: '<String>' }, select: { id: true } }).execute()
+db.car.delete({ where: { id: '<UUID>' } }).execute()
 \`\`\`
 
 ## Examples
@@ -4369,7 +4369,7 @@ const items = await db.car.findMany({
 
 \`\`\`typescript
 const item = await db.car.create({
-  data: { make: 'value', model: 'value', year: 'value', isElectric: 'value' },
+  data: { make: '<String>', model: '<String>', year: '<Int>', isElectric: '<Boolean>' },
   select: { id: true }
 }).execute();
 \`\`\`
@@ -4387,10 +4387,10 @@ ORM operations for Driver records
 
 \`\`\`typescript
 db.driver.findMany({ select: { id: true } }).execute()
-db.driver.findOne({ id: '<value>', select: { id: true } }).execute()
-db.driver.create({ data: { name: '<value>', licenseNumber: '<value>' }, select: { id: true } }).execute()
-db.driver.update({ where: { id: '<value>' }, data: { name: '<new>' }, select: { id: true } }).execute()
-db.driver.delete({ where: { id: '<value>' } }).execute()
+db.driver.findOne({ id: '<UUID>', select: { id: true } }).execute()
+db.driver.create({ data: { name: '<String>', licenseNumber: '<String>' }, select: { id: true } }).execute()
+db.driver.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute()
+db.driver.delete({ where: { id: '<UUID>' } }).execute()
 \`\`\`
 
 ## Examples
@@ -4407,7 +4407,7 @@ const items = await db.driver.findMany({
 
 \`\`\`typescript
 const item = await db.driver.create({
-  data: { name: 'value', licenseNumber: 'value' },
+  data: { name: '<String>', licenseNumber: '<String>' },
   select: { id: true }
 }).execute();
 \`\`\`
@@ -4447,7 +4447,7 @@ Authenticate a user
 ## Usage
 
 \`\`\`typescript
-db.mutation.login({ email: '<value>', password: '<value>' }).execute()
+db.mutation.login({ email: '<String>', password: '<String>' }).execute()
 \`\`\`
 
 ## Examples
@@ -4455,7 +4455,7 @@ db.mutation.login({ email: '<value>', password: '<value>' }).execute()
 ### Run login
 
 \`\`\`typescript
-const result = await db.mutation.login({ email: '<value>', password: '<value>' }).execute();
+const result = await db.mutation.login({ email: '<String>', password: '<String>' }).execute();
 \`\`\`
 "
 `;
@@ -4480,10 +4480,10 @@ import { db } from './orm';
 
 // Available models: car, driver
 db.<model>.findMany({ select: { id: true } }).execute()
-db.<model>.findOne({ id: '<value>', select: { id: true } }).execute()
+db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
-db.<model>.update({ where: { id: '<value>' }, data: { ... }, select: { id: true } }).execute()
-db.<model>.delete({ where: { id: '<value>' } }).execute()
+db.<model>.update({ where: { id: '<UUID>' }, data: { ... }, select: { id: true } }).execute()
+db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 \`\`\`
 
 ## Examples

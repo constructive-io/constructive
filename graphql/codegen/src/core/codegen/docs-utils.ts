@@ -421,10 +421,63 @@ export function flattenArgs(args: CleanArgument[], registry?: TypeRegistry): Fla
 
 /**
  * Build CLI flags string from flattened args.
- * e.g. '--input.email <value> --input.password <value>'
+ * e.g. '--input.email <String> --input.password <String>'
  */
 export function flattenedArgsToFlags(flatArgs: FlattenedArg[]): string {
-  return flatArgs.map((a) => `--${a.flag} <value>`).join(' ');
+  return flatArgs.map((a) => `--${a.flag} <${a.type}>`).join(' ');
+}
+
+// ---------------------------------------------------------------------------
+// Type-aware placeholder helpers for code examples
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a type-aware placeholder for a table field value in code examples.
+ * Returns a quoted placeholder string, e.g. `'<UUID>'`, `'<String>'`, `'<Int>'`.
+ */
+export function fieldPlaceholder(field: CleanField): string {
+  return `'<${cleanTypeName(field.type.gqlType)}>'`;
+}
+
+/**
+ * Generate a type-aware placeholder for a primary key value in code examples.
+ * PrimaryKeyField has `gqlType` directly (not nested under `.type`).
+ */
+export function pkPlaceholder(pk: { gqlType: string }): string {
+  return `'<${cleanTypeName(pk.gqlType)}>'`;
+}
+
+/**
+ * Generate a type-aware placeholder for an operation argument value.
+ *
+ * - Scalar args: `'<String>'`
+ * - INPUT_OBJECT with resolvable fields (up to a limit): `{ email: '<String>', password: '<String>' }`
+ * - INPUT_OBJECT without resolvable fields: `'<TypeName>'`
+ *
+ * The result is a ready-to-embed JS expression (quotes included for scalars).
+ */
+export function argPlaceholder(arg: CleanArgument, registry?: TypeRegistry): string {
+  const { inner } = unwrapNonNull(arg.type);
+
+  if (inner.kind === 'INPUT_OBJECT') {
+    const fields = resolveInputFields(inner, registry);
+    if (fields && fields.length > 0) {
+      const meaningful = fields.filter((f) => f.name !== 'clientMutationId');
+      if (meaningful.length > 0 && meaningful.length <= 5) {
+        const parts = meaningful.map((f) => {
+          const typeName = cleanTypeName(getScalarTypeName(f.type));
+          return `${f.name}: '<${typeName}>'`;
+        });
+        return '{ ' + parts.join(', ') + ' }';
+      }
+    }
+    if (inner.name) {
+      return `'<${cleanTypeName(inner.name)}>'`;
+    }
+  }
+
+  const typeName = cleanTypeName(getScalarTypeName(arg.type));
+  return `'<${typeName}>'`;
 }
 
 export function gqlTypeToJsonSchemaType(gqlType: string): string {

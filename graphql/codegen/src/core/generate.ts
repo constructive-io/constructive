@@ -348,7 +348,7 @@ export async function generate(
 
   if (runOrm) {
     if (docsConfig.readme) {
-      const readme = generateOrmReadme(tables, allCustomOps);
+      const readme = generateOrmReadme(tables, allCustomOps, customOperations.typeRegistry);
       filesToWrite.push({ path: path.posix.join('orm', readme.fileName), content: readme.content });
     }
     if (docsConfig.agents) {
@@ -359,7 +359,7 @@ export async function generate(
       allMcpTools.push(...getOrmMcpTools(tables, allCustomOps));
     }
     if (docsConfig.skills) {
-      for (const skill of generateOrmSkills(tables, allCustomOps, targetName)) {
+      for (const skill of generateOrmSkills(tables, allCustomOps, targetName, customOperations.typeRegistry)) {
         skillsToWrite.push({ path: skill.fileName, content: skill.content });
       }
     }
@@ -367,7 +367,7 @@ export async function generate(
 
   if (runReactQuery) {
     if (docsConfig.readme) {
-      const readme = generateHooksReadme(tables, allCustomOps);
+      const readme = generateHooksReadme(tables, allCustomOps, customOperations.typeRegistry);
       filesToWrite.push({ path: path.posix.join('hooks', readme.fileName), content: readme.content });
     }
     if (docsConfig.agents) {
@@ -378,7 +378,7 @@ export async function generate(
       allMcpTools.push(...getHooksMcpTools(tables, allCustomOps));
     }
     if (docsConfig.skills) {
-      for (const skill of generateHooksSkills(tables, allCustomOps, targetName)) {
+      for (const skill of generateHooksSkills(tables, allCustomOps, targetName, customOperations.typeRegistry)) {
         skillsToWrite.push({ path: skill.fileName, content: skill.content });
       }
     }

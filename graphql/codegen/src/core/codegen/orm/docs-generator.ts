@@ -1,10 +1,13 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanOperation, CleanTable } from '../../../types/schema';
+import type { CleanOperation, CleanTable, TypeRegistry } from '../../../types/schema';
 import {
   buildSkillFile,
   buildSkillReference,
   formatArgType,
+  fieldPlaceholder,
+  pkPlaceholder,
+  argPlaceholder,
   getEditableFields,
   categorizeSpecialFields,
   buildSpecialFieldsMarkdown,
@@ -24,6 +27,7 @@ import {
 export function generateOrmReadme(
   tables: CleanTable[],
   customOperations: CleanOperation[],
+  registry?: TypeRegistry,
 ): GeneratedDocFile {
   const lines: string[] = [];
 
@@ -87,22 +91,22 @@ export function generateOrmReadme(
       lines.push('');
       lines.push(`// Get one by ${pk.name}`);
       lines.push(
-        `const item = await db.${singularName}.findOne({ ${pk.name}: '<value>', select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
+        `const item = await db.${singularName}.findOne({ ${pk.name}: ${pkPlaceholder(pk)}, select: { ${scalarFields.map((f) => `${f.name}: true`).join(', ')} } }).execute();`,
       );
       lines.push('');
       lines.push(`// Create`);
       lines.push(
-        `const created = await db.${singularName}.create({ data: { ${editableFields.map((f) => `${f.name}: '<value>'`).join(', ')} }, select: { ${pk.name}: true } }).execute();`,
+        `const created = await db.${singularName}.create({ data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }, select: { ${pk.name}: true } }).execute();`,
       );
       lines.push('');
       lines.push(`// Update`);
       lines.push(
-        `const updated = await db.${singularName}.update({ where: { ${pk.name}: '<value>' }, data: { ${editableFields[0]?.name || 'field'}: '<new-value>' }, select: { ${pk.name}: true } }).execute();`,
+        `const updated = await db.${singularName}.update({ where: { ${pk.name}: ${pkPlaceholder(pk)} }, data: { ${editableFields[0]?.name || 'field'}: ${editableFields[0] ? fieldPlaceholder(editableFields[0]) : "'<String>'"} }, select: { ${pk.name}: true } }).execute();`,
       );
       lines.push('');
       lines.push(`// Delete`);
       lines.push(
-        `const deleted = await db.${singularName}.delete({ where: { ${pk.name}: '<value>' } }).execute();`,
+        `const deleted = await db.${singularName}.delete({ where: { ${pk.name}: ${pkPlaceholder(pk)} } }).execute();`,
       );
       lines.push('```');
       lines.push('');
@@ -132,7 +136,7 @@ export function generateOrmReadme(
         lines.push('');
         lines.push('```typescript');
         lines.push(
-          `const result = await db.${accessor}.${op.name}({ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }).execute();`,
+          `const result = await db.${accessor}.${op.name}({ ${op.args.map((a) => `${a.name}: ${argPlaceholder(a, registry)}`).join(', ')} }).execute();`,
         );
         lines.push('```');
       } else {
@@ -358,6 +362,7 @@ export function generateOrmSkills(
   tables: CleanTable[],
   customOperations: CleanOperation[],
   targetName: string,
+  registry?: TypeRegistry,
 ): GeneratedDocFile[] {
   const files: GeneratedDocFile[] = [];
   const skillName = `orm-${targetName}`;
@@ -388,10 +393,10 @@ export function generateOrmSkills(
         language: 'typescript',
         usage: [
           `db.${modelName}.findMany({ select: { id: true } }).execute()`,
-          `db.${modelName}.findOne({ ${pk.name}: '<value>', select: { id: true } }).execute()`,
-          `db.${modelName}.create({ data: { ${editableFields.map((f) => `${f.name}: '<value>'`).join(', ')} }, select: { id: true } }).execute()`,
-          `db.${modelName}.update({ where: { ${pk.name}: '<value>' }, data: { ${editableFields[0]?.name || 'field'}: '<new>' }, select: { id: true } }).execute()`,
-          `db.${modelName}.delete({ where: { ${pk.name}: '<value>' } }).execute()`,
+          `db.${modelName}.findOne({ ${pk.name}: ${pkPlaceholder(pk)}, select: { id: true } }).execute()`,
+          `db.${modelName}.create({ data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} }, select: { id: true } }).execute()`,
+          `db.${modelName}.update({ where: { ${pk.name}: ${pkPlaceholder(pk)} }, data: { ${editableFields[0]?.name || 'field'}: ${editableFields[0] ? fieldPlaceholder(editableFields[0]) : "'<String>'"} }, select: { id: true } }).execute()`,
+          `db.${modelName}.delete({ where: { ${pk.name}: ${pkPlaceholder(pk)} } }).execute()`,
         ],
         examples: [
           {
@@ -406,7 +411,7 @@ export function generateOrmSkills(
             description: `Create a ${singularName}`,
             code: [
               `const item = await db.${modelName}.create({`,
-              `  data: { ${editableFields.map((f) => `${f.name}: 'value'`).join(', ')} },`,
+              `  data: { ${editableFields.map((f) => `${f.name}: ${fieldPlaceholder(f)}`).join(', ')} },`,
               `  select: { ${pk.name}: true }`,
               '}).execute();',
             ],
@@ -421,7 +426,7 @@ export function generateOrmSkills(
     const accessor = op.kind === 'query' ? 'query' : 'mutation';
     const callArgs =
       op.args.length > 0
-        ? `{ ${op.args.map((a) => `${a.name}: '<value>'`).join(', ')} }`
+        ? `{ ${op.args.map((a) => `${a.name}: ${argPlaceholder(a, registry)}`).join(', ')} }`
         : '';
 
     const refName = toKebabCase(op.name);
@@ -459,10 +464,10 @@ export function generateOrmSkills(
           '',
           `// Available models: ${tableNames.slice(0, 8).join(', ')}${tableNames.length > 8 ? ', ...' : ''}`,
           `db.<model>.findMany({ select: { id: true } }).execute()`,
-          `db.<model>.findOne({ id: '<value>', select: { id: true } }).execute()`,
+          `db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()`,
           `db.<model>.create({ data: { ... }, select: { id: true } }).execute()`,
-          `db.<model>.update({ where: { id: '<value>' }, data: { ... }, select: { id: true } }).execute()`,
-          `db.<model>.delete({ where: { id: '<value>' } }).execute()`,
+          `db.<model>.update({ where: { id: '<UUID>' }, data: { ... }, select: { id: true } }).execute()`,
+          `db.<model>.delete({ where: { id: '<UUID>' } }).execute()`,
         ],
         examples: [
           {
