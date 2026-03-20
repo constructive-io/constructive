@@ -45,16 +45,16 @@ CRUD operations for MigrateFile records.
 const items = await db.migrateFile.findMany({ select: { id: true, databaseId: true, upload: true } }).execute();
 
 // Get one by id
-const item = await db.migrateFile.findOne({ id: '<value>', select: { id: true, databaseId: true, upload: true } }).execute();
+const item = await db.migrateFile.findOne({ id: '<UUID>', select: { id: true, databaseId: true, upload: true } }).execute();
 
 // Create
-const created = await db.migrateFile.create({ data: { databaseId: '<value>', upload: '<value>' }, select: { id: true } }).execute();
+const created = await db.migrateFile.create({ data: { databaseId: '<UUID>', upload: '<Upload>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.migrateFile.update({ where: { id: '<value>' }, data: { databaseId: '<new-value>' }, select: { id: true } }).execute();
+const updated = await db.migrateFile.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.migrateFile.delete({ where: { id: '<value>' } }).execute();
+const deleted = await db.migrateFile.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.sqlAction`
@@ -86,16 +86,16 @@ CRUD operations for SqlAction records.
 const items = await db.sqlAction.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Get one by id
-const item = await db.sqlAction.findOne({ id: '<value>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.sqlAction.findOne({ id: '<Int>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Create
-const created = await db.sqlAction.create({ data: { name: '<value>', databaseId: '<value>', deploy: '<value>', deps: '<value>', payload: '<value>', content: '<value>', revert: '<value>', verify: '<value>', action: '<value>', actionId: '<value>', actorId: '<value>' }, select: { id: true } }).execute();
+const created = await db.sqlAction.create({ data: { name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.sqlAction.update({ where: { id: '<value>' }, data: { name: '<new-value>' }, select: { id: true } }).execute();
+const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.sqlAction.delete({ where: { id: '<value>' } }).execute();
+const deleted = await db.sqlAction.delete({ where: { id: '<Int>' } }).execute();
 ```
 
 ## Custom Operations
@@ -112,7 +112,7 @@ executeSql
   | `input` | ExecuteSqlInput (required) |
 
 ```typescript
-const result = await db.mutation.executeSql({ input: '<value>' }).execute();
+const result = await db.mutation.executeSql({ input: { stmt: '<String>' } }).execute();
 ```
 
 ### `db.mutation.runMigration`
@@ -127,7 +127,7 @@ runMigration
   | `input` | RunMigrationInput (required) |
 
 ```typescript
-const result = await db.mutation.runMigration({ input: '<value>' }).execute();
+const result = await db.mutation.runMigration({ input: { databaseId: '<UUID>', migration: '<Int>', kind: '<String>' } }).execute();
 ```
 
 ---
