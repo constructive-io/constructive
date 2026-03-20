@@ -4,7 +4,7 @@ import { cors, healthz, poweredBy } from '@pgpmjs/server-utils';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
-import { makePgService } from 'graphile-settings';
+import { makePgService, fetchNodeTypeRegistry, BlueprintTypesPreset } from 'graphile-settings';
 import type { GraphileConfig } from 'graphile-config';
 import { buildConnectionString, getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
@@ -40,9 +40,12 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
       pgConfig.database
     );
 
+    const nodeTypes = await fetchNodeTypeRegistry(connectionString);
+
     const basePreset = getGraphilePreset(opts);
     const preset: GraphileConfig.Preset = {
       ...basePreset,
+      extends: [...(basePreset.extends ?? []), BlueprintTypesPreset(nodeTypes)],
       pgServices: [
         makePgService({ connectionString, schemas: [schemaname] }),
       ],

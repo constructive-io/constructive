@@ -115,5 +115,6 @@ export type {
 export {
   createBlueprintTypesPlugin,
   BlueprintTypesPreset,
+  fetchNodeTypeRegistry,
 } from './blueprint-types';
 export type { NodeTypeRegistryEntry } from './blueprint-types';
