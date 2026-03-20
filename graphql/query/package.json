@@ -50,5 +50,158 @@
   ],
   "devDependencies": {
     "makage": "^0.1.10"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./ast": {
+      "types": "./dist/ast.d.ts",
+      "import": "./dist/esm/ast.js",
+      "require": "./dist/ast.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/esm/client/index.js",
+      "require": "./dist/client/index.js"
+    },
+    "./client/error": {
+      "types": "./dist/client/error.d.ts",
+      "import": "./dist/esm/client/error.js",
+      "require": "./dist/client/error.js"
+    },
+    "./client/execute": {
+      "types": "./dist/client/execute.d.ts",
+      "import": "./dist/esm/client/execute.js",
+      "require": "./dist/client/execute.js"
+    },
+    "./client/typed-document": {
+      "types": "./dist/client/typed-document.d.ts",
+      "import": "./dist/esm/client/typed-document.js",
+      "require": "./dist/client/typed-document.js"
+    },
+    "./custom-ast": {
+      "types": "./dist/custom-ast.d.ts",
+      "import": "./dist/esm/custom-ast.js",
+      "require": "./dist/custom-ast.js"
+    },
+    "./executor": {
+      "types": "./dist/executor.d.ts",
+      "import": "./dist/esm/executor.js",
+      "require": "./dist/executor.js"
+    },
+    "./generators": {
+      "types": "./dist/generators/index.d.ts",
+      "import": "./dist/esm/generators/index.js",
+      "require": "./dist/generators/index.js"
+    },
+    "./generators/field-selector": {
+      "types": "./dist/generators/field-selector.d.ts",
+      "import": "./dist/esm/generators/field-selector.js",
+      "require": "./dist/generators/field-selector.js"
+    },
+    "./generators/mutations": {
+      "types": "./dist/generators/mutations.d.ts",
+      "import": "./dist/esm/generators/mutations.js",
+      "require": "./dist/generators/mutations.js"
+    },
+    "./generators/naming-helpers": {
+      "types": "./dist/generators/naming-helpers.d.ts",
+      "import": "./dist/esm/generators/naming-helpers.js",
+      "require": "./dist/generators/naming-helpers.js"
+    },
+    "./generators/select": {
+      "types": "./dist/generators/select.d.ts",
+      "import": "./dist/esm/generators/select.js",
+      "require": "./dist/generators/select.js"
+    },
+    "./introspect": {
+      "types": "./dist/introspect/index.d.ts",
+      "import": "./dist/esm/introspect/index.js",
+      "require": "./dist/introspect/index.js"
+    },
+    "./introspect/infer-tables": {
+      "types": "./dist/introspect/infer-tables.d.ts",
+      "import": "./dist/esm/introspect/infer-tables.js",
+      "require": "./dist/introspect/infer-tables.js"
+    },
+    "./introspect/schema-query": {
+      "types": "./dist/introspect/schema-query.d.ts",
+      "import": "./dist/esm/introspect/schema-query.js",
+      "require": "./dist/introspect/schema-query.js"
+    },
+    "./introspect/transform": {
+      "types": "./dist/introspect/transform.d.ts",
+      "import": "./dist/esm/introspect/transform.js",
+      "require": "./dist/introspect/transform.js"
+    },
+    "./introspect/transform-schema": {
+      "types": "./dist/introspect/transform-schema.d.ts",
+      "import": "./dist/esm/introspect/transform-schema.js",
+      "require": "./dist/introspect/transform-schema.js"
+    },
+    "./meta-object": {
+      "types": "./dist/meta-object/index.d.ts",
+      "import": "./dist/esm/meta-object/index.js",
+      "require": "./dist/meta-object/index.js"
+    },
+    "./meta-object/convert": {
+      "types": "./dist/meta-object/convert.d.ts",
+      "import": "./dist/esm/meta-object/convert.js",
+      "require": "./dist/meta-object/convert.js"
+    },
+    "./meta-object/validate": {
+      "types": "./dist/meta-object/validate.d.ts",
+      "import": "./dist/esm/meta-object/validate.js",
+      "require": "./dist/meta-object/validate.js"
+    },
+    "./query-builder": {
+      "types": "./dist/query-builder.d.ts",
+      "import": "./dist/esm/query-builder.js",
+      "require": "./dist/query-builder.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/types/index.js",
+      "require": "./dist/types/index.js"
+    },
+    "./types/core": {
+      "types": "./dist/types/core.d.ts",
+      "import": "./dist/esm/types/core.js",
+      "require": "./dist/types/core.js"
+    },
+    "./types/introspection": {
+      "types": "./dist/types/introspection.d.ts",
+      "import": "./dist/esm/types/introspection.js",
+      "require": "./dist/types/introspection.js"
+    },
+    "./types/mutation": {
+      "types": "./dist/types/mutation.d.ts",
+      "import": "./dist/esm/types/mutation.js",
+      "require": "./dist/types/mutation.js"
+    },
+    "./types/query": {
+      "types": "./dist/types/query.d.ts",
+      "import": "./dist/esm/types/query.js",
+      "require": "./dist/types/query.js"
+    },
+    "./types/schema": {
+      "types": "./dist/types/schema.d.ts",
+      "import": "./dist/esm/types/schema.js",
+      "require": "./dist/types/schema.js"
+    },
+    "./types/selection": {
+      "types": "./dist/types/selection.d.ts",
+      "import": "./dist/esm/types/selection.js",
+      "require": "./dist/types/selection.js"
+    },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/esm/utils.js",
+      "require": "./dist/utils.js"
+    },
+    "./package.json": "./package.json"
   }
 }
