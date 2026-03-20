@@ -3,7 +3,7 @@ import { Parser } from 'csv-to-pg';
 import { getPgPool } from 'pg-cache';
 import type { Pool } from 'pg';
 
-type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'int' | 'interval' | 'timestamptz';
+type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'jsonb[]' | 'int' | 'interval' | 'timestamptz';
 
 interface TableConfig {
   schema: string;
@@ -35,6 +35,8 @@ const mapPgTypeToFieldType = (udtName: string): FieldType => {
     case 'jsonb':
     case 'json':
       return 'jsonb';
+    case '_jsonb':
+      return 'jsonb[]';
     case 'int4':
     case 'int8':
     case 'int2':
@@ -855,7 +857,8 @@ const config: Record<string, TableConfig> = {
       use_rls: 'boolean',
       node_data: 'jsonb',
       grant_roles: 'text[]',
-      grant_privileges: 'jsonb',
+      fields: 'jsonb[]',
+      grant_privileges: 'jsonb[]',
       policy_type: 'text',
       policy_privileges: 'text[]',
       policy_role: 'text',
