@@ -13,7 +13,7 @@
  * The snapshot captures how our plugins sculpt the GraphQL API:
  * - InflektPreset: table/field naming conventions
  * - PostGraphileConnectionFilterPreset: filter fields on connections
- * - ManyToManyOptInPreset: many-to-many fields (enabled by default, opt-out via @behavior -manyToMany)
+ * - ManyToManyOptInPreset: many-to-many fields via @behavior +manyToMany
  * - MetaSchemaPreset: _meta query for introspection
  * - MinimalPreset: no Node/Relay (id stays as id)
  * - NoUniqueLookupPreset: no *ByEmail, *ByUsername lookups
