@@ -7,7 +7,7 @@
 
 import { execute } from 'grafast';
 import { postgraphile, type PostGraphileInstance } from 'postgraphile';
-import { ConstructivePreset, makePgService } from 'graphile-settings';
+import { ConstructivePreset, makePgService, fetchNodeTypeRegistry, BlueprintTypesPreset } from 'graphile-settings';
 import { withPgClientFromPgService } from 'graphile-build-pg';
 import type {
   DocumentNode,
@@ -111,11 +111,14 @@ export class QueryExecutor {
       schemas: this.options.schemas,
     });
 
+    // Fetch node type registry for blueprint @oneOf types
+    const nodeTypes = await fetchNodeTypeRegistry(this.options.connectionString);
+
     // Note: Using 'as unknown as' to bypass strict type checking
     // because GraphileConfig.Preset doesn't include pgServices in its type definition
     // but postgraphile() accepts it at runtime
     const preset = {
-      extends: [ConstructivePreset],
+      extends: [ConstructivePreset, BlueprintTypesPreset(nodeTypes)],
       pgServices: [pgService],
       grafast: {
         context: () => ({

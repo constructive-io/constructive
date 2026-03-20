@@ -9,3 +9,4 @@ export {
   BlueprintTypesPreset,
 } from './plugin';
 export type { NodeTypeRegistryEntry } from './plugin';
+export { fetchNodeTypeRegistry } from './fetch-registry';
