@@ -299,11 +299,11 @@ function buildCleanTable(
     mutationOps.delete
   );
 
-  // Infer primary key from mutation inputs
-  const constraints = inferConstraints(entityName, typeMap);
+  // Infer primary key from mutation inputs (pass mutation ops for composite PK input type derivation)
+  const constraints = inferConstraints(entityName, typeMap, mutationOps);
 
   // Infer the patch field name from UpdateXxxInput (e.g., "userPatch")
-  const patchFieldName = inferPatchFieldName(entityName, typeMap);
+  const patchFieldName = inferPatchFieldName(entityName, typeMap, mutationOps);
 
   // Build inflection map from discovered types
   const inflection = buildInflection(entityName, typeMap, entityToConnection);
@@ -674,26 +674,26 @@ function matchMutationOperations(
       create = field.name;
     }
 
-    // Match update (could be updateUser or updateUserById)
-    if (
-      field.name === expectedUpdate ||
-      field.name === `${expectedUpdate}ById`
+    // Match update (could be updateUser, updateUserById, or updateUserByFooAndBar for composite PKs)
+    if (field.name === expectedUpdate) {
+      update = field.name;
+    } else if (
+      !update &&
+      (field.name === `${expectedUpdate}ById` ||
+        field.name.startsWith(`${expectedUpdate}By`))
     ) {
-      // Prefer non-ById version
-      if (!update || field.name === expectedUpdate) {
-        update = field.name;
-      }
+      update = field.name;
     }
 
-    // Match delete (could be deleteUser or deleteUserById)
-    if (
-      field.name === expectedDelete ||
-      field.name === `${expectedDelete}ById`
+    // Match delete (could be deleteUser, deleteUserById, or deleteUserByFooAndBar for composite PKs)
+    if (field.name === expectedDelete) {
+      del = field.name;
+    } else if (
+      !del &&
+      (field.name === `${expectedDelete}ById` ||
+        field.name.startsWith(`${expectedDelete}By`))
     ) {
-      // Prefer non-ById version
-      if (!del || field.name === expectedDelete) {
-        del = field.name;
-      }
+      del = field.name;
     }
   }
 
@@ -709,16 +709,26 @@ function matchMutationOperations(
  *
  * Primary key can be inferred from Update/Delete mutation input types,
  * which typically have an 'id' field or similar.
+ *
+ * For composite PK tables (e.g. junction tables), PostGraphile generates
+ * mutations like `deletePostTagByPostIdAndTagId` with input type
+ * `DeletePostTagByPostIdAndTagIdInput`. We derive input type names from
+ * the actual matched mutation names when available.
  */
 function inferConstraints(
   entityName: string,
   typeMap: Map<string, IntrospectionType>,
+  mutations?: MutationOperations,
 ): TableConstraints {
   const primaryKey: ConstraintInfo[] = [];
 
-  // Try to find Update or Delete input type to extract PK
-  const updateInputName = `Update${entityName}Input`;
-  const deleteInputName = `Delete${entityName}Input`;
+  // Derive input type names from actual mutation names (handles composite PK naming)
+  const deleteInputName = mutations?.delete
+    ? ucFirst(mutations.delete) + 'Input'
+    : `Delete${entityName}Input`;
+  const updateInputName = mutations?.update
+    ? ucFirst(mutations.update) + 'Input'
+    : `Update${entityName}Input`;
 
   const updateInput = typeMap.get(updateInputName);
   const deleteInput = typeMap.get(deleteInputName);
@@ -816,8 +826,12 @@ function inferPrimaryKeyFromInputObject(
 function inferPatchFieldName(
   entityName: string,
   typeMap: Map<string, IntrospectionType>,
+  mutations?: MutationOperations,
 ): string {
-  const updateInputName = `Update${entityName}Input`;
+  // Derive input type name from actual mutation name (handles composite PK naming)
+  const updateInputName = mutations?.update
+    ? ucFirst(mutations.update) + 'Input'
+    : `Update${entityName}Input`;
   const updateInput = typeMap.get(updateInputName);
   const inputFields = updateInput?.inputFields ?? [];
 

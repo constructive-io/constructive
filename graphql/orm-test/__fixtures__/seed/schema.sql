@@ -30,11 +30,10 @@ CREATE TABLE "orm_test".tags (
 -- M:N relationship between posts and tags
 -- =============================================================================
 CREATE TABLE "orm_test".post_tags (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id uuid NOT NULL REFERENCES "orm_test".posts(id) ON DELETE CASCADE,
   tag_id uuid NOT NULL REFERENCES "orm_test".tags(id) ON DELETE CASCADE,
   created_at timestamptz DEFAULT now(),
-  UNIQUE(post_id, tag_id)
+  PRIMARY KEY (post_id, tag_id)
 );
 
 CREATE INDEX post_tags_post_id_idx ON "orm_test".post_tags (post_id);

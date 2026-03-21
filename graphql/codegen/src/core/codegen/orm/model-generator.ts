@@ -189,7 +189,6 @@ export function generateModelFile(
   const orderByTypeName = getOrderByTypeName(table);
   const createInputTypeName = `Create${typeName}Input`;
   const updateInputTypeName = `Update${typeName}Input`;
-  const deleteInputTypeName = `Delete${typeName}Input`;
   const patchTypeName = `${typeName}Patch`;
 
   const pkFields = getPrimaryKeyInfo(table);
@@ -200,6 +199,11 @@ export function generateModelFile(
   const createMutationName = table.query?.create ?? `create${typeName}`;
   const updateMutationName = table.query?.update;
   const deleteMutationName = table.query?.delete;
+
+  // Derive delete input type from actual mutation name (handles composite PK naming like DeletePostTagByPostIdAndTagIdInput)
+  const deleteInputTypeName = deleteMutationName
+    ? ucFirst(deleteMutationName) + 'Input'
+    : `Delete${typeName}Input`;
 
   const statements: t.Statement[] = [];
 
@@ -913,17 +917,18 @@ export function generateModelFile(
 
   // ── delete ─────────────────────────────────────────────────────────────
   if (deleteMutationName) {
+    // Build where type with ALL PK fields (supports composite PKs)
     const whereLiteral = () =>
-      t.tsTypeLiteral([
-        (() => {
+      t.tsTypeLiteral(
+        pkFields.map((pk) => {
           const prop = t.tsPropertySignature(
-            t.identifier(pkField.name),
-            t.tsTypeAnnotation(pkTsType()),
+            t.identifier(pk.name),
+            t.tsTypeAnnotation(tsTypeFromPrimitive(pk.tsType ?? 'string')),
           );
           prop.optional = false;
           return prop;
-        })(),
-      ]);
+        }),
+      );
     const argsType = (sel: t.TSType) =>
       t.tsTypeReference(
         t.identifier('DeleteArgs'),
@@ -971,16 +976,24 @@ export function generateModelFile(
       t.identifier('args'),
       t.identifier('select'),
     );
+    // Build keys object: { field1: args.where.field1, field2: args.where.field2, ... }
+    const keysObj = t.objectExpression(
+      pkFields.map((pk) =>
+        t.objectProperty(
+          t.identifier(pk.name),
+          t.memberExpression(
+            t.memberExpression(t.identifier('args'), t.identifier('where')),
+            t.identifier(pk.name),
+          ),
+        ),
+      ),
+    );
     const bodyArgs = [
       t.stringLiteral(typeName),
       t.stringLiteral(deleteMutationName),
       t.stringLiteral(entityLower),
-      t.memberExpression(
-        t.memberExpression(t.identifier('args'), t.identifier('where')),
-        t.identifier(pkField.name),
-      ),
+      keysObj,
       t.stringLiteral(deleteInputTypeName),
-      t.stringLiteral(pkField.name),
       selectExpr,
       t.identifier('connectionFieldsMap'),
     ];
@@ -1012,7 +1025,10 @@ export function generateModelFile(
     const junctionCreateMutation = getCreateMutationName(junctionTable);
     const junctionCreateInputType = getCreateInputTypeName(junctionTable);
     const junctionDeleteMutation = junctionTable.query?.delete ?? getDeleteMutationName(junctionTable);
-    const junctionDeleteInputType = getDeleteInputTypeName(junctionTable);
+    // Derive junction delete input type from actual mutation name (handles composite PK naming)
+    const junctionDeleteInputType = junctionTable.query?.delete
+      ? ucFirst(junctionTable.query.delete) + 'Input'
+      : getDeleteInputTypeName(junctionTable);
     const junctionSingular = junctionNames.singularName;
 
     // Derive a friendly singular name from the fieldName (e.g., "tags" → "Tag", "categories" → "Category")

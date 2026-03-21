@@ -13,7 +13,7 @@
  */
 import path from 'path';
 import { getConnectionsObject, seed } from 'graphile-test';
-import type { GraphQLQueryFnObj, GraphQLResponse } from 'graphile-test';
+import type { GraphQLQueryFnObj } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 import { ConstructivePreset } from 'graphile-settings';
 import { runCodegenAndLoad } from './helpers/codegen-helper';
@@ -80,14 +80,6 @@ describe('ORM M:N integration', () => {
     return Object.values(data)[0];
   }
 
-  /** Raw GraphQL for operations the ORM doesn't generate (e.g. junction delete) */
-  async function gql<T = unknown>(
-    queryStr: string,
-    variables?: Record<string, unknown>,
-  ): Promise<GraphQLResponse<T>> {
-    return query<T>({ query: queryStr, variables });
-  }
-
   // =========================================================================
   // Smoke test: verify codegen produced the expected models
   // =========================================================================
@@ -106,6 +98,7 @@ describe('ORM M:N integration', () => {
       expect(typeof orm.tag.findMany).toBe('function');
       expect(typeof orm.postTag.findMany).toBe('function');
       expect(typeof orm.postTag.create).toBe('function');
+      expect(typeof orm.postTag.delete).toBe('function');
     });
   });
 
@@ -177,7 +170,7 @@ describe('ORM M:N integration', () => {
       const result = await orm.postTag
         .create({
           data: { postId: POST_1, tagId: TAG_DESIGN },
-          select: { id: true, postId: true, tagId: true },
+          select: { postId: true, tagId: true },
         })
         .execute();
 
@@ -213,7 +206,7 @@ describe('ORM M:N integration', () => {
       const result = await orm.postTag
         .create({
           data: { postId: POST_2, tagId: TAG_SCIENCE },
-          select: { id: true, postId: true, tagId: true },
+          select: { postId: true, tagId: true },
         })
         .execute();
 
@@ -227,7 +220,7 @@ describe('ORM M:N integration', () => {
       const result = await orm.postTag
         .create({
           data: { postId: POST_1, tagId: TAG_TECH },
-          select: { id: true },
+          select: { postId: true },
         })
         .execute();
 
@@ -240,17 +233,12 @@ describe('ORM M:N integration', () => {
   // =========================================================================
   // Test: removeTag pattern (delete junction row via ORM postTag.delete)
   // =========================================================================
-  describe('removeTag (delete junction row)', () => {
-    // The codegen doesn't generate a delete method for post_tags because
-    // inferTablesFromIntrospection reports primaryKey: undefined for this
-    // junction table. We use ORM findMany to locate the row, then raw
-    // GraphQL deletePostTagByPostIdAndTagId (composite unique key) to remove it.
-
-    it('deletes a junction row by composite key', async () => {
+  describe('removeTag (delete junction row via ORM)', () => {
+    it('deletes a junction row by composite PK via postTag.delete', async () => {
       // ORM: verify post1 currently has Technology + Design
       const beforeResult = await orm.postTag
         .findMany({
-          select: { id: true, postId: true, tagId: true },
+          select: { postId: true, tagId: true },
           where: { postId: { equalTo: POST_1 } },
         })
         .execute();
@@ -259,17 +247,18 @@ describe('ORM M:N integration', () => {
       const beforeNodes = unwrapData(beforeResult.data).nodes;
       expect(beforeNodes.length).toBeGreaterThanOrEqual(2);
 
-      // Raw GraphQL: delete by composite key (postId + tagId)
-      const deleteResult = await gql<{ deletePostTagByPostIdAndTagId: { postTag: { postId: string; tagId: string } } }>(`
-        mutation ($postId: UUID!, $tagId: UUID!) {
-          deletePostTagByPostIdAndTagId(input: { postId: $postId, tagId: $tagId }) {
-            postTag { postId tagId }
-          }
-        }
-      `, { postId: POST_1, tagId: TAG_DESIGN });
+      // ORM: delete by composite PK (postId + tagId)
+      const deleteResult = await orm.postTag
+        .delete({
+          where: { postId: POST_1, tagId: TAG_DESIGN },
+          select: { postId: true, tagId: true },
+        })
+        .execute();
 
-      expect(deleteResult.errors).toBeUndefined();
-      expect(deleteResult.data?.deletePostTagByPostIdAndTagId.postTag.tagId).toBe(TAG_DESIGN);
+      expect(deleteResult.ok).toBe(true);
+      const deleted = unwrapData(deleteResult.data).postTag;
+      expect(deleted.postId).toBe(POST_1);
+      expect(deleted.tagId).toBe(TAG_DESIGN);
 
       // ORM: verify post1 is back to just Technology
       const afterResult = await orm.post
@@ -292,31 +281,34 @@ describe('ORM M:N integration', () => {
       expect(post1Tags[0].name).toBe('Technology');
     });
 
-    it('deletes a junction row by id (PK)', async () => {
-      // ORM: find the science junction row
-      const findResult = await orm.postTag
+    it('deletes another junction row by composite PK', async () => {
+      // ORM: delete post2 <-> science via composite PK
+      const deleteResult = await orm.postTag
+        .delete({
+          where: { postId: POST_2, tagId: TAG_SCIENCE },
+          select: { postId: true, tagId: true },
+        })
+        .execute();
+
+      expect(deleteResult.ok).toBe(true);
+      const deleted = unwrapData(deleteResult.data).postTag;
+      expect(deleted.postId).toBe(POST_2);
+      expect(deleted.tagId).toBe(TAG_SCIENCE);
+
+      // Verify post2 has no more tags (Science was removed)
+      const verifyResult = await orm.postTag
         .findMany({
-          select: { id: true, postId: true, tagId: true },
+          select: { postId: true, tagId: true },
           where: { postId: { equalTo: POST_2 } },
         })
         .execute();
 
-      expect(findResult.ok).toBe(true);
-      const scienceRow = unwrapData(findResult.data).nodes.find(
+      expect(verifyResult.ok).toBe(true);
+      // post2 may still have the NewTag from earlier CRUD test
+      const remaining = unwrapData(verifyResult.data).nodes.filter(
         (r: any) => r.tagId === TAG_SCIENCE,
       );
-      expect(scienceRow).toBeDefined();
-
-      // Raw GraphQL: delete by PK (id)
-      const deleteResult = await gql<{ deletePostTag: { postTag: { id: string } } }>(`
-        mutation ($id: UUID!) {
-          deletePostTag(input: { id: $id }) {
-            postTag { id }
-          }
-        }
-      `, { id: scienceRow.id });
-
-      expect(deleteResult.errors).toBeUndefined();
+      expect(remaining).toHaveLength(0);
     });
   });
 
@@ -356,7 +348,7 @@ describe('ORM M:N integration', () => {
       const newTag = unwrapData(tagResult.data).tag;
       expect(newTag).toBeDefined();
 
-      // Link it to post2 via ORM
+      // Link it to post2 via junction ORM
       const linkResult = await orm.postTag
         .create({
           data: { postId: POST_2, tagId: newTag.id },

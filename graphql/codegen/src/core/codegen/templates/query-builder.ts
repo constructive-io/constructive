@@ -621,9 +621,8 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
   operationName: string,
   mutationField: string,
   entityField: string,
-  id: string | number,
+  keys: Record<string, unknown>,
   inputTypeName: string,
-  idFieldName: string,
   select?: TSelect,
   connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
@@ -648,9 +647,7 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
       ],
     }),
     variables: {
-      input: {
-        [idFieldName]: id,
-      },
+      input: keys,
     },
   };
 }
