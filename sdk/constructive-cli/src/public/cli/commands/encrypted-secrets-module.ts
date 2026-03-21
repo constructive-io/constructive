@@ -17,8 +17,6 @@ const fieldSchema: FieldSchema = {
   schemaId: 'uuid',
   tableId: 'uuid',
   tableName: 'string',
-  tableNameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nencrypted-secrets-module <command>\n\nCommands:\n  list                  List all encryptedSecretsModule records\n  get                   Get a encryptedSecretsModule by ID\n  create                Create a new encryptedSecretsModule\n  update                Update an existing encryptedSecretsModule\n  delete                Delete a encryptedSecretsModule\n\n  --help, -h            Show this help message\n';

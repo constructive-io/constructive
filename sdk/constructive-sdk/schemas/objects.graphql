@@ -313,16 +313,6 @@ type Ref {
   databaseId: UUID!
   storeId: UUID!
   commitId: UUID
-
-  """
-  TRGM similarity when searching `name`. Returns null when no trgm search filter is active.
-  """
-  nameTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `Ref` edge in the connection."""
@@ -361,17 +351,6 @@ input RefFilter {
 
   """Negates the expression."""
   not: RefFilter
-
-  """TRGM search on the `name` column."""
-  trgmName: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -546,29 +525,6 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
-
-  """
-  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
-  """
-  similarTo: TrgmSearchInput
-
-  """
-  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
-  """
-  wordSimilarTo: TrgmSearchInput
-}
-
-"""
-Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
-"""
-input TrgmSearchInput {
-  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
-  value: String!
-
-  """
-  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
-  """
-  threshold: Float
 }
 
 """Methods to use when ordering `Ref`."""
@@ -582,10 +538,6 @@ enum RefOrderBy {
   DATABASE_ID_DESC
   STORE_ID_ASC
   STORE_ID_DESC
-  NAME_TRGM_SIMILARITY_ASC
-  NAME_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `Store` values."""
@@ -619,16 +571,6 @@ type Store {
   """The current head tree_id for this store."""
   hash: UUID
   createdAt: Datetime
-
-  """
-  TRGM similarity when searching `name`. Returns null when no trgm search filter is active.
-  """
-  nameTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `Store` edge in the connection."""
@@ -667,17 +609,6 @@ input StoreFilter {
 
   """Negates the expression."""
   not: StoreFilter
-
-  """TRGM search on the `name` column."""
-  trgmName: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -731,10 +662,6 @@ enum StoreOrderBy {
   ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-  NAME_TRGM_SIMILARITY_ASC
-  NAME_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `Commit` values."""
@@ -778,16 +705,6 @@ type Commit {
   """The root of the tree"""
   treeId: UUID
   date: Datetime!
-
-  """
-  TRGM similarity when searching `message`. Returns null when no trgm search filter is active.
-  """
-  messageTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `Commit` edge in the connection."""
@@ -838,17 +755,6 @@ input CommitFilter {
 
   """Negates the expression."""
   not: CommitFilter
-
-  """TRGM search on the `message` column."""
-  trgmMessage: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -923,10 +829,6 @@ enum CommitOrderBy {
   ID_DESC
   DATABASE_ID_ASC
   DATABASE_ID_DESC
-  MESSAGE_TRGM_SIMILARITY_ASC
-  MESSAGE_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """

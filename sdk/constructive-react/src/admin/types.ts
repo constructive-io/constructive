@@ -19,8 +19,6 @@ export interface AppPermission {
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgPermission {
   id: string | null;
@@ -28,8 +26,6 @@ export interface OrgPermission {
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppLevelRequirement {
   id: string | null;
@@ -40,8 +36,6 @@ export interface AppLevelRequirement {
   priority: number | null;
   createdAt: string | null;
   updatedAt: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgMember {
   id: string | null;
@@ -112,17 +106,12 @@ export interface OrgChartEdgeGrant {
   positionTitle: string | null;
   positionLevel: number | null;
   createdAt: string | null;
-  positionTitleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface MembershipType {
   id: number | null;
   name: string | null;
   description: string | null;
   prefix: string | null;
-  descriptionTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppLimit {
   id: string | null;
@@ -209,8 +198,6 @@ export interface OrgChartEdge {
   parentId: string | null;
   positionTitle: string | null;
   positionLevel: number | null;
-  positionTitleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgMembershipDefault {
   id: string | null;
@@ -272,8 +259,6 @@ export interface Invite {
   expiresAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  inviteTokenTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppLevel {
   id: string | null;
@@ -283,8 +268,6 @@ export interface AppLevel {
   ownerId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgInvite {
   id: string | null;
@@ -301,8 +284,6 @@ export interface OrgInvite {
   createdAt: string | null;
   updatedAt: string | null;
   entityId: string | null;
-  inviteTokenTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface StringFilter {
   isNull?: boolean;

@@ -18,22 +18,13 @@
 // Entity Mutation Keys
 // ============================================================================
 
-export const cryptoAddressMutationKeys = {
-  /** All cryptoAddress mutation keys */ all: ['mutation', 'cryptoaddress'] as const,
-  /** Create cryptoAddress mutation key */ create: () =>
-    ['mutation', 'cryptoaddress', 'create'] as const,
-  /** Update cryptoAddress mutation key */ update: (id: string | number) =>
-    ['mutation', 'cryptoaddress', 'update', id] as const,
-  /** Delete cryptoAddress mutation key */ delete: (id: string | number) =>
-    ['mutation', 'cryptoaddress', 'delete', id] as const,
-} as const;
-export const roleTypeMutationKeys = {
-  /** All roleType mutation keys */ all: ['mutation', 'roletype'] as const,
-  /** Create roleType mutation key */ create: () => ['mutation', 'roletype', 'create'] as const,
-  /** Update roleType mutation key */ update: (id: string | number) =>
-    ['mutation', 'roletype', 'update', id] as const,
-  /** Delete roleType mutation key */ delete: (id: string | number) =>
-    ['mutation', 'roletype', 'delete', id] as const,
+export const emailMutationKeys = {
+  /** All email mutation keys */ all: ['mutation', 'email'] as const,
+  /** Create email mutation key */ create: () => ['mutation', 'email', 'create'] as const,
+  /** Update email mutation key */ update: (id: string | number) =>
+    ['mutation', 'email', 'update', id] as const,
+  /** Delete email mutation key */ delete: (id: string | number) =>
+    ['mutation', 'email', 'delete', id] as const,
 } as const;
 export const phoneNumberMutationKeys = {
   /** All phoneNumber mutation keys */ all: ['mutation', 'phonenumber'] as const,
@@ -43,6 +34,15 @@ export const phoneNumberMutationKeys = {
     ['mutation', 'phonenumber', 'update', id] as const,
   /** Delete phoneNumber mutation key */ delete: (id: string | number) =>
     ['mutation', 'phonenumber', 'delete', id] as const,
+} as const;
+export const cryptoAddressMutationKeys = {
+  /** All cryptoAddress mutation keys */ all: ['mutation', 'cryptoaddress'] as const,
+  /** Create cryptoAddress mutation key */ create: () =>
+    ['mutation', 'cryptoaddress', 'create'] as const,
+  /** Update cryptoAddress mutation key */ update: (id: string | number) =>
+    ['mutation', 'cryptoaddress', 'update', id] as const,
+  /** Delete cryptoAddress mutation key */ delete: (id: string | number) =>
+    ['mutation', 'cryptoaddress', 'delete', id] as const,
 } as const;
 export const connectedAccountMutationKeys = {
   /** All connectedAccount mutation keys */ all: ['mutation', 'connectedaccount'] as const,
@@ -61,13 +61,13 @@ export const auditLogMutationKeys = {
   /** Delete auditLog mutation key */ delete: (id: string | number) =>
     ['mutation', 'auditlog', 'delete', id] as const,
 } as const;
-export const emailMutationKeys = {
-  /** All email mutation keys */ all: ['mutation', 'email'] as const,
-  /** Create email mutation key */ create: () => ['mutation', 'email', 'create'] as const,
-  /** Update email mutation key */ update: (id: string | number) =>
-    ['mutation', 'email', 'update', id] as const,
-  /** Delete email mutation key */ delete: (id: string | number) =>
-    ['mutation', 'email', 'delete', id] as const,
+export const roleTypeMutationKeys = {
+  /** All roleType mutation keys */ all: ['mutation', 'roletype'] as const,
+  /** Create roleType mutation key */ create: () => ['mutation', 'roletype', 'create'] as const,
+  /** Update roleType mutation key */ update: (id: string | number) =>
+    ['mutation', 'roletype', 'update', id] as const,
+  /** Delete roleType mutation key */ delete: (id: string | number) =>
+    ['mutation', 'roletype', 'delete', id] as const,
 } as const;
 export const userMutationKeys = {
   /** All user mutation keys */ all: ['mutation', 'user'] as const,
@@ -169,12 +169,12 @@ export const customMutationKeys = {
  * ```
  */
 export const mutationKeys = {
-  cryptoAddress: cryptoAddressMutationKeys,
-  roleType: roleTypeMutationKeys,
+  email: emailMutationKeys,
   phoneNumber: phoneNumberMutationKeys,
+  cryptoAddress: cryptoAddressMutationKeys,
   connectedAccount: connectedAccountMutationKeys,
   auditLog: auditLogMutationKeys,
-  email: emailMutationKeys,
+  roleType: roleTypeMutationKeys,
   user: userMutationKeys,
   custom: customMutationKeys,
 } as const;

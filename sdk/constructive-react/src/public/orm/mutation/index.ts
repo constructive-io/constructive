@@ -7,23 +7,28 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  SignOutInput,
   SendAccountDeletionEmailInput,
-  CheckPasswordInput,
+  SignOutInput,
+  AcceptDatabaseTransferInput,
+  CancelDatabaseTransferInput,
+  RejectDatabaseTransferInput,
   SubmitInviteCodeInput,
   SubmitOrgInviteCodeInput,
-  FreezeObjectsInput,
-  InitEmptyRepoInput,
+  CheckPasswordInput,
   ConfirmDeleteAccountInput,
   SetPasswordInput,
   VerifyEmailInput,
-  RemoveNodeAtPathInput,
+  FreezeObjectsInput,
+  InitEmptyRepoInput,
+  ConstructBlueprintInput,
   ResetPasswordInput,
-  BootstrapUserInput,
-  SetFieldOrderInput,
+  RemoveNodeAtPathInput,
   SetDataAtPathInput,
   SetPropsAndCommitInput,
+  CopyTemplateToBlueprintInput,
   ProvisionDatabaseWithUserInput,
+  BootstrapUserInput,
+  SetFieldOrderInput,
   InsertNodeAtPathInput,
   UpdateNodeAtPathInput,
   SetAndCommitInput,
@@ -34,27 +39,32 @@ import type {
   SignInInput,
   SignUpInput,
   OneTimeTokenInput,
-  ForgotPasswordInput,
   SendVerificationEmailInput,
+  ForgotPasswordInput,
   VerifyPasswordInput,
   VerifyTotpInput,
-  SignOutPayload,
   SendAccountDeletionEmailPayload,
-  CheckPasswordPayload,
+  SignOutPayload,
+  AcceptDatabaseTransferPayload,
+  CancelDatabaseTransferPayload,
+  RejectDatabaseTransferPayload,
   SubmitInviteCodePayload,
   SubmitOrgInviteCodePayload,
-  FreezeObjectsPayload,
-  InitEmptyRepoPayload,
+  CheckPasswordPayload,
   ConfirmDeleteAccountPayload,
   SetPasswordPayload,
   VerifyEmailPayload,
-  RemoveNodeAtPathPayload,
+  FreezeObjectsPayload,
+  InitEmptyRepoPayload,
+  ConstructBlueprintPayload,
   ResetPasswordPayload,
-  BootstrapUserPayload,
-  SetFieldOrderPayload,
+  RemoveNodeAtPathPayload,
   SetDataAtPathPayload,
   SetPropsAndCommitPayload,
+  CopyTemplateToBlueprintPayload,
   ProvisionDatabaseWithUserPayload,
+  BootstrapUserPayload,
+  SetFieldOrderPayload,
   InsertNodeAtPathPayload,
   UpdateNodeAtPathPayload,
   SetAndCommitPayload,
@@ -65,27 +75,32 @@ import type {
   SignInPayload,
   SignUpPayload,
   OneTimeTokenPayload,
-  ForgotPasswordPayload,
   SendVerificationEmailPayload,
+  ForgotPasswordPayload,
   VerifyPasswordPayload,
   VerifyTotpPayload,
-  SignOutPayloadSelect,
   SendAccountDeletionEmailPayloadSelect,
-  CheckPasswordPayloadSelect,
+  SignOutPayloadSelect,
+  AcceptDatabaseTransferPayloadSelect,
+  CancelDatabaseTransferPayloadSelect,
+  RejectDatabaseTransferPayloadSelect,
   SubmitInviteCodePayloadSelect,
   SubmitOrgInviteCodePayloadSelect,
-  FreezeObjectsPayloadSelect,
-  InitEmptyRepoPayloadSelect,
+  CheckPasswordPayloadSelect,
   ConfirmDeleteAccountPayloadSelect,
   SetPasswordPayloadSelect,
   VerifyEmailPayloadSelect,
-  RemoveNodeAtPathPayloadSelect,
+  FreezeObjectsPayloadSelect,
+  InitEmptyRepoPayloadSelect,
+  ConstructBlueprintPayloadSelect,
   ResetPasswordPayloadSelect,
-  BootstrapUserPayloadSelect,
-  SetFieldOrderPayloadSelect,
+  RemoveNodeAtPathPayloadSelect,
   SetDataAtPathPayloadSelect,
   SetPropsAndCommitPayloadSelect,
+  CopyTemplateToBlueprintPayloadSelect,
   ProvisionDatabaseWithUserPayloadSelect,
+  BootstrapUserPayloadSelect,
+  SetFieldOrderPayloadSelect,
   InsertNodeAtPathPayloadSelect,
   UpdateNodeAtPathPayloadSelect,
   SetAndCommitPayloadSelect,
@@ -96,20 +111,26 @@ import type {
   SignInPayloadSelect,
   SignUpPayloadSelect,
   OneTimeTokenPayloadSelect,
-  ForgotPasswordPayloadSelect,
   SendVerificationEmailPayloadSelect,
+  ForgotPasswordPayloadSelect,
   VerifyPasswordPayloadSelect,
   VerifyTotpPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface SignOutVariables {
-  input: SignOutInput;
-}
 export interface SendAccountDeletionEmailVariables {
   input: SendAccountDeletionEmailInput;
 }
-export interface CheckPasswordVariables {
-  input: CheckPasswordInput;
+export interface SignOutVariables {
+  input: SignOutInput;
+}
+export interface AcceptDatabaseTransferVariables {
+  input: AcceptDatabaseTransferInput;
+}
+export interface CancelDatabaseTransferVariables {
+  input: CancelDatabaseTransferInput;
+}
+export interface RejectDatabaseTransferVariables {
+  input: RejectDatabaseTransferInput;
 }
 export interface SubmitInviteCodeVariables {
   input: SubmitInviteCodeInput;
@@ -117,11 +138,8 @@ export interface SubmitInviteCodeVariables {
 export interface SubmitOrgInviteCodeVariables {
   input: SubmitOrgInviteCodeInput;
 }
-export interface FreezeObjectsVariables {
-  input: FreezeObjectsInput;
-}
-export interface InitEmptyRepoVariables {
-  input: InitEmptyRepoInput;
+export interface CheckPasswordVariables {
+  input: CheckPasswordInput;
 }
 export interface ConfirmDeleteAccountVariables {
   input: ConfirmDeleteAccountInput;
@@ -132,17 +150,24 @@ export interface SetPasswordVariables {
 export interface VerifyEmailVariables {
   input: VerifyEmailInput;
 }
-export interface RemoveNodeAtPathVariables {
-  input: RemoveNodeAtPathInput;
+export interface FreezeObjectsVariables {
+  input: FreezeObjectsInput;
+}
+export interface InitEmptyRepoVariables {
+  input: InitEmptyRepoInput;
+}
+/**
+ * Variables for constructBlueprint
+ * Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config in data. Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
+ */
+export interface ConstructBlueprintVariables {
+  input: ConstructBlueprintInput;
 }
 export interface ResetPasswordVariables {
   input: ResetPasswordInput;
 }
-export interface BootstrapUserVariables {
-  input: BootstrapUserInput;
-}
-export interface SetFieldOrderVariables {
-  input: SetFieldOrderInput;
+export interface RemoveNodeAtPathVariables {
+  input: RemoveNodeAtPathInput;
 }
 export interface SetDataAtPathVariables {
   input: SetDataAtPathInput;
@@ -150,8 +175,21 @@ export interface SetDataAtPathVariables {
 export interface SetPropsAndCommitVariables {
   input: SetPropsAndCommitInput;
 }
+/**
+ * Variables for copyTemplateToBlueprint
+ * Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
+ */
+export interface CopyTemplateToBlueprintVariables {
+  input: CopyTemplateToBlueprintInput;
+}
 export interface ProvisionDatabaseWithUserVariables {
   input: ProvisionDatabaseWithUserInput;
+}
+export interface BootstrapUserVariables {
+  input: BootstrapUserInput;
+}
+export interface SetFieldOrderVariables {
+  input: SetFieldOrderInput;
 }
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
@@ -202,11 +240,11 @@ export interface SignUpVariables {
 export interface OneTimeTokenVariables {
   input: OneTimeTokenInput;
 }
-export interface ForgotPasswordVariables {
-  input: ForgotPasswordInput;
-}
 export interface SendVerificationEmailVariables {
   input: SendVerificationEmailInput;
+}
+export interface ForgotPasswordVariables {
+  input: ForgotPasswordInput;
 }
 export interface VerifyPasswordVariables {
   input: VerifyPasswordInput;
@@ -216,35 +254,6 @@ export interface VerifyTotpVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
-    signOut: <S extends SignOutPayloadSelect>(
-      args: SignOutVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SignOutPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        signOut: InferSelectResult<SignOutPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SignOut',
-        fieldName: 'signOut',
-        ...buildCustomDocument(
-          'mutation',
-          'SignOut',
-          'signOut',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SignOutInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SignOutPayload'
-        ),
-      }),
     sendAccountDeletionEmail: <S extends SendAccountDeletionEmailPayloadSelect>(
       args: SendAccountDeletionEmailVariables,
       options: {
@@ -274,33 +283,120 @@ export function createMutationOperations(client: OrmClient) {
           'SendAccountDeletionEmailPayload'
         ),
       }),
-    checkPassword: <S extends CheckPasswordPayloadSelect>(
-      args: CheckPasswordVariables,
+    signOut: <S extends SignOutPayloadSelect>(
+      args: SignOutVariables,
       options: {
         select: S;
-      } & StrictSelect<S, CheckPasswordPayloadSelect>
+      } & StrictSelect<S, SignOutPayloadSelect>
     ) =>
       new QueryBuilder<{
-        checkPassword: InferSelectResult<CheckPasswordPayload, S> | null;
+        signOut: InferSelectResult<SignOutPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'CheckPassword',
-        fieldName: 'checkPassword',
+        operationName: 'SignOut',
+        fieldName: 'signOut',
         ...buildCustomDocument(
           'mutation',
-          'CheckPassword',
-          'checkPassword',
+          'SignOut',
+          'signOut',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'CheckPasswordInput!',
+              type: 'SignOutInput!',
             },
           ],
           connectionFieldsMap,
-          'CheckPasswordPayload'
+          'SignOutPayload'
+        ),
+      }),
+    acceptDatabaseTransfer: <S extends AcceptDatabaseTransferPayloadSelect>(
+      args: AcceptDatabaseTransferVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, AcceptDatabaseTransferPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        acceptDatabaseTransfer: InferSelectResult<AcceptDatabaseTransferPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'AcceptDatabaseTransfer',
+        fieldName: 'acceptDatabaseTransfer',
+        ...buildCustomDocument(
+          'mutation',
+          'AcceptDatabaseTransfer',
+          'acceptDatabaseTransfer',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'AcceptDatabaseTransferInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'AcceptDatabaseTransferPayload'
+        ),
+      }),
+    cancelDatabaseTransfer: <S extends CancelDatabaseTransferPayloadSelect>(
+      args: CancelDatabaseTransferVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CancelDatabaseTransferPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        cancelDatabaseTransfer: InferSelectResult<CancelDatabaseTransferPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CancelDatabaseTransfer',
+        fieldName: 'cancelDatabaseTransfer',
+        ...buildCustomDocument(
+          'mutation',
+          'CancelDatabaseTransfer',
+          'cancelDatabaseTransfer',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CancelDatabaseTransferInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CancelDatabaseTransferPayload'
+        ),
+      }),
+    rejectDatabaseTransfer: <S extends RejectDatabaseTransferPayloadSelect>(
+      args: RejectDatabaseTransferVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RejectDatabaseTransferPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        rejectDatabaseTransfer: InferSelectResult<RejectDatabaseTransferPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RejectDatabaseTransfer',
+        fieldName: 'rejectDatabaseTransfer',
+        ...buildCustomDocument(
+          'mutation',
+          'RejectDatabaseTransfer',
+          'rejectDatabaseTransfer',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RejectDatabaseTransferInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RejectDatabaseTransferPayload'
         ),
       }),
     submitInviteCode: <S extends SubmitInviteCodePayloadSelect>(
@@ -361,62 +457,33 @@ export function createMutationOperations(client: OrmClient) {
           'SubmitOrgInviteCodePayload'
         ),
       }),
-    freezeObjects: <S extends FreezeObjectsPayloadSelect>(
-      args: FreezeObjectsVariables,
+    checkPassword: <S extends CheckPasswordPayloadSelect>(
+      args: CheckPasswordVariables,
       options: {
         select: S;
-      } & StrictSelect<S, FreezeObjectsPayloadSelect>
+      } & StrictSelect<S, CheckPasswordPayloadSelect>
     ) =>
       new QueryBuilder<{
-        freezeObjects: InferSelectResult<FreezeObjectsPayload, S> | null;
+        checkPassword: InferSelectResult<CheckPasswordPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'FreezeObjects',
-        fieldName: 'freezeObjects',
+        operationName: 'CheckPassword',
+        fieldName: 'checkPassword',
         ...buildCustomDocument(
           'mutation',
-          'FreezeObjects',
-          'freezeObjects',
+          'CheckPassword',
+          'checkPassword',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'FreezeObjectsInput!',
+              type: 'CheckPasswordInput!',
             },
           ],
           connectionFieldsMap,
-          'FreezeObjectsPayload'
-        ),
-      }),
-    initEmptyRepo: <S extends InitEmptyRepoPayloadSelect>(
-      args: InitEmptyRepoVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, InitEmptyRepoPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        initEmptyRepo: InferSelectResult<InitEmptyRepoPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'InitEmptyRepo',
-        fieldName: 'initEmptyRepo',
-        ...buildCustomDocument(
-          'mutation',
-          'InitEmptyRepo',
-          'initEmptyRepo',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'InitEmptyRepoInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'InitEmptyRepoPayload'
+          'CheckPasswordPayload'
         ),
       }),
     confirmDeleteAccount: <S extends ConfirmDeleteAccountPayloadSelect>(
@@ -506,33 +573,91 @@ export function createMutationOperations(client: OrmClient) {
           'VerifyEmailPayload'
         ),
       }),
-    removeNodeAtPath: <S extends RemoveNodeAtPathPayloadSelect>(
-      args: RemoveNodeAtPathVariables,
+    freezeObjects: <S extends FreezeObjectsPayloadSelect>(
+      args: FreezeObjectsVariables,
       options: {
         select: S;
-      } & StrictSelect<S, RemoveNodeAtPathPayloadSelect>
+      } & StrictSelect<S, FreezeObjectsPayloadSelect>
     ) =>
       new QueryBuilder<{
-        removeNodeAtPath: InferSelectResult<RemoveNodeAtPathPayload, S> | null;
+        freezeObjects: InferSelectResult<FreezeObjectsPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'RemoveNodeAtPath',
-        fieldName: 'removeNodeAtPath',
+        operationName: 'FreezeObjects',
+        fieldName: 'freezeObjects',
         ...buildCustomDocument(
           'mutation',
-          'RemoveNodeAtPath',
-          'removeNodeAtPath',
+          'FreezeObjects',
+          'freezeObjects',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'RemoveNodeAtPathInput!',
+              type: 'FreezeObjectsInput!',
             },
           ],
           connectionFieldsMap,
-          'RemoveNodeAtPathPayload'
+          'FreezeObjectsPayload'
+        ),
+      }),
+    initEmptyRepo: <S extends InitEmptyRepoPayloadSelect>(
+      args: InitEmptyRepoVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, InitEmptyRepoPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        initEmptyRepo: InferSelectResult<InitEmptyRepoPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'InitEmptyRepo',
+        fieldName: 'initEmptyRepo',
+        ...buildCustomDocument(
+          'mutation',
+          'InitEmptyRepo',
+          'initEmptyRepo',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'InitEmptyRepoInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'InitEmptyRepoPayload'
+        ),
+      }),
+    constructBlueprint: <S extends ConstructBlueprintPayloadSelect>(
+      args: ConstructBlueprintVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ConstructBlueprintPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        constructBlueprint: InferSelectResult<ConstructBlueprintPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ConstructBlueprint',
+        fieldName: 'constructBlueprint',
+        ...buildCustomDocument(
+          'mutation',
+          'ConstructBlueprint',
+          'constructBlueprint',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ConstructBlueprintInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ConstructBlueprintPayload'
         ),
       }),
     resetPassword: <S extends ResetPasswordPayloadSelect>(
@@ -564,62 +689,33 @@ export function createMutationOperations(client: OrmClient) {
           'ResetPasswordPayload'
         ),
       }),
-    bootstrapUser: <S extends BootstrapUserPayloadSelect>(
-      args: BootstrapUserVariables,
+    removeNodeAtPath: <S extends RemoveNodeAtPathPayloadSelect>(
+      args: RemoveNodeAtPathVariables,
       options: {
         select: S;
-      } & StrictSelect<S, BootstrapUserPayloadSelect>
+      } & StrictSelect<S, RemoveNodeAtPathPayloadSelect>
     ) =>
       new QueryBuilder<{
-        bootstrapUser: InferSelectResult<BootstrapUserPayload, S> | null;
+        removeNodeAtPath: InferSelectResult<RemoveNodeAtPathPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'BootstrapUser',
-        fieldName: 'bootstrapUser',
+        operationName: 'RemoveNodeAtPath',
+        fieldName: 'removeNodeAtPath',
         ...buildCustomDocument(
           'mutation',
-          'BootstrapUser',
-          'bootstrapUser',
+          'RemoveNodeAtPath',
+          'removeNodeAtPath',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'BootstrapUserInput!',
+              type: 'RemoveNodeAtPathInput!',
             },
           ],
           connectionFieldsMap,
-          'BootstrapUserPayload'
-        ),
-      }),
-    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
-      args: SetFieldOrderVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetFieldOrderPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetFieldOrder',
-        fieldName: 'setFieldOrder',
-        ...buildCustomDocument(
-          'mutation',
-          'SetFieldOrder',
-          'setFieldOrder',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetFieldOrderInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetFieldOrderPayload'
+          'RemoveNodeAtPathPayload'
         ),
       }),
     setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
@@ -680,6 +776,35 @@ export function createMutationOperations(client: OrmClient) {
           'SetPropsAndCommitPayload'
         ),
       }),
+    copyTemplateToBlueprint: <S extends CopyTemplateToBlueprintPayloadSelect>(
+      args: CopyTemplateToBlueprintVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CopyTemplateToBlueprintPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        copyTemplateToBlueprint: InferSelectResult<CopyTemplateToBlueprintPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CopyTemplateToBlueprint',
+        fieldName: 'copyTemplateToBlueprint',
+        ...buildCustomDocument(
+          'mutation',
+          'CopyTemplateToBlueprint',
+          'copyTemplateToBlueprint',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CopyTemplateToBlueprintInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CopyTemplateToBlueprintPayload'
+        ),
+      }),
     provisionDatabaseWithUser: <S extends ProvisionDatabaseWithUserPayloadSelect>(
       args: ProvisionDatabaseWithUserVariables,
       options: {
@@ -707,6 +832,64 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ProvisionDatabaseWithUserPayload'
+        ),
+      }),
+    bootstrapUser: <S extends BootstrapUserPayloadSelect>(
+      args: BootstrapUserVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, BootstrapUserPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        bootstrapUser: InferSelectResult<BootstrapUserPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'BootstrapUser',
+        fieldName: 'bootstrapUser',
+        ...buildCustomDocument(
+          'mutation',
+          'BootstrapUser',
+          'bootstrapUser',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'BootstrapUserInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'BootstrapUserPayload'
+        ),
+      }),
+    setFieldOrder: <S extends SetFieldOrderPayloadSelect>(
+      args: SetFieldOrderVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetFieldOrderPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setFieldOrder: InferSelectResult<SetFieldOrderPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetFieldOrder',
+        fieldName: 'setFieldOrder',
+        ...buildCustomDocument(
+          'mutation',
+          'SetFieldOrder',
+          'setFieldOrder',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetFieldOrderInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetFieldOrderPayload'
         ),
       }),
     insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
@@ -999,35 +1182,6 @@ export function createMutationOperations(client: OrmClient) {
           'OneTimeTokenPayload'
         ),
       }),
-    forgotPassword: <S extends ForgotPasswordPayloadSelect>(
-      args: ForgotPasswordVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ForgotPasswordPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        forgotPassword: InferSelectResult<ForgotPasswordPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ForgotPassword',
-        fieldName: 'forgotPassword',
-        ...buildCustomDocument(
-          'mutation',
-          'ForgotPassword',
-          'forgotPassword',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ForgotPasswordInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ForgotPasswordPayload'
-        ),
-      }),
     sendVerificationEmail: <S extends SendVerificationEmailPayloadSelect>(
       args: SendVerificationEmailVariables,
       options: {
@@ -1055,6 +1209,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SendVerificationEmailPayload'
+        ),
+      }),
+    forgotPassword: <S extends ForgotPasswordPayloadSelect>(
+      args: ForgotPasswordVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ForgotPasswordPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        forgotPassword: InferSelectResult<ForgotPasswordPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ForgotPassword',
+        fieldName: 'forgotPassword',
+        ...buildCustomDocument(
+          'mutation',
+          'ForgotPassword',
+          'forgotPassword',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ForgotPasswordInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ForgotPasswordPayload'
         ),
       }),
     verifyPassword: <S extends VerifyPasswordPayloadSelect>(

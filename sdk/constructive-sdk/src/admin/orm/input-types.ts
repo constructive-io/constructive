@@ -253,10 +253,6 @@ export interface AppPermission {
   bitstr?: string | null;
   /** Human-readable description of what this permission allows */
   description?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines available permissions as named bits within a bitmask, used by the RBAC system for access control */
 export interface OrgPermission {
@@ -269,10 +265,6 @@ export interface OrgPermission {
   bitstr?: string | null;
   /** Human-readable description of what this permission allows */
   description?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines the specific requirements that must be met to achieve a level */
 export interface AppLevelRequirement {
@@ -289,10 +281,6 @@ export interface AppLevelRequirement {
   priority?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Simplified view of active members in an entity, used for listing who belongs to an org or group */
 export interface OrgMember {
@@ -391,7 +379,7 @@ export interface OrgChartEdgeGrant {
   childId?: string | null;
   /** User ID of the manager being assigned; NULL for top-level positions */
   parentId?: string | null;
-  /** User ID of the admin who performed this grant or revocation */
+  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
   grantorId?: string | null;
   /** TRUE to add/update the edge, FALSE to remove it */
   isGrant?: boolean | null;
@@ -401,10 +389,6 @@ export interface OrgChartEdgeGrant {
   positionLevel?: number | null;
   /** Timestamp when this grant or revocation was recorded */
   createdAt?: string | null;
-  /** TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active. */
-  positionTitleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
 export interface MembershipType {
@@ -416,12 +400,6 @@ export interface MembershipType {
   description?: string | null;
   /** Short prefix used to namespace tables and functions for this membership scope */
   prefix?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Tracks per-actor usage counts against configurable maximum limits */
 export interface AppLimit {
@@ -550,10 +528,6 @@ export interface OrgChartEdge {
   positionTitle?: string | null;
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number | null;
-  /** TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active. */
-  positionTitleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface OrgMembershipDefault {
@@ -652,10 +626,6 @@ export interface Invite {
   expiresAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active. */
-  inviteTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines available levels that users can achieve by completing requirements */
 export interface AppLevel {
@@ -670,10 +640,6 @@ export interface AppLevel {
   ownerId?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Invitation records sent to prospective members via email, with token-based redemption and expiration */
 export interface OrgInvite {
@@ -701,10 +667,6 @@ export interface OrgInvite {
   createdAt?: string | null;
   updatedAt?: string | null;
   entityId?: string | null;
-  /** TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active. */
-  inviteTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -805,8 +767,6 @@ export type AppPermissionSelect = {
   bitnum?: boolean;
   bitstr?: boolean;
   description?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type OrgPermissionSelect = {
   id?: boolean;
@@ -814,8 +774,6 @@ export type OrgPermissionSelect = {
   bitnum?: boolean;
   bitstr?: boolean;
   description?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppLevelRequirementSelect = {
   id?: boolean;
@@ -826,8 +784,6 @@ export type AppLevelRequirementSelect = {
   priority?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type OrgMemberSelect = {
   id?: boolean;
@@ -898,17 +854,12 @@ export type OrgChartEdgeGrantSelect = {
   positionTitle?: boolean;
   positionLevel?: boolean;
   createdAt?: boolean;
-  positionTitleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type MembershipTypeSelect = {
   id?: boolean;
   name?: boolean;
   description?: boolean;
   prefix?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppLimitSelect = {
   id?: boolean;
@@ -995,8 +946,6 @@ export type OrgChartEdgeSelect = {
   parentId?: boolean;
   positionTitle?: boolean;
   positionLevel?: boolean;
-  positionTitleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type OrgMembershipDefaultSelect = {
   id?: boolean;
@@ -1058,8 +1007,6 @@ export type InviteSelect = {
   expiresAt?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  inviteTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppLevelSelect = {
   id?: boolean;
@@ -1069,8 +1016,6 @@ export type AppLevelSelect = {
   ownerId?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type OrgInviteSelect = {
   id?: boolean;
@@ -1087,8 +1032,6 @@ export type OrgInviteSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   entityId?: boolean;
-  inviteTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 // ============ Table Filter Types ============
 export interface OrgGetManagersRecordFilter {
@@ -1111,8 +1054,6 @@ export interface AppPermissionFilter {
   bitnum?: IntFilter;
   bitstr?: BitStringFilter;
   description?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: AppPermissionFilter[];
   or?: AppPermissionFilter[];
   not?: AppPermissionFilter;
@@ -1123,8 +1064,6 @@ export interface OrgPermissionFilter {
   bitnum?: IntFilter;
   bitstr?: BitStringFilter;
   description?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgPermissionFilter[];
   or?: OrgPermissionFilter[];
   not?: OrgPermissionFilter;
@@ -1138,8 +1077,6 @@ export interface AppLevelRequirementFilter {
   priority?: IntFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: AppLevelRequirementFilter[];
   or?: AppLevelRequirementFilter[];
   not?: AppLevelRequirementFilter;
@@ -1240,8 +1177,6 @@ export interface OrgChartEdgeGrantFilter {
   positionTitle?: StringFilter;
   positionLevel?: IntFilter;
   createdAt?: DatetimeFilter;
-  positionTitleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgChartEdgeGrantFilter[];
   or?: OrgChartEdgeGrantFilter[];
   not?: OrgChartEdgeGrantFilter;
@@ -1251,9 +1186,6 @@ export interface MembershipTypeFilter {
   name?: StringFilter;
   description?: StringFilter;
   prefix?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: MembershipTypeFilter[];
   or?: MembershipTypeFilter[];
   not?: MembershipTypeFilter;
@@ -1370,8 +1302,6 @@ export interface OrgChartEdgeFilter {
   parentId?: UUIDFilter;
   positionTitle?: StringFilter;
   positionLevel?: IntFilter;
-  positionTitleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgChartEdgeFilter[];
   or?: OrgChartEdgeFilter[];
   not?: OrgChartEdgeFilter;
@@ -1445,8 +1375,6 @@ export interface InviteFilter {
   expiresAt?: DatetimeFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  inviteTokenTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: InviteFilter[];
   or?: InviteFilter[];
   not?: InviteFilter;
@@ -1459,8 +1387,6 @@ export interface AppLevelFilter {
   ownerId?: UUIDFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: AppLevelFilter[];
   or?: AppLevelFilter[];
   not?: AppLevelFilter;
@@ -1480,8 +1406,6 @@ export interface OrgInviteFilter {
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
   entityId?: UUIDFilter;
-  inviteTokenTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgInviteFilter[];
   or?: OrgInviteFilter[];
   not?: OrgInviteFilter;
@@ -1512,11 +1436,7 @@ export type AppPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 export type OrgPermissionOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1526,11 +1446,7 @@ export type OrgPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 export type AppLevelRequirementOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1546,11 +1462,7 @@ export type AppLevelRequirementOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type OrgMemberOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1574,13 +1486,17 @@ export type OrgPermissionDefaultOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
-  | 'ID_DESC';
+  | 'ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 export type AppAdminGrantOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1593,6 +1509,8 @@ export type AppOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1605,6 +1523,8 @@ export type OrgAdminGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -1619,6 +1539,8 @@ export type OrgOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -1656,11 +1578,7 @@ export type OrgChartEdgeGrantOrderBy =
   | 'PARENT_ID_ASC'
   | 'PARENT_ID_DESC'
   | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'GRANTOR_ID_DESC';
 export type MembershipTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1668,13 +1586,7 @@ export type MembershipTypeOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
 export type AppLimitOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1733,6 +1645,8 @@ export type AppGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -1778,13 +1692,17 @@ export type OrgClaimedInviteOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 export type OrgGrantOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -1808,11 +1726,7 @@ export type OrgChartEdgeOrderBy =
   | 'CHILD_ID_ASC'
   | 'CHILD_ID_DESC'
   | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'PARENT_ID_DESC';
 export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1894,11 +1808,7 @@ export type InviteOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type AppLevelOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1907,14 +1817,12 @@ export type AppLevelOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type OrgInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1925,6 +1833,8 @@ export type OrgInviteOrderBy =
   | 'EMAIL_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
   | 'INVITE_TOKEN_ASC'
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
@@ -1936,11 +1846,7 @@ export type OrgInviteOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'ENTITY_ID_DESC';
 // ============ CRUD Input Types ============
 export interface CreateOrgGetManagersRecordInput {
   clientMutationId?: string;
@@ -2254,7 +2160,7 @@ export interface CreateOrgChartEdgeGrantInput {
     entityId: string;
     childId: string;
     parentId?: string;
-    grantorId: string;
+    grantorId?: string;
     isGrant?: boolean;
     positionTitle?: string;
     positionLevel?: number;

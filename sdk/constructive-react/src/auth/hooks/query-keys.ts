@@ -19,23 +19,14 @@
 // Entity Query Keys
 // ============================================================================
 
-export const cryptoAddressKeys = {
-  /** All cryptoAddress queries */ all: ['cryptoaddress'] as const,
-  /** List query keys */ lists: () => [...cryptoAddressKeys.all, 'list'] as const,
+export const emailKeys = {
+  /** All email queries */ all: ['email'] as const,
+  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...cryptoAddressKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...cryptoAddressKeys.all, 'detail'] as const,
+    [...emailKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...cryptoAddressKeys.details(), id] as const,
-} as const;
-export const roleTypeKeys = {
-  /** All roleType queries */ all: ['roletype'] as const,
-  /** List query keys */ lists: () => [...roleTypeKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...roleTypeKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...roleTypeKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...roleTypeKeys.details(), id] as const,
+    [...emailKeys.details(), id] as const,
 } as const;
 export const phoneNumberKeys = {
   /** All phoneNumber queries */ all: ['phonenumber'] as const,
@@ -45,6 +36,15 @@ export const phoneNumberKeys = {
   /** Detail query keys */ details: () => [...phoneNumberKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...phoneNumberKeys.details(), id] as const,
+} as const;
+export const cryptoAddressKeys = {
+  /** All cryptoAddress queries */ all: ['cryptoaddress'] as const,
+  /** List query keys */ lists: () => [...cryptoAddressKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...cryptoAddressKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...cryptoAddressKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...cryptoAddressKeys.details(), id] as const,
 } as const;
 export const connectedAccountKeys = {
   /** All connectedAccount queries */ all: ['connectedaccount'] as const,
@@ -64,14 +64,14 @@ export const auditLogKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...auditLogKeys.details(), id] as const,
 } as const;
-export const emailKeys = {
-  /** All email queries */ all: ['email'] as const,
-  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
+export const roleTypeKeys = {
+  /** All roleType queries */ all: ['roletype'] as const,
+  /** List query keys */ lists: () => [...roleTypeKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...emailKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
+    [...roleTypeKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...roleTypeKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...emailKeys.details(), id] as const,
+    [...roleTypeKeys.details(), id] as const,
 } as const;
 export const userKeys = {
   /** All user queries */ all: ['user'] as const,
@@ -116,12 +116,12 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
-  cryptoAddress: cryptoAddressKeys,
-  roleType: roleTypeKeys,
+  email: emailKeys,
   phoneNumber: phoneNumberKeys,
+  cryptoAddress: cryptoAddressKeys,
   connectedAccount: connectedAccountKeys,
   auditLog: auditLogKeys,
-  email: emailKeys,
+  roleType: roleTypeKeys,
   user: userKeys,
   custom: customQueryKeys,
 } as const;

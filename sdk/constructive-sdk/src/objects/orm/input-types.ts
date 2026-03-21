@@ -254,10 +254,6 @@ export interface Ref {
   databaseId?: string | null;
   storeId?: string | null;
   commitId?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A store represents an isolated object repository within a database. */
 export interface Store {
@@ -270,10 +266,6 @@ export interface Store {
   /** The current head tree_id for this store. */
   hash?: string | null;
   createdAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A commit records changes to the repository. */
 export interface Commit {
@@ -293,10 +285,6 @@ export interface Commit {
   /** The root of the tree */
   treeId?: string | null;
   date?: string | null;
-  /** TRGM similarity when searching `message`. Returns null when no trgm search filter is active. */
-  messageTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -343,8 +331,6 @@ export type RefSelect = {
   databaseId?: boolean;
   storeId?: boolean;
   commitId?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type StoreSelect = {
   id?: boolean;
@@ -352,8 +338,6 @@ export type StoreSelect = {
   databaseId?: boolean;
   hash?: boolean;
   createdAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type CommitSelect = {
   id?: boolean;
@@ -365,8 +349,6 @@ export type CommitSelect = {
   committerId?: boolean;
   treeId?: boolean;
   date?: boolean;
-  messageTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 // ============ Table Filter Types ============
 export interface GetAllRecordFilter {
@@ -395,8 +377,6 @@ export interface RefFilter {
   databaseId?: UUIDFilter;
   storeId?: UUIDFilter;
   commitId?: UUIDFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: RefFilter[];
   or?: RefFilter[];
   not?: RefFilter;
@@ -407,8 +387,6 @@ export interface StoreFilter {
   databaseId?: UUIDFilter;
   hash?: UUIDFilter;
   createdAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: StoreFilter[];
   or?: StoreFilter[];
   not?: StoreFilter;
@@ -423,8 +401,6 @@ export interface CommitFilter {
   committerId?: UUIDFilter;
   treeId?: UUIDFilter;
   date?: DatetimeFilter;
-  messageTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: CommitFilter[];
   or?: CommitFilter[];
   not?: CommitFilter;
@@ -457,11 +433,7 @@ export type RefOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'STORE_ID_DESC';
 export type StoreOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -469,11 +441,7 @@ export type StoreOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type CommitOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -481,11 +449,7 @@ export type CommitOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'MESSAGE_TRGM_SIMILARITY_ASC'
-  | 'MESSAGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 // ============ CRUD Input Types ============
 export interface CreateGetAllRecordInput {
   clientMutationId?: string;

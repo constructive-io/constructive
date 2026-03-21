@@ -6,20 +6,14 @@
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
-export interface CryptoAddress {
+export interface Email {
   id: string | null;
   ownerId: string | null;
-  address: string | null;
+  email: ConstructiveInternalTypeEmail | null;
   isVerified: boolean | null;
   isPrimary: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
-  addressTrgmSimilarity: number | null;
-  searchScore: number | null;
-}
-export interface RoleType {
-  id: number | null;
-  name: string | null;
 }
 export interface PhoneNumber {
   id: string | null;
@@ -30,9 +24,15 @@ export interface PhoneNumber {
   isPrimary: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
-  ccTrgmSimilarity: number | null;
-  numberTrgmSimilarity: number | null;
-  searchScore: number | null;
+}
+export interface CryptoAddress {
+  id: string | null;
+  ownerId: string | null;
+  address: string | null;
+  isVerified: boolean | null;
+  isPrimary: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface ConnectedAccount {
   id: string | null;
@@ -43,9 +43,6 @@ export interface ConnectedAccount {
   isVerified: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
-  serviceTrgmSimilarity: number | null;
-  identifierTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AuditLog {
   id: string | null;
@@ -56,17 +53,10 @@ export interface AuditLog {
   ipAddress: string | null;
   success: boolean | null;
   createdAt: string | null;
-  userAgentTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
-export interface Email {
-  id: string | null;
-  ownerId: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
+export interface RoleType {
+  id: number | null;
+  name: string | null;
 }
 export interface User {
   id: string | null;

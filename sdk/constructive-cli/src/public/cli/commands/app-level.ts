@@ -16,8 +16,6 @@ const fieldSchema: FieldSchema = {
   ownerId: 'uuid',
   createdAt: 'string',
   updatedAt: 'string',
-  descriptionTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\napp-level <command>\n\nCommands:\n  list                  List all appLevel records\n  get                   Get a appLevel by ID\n  create                Create a new appLevel\n  update                Update an existing appLevel\n  delete                Delete a appLevel\n\n  --help, -h            Show this help message\n';
