@@ -6,6 +6,8 @@
  */
 import * as t from '@babel/types';
 
+import { singularize } from 'inflekt';
+
 import type { Table } from '../../../types/schema';
 import { asConst, generateCode } from '../babel-ast';
 import {
@@ -1005,8 +1007,8 @@ export function generateModelFile(
     const junctionDeleteInputType = `Delete${junctionNames.typeName}Input`;
     const junctionSingular = junctionNames.singularName;
 
-    // Derive a friendly singular name from the fieldName (e.g., "tags" → "Tag")
-    const relSingular = ucFirst(rel.fieldName.replace(/s$/, ''));
+    // Derive a friendly singular name from the fieldName (e.g., "tags" → "Tag", "categories" → "Category")
+    const relSingular = ucFirst(singularize(rel.fieldName));
 
     const leftKeys = rel.junctionLeftKeyFields!;
     const rightKeys = rel.junctionRightKeyFields!;
