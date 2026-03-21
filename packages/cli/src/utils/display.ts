@@ -33,7 +33,7 @@ export const usageText = `
     cnc server --port 8080            Start server on custom port
     cnc explorer                      Launch GraphiQL explorer
     cnc codegen --schema schema.graphql  Generate types from schema
-    cnc codegen --schema-only --out schema.graphql  Export schema SDL
+    cnc codegen --schema-enabled --output ./schemas  Export schema SDL
     cnc jobs up                       Start combined server (jobs runtime)
 
     # Execution Engine

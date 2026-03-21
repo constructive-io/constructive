@@ -1,10 +1,11 @@
 import { toKebabCase } from 'komoji';
 
-import type { CleanTable, CleanOperation, TypeRegistry } from '../../../types/schema';
+import type { Table, Operation, TypeRegistry } from '../../../types/schema';
 import {
   flattenArgs,
   flattenedArgsToFlags,
   cleanTypeName,
+  fieldPlaceholder,
   getEditableFields,
   getSearchFields,
   categorizeSpecialFields,
@@ -27,8 +28,8 @@ export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile, McpTool } from '../docs-utils';
 
 export function generateReadme(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   registry?: TypeRegistry,
 ): GeneratedDocFile {
@@ -209,8 +210,8 @@ export function generateReadme(
 }
 
 export function generateAgentsDocs(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   _registry?: TypeRegistry,
 ): GeneratedDocFile {
@@ -264,8 +265,8 @@ export function generateAgentsDocs(
 }
 
 export function getCliMcpTools(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   registry?: TypeRegistry,
 ): McpTool[] {
@@ -519,8 +520,8 @@ export function getCliMcpTools(
 }
 
 export function generateSkills(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
   targetName: string,
   registry?: TypeRegistry,
@@ -621,8 +622,8 @@ export function generateSkills(
     const editableFields = getEditableFields(table, registry);
     const defaultFields = getFieldsWithDefaults(table, registry);
     const createFlags = [
-      ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <value>`),
-      ...editableFields.filter((f) => defaultFields.has(f.name)).map((f) => `[--${f.name} <value>]`),
+      ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <${cleanTypeName(f.type.gqlType)}>`),
+      ...editableFields.filter((f) => defaultFields.has(f.name)).map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`),
     ].join(' ');
 
     referenceNames.push(kebab);
@@ -640,10 +641,10 @@ export function generateSkills(
         description: skillSpecialDesc,
         usage: [
           `${toolName} ${kebab} list`,
-          `${toolName} ${kebab} get --${pk.name} <value>`,
+          `${toolName} ${kebab} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
           `${toolName} ${kebab} create ${createFlags}`,
-          `${toolName} ${kebab} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`,
-          `${toolName} ${kebab} delete --${pk.name} <value>`,
+          `${toolName} ${kebab} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
+          `${toolName} ${kebab} delete --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
         ],
         examples: [
           {
@@ -752,8 +753,8 @@ export interface MultiTargetDocsInput {
   targets: Array<{
     name: string;
     endpoint: string;
-    tables: CleanTable[];
-    customOperations: CleanOperation[];
+    tables: Table[];
+    customOperations: Operation[];
     isAuthTarget?: boolean;
   }>;
 }
@@ -1519,8 +1520,8 @@ export function generateMultiTargetSkills(
       const editableFields = getEditableFields(table, registry);
       const defaultFields = getFieldsWithDefaults(table, registry);
       const createFlags = [
-        ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <value>`),
-        ...editableFields.filter((f) => defaultFields.has(f.name)).map((f) => `[--${f.name} <value>]`),
+        ...editableFields.filter((f) => !defaultFields.has(f.name)).map((f) => `--${f.name} <${cleanTypeName(f.type.gqlType)}>`),
+        ...editableFields.filter((f) => defaultFields.has(f.name)).map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`),
       ].join(' ');
       const cmd = `${tgt.name}:${kebab}`;
 
@@ -1539,10 +1540,10 @@ export function generateMultiTargetSkills(
           description: mtSkillSpecialDesc,
           usage: [
             `${toolName} ${cmd} list`,
-            `${toolName} ${cmd} get --${pk.name} <value>`,
+            `${toolName} ${cmd} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
             `${toolName} ${cmd} create ${createFlags}`,
-            `${toolName} ${cmd} update --${pk.name} <value> ${editableFields.map((f) => `[--${f.name} <value>]`).join(' ')}`,
-            `${toolName} ${cmd} delete --${pk.name} <value>`,
+            `${toolName} ${cmd} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
+            `${toolName} ${cmd} delete --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
           ],
           examples: [
             {

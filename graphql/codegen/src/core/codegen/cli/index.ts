@@ -1,5 +1,5 @@
 import type { BuiltinNames, GraphQLSDKConfigTarget } from '../../../types/config';
-import type { CleanOperation, CleanTable, TypeRegistry } from '../../../types/schema';
+import type { Operation, Table, TypeRegistry } from '../../../types/schema';
 import { generateCommandMap, generateMultiTargetCommandMap } from './command-map-generator';
 import { generateConfigCommand } from './config-command-generator';
 import { generateCustomCommand } from './custom-command-generator';
@@ -17,10 +17,10 @@ import { generateTableCommand } from './table-command-generator';
 import { generateUtilsFile, generateNodeFetchFile, generateEntryPointFile } from './utils-generator';
 
 export interface GenerateCliOptions {
-  tables: CleanTable[];
+  tables: Table[];
   customOperations?: {
-    queries: CleanOperation[];
-    mutations: CleanOperation[];
+    queries: Operation[];
+    mutations: Operation[];
   };
   config: GraphQLSDKConfigTarget;
   /** TypeRegistry from introspection, used to check field defaults */
@@ -77,7 +77,7 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
     files.push(tableFile);
   }
 
-  const allCustomOps: CleanOperation[] = [
+  const allCustomOps: Operation[] = [
     ...(customOperations?.queries ?? []),
     ...(customOperations?.mutations ?? []),
   ];
@@ -117,10 +117,10 @@ export interface MultiTargetCliTarget {
   name: string;
   endpoint: string;
   ormImportPath: string;
-  tables: CleanTable[];
+  tables: Table[];
   customOperations: {
-    queries: CleanOperation[];
-    mutations: CleanOperation[];
+    queries: Operation[];
+    mutations: Operation[];
   };
   isAuthTarget?: boolean;
   /** TypeRegistry from introspection, used to check field defaults */
@@ -211,12 +211,12 @@ export function generateMultiTargetCli(
 
   const commandMapTargets: Array<{
     name: string;
-    tables: CleanTable[];
-    customOperations: CleanOperation[];
+    tables: Table[];
+    customOperations: Operation[];
   }> = [];
 
   for (const target of targets) {
-    const allOps: CleanOperation[] = [
+    const allOps: Operation[] = [
       ...(target.customOperations?.queries ?? []),
       ...(target.customOperations?.mutations ?? []),
     ];

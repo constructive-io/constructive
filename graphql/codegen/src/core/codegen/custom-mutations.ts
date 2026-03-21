@@ -15,7 +15,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanOperation, TypeRegistry } from '../../types/schema';
+import type { Operation, TypeRegistry } from '../../types/schema';
 import {
   buildSelectionArgsCall,
   callExpr,
@@ -57,7 +57,7 @@ export interface GeneratedCustomMutationFile {
 }
 
 export interface GenerateCustomMutationHookOptions {
-  operation: CleanOperation;
+  operation: Operation;
   typeRegistry: TypeRegistry;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;
@@ -398,7 +398,7 @@ function generateCustomMutationHookInternal(
 }
 
 export interface GenerateAllCustomMutationHooksOptions {
-  operations: CleanOperation[];
+  operations: Operation[];
   typeRegistry: TypeRegistry;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;

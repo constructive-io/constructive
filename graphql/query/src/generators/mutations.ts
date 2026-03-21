@@ -12,7 +12,7 @@ import {
   requiresSubfieldSelection,
 } from '../custom-ast';
 import type { MutationOptions } from '../types/mutation';
-import type { CleanTable } from '../types/schema';
+import type { Table } from '../types/schema';
 import { isRelationalField } from './field-selector';
 import {
   toCamelCaseSingular,
@@ -28,7 +28,7 @@ import {
  * Generate field selections for PostGraphile mutations using custom AST logic
  * This handles both scalar fields and complex types that require subfield selections
  */
-function generateFieldSelections(table: CleanTable): FieldNode[] {
+function generateFieldSelections(table: Table): FieldNode[] {
   return table.fields
     .filter((field) => !isRelationalField(field.name, table)) // Exclude relational fields
     .map((field) => {
@@ -47,8 +47,8 @@ function generateFieldSelections(table: CleanTable): FieldNode[] {
  * PostGraphile expects: mutation { createTableName(input: { tableName: TableNameInput! }) { tableName { ... } } }
  */
 export function buildPostGraphileCreate(
-  table: CleanTable,
-  _allTables: CleanTable[],
+  table: Table,
+  _allTables: Table[],
   _options: MutationOptions = {},
 ): TypedDocumentString<
   Record<string, unknown>,
@@ -124,8 +124,8 @@ export function buildPostGraphileCreate(
  * PostGraphile expects: mutation { updateTableName(input: { id: UUID!, patch: TableNamePatch! }) { tableName { ... } } }
  */
 export function buildPostGraphileUpdate(
-  table: CleanTable,
-  _allTables: CleanTable[],
+  table: Table,
+  _allTables: Table[],
   _options: MutationOptions = {},
 ): TypedDocumentString<
   Record<string, unknown>,
@@ -201,8 +201,8 @@ export function buildPostGraphileUpdate(
  * PostGraphile expects: mutation { deleteTableName(input: { id: UUID! }) { clientMutationId } }
  */
 export function buildPostGraphileDelete(
-  table: CleanTable,
-  _allTables: CleanTable[],
+  table: Table,
+  _allTables: Table[],
   _options: MutationOptions = {},
 ): TypedDocumentString<
   Record<string, unknown>,

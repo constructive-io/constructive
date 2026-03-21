@@ -28,8 +28,8 @@ import type {
 } from '../../types/config';
 import { DEFAULT_QUERY_KEY_CONFIG } from '../../types/config';
 import type {
-  CleanOperation,
-  CleanTable,
+  Operation,
+  Table,
   TypeRegistry,
 } from '../../types/schema';
 import {
@@ -75,11 +75,11 @@ export interface GenerateResult {
 
 export interface GenerateOptions {
   /** Tables from GraphQL introspection */
-  tables: CleanTable[];
+  tables: Table[];
   /** Custom operations from __schema introspection */
   customOperations?: {
-    queries: CleanOperation[];
-    mutations: CleanOperation[];
+    queries: Operation[];
+    mutations: Operation[];
     typeRegistry: TypeRegistry;
   };
   /** Configuration */
@@ -101,7 +101,7 @@ export interface GenerateOptions {
  * Generate all SDK files for tables only
  */
 export function generateAllFiles(
-  tables: CleanTable[],
+  tables: Table[],
   config: GraphQLSDKConfigTarget,
 ): GenerateResult {
   return generate({ tables, config });

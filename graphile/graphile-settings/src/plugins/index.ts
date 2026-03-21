@@ -110,3 +110,14 @@ export type {
   TrgmAdapterOptions,
   PgvectorAdapterOptions,
 } from 'graphile-search';
+
+// Node type registry — @oneOf typed input types for blueprint definitions
+// Gather-phase plugin queries node_type_registry through existing pgService
+export {
+  NodeTypeRegistryPlugin,
+  NodeTypeRegistryPreset,
+  // Legacy exports for backward compatibility
+  createBlueprintTypesPlugin,
+  BlueprintTypesPreset,
+} from './blueprint-types';
+export type { NodeTypeRegistryEntry } from './blueprint-types';

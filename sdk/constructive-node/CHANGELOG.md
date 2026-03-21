@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.4.14...@constructive-io/node@0.5.0) (2026-03-20)
+
+**Note:** Version bump only for package @constructive-io/node
+
+## [0.4.14](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.4.13...@constructive-io/node@0.4.14) (2026-03-20)
+
+**Note:** Version bump only for package @constructive-io/node
+
+## [0.4.13](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.4.12...@constructive-io/node@0.4.13) (2026-03-20)
+
+**Note:** Version bump only for package @constructive-io/node
+
+## [0.4.12](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.4.11...@constructive-io/node@0.4.12) (2026-03-20)
+
+**Note:** Version bump only for package @constructive-io/node
+
+## [0.4.11](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.4.10...@constructive-io/node@0.4.11) (2026-03-19)
+
+**Note:** Version bump only for package @constructive-io/node
+
+## [0.4.10](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.4.9...@constructive-io/node@0.4.10) (2026-03-18)
+
+**Note:** Version bump only for package @constructive-io/node
+
 ## [0.4.9](https://github.com/constructive-io/constructive/compare/@constructive-io/node@0.4.8...@constructive-io/node@0.4.9) (2026-03-17)
 
 **Note:** Version bump only for package @constructive-io/node

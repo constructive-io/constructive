@@ -25,22 +25,22 @@ import {
   generateRootRootReadme,
 } from '../../core/codegen/target-docs-generator';
 import type {
-  CleanFieldType,
-  CleanOperation,
-  CleanRelations,
-  CleanTable,
-  CleanTypeRef,
+  FieldType,
+  Operation,
+  Relations,
+  Table,
+  TypeRef,
 } from '../../types/schema';
 
 const fieldTypes = {
-  uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
-  string: { gqlType: 'String', isArray: false } as CleanFieldType,
-  int: { gqlType: 'Int', isArray: false } as CleanFieldType,
-  boolean: { gqlType: 'Boolean', isArray: false } as CleanFieldType,
-  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType,
+  uuid: { gqlType: 'UUID', isArray: false } as FieldType,
+  string: { gqlType: 'String', isArray: false } as FieldType,
+  int: { gqlType: 'Int', isArray: false } as FieldType,
+  boolean: { gqlType: 'Boolean', isArray: false } as FieldType,
+  datetime: { gqlType: 'Datetime', isArray: false } as FieldType,
 };
 
-const emptyRelations: CleanRelations = {
+const emptyRelations: Relations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
@@ -48,8 +48,8 @@ const emptyRelations: CleanRelations = {
 };
 
 function createTable(
-  partial: Partial<CleanTable> & { name: string },
-): CleanTable {
+  partial: Partial<Table> & { name: string },
+): Table {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -61,10 +61,10 @@ function createTable(
 }
 
 function createTypeRef(
-  kind: CleanTypeRef['kind'],
+  kind: TypeRef['kind'],
   name: string | null,
-  ofType?: CleanTypeRef,
-): CleanTypeRef {
+  ofType?: TypeRef,
+): TypeRef {
   return { kind, name, ofType };
 }
 
@@ -103,7 +103,7 @@ const driverTable = createTable({
   },
 });
 
-const loginMutation: CleanOperation = {
+const loginMutation: Operation = {
   name: 'login',
   kind: 'mutation',
   args: [
@@ -128,7 +128,7 @@ const loginMutation: CleanOperation = {
   description: 'Authenticate a user',
 };
 
-const currentUserQuery: CleanOperation = {
+const currentUserQuery: Operation = {
   name: 'currentUser',
   kind: 'query',
   args: [],
@@ -255,7 +255,7 @@ describe('cli-generator', () => {
   });
 });
 
-const allCustomOps: CleanOperation[] = [currentUserQuery, loginMutation];
+const allCustomOps: Operation[] = [currentUserQuery, loginMutation];
 
 describe('cli docs generator', () => {
   it('generates CLI README', () => {

@@ -34,6 +34,7 @@ query IntrospectSchema {
       kind
       name
       description
+      isOneOf
       fields(includeDeprecated: true) {
         name
         description

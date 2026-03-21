@@ -6,7 +6,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanTable } from '../../../types/schema';
+import type { Table } from '../../../types/schema';
 import { asConst, generateCode } from '../babel-ast';
 import {
   getFilterTypeName,
@@ -162,7 +162,7 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
 }
 
 export function generateModelFile(
-  table: CleanTable,
+  table: Table,
   _useSharedTypes: boolean,
   options?: { condition?: boolean },
 ): GeneratedModelFile {
@@ -1001,7 +1001,7 @@ export function generateModelFile(
 }
 
 export function generateAllModelFiles(
-  tables: CleanTable[],
+  tables: Table[],
   useSharedTypes: boolean,
   options?: { condition?: boolean },
 ): GeneratedModelFile[] {

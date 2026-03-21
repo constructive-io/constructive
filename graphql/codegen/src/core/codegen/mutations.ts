@@ -9,7 +9,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanTable } from '../../types/schema';
+import type { Table } from '../../types/schema';
 import {
   addJSDocComment,
   buildSelectionArgsCall,
@@ -106,7 +106,7 @@ function buildFieldsSelectionType(
 }
 
 export function generateCreateMutationHook(
-  table: CleanTable,
+  table: Table,
   options: MutationGeneratorOptions = {},
 ): GeneratedMutationFile | null {
   const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
@@ -321,7 +321,7 @@ export function generateCreateMutationHook(
 }
 
 export function generateUpdateMutationHook(
-  table: CleanTable,
+  table: Table,
   options: MutationGeneratorOptions = {},
 ): GeneratedMutationFile | null {
   const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
@@ -581,7 +581,7 @@ export function generateUpdateMutationHook(
 }
 
 export function generateDeleteMutationHook(
-  table: CleanTable,
+  table: Table,
   options: MutationGeneratorOptions = {},
 ): GeneratedMutationFile | null {
   const { reactQueryEnabled = true, useCentralizedKeys = true } = options;
@@ -828,7 +828,7 @@ export function generateDeleteMutationHook(
 }
 
 export function generateAllMutationHooks(
-  tables: CleanTable[],
+  tables: Table[],
   options: MutationGeneratorOptions = {},
 ): GeneratedMutationFile[] {
   const files: GeneratedMutationFile[] = [];

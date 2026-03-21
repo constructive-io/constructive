@@ -31,7 +31,13 @@ export async function runCodegenHandler(
 ): Promise<void> {
   const args = camelizeArgv(argv as Record<string, any>);
 
-  const schemaOnly = Boolean(args.schemaOnly);
+  const schemaConfig = args.schemaEnabled
+    ? {
+        enabled: true,
+        ...(args.schemaOutput ? { output: String(args.schemaOutput) } : {}),
+        ...(args.schemaFilename ? { filename: String(args.schemaFilename) } : {}),
+      }
+    : undefined;
 
   const hasSourceFlags = Boolean(
     args.endpoint || args.schemaFile || args.schemaDir || args.schemas || args.apiNames
@@ -80,7 +86,7 @@ export async function runCodegenHandler(
       const { results, hasError } = await generateMulti({
         configs: selectedTargets,
         cliOverrides: cliOptions as Partial<GraphQLSDKConfigTarget>,
-        schemaOnly,
+        schema: schemaConfig,
       });
 
       for (const { name, result } of results) {
@@ -107,7 +113,7 @@ export async function runCodegenHandler(
   if (expanded) {
     const { results, hasError } = await generateMulti({
       configs: expanded,
-      schemaOnly,
+      schema: schemaConfig,
     });
     for (const { name, result } of results) {
       console.log(`\n[${name}]`);
@@ -117,6 +123,9 @@ export async function runCodegenHandler(
     return;
   }
 
-  const result = await generate({ ...options, schemaOnly });
+  const result = await generate({
+    ...options,
+    ...(schemaConfig ? { schema: schemaConfig } : {}),
+  });
   printResult(result);
 }

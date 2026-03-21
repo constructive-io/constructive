@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.7.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.6.6...graphile-postgis@2.7.0) (2026-03-20)
+
+### Features
+
+- **graphile-postgis:** implement all missing PostGIS features ([4631f9e](https://github.com/constructive-io/constructive/commit/4631f9e7a31e429abc4b369aea0a8e381729071f))
+
+## [2.6.6](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.6.5...graphile-postgis@2.6.6) (2026-03-20)
+
+**Note:** Version bump only for package graphile-postgis
+
 ## [2.6.5](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.6.4...graphile-postgis@2.6.5) (2026-03-17)
 
 **Note:** Version bump only for package graphile-postgis

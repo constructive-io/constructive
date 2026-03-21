@@ -15,7 +15,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanOperation, TypeRegistry } from '../../types/schema';
+import type { Operation, TypeRegistry } from '../../types/schema';
 import { asConst } from './babel-ast';
 import {
   addJSDocComment,
@@ -68,7 +68,7 @@ export interface GeneratedCustomQueryFile {
 }
 
 export interface GenerateCustomQueryHookOptions {
-  operation: CleanOperation;
+  operation: Operation;
   typeRegistry: TypeRegistry;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;
@@ -1102,7 +1102,7 @@ export function generateCustomQueryHook(
 }
 
 export interface GenerateAllCustomQueryHooksOptions {
-  operations: CleanOperation[];
+  operations: Operation[];
   typeRegistry: TypeRegistry;
   skipQueryField?: boolean;
   reactQueryEnabled?: boolean;

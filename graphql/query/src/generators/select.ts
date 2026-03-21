@@ -22,7 +22,7 @@ import type {
   QuerySelectionOptions,
 } from '../types';
 import type { QueryOptions } from '../types/query';
-import type { CleanTable } from '../types/schema';
+import type { Table } from '../types/schema';
 import type { FieldSelection } from '../types/selection';
 import { convertToSelectionOptions, isRelationalField } from './field-selector';
 import {
@@ -44,9 +44,9 @@ import {
 export { toCamelCasePlural, toOrderByTypeName } from './naming-helpers';
 
 /**
- * Convert CleanTable to MetaObject format for QueryBuilder
+ * Convert Table to MetaObject format for QueryBuilder
  */
-export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
+export function cleanTableToMetaObject(tables: Table[]): MetaObject {
   return {
     tables: tables.map((table) => ({
       name: table.name,
@@ -97,11 +97,11 @@ export function cleanTableToMetaObject(tables: CleanTable[]): MetaObject {
 }
 
 /**
- * Generate basic IntrospectionSchema from CleanTable array
+ * Generate basic IntrospectionSchema from Table array
  * This creates a minimal schema for AST generation
  */
 export function generateIntrospectionSchema(
-  tables: CleanTable[],
+  tables: Table[],
 ): QueryIntrospectionSchema {
   const schema: QueryIntrospectionSchema = {};
 
@@ -224,9 +224,9 @@ export function generateIntrospectionSchema(
 }
 
 /**
- * Convert CleanTable fields to QueryBuilder properties
+ * Convert Table fields to QueryBuilder properties
  */
-function convertFieldsToProperties(fields: CleanTable['fields']) {
+function convertFieldsToProperties(fields: Table['fields']) {
   const properties: Record<string, unknown> = {};
 
   fields.forEach((field) => {
@@ -245,7 +245,7 @@ function convertFieldsToProperties(fields: CleanTable['fields']) {
 /**
  * Convert fields to nested properties for mutations
  */
-function convertFieldsToNestedProperties(fields: CleanTable['fields']) {
+function convertFieldsToNestedProperties(fields: Table['fields']) {
   const properties: Record<string, unknown> = {};
 
   fields.forEach((field) => {
@@ -264,7 +264,7 @@ function convertFieldsToNestedProperties(fields: CleanTable['fields']) {
 /**
  * Create AST-based query builder for a table
  */
-export function createASTQueryBuilder(tables: CleanTable[]): QueryBuilder {
+export function createASTQueryBuilder(tables: Table[]): QueryBuilder {
   const metaObject = cleanTableToMetaObject(tables);
   const introspectionSchema = generateIntrospectionSchema(tables);
 
@@ -279,8 +279,8 @@ export function createASTQueryBuilder(tables: CleanTable[]): QueryBuilder {
  * Uses direct AST generation without intermediate conversions
  */
 export function buildSelect(
-  table: CleanTable,
-  allTables: readonly CleanTable[],
+  table: Table,
+  allTables: readonly Table[],
   options: QueryOptions = {},
 ): TypedDocumentString<Record<string, unknown>, QueryOptions> {
   const tableList = Array.from(allTables);
@@ -309,7 +309,7 @@ export function buildSelect(
  * Build a single row query by primary key or unique field
  */
 export function buildFindOne(
-  table: CleanTable,
+  table: Table,
   _pkField: string = 'id',
 ): TypedDocumentString<Record<string, unknown>, Record<string, unknown>> {
   const queryString = generateFindOneQueryAST(table);
@@ -324,7 +324,7 @@ export function buildFindOne(
  * Build a count query for a table
  */
 export function buildCount(
-  table: CleanTable,
+  table: Table,
 ): TypedDocumentString<
   { [key: string]: { totalCount: number } },
   { condition?: Record<string, unknown>; filter?: Record<string, unknown> }
@@ -338,19 +338,19 @@ export function buildCount(
 }
 
 function convertFieldSelectionToSelectionOptions(
-  table: CleanTable,
-  allTables: CleanTable[],
+  table: Table,
+  allTables: Table[],
   options?: FieldSelection,
 ): QuerySelectionOptions | null {
   return convertToSelectionOptions(table, allTables, options);
 }
 
 /**
- * Generate SELECT query AST directly from CleanTable
+ * Generate SELECT query AST directly from Table
  */
 function generateSelectQueryAST(
-  table: CleanTable,
-  allTables: CleanTable[],
+  table: Table,
+  allTables: Table[],
   selection: QuerySelectionOptions | null,
   options: QueryOptions,
   relationFieldMap?: Record<string, string | null>,
@@ -529,8 +529,8 @@ function generateSelectQueryAST(
  * Generate field selections from SelectionOptions
  */
 function generateFieldSelectionsFromOptions(
-  table: CleanTable,
-  allTables: CleanTable[],
+  table: Table,
+  allTables: Table[],
   selection: QuerySelectionOptions | null,
   relationFieldMap?: Record<string, string | null>,
 ): FieldNode[] {
@@ -703,7 +703,7 @@ function createFieldSelectionNode(
  */
 function getRelationInfo(
   fieldName: string,
-  table: CleanTable,
+  table: Table,
 ): { type: string; relation: unknown } | null {
   const { belongsTo, hasOne, hasMany, manyToMany } = table.relations;
 
@@ -739,9 +739,9 @@ function getRelationInfo(
  */
 function findRelatedTable(
   relationField: string,
-  table: CleanTable,
-  allTables: CleanTable[],
-): CleanTable | null {
+  table: Table,
+  allTables: Table[],
+): Table | null {
   // Find the related table name
   let referencedTableName: string | undefined;
 
@@ -792,9 +792,9 @@ function findRelatedTable(
 }
 
 /**
- * Generate FindOne query AST directly from CleanTable
+ * Generate FindOne query AST directly from Table
  */
-function generateFindOneQueryAST(table: CleanTable): string {
+function generateFindOneQueryAST(table: Table): string {
   const singularName = toCamelCaseSingular(table.name, table);
 
   // Generate field selections (include all non-relational fields, including complex types)
@@ -847,9 +847,9 @@ function generateFindOneQueryAST(table: CleanTable): string {
 }
 
 /**
- * Generate Count query AST directly from CleanTable
+ * Generate Count query AST directly from Table
  */
-function generateCountQueryAST(table: CleanTable): string {
+function generateCountQueryAST(table: Table): string {
   const pluralName = toCamelCasePlural(table.name, table);
 
   const ast = t.document({

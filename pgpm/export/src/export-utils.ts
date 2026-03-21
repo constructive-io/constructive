@@ -139,7 +139,7 @@ export const META_TABLE_ORDER = [
 // Shared types for table config
 // =============================================================================
 
-export type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'int' | 'interval' | 'timestamptz';
+type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'jsonb[]' | 'int' | 'interval' | 'timestamptz';
 
 export interface TableConfig {
   schema: string;
@@ -943,7 +943,8 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       use_rls: 'boolean',
       node_data: 'jsonb',
       grant_roles: 'text[]',
-      grant_privileges: 'jsonb',
+      fields: 'jsonb[]',
+      grant_privileges: 'jsonb[]',
       policy_type: 'text',
       policy_privileges: 'text[]',
       policy_role: 'text',

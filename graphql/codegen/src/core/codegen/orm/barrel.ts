@@ -5,7 +5,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanTable } from '../../../types/schema';
+import type { Table } from '../../../types/schema';
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader, getTableNames, lcFirst } from '../utils';
 
@@ -18,7 +18,7 @@ export interface GeneratedBarrelFile {
  * Generate the models/index.ts barrel file
  */
 export function generateModelsBarrel(
-  tables: CleanTable[],
+  tables: Table[],
 ): GeneratedBarrelFile {
   const statements: t.Statement[] = [];
 

@@ -10,7 +10,7 @@
 import * as t from '@babel/types';
 
 import type { EntityRelationship, QueryKeyConfig } from '../../types/config';
-import type { CleanOperation, CleanTable } from '../../types/schema';
+import type { Operation, Table } from '../../types/schema';
 import {
   addJSDocComment,
   asConst,
@@ -21,8 +21,8 @@ import {
 import { getGeneratedFileHeader, getTableNames, lcFirst } from './utils';
 
 export interface MutationKeyGeneratorOptions {
-  tables: CleanTable[];
-  customMutations: CleanOperation[];
+  tables: Table[];
+  customMutations: Operation[];
   config: QueryKeyConfig;
 }
 
@@ -35,7 +35,7 @@ export interface GeneratedMutationKeysFile {
  * Generate mutation keys declaration for a single table entity
  */
 function generateEntityMutationKeysDeclaration(
-  table: CleanTable,
+  table: Table,
   relationships: Record<string, EntityRelationship>,
 ): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
@@ -154,7 +154,7 @@ function generateEntityMutationKeysDeclaration(
  * Generate custom mutation keys declaration
  */
 function generateCustomMutationKeysDeclaration(
-  operations: CleanOperation[],
+  operations: Operation[],
 ): t.ExportNamedDeclaration | null {
   if (operations.length === 0) return null;
 
@@ -211,7 +211,7 @@ function generateCustomMutationKeysDeclaration(
  * Generate the unified mutation keys store declaration
  */
 function generateUnifiedMutationStoreDeclaration(
-  tables: CleanTable[],
+  tables: Table[],
   hasCustomMutations: boolean,
 ): t.ExportNamedDeclaration {
   const properties: t.ObjectProperty[] = [];

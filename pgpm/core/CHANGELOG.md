@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.7.1...@pgpmjs/core@6.8.0) (2026-03-20)
+
+### Features
+
+- add jsonb[] type support for secure_table_provision export ([1ba8a0e](https://github.com/constructive-io/constructive/commit/1ba8a0ed827d62f2d3c52956a68c827e80709abb))
+
 ## [6.7.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.7.0...@pgpmjs/core@6.7.1) (2026-03-17)
 
 **Note:** Version bump only for package @pgpmjs/core

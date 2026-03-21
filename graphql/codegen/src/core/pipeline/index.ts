@@ -10,8 +10,8 @@
  */
 import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type {
-  CleanOperation,
-  CleanTable,
+  Operation,
+  Table,
   TypeRegistry,
 } from '../../types/schema';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
@@ -61,14 +61,14 @@ export interface CodegenPipelineResult {
   /**
    * Inferred table metadata
    */
-  tables: CleanTable[];
+  tables: Table[];
 
   /**
    * Custom operations (queries and mutations not covered by tables)
    */
   customOperations: {
-    queries: CleanOperation[];
-    mutations: CleanOperation[];
+    queries: Operation[];
+    mutations: Operation[];
     typeRegistry: TypeRegistry;
   };
 
@@ -145,8 +145,8 @@ export async function runCodegenPipeline(
   const tableOperationNames = getTableOperationNames(tables);
 
   // 6. Filter and separate custom operations
-  let customQueries: CleanOperation[] = [];
-  let customMutations: CleanOperation[] = [];
+  let customQueries: Operation[] = [];
+  let customMutations: Operation[] = [];
 
   if (!skipCustomOperations) {
     // Filter by config include/exclude (combine exclude and systemExclude)
@@ -202,7 +202,7 @@ export async function runCodegenPipeline(
 /**
  * Validate that tables were found
  */
-export function validateTablesFound(tables: CleanTable[]): {
+export function validateTablesFound(tables: Table[]): {
   valid: boolean;
   error?: string;
 } {

@@ -5,7 +5,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanTable } from '../../types/schema';
+import type { Table } from '../../types/schema';
 import { addJSDocComment, generateCode } from './babel-ast';
 import { getOperationHookName } from './type-resolver';
 import {
@@ -27,7 +27,7 @@ function exportAllFrom(modulePath: string): t.ExportAllDeclaration {
 /**
  * Generate the queries/index.ts barrel file
  */
-export function generateQueriesBarrel(tables: CleanTable[]): string {
+export function generateQueriesBarrel(tables: Table[]): string {
   const statements: t.Statement[] = [];
 
   // Export all query hooks
@@ -57,7 +57,7 @@ export function generateQueriesBarrel(tables: CleanTable[]): string {
 /**
  * Generate the mutations/index.ts barrel file
  */
-export function generateMutationsBarrel(tables: CleanTable[]): string {
+export function generateMutationsBarrel(tables: Table[]): string {
   const statements: t.Statement[] = [];
 
   // Export all mutation hooks
@@ -106,7 +106,7 @@ export interface MainBarrelOptions {
 }
 
 export function generateMainBarrel(
-  tables: CleanTable[],
+  tables: Table[],
   options: MainBarrelOptions = {},
 ): string {
   const opts: MainBarrelOptions = options;
@@ -238,7 +238,7 @@ export function generateRootBarrel(options: RootBarrelOptions = {}): string {
  * Generate queries barrel including custom query operations
  */
 export function generateCustomQueriesBarrel(
-  tables: CleanTable[],
+  tables: Table[],
   customQueryNames: string[],
 ): string {
   const statements: t.Statement[] = [];
@@ -287,7 +287,7 @@ export function generateCustomQueriesBarrel(
  * Generate mutations barrel including custom mutation operations
  */
 export function generateCustomMutationsBarrel(
-  tables: CleanTable[],
+  tables: Table[],
   customMutationNames: string[],
 ): string {
   const statements: t.Statement[] = [];

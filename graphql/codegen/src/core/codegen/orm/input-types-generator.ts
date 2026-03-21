@@ -14,8 +14,8 @@ import * as t from '@babel/types';
 import { pluralize } from 'inflekt';
 
 import type {
-  CleanArgument,
-  CleanTable,
+  Argument,
+  Table,
   TypeRegistry,
 } from '../../../types/schema';
 import { addJSDocComment, addLineComment, generateCode } from '../babel-ast';
@@ -74,19 +74,19 @@ function scalarToInputTs(scalar: string): string {
 }
 
 /**
- * Convert a CleanTypeRef to TypeScript type string
+ * Convert a TypeRef to TypeScript type string
  */
-function typeRefToTs(typeRef: CleanArgument['type']): string {
+function typeRefToTs(typeRef: Argument['type']): string {
   if (typeRef.kind === 'NON_NULL') {
     if (typeRef.ofType) {
-      return typeRefToTs(typeRef.ofType as CleanArgument['type']);
+      return typeRefToTs(typeRef.ofType as Argument['type']);
     }
     return typeRef.name ?? 'unknown';
   }
 
   if (typeRef.kind === 'LIST') {
     if (typeRef.ofType) {
-      return `${typeRefToTs(typeRef.ofType as CleanArgument['type'])}[]`;
+      return `${typeRefToTs(typeRef.ofType as Argument['type'])}[]`;
     }
     return 'unknown[]';
   }
@@ -99,7 +99,7 @@ function typeRefToTs(typeRef: CleanArgument['type']): string {
 /**
  * Check if a type is required (NON_NULL)
  */
-function isRequired(typeRef: CleanArgument['type']): boolean {
+function isRequired(typeRef: Argument['type']): boolean {
   return typeRef.kind === 'NON_NULL';
 }
 
@@ -494,7 +494,7 @@ function isLikelyEnumType(
  * Collect enum types used by table fields
  */
 function collectEnumTypesFromTables(
-  tables: CleanTable[],
+  tables: Table[],
   typeRegistry: TypeRegistry,
 ): Set<string> {
   const enumTypes = new Set<string>();
@@ -551,7 +551,7 @@ function generateEnumTypes(
 
 function collectCustomScalarTypes(
   typeRegistry: TypeRegistry,
-  tables: CleanTable[],
+  tables: Table[],
   excludedTypeNames: Set<string>,
 ): string[] {
   const customScalarTypes = new Set<string>();
@@ -597,7 +597,7 @@ function generateCustomScalarTypes(customScalarTypes: string[]): t.Statement[] {
 /**
  * Build properties for an entity interface
  */
-function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
+function buildEntityProperties(table: Table): InterfaceProperty[] {
   const properties: InterfaceProperty[] = [];
 
   for (const field of table.fields) {
@@ -625,7 +625,7 @@ function buildEntityProperties(table: CleanTable): InterfaceProperty[] {
 /**
  * Generate entity type statements
  */
-function generateEntityTypes(tables: CleanTable[]): t.Statement[] {
+function generateEntityTypes(tables: Table[]): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
@@ -690,7 +690,7 @@ function generateRelationHelperTypes(): t.Statement[] {
 
 function getRelatedTypeName(
   tableName: string,
-  tableByName: Map<string, CleanTable>,
+  tableByName: Map<string, Table>,
 ): string {
   const relatedTable = tableByName.get(tableName);
   return relatedTable ? getTableNames(relatedTable).typeName : tableName;
@@ -698,7 +698,7 @@ function getRelatedTypeName(
 
 function getRelatedOrderByName(
   tableName: string,
-  tableByName: Map<string, CleanTable>,
+  tableByName: Map<string, Table>,
 ): string {
   const relatedTable = tableByName.get(tableName);
   if (relatedTable) {
@@ -714,7 +714,7 @@ function getRelatedOrderByName(
 
 function getRelatedFilterName(
   tableName: string,
-  tableByName: Map<string, CleanTable>,
+  tableByName: Map<string, Table>,
 ): string {
   const relatedTable = tableByName.get(tableName);
   return relatedTable ? getFilterTypeName(relatedTable) : `${tableName}Filter`;
@@ -724,8 +724,8 @@ function getRelatedFilterName(
  * Build properties for entity relations interface
  */
 function buildEntityRelationProperties(
-  table: CleanTable,
-  tableByName: Map<string, CleanTable>,
+  table: Table,
+  tableByName: Map<string, Table>,
 ): InterfaceProperty[] {
   const properties: InterfaceProperty[] = [];
 
@@ -788,8 +788,8 @@ function buildEntityRelationProperties(
  * Generate entity relation type statements
  */
 function generateEntityRelationTypes(
-  tables: CleanTable[],
-  tableByName: Map<string, CleanTable>,
+  tables: Table[],
+  tableByName: Map<string, Table>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
 
@@ -812,7 +812,7 @@ function generateEntityRelationTypes(
 /**
  * Generate entity types with relations (intersection types)
  */
-function generateEntityWithRelations(tables: CleanTable[]): t.Statement[] {
+function generateEntityWithRelations(tables: Table[]): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
@@ -839,8 +839,8 @@ function generateEntityWithRelations(tables: CleanTable[]): t.Statement[] {
  * Build the Select type as a TSTypeLiteral
  */
 function buildSelectTypeLiteral(
-  table: CleanTable,
-  tableByName: Map<string, CleanTable>,
+  table: Table,
+  tableByName: Map<string, Table>,
 ): t.TSTypeLiteral {
   const members: t.TSTypeElement[] = [];
 
@@ -1044,8 +1044,8 @@ function buildSelectTypeLiteral(
  * Generate entity Select type statements
  */
 function generateEntitySelectTypes(
-  tables: CleanTable[],
-  tableByName: Map<string, CleanTable>,
+  tables: Table[],
+  tableByName: Map<string, Table>,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
 
@@ -1079,7 +1079,7 @@ function getFilterTypeForField(fieldType: string, isArray = false): string {
 /**
  * Build properties for a table filter interface
  */
-function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
+function buildTableFilterProperties(table: Table): InterfaceProperty[] {
   const filterName = getFilterTypeName(table);
   const properties: InterfaceProperty[] = [];
 
@@ -1105,7 +1105,7 @@ function buildTableFilterProperties(table: CleanTable): InterfaceProperty[] {
 /**
  * Generate table filter type statements
  */
-function generateTableFilterTypes(tables: CleanTable[]): t.Statement[] {
+function generateTableFilterTypes(tables: Table[]): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
@@ -1134,7 +1134,7 @@ function generateTableFilterTypes(tables: CleanTable[]): t.Statement[] {
  * that are not derived from the table's own columns.
  */
 function buildTableConditionProperties(
-  table: CleanTable,
+  table: Table,
   typeRegistry?: TypeRegistry,
 ): InterfaceProperty[] {
   const properties: InterfaceProperty[] = [];
@@ -1185,7 +1185,7 @@ function buildTableConditionProperties(
  * Generate table condition type statements
  */
 function generateTableConditionTypes(
-  tables: CleanTable[],
+  tables: Table[],
   typeRegistry?: TypeRegistry,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
@@ -1218,7 +1218,7 @@ function generateTableConditionTypes(
  * from VectorSearchPlugin).
  */
 function buildOrderByValues(
-  table: CleanTable,
+  table: Table,
   typeRegistry?: TypeRegistry,
 ): string[] {
   // When the schema's orderBy enum is available, use it as the source of truth
@@ -1248,7 +1248,7 @@ function buildOrderByValues(
  * Generate OrderBy type statements
  */
 function generateOrderByTypes(
-  tables: CleanTable[],
+  tables: Table[],
   typeRegistry?: TypeRegistry,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
@@ -1279,7 +1279,7 @@ function generateOrderByTypes(
  * Build the nested data object fields for Create input
  */
 function buildCreateDataFieldsFromTable(
-  table: CleanTable,
+  table: Table,
 ): Array<{ name: string; type: string; optional: boolean }> {
   const fields: Array<{ name: string; type: string; optional: boolean }> = [];
 
@@ -1313,7 +1313,7 @@ function buildCreateDataFieldsFromTable(
  * `CreateXInput { clientMutationId?, x: XInput! }`
  */
 function buildCreateDataFieldsFromSchema(
-  table: CleanTable,
+  table: Table,
   typeRegistry: TypeRegistry,
 ): Array<{ name: string; type: string; optional: boolean }> | null {
   const createInputTypeName = getCreateInputTypeName(table);
@@ -1370,7 +1370,7 @@ function buildCreateDataFieldsFromSchema(
  * Build Create input fields, preferring schema-derived Input object fields.
  */
 function buildCreateDataFields(
-  table: CleanTable,
+  table: Table,
   typeRegistry: TypeRegistry,
 ): Array<{ name: string; type: string; optional: boolean }> {
   return (
@@ -1383,7 +1383,7 @@ function buildCreateDataFields(
  * Build Create input interface as AST
  */
 function buildCreateInputInterface(
-  table: CleanTable,
+  table: Table,
   typeRegistry: TypeRegistry,
 ): t.ExportNamedDeclaration {
   const { typeName, singularName } = getTableNames(table);
@@ -1435,7 +1435,7 @@ function buildCreateInputInterface(
  * Falls back to deriving from table fields if the schema type is not found.
  */
 function buildPatchProperties(
-  table: CleanTable,
+  table: Table,
   typeRegistry?: TypeRegistry,
 ): InterfaceProperty[] {
   // Try to read from the schema's Patch input type first
@@ -1499,7 +1499,7 @@ function buildPatchProperties(
  * Generate CRUD input type statements for a table
  */
 function generateCrudInputTypes(
-  table: CleanTable,
+  table: Table,
   typeRegistry: TypeRegistry,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
@@ -1545,7 +1545,7 @@ function generateCrudInputTypes(
  * Generate all CRUD input type statements
  */
 function generateAllCrudInputTypes(
-  tables: CleanTable[],
+  tables: Table[],
   typeRegistry: TypeRegistry,
 ): t.Statement[] {
   const statements: t.Statement[] = [];
@@ -1568,11 +1568,11 @@ function generateAllCrudInputTypes(
  * Collect all input type names used by operations
  */
 export function collectInputTypeNames(
-  operations: Array<{ args: CleanArgument[] }>,
+  operations: Array<{ args: Argument[] }>,
 ): Set<string> {
   const inputTypes = new Set<string>();
 
-  function collectFromTypeRef(typeRef: CleanArgument['type']) {
+  function collectFromTypeRef(typeRef: Argument['type']) {
     const baseName = getTypeBaseName(typeRef);
     if (baseName && baseName.endsWith('Input')) {
       inputTypes.add(baseName);
@@ -1595,7 +1595,7 @@ export function collectInputTypeNames(
  * Build a set of exact table CRUD input type names to skip
  * These are generated by generateAllCrudInputTypes, so we don't need to regenerate them
  */
-function buildTableCrudTypeNames(tables: CleanTable[]): Set<string> {
+function buildTableCrudTypeNames(tables: Table[]): Set<string> {
   const crudTypes = new Set<string>();
   for (const table of tables) {
     const { typeName } = getTableNames(table);
@@ -1721,7 +1721,7 @@ function generateCustomInputTypes(
  * Collect all payload type names from operation return types
  */
 export function collectPayloadTypeNames(
-  operations: Array<{ returnType: CleanArgument['type'] }>,
+  operations: Array<{ returnType: Argument['type'] }>,
 ): Set<string> {
   const payloadTypes = new Set<string>();
 
@@ -1878,8 +1878,8 @@ function generatePayloadTypes(
  * to detect connection fields that need `nodes { ... }` wrapping.
  */
 function generateConnectionFieldsMap(
-  tables: CleanTable[],
-  tableByName: Map<string, CleanTable>,
+  tables: Table[],
+  tableByName: Map<string, Table>,
 ): t.Statement[] {
   const properties: t.ObjectProperty[] = [];
 
@@ -1965,7 +1965,7 @@ function generateConnectionFieldsMap(
  * schema's condition type fields against the table's own columns.
  */
 function collectConditionExtraInputTypes(
-  tables: CleanTable[],
+  tables: Table[],
   typeRegistry: TypeRegistry,
 ): Set<string> {
   const extraTypes = new Set<string>();
@@ -2011,7 +2011,7 @@ function collectConditionExtraInputTypes(
 export function generateInputTypesFile(
   typeRegistry: TypeRegistry,
   usedInputTypes: Set<string>,
-  tables?: CleanTable[],
+  tables?: Table[],
   usedPayloadTypes?: Set<string>,
   comments: boolean = true,
   options?: { condition?: boolean },

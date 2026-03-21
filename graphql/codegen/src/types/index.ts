@@ -4,14 +4,14 @@
 
 // Schema types
 export type {
-  CleanBelongsToRelation,
-  CleanField,
-  CleanFieldType,
-  CleanHasManyRelation,
-  CleanHasOneRelation,
-  CleanManyToManyRelation,
-  CleanRelations,
-  CleanTable,
+  BelongsToRelation,
+  Field,
+  FieldType,
+  HasManyRelation,
+  HasOneRelation,
+  ManyToManyRelation,
+  Relations,
+  Table,
   ConstraintInfo,
   ForeignKeyConstraint,
   TableConstraints,
@@ -49,7 +49,7 @@ export type {
 } from './selection';
 
 // Config types
-export type { GraphQLSDKConfig, GraphQLSDKConfigTarget } from './config';
+export type { GraphQLSDKConfig, GraphQLSDKConfigTarget, SchemaConfig } from './config';
 export {
   DEFAULT_CONFIG,
   defineConfig,

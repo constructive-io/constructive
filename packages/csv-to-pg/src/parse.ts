@@ -458,6 +458,39 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
         });
         return wrapValue(val, opts);
       };
+    case 'jsonb[]':
+      return (record: Record<string, unknown>): Node => {
+        const rawValue = record[from[0]];
+        if (isNullToken(rawValue)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+        }
+        if (Array.isArray(rawValue)) {
+          if (rawValue.length === 0) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
+          }
+          const elements = rawValue.map(el => JSON.stringify(el));
+          const arrayLiteral = psqlArray(elements);
+          if (isEmpty(arrayLiteral)) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
+          }
+          const val = nodes.aConst({
+            sval: ast.string({ sval: String(arrayLiteral) })
+          });
+          return wrapValue(val, opts);
+        }
+        // If it's a string, try to parse as JSON array
+        if (typeof rawValue === 'string') {
+          const parsed = parseJson(cleanseEmptyStrings(rawValue));
+          if (isEmpty(parsed)) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+          }
+          const val = nodes.aConst({
+            sval: ast.string({ sval: String(parsed) })
+          });
+          return wrapValue(val, opts);
+        }
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
+      };
     default:
       return (record: Record<string, unknown>): Node => {
         const rawValue = record[from[0]];

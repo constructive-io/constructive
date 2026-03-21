@@ -30,24 +30,24 @@ import {
 import { generateSchemaTypesFile } from '../../core/codegen/schema-types-generator';
 import { generateTypesFile } from '../../core/codegen/types';
 import type {
-  CleanFieldType,
-  CleanOperation,
-  CleanRelations,
-  CleanTable,
-  CleanTypeRef,
+  FieldType,
+  Operation,
+  Relations,
+  Table,
+  TypeRef,
   ResolvedType,
   TypeRegistry,
 } from '../../types/schema';
 
 const fieldTypes = {
-  uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
-  string: { gqlType: 'String', isArray: false } as CleanFieldType,
-  int: { gqlType: 'Int', isArray: false } as CleanFieldType,
-  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType,
-  boolean: { gqlType: 'Boolean', isArray: false } as CleanFieldType,
+  uuid: { gqlType: 'UUID', isArray: false } as FieldType,
+  string: { gqlType: 'String', isArray: false } as FieldType,
+  int: { gqlType: 'Int', isArray: false } as FieldType,
+  datetime: { gqlType: 'Datetime', isArray: false } as FieldType,
+  boolean: { gqlType: 'Boolean', isArray: false } as FieldType,
 };
 
-const emptyRelations: CleanRelations = {
+const emptyRelations: Relations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
@@ -55,8 +55,8 @@ const emptyRelations: CleanRelations = {
 };
 
 function createTable(
-  partial: Partial<CleanTable> & { name: string },
-): CleanTable {
+  partial: Partial<Table> & { name: string },
+): Table {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -68,10 +68,10 @@ function createTable(
 }
 
 function createTypeRef(
-  kind: CleanTypeRef['kind'],
+  kind: TypeRef['kind'],
   name: string | null,
-  ofType?: CleanTypeRef,
-): CleanTypeRef {
+  ofType?: TypeRef,
+): TypeRef {
   return { kind, name, ofType };
 }
 
@@ -111,7 +111,7 @@ const postTable = createTable({
   },
 });
 
-const simpleCustomQueries: CleanOperation[] = [
+const simpleCustomQueries: Operation[] = [
   {
     name: 'currentUser',
     kind: 'query',
@@ -138,7 +138,7 @@ const simpleCustomQueries: CleanOperation[] = [
   },
 ];
 
-const optionalArgsCustomQuery: CleanOperation = {
+const optionalArgsCustomQuery: Operation = {
   name: 'recentUsers',
   kind: 'query',
   args: [{ name: 'limit', type: createTypeRef('SCALAR', 'Int') }],
@@ -146,7 +146,7 @@ const optionalArgsCustomQuery: CleanOperation = {
   description: 'Fetch recently active users',
 };
 
-const simpleCustomMutations: CleanOperation[] = [
+const simpleCustomMutations: Operation[] = [
   {
     name: 'login',
     kind: 'mutation',

@@ -14,7 +14,7 @@
 import * as t from '@babel/types';
 
 import type {
-  CleanArgument,
+  Argument,
   ResolvedType,
   TypeRegistry,
 } from '../../types/schema';
@@ -57,17 +57,17 @@ const SKIP_TYPES = new Set([
 
 const SKIP_TYPE_PATTERNS: RegExp[] = [];
 
-function typeRefToTs(typeRef: CleanArgument['type']): string {
+function typeRefToTs(typeRef: Argument['type']): string {
   if (typeRef.kind === 'NON_NULL') {
     if (typeRef.ofType) {
-      return typeRefToTs(typeRef.ofType as CleanArgument['type']);
+      return typeRefToTs(typeRef.ofType as Argument['type']);
     }
     return typeRef.name ?? 'unknown';
   }
 
   if (typeRef.kind === 'LIST') {
     if (typeRef.ofType) {
-      return `${typeRefToTs(typeRef.ofType as CleanArgument['type'])}[]`;
+      return `${typeRefToTs(typeRef.ofType as Argument['type'])}[]`;
     }
     return 'unknown[]';
   }
@@ -76,7 +76,7 @@ function typeRefToTs(typeRef: CleanArgument['type']): string {
   return scalarToTsType(name, { unknownScalar: 'name' });
 }
 
-function isRequired(typeRef: CleanArgument['type']): boolean {
+function isRequired(typeRef: Argument['type']): boolean {
   return typeRef.kind === 'NON_NULL';
 }
 
@@ -154,6 +154,80 @@ function generateEnumTypes(
   return { statements, generatedTypes };
 }
 
+/**
+ * Generate a discriminated union type for a @oneOf INPUT_OBJECT.
+ *
+ * For a @oneOf input like:
+ *   input BlueprintNodeInput @oneOf {
+ *     shorthand: String
+ *     DataId: DataIdParams
+ *     DataTimestamps: DataTimestampsParams
+ *   }
+ *
+ * Generates:
+ *   type BlueprintNodeInput =
+ *     | { shorthand: string }
+ *     | { DataId: DataIdParams }
+ *     | { DataTimestamps: DataTimestampsParams }
+ */
+function generateOneOfUnionType(
+  typeName: string,
+  typeInfo: ResolvedType,
+  typeRegistry: TypeRegistry,
+  tableTypeNames: Set<string>,
+  generatedTypes: Set<string>,
+  typesToGenerate: Set<string>,
+  comments: boolean,
+): t.Statement {
+  const unionMembers: t.TSType[] = [];
+
+  if (typeInfo.inputFields && typeInfo.inputFields.length > 0) {
+    for (const field of typeInfo.inputFields) {
+      const tsType = typeRefToTs(field.type);
+
+      // Each @oneOf field becomes a single-property object type in the union
+      const prop = t.tsPropertySignature(
+        t.identifier(field.name),
+        t.tsTypeAnnotation(t.tsTypeReference(t.identifier(tsType))),
+      );
+      prop.optional = false; // In @oneOf, the chosen field is required
+
+      const memberType = t.tsTypeLiteral([prop]);
+      unionMembers.push(memberType);
+
+      // Track nested types for generation
+      const baseType = getTypeBaseName(field.type);
+      if (
+        baseType &&
+        !generatedTypes.has(baseType) &&
+        !shouldSkipType(baseType, tableTypeNames)
+      ) {
+        const nestedType = typeRegistry.get(baseType);
+        if (nestedType?.kind === 'INPUT_OBJECT') {
+          typesToGenerate.add(baseType);
+        }
+      }
+    }
+  }
+
+  const unionType =
+    unionMembers.length > 0
+      ? t.tsUnionType(unionMembers)
+      : t.tsNeverKeyword();
+
+  const typeAlias = t.tsTypeAliasDeclaration(
+    t.identifier(typeName),
+    null,
+    unionType,
+  );
+  const exportDecl = t.exportNamedDeclaration(typeAlias);
+  const inputDescription = stripSmartComments(typeInfo.description, comments);
+  if (inputDescription) {
+    addJSDocComment(exportDecl, inputDescription.split('\n'));
+  }
+  return exportDecl;
+}
+
 function generateInputObjectTypes(
   typeRegistry: TypeRegistry,
   tableTypeNames: Set<string>,
@@ -183,6 +257,22 @@ function generateInputObjectTypes(
     if (!typeInfo || typeInfo.kind !== 'INPUT_OBJECT') continue;
 
     generatedTypes.add(typeName);
+
+    // @oneOf types become discriminated unions instead of interfaces
+    if (typeInfo.isOneOf) {
+      statements.push(
+        generateOneOfUnionType(
+          typeName,
+          typeInfo,
+          typeRegistry,
+          tableTypeNames,
+          generatedTypes,
+          typesToGenerate,
+          comments,
+        ),
+      );
+      continue;
+    }
 
     const properties: t.TSPropertySignature[] = [];
 
