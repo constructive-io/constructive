@@ -39,6 +39,46 @@ export const DB_REQUIRED_EXTENSIONS = [
 ] as const;
 
 /**
+ * Map PostgreSQL data types to FieldType values.
+ * Uses udt_name from information_schema which gives the base type name.
+ */
+const mapPgTypeToFieldType = (udtName: string): FieldType => {
+  switch (udtName) {
+    case 'uuid':
+      return 'uuid';
+    case '_uuid':
+      return 'uuid[]';
+    case 'text':
+    case 'varchar':
+    case 'bpchar':
+    case 'name':
+      return 'text';
+    case '_text':
+    case '_varchar':
+      return 'text[]';
+    case 'bool':
+      return 'boolean';
+    case 'jsonb':
+    case 'json':
+      return 'jsonb';
+    case '_jsonb':
+      return 'jsonb[]';
+    case 'int4':
+    case 'int8':
+    case 'int2':
+    case 'numeric':
+      return 'int';
+    case 'interval':
+      return 'interval';
+    case 'timestamptz':
+    case 'timestamp':
+      return 'timestamptz';
+    default:
+      return 'text';
+  }
+};
+
+/**
  * Required extensions for service/meta exports.
  * Includes native PostgreSQL extensions and pgpm modules for metadata management.
  */
