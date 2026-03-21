@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.20.0...@constructive-io/graphql-codegen@4.21.0) (2026-03-21)
+
+### Bug Fixes
+
+- composite PK detection + filter type-safety from schema source of truth ([0bda790](https://github.com/constructive-io/constructive/commit/0bda790694a009578014eebfdbabd5aac13084d1))
+- remove dead toPascalCase import, drop async on add/remove methods to match CRUD pattern ([e8277db](https://github.com/constructive-io/constructive/commit/e8277dbf347e8d05866d248fa3e0e05b42487d75))
+- use existing utils for junction naming + resolve actual PK types for M:N methods ([b7eaca5](https://github.com/constructive-io/constructive/commit/b7eaca5df5a5e7861f52aaeeacf95a9da02d15f2))
+- use inflekt singularize for M:N method names (handles irregular plurals) ([de47501](https://github.com/constructive-io/constructive/commit/de47501bea6bfbe8c3c15297407f189e52ddac5b))
+
+### Features
+
+- composite PK delete support — junction tables use (post_id, tag_id) PK, ORM delete with composite keys, derive input types from actual mutation names ([01f22e3](https://github.com/constructive-io/constructive/commit/01f22e3b770b1604611211cbaaae156f1770dfba))
+- wire tablesMeta through pipeline, enrich M:N relations, add ORM add/remove junction methods ([23a31e5](https://github.com/constructive-io/constructive/commit/23a31e53590c27d2ea8ff5f3eb29bb18e5626400))
+
 # [4.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.19.1...@constructive-io/graphql-codegen@4.20.0) (2026-03-21)
 
 ### Bug Fixes

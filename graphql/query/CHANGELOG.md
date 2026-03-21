@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.8.1...@constructive-io/graphql-query@3.9.0) (2026-03-21)
+
+### Bug Fixes
+
+- composite PK detection + filter type-safety from schema source of truth ([0bda790](https://github.com/constructive-io/constructive/commit/0bda790694a009578014eebfdbabd5aac13084d1))
+
+### Features
+
+- composite PK delete support — junction tables use (post_id, tag_id) PK, ORM delete with composite keys, derive input types from actual mutation names ([01f22e3](https://github.com/constructive-io/constructive/commit/01f22e3b770b1604611211cbaaae156f1770dfba))
+
 ## [3.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.8.0...@constructive-io/graphql-query@3.8.1) (2026-03-21)
 
 **Note:** Version bump only for package @constructive-io/graphql-query
