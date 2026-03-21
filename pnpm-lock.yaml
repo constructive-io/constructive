@@ -830,18 +830,33 @@ importers:
 
   graphql/orm-test:
     devDependencies:
+      '@0no-co/graphql.web':
+        specifier: ^1.1.2
+        version: 1.2.0(graphql@16.13.0)
       '@constructive-io/graphql-codegen':
         specifier: workspace:^
         version: link:../codegen/dist
+      '@constructive-io/graphql-query':
+        specifier: workspace:^
+        version: link:../query/dist
+      '@constructive-io/graphql-types':
+        specifier: workspace:^
+        version: link:../types/dist
       '@types/pg':
         specifier: ^8.18.0
         version: 8.18.0
+      gql-ast:
+        specifier: workspace:^
+        version: link:../gql-ast/dist
       graphile-settings:
         specifier: workspace:^
         version: link:../../graphile/graphile-settings/dist
       graphile-test:
         specifier: workspace:^
         version: link:../../graphile/graphile-test/dist
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
       pgsql-test:
         specifier: workspace:^
         version: link:../../postgres/pgsql-test/dist
