@@ -1077,10 +1077,38 @@ function getFilterTypeForField(fieldType: string, isArray = false): string {
 }
 
 /**
- * Build properties for a table filter interface
+ * Build properties for a table filter interface.
+ *
+ * When typeRegistry is available, uses the schema's filter input type as
+ * the sole source of truth — this captures plugin-injected filter fields
+ * (e.g., bm25Body, tsvTsv, trgmName, vectorEmbedding, geom) that are not
+ * present on the entity type itself. Same pattern as buildOrderByValues().
  */
-function buildTableFilterProperties(table: Table): InterfaceProperty[] {
+function buildTableFilterProperties(
+  table: Table,
+  typeRegistry?: TypeRegistry,
+): InterfaceProperty[] {
   const filterName = getFilterTypeName(table);
+
+  // When the schema's filter type is available, use it as the source of truth
+  if (typeRegistry) {
+    const filterType = typeRegistry.get(filterName);
+    if (filterType?.kind === 'INPUT_OBJECT' && filterType.inputFields) {
+      const properties: InterfaceProperty[] = [];
+      for (const field of filterType.inputFields) {
+        const tsType = typeRefToTs(field.type);
+        properties.push({
+          name: field.name,
+          type: tsType,
+          optional: true,
+          description: stripSmartComments(field.description, true),
+        });
+      }
+      return properties;
+    }
+  }
+
+  // Fallback: derive from table fields when schema filter type is not available
   const properties: InterfaceProperty[] = [];
 
   for (const field of table.fields) {
@@ -1105,13 +1133,19 @@ function buildTableFilterProperties(table: Table): InterfaceProperty[] {
 /**
  * Generate table filter type statements
  */
-function generateTableFilterTypes(tables: Table[]): t.Statement[] {
+function generateTableFilterTypes(
+  tables: Table[],
+  typeRegistry?: TypeRegistry,
+): t.Statement[] {
   const statements: t.Statement[] = [];
 
   for (const table of tables) {
     const filterName = getFilterTypeName(table);
     statements.push(
-      createExportedInterface(filterName, buildTableFilterProperties(table)),
+      createExportedInterface(
+        filterName,
+        buildTableFilterProperties(table, typeRegistry),
+      ),
     );
   }
 
@@ -1957,6 +1991,54 @@ function generateConnectionFieldsMap(
 // ============================================================================
 
 /**
+ * Collect extra input type names referenced by plugin-injected filter fields.
+ *
+ * When the schema's filter type is used as source of truth, plugin-injected
+ * fields reference custom filter types (e.g., Bm25BodyFilter, TsvectorFilter,
+ * GeometryFilter) that also need to be generated. This function discovers
+ * those types by comparing the schema's filter type fields against the
+ * standard scalar filter types.
+ */
+function collectFilterExtraInputTypes(
+  tables: Table[],
+  typeRegistry: TypeRegistry,
+): Set<string> {
+  const extraTypes = new Set<string>();
+
+  for (const table of tables) {
+    const filterTypeName = getFilterTypeName(table);
+    const filterType = typeRegistry.get(filterTypeName);
+    if (
+      !filterType ||
+      filterType.kind !== 'INPUT_OBJECT' ||
+      !filterType.inputFields
+    ) {
+      continue;
+    }
+
+    const tableFieldNames = new Set(
+      table.fields
+        .filter((f) => !isRelationField(f.name, table))
+        .map((f) => f.name),
+    );
+
+    for (const field of filterType.inputFields) {
+      // Skip standard column-derived fields and logical operators
+      if (tableFieldNames.has(field.name)) continue;
+      if (['and', 'or', 'not'].includes(field.name)) continue;
+
+      // Collect the base type name of this extra field
+      const baseName = getTypeBaseName(field.type);
+      if (baseName && !SCALAR_NAMES.has(baseName)) {
+        extraTypes.add(baseName);
+      }
+    }
+  }
+
+  return extraTypes;
+}
+
+/**
  * Collect extra input type names referenced by plugin-injected condition fields.
  *
  * When plugins (like VectorSearchPlugin) inject fields into condition types,
@@ -2048,7 +2130,9 @@ export function generateInputTypesFile(
     statements.push(...generateEntitySelectTypes(tablesList, tableByName));
 
     // 4. Table filter types
-    statements.push(...generateTableFilterTypes(tablesList));
+    // Pass typeRegistry to use schema's filter type as source of truth,
+    // capturing plugin-injected filter fields (e.g., bm25, tsvector, trgm, vector, geom)
+    statements.push(...generateTableFilterTypes(tablesList, typeRegistry));
 
     // 4b. Table condition types (simple equality filter)
     // Pass typeRegistry to merge plugin-injected condition fields
@@ -2071,8 +2155,17 @@ export function generateInputTypesFile(
   statements.push(...generateConnectionFieldsMap(tablesList, tableByName));
 
   // 7. Custom input types from TypeRegistry
-  // Also include any extra types referenced by plugin-injected condition fields
+  // Also include any extra types referenced by plugin-injected filter/condition fields
   const mergedUsedInputTypes = new Set(usedInputTypes);
+  if (hasTables) {
+    const filterExtraTypes = collectFilterExtraInputTypes(
+      tablesList,
+      typeRegistry,
+    );
+    for (const typeName of filterExtraTypes) {
+      mergedUsedInputTypes.add(typeName);
+    }
+  }
   if (hasTables && conditionEnabled) {
     const conditionExtraTypes = collectConditionExtraInputTypes(
       tablesList,
