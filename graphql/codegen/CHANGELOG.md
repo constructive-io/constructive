@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.19.1...@constructive-io/graphql-codegen@4.20.0) (2026-03-21)
+
+### Bug Fixes
+
+- generate root barrel file in multi-target codegen ([3e62d31](https://github.com/constructive-io/constructive/commit/3e62d31c757d91b8ac68cef4ddc5bbf4ad9ae43d))
+
+## [4.19.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.19.0...@constructive-io/graphql-codegen@4.19.1) (2026-03-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.18.0...@constructive-io/graphql-codegen@4.19.0) (2026-03-21)
+
+### Features
+
+- add .agents/skills/ directory + fix codegen output path ([e1d7dfd](https://github.com/constructive-io/constructive/commit/e1d7dfd9d6717a2e306c104f329c2224d371fba5))
+
 # [4.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.17.1...@constructive-io/graphql-codegen@4.18.0) (2026-03-20)
 
 ### Features

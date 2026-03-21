@@ -15,10 +15,6 @@ const fieldSchema: FieldSchema = {
   name: 'string',
   event: 'string',
   action: 'string',
-  nameTrgmSimilarity: 'float',
-  eventTrgmSimilarity: 'float',
-  actionTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nview-rule <command>\n\nCommands:\n  list                  List all viewRule records\n  get                   Get a viewRule by ID\n  create                Create a new viewRule\n  update                Update an existing viewRule\n  delete                Delete a viewRule\n\n  --help, -h            Show this help message\n';

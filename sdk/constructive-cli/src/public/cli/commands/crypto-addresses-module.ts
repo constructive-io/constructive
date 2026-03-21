@@ -20,9 +20,6 @@ const fieldSchema: FieldSchema = {
   ownerTableId: 'uuid',
   tableName: 'string',
   cryptoNetwork: 'string',
-  tableNameTrgmSimilarity: 'float',
-  cryptoNetworkTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\ncrypto-addresses-module <command>\n\nCommands:\n  list                  List all cryptoAddressesModule records\n  get                   Get a cryptoAddressesModule by ID\n  create                Create a new cryptoAddressesModule\n  update                Update an existing cryptoAddressesModule\n  delete                Delete a cryptoAddressesModule\n\n  --help, -h            Show this help message\n';

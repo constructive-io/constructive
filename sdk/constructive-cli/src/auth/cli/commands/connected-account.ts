@@ -17,9 +17,6 @@ const fieldSchema: FieldSchema = {
   isVerified: 'boolean',
   createdAt: 'string',
   updatedAt: 'string',
-  serviceTrgmSimilarity: 'float',
-  identifierTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nconnected-account <command>\n\nCommands:\n  list                  List all connectedAccount records\n  get                   Get a connectedAccount by ID\n  create                Create a new connectedAccount\n  update                Update an existing connectedAccount\n  delete                Delete a connectedAccount\n\n  --help, -h            Show this help message\n';

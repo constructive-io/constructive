@@ -20,10 +20,6 @@ const fieldSchema: FieldSchema = {
   sessionsTable: 'string',
   sessionCredentialsTable: 'string',
   authSettingsTable: 'string',
-  sessionsTableTrgmSimilarity: 'float',
-  sessionCredentialsTableTrgmSimilarity: 'float',
-  authSettingsTableTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nsessions-module <command>\n\nCommands:\n  list                  List all sessionsModule records\n  get                   Get a sessionsModule by ID\n  create                Create a new sessionsModule\n  update                Update an existing sessionsModule\n  delete                Delete a sessionsModule\n\n  --help, -h            Show this help message\n';

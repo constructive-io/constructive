@@ -131,7 +131,7 @@ CRUD operations for Object records.
 | `frzn` | Boolean |
 | `createdAt` | Datetime |
 
-**Required create fields:** `hashUuid`, `databaseId`
+**Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `kids`, `ktree`, `data`, `frzn`
 
 ### `ref`
@@ -155,10 +155,8 @@ CRUD operations for Ref records.
 | `databaseId` | UUID |
 | `storeId` | UUID |
 | `commitId` | UUID |
-| `nameTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `name`, `databaseId`, `storeId`, `nameTrgmSimilarity`, `searchScore`
+**Required create fields:** `name`, `databaseId`, `storeId`
 **Optional create fields (backend defaults):** `commitId`
 
 ### `store`
@@ -182,10 +180,8 @@ CRUD operations for Store records.
 | `databaseId` | UUID |
 | `hash` | UUID |
 | `createdAt` | Datetime |
-| `nameTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `name`, `databaseId`, `nameTrgmSimilarity`, `searchScore`
+**Required create fields:** `name`, `databaseId`
 **Optional create fields (backend defaults):** `hash`
 
 ### `commit`
@@ -213,10 +209,8 @@ CRUD operations for Commit records.
 | `committerId` | UUID |
 | `treeId` | UUID |
 | `date` | Datetime |
-| `messageTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `databaseId`, `storeId`, `messageTrgmSimilarity`, `searchScore`
+**Required create fields:** `databaseId`, `storeId`
 **Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
 ## Custom Operations

@@ -16,9 +16,6 @@ const fieldSchema: FieldSchema = {
   privilege: 'string',
   withGrantOption: 'boolean',
   isGrant: 'boolean',
-  granteeNameTrgmSimilarity: 'float',
-  privilegeTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nview-grant <command>\n\nCommands:\n  list                  List all viewGrant records\n  get                   Get a viewGrant by ID\n  create                Create a new viewGrant\n  update                Update an existing viewGrant\n  delete                Delete a viewGrant\n\n  --help, -h            Show this help message\n';
