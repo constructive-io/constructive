@@ -179,7 +179,7 @@ export const META_TABLE_ORDER = [
 // Shared types for table config
 // =============================================================================
 
-type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'jsonb[]' | 'int' | 'interval' | 'timestamptz';
+export type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'jsonb[]' | 'int' | 'interval' | 'timestamptz';
 
 export interface TableConfig {
   schema: string;
@@ -249,6 +249,9 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
   field: {
     schema: 'metaschema_public',
     table: 'field',
+    // Use ON CONFLICT DO NOTHING to handle the unique constraint (databases_field_uniq_names_idx)
+    // which normalizes UUID field names by stripping suffixes like _id, _uuid, etc.
+    // This causes collisions when tables have both 'foo' (text) and 'foo_id' (uuid) columns.
     conflictDoNothing: true,
     fields: {
       id: 'uuid',
