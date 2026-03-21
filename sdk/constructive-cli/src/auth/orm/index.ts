@@ -5,12 +5,12 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { CryptoAddressModel } from './models/cryptoAddress';
-import { RoleTypeModel } from './models/roleType';
+import { EmailModel } from './models/email';
 import { PhoneNumberModel } from './models/phoneNumber';
+import { CryptoAddressModel } from './models/cryptoAddress';
 import { ConnectedAccountModel } from './models/connectedAccount';
 import { AuditLogModel } from './models/auditLog';
-import { EmailModel } from './models/email';
+import { RoleTypeModel } from './models/roleType';
 import { UserModel } from './models/user';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -48,12 +48,12 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    cryptoAddress: new CryptoAddressModel(client),
-    roleType: new RoleTypeModel(client),
+    email: new EmailModel(client),
     phoneNumber: new PhoneNumberModel(client),
+    cryptoAddress: new CryptoAddressModel(client),
     connectedAccount: new ConnectedAccountModel(client),
     auditLog: new AuditLogModel(client),
-    email: new EmailModel(client),
+    roleType: new RoleTypeModel(client),
     user: new UserModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

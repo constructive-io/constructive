@@ -14,8 +14,6 @@ const fieldSchema: FieldSchema = {
   databaseId: 'uuid',
   storeId: 'uuid',
   commitId: 'uuid',
-  nameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nref <command>\n\nCommands:\n  list                  List all ref records\n  get                   Get a ref by ID\n  create                Create a new ref\n  update                Update an existing ref\n  delete                Delete a ref\n\n  --help, -h            Show this help message\n';

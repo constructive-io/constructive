@@ -235,6 +235,151 @@ type User {
   """Reads a single `RoleType` that is related to this `User`."""
   roleType: RoleType
 
+  """Reads and enables pagination through a set of `Email`."""
+  ownedEmails(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmailFilter
+
+    """The method to use when ordering `Email`."""
+    orderBy: [EmailOrderBy!] = [PRIMARY_KEY_ASC]
+  ): EmailConnection!
+
+  """Reads and enables pagination through a set of `PhoneNumber`."""
+  ownedPhoneNumbers(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PhoneNumberFilter
+
+    """The method to use when ordering `PhoneNumber`."""
+    orderBy: [PhoneNumberOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhoneNumberConnection!
+
+  """Reads and enables pagination through a set of `CryptoAddress`."""
+  ownedCryptoAddresses(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CryptoAddressFilter
+
+    """The method to use when ordering `CryptoAddress`."""
+    orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CryptoAddressConnection!
+
+  """Reads and enables pagination through a set of `ConnectedAccount`."""
+  ownedConnectedAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ConnectedAccountFilter
+
+    """The method to use when ordering `ConnectedAccount`."""
+    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ConnectedAccountConnection!
+
+  """Reads and enables pagination through a set of `AuditLog`."""
+  auditLogsByActorId(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AuditLogFilter
+
+    """The method to use when ordering `AuditLog`."""
+    orderBy: [AuditLogOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AuditLogConnection!
+
   """
   TSV rank when searching `searchTsv`. Returns null when no tsv search filter is active.
   """
@@ -246,7 +391,7 @@ type User {
   displayNameTrgmSimilarity: Float
 
   """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
+  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active.
   """
   searchScore: Float
 }
@@ -270,64 +415,52 @@ type RoleType {
   name: String!
 }
 
-"""A connection to a list of `CryptoAddress` values."""
-type CryptoAddressConnection {
-  """A list of `CryptoAddress` objects."""
-  nodes: [CryptoAddress]!
+"""A connection to a list of `Email` values."""
+type EmailConnection {
+  """A list of `Email` objects."""
+  nodes: [Email]!
 
   """
-  A list of edges which contains the `CryptoAddress` and cursor to aid in pagination.
+  A list of edges which contains the `Email` and cursor to aid in pagination.
   """
-  edges: [CryptoAddressEdge]!
+  edges: [EmailEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `CryptoAddress` you could get from the connection."""
+  """The count of *all* `Email` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-Cryptocurrency wallet addresses owned by users, with network-specific validation and verification
-"""
-type CryptoAddress {
+"""User email addresses with verification and primary-email management"""
+type Email {
   id: UUID!
   ownerId: UUID!
 
-  """
-  The cryptocurrency wallet address, validated against network-specific patterns
-  """
-  address: String!
+  """The email address"""
+  email: ConstructiveInternalTypeEmail!
 
-  """Whether ownership of this address has been cryptographically verified"""
+  """Whether the email address has been verified via confirmation link"""
   isVerified: Boolean!
 
-  """Whether this is the user's primary cryptocurrency address"""
+  """Whether this is the user's primary email address"""
   isPrimary: Boolean!
   createdAt: Datetime
   updatedAt: Datetime
 
-  """Reads a single `User` that is related to this `CryptoAddress`."""
+  """Reads a single `User` that is related to this `Email`."""
   owner: User
-
-  """
-  TRGM similarity when searching `address`. Returns null when no trgm search filter is active.
-  """
-  addressTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
-"""A `CryptoAddress` edge in the connection."""
-type CryptoAddressEdge {
+scalar ConstructiveInternalTypeEmail
+
+"""A `Email` edge in the connection."""
+type EmailEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `CryptoAddress` at the end of the edge."""
-  node: CryptoAddress
+  """The `Email` at the end of the edge."""
+  node: Email
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -349,17 +482,17 @@ type PageInfo {
 }
 
 """
-A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’
 """
-input CryptoAddressFilter {
+input EmailFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
   """Filter by the object’s `ownerId` field."""
   ownerId: UUIDFilter
 
-  """Filter by the object’s `address` field."""
-  address: StringFilter
+  """Filter by the object’s `email` field."""
+  email: ConstructiveInternalTypeEmailFilter
 
   """Filter by the object’s `isVerified` field."""
   isVerified: BooleanFilter
@@ -374,27 +507,16 @@ input CryptoAddressFilter {
   updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [CryptoAddressFilter!]
+  and: [EmailFilter!]
 
   """Checks for any expressions in this list."""
-  or: [CryptoAddressFilter!]
+  or: [EmailFilter!]
 
   """Negates the expression."""
-  not: CryptoAddressFilter
+  not: EmailFilter
 
   """Filter by the object’s `owner` relation."""
   owner: UserFilter
-
-  """TRGM search on the `address` column."""
-  trgmAddress: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -440,9 +562,310 @@ input UUIDFilter {
 }
 
 """
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
+A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
 """
-input StringFilter {
+input ConstructiveInternalTypeEmailFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: ConstructiveInternalTypeEmail
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: ConstructiveInternalTypeEmail
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: ConstructiveInternalTypeEmail
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+}
+
+"""
+A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
+"""
+input BooleanFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Boolean
+
+  """Not equal to the specified value."""
+  notEqualTo: Boolean
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Boolean
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Boolean
+
+  """Included in the specified list."""
+  in: [Boolean!]
+
+  """Not included in the specified list."""
+  notIn: [Boolean!]
+
+  """Less than the specified value."""
+  lessThan: Boolean
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Boolean
+
+  """Greater than the specified value."""
+  greaterThan: Boolean
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Boolean
+}
+
+"""
+A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
+"""
+input DatetimeFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: Datetime
+
+  """Not equal to the specified value."""
+  notEqualTo: Datetime
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: Datetime
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: Datetime
+
+  """Included in the specified list."""
+  in: [Datetime!]
+
+  """Not included in the specified list."""
+  notIn: [Datetime!]
+
+  """Less than the specified value."""
+  lessThan: Datetime
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: Datetime
+
+  """Greater than the specified value."""
+  greaterThan: Datetime
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: Datetime
+}
+
+"""
+A filter to be used against `User` object types. All fields are combined with a logical ‘and.’
+"""
+input UserFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `username` field."""
+  username: StringTrgmFilter
+
+  """Filter by the object’s `displayName` field."""
+  displayName: StringTrgmFilter
+
+  """Filter by the object’s `profilePicture` field."""
+  profilePicture: ConstructiveInternalTypeImageFilter
+
+  """Filter by the object’s `searchTsv` field."""
+  searchTsv: FullTextFilter
+
+  """Filter by the object’s `type` field."""
+  type: IntFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [UserFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [UserFilter!]
+
+  """Negates the expression."""
+  not: UserFilter
+
+  """Filter by the object’s `roleType` relation."""
+  roleType: RoleTypeFilter
+
+  """Filter by the object’s `ownedEmails` relation."""
+  ownedEmails: UserToManyEmailFilter
+
+  """`ownedEmails` exist."""
+  ownedEmailsExist: Boolean
+
+  """Filter by the object’s `ownedPhoneNumbers` relation."""
+  ownedPhoneNumbers: UserToManyPhoneNumberFilter
+
+  """`ownedPhoneNumbers` exist."""
+  ownedPhoneNumbersExist: Boolean
+
+  """Filter by the object’s `ownedCryptoAddresses` relation."""
+  ownedCryptoAddresses: UserToManyCryptoAddressFilter
+
+  """`ownedCryptoAddresses` exist."""
+  ownedCryptoAddressesExist: Boolean
+
+  """Filter by the object’s `ownedConnectedAccounts` relation."""
+  ownedConnectedAccounts: UserToManyConnectedAccountFilter
+
+  """`ownedConnectedAccounts` exist."""
+  ownedConnectedAccountsExist: Boolean
+
+  """Filter by the object’s `auditLogsByActorId` relation."""
+  auditLogsByActorId: UserToManyAuditLogFilter
+
+  """`auditLogsByActorId` exist."""
+  auditLogsByActorIdExist: Boolean
+
+  """TSV search on the `search_tsv` column."""
+  tsvSearchTsv: String
+
+  """TRGM search on the `display_name` column."""
+  trgmDisplayName: TrgmSearchInput
+
+  """
+  Composite full-text search. Provide a search string and it will be dispatched
+  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  simultaneously. Rows matching ANY algorithm are returned. All matching score
+  fields are populated.
+  """
+  fullTextSearch: String
+}
+
+"""
+A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’
+"""
+input StringTrgmFilter {
   """
   Is null (if `true` is specified) or is not null (if `false` is specified).
   """
@@ -592,145 +1015,6 @@ input TrgmSearchInput {
   Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
   """
   threshold: Float
-}
-
-"""
-A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’
-"""
-input BooleanFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Boolean
-
-  """Not equal to the specified value."""
-  notEqualTo: Boolean
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Boolean
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Boolean
-
-  """Included in the specified list."""
-  in: [Boolean!]
-
-  """Not included in the specified list."""
-  notIn: [Boolean!]
-
-  """Less than the specified value."""
-  lessThan: Boolean
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Boolean
-
-  """Greater than the specified value."""
-  greaterThan: Boolean
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Boolean
-}
-
-"""
-A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
-"""
-input DatetimeFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: Datetime
-
-  """Not equal to the specified value."""
-  notEqualTo: Datetime
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: Datetime
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: Datetime
-
-  """Included in the specified list."""
-  in: [Datetime!]
-
-  """Not included in the specified list."""
-  notIn: [Datetime!]
-
-  """Less than the specified value."""
-  lessThan: Datetime
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: Datetime
-
-  """Greater than the specified value."""
-  greaterThan: Datetime
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: Datetime
-}
-
-"""
-A filter to be used against `User` object types. All fields are combined with a logical ‘and.’
-"""
-input UserFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `username` field."""
-  username: StringFilter
-
-  """Filter by the object’s `displayName` field."""
-  displayName: StringFilter
-
-  """Filter by the object’s `profilePicture` field."""
-  profilePicture: ConstructiveInternalTypeImageFilter
-
-  """Filter by the object’s `searchTsv` field."""
-  searchTsv: FullTextFilter
-
-  """Filter by the object’s `type` field."""
-  type: IntFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [UserFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [UserFilter!]
-
-  """Negates the expression."""
-  not: UserFilter
-
-  """Filter by the object’s `roleType` relation."""
-  roleType: RoleTypeFilter
-
-  """TSV search on the `search_tsv` column."""
-  tsvSearchTsv: String
-
-  """TRGM search on the `display_name` column."""
-  trgmDisplayName: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -885,126 +1169,164 @@ input RoleTypeFilter {
   not: RoleTypeFilter
 }
 
-"""Methods to use when ordering `CryptoAddress`."""
-enum CryptoAddressOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ADDRESS_ASC
-  ADDRESS_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  ADDRESS_TRGM_SIMILARITY_ASC
-  ADDRESS_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
-}
+"""
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
 
-"""A connection to a list of `RoleType` values."""
-type RoleTypeConnection {
-  """A list of `RoleType` objects."""
-  nodes: [RoleType]!
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
 
   """
-  A list of edges which contains the `RoleType` and cursor to aid in pagination.
+  Not equal to the specified value, treating null like an ordinary value.
   """
-  edges: [RoleTypeEdge]!
+  distinctFrom: String
 
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
 
-  """The count of *all* `RoleType` you could get from the connection."""
-  totalCount: Int!
-}
+  """Included in the specified list."""
+  in: [String!]
 
-"""A `RoleType` edge in the connection."""
-type RoleTypeEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+  """Not included in the specified list."""
+  notIn: [String!]
 
-  """The `RoleType` at the end of the edge."""
-  node: RoleType
-}
+  """Less than the specified value."""
+  lessThan: String
 
-"""Methods to use when ordering `RoleType`."""
-enum RoleTypeOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
 
-"""A connection to a list of `PhoneNumber` values."""
-type PhoneNumberConnection {
-  """A list of `PhoneNumber` objects."""
-  nodes: [PhoneNumber]!
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
 
   """
-  A list of edges which contains the `PhoneNumber` and cursor to aid in pagination.
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
   """
-  edges: [PhoneNumberEdge]!
+  like: String
 
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
 
-  """The count of *all* `PhoneNumber` you could get from the connection."""
-  totalCount: Int!
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
 }
 
 """
-User phone numbers with country code, verification, and primary-number management
+A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’
 """
-type PhoneNumber {
-  id: UUID!
-  ownerId: UUID!
+input UserToManyEmailFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: EmailFilter
 
-  """Country calling code (e.g. +1, +44)"""
-  cc: String!
+  """Filters to entities where every related entity matches."""
+  every: EmailFilter
 
-  """The phone number without country code"""
-  number: String!
-
-  """Whether the phone number has been verified via SMS code"""
-  isVerified: Boolean!
-
-  """Whether this is the user's primary phone number"""
-  isPrimary: Boolean!
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single `User` that is related to this `PhoneNumber`."""
-  owner: User
-
-  """
-  TRGM similarity when searching `cc`. Returns null when no trgm search filter is active.
-  """
-  ccTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `number`. Returns null when no trgm search filter is active.
-  """
-  numberTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
+  """Filters to entities where no related entity matches."""
+  none: EmailFilter
 }
 
-"""A `PhoneNumber` edge in the connection."""
-type PhoneNumberEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+"""
+A filter to be used against many `PhoneNumber` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyPhoneNumberFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: PhoneNumberFilter
 
-  """The `PhoneNumber` at the end of the edge."""
-  node: PhoneNumber
+  """Filters to entities where every related entity matches."""
+  every: PhoneNumberFilter
+
+  """Filters to entities where no related entity matches."""
+  none: PhoneNumberFilter
 }
 
 """
@@ -1046,114 +1368,72 @@ input PhoneNumberFilter {
 
   """Filter by the object’s `owner` relation."""
   owner: UserFilter
-
-  """TRGM search on the `cc` column."""
-  trgmCc: TrgmSearchInput
-
-  """TRGM search on the `number` column."""
-  trgmNumber: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
-}
-
-"""Methods to use when ordering `PhoneNumber`."""
-enum PhoneNumberOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NUMBER_ASC
-  NUMBER_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  CC_TRGM_SIMILARITY_ASC
-  CC_TRGM_SIMILARITY_DESC
-  NUMBER_TRGM_SIMILARITY_ASC
-  NUMBER_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
-}
-
-"""A connection to a list of `ConnectedAccount` values."""
-type ConnectedAccountConnection {
-  """A list of `ConnectedAccount` objects."""
-  nodes: [ConnectedAccount]!
-
-  """
-  A list of edges which contains the `ConnectedAccount` and cursor to aid in pagination.
-  """
-  edges: [ConnectedAccountEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `ConnectedAccount` you could get from the connection.
-  """
-  totalCount: Int!
 }
 
 """
-OAuth and social login connections linking external service accounts to users
+A filter to be used against many `CryptoAddress` object types. All fields are combined with a logical ‘and.’
 """
-type ConnectedAccount {
-  id: UUID!
-  ownerId: UUID!
+input UserToManyCryptoAddressFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: CryptoAddressFilter
 
-  """The service used, e.g. `twitter` or `github`."""
-  service: String!
+  """Filters to entities where every related entity matches."""
+  every: CryptoAddressFilter
 
-  """A unique identifier for the user within the service"""
-  identifier: String!
-
-  """Additional profile details extracted from this login method"""
-  details: JSON!
-
-  """Whether this connected account has been verified"""
-  isVerified: Boolean!
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single `User` that is related to this `ConnectedAccount`."""
-  owner: User
-
-  """
-  TRGM similarity when searching `service`. Returns null when no trgm search filter is active.
-  """
-  serviceTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `identifier`. Returns null when no trgm search filter is active.
-  """
-  identifierTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
+  """Filters to entities where no related entity matches."""
+  none: CryptoAddressFilter
 }
 
 """
-Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’
 """
-scalar JSON
+input CryptoAddressFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
 
-"""A `ConnectedAccount` edge in the connection."""
-type ConnectedAccountEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
 
-  """The `ConnectedAccount` at the end of the edge."""
-  node: ConnectedAccount
+  """Filter by the object’s `address` field."""
+  address: StringFilter
+
+  """Filter by the object’s `isVerified` field."""
+  isVerified: BooleanFilter
+
+  """Filter by the object’s `isPrimary` field."""
+  isPrimary: BooleanFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [CryptoAddressFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [CryptoAddressFilter!]
+
+  """Negates the expression."""
+  not: CryptoAddressFilter
+
+  """Filter by the object’s `owner` relation."""
+  owner: UserFilter
+}
+
+"""
+A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’
+"""
+input UserToManyConnectedAccountFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: ConnectedAccountFilter
+
+  """Filters to entities where every related entity matches."""
+  every: ConnectedAccountFilter
+
+  """Filters to entities where no related entity matches."""
+  none: ConnectedAccountFilter
 }
 
 """
@@ -1195,20 +1475,6 @@ input ConnectedAccountFilter {
 
   """Filter by the object’s `owner` relation."""
   owner: UserFilter
-
-  """TRGM search on the `service` column."""
-  trgmService: TrgmSearchInput
-
-  """TRGM search on the `identifier` column."""
-  trgmIdentifier: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -1268,98 +1534,23 @@ input JSONFilter {
   containedBy: JSON
 }
 
-"""Methods to use when ordering `ConnectedAccount`."""
-enum ConnectedAccountOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  SERVICE_ASC
-  SERVICE_DESC
-  IDENTIFIER_ASC
-  IDENTIFIER_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  SERVICE_TRGM_SIMILARITY_ASC
-  SERVICE_TRGM_SIMILARITY_DESC
-  IDENTIFIER_TRGM_SIMILARITY_ASC
-  IDENTIFIER_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
-}
-
-"""A connection to a list of `AuditLog` values."""
-type AuditLogConnection {
-  """A list of `AuditLog` objects."""
-  nodes: [AuditLog]!
-
-  """
-  A list of edges which contains the `AuditLog` and cursor to aid in pagination.
-  """
-  edges: [AuditLogEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AuditLog` you could get from the connection."""
-  totalCount: Int!
-}
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
 
 """
-Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
+A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’
 """
-type AuditLog {
-  id: UUID!
+input UserToManyAuditLogFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: AuditLogFilter
 
-  """
-  Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email)
-  """
-  event: String!
+  """Filters to entities where every related entity matches."""
+  every: AuditLogFilter
 
-  """User who performed the authentication action"""
-  actorId: UUID!
-
-  """Request origin (domain) where the auth event occurred"""
-  origin: ConstructiveInternalTypeOrigin
-
-  """Browser or client user-agent string from the request"""
-  userAgent: String
-
-  """IP address of the client that initiated the auth event"""
-  ipAddress: InternetAddress
-
-  """Whether the authentication attempt succeeded"""
-  success: Boolean!
-
-  """Timestamp when the audit event was recorded"""
-  createdAt: Datetime!
-
-  """Reads a single `User` that is related to this `AuditLog`."""
-  actor: User
-
-  """
-  TRGM similarity when searching `userAgent`. Returns null when no trgm search filter is active.
-  """
-  userAgentTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
-}
-
-scalar ConstructiveInternalTypeOrigin
-
-"""A `AuditLog` edge in the connection."""
-type AuditLogEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AuditLog` at the end of the edge."""
-  node: AuditLog
+  """Filters to entities where no related entity matches."""
+  none: AuditLogFilter
 }
 
 """
@@ -1402,16 +1593,8 @@ input AuditLogFilter {
   """Filter by the object’s `actor` relation."""
   actor: UserFilter
 
-  """TRGM search on the `user_agent` column."""
-  trgmUserAgent: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
+  """A related `actor` exists."""
+  actorExists: Boolean
 }
 
 """
@@ -1546,6 +1729,8 @@ input ConstructiveInternalTypeOriginFilter {
   greaterThanOrEqualToInsensitive: String
 }
 
+scalar ConstructiveInternalTypeOrigin
+
 """
 A filter to be used against InternetAddress fields. All fields are combined with a logical ‘and.’
 """
@@ -1603,6 +1788,289 @@ input InternetAddressFilter {
   containsOrContainedBy: InternetAddress
 }
 
+"""Methods to use when ordering `Email`."""
+enum EmailOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `PhoneNumber` values."""
+type PhoneNumberConnection {
+  """A list of `PhoneNumber` objects."""
+  nodes: [PhoneNumber]!
+
+  """
+  A list of edges which contains the `PhoneNumber` and cursor to aid in pagination.
+  """
+  edges: [PhoneNumberEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PhoneNumber` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+User phone numbers with country code, verification, and primary-number management
+"""
+type PhoneNumber {
+  id: UUID!
+  ownerId: UUID!
+
+  """Country calling code (e.g. +1, +44)"""
+  cc: String!
+
+  """The phone number without country code"""
+  number: String!
+
+  """Whether the phone number has been verified via SMS code"""
+  isVerified: Boolean!
+
+  """Whether this is the user's primary phone number"""
+  isPrimary: Boolean!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Reads a single `User` that is related to this `PhoneNumber`."""
+  owner: User
+}
+
+"""A `PhoneNumber` edge in the connection."""
+type PhoneNumberEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PhoneNumber` at the end of the edge."""
+  node: PhoneNumber
+}
+
+"""Methods to use when ordering `PhoneNumber`."""
+enum PhoneNumberOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  NUMBER_ASC
+  NUMBER_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `CryptoAddress` values."""
+type CryptoAddressConnection {
+  """A list of `CryptoAddress` objects."""
+  nodes: [CryptoAddress]!
+
+  """
+  A list of edges which contains the `CryptoAddress` and cursor to aid in pagination.
+  """
+  edges: [CryptoAddressEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `CryptoAddress` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Cryptocurrency wallet addresses owned by users, with network-specific validation and verification
+"""
+type CryptoAddress {
+  id: UUID!
+  ownerId: UUID!
+
+  """
+  The cryptocurrency wallet address, validated against network-specific patterns
+  """
+  address: String!
+
+  """Whether ownership of this address has been cryptographically verified"""
+  isVerified: Boolean!
+
+  """Whether this is the user's primary cryptocurrency address"""
+  isPrimary: Boolean!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Reads a single `User` that is related to this `CryptoAddress`."""
+  owner: User
+}
+
+"""A `CryptoAddress` edge in the connection."""
+type CryptoAddressEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `CryptoAddress` at the end of the edge."""
+  node: CryptoAddress
+}
+
+"""Methods to use when ordering `CryptoAddress`."""
+enum CryptoAddressOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  ADDRESS_ASC
+  ADDRESS_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `ConnectedAccount` values."""
+type ConnectedAccountConnection {
+  """A list of `ConnectedAccount` objects."""
+  nodes: [ConnectedAccount]!
+
+  """
+  A list of edges which contains the `ConnectedAccount` and cursor to aid in pagination.
+  """
+  edges: [ConnectedAccountEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ConnectedAccount` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+OAuth and social login connections linking external service accounts to users
+"""
+type ConnectedAccount {
+  id: UUID!
+  ownerId: UUID!
+
+  """The service used, e.g. `twitter` or `github`."""
+  service: String!
+
+  """A unique identifier for the user within the service"""
+  identifier: String!
+
+  """Additional profile details extracted from this login method"""
+  details: JSON!
+
+  """Whether this connected account has been verified"""
+  isVerified: Boolean!
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Reads a single `User` that is related to this `ConnectedAccount`."""
+  owner: User
+}
+
+"""A `ConnectedAccount` edge in the connection."""
+type ConnectedAccountEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ConnectedAccount` at the end of the edge."""
+  node: ConnectedAccount
+}
+
+"""Methods to use when ordering `ConnectedAccount`."""
+enum ConnectedAccountOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  SERVICE_ASC
+  SERVICE_DESC
+  IDENTIFIER_ASC
+  IDENTIFIER_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `AuditLog` values."""
+type AuditLogConnection {
+  """A list of `AuditLog` objects."""
+  nodes: [AuditLog]!
+
+  """
+  A list of edges which contains the `AuditLog` and cursor to aid in pagination.
+  """
+  edges: [AuditLogEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AuditLog` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.)
+"""
+type AuditLog {
+  id: UUID!
+
+  """
+  Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email)
+  """
+  event: String!
+
+  """User who performed the authentication action; NULL if user was deleted"""
+  actorId: UUID
+
+  """Request origin (domain) where the auth event occurred"""
+  origin: ConstructiveInternalTypeOrigin
+
+  """Browser or client user-agent string from the request"""
+  userAgent: String
+
+  """IP address of the client that initiated the auth event"""
+  ipAddress: InternetAddress
+
+  """Whether the authentication attempt succeeded"""
+  success: Boolean!
+
+  """Timestamp when the audit event was recorded"""
+  createdAt: Datetime!
+
+  """Reads a single `User` that is related to this `AuditLog`."""
+  actor: User
+}
+
+"""A `AuditLog` edge in the connection."""
+type AuditLogEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AuditLog` at the end of the edge."""
+  node: AuditLog
+}
+
 """Methods to use when ordering `AuditLog`."""
 enum AuditLogOrderBy {
   NATURAL
@@ -1612,243 +2080,45 @@ enum AuditLogOrderBy {
   ID_DESC
   EVENT_ASC
   EVENT_DESC
-  USER_AGENT_TRGM_SIMILARITY_ASC
-  USER_AGENT_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
 }
 
-"""A connection to a list of `Email` values."""
-type EmailConnection {
-  """A list of `Email` objects."""
-  nodes: [Email]!
+"""A connection to a list of `RoleType` values."""
+type RoleTypeConnection {
+  """A list of `RoleType` objects."""
+  nodes: [RoleType]!
 
   """
-  A list of edges which contains the `Email` and cursor to aid in pagination.
+  A list of edges which contains the `RoleType` and cursor to aid in pagination.
   """
-  edges: [EmailEdge]!
+  edges: [RoleTypeEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `Email` you could get from the connection."""
+  """The count of *all* `RoleType` you could get from the connection."""
   totalCount: Int!
 }
 
-"""User email addresses with verification and primary-email management"""
-type Email {
-  id: UUID!
-  ownerId: UUID!
-
-  """The email address"""
-  email: ConstructiveInternalTypeEmail!
-
-  """Whether the email address has been verified via confirmation link"""
-  isVerified: Boolean!
-
-  """Whether this is the user's primary email address"""
-  isPrimary: Boolean!
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single `User` that is related to this `Email`."""
-  owner: User
-}
-
-scalar ConstructiveInternalTypeEmail
-
-"""A `Email` edge in the connection."""
-type EmailEdge {
+"""A `RoleType` edge in the connection."""
+type RoleTypeEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `Email` at the end of the edge."""
-  node: Email
+  """The `RoleType` at the end of the edge."""
+  node: RoleType
 }
 
-"""
-A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’
-"""
-input EmailFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
-
-  """Filter by the object’s `email` field."""
-  email: ConstructiveInternalTypeEmailFilter
-
-  """Filter by the object’s `isVerified` field."""
-  isVerified: BooleanFilter
-
-  """Filter by the object’s `isPrimary` field."""
-  isPrimary: BooleanFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [EmailFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [EmailFilter!]
-
-  """Negates the expression."""
-  not: EmailFilter
-
-  """Filter by the object’s `owner` relation."""
-  owner: UserFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeEmailFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: ConstructiveInternalTypeEmail
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: ConstructiveInternalTypeEmail
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: ConstructiveInternalTypeEmail
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-}
-
-"""Methods to use when ordering `Email`."""
-enum EmailOrderBy {
+"""Methods to use when ordering `RoleType`."""
+enum RoleTypeOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
+  NAME_ASC
+  NAME_DESC
 }
 
 """A connection to a list of `User` values."""
@@ -2512,16 +2782,6 @@ type SignInOneTimeTokenRecord {
   accessTokenExpiresAt: Datetime
   isVerified: Boolean
   totpEnabled: Boolean
-
-  """
-  TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active.
-  """
-  accessTokenTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """All input for the `signInOneTimeToken` mutation."""
@@ -2557,16 +2817,6 @@ type SignInRecord {
   accessTokenExpiresAt: Datetime
   isVerified: Boolean
   totpEnabled: Boolean
-
-  """
-  TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active.
-  """
-  accessTokenTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """All input for the `signIn` mutation."""
@@ -2605,16 +2855,6 @@ type SignUpRecord {
   accessTokenExpiresAt: Datetime
   isVerified: Boolean
   totpEnabled: Boolean
-
-  """
-  TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active.
-  """
-  accessTokenTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """All input for the `signUp` mutation."""
@@ -2833,26 +3073,6 @@ type Session {
   csrfSecret: String
   createdAt: Datetime
   updatedAt: Datetime
-
-  """
-  TRGM similarity when searching `uagent`. Returns null when no trgm search filter is active.
-  """
-  uagentTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `fingerprintMode`. Returns null when no trgm search filter is active.
-  """
-  fingerprintModeTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `csrfSecret`. Returns null when no trgm search filter is active.
-  """
-  csrfSecretTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """All input for the `verifyPassword` mutation."""
@@ -3139,7 +3359,7 @@ input AuditLogInput {
   """
   event: String!
 
-  """User who performed the authentication action"""
+  """User who performed the authentication action; NULL if user was deleted"""
   actorId: UUID
 
   """Request origin (domain) where the auth event occurred"""
@@ -3530,7 +3750,7 @@ input AuditLogPatch {
   """
   event: String
 
-  """User who performed the authentication action"""
+  """User who performed the authentication action; NULL if user was deleted"""
   actorId: UUID
 
   """Request origin (domain) where the auth event occurred"""

@@ -13,9 +13,6 @@ const fieldSchema: FieldSchema = {
   name: 'string',
   description: 'string',
   prefix: 'string',
-  descriptionTrgmSimilarity: 'float',
-  prefixTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nmembership-type <command>\n\nCommands:\n  list                  List all membershipType records\n  get                   Get a membershipType by ID\n  create                Create a new membershipType\n  update                Update an existing membershipType\n  delete                Delete a membershipType\n\n  --help, -h            Show this help message\n';

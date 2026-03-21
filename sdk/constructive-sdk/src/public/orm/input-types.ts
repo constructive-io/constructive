@@ -240,6 +240,10 @@ export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 // ============ Entity Types ============
+export interface GetAllRecord {
+  path?: string[] | null;
+  data?: Record<string, unknown> | null;
+}
 export interface OrgGetManagersRecord {
   userId?: string | null;
   depth?: number | null;
@@ -247,10 +251,6 @@ export interface OrgGetManagersRecord {
 export interface OrgGetSubordinatesRecord {
   userId?: string | null;
   depth?: number | null;
-}
-export interface GetAllRecord {
-  path?: string[] | null;
-  data?: Record<string, unknown> | null;
 }
 export interface Object {
   hashUuid?: string | null;
@@ -273,10 +273,6 @@ export interface AppPermission {
   bitstr?: string | null;
   /** Human-readable description of what this permission allows */
   description?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines available permissions as named bits within a bitmask, used by the RBAC system for access control */
 export interface OrgPermission {
@@ -289,10 +285,6 @@ export interface OrgPermission {
   bitstr?: string | null;
   /** Human-readable description of what this permission allows */
   description?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines the specific requirements that must be met to achieve a level */
 export interface AppLevelRequirement {
@@ -309,10 +301,6 @@ export interface AppLevelRequirement {
   priority?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Database {
   id: string;
@@ -323,14 +311,6 @@ export interface Database {
   hash?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `schemaHash`. Returns null when no trgm search filter is active. */
-  schemaHashTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Schema {
   id: string;
@@ -347,18 +327,6 @@ export interface Schema {
   isPublic?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `schemaName`. Returns null when no trgm search filter is active. */
-  schemaNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Table {
   id: string;
@@ -380,20 +348,6 @@ export interface Table {
   inheritsId?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `pluralName`. Returns null when no trgm search filter is active. */
-  pluralNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `singularName`. Returns null when no trgm search filter is active. */
-  singularNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface CheckConstraint {
   id: string;
@@ -410,14 +364,6 @@ export interface CheckConstraint {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Field {
   id: string;
@@ -428,6 +374,7 @@ export interface Field {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   isRequired?: boolean | null;
+  apiRequired?: boolean | null;
   defaultValue?: string | null;
   defaultValueAst?: Record<string, unknown> | null;
   isHidden?: boolean | null;
@@ -444,20 +391,6 @@ export interface Field {
   scope?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `defaultValue`. Returns null when no trgm search filter is active. */
-  defaultValueTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `regexp`. Returns null when no trgm search filter is active. */
-  regexpTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface ForeignKeyConstraint {
   id: string;
@@ -478,20 +411,6 @@ export interface ForeignKeyConstraint {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deleteAction`. Returns null when no trgm search filter is active. */
-  deleteActionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `updateAction`. Returns null when no trgm search filter is active. */
-  updateActionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface FullTextSearch {
   id: string;
@@ -524,14 +443,6 @@ export interface Index {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `accessMethod`. Returns null when no trgm search filter is active. */
-  accessMethodTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Policy {
   id: string;
@@ -551,18 +462,6 @@ export interface Policy {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyType`. Returns null when no trgm search filter is active. */
-  policyTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface PrimaryKeyConstraint {
   id: string;
@@ -578,14 +477,6 @@ export interface PrimaryKeyConstraint {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface TableGrant {
   id: string;
@@ -597,12 +488,6 @@ export interface TableGrant {
   isGrant?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Trigger {
   id: string;
@@ -618,16 +503,6 @@ export interface Trigger {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `event`. Returns null when no trgm search filter is active. */
-  eventTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `functionName`. Returns null when no trgm search filter is active. */
-  functionNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface UniqueConstraint {
   id: string;
@@ -644,16 +519,6 @@ export interface UniqueConstraint {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface View {
   id: string;
@@ -672,16 +537,6 @@ export interface View {
   module?: string | null;
   scope?: number | null;
   tags?: string[] | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `viewType`. Returns null when no trgm search filter is active. */
-  viewTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `filterType`. Returns null when no trgm search filter is active. */
-  filterTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Junction table linking views to their joined tables for referential integrity */
 export interface ViewTable {
@@ -698,12 +553,6 @@ export interface ViewGrant {
   privilege?: string | null;
   withGrantOption?: boolean | null;
   isGrant?: boolean | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** DO INSTEAD rules for views (e.g., read-only enforcement) */
 export interface ViewRule {
@@ -715,14 +564,26 @@ export interface ViewRule {
   event?: string | null;
   /** NOTHING (for read-only) or custom action */
   action?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `event`. Returns null when no trgm search filter is active. */
-  eventTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `action`. Returns null when no trgm search filter is active. */
-  actionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+export interface EmbeddingChunk {
+  id: string;
+  databaseId?: string | null;
+  tableId?: string | null;
+  embeddingFieldId?: string | null;
+  chunksTableId?: string | null;
+  chunksTableName?: string | null;
+  contentFieldName?: string | null;
+  dimensions?: number | null;
+  metric?: string | null;
+  chunkSize?: number | null;
+  chunkOverlap?: number | null;
+  chunkStrategy?: string | null;
+  metadataFields?: Record<string, unknown> | null;
+  enqueueChunkingJob?: boolean | null;
+  chunkingTaskName?: string | null;
+  parentFkFieldId?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 export interface TableTemplateModule {
   id: string;
@@ -734,12 +595,6 @@ export interface TableTemplateModule {
   tableName?: string | null;
   nodeType?: string | null;
   data?: Record<string, unknown> | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. */
 export interface SecureTableProvision {
@@ -757,14 +612,14 @@ export interface SecureTableProvision {
   nodeType?: string | null;
   /** If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true. */
   useRls?: boolean | null;
-  /** Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table. Defaults to '{}'. */
+  /** Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'. */
   nodeData?: Record<string, unknown> | null;
-  /** JSON array of field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: [{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"},{"name":"score","type":"integer","min":0,"max":100}]. Defaults to '[]' (no additional fields). */
-  fields?: Record<string, unknown> | null;
+  /** PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields). */
+  fields?: Record<string, unknown>[] | null;
   /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
   grantRoles?: string[] | null;
-  /** Array of [privilege, columns] tuples defining table grants. Examples: [["select","*"],["insert","*"]] for full access, or [["update",["name","bio"]]] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '[]' (no grants). The trigger validates this is a proper jsonb array. */
-  grantPrivileges?: Record<string, unknown> | null;
+  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants). Type safety is enforced by PostgreSQL at INSERT time. */
+  grantPrivileges?: Record<string, unknown>[] | null;
   /** Policy generator type, e.g. 'AuthzEntityMembership', 'AuthzMembership', 'AuthzAllowAll'. NULL means no policy is created. When set, the trigger automatically enables RLS on the target table. */
   policyType?: string | null;
   /** Privileges the policy applies to, e.g. ARRAY['select','update']. NULL means privileges are derived from the grant_privileges verbs. */
@@ -779,18 +634,6 @@ export interface SecureTableProvision {
   policyData?: Record<string, unknown> | null;
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly. */
   outFields?: string[] | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyType`. Returns null when no trgm search filter is active. */
-  policyTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyRole`. Returns null when no trgm search filter is active. */
-  policyRoleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyName`. Returns null when no trgm search filter is active. */
-  policyNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /**
  * Provisions relational structure between tables. Supports four relation types:
@@ -851,6 +694,13 @@ export interface RelationProvision {
    */
   isRequired?: boolean | null;
   /**
+   * Whether the FK field should be required at the API level even though it is nullable at the database level. Defaults to false.
+   *      When true and is_required is false, the field is created as nullable (allowing SET NULL cascade) but a @requiredInput smart tag is added so PostGraphile treats it as non-null in create/update input types.
+   *      When is_required is true, api_required is ignored (the field is already required at both levels).
+   *      Ignored for RelationManyToMany (junction FK fields are always required).
+   */
+  apiRequired?: boolean | null;
+  /**
    * For RelationManyToMany: an existing junction table to use. Defaults to uuid_nil().
    *      - When uuid_nil(): the trigger creates a new junction table via secure_table_provision using junction_table_name.
    *      - When set to a valid table UUID: the trigger skips table creation and only adds FK fields, composite key (if use_composite_key is true), and security to the existing table.
@@ -874,6 +724,26 @@ export interface RelationProvision {
    */
   useCompositeKey?: boolean | null;
   /**
+   * Whether to create a btree index on FK fields created by this relation. Defaults to true.
+   *      PostgreSQL does not automatically index foreign key columns (only the referenced PK side is indexed).
+   *      Without indexes on FK columns, JOINs, CASCADE deletes, and RLS policy lookups perform sequential scans.
+   *      - RelationBelongsTo: creates an index on the FK field on the source table.
+   *      - RelationHasMany: creates an index on the FK field on the target table.
+   *      - RelationHasOne: skipped — the unique constraint already creates an implicit index.
+   *      - RelationManyToMany: creates indexes on both FK fields on the junction table.
+   *      Set to false only for very small tables or write-heavy tables where index maintenance cost outweighs read performance.
+   */
+  createIndex?: boolean | null;
+  /**
+   * For RelationManyToMany: whether to expose the M:N shortcut fields in the GraphQL API. Defaults to true.
+   *      When true, sets @behavior +manyToMany on the junction table smart_tags so PostGraphile generates
+   *      clean M:N connection fields (e.g., event.contacts instead of event.contactEventsByEventId).
+   *      When false (or toggled off via UPDATE), the behavior tag is removed and the M:N fields disappear from GraphQL.
+   *      Toggling is supported: UPDATE expose_in_api to true/false and the smart tag is added/removed automatically.
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  exposeInApi?: boolean | null;
+  /**
    * For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
    *      Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
    *      NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
@@ -892,8 +762,8 @@ export interface RelationProvision {
   nodeData?: Record<string, unknown> | null;
   /** For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne. */
   grantRoles?: string[] | null;
-  /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: array of [privilege, columns] tuples. Examples: [["select","*"],["insert","*"]] for full access, or [["update",["name","bio"]]] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne. */
-  grantPrivileges?: Record<string, unknown> | null;
+  /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne. */
+  grantPrivileges?: Record<string, unknown>[] | null;
   /**
    * For RelationManyToMany: RLS policy type for the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
    *      Examples: AuthzEntityMembership, AuthzMembership, AuthzAllowAll, AuthzDirectOwner, AuthzOrgHierarchy.
@@ -926,28 +796,6 @@ export interface RelationProvision {
   outSourceFieldId?: string | null;
   /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
   outTargetFieldId?: string | null;
-  /** TRGM similarity when searching `relationType`. Returns null when no trgm search filter is active. */
-  relationTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `fieldName`. Returns null when no trgm search filter is active. */
-  fieldNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deleteAction`. Returns null when no trgm search filter is active. */
-  deleteActionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `junctionTableName`. Returns null when no trgm search filter is active. */
-  junctionTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sourceFieldName`. Returns null when no trgm search filter is active. */
-  sourceFieldNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `targetFieldName`. Returns null when no trgm search filter is active. */
-  targetFieldNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyType`. Returns null when no trgm search filter is active. */
-  policyTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyRole`. Returns null when no trgm search filter is active. */
-  policyRoleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyName`. Returns null when no trgm search filter is active. */
-  policyNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface SchemaGrant {
   id: string;
@@ -956,10 +804,6 @@ export interface SchemaGrant {
   granteeName?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface DefaultPrivilege {
   id: string;
@@ -969,14 +813,20 @@ export interface DefaultPrivilege {
   privilege?: string | null;
   granteeName?: string | null;
   isGrant?: boolean | null;
-  /** TRGM similarity when searching `objectType`. Returns null when no trgm search filter is active. */
-  objectTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+export interface Enum {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  name?: string | null;
+  label?: string | null;
+  description?: string | null;
+  values?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
+  module?: string | null;
+  scope?: number | null;
+  tags?: string[] | null;
 }
 /** Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API */
 export interface ApiSchema {
@@ -1001,10 +851,6 @@ export interface ApiModule {
   name?: string | null;
   /** JSON configuration data for this module */
   data?: Record<string, unknown> | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site */
 export interface Domain {
@@ -1035,12 +881,6 @@ export interface SiteMetadatum {
   description?: string | null;
   /** Open Graph image for social media previews */
   ogImage?: ConstructiveInternalTypeImage | null;
-  /** TRGM similarity when searching `title`. Returns null when no trgm search filter is active. */
-  titleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site */
 export interface SiteModule {
@@ -1054,10 +894,6 @@ export interface SiteModule {
   name?: string | null;
   /** JSON configuration data for this module */
   data?: Record<string, unknown> | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Theme configuration for a site; stores design tokens, colors, and typography as JSONB */
 export interface SiteTheme {
@@ -1077,12 +913,22 @@ export interface TriggerFunction {
   code?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `code`. Returns null when no trgm search filter is active. */
-  codeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+export interface DatabaseTransfer {
+  id: string;
+  databaseId?: string | null;
+  targetOwnerId?: string | null;
+  sourceApproved?: boolean | null;
+  targetApproved?: boolean | null;
+  sourceApprovedAt?: string | null;
+  targetApprovedAt?: string | null;
+  status?: string | null;
+  initiatedBy?: string | null;
+  notes?: string | null;
+  expiresAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  completedAt?: string | null;
 }
 /** API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings */
 export interface Api {
@@ -1100,16 +946,6 @@ export interface Api {
   anonRole?: string | null;
   /** Whether this API is publicly accessible without authentication */
   isPublic?: boolean | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `dbname`. Returns null when no trgm search filter is active. */
-  dbnameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `roleName`. Returns null when no trgm search filter is active. */
-  roleNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `anonRole`. Returns null when no trgm search filter is active. */
-  anonRoleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Top-level site configuration: branding assets, title, and description for a deployed application */
 export interface Site {
@@ -1131,14 +967,6 @@ export interface Site {
   logo?: ConstructiveInternalTypeImage | null;
   /** PostgreSQL database name this site connects to */
   dbname?: string | null;
-  /** TRGM similarity when searching `title`. Returns null when no trgm search filter is active. */
-  titleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `dbname`. Returns null when no trgm search filter is active. */
-  dbnameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Mobile and native app configuration linked to a site, including store links and identifiers */
 export interface App {
@@ -1160,14 +988,6 @@ export interface App {
   appIdPrefix?: string | null;
   /** URL to the Google Play Store listing */
   playStoreLink?: ConstructiveInternalTypeUrl | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `appStoreId`. Returns null when no trgm search filter is active. */
-  appStoreIdTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `appIdPrefix`. Returns null when no trgm search filter is active. */
-  appIdPrefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface ConnectedAccountsModule {
   id: string;
@@ -1177,10 +997,6 @@ export interface ConnectedAccountsModule {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface CryptoAddressesModule {
   id: string;
@@ -1191,12 +1007,6 @@ export interface CryptoAddressesModule {
   ownerTableId?: string | null;
   tableName?: string | null;
   cryptoNetwork?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `cryptoNetwork`. Returns null when no trgm search filter is active. */
-  cryptoNetworkTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface CryptoAuthModule {
   id: string;
@@ -1213,20 +1023,6 @@ export interface CryptoAuthModule {
   signInRecordFailure?: string | null;
   signUpWithKey?: string | null;
   signInWithChallenge?: string | null;
-  /** TRGM similarity when searching `userField`. Returns null when no trgm search filter is active. */
-  userFieldTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `cryptoNetwork`. Returns null when no trgm search filter is active. */
-  cryptoNetworkTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInRequestChallenge`. Returns null when no trgm search filter is active. */
-  signInRequestChallengeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInRecordFailure`. Returns null when no trgm search filter is active. */
-  signInRecordFailureTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signUpWithKey`. Returns null when no trgm search filter is active. */
-  signUpWithKeyTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInWithChallenge`. Returns null when no trgm search filter is active. */
-  signInWithChallengeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface DefaultIdsModule {
   id: string;
@@ -1245,10 +1041,6 @@ export interface DenormalizedTableField {
   updateDefaults?: boolean | null;
   funcName?: string | null;
   funcOrder?: number | null;
-  /** TRGM similarity when searching `funcName`. Returns null when no trgm search filter is active. */
-  funcNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface EmailsModule {
   id: string;
@@ -1258,10 +1050,6 @@ export interface EmailsModule {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface EncryptedSecretsModule {
   id: string;
@@ -1269,10 +1057,6 @@ export interface EncryptedSecretsModule {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface FieldModule {
   id: string;
@@ -1284,10 +1068,6 @@ export interface FieldModule {
   data?: Record<string, unknown> | null;
   triggers?: string[] | null;
   functions?: string[] | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface InvitesModule {
   id: string;
@@ -1304,16 +1084,6 @@ export interface InvitesModule {
   prefix?: string | null;
   membershipType?: number | null;
   entityTableId?: string | null;
-  /** TRGM similarity when searching `invitesTableName`. Returns null when no trgm search filter is active. */
-  invitesTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `claimedInvitesTableName`. Returns null when no trgm search filter is active. */
-  claimedInvitesTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `submitInviteCodeFunction`. Returns null when no trgm search filter is active. */
-  submitInviteCodeFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface LevelsModule {
   id: string;
@@ -1342,38 +1112,6 @@ export interface LevelsModule {
   membershipType?: number | null;
   entityTableId?: string | null;
   actorTableId?: string | null;
-  /** TRGM similarity when searching `stepsTableName`. Returns null when no trgm search filter is active. */
-  stepsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `achievementsTableName`. Returns null when no trgm search filter is active. */
-  achievementsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `levelsTableName`. Returns null when no trgm search filter is active. */
-  levelsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `levelRequirementsTableName`. Returns null when no trgm search filter is active. */
-  levelRequirementsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `completedStep`. Returns null when no trgm search filter is active. */
-  completedStepTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `incompletedStep`. Returns null when no trgm search filter is active. */
-  incompletedStepTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievement`. Returns null when no trgm search filter is active. */
-  tgAchievementTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievementToggle`. Returns null when no trgm search filter is active. */
-  tgAchievementToggleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievementToggleBoolean`. Returns null when no trgm search filter is active. */
-  tgAchievementToggleBooleanTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievementBoolean`. Returns null when no trgm search filter is active. */
-  tgAchievementBooleanTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `upsertAchievement`. Returns null when no trgm search filter is active. */
-  upsertAchievementTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgUpdateAchievements`. Returns null when no trgm search filter is active. */
-  tgUpdateAchievementsTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `stepsRequired`. Returns null when no trgm search filter is active. */
-  stepsRequiredTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `levelAchieved`. Returns null when no trgm search filter is active. */
-  levelAchievedTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface LimitsModule {
   id: string;
@@ -1394,26 +1132,6 @@ export interface LimitsModule {
   membershipType?: number | null;
   entityTableId?: string | null;
   actorTableId?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `defaultTableName`. Returns null when no trgm search filter is active. */
-  defaultTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitIncrementFunction`. Returns null when no trgm search filter is active. */
-  limitIncrementFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitDecrementFunction`. Returns null when no trgm search filter is active. */
-  limitDecrementFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitIncrementTrigger`. Returns null when no trgm search filter is active. */
-  limitIncrementTriggerTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitDecrementTrigger`. Returns null when no trgm search filter is active. */
-  limitDecrementTriggerTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitUpdateTrigger`. Returns null when no trgm search filter is active. */
-  limitUpdateTriggerTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitCheckFunction`. Returns null when no trgm search filter is active. */
-  limitCheckFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface MembershipTypesModule {
   id: string;
@@ -1421,10 +1139,6 @@ export interface MembershipTypesModule {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface MembershipsModule {
   id: string;
@@ -1458,32 +1172,6 @@ export interface MembershipsModule {
   entityIdsByMask?: string | null;
   entityIdsByPerm?: string | null;
   entityIdsFunction?: string | null;
-  /** TRGM similarity when searching `membershipsTableName`. Returns null when no trgm search filter is active. */
-  membershipsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `membersTableName`. Returns null when no trgm search filter is active. */
-  membersTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `membershipDefaultsTableName`. Returns null when no trgm search filter is active. */
-  membershipDefaultsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `grantsTableName`. Returns null when no trgm search filter is active. */
-  grantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `adminGrantsTableName`. Returns null when no trgm search filter is active. */
-  adminGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `ownerGrantsTableName`. Returns null when no trgm search filter is active. */
-  ownerGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `actorMaskCheck`. Returns null when no trgm search filter is active. */
-  actorMaskCheckTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `actorPermCheck`. Returns null when no trgm search filter is active. */
-  actorPermCheckTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `entityIdsByMask`. Returns null when no trgm search filter is active. */
-  entityIdsByMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `entityIdsByPerm`. Returns null when no trgm search filter is active. */
-  entityIdsByPermTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `entityIdsFunction`. Returns null when no trgm search filter is active. */
-  entityIdsFunctionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface PermissionsModule {
   id: string;
@@ -1503,22 +1191,6 @@ export interface PermissionsModule {
   getMask?: string | null;
   getByMask?: string | null;
   getMaskByName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `defaultTableName`. Returns null when no trgm search filter is active. */
-  defaultTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getPaddedMask`. Returns null when no trgm search filter is active. */
-  getPaddedMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getMask`. Returns null when no trgm search filter is active. */
-  getMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getByMask`. Returns null when no trgm search filter is active. */
-  getByMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getMaskByName`. Returns null when no trgm search filter is active. */
-  getMaskByNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface PhoneNumbersModule {
   id: string;
@@ -1528,10 +1200,6 @@ export interface PhoneNumbersModule {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface ProfilesModule {
   id: string;
@@ -1552,18 +1220,6 @@ export interface ProfilesModule {
   permissionsTableId?: string | null;
   membershipsTableId?: string | null;
   prefix?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `profilePermissionsTableName`. Returns null when no trgm search filter is active. */
-  profilePermissionsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `profileGrantsTableName`. Returns null when no trgm search filter is active. */
-  profileGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `profileDefinitionGrantsTableName`. Returns null when no trgm search filter is active. */
-  profileDefinitionGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface SecretsModule {
   id: string;
@@ -1571,10 +1227,6 @@ export interface SecretsModule {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface SessionsModule {
   id: string;
@@ -1588,14 +1240,6 @@ export interface SessionsModule {
   sessionsTable?: string | null;
   sessionCredentialsTable?: string | null;
   authSettingsTable?: string | null;
-  /** TRGM similarity when searching `sessionsTable`. Returns null when no trgm search filter is active. */
-  sessionsTableTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sessionCredentialsTable`. Returns null when no trgm search filter is active. */
-  sessionCredentialsTableTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `authSettingsTable`. Returns null when no trgm search filter is active. */
-  authSettingsTableTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface UserAuthModule {
   id: string;
@@ -1624,40 +1268,6 @@ export interface UserAuthModule {
   signInOneTimeTokenFunction?: string | null;
   oneTimeTokenFunction?: string | null;
   extendTokenExpires?: string | null;
-  /** TRGM similarity when searching `auditsTableName`. Returns null when no trgm search filter is active. */
-  auditsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInFunction`. Returns null when no trgm search filter is active. */
-  signInFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signUpFunction`. Returns null when no trgm search filter is active. */
-  signUpFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signOutFunction`. Returns null when no trgm search filter is active. */
-  signOutFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `setPasswordFunction`. Returns null when no trgm search filter is active. */
-  setPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `resetPasswordFunction`. Returns null when no trgm search filter is active. */
-  resetPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `forgotPasswordFunction`. Returns null when no trgm search filter is active. */
-  forgotPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sendVerificationEmailFunction`. Returns null when no trgm search filter is active. */
-  sendVerificationEmailFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `verifyEmailFunction`. Returns null when no trgm search filter is active. */
-  verifyEmailFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `verifyPasswordFunction`. Returns null when no trgm search filter is active. */
-  verifyPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `checkPasswordFunction`. Returns null when no trgm search filter is active. */
-  checkPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sendAccountDeletionEmailFunction`. Returns null when no trgm search filter is active. */
-  sendAccountDeletionEmailFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deleteAccountFunction`. Returns null when no trgm search filter is active. */
-  deleteAccountFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInOneTimeTokenFunction`. Returns null when no trgm search filter is active. */
-  signInOneTimeTokenFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `oneTimeTokenFunction`. Returns null when no trgm search filter is active. */
-  oneTimeTokenFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `extendTokenExpires`. Returns null when no trgm search filter is active. */
-  extendTokenExpiresTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface UsersModule {
   id: string;
@@ -1667,25 +1277,86 @@ export interface UsersModule {
   tableName?: string | null;
   typeTableId?: string | null;
   typeTableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `typeTableName`. Returns null when no trgm search filter is active. */
-  typeTableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
-export interface UuidModule {
+/** An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. */
+export interface Blueprint {
+  /** Unique identifier for this blueprint. */
   id: string;
+  /** The user who owns this blueprint. */
+  ownerId?: string | null;
+  /** The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database. */
   databaseId?: string | null;
-  schemaId?: string | null;
-  uuidFunction?: string | null;
-  uuidSeed?: string | null;
-  /** TRGM similarity when searching `uuidFunction`. Returns null when no trgm search filter is active. */
-  uuidFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `uuidSeed`. Returns null when no trgm search filter is active. */
-  uuidSeedTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+  /** Machine-readable name for the blueprint. Must be unique per database. */
+  name?: string | null;
+  /** Human-readable display name for the blueprint. */
+  displayName?: string | null;
+  /** Optional description of the blueprint. */
+  description?: string | null;
+  /** The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing. */
+  definition?: Record<string, unknown> | null;
+  /** If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch. */
+  templateId?: string | null;
+  /** Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft. */
+  status?: string | null;
+  /** Timestamp when construct_blueprint() successfully completed. NULL until constructed. */
+  constructedAt?: string | null;
+  /** Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed. */
+  errorDetails?: string | null;
+  /** Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
+  refMap?: Record<string, unknown> | null;
+  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed. */
+  constructedDefinition?: Record<string, unknown> | null;
+  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly. */
+  definitionHash?: string | null;
+  /** JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
+  tableHashes?: Record<string, unknown> | null;
+  /** Timestamp when this blueprint was created. */
+  createdAt?: string | null;
+  /** Timestamp when this blueprint was last modified. */
+  updatedAt?: string | null;
+}
+/** A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible). */
+export interface BlueprintTemplate {
+  /** Unique identifier for this template. */
+  id: string;
+  /** Machine-readable name for the template (e.g. e_commerce_basic). Must be unique per owner + version. */
+  name?: string | null;
+  /** Semantic version string. Defaults to 1.0.0. */
+  version?: string | null;
+  /** Human-readable display name for the template (e.g. E-Commerce Basic). */
+  displayName?: string | null;
+  /** Optional description of what the template provisions. */
+  description?: string | null;
+  /** The user who created or published this template. */
+  ownerId?: string | null;
+  /** Access control for the template. private: only the owner can see and copy. public: anyone can browse and copy from the marketplace. Defaults to private. */
+  visibility?: string | null;
+  /** Domain categories for marketplace browsing (e.g. e-commerce, healthcare, social). Defaults to empty array. */
+  categories?: string[] | null;
+  /** Freeform tags for search and discovery (e.g. products, orders, payments). Defaults to empty array. */
+  tags?: string[] | null;
+  /** The blueprint definition as a JSONB document. Contains tables[] (each with nodes[] for data behaviors via string shorthand or {"$type": "...", "data": {...}} objects, fields[], grants[], and policies[] using {"$type": "...", "data": {...}}), and relations[] (using $type for relation_type with junction config in data). This is the core payload that gets copied into a blueprint for execution. */
+  definition?: Record<string, unknown> | null;
+  /** Version of the definition format schema. Used for forward-compatible parsing. Defaults to 1. */
+  definitionSchemaVersion?: string | null;
+  /** Provenance of the template. user: manually created by a human. system: official curated template from the Constructive team. agent: AI-generated. Defaults to user. */
+  source?: string | null;
+  /** Complexity indicator for marketplace filtering. simple: 3-5 tables. moderate: 6-12 tables. complex: 13+ tables. NULL if not categorized. */
+  complexity?: string | null;
+  /** Denormalized count of how many blueprints have been created from this template via copy_template_to_blueprint(). Incremented automatically. Defaults to 0. */
+  copyCount?: number | null;
+  /** Denormalized count of how many derivative templates have been forked from this template. Defaults to 0. */
+  forkCount?: number | null;
+  /** If this template was forked from another template, the ID of the parent. NULL for original templates. */
+  forkedFromId?: string | null;
+  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication, provenance tracking, and cross-blueprint structural comparison. NULL columns are backend-computed — clients should never set this directly. */
+  definitionHash?: string | null;
+  /** JSONB map of table ref names to their individual UUIDv5 content hashes (e.g. {"products": "uuid", "categories": "uuid"}). Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across different blueprints. Backend-computed via trigger. */
+  tableHashes?: Record<string, unknown> | null;
+  /** Timestamp when this template was created. */
+  createdAt?: string | null;
+  /** Timestamp when this template was last modified. */
+  updatedAt?: string | null;
 }
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
@@ -1712,18 +1383,6 @@ export interface DatabaseProvisionModule {
   createdAt?: string | null;
   updatedAt?: string | null;
   completedAt?: string | null;
-  /** TRGM similarity when searching `databaseName`. Returns null when no trgm search filter is active. */
-  databaseNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `subdomain`. Returns null when no trgm search filter is active. */
-  subdomainTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `domain`. Returns null when no trgm search filter is active. */
-  domainTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `status`. Returns null when no trgm search filter is active. */
-  statusTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `errorMessage`. Returns null when no trgm search filter is active. */
-  errorMessageTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Records of admin role grants and revocations between members */
 export interface AppAdminGrant {
@@ -1855,10 +1514,6 @@ export interface OrgChartEdge {
   positionTitle?: string | null;
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number | null;
-  /** TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active. */
-  positionTitleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table */
 export interface OrgChartEdgeGrant {
@@ -1869,7 +1524,7 @@ export interface OrgChartEdgeGrant {
   childId?: string | null;
   /** User ID of the manager being assigned; NULL for top-level positions */
   parentId?: string | null;
-  /** User ID of the admin who performed this grant or revocation */
+  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
   grantorId?: string | null;
   /** TRUE to add/update the edge, FALSE to remove it */
   isGrant?: boolean | null;
@@ -1879,10 +1534,14 @@ export interface OrgChartEdgeGrant {
   positionLevel?: number | null;
   /** Timestamp when this grant or revocation was recorded */
   createdAt?: string | null;
-  /** TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active. */
-  positionTitleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+/** Stores the default permission bitmask assigned to new members upon joining */
+export interface OrgPermissionDefault {
+  id: string;
+  /** Default permission bitmask applied to new members */
+  permissions?: string | null;
+  /** References the entity these default permissions apply to */
+  entityId?: string | null;
 }
 /** Tracks per-actor usage counts against configurable maximum limits */
 export interface AppLimit {
@@ -1931,6 +1590,76 @@ export interface AppAchievement {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+/** Defines available levels that users can achieve by completing requirements */
+export interface AppLevel {
+  id: string;
+  /** Unique name of the level */
+  name?: string | null;
+  /** Human-readable description of what this level represents */
+  description?: string | null;
+  /** Badge or icon image associated with this level */
+  image?: ConstructiveInternalTypeImage | null;
+  /** Optional owner (actor) who created or manages this level */
+  ownerId?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** User email addresses with verification and primary-email management */
+export interface Email {
+  id: string;
+  ownerId?: string | null;
+  /** The email address */
+  email?: ConstructiveInternalTypeEmail | null;
+  /** Whether the email address has been verified via confirmation link */
+  isVerified?: boolean | null;
+  /** Whether this is the user's primary email address */
+  isPrimary?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** User phone numbers with country code, verification, and primary-number management */
+export interface PhoneNumber {
+  id: string;
+  ownerId?: string | null;
+  /** Country calling code (e.g. +1, +44) */
+  cc?: string | null;
+  /** The phone number without country code */
+  number?: string | null;
+  /** Whether the phone number has been verified via SMS code */
+  isVerified?: boolean | null;
+  /** Whether this is the user's primary phone number */
+  isPrimary?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** Cryptocurrency wallet addresses owned by users, with network-specific validation and verification */
+export interface CryptoAddress {
+  id: string;
+  ownerId?: string | null;
+  /** The cryptocurrency wallet address, validated against network-specific patterns */
+  address?: string | null;
+  /** Whether ownership of this address has been cryptographically verified */
+  isVerified?: boolean | null;
+  /** Whether this is the user's primary cryptocurrency address */
+  isPrimary?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** OAuth and social login connections linking external service accounts to users */
+export interface ConnectedAccount {
+  id: string;
+  ownerId?: string | null;
+  /** The service used, e.g. `twitter` or `github`. */
+  service?: string | null;
+  /** A unique identifier for the user within the service */
+  identifier?: string | null;
+  /** Additional profile details extracted from this login method */
+  details?: Record<string, unknown> | null;
+  /** Whether this connected account has been verified */
+  isVerified?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
 /** Invitation records sent to prospective members via email, with token-based redemption and expiration */
 export interface Invite {
   id: string;
@@ -1954,10 +1683,6 @@ export interface Invite {
   expiresAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active. */
-  inviteTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Records of successfully claimed invitations, linking senders to receivers */
 export interface ClaimedInvite {
@@ -1997,10 +1722,6 @@ export interface OrgInvite {
   createdAt?: string | null;
   updatedAt?: string | null;
   entityId?: string | null;
-  /** TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active. */
-  inviteTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Records of successfully claimed invitations, linking senders to receivers */
 export interface OrgClaimedInvite {
@@ -2015,6 +1736,24 @@ export interface OrgClaimedInvite {
   updatedAt?: string | null;
   entityId?: string | null;
 }
+/** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
+export interface AuditLog {
+  id: string;
+  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
+  event?: string | null;
+  /** User who performed the authentication action; NULL if user was deleted */
+  actorId?: string | null;
+  /** Request origin (domain) where the auth event occurred */
+  origin?: ConstructiveInternalTypeOrigin | null;
+  /** Browser or client user-agent string from the request */
+  userAgent?: string | null;
+  /** IP address of the client that initiated the auth event */
+  ipAddress?: string | null;
+  /** Whether the authentication attempt succeeded */
+  success?: boolean | null;
+  /** Timestamp when the audit event was recorded */
+  createdAt?: string | null;
+}
 /** A ref is a data structure for pointing to a commit. */
 export interface Ref {
   /** The primary unique identifier for the ref. */
@@ -2024,10 +1763,6 @@ export interface Ref {
   databaseId?: string | null;
   storeId?: string | null;
   commitId?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A store represents an isolated object repository within a database. */
 export interface Store {
@@ -2040,10 +1775,6 @@ export interface Store {
   /** The current head tree_id for this store. */
   hash?: string | null;
   createdAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Stores the default permission bitmask assigned to new members upon joining */
 export interface AppPermissionDefault {
@@ -2051,55 +1782,9 @@ export interface AppPermissionDefault {
   /** Default permission bitmask applied to new members */
   permissions?: string | null;
 }
-/** Cryptocurrency wallet addresses owned by users, with network-specific validation and verification */
-export interface CryptoAddress {
-  id: string;
-  ownerId?: string | null;
-  /** The cryptocurrency wallet address, validated against network-specific patterns */
-  address?: string | null;
-  /** Whether ownership of this address has been cryptographically verified */
-  isVerified?: boolean | null;
-  /** Whether this is the user's primary cryptocurrency address */
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `address`. Returns null when no trgm search filter is active. */
-  addressTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
 export interface RoleType {
   id: number;
   name?: string | null;
-}
-/** Stores the default permission bitmask assigned to new members upon joining */
-export interface OrgPermissionDefault {
-  id: string;
-  /** Default permission bitmask applied to new members */
-  permissions?: string | null;
-  /** References the entity these default permissions apply to */
-  entityId?: string | null;
-}
-/** User phone numbers with country code, verification, and primary-number management */
-export interface PhoneNumber {
-  id: string;
-  ownerId?: string | null;
-  /** Country calling code (e.g. +1, +44) */
-  cc?: string | null;
-  /** The phone number without country code */
-  number?: string | null;
-  /** Whether the phone number has been verified via SMS code */
-  isVerified?: boolean | null;
-  /** Whether this is the user's primary phone number */
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `cc`. Returns null when no trgm search filter is active. */
-  ccTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `number`. Returns null when no trgm search filter is active. */
-  numberTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Default maximum values for each named limit, applied when no per-actor override exists */
 export interface AppLimitDefault {
@@ -2116,27 +1801,6 @@ export interface OrgLimitDefault {
   name?: string | null;
   /** Default maximum usage allowed for this limit */
   max?: number | null;
-}
-/** OAuth and social login connections linking external service accounts to users */
-export interface ConnectedAccount {
-  id: string;
-  ownerId?: string | null;
-  /** The service used, e.g. `twitter` or `github`. */
-  service?: string | null;
-  /** A unique identifier for the user within the service */
-  identifier?: string | null;
-  /** Additional profile details extracted from this login method */
-  details?: Record<string, unknown> | null;
-  /** Whether this connected account has been verified */
-  isVerified?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `service`. Returns null when no trgm search filter is active. */
-  serviceTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `identifier`. Returns null when no trgm search filter is active. */
-  identifierTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). */
 export interface NodeTypeRegistry {
@@ -2156,18 +1820,6 @@ export interface NodeTypeRegistry {
   tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `slug`. Returns null when no trgm search filter is active. */
-  slugTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `category`. Returns null when no trgm search filter is active. */
-  categoryTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active. */
-  displayNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
 export interface MembershipType {
@@ -2179,12 +1831,6 @@ export interface MembershipType {
   description?: string | null;
   /** Short prefix used to namespace tables and functions for this membership scope */
   prefix?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A commit records changes to the repository. */
 export interface Commit {
@@ -2204,10 +1850,6 @@ export interface Commit {
   /** The root of the tree */
   treeId?: string | null;
   date?: string | null;
-  /** TRGM similarity when searching `message`. Returns null when no trgm search filter is active. */
-  messageTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface AppMembershipDefault {
@@ -2233,16 +1875,6 @@ export interface RlsModule {
   authenticateStrict?: string | null;
   currentRole?: string | null;
   currentRoleId?: string | null;
-  /** TRGM similarity when searching `authenticate`. Returns null when no trgm search filter is active. */
-  authenticateTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `authenticateStrict`. Returns null when no trgm search filter is active. */
-  authenticateStrictTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `currentRole`. Returns null when no trgm search filter is active. */
-  currentRoleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `currentRoleId`. Returns null when no trgm search filter is active. */
-  currentRoleIdTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface OrgMembershipDefault {
@@ -2260,46 +1892,6 @@ export interface OrgMembershipDefault {
   /** When a group is created, whether to auto-add existing org members as group members */
   createGroupsCascadeMembers?: boolean | null;
 }
-/** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
-export interface AuditLog {
-  id: string;
-  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
-  event?: string | null;
-  /** User who performed the authentication action */
-  actorId?: string | null;
-  /** Request origin (domain) where the auth event occurred */
-  origin?: ConstructiveInternalTypeOrigin | null;
-  /** Browser or client user-agent string from the request */
-  userAgent?: string | null;
-  /** IP address of the client that initiated the auth event */
-  ipAddress?: string | null;
-  /** Whether the authentication attempt succeeded */
-  success?: boolean | null;
-  /** Timestamp when the audit event was recorded */
-  createdAt?: string | null;
-  /** TRGM similarity when searching `userAgent`. Returns null when no trgm search filter is active. */
-  userAgentTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
-/** Defines available levels that users can achieve by completing requirements */
-export interface AppLevel {
-  id: string;
-  /** Unique name of the level */
-  name?: string | null;
-  /** Human-readable description of what this level represents */
-  description?: string | null;
-  /** Badge or icon image associated with this level */
-  image?: ConstructiveInternalTypeImage | null;
-  /** Optional owner (actor) who created or manages this level */
-  ownerId?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
 export interface SqlMigration {
   id: number;
   name?: string | null;
@@ -2314,33 +1906,6 @@ export interface SqlMigration {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deploy`. Returns null when no trgm search filter is active. */
-  deployTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `content`. Returns null when no trgm search filter is active. */
-  contentTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `revert`. Returns null when no trgm search filter is active. */
-  revertTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `verify`. Returns null when no trgm search filter is active. */
-  verifyTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `action`. Returns null when no trgm search filter is active. */
-  actionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
-/** User email addresses with verification and primary-email management */
-export interface Email {
-  id: string;
-  ownerId?: string | null;
-  /** The email address */
-  email?: ConstructiveInternalTypeEmail | null;
-  /** Whether the email address has been verified via confirmation link */
-  isVerified?: boolean | null;
-  /** Whether this is the user's primary email address */
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
 }
 export interface User {
   id: string;
@@ -2355,7 +1920,7 @@ export interface User {
   searchTsvRank?: number | null;
   /** TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active. */
   displayNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active. */
   searchScore?: number | null;
 }
 export interface AstMigration {
@@ -2372,10 +1937,6 @@ export interface AstMigration {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  /** TRGM similarity when searching `action`. Returns null when no trgm search filter is active. */
-  actionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status */
 export interface AppMembership {
@@ -2427,28 +1988,6 @@ export interface HierarchyModule {
   getManagersFunction?: string | null;
   isManagerOfFunction?: string | null;
   createdAt?: string | null;
-  /** TRGM similarity when searching `chartEdgesTableName`. Returns null when no trgm search filter is active. */
-  chartEdgesTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `hierarchySprtTableName`. Returns null when no trgm search filter is active. */
-  hierarchySprtTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `chartEdgeGrantsTableName`. Returns null when no trgm search filter is active. */
-  chartEdgeGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privateSchemaName`. Returns null when no trgm search filter is active. */
-  privateSchemaNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sprtTableName`. Returns null when no trgm search filter is active. */
-  sprtTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `rebuildHierarchyFunction`. Returns null when no trgm search filter is active. */
-  rebuildHierarchyFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getSubordinatesFunction`. Returns null when no trgm search filter is active. */
-  getSubordinatesFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getManagersFunction`. Returns null when no trgm search filter is active. */
-  getManagersFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `isManagerOfFunction`. Returns null when no trgm search filter is active. */
-  isManagerOfFunctionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -2463,9 +2002,9 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
+export interface GetAllRecordRelations {}
 export interface OrgGetManagersRecordRelations {}
 export interface OrgGetSubordinatesRecordRelations {}
-export interface GetAllRecordRelations {}
 export interface ObjectRelations {}
 export interface AppPermissionRelations {}
 export interface OrgPermissionRelations {}
@@ -2492,6 +2031,9 @@ export interface DatabaseRelations {
   viewGrants?: ConnectionResult<ViewGrant>;
   viewRules?: ConnectionResult<ViewRule>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
+  enums?: ConnectionResult<Enum>;
+  embeddingChunks?: ConnectionResult<EmbeddingChunk>;
+  databaseTransfers?: ConnectionResult<DatabaseTransfer>;
   apis?: ConnectionResult<Api>;
   apiModules?: ConnectionResult<ApiModule>;
   apiSchemas?: ConnectionResult<ApiSchema>;
@@ -2521,10 +2063,10 @@ export interface DatabaseRelations {
   sessionsModules?: ConnectionResult<SessionsModule>;
   userAuthModules?: ConnectionResult<UserAuthModule>;
   usersModules?: ConnectionResult<UsersModule>;
-  uuidModules?: ConnectionResult<UuidModule>;
   tableTemplateModules?: ConnectionResult<TableTemplateModule>;
   secureTableProvisions?: ConnectionResult<SecureTableProvision>;
   relationProvisions?: ConnectionResult<RelationProvision>;
+  blueprints?: ConnectionResult<Blueprint>;
   databaseProvisionModules?: ConnectionResult<DatabaseProvisionModule>;
 }
 export interface SchemaRelations {
@@ -2533,6 +2075,7 @@ export interface SchemaRelations {
   schemaGrants?: ConnectionResult<SchemaGrant>;
   views?: ConnectionResult<View>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
+  enums?: ConnectionResult<Enum>;
   apiSchemas?: ConnectionResult<ApiSchema>;
   tableTemplateModulesByPrivateSchemaId?: ConnectionResult<TableTemplateModule>;
   tableTemplateModules?: ConnectionResult<TableTemplateModule>;
@@ -2553,6 +2096,8 @@ export interface TableRelations {
   uniqueConstraints?: ConnectionResult<UniqueConstraint>;
   views?: ConnectionResult<View>;
   viewTables?: ConnectionResult<ViewTable>;
+  embeddingChunksByChunksTableId?: ConnectionResult<EmbeddingChunk>;
+  embeddingChunks?: ConnectionResult<EmbeddingChunk>;
   tableTemplateModulesByOwnerTableId?: ConnectionResult<TableTemplateModule>;
   tableTemplateModules?: ConnectionResult<TableTemplateModule>;
   secureTableProvisions?: ConnectionResult<SecureTableProvision>;
@@ -2620,6 +2165,13 @@ export interface ViewRuleRelations {
   database?: Database | null;
   view?: View | null;
 }
+export interface EmbeddingChunkRelations {
+  chunksTable?: Table | null;
+  database?: Database | null;
+  embeddingField?: Field | null;
+  parentFkField?: Field | null;
+  table?: Table | null;
+}
 export interface TableTemplateModuleRelations {
   database?: Database | null;
   ownerTable?: Table | null;
@@ -2642,6 +2194,10 @@ export interface SchemaGrantRelations {
   schema?: Schema | null;
 }
 export interface DefaultPrivilegeRelations {
+  database?: Database | null;
+  schema?: Schema | null;
+}
+export interface EnumRelations {
   database?: Database | null;
   schema?: Schema | null;
 }
@@ -2672,6 +2228,9 @@ export interface SiteThemeRelations {
   site?: Site | null;
 }
 export interface TriggerFunctionRelations {
+  database?: Database | null;
+}
+export interface DatabaseTransferRelations {
   database?: Database | null;
 }
 export interface ApiRelations {
@@ -2852,9 +2411,14 @@ export interface UsersModuleRelations {
   table?: Table | null;
   typeTable?: Table | null;
 }
-export interface UuidModuleRelations {
+export interface BlueprintRelations {
   database?: Database | null;
-  schema?: Schema | null;
+  template?: BlueprintTemplate | null;
+}
+export interface BlueprintTemplateRelations {
+  forkedFrom?: BlueprintTemplate | null;
+  blueprintTemplatesByForkedFromId?: ConnectionResult<BlueprintTemplate>;
+  blueprintsByTemplateId?: ConnectionResult<Blueprint>;
 }
 export interface DatabaseProvisionModuleRelations {
   database?: Database | null;
@@ -2905,6 +2469,9 @@ export interface OrgChartEdgeGrantRelations {
   grantor?: User | null;
   parent?: User | null;
 }
+export interface OrgPermissionDefaultRelations {
+  entity?: User | null;
+}
 export interface AppLimitRelations {
   actor?: User | null;
 }
@@ -2917,6 +2484,21 @@ export interface AppStepRelations {
 }
 export interface AppAchievementRelations {
   actor?: User | null;
+}
+export interface AppLevelRelations {
+  owner?: User | null;
+}
+export interface EmailRelations {
+  owner?: User | null;
+}
+export interface PhoneNumberRelations {
+  owner?: User | null;
+}
+export interface CryptoAddressRelations {
+  owner?: User | null;
+}
+export interface ConnectedAccountRelations {
+  owner?: User | null;
 }
 export interface InviteRelations {
   sender?: User | null;
@@ -2935,24 +2517,15 @@ export interface OrgClaimedInviteRelations {
   receiver?: User | null;
   sender?: User | null;
 }
+export interface AuditLogRelations {
+  actor?: User | null;
+}
 export interface RefRelations {}
 export interface StoreRelations {}
 export interface AppPermissionDefaultRelations {}
-export interface CryptoAddressRelations {
-  owner?: User | null;
-}
 export interface RoleTypeRelations {}
-export interface OrgPermissionDefaultRelations {
-  entity?: User | null;
-}
-export interface PhoneNumberRelations {
-  owner?: User | null;
-}
 export interface AppLimitDefaultRelations {}
 export interface OrgLimitDefaultRelations {}
-export interface ConnectedAccountRelations {
-  owner?: User | null;
-}
 export interface NodeTypeRegistryRelations {}
 export interface MembershipTypeRelations {}
 export interface CommitRelations {}
@@ -2968,32 +2541,29 @@ export interface RlsModuleRelations {
 export interface OrgMembershipDefaultRelations {
   entity?: User | null;
 }
-export interface AuditLogRelations {
-  actor?: User | null;
-}
-export interface AppLevelRelations {
-  owner?: User | null;
-}
 export interface SqlMigrationRelations {}
-export interface EmailRelations {
-  owner?: User | null;
-}
 export interface UserRelations {
   roleType?: RoleType | null;
   appMembershipByActorId?: AppMembership | null;
   orgMembershipDefaultByEntityId?: OrgMembershipDefault | null;
   ownedDatabases?: ConnectionResult<Database>;
+  appAdminGrantsByActorId?: ConnectionResult<AppAdminGrant>;
   appAdminGrantsByGrantorId?: ConnectionResult<AppAdminGrant>;
+  appOwnerGrantsByActorId?: ConnectionResult<AppOwnerGrant>;
   appOwnerGrantsByGrantorId?: ConnectionResult<AppOwnerGrant>;
+  appGrantsByActorId?: ConnectionResult<AppGrant>;
   appGrantsByGrantorId?: ConnectionResult<AppGrant>;
   orgMembershipsByActorId?: ConnectionResult<OrgMembership>;
   orgMembershipsByEntityId?: ConnectionResult<OrgMembership>;
   orgMembersByActorId?: ConnectionResult<OrgMember>;
   orgMembersByEntityId?: ConnectionResult<OrgMember>;
+  orgAdminGrantsByActorId?: ConnectionResult<OrgAdminGrant>;
   orgAdminGrantsByEntityId?: ConnectionResult<OrgAdminGrant>;
   orgAdminGrantsByGrantorId?: ConnectionResult<OrgAdminGrant>;
+  orgOwnerGrantsByActorId?: ConnectionResult<OrgOwnerGrant>;
   orgOwnerGrantsByEntityId?: ConnectionResult<OrgOwnerGrant>;
   orgOwnerGrantsByGrantorId?: ConnectionResult<OrgOwnerGrant>;
+  orgGrantsByActorId?: ConnectionResult<OrgGrant>;
   orgGrantsByEntityId?: ConnectionResult<OrgGrant>;
   orgGrantsByGrantorId?: ConnectionResult<OrgGrant>;
   parentOrgChartEdges?: ConnectionResult<OrgChartEdge>;
@@ -3003,18 +2573,27 @@ export interface UserRelations {
   orgChartEdgeGrantsByEntityId?: ConnectionResult<OrgChartEdgeGrant>;
   orgChartEdgeGrantsByGrantorId?: ConnectionResult<OrgChartEdgeGrant>;
   childOrgChartEdgeGrants?: ConnectionResult<OrgChartEdgeGrant>;
+  orgPermissionDefaultsByEntityId?: ConnectionResult<OrgPermissionDefault>;
   appLimitsByActorId?: ConnectionResult<AppLimit>;
   orgLimitsByActorId?: ConnectionResult<OrgLimit>;
   orgLimitsByEntityId?: ConnectionResult<OrgLimit>;
   appStepsByActorId?: ConnectionResult<AppStep>;
   appAchievementsByActorId?: ConnectionResult<AppAchievement>;
+  ownedAppLevels?: ConnectionResult<AppLevel>;
+  ownedEmails?: ConnectionResult<Email>;
+  ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
+  ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
+  ownedConnectedAccounts?: ConnectionResult<ConnectedAccount>;
   invitesBySenderId?: ConnectionResult<Invite>;
   claimedInvitesByReceiverId?: ConnectionResult<ClaimedInvite>;
   claimedInvitesBySenderId?: ConnectionResult<ClaimedInvite>;
   orgInvitesByEntityId?: ConnectionResult<OrgInvite>;
+  orgInvitesByReceiverId?: ConnectionResult<OrgInvite>;
   orgInvitesBySenderId?: ConnectionResult<OrgInvite>;
+  orgClaimedInvitesByEntityId?: ConnectionResult<OrgClaimedInvite>;
   orgClaimedInvitesByReceiverId?: ConnectionResult<OrgClaimedInvite>;
   orgClaimedInvitesBySenderId?: ConnectionResult<OrgClaimedInvite>;
+  auditLogsByActorId?: ConnectionResult<AuditLog>;
 }
 export interface AstMigrationRelations {}
 export interface AppMembershipRelations {
@@ -3031,11 +2610,11 @@ export interface HierarchyModuleRelations {
   usersTable?: Table | null;
 }
 // ============ Entity Types With Relations ============
+export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type OrgGetManagersRecordWithRelations = OrgGetManagersRecord &
   OrgGetManagersRecordRelations;
 export type OrgGetSubordinatesRecordWithRelations = OrgGetSubordinatesRecord &
   OrgGetSubordinatesRecordRelations;
-export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type ObjectWithRelations = Object & ObjectRelations;
 export type AppPermissionWithRelations = AppPermission & AppPermissionRelations;
 export type OrgPermissionWithRelations = OrgPermission & OrgPermissionRelations;
@@ -3059,12 +2638,14 @@ export type ViewWithRelations = View & ViewRelations;
 export type ViewTableWithRelations = ViewTable & ViewTableRelations;
 export type ViewGrantWithRelations = ViewGrant & ViewGrantRelations;
 export type ViewRuleWithRelations = ViewRule & ViewRuleRelations;
+export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelations;
 export type TableTemplateModuleWithRelations = TableTemplateModule & TableTemplateModuleRelations;
 export type SecureTableProvisionWithRelations = SecureTableProvision &
   SecureTableProvisionRelations;
 export type RelationProvisionWithRelations = RelationProvision & RelationProvisionRelations;
 export type SchemaGrantWithRelations = SchemaGrant & SchemaGrantRelations;
 export type DefaultPrivilegeWithRelations = DefaultPrivilege & DefaultPrivilegeRelations;
+export type EnumWithRelations = Enum & EnumRelations;
 export type ApiSchemaWithRelations = ApiSchema & ApiSchemaRelations;
 export type ApiModuleWithRelations = ApiModule & ApiModuleRelations;
 export type DomainWithRelations = Domain & DomainRelations;
@@ -3072,6 +2653,7 @@ export type SiteMetadatumWithRelations = SiteMetadatum & SiteMetadatumRelations;
 export type SiteModuleWithRelations = SiteModule & SiteModuleRelations;
 export type SiteThemeWithRelations = SiteTheme & SiteThemeRelations;
 export type TriggerFunctionWithRelations = TriggerFunction & TriggerFunctionRelations;
+export type DatabaseTransferWithRelations = DatabaseTransfer & DatabaseTransferRelations;
 export type ApiWithRelations = Api & ApiRelations;
 export type SiteWithRelations = Site & SiteRelations;
 export type AppWithRelations = App & AppRelations;
@@ -3100,7 +2682,8 @@ export type SecretsModuleWithRelations = SecretsModule & SecretsModuleRelations;
 export type SessionsModuleWithRelations = SessionsModule & SessionsModuleRelations;
 export type UserAuthModuleWithRelations = UserAuthModule & UserAuthModuleRelations;
 export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
-export type UuidModuleWithRelations = UuidModule & UuidModuleRelations;
+export type BlueprintWithRelations = Blueprint & BlueprintRelations;
+export type BlueprintTemplateWithRelations = BlueprintTemplate & BlueprintTemplateRelations;
 export type DatabaseProvisionModuleWithRelations = DatabaseProvisionModule &
   DatabaseProvisionModuleRelations;
 export type AppAdminGrantWithRelations = AppAdminGrant & AppAdminGrantRelations;
@@ -3113,26 +2696,29 @@ export type OrgOwnerGrantWithRelations = OrgOwnerGrant & OrgOwnerGrantRelations;
 export type OrgGrantWithRelations = OrgGrant & OrgGrantRelations;
 export type OrgChartEdgeWithRelations = OrgChartEdge & OrgChartEdgeRelations;
 export type OrgChartEdgeGrantWithRelations = OrgChartEdgeGrant & OrgChartEdgeGrantRelations;
+export type OrgPermissionDefaultWithRelations = OrgPermissionDefault &
+  OrgPermissionDefaultRelations;
 export type AppLimitWithRelations = AppLimit & AppLimitRelations;
 export type OrgLimitWithRelations = OrgLimit & OrgLimitRelations;
 export type AppStepWithRelations = AppStep & AppStepRelations;
 export type AppAchievementWithRelations = AppAchievement & AppAchievementRelations;
+export type AppLevelWithRelations = AppLevel & AppLevelRelations;
+export type EmailWithRelations = Email & EmailRelations;
+export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
+export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
+export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
 export type InviteWithRelations = Invite & InviteRelations;
 export type ClaimedInviteWithRelations = ClaimedInvite & ClaimedInviteRelations;
 export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type OrgClaimedInviteWithRelations = OrgClaimedInvite & OrgClaimedInviteRelations;
+export type AuditLogWithRelations = AuditLog & AuditLogRelations;
 export type RefWithRelations = Ref & RefRelations;
 export type StoreWithRelations = Store & StoreRelations;
 export type AppPermissionDefaultWithRelations = AppPermissionDefault &
   AppPermissionDefaultRelations;
-export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
-export type OrgPermissionDefaultWithRelations = OrgPermissionDefault &
-  OrgPermissionDefaultRelations;
-export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
-export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
 export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
 export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type CommitWithRelations = Commit & CommitRelations;
@@ -3141,15 +2727,16 @@ export type AppMembershipDefaultWithRelations = AppMembershipDefault &
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
 export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
   OrgMembershipDefaultRelations;
-export type AuditLogWithRelations = AuditLog & AuditLogRelations;
-export type AppLevelWithRelations = AppLevel & AppLevelRelations;
 export type SqlMigrationWithRelations = SqlMigration & SqlMigrationRelations;
-export type EmailWithRelations = Email & EmailRelations;
 export type UserWithRelations = User & UserRelations;
 export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
 export type AppMembershipWithRelations = AppMembership & AppMembershipRelations;
 export type HierarchyModuleWithRelations = HierarchyModule & HierarchyModuleRelations;
 // ============ Entity Select Types ============
+export type GetAllRecordSelect = {
+  path?: boolean;
+  data?: boolean;
+};
 export type OrgGetManagersRecordSelect = {
   userId?: boolean;
   depth?: boolean;
@@ -3157,10 +2744,6 @@ export type OrgGetManagersRecordSelect = {
 export type OrgGetSubordinatesRecordSelect = {
   userId?: boolean;
   depth?: boolean;
-};
-export type GetAllRecordSelect = {
-  path?: boolean;
-  data?: boolean;
 };
 export type ObjectSelect = {
   hashUuid?: boolean;
@@ -3178,8 +2761,6 @@ export type AppPermissionSelect = {
   bitnum?: boolean;
   bitstr?: boolean;
   description?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type OrgPermissionSelect = {
   id?: boolean;
@@ -3187,8 +2768,6 @@ export type OrgPermissionSelect = {
   bitnum?: boolean;
   bitstr?: boolean;
   description?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppLevelRequirementSelect = {
   id?: boolean;
@@ -3199,8 +2778,6 @@ export type AppLevelRequirementSelect = {
   priority?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type DatabaseSelect = {
   id?: boolean;
@@ -3211,10 +2788,6 @@ export type DatabaseSelect = {
   hash?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  schemaHashTrgmSimilarity?: boolean;
-  nameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   owner?: {
     select: UserSelect;
   };
@@ -3331,6 +2904,24 @@ export type DatabaseSelect = {
     first?: number;
     filter?: DefaultPrivilegeFilter;
     orderBy?: DefaultPrivilegeOrderBy[];
+  };
+  enums?: {
+    select: EnumSelect;
+    first?: number;
+    filter?: EnumFilter;
+    orderBy?: EnumOrderBy[];
+  };
+  embeddingChunks?: {
+    select: EmbeddingChunkSelect;
+    first?: number;
+    filter?: EmbeddingChunkFilter;
+    orderBy?: EmbeddingChunkOrderBy[];
+  };
+  databaseTransfers?: {
+    select: DatabaseTransferSelect;
+    first?: number;
+    filter?: DatabaseTransferFilter;
+    orderBy?: DatabaseTransferOrderBy[];
   };
   apis?: {
     select: ApiSelect;
@@ -3506,12 +3097,6 @@ export type DatabaseSelect = {
     filter?: UsersModuleFilter;
     orderBy?: UsersModuleOrderBy[];
   };
-  uuidModules?: {
-    select: UuidModuleSelect;
-    first?: number;
-    filter?: UuidModuleFilter;
-    orderBy?: UuidModuleOrderBy[];
-  };
   tableTemplateModules?: {
     select: TableTemplateModuleSelect;
     first?: number;
@@ -3529,6 +3114,12 @@ export type DatabaseSelect = {
     first?: number;
     filter?: RelationProvisionFilter;
     orderBy?: RelationProvisionOrderBy[];
+  };
+  blueprints?: {
+    select: BlueprintSelect;
+    first?: number;
+    filter?: BlueprintFilter;
+    orderBy?: BlueprintOrderBy[];
   };
   databaseProvisionModules?: {
     select: DatabaseProvisionModuleSelect;
@@ -3552,12 +3143,6 @@ export type SchemaSelect = {
   isPublic?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  schemaNameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3584,6 +3169,12 @@ export type SchemaSelect = {
     first?: number;
     filter?: DefaultPrivilegeFilter;
     orderBy?: DefaultPrivilegeOrderBy[];
+  };
+  enums?: {
+    select: EnumSelect;
+    first?: number;
+    filter?: EnumFilter;
+    orderBy?: EnumOrderBy[];
   };
   apiSchemas?: {
     select: ApiSchemaSelect;
@@ -3624,13 +3215,6 @@ export type TableSelect = {
   inheritsId?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  pluralNameTrgmSimilarity?: boolean;
-  singularNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3712,6 +3296,18 @@ export type TableSelect = {
     filter?: ViewTableFilter;
     orderBy?: ViewTableOrderBy[];
   };
+  embeddingChunksByChunksTableId?: {
+    select: EmbeddingChunkSelect;
+    first?: number;
+    filter?: EmbeddingChunkFilter;
+    orderBy?: EmbeddingChunkOrderBy[];
+  };
+  embeddingChunks?: {
+    select: EmbeddingChunkSelect;
+    first?: number;
+    filter?: EmbeddingChunkFilter;
+    orderBy?: EmbeddingChunkOrderBy[];
+  };
   tableTemplateModulesByOwnerTableId?: {
     select: TableTemplateModuleSelect;
     first?: number;
@@ -3758,10 +3354,6 @@ export type CheckConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3778,6 +3370,7 @@ export type FieldSelect = {
   description?: boolean;
   smartTags?: boolean;
   isRequired?: boolean;
+  apiRequired?: boolean;
   defaultValue?: boolean;
   defaultValueAst?: boolean;
   isHidden?: boolean;
@@ -3794,13 +3387,6 @@ export type FieldSelect = {
   scope?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  defaultValueTrgmSimilarity?: boolean;
-  regexpTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3827,13 +3413,6 @@ export type ForeignKeyConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  deleteActionTrgmSimilarity?: boolean;
-  updateActionTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3881,10 +3460,6 @@ export type IndexSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  accessMethodTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3910,12 +3485,6 @@ export type PolicySelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  policyTypeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3937,10 +3506,6 @@ export type PrimaryKeyConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3958,9 +3523,6 @@ export type TableGrantSelect = {
   isGrant?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3982,11 +3544,6 @@ export type TriggerSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  eventTrgmSimilarity?: boolean;
-  functionNameTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4009,11 +3566,6 @@ export type UniqueConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4038,11 +3590,6 @@ export type ViewSelect = {
   module?: boolean;
   scope?: boolean;
   tags?: boolean;
-  nameTrgmSimilarity?: boolean;
-  viewTypeTrgmSimilarity?: boolean;
-  filterTypeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4091,9 +3638,6 @@ export type ViewGrantSelect = {
   privilege?: boolean;
   withGrantOption?: boolean;
   isGrant?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4108,15 +3652,46 @@ export type ViewRuleSelect = {
   name?: boolean;
   event?: boolean;
   action?: boolean;
-  nameTrgmSimilarity?: boolean;
-  eventTrgmSimilarity?: boolean;
-  actionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
   view?: {
     select: ViewSelect;
+  };
+};
+export type EmbeddingChunkSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  tableId?: boolean;
+  embeddingFieldId?: boolean;
+  chunksTableId?: boolean;
+  chunksTableName?: boolean;
+  contentFieldName?: boolean;
+  dimensions?: boolean;
+  metric?: boolean;
+  chunkSize?: boolean;
+  chunkOverlap?: boolean;
+  chunkStrategy?: boolean;
+  metadataFields?: boolean;
+  enqueueChunkingJob?: boolean;
+  chunkingTaskName?: boolean;
+  parentFkFieldId?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  chunksTable?: {
+    select: TableSelect;
+  };
+  database?: {
+    select: DatabaseSelect;
+  };
+  embeddingField?: {
+    select: FieldSelect;
+  };
+  parentFkField?: {
+    select: FieldSelect;
+  };
+  table?: {
+    select: TableSelect;
   };
 };
 export type TableTemplateModuleSelect = {
@@ -4129,9 +3704,6 @@ export type TableTemplateModuleSelect = {
   tableName?: boolean;
   nodeType?: boolean;
   data?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4167,12 +3739,6 @@ export type SecureTableProvisionSelect = {
   policyName?: boolean;
   policyData?: boolean;
   outFields?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  policyTypeTrgmSimilarity?: boolean;
-  policyRoleTrgmSimilarity?: boolean;
-  policyNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4192,12 +3758,15 @@ export type RelationProvisionSelect = {
   fieldName?: boolean;
   deleteAction?: boolean;
   isRequired?: boolean;
+  apiRequired?: boolean;
   junctionTableId?: boolean;
   junctionTableName?: boolean;
   junctionSchemaId?: boolean;
   sourceFieldName?: boolean;
   targetFieldName?: boolean;
   useCompositeKey?: boolean;
+  createIndex?: boolean;
+  exposeInApi?: boolean;
   nodeType?: boolean;
   nodeData?: boolean;
   grantRoles?: boolean;
@@ -4212,17 +3781,6 @@ export type RelationProvisionSelect = {
   outJunctionTableId?: boolean;
   outSourceFieldId?: boolean;
   outTargetFieldId?: boolean;
-  relationTypeTrgmSimilarity?: boolean;
-  fieldNameTrgmSimilarity?: boolean;
-  deleteActionTrgmSimilarity?: boolean;
-  junctionTableNameTrgmSimilarity?: boolean;
-  sourceFieldNameTrgmSimilarity?: boolean;
-  targetFieldNameTrgmSimilarity?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  policyTypeTrgmSimilarity?: boolean;
-  policyRoleTrgmSimilarity?: boolean;
-  policyNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4240,8 +3798,6 @@ export type SchemaGrantSelect = {
   granteeName?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4257,10 +3813,26 @@ export type DefaultPrivilegeSelect = {
   privilege?: boolean;
   granteeName?: boolean;
   isGrant?: boolean;
-  objectTypeTrgmSimilarity?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
+  };
+};
+export type EnumSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  name?: boolean;
+  label?: boolean;
+  description?: boolean;
+  values?: boolean;
+  smartTags?: boolean;
+  category?: boolean;
+  module?: boolean;
+  scope?: boolean;
+  tags?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4289,8 +3861,6 @@ export type ApiModuleSelect = {
   apiId?: boolean;
   name?: boolean;
   data?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   api?: {
     select: ApiSelect;
   };
@@ -4322,9 +3892,6 @@ export type SiteMetadatumSelect = {
   title?: boolean;
   description?: boolean;
   ogImage?: boolean;
-  titleTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4338,8 +3905,6 @@ export type SiteModuleSelect = {
   siteId?: boolean;
   name?: boolean;
   data?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4366,9 +3931,25 @@ export type TriggerFunctionSelect = {
   code?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  codeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+};
+export type DatabaseTransferSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  targetOwnerId?: boolean;
+  sourceApproved?: boolean;
+  targetApproved?: boolean;
+  sourceApprovedAt?: boolean;
+  targetApprovedAt?: boolean;
+  status?: boolean;
+  initiatedBy?: boolean;
+  notes?: boolean;
+  expiresAt?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  completedAt?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4381,11 +3962,6 @@ export type ApiSelect = {
   roleName?: boolean;
   anonRole?: boolean;
   isPublic?: boolean;
-  nameTrgmSimilarity?: boolean;
-  dbnameTrgmSimilarity?: boolean;
-  roleNameTrgmSimilarity?: boolean;
-  anonRoleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4418,10 +3994,6 @@ export type SiteSelect = {
   appleTouchIcon?: boolean;
   logo?: boolean;
   dbname?: boolean;
-  titleTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  dbnameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4463,10 +4035,6 @@ export type AppSelect = {
   appStoreId?: boolean;
   appIdPrefix?: boolean;
   playStoreLink?: boolean;
-  nameTrgmSimilarity?: boolean;
-  appStoreIdTrgmSimilarity?: boolean;
-  appIdPrefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   site?: {
     select: SiteSelect;
   };
@@ -4482,8 +4050,6 @@ export type ConnectedAccountsModuleSelect = {
   tableId?: boolean;
   ownerTableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4509,9 +4075,6 @@ export type CryptoAddressesModuleSelect = {
   ownerTableId?: boolean;
   tableName?: boolean;
   cryptoNetwork?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  cryptoNetworkTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4543,13 +4106,6 @@ export type CryptoAuthModuleSelect = {
   signInRecordFailure?: boolean;
   signUpWithKey?: boolean;
   signInWithChallenge?: boolean;
-  userFieldTrgmSimilarity?: boolean;
-  cryptoNetworkTrgmSimilarity?: boolean;
-  signInRequestChallengeTrgmSimilarity?: boolean;
-  signInRecordFailureTrgmSimilarity?: boolean;
-  signUpWithKeyTrgmSimilarity?: boolean;
-  signInWithChallengeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4589,8 +4145,6 @@ export type DenormalizedTableFieldSelect = {
   updateDefaults?: boolean;
   funcName?: boolean;
   funcOrder?: boolean;
-  funcNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4615,8 +4169,6 @@ export type EmailsModuleSelect = {
   tableId?: boolean;
   ownerTableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4639,8 +4191,6 @@ export type EncryptedSecretsModuleSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4661,8 +4211,6 @@ export type FieldModuleSelect = {
   data?: boolean;
   triggers?: boolean;
   functions?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4691,11 +4239,6 @@ export type InvitesModuleSelect = {
   prefix?: boolean;
   membershipType?: boolean;
   entityTableId?: boolean;
-  invitesTableNameTrgmSimilarity?: boolean;
-  claimedInvitesTableNameTrgmSimilarity?: boolean;
-  submitInviteCodeFunctionTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   claimedInvitesTable?: {
     select: TableSelect;
   };
@@ -4748,22 +4291,6 @@ export type LevelsModuleSelect = {
   membershipType?: boolean;
   entityTableId?: boolean;
   actorTableId?: boolean;
-  stepsTableNameTrgmSimilarity?: boolean;
-  achievementsTableNameTrgmSimilarity?: boolean;
-  levelsTableNameTrgmSimilarity?: boolean;
-  levelRequirementsTableNameTrgmSimilarity?: boolean;
-  completedStepTrgmSimilarity?: boolean;
-  incompletedStepTrgmSimilarity?: boolean;
-  tgAchievementTrgmSimilarity?: boolean;
-  tgAchievementToggleTrgmSimilarity?: boolean;
-  tgAchievementToggleBooleanTrgmSimilarity?: boolean;
-  tgAchievementBooleanTrgmSimilarity?: boolean;
-  upsertAchievementTrgmSimilarity?: boolean;
-  tgUpdateAchievementsTrgmSimilarity?: boolean;
-  stepsRequiredTrgmSimilarity?: boolean;
-  levelAchievedTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   achievementsTable?: {
     select: TableSelect;
   };
@@ -4811,16 +4338,6 @@ export type LimitsModuleSelect = {
   membershipType?: boolean;
   entityTableId?: boolean;
   actorTableId?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  defaultTableNameTrgmSimilarity?: boolean;
-  limitIncrementFunctionTrgmSimilarity?: boolean;
-  limitDecrementFunctionTrgmSimilarity?: boolean;
-  limitIncrementTriggerTrgmSimilarity?: boolean;
-  limitDecrementTriggerTrgmSimilarity?: boolean;
-  limitUpdateTriggerTrgmSimilarity?: boolean;
-  limitCheckFunctionTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -4849,8 +4366,6 @@ export type MembershipTypesModuleSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4893,19 +4408,6 @@ export type MembershipsModuleSelect = {
   entityIdsByMask?: boolean;
   entityIdsByPerm?: boolean;
   entityIdsFunction?: boolean;
-  membershipsTableNameTrgmSimilarity?: boolean;
-  membersTableNameTrgmSimilarity?: boolean;
-  membershipDefaultsTableNameTrgmSimilarity?: boolean;
-  grantsTableNameTrgmSimilarity?: boolean;
-  adminGrantsTableNameTrgmSimilarity?: boolean;
-  ownerGrantsTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  actorMaskCheckTrgmSimilarity?: boolean;
-  actorPermCheckTrgmSimilarity?: boolean;
-  entityIdsByMaskTrgmSimilarity?: boolean;
-  entityIdsByPermTrgmSimilarity?: boolean;
-  entityIdsFunctionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -4970,14 +4472,6 @@ export type PermissionsModuleSelect = {
   getMask?: boolean;
   getByMask?: boolean;
   getMaskByName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  defaultTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  getPaddedMaskTrgmSimilarity?: boolean;
-  getMaskTrgmSimilarity?: boolean;
-  getByMaskTrgmSimilarity?: boolean;
-  getMaskByNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -5008,8 +4502,6 @@ export type PhoneNumbersModuleSelect = {
   tableId?: boolean;
   ownerTableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5045,12 +4537,6 @@ export type ProfilesModuleSelect = {
   permissionsTableId?: boolean;
   membershipsTableId?: boolean;
   prefix?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  profilePermissionsTableNameTrgmSimilarity?: boolean;
-  profileGrantsTableNameTrgmSimilarity?: boolean;
-  profileDefinitionGrantsTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -5091,8 +4577,6 @@ export type SecretsModuleSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5115,10 +4599,6 @@ export type SessionsModuleSelect = {
   sessionsTable?: boolean;
   sessionCredentialsTable?: boolean;
   authSettingsTable?: boolean;
-  sessionsTableTrgmSimilarity?: boolean;
-  sessionCredentialsTableTrgmSimilarity?: boolean;
-  authSettingsTableTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   authSettingsTableByAuthSettingsTableId?: {
     select: TableSelect;
   };
@@ -5165,23 +4645,6 @@ export type UserAuthModuleSelect = {
   signInOneTimeTokenFunction?: boolean;
   oneTimeTokenFunction?: boolean;
   extendTokenExpires?: boolean;
-  auditsTableNameTrgmSimilarity?: boolean;
-  signInFunctionTrgmSimilarity?: boolean;
-  signUpFunctionTrgmSimilarity?: boolean;
-  signOutFunctionTrgmSimilarity?: boolean;
-  setPasswordFunctionTrgmSimilarity?: boolean;
-  resetPasswordFunctionTrgmSimilarity?: boolean;
-  forgotPasswordFunctionTrgmSimilarity?: boolean;
-  sendVerificationEmailFunctionTrgmSimilarity?: boolean;
-  verifyEmailFunctionTrgmSimilarity?: boolean;
-  verifyPasswordFunctionTrgmSimilarity?: boolean;
-  checkPasswordFunctionTrgmSimilarity?: boolean;
-  sendAccountDeletionEmailFunctionTrgmSimilarity?: boolean;
-  deleteAccountFunctionTrgmSimilarity?: boolean;
-  signInOneTimeTokenFunctionTrgmSimilarity?: boolean;
-  oneTimeTokenFunctionTrgmSimilarity?: boolean;
-  extendTokenExpiresTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5215,9 +4678,6 @@ export type UsersModuleSelect = {
   tableName?: boolean;
   typeTableId?: boolean;
   typeTableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  typeTableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5231,20 +4691,66 @@ export type UsersModuleSelect = {
     select: TableSelect;
   };
 };
-export type UuidModuleSelect = {
+export type BlueprintSelect = {
   id?: boolean;
+  ownerId?: boolean;
   databaseId?: boolean;
-  schemaId?: boolean;
-  uuidFunction?: boolean;
-  uuidSeed?: boolean;
-  uuidFunctionTrgmSimilarity?: boolean;
-  uuidSeedTrgmSimilarity?: boolean;
-  searchScore?: boolean;
+  name?: boolean;
+  displayName?: boolean;
+  description?: boolean;
+  definition?: boolean;
+  templateId?: boolean;
+  status?: boolean;
+  constructedAt?: boolean;
+  errorDetails?: boolean;
+  refMap?: boolean;
+  constructedDefinition?: boolean;
+  definitionHash?: boolean;
+  tableHashes?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
   database?: {
     select: DatabaseSelect;
   };
-  schema?: {
-    select: SchemaSelect;
+  template?: {
+    select: BlueprintTemplateSelect;
+  };
+};
+export type BlueprintTemplateSelect = {
+  id?: boolean;
+  name?: boolean;
+  version?: boolean;
+  displayName?: boolean;
+  description?: boolean;
+  ownerId?: boolean;
+  visibility?: boolean;
+  categories?: boolean;
+  tags?: boolean;
+  definition?: boolean;
+  definitionSchemaVersion?: boolean;
+  source?: boolean;
+  complexity?: boolean;
+  copyCount?: boolean;
+  forkCount?: boolean;
+  forkedFromId?: boolean;
+  definitionHash?: boolean;
+  tableHashes?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  forkedFrom?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplatesByForkedFromId?: {
+    select: BlueprintTemplateSelect;
+    first?: number;
+    filter?: BlueprintTemplateFilter;
+    orderBy?: BlueprintTemplateOrderBy[];
+  };
+  blueprintsByTemplateId?: {
+    select: BlueprintSelect;
+    first?: number;
+    filter?: BlueprintFilter;
+    orderBy?: BlueprintOrderBy[];
   };
 };
 export type DatabaseProvisionModuleSelect = {
@@ -5262,12 +4768,6 @@ export type DatabaseProvisionModuleSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   completedAt?: boolean;
-  databaseNameTrgmSimilarity?: boolean;
-  subdomainTrgmSimilarity?: boolean;
-  domainTrgmSimilarity?: boolean;
-  statusTrgmSimilarity?: boolean;
-  errorMessageTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5415,8 +4915,6 @@ export type OrgChartEdgeSelect = {
   parentId?: boolean;
   positionTitle?: boolean;
   positionLevel?: boolean;
-  positionTitleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   child?: {
     select: UserSelect;
   };
@@ -5437,8 +4935,6 @@ export type OrgChartEdgeGrantSelect = {
   positionTitle?: boolean;
   positionLevel?: boolean;
   createdAt?: boolean;
-  positionTitleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   child?: {
     select: UserSelect;
   };
@@ -5449,6 +4945,14 @@ export type OrgChartEdgeGrantSelect = {
     select: UserSelect;
   };
   parent?: {
+    select: UserSelect;
+  };
+};
+export type OrgPermissionDefaultSelect = {
+  id?: boolean;
+  permissions?: boolean;
+  entityId?: boolean;
+  entity?: {
     select: UserSelect;
   };
 };
@@ -5498,6 +5002,68 @@ export type AppAchievementSelect = {
     select: UserSelect;
   };
 };
+export type AppLevelSelect = {
+  id?: boolean;
+  name?: boolean;
+  description?: boolean;
+  image?: boolean;
+  ownerId?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type EmailSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  email?: boolean;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type PhoneNumberSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  cc?: boolean;
+  number?: boolean;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type CryptoAddressSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  address?: boolean;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type ConnectedAccountSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  service?: boolean;
+  identifier?: boolean;
+  details?: boolean;
+  isVerified?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
 export type InviteSelect = {
   id?: boolean;
   email?: boolean;
@@ -5511,8 +5077,6 @@ export type InviteSelect = {
   expiresAt?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  inviteTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   sender?: {
     select: UserSelect;
   };
@@ -5546,8 +5110,6 @@ export type OrgInviteSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   entityId?: boolean;
-  inviteTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   entity?: {
     select: UserSelect;
   };
@@ -5576,14 +5138,25 @@ export type OrgClaimedInviteSelect = {
     select: UserSelect;
   };
 };
+export type AuditLogSelect = {
+  id?: boolean;
+  event?: boolean;
+  actorId?: boolean;
+  origin?: boolean;
+  userAgent?: boolean;
+  ipAddress?: boolean;
+  success?: boolean;
+  createdAt?: boolean;
+  actor?: {
+    select: UserSelect;
+  };
+};
 export type RefSelect = {
   id?: boolean;
   name?: boolean;
   databaseId?: boolean;
   storeId?: boolean;
   commitId?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type StoreSelect = {
   id?: boolean;
@@ -5591,54 +5164,14 @@ export type StoreSelect = {
   databaseId?: boolean;
   hash?: boolean;
   createdAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppPermissionDefaultSelect = {
   id?: boolean;
   permissions?: boolean;
 };
-export type CryptoAddressSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  address?: boolean;
-  isVerified?: boolean;
-  isPrimary?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  addressTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type RoleTypeSelect = {
   id?: boolean;
   name?: boolean;
-};
-export type OrgPermissionDefaultSelect = {
-  id?: boolean;
-  permissions?: boolean;
-  entityId?: boolean;
-  entity?: {
-    select: UserSelect;
-  };
-};
-export type PhoneNumberSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  cc?: boolean;
-  number?: boolean;
-  isVerified?: boolean;
-  isPrimary?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  ccTrgmSimilarity?: boolean;
-  numberTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
 };
 export type AppLimitDefaultSelect = {
   id?: boolean;
@@ -5650,22 +5183,6 @@ export type OrgLimitDefaultSelect = {
   name?: boolean;
   max?: boolean;
 };
-export type ConnectedAccountSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  service?: boolean;
-  identifier?: boolean;
-  details?: boolean;
-  isVerified?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  serviceTrgmSimilarity?: boolean;
-  identifierTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type NodeTypeRegistrySelect = {
   name?: boolean;
   slug?: boolean;
@@ -5676,21 +5193,12 @@ export type NodeTypeRegistrySelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  slugTrgmSimilarity?: boolean;
-  categoryTrgmSimilarity?: boolean;
-  displayNameTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type MembershipTypeSelect = {
   id?: boolean;
   name?: boolean;
   description?: boolean;
   prefix?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type CommitSelect = {
   id?: boolean;
@@ -5702,8 +5210,6 @@ export type CommitSelect = {
   committerId?: boolean;
   treeId?: boolean;
   date?: boolean;
-  messageTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppMembershipDefaultSelect = {
   id?: boolean;
@@ -5726,11 +5232,6 @@ export type RlsModuleSelect = {
   authenticateStrict?: boolean;
   currentRole?: boolean;
   currentRoleId?: boolean;
-  authenticateTrgmSimilarity?: boolean;
-  authenticateStrictTrgmSimilarity?: boolean;
-  currentRoleTrgmSimilarity?: boolean;
-  currentRoleIdTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5764,35 +5265,6 @@ export type OrgMembershipDefaultSelect = {
     select: UserSelect;
   };
 };
-export type AuditLogSelect = {
-  id?: boolean;
-  event?: boolean;
-  actorId?: boolean;
-  origin?: boolean;
-  userAgent?: boolean;
-  ipAddress?: boolean;
-  success?: boolean;
-  createdAt?: boolean;
-  userAgentTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  actor?: {
-    select: UserSelect;
-  };
-};
-export type AppLevelSelect = {
-  id?: boolean;
-  name?: boolean;
-  description?: boolean;
-  image?: boolean;
-  ownerId?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type SqlMigrationSelect = {
   id?: boolean;
   name?: boolean;
@@ -5807,25 +5279,6 @@ export type SqlMigrationSelect = {
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
-  nameTrgmSimilarity?: boolean;
-  deployTrgmSimilarity?: boolean;
-  contentTrgmSimilarity?: boolean;
-  revertTrgmSimilarity?: boolean;
-  verifyTrgmSimilarity?: boolean;
-  actionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-};
-export type EmailSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  email?: boolean;
-  isVerified?: boolean;
-  isPrimary?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
 };
 export type UserSelect = {
   id?: boolean;
@@ -5854,17 +5307,35 @@ export type UserSelect = {
     filter?: DatabaseFilter;
     orderBy?: DatabaseOrderBy[];
   };
+  appAdminGrantsByActorId?: {
+    select: AppAdminGrantSelect;
+    first?: number;
+    filter?: AppAdminGrantFilter;
+    orderBy?: AppAdminGrantOrderBy[];
+  };
   appAdminGrantsByGrantorId?: {
     select: AppAdminGrantSelect;
     first?: number;
     filter?: AppAdminGrantFilter;
     orderBy?: AppAdminGrantOrderBy[];
   };
+  appOwnerGrantsByActorId?: {
+    select: AppOwnerGrantSelect;
+    first?: number;
+    filter?: AppOwnerGrantFilter;
+    orderBy?: AppOwnerGrantOrderBy[];
+  };
   appOwnerGrantsByGrantorId?: {
     select: AppOwnerGrantSelect;
     first?: number;
     filter?: AppOwnerGrantFilter;
     orderBy?: AppOwnerGrantOrderBy[];
+  };
+  appGrantsByActorId?: {
+    select: AppGrantSelect;
+    first?: number;
+    filter?: AppGrantFilter;
+    orderBy?: AppGrantOrderBy[];
   };
   appGrantsByGrantorId?: {
     select: AppGrantSelect;
@@ -5896,6 +5367,12 @@ export type UserSelect = {
     filter?: OrgMemberFilter;
     orderBy?: OrgMemberOrderBy[];
   };
+  orgAdminGrantsByActorId?: {
+    select: OrgAdminGrantSelect;
+    first?: number;
+    filter?: OrgAdminGrantFilter;
+    orderBy?: OrgAdminGrantOrderBy[];
+  };
   orgAdminGrantsByEntityId?: {
     select: OrgAdminGrantSelect;
     first?: number;
@@ -5908,6 +5385,12 @@ export type UserSelect = {
     filter?: OrgAdminGrantFilter;
     orderBy?: OrgAdminGrantOrderBy[];
   };
+  orgOwnerGrantsByActorId?: {
+    select: OrgOwnerGrantSelect;
+    first?: number;
+    filter?: OrgOwnerGrantFilter;
+    orderBy?: OrgOwnerGrantOrderBy[];
+  };
   orgOwnerGrantsByEntityId?: {
     select: OrgOwnerGrantSelect;
     first?: number;
@@ -5919,6 +5402,12 @@ export type UserSelect = {
     first?: number;
     filter?: OrgOwnerGrantFilter;
     orderBy?: OrgOwnerGrantOrderBy[];
+  };
+  orgGrantsByActorId?: {
+    select: OrgGrantSelect;
+    first?: number;
+    filter?: OrgGrantFilter;
+    orderBy?: OrgGrantOrderBy[];
   };
   orgGrantsByEntityId?: {
     select: OrgGrantSelect;
@@ -5974,6 +5463,12 @@ export type UserSelect = {
     filter?: OrgChartEdgeGrantFilter;
     orderBy?: OrgChartEdgeGrantOrderBy[];
   };
+  orgPermissionDefaultsByEntityId?: {
+    select: OrgPermissionDefaultSelect;
+    first?: number;
+    filter?: OrgPermissionDefaultFilter;
+    orderBy?: OrgPermissionDefaultOrderBy[];
+  };
   appLimitsByActorId?: {
     select: AppLimitSelect;
     first?: number;
@@ -6004,6 +5499,36 @@ export type UserSelect = {
     filter?: AppAchievementFilter;
     orderBy?: AppAchievementOrderBy[];
   };
+  ownedAppLevels?: {
+    select: AppLevelSelect;
+    first?: number;
+    filter?: AppLevelFilter;
+    orderBy?: AppLevelOrderBy[];
+  };
+  ownedEmails?: {
+    select: EmailSelect;
+    first?: number;
+    filter?: EmailFilter;
+    orderBy?: EmailOrderBy[];
+  };
+  ownedPhoneNumbers?: {
+    select: PhoneNumberSelect;
+    first?: number;
+    filter?: PhoneNumberFilter;
+    orderBy?: PhoneNumberOrderBy[];
+  };
+  ownedCryptoAddresses?: {
+    select: CryptoAddressSelect;
+    first?: number;
+    filter?: CryptoAddressFilter;
+    orderBy?: CryptoAddressOrderBy[];
+  };
+  ownedConnectedAccounts?: {
+    select: ConnectedAccountSelect;
+    first?: number;
+    filter?: ConnectedAccountFilter;
+    orderBy?: ConnectedAccountOrderBy[];
+  };
   invitesBySenderId?: {
     select: InviteSelect;
     first?: number;
@@ -6028,11 +5553,23 @@ export type UserSelect = {
     filter?: OrgInviteFilter;
     orderBy?: OrgInviteOrderBy[];
   };
+  orgInvitesByReceiverId?: {
+    select: OrgInviteSelect;
+    first?: number;
+    filter?: OrgInviteFilter;
+    orderBy?: OrgInviteOrderBy[];
+  };
   orgInvitesBySenderId?: {
     select: OrgInviteSelect;
     first?: number;
     filter?: OrgInviteFilter;
     orderBy?: OrgInviteOrderBy[];
+  };
+  orgClaimedInvitesByEntityId?: {
+    select: OrgClaimedInviteSelect;
+    first?: number;
+    filter?: OrgClaimedInviteFilter;
+    orderBy?: OrgClaimedInviteOrderBy[];
   };
   orgClaimedInvitesByReceiverId?: {
     select: OrgClaimedInviteSelect;
@@ -6045,6 +5582,12 @@ export type UserSelect = {
     first?: number;
     filter?: OrgClaimedInviteFilter;
     orderBy?: OrgClaimedInviteOrderBy[];
+  };
+  auditLogsByActorId?: {
+    select: AuditLogSelect;
+    first?: number;
+    filter?: AuditLogFilter;
+    orderBy?: AuditLogOrderBy[];
   };
 };
 export type AstMigrationSelect = {
@@ -6061,8 +5604,6 @@ export type AstMigrationSelect = {
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
-  actionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppMembershipSelect = {
   id?: boolean;
@@ -6106,17 +5647,6 @@ export type HierarchyModuleSelect = {
   getManagersFunction?: boolean;
   isManagerOfFunction?: boolean;
   createdAt?: boolean;
-  chartEdgesTableNameTrgmSimilarity?: boolean;
-  hierarchySprtTableNameTrgmSimilarity?: boolean;
-  chartEdgeGrantsTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  privateSchemaNameTrgmSimilarity?: boolean;
-  sprtTableNameTrgmSimilarity?: boolean;
-  rebuildHierarchyFunctionTrgmSimilarity?: boolean;
-  getSubordinatesFunctionTrgmSimilarity?: boolean;
-  getManagersFunctionTrgmSimilarity?: boolean;
-  isManagerOfFunctionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   chartEdgeGrantsTable?: {
     select: TableSelect;
   };
@@ -6143,6 +5673,13 @@ export type HierarchyModuleSelect = {
   };
 };
 // ============ Table Filter Types ============
+export interface GetAllRecordFilter {
+  path?: StringListFilter;
+  data?: JSONFilter;
+  and?: GetAllRecordFilter[];
+  or?: GetAllRecordFilter[];
+  not?: GetAllRecordFilter;
+}
 export interface OrgGetManagersRecordFilter {
   userId?: UUIDFilter;
   depth?: IntFilter;
@@ -6156,13 +5693,6 @@ export interface OrgGetSubordinatesRecordFilter {
   and?: OrgGetSubordinatesRecordFilter[];
   or?: OrgGetSubordinatesRecordFilter[];
   not?: OrgGetSubordinatesRecordFilter;
-}
-export interface GetAllRecordFilter {
-  path?: StringListFilter;
-  data?: JSONFilter;
-  and?: GetAllRecordFilter[];
-  or?: GetAllRecordFilter[];
-  not?: GetAllRecordFilter;
 }
 export interface ObjectFilter {
   hashUuid?: UUIDFilter;
@@ -6183,8 +5713,6 @@ export interface AppPermissionFilter {
   bitnum?: IntFilter;
   bitstr?: BitStringFilter;
   description?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: AppPermissionFilter[];
   or?: AppPermissionFilter[];
   not?: AppPermissionFilter;
@@ -6195,8 +5723,6 @@ export interface OrgPermissionFilter {
   bitnum?: IntFilter;
   bitstr?: BitStringFilter;
   description?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgPermissionFilter[];
   or?: OrgPermissionFilter[];
   not?: OrgPermissionFilter;
@@ -6210,8 +5736,6 @@ export interface AppLevelRequirementFilter {
   priority?: IntFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: AppLevelRequirementFilter[];
   or?: AppLevelRequirementFilter[];
   not?: AppLevelRequirementFilter;
@@ -6225,10 +5749,6 @@ export interface DatabaseFilter {
   hash?: UUIDFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  schemaHashTrgmSimilarity?: FloatFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: DatabaseFilter[];
   or?: DatabaseFilter[];
   not?: DatabaseFilter;
@@ -6248,12 +5768,6 @@ export interface SchemaFilter {
   isPublic?: BooleanFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  schemaNameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SchemaFilter[];
   or?: SchemaFilter[];
   not?: SchemaFilter;
@@ -6278,13 +5792,6 @@ export interface TableFilter {
   inheritsId?: UUIDFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  pluralNameTrgmSimilarity?: FloatFilter;
-  singularNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: TableFilter[];
   or?: TableFilter[];
   not?: TableFilter;
@@ -6304,10 +5811,6 @@ export interface CheckConstraintFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: CheckConstraintFilter[];
   or?: CheckConstraintFilter[];
   not?: CheckConstraintFilter;
@@ -6321,6 +5824,7 @@ export interface FieldFilter {
   description?: StringFilter;
   smartTags?: JSONFilter;
   isRequired?: BooleanFilter;
+  apiRequired?: BooleanFilter;
   defaultValue?: StringFilter;
   defaultValueAst?: JSONFilter;
   isHidden?: BooleanFilter;
@@ -6337,13 +5841,6 @@ export interface FieldFilter {
   scope?: IntFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  defaultValueTrgmSimilarity?: FloatFilter;
-  regexpTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: FieldFilter[];
   or?: FieldFilter[];
   not?: FieldFilter;
@@ -6367,13 +5864,6 @@ export interface ForeignKeyConstraintFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  deleteActionTrgmSimilarity?: FloatFilter;
-  updateActionTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ForeignKeyConstraintFilter[];
   or?: ForeignKeyConstraintFilter[];
   not?: ForeignKeyConstraintFilter;
@@ -6412,10 +5902,6 @@ export interface IndexFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  accessMethodTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: IndexFilter[];
   or?: IndexFilter[];
   not?: IndexFilter;
@@ -6438,12 +5924,6 @@ export interface PolicyFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  policyTypeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: PolicyFilter[];
   or?: PolicyFilter[];
   not?: PolicyFilter;
@@ -6462,10 +5942,6 @@ export interface PrimaryKeyConstraintFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: PrimaryKeyConstraintFilter[];
   or?: PrimaryKeyConstraintFilter[];
   not?: PrimaryKeyConstraintFilter;
@@ -6480,9 +5956,6 @@ export interface TableGrantFilter {
   isGrant?: BooleanFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: TableGrantFilter[];
   or?: TableGrantFilter[];
   not?: TableGrantFilter;
@@ -6501,11 +5974,6 @@ export interface TriggerFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  eventTrgmSimilarity?: FloatFilter;
-  functionNameTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: TriggerFilter[];
   or?: TriggerFilter[];
   not?: TriggerFilter;
@@ -6525,11 +5993,6 @@ export interface UniqueConstraintFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: UniqueConstraintFilter[];
   or?: UniqueConstraintFilter[];
   not?: UniqueConstraintFilter;
@@ -6551,11 +6014,6 @@ export interface ViewFilter {
   module?: StringFilter;
   scope?: IntFilter;
   tags?: StringListFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  viewTypeTrgmSimilarity?: FloatFilter;
-  filterTypeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ViewFilter[];
   or?: ViewFilter[];
   not?: ViewFilter;
@@ -6577,9 +6035,6 @@ export interface ViewGrantFilter {
   privilege?: StringFilter;
   withGrantOption?: BooleanFilter;
   isGrant?: BooleanFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ViewGrantFilter[];
   or?: ViewGrantFilter[];
   not?: ViewGrantFilter;
@@ -6591,13 +6046,32 @@ export interface ViewRuleFilter {
   name?: StringFilter;
   event?: StringFilter;
   action?: StringFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  eventTrgmSimilarity?: FloatFilter;
-  actionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ViewRuleFilter[];
   or?: ViewRuleFilter[];
   not?: ViewRuleFilter;
+}
+export interface EmbeddingChunkFilter {
+  id?: UUIDFilter;
+  databaseId?: UUIDFilter;
+  tableId?: UUIDFilter;
+  embeddingFieldId?: UUIDFilter;
+  chunksTableId?: UUIDFilter;
+  chunksTableName?: StringFilter;
+  contentFieldName?: StringFilter;
+  dimensions?: IntFilter;
+  metric?: StringFilter;
+  chunkSize?: IntFilter;
+  chunkOverlap?: IntFilter;
+  chunkStrategy?: StringFilter;
+  metadataFields?: JSONFilter;
+  enqueueChunkingJob?: BooleanFilter;
+  chunkingTaskName?: StringFilter;
+  parentFkFieldId?: UUIDFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: EmbeddingChunkFilter[];
+  or?: EmbeddingChunkFilter[];
+  not?: EmbeddingChunkFilter;
 }
 export interface TableTemplateModuleFilter {
   id?: UUIDFilter;
@@ -6609,9 +6083,6 @@ export interface TableTemplateModuleFilter {
   tableName?: StringFilter;
   nodeType?: StringFilter;
   data?: JSONFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: TableTemplateModuleFilter[];
   or?: TableTemplateModuleFilter[];
   not?: TableTemplateModuleFilter;
@@ -6625,9 +6096,9 @@ export interface SecureTableProvisionFilter {
   nodeType?: StringFilter;
   useRls?: BooleanFilter;
   nodeData?: JSONFilter;
-  fields?: JSONFilter;
+  fields?: StringFilter;
   grantRoles?: StringListFilter;
-  grantPrivileges?: JSONFilter;
+  grantPrivileges?: StringFilter;
   policyType?: StringFilter;
   policyPrivileges?: StringListFilter;
   policyRole?: StringFilter;
@@ -6635,12 +6106,6 @@ export interface SecureTableProvisionFilter {
   policyName?: StringFilter;
   policyData?: JSONFilter;
   outFields?: UUIDListFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  policyTypeTrgmSimilarity?: FloatFilter;
-  policyRoleTrgmSimilarity?: FloatFilter;
-  policyNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SecureTableProvisionFilter[];
   or?: SecureTableProvisionFilter[];
   not?: SecureTableProvisionFilter;
@@ -6654,16 +6119,19 @@ export interface RelationProvisionFilter {
   fieldName?: StringFilter;
   deleteAction?: StringFilter;
   isRequired?: BooleanFilter;
+  apiRequired?: BooleanFilter;
   junctionTableId?: UUIDFilter;
   junctionTableName?: StringFilter;
   junctionSchemaId?: UUIDFilter;
   sourceFieldName?: StringFilter;
   targetFieldName?: StringFilter;
   useCompositeKey?: BooleanFilter;
+  createIndex?: BooleanFilter;
+  exposeInApi?: BooleanFilter;
   nodeType?: StringFilter;
   nodeData?: JSONFilter;
   grantRoles?: StringListFilter;
-  grantPrivileges?: JSONFilter;
+  grantPrivileges?: StringFilter;
   policyType?: StringFilter;
   policyPrivileges?: StringListFilter;
   policyRole?: StringFilter;
@@ -6674,17 +6142,6 @@ export interface RelationProvisionFilter {
   outJunctionTableId?: UUIDFilter;
   outSourceFieldId?: UUIDFilter;
   outTargetFieldId?: UUIDFilter;
-  relationTypeTrgmSimilarity?: FloatFilter;
-  fieldNameTrgmSimilarity?: FloatFilter;
-  deleteActionTrgmSimilarity?: FloatFilter;
-  junctionTableNameTrgmSimilarity?: FloatFilter;
-  sourceFieldNameTrgmSimilarity?: FloatFilter;
-  targetFieldNameTrgmSimilarity?: FloatFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  policyTypeTrgmSimilarity?: FloatFilter;
-  policyRoleTrgmSimilarity?: FloatFilter;
-  policyNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: RelationProvisionFilter[];
   or?: RelationProvisionFilter[];
   not?: RelationProvisionFilter;
@@ -6696,8 +6153,6 @@ export interface SchemaGrantFilter {
   granteeName?: StringFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SchemaGrantFilter[];
   or?: SchemaGrantFilter[];
   not?: SchemaGrantFilter;
@@ -6710,13 +6165,26 @@ export interface DefaultPrivilegeFilter {
   privilege?: StringFilter;
   granteeName?: StringFilter;
   isGrant?: BooleanFilter;
-  objectTypeTrgmSimilarity?: FloatFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: DefaultPrivilegeFilter[];
   or?: DefaultPrivilegeFilter[];
   not?: DefaultPrivilegeFilter;
+}
+export interface EnumFilter {
+  id?: UUIDFilter;
+  databaseId?: UUIDFilter;
+  schemaId?: UUIDFilter;
+  name?: StringFilter;
+  label?: StringFilter;
+  description?: StringFilter;
+  values?: StringListFilter;
+  smartTags?: JSONFilter;
+  category?: StringFilter;
+  module?: StringFilter;
+  scope?: IntFilter;
+  tags?: StringListFilter;
+  and?: EnumFilter[];
+  or?: EnumFilter[];
+  not?: EnumFilter;
 }
 export interface ApiSchemaFilter {
   id?: UUIDFilter;
@@ -6733,8 +6201,6 @@ export interface ApiModuleFilter {
   apiId?: UUIDFilter;
   name?: StringFilter;
   data?: JSONFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ApiModuleFilter[];
   or?: ApiModuleFilter[];
   not?: ApiModuleFilter;
@@ -6757,9 +6223,6 @@ export interface SiteMetadatumFilter {
   title?: StringFilter;
   description?: StringFilter;
   ogImage?: StringFilter;
-  titleTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SiteMetadatumFilter[];
   or?: SiteMetadatumFilter[];
   not?: SiteMetadatumFilter;
@@ -6770,8 +6233,6 @@ export interface SiteModuleFilter {
   siteId?: UUIDFilter;
   name?: StringFilter;
   data?: JSONFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SiteModuleFilter[];
   or?: SiteModuleFilter[];
   not?: SiteModuleFilter;
@@ -6792,12 +6253,28 @@ export interface TriggerFunctionFilter {
   code?: StringFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  codeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: TriggerFunctionFilter[];
   or?: TriggerFunctionFilter[];
   not?: TriggerFunctionFilter;
+}
+export interface DatabaseTransferFilter {
+  id?: UUIDFilter;
+  databaseId?: UUIDFilter;
+  targetOwnerId?: UUIDFilter;
+  sourceApproved?: BooleanFilter;
+  targetApproved?: BooleanFilter;
+  sourceApprovedAt?: DatetimeFilter;
+  targetApprovedAt?: DatetimeFilter;
+  status?: StringFilter;
+  initiatedBy?: UUIDFilter;
+  notes?: StringFilter;
+  expiresAt?: DatetimeFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  completedAt?: DatetimeFilter;
+  and?: DatabaseTransferFilter[];
+  or?: DatabaseTransferFilter[];
+  not?: DatabaseTransferFilter;
 }
 export interface ApiFilter {
   id?: UUIDFilter;
@@ -6807,11 +6284,6 @@ export interface ApiFilter {
   roleName?: StringFilter;
   anonRole?: StringFilter;
   isPublic?: BooleanFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  dbnameTrgmSimilarity?: FloatFilter;
-  roleNameTrgmSimilarity?: FloatFilter;
-  anonRoleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ApiFilter[];
   or?: ApiFilter[];
   not?: ApiFilter;
@@ -6826,10 +6298,6 @@ export interface SiteFilter {
   appleTouchIcon?: StringFilter;
   logo?: StringFilter;
   dbname?: StringFilter;
-  titleTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  dbnameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SiteFilter[];
   or?: SiteFilter[];
   not?: SiteFilter;
@@ -6844,10 +6312,6 @@ export interface AppFilter {
   appStoreId?: StringFilter;
   appIdPrefix?: StringFilter;
   playStoreLink?: StringFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  appStoreIdTrgmSimilarity?: FloatFilter;
-  appIdPrefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: AppFilter[];
   or?: AppFilter[];
   not?: AppFilter;
@@ -6860,8 +6324,6 @@ export interface ConnectedAccountsModuleFilter {
   tableId?: UUIDFilter;
   ownerTableId?: UUIDFilter;
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ConnectedAccountsModuleFilter[];
   or?: ConnectedAccountsModuleFilter[];
   not?: ConnectedAccountsModuleFilter;
@@ -6875,9 +6337,6 @@ export interface CryptoAddressesModuleFilter {
   ownerTableId?: UUIDFilter;
   tableName?: StringFilter;
   cryptoNetwork?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  cryptoNetworkTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: CryptoAddressesModuleFilter[];
   or?: CryptoAddressesModuleFilter[];
   not?: CryptoAddressesModuleFilter;
@@ -6897,13 +6356,6 @@ export interface CryptoAuthModuleFilter {
   signInRecordFailure?: StringFilter;
   signUpWithKey?: StringFilter;
   signInWithChallenge?: StringFilter;
-  userFieldTrgmSimilarity?: FloatFilter;
-  cryptoNetworkTrgmSimilarity?: FloatFilter;
-  signInRequestChallengeTrgmSimilarity?: FloatFilter;
-  signInRecordFailureTrgmSimilarity?: FloatFilter;
-  signUpWithKeyTrgmSimilarity?: FloatFilter;
-  signInWithChallengeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: CryptoAuthModuleFilter[];
   or?: CryptoAuthModuleFilter[];
   not?: CryptoAuthModuleFilter;
@@ -6928,8 +6380,6 @@ export interface DenormalizedTableFieldFilter {
   updateDefaults?: BooleanFilter;
   funcName?: StringFilter;
   funcOrder?: IntFilter;
-  funcNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: DenormalizedTableFieldFilter[];
   or?: DenormalizedTableFieldFilter[];
   not?: DenormalizedTableFieldFilter;
@@ -6942,8 +6392,6 @@ export interface EmailsModuleFilter {
   tableId?: UUIDFilter;
   ownerTableId?: UUIDFilter;
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: EmailsModuleFilter[];
   or?: EmailsModuleFilter[];
   not?: EmailsModuleFilter;
@@ -6954,8 +6402,6 @@ export interface EncryptedSecretsModuleFilter {
   schemaId?: UUIDFilter;
   tableId?: UUIDFilter;
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: EncryptedSecretsModuleFilter[];
   or?: EncryptedSecretsModuleFilter[];
   not?: EncryptedSecretsModuleFilter;
@@ -6970,8 +6416,6 @@ export interface FieldModuleFilter {
   data?: JSONFilter;
   triggers?: StringListFilter;
   functions?: StringListFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: FieldModuleFilter[];
   or?: FieldModuleFilter[];
   not?: FieldModuleFilter;
@@ -6991,11 +6435,6 @@ export interface InvitesModuleFilter {
   prefix?: StringFilter;
   membershipType?: IntFilter;
   entityTableId?: UUIDFilter;
-  invitesTableNameTrgmSimilarity?: FloatFilter;
-  claimedInvitesTableNameTrgmSimilarity?: FloatFilter;
-  submitInviteCodeFunctionTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: InvitesModuleFilter[];
   or?: InvitesModuleFilter[];
   not?: InvitesModuleFilter;
@@ -7027,22 +6466,6 @@ export interface LevelsModuleFilter {
   membershipType?: IntFilter;
   entityTableId?: UUIDFilter;
   actorTableId?: UUIDFilter;
-  stepsTableNameTrgmSimilarity?: FloatFilter;
-  achievementsTableNameTrgmSimilarity?: FloatFilter;
-  levelsTableNameTrgmSimilarity?: FloatFilter;
-  levelRequirementsTableNameTrgmSimilarity?: FloatFilter;
-  completedStepTrgmSimilarity?: FloatFilter;
-  incompletedStepTrgmSimilarity?: FloatFilter;
-  tgAchievementTrgmSimilarity?: FloatFilter;
-  tgAchievementToggleTrgmSimilarity?: FloatFilter;
-  tgAchievementToggleBooleanTrgmSimilarity?: FloatFilter;
-  tgAchievementBooleanTrgmSimilarity?: FloatFilter;
-  upsertAchievementTrgmSimilarity?: FloatFilter;
-  tgUpdateAchievementsTrgmSimilarity?: FloatFilter;
-  stepsRequiredTrgmSimilarity?: FloatFilter;
-  levelAchievedTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: LevelsModuleFilter[];
   or?: LevelsModuleFilter[];
   not?: LevelsModuleFilter;
@@ -7066,16 +6489,6 @@ export interface LimitsModuleFilter {
   membershipType?: IntFilter;
   entityTableId?: UUIDFilter;
   actorTableId?: UUIDFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  defaultTableNameTrgmSimilarity?: FloatFilter;
-  limitIncrementFunctionTrgmSimilarity?: FloatFilter;
-  limitDecrementFunctionTrgmSimilarity?: FloatFilter;
-  limitIncrementTriggerTrgmSimilarity?: FloatFilter;
-  limitDecrementTriggerTrgmSimilarity?: FloatFilter;
-  limitUpdateTriggerTrgmSimilarity?: FloatFilter;
-  limitCheckFunctionTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: LimitsModuleFilter[];
   or?: LimitsModuleFilter[];
   not?: LimitsModuleFilter;
@@ -7086,8 +6499,6 @@ export interface MembershipTypesModuleFilter {
   schemaId?: UUIDFilter;
   tableId?: UUIDFilter;
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: MembershipTypesModuleFilter[];
   or?: MembershipTypesModuleFilter[];
   not?: MembershipTypesModuleFilter;
@@ -7124,19 +6535,6 @@ export interface MembershipsModuleFilter {
   entityIdsByMask?: StringFilter;
   entityIdsByPerm?: StringFilter;
   entityIdsFunction?: StringFilter;
-  membershipsTableNameTrgmSimilarity?: FloatFilter;
-  membersTableNameTrgmSimilarity?: FloatFilter;
-  membershipDefaultsTableNameTrgmSimilarity?: FloatFilter;
-  grantsTableNameTrgmSimilarity?: FloatFilter;
-  adminGrantsTableNameTrgmSimilarity?: FloatFilter;
-  ownerGrantsTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  actorMaskCheckTrgmSimilarity?: FloatFilter;
-  actorPermCheckTrgmSimilarity?: FloatFilter;
-  entityIdsByMaskTrgmSimilarity?: FloatFilter;
-  entityIdsByPermTrgmSimilarity?: FloatFilter;
-  entityIdsFunctionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: MembershipsModuleFilter[];
   or?: MembershipsModuleFilter[];
   not?: MembershipsModuleFilter;
@@ -7159,14 +6557,6 @@ export interface PermissionsModuleFilter {
   getMask?: StringFilter;
   getByMask?: StringFilter;
   getMaskByName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  defaultTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  getPaddedMaskTrgmSimilarity?: FloatFilter;
-  getMaskTrgmSimilarity?: FloatFilter;
-  getByMaskTrgmSimilarity?: FloatFilter;
-  getMaskByNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: PermissionsModuleFilter[];
   or?: PermissionsModuleFilter[];
   not?: PermissionsModuleFilter;
@@ -7179,8 +6569,6 @@ export interface PhoneNumbersModuleFilter {
   tableId?: UUIDFilter;
   ownerTableId?: UUIDFilter;
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: PhoneNumbersModuleFilter[];
   or?: PhoneNumbersModuleFilter[];
   not?: PhoneNumbersModuleFilter;
@@ -7204,12 +6592,6 @@ export interface ProfilesModuleFilter {
   permissionsTableId?: UUIDFilter;
   membershipsTableId?: UUIDFilter;
   prefix?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  profilePermissionsTableNameTrgmSimilarity?: FloatFilter;
-  profileGrantsTableNameTrgmSimilarity?: FloatFilter;
-  profileDefinitionGrantsTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: ProfilesModuleFilter[];
   or?: ProfilesModuleFilter[];
   not?: ProfilesModuleFilter;
@@ -7220,8 +6602,6 @@ export interface SecretsModuleFilter {
   schemaId?: UUIDFilter;
   tableId?: UUIDFilter;
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SecretsModuleFilter[];
   or?: SecretsModuleFilter[];
   not?: SecretsModuleFilter;
@@ -7238,10 +6618,6 @@ export interface SessionsModuleFilter {
   sessionsTable?: StringFilter;
   sessionCredentialsTable?: StringFilter;
   authSettingsTable?: StringFilter;
-  sessionsTableTrgmSimilarity?: FloatFilter;
-  sessionCredentialsTableTrgmSimilarity?: FloatFilter;
-  authSettingsTableTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SessionsModuleFilter[];
   or?: SessionsModuleFilter[];
   not?: SessionsModuleFilter;
@@ -7273,23 +6649,6 @@ export interface UserAuthModuleFilter {
   signInOneTimeTokenFunction?: StringFilter;
   oneTimeTokenFunction?: StringFilter;
   extendTokenExpires?: StringFilter;
-  auditsTableNameTrgmSimilarity?: FloatFilter;
-  signInFunctionTrgmSimilarity?: FloatFilter;
-  signUpFunctionTrgmSimilarity?: FloatFilter;
-  signOutFunctionTrgmSimilarity?: FloatFilter;
-  setPasswordFunctionTrgmSimilarity?: FloatFilter;
-  resetPasswordFunctionTrgmSimilarity?: FloatFilter;
-  forgotPasswordFunctionTrgmSimilarity?: FloatFilter;
-  sendVerificationEmailFunctionTrgmSimilarity?: FloatFilter;
-  verifyEmailFunctionTrgmSimilarity?: FloatFilter;
-  verifyPasswordFunctionTrgmSimilarity?: FloatFilter;
-  checkPasswordFunctionTrgmSimilarity?: FloatFilter;
-  sendAccountDeletionEmailFunctionTrgmSimilarity?: FloatFilter;
-  deleteAccountFunctionTrgmSimilarity?: FloatFilter;
-  signInOneTimeTokenFunctionTrgmSimilarity?: FloatFilter;
-  oneTimeTokenFunctionTrgmSimilarity?: FloatFilter;
-  extendTokenExpiresTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: UserAuthModuleFilter[];
   or?: UserAuthModuleFilter[];
   not?: UserAuthModuleFilter;
@@ -7302,25 +6661,56 @@ export interface UsersModuleFilter {
   tableName?: StringFilter;
   typeTableId?: UUIDFilter;
   typeTableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  typeTableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: UsersModuleFilter[];
   or?: UsersModuleFilter[];
   not?: UsersModuleFilter;
 }
-export interface UuidModuleFilter {
+export interface BlueprintFilter {
   id?: UUIDFilter;
+  ownerId?: UUIDFilter;
   databaseId?: UUIDFilter;
-  schemaId?: UUIDFilter;
-  uuidFunction?: StringFilter;
-  uuidSeed?: StringFilter;
-  uuidFunctionTrgmSimilarity?: FloatFilter;
-  uuidSeedTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: UuidModuleFilter[];
-  or?: UuidModuleFilter[];
-  not?: UuidModuleFilter;
+  name?: StringFilter;
+  displayName?: StringFilter;
+  description?: StringFilter;
+  definition?: JSONFilter;
+  templateId?: UUIDFilter;
+  status?: StringFilter;
+  constructedAt?: DatetimeFilter;
+  errorDetails?: StringFilter;
+  refMap?: JSONFilter;
+  constructedDefinition?: JSONFilter;
+  definitionHash?: UUIDFilter;
+  tableHashes?: JSONFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: BlueprintFilter[];
+  or?: BlueprintFilter[];
+  not?: BlueprintFilter;
+}
+export interface BlueprintTemplateFilter {
+  id?: UUIDFilter;
+  name?: StringFilter;
+  version?: StringFilter;
+  displayName?: StringFilter;
+  description?: StringFilter;
+  ownerId?: UUIDFilter;
+  visibility?: StringFilter;
+  categories?: StringListFilter;
+  tags?: StringListFilter;
+  definition?: JSONFilter;
+  definitionSchemaVersion?: StringFilter;
+  source?: StringFilter;
+  complexity?: StringFilter;
+  copyCount?: IntFilter;
+  forkCount?: IntFilter;
+  forkedFromId?: UUIDFilter;
+  definitionHash?: UUIDFilter;
+  tableHashes?: JSONFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: BlueprintTemplateFilter[];
+  or?: BlueprintTemplateFilter[];
+  not?: BlueprintTemplateFilter;
 }
 export interface DatabaseProvisionModuleFilter {
   id?: UUIDFilter;
@@ -7337,12 +6727,6 @@ export interface DatabaseProvisionModuleFilter {
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
   completedAt?: DatetimeFilter;
-  databaseNameTrgmSimilarity?: FloatFilter;
-  subdomainTrgmSimilarity?: FloatFilter;
-  domainTrgmSimilarity?: FloatFilter;
-  statusTrgmSimilarity?: FloatFilter;
-  errorMessageTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: DatabaseProvisionModuleFilter[];
   or?: DatabaseProvisionModuleFilter[];
   not?: DatabaseProvisionModuleFilter;
@@ -7457,8 +6841,6 @@ export interface OrgChartEdgeFilter {
   parentId?: UUIDFilter;
   positionTitle?: StringFilter;
   positionLevel?: IntFilter;
-  positionTitleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgChartEdgeFilter[];
   or?: OrgChartEdgeFilter[];
   not?: OrgChartEdgeFilter;
@@ -7473,11 +6855,17 @@ export interface OrgChartEdgeGrantFilter {
   positionTitle?: StringFilter;
   positionLevel?: IntFilter;
   createdAt?: DatetimeFilter;
-  positionTitleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgChartEdgeGrantFilter[];
   or?: OrgChartEdgeGrantFilter[];
   not?: OrgChartEdgeGrantFilter;
+}
+export interface OrgPermissionDefaultFilter {
+  id?: UUIDFilter;
+  permissions?: BitStringFilter;
+  entityId?: UUIDFilter;
+  and?: OrgPermissionDefaultFilter[];
+  or?: OrgPermissionDefaultFilter[];
+  not?: OrgPermissionDefaultFilter;
 }
 export interface AppLimitFilter {
   id?: UUIDFilter;
@@ -7522,6 +6910,68 @@ export interface AppAchievementFilter {
   or?: AppAchievementFilter[];
   not?: AppAchievementFilter;
 }
+export interface AppLevelFilter {
+  id?: UUIDFilter;
+  name?: StringFilter;
+  description?: StringFilter;
+  image?: StringFilter;
+  ownerId?: UUIDFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: AppLevelFilter[];
+  or?: AppLevelFilter[];
+  not?: AppLevelFilter;
+}
+export interface EmailFilter {
+  id?: UUIDFilter;
+  ownerId?: UUIDFilter;
+  email?: StringFilter;
+  isVerified?: BooleanFilter;
+  isPrimary?: BooleanFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: EmailFilter[];
+  or?: EmailFilter[];
+  not?: EmailFilter;
+}
+export interface PhoneNumberFilter {
+  id?: UUIDFilter;
+  ownerId?: UUIDFilter;
+  cc?: StringFilter;
+  number?: StringFilter;
+  isVerified?: BooleanFilter;
+  isPrimary?: BooleanFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: PhoneNumberFilter[];
+  or?: PhoneNumberFilter[];
+  not?: PhoneNumberFilter;
+}
+export interface CryptoAddressFilter {
+  id?: UUIDFilter;
+  ownerId?: UUIDFilter;
+  address?: StringFilter;
+  isVerified?: BooleanFilter;
+  isPrimary?: BooleanFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: CryptoAddressFilter[];
+  or?: CryptoAddressFilter[];
+  not?: CryptoAddressFilter;
+}
+export interface ConnectedAccountFilter {
+  id?: UUIDFilter;
+  ownerId?: UUIDFilter;
+  service?: StringFilter;
+  identifier?: StringFilter;
+  details?: JSONFilter;
+  isVerified?: BooleanFilter;
+  createdAt?: DatetimeFilter;
+  updatedAt?: DatetimeFilter;
+  and?: ConnectedAccountFilter[];
+  or?: ConnectedAccountFilter[];
+  not?: ConnectedAccountFilter;
+}
 export interface InviteFilter {
   id?: UUIDFilter;
   email?: StringFilter;
@@ -7535,8 +6985,6 @@ export interface InviteFilter {
   expiresAt?: DatetimeFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  inviteTokenTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: InviteFilter[];
   or?: InviteFilter[];
   not?: InviteFilter;
@@ -7567,8 +7015,6 @@ export interface OrgInviteFilter {
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
   entityId?: UUIDFilter;
-  inviteTokenTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: OrgInviteFilter[];
   or?: OrgInviteFilter[];
   not?: OrgInviteFilter;
@@ -7585,14 +7031,25 @@ export interface OrgClaimedInviteFilter {
   or?: OrgClaimedInviteFilter[];
   not?: OrgClaimedInviteFilter;
 }
+export interface AuditLogFilter {
+  id?: UUIDFilter;
+  event?: StringFilter;
+  actorId?: UUIDFilter;
+  origin?: StringFilter;
+  userAgent?: StringFilter;
+  ipAddress?: InternetAddressFilter;
+  success?: BooleanFilter;
+  createdAt?: DatetimeFilter;
+  and?: AuditLogFilter[];
+  or?: AuditLogFilter[];
+  not?: AuditLogFilter;
+}
 export interface RefFilter {
   id?: UUIDFilter;
   name?: StringFilter;
   databaseId?: UUIDFilter;
   storeId?: UUIDFilter;
   commitId?: UUIDFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: RefFilter[];
   or?: RefFilter[];
   not?: RefFilter;
@@ -7603,8 +7060,6 @@ export interface StoreFilter {
   databaseId?: UUIDFilter;
   hash?: UUIDFilter;
   createdAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: StoreFilter[];
   or?: StoreFilter[];
   not?: StoreFilter;
@@ -7616,50 +7071,12 @@ export interface AppPermissionDefaultFilter {
   or?: AppPermissionDefaultFilter[];
   not?: AppPermissionDefaultFilter;
 }
-export interface CryptoAddressFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  address?: StringFilter;
-  isVerified?: BooleanFilter;
-  isPrimary?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  addressTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: CryptoAddressFilter[];
-  or?: CryptoAddressFilter[];
-  not?: CryptoAddressFilter;
-}
 export interface RoleTypeFilter {
   id?: IntFilter;
   name?: StringFilter;
   and?: RoleTypeFilter[];
   or?: RoleTypeFilter[];
   not?: RoleTypeFilter;
-}
-export interface OrgPermissionDefaultFilter {
-  id?: UUIDFilter;
-  permissions?: BitStringFilter;
-  entityId?: UUIDFilter;
-  and?: OrgPermissionDefaultFilter[];
-  or?: OrgPermissionDefaultFilter[];
-  not?: OrgPermissionDefaultFilter;
-}
-export interface PhoneNumberFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  cc?: StringFilter;
-  number?: StringFilter;
-  isVerified?: BooleanFilter;
-  isPrimary?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  ccTrgmSimilarity?: FloatFilter;
-  numberTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: PhoneNumberFilter[];
-  or?: PhoneNumberFilter[];
-  not?: PhoneNumberFilter;
 }
 export interface AppLimitDefaultFilter {
   id?: UUIDFilter;
@@ -7677,22 +7094,6 @@ export interface OrgLimitDefaultFilter {
   or?: OrgLimitDefaultFilter[];
   not?: OrgLimitDefaultFilter;
 }
-export interface ConnectedAccountFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  service?: StringFilter;
-  identifier?: StringFilter;
-  details?: JSONFilter;
-  isVerified?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  serviceTrgmSimilarity?: FloatFilter;
-  identifierTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: ConnectedAccountFilter[];
-  or?: ConnectedAccountFilter[];
-  not?: ConnectedAccountFilter;
-}
 export interface NodeTypeRegistryFilter {
   name?: StringFilter;
   slug?: StringFilter;
@@ -7703,12 +7104,6 @@ export interface NodeTypeRegistryFilter {
   tags?: StringListFilter;
   createdAt?: DatetimeFilter;
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  slugTrgmSimilarity?: FloatFilter;
-  categoryTrgmSimilarity?: FloatFilter;
-  displayNameTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: NodeTypeRegistryFilter[];
   or?: NodeTypeRegistryFilter[];
   not?: NodeTypeRegistryFilter;
@@ -7718,9 +7113,6 @@ export interface MembershipTypeFilter {
   name?: StringFilter;
   description?: StringFilter;
   prefix?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: MembershipTypeFilter[];
   or?: MembershipTypeFilter[];
   not?: MembershipTypeFilter;
@@ -7735,8 +7127,6 @@ export interface CommitFilter {
   committerId?: UUIDFilter;
   treeId?: UUIDFilter;
   date?: DatetimeFilter;
-  messageTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: CommitFilter[];
   or?: CommitFilter[];
   not?: CommitFilter;
@@ -7765,11 +7155,6 @@ export interface RlsModuleFilter {
   authenticateStrict?: StringFilter;
   currentRole?: StringFilter;
   currentRoleId?: StringFilter;
-  authenticateTrgmSimilarity?: FloatFilter;
-  authenticateStrictTrgmSimilarity?: FloatFilter;
-  currentRoleTrgmSimilarity?: FloatFilter;
-  currentRoleIdTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: RlsModuleFilter[];
   or?: RlsModuleFilter[];
   not?: RlsModuleFilter;
@@ -7788,35 +7173,6 @@ export interface OrgMembershipDefaultFilter {
   or?: OrgMembershipDefaultFilter[];
   not?: OrgMembershipDefaultFilter;
 }
-export interface AuditLogFilter {
-  id?: UUIDFilter;
-  event?: StringFilter;
-  actorId?: UUIDFilter;
-  origin?: StringFilter;
-  userAgent?: StringFilter;
-  ipAddress?: InternetAddressFilter;
-  success?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  userAgentTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: AuditLogFilter[];
-  or?: AuditLogFilter[];
-  not?: AuditLogFilter;
-}
-export interface AppLevelFilter {
-  id?: UUIDFilter;
-  name?: StringFilter;
-  description?: StringFilter;
-  image?: StringFilter;
-  ownerId?: UUIDFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: AppLevelFilter[];
-  or?: AppLevelFilter[];
-  not?: AppLevelFilter;
-}
 export interface SqlMigrationFilter {
   id?: IntFilter;
   name?: StringFilter;
@@ -7831,28 +7187,9 @@ export interface SqlMigrationFilter {
   action?: StringFilter;
   actionId?: UUIDFilter;
   actorId?: UUIDFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  deployTrgmSimilarity?: FloatFilter;
-  contentTrgmSimilarity?: FloatFilter;
-  revertTrgmSimilarity?: FloatFilter;
-  verifyTrgmSimilarity?: FloatFilter;
-  actionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: SqlMigrationFilter[];
   or?: SqlMigrationFilter[];
   not?: SqlMigrationFilter;
-}
-export interface EmailFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  email?: StringFilter;
-  isVerified?: BooleanFilter;
-  isPrimary?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  and?: EmailFilter[];
-  or?: EmailFilter[];
-  not?: EmailFilter;
 }
 export interface UserFilter {
   id?: UUIDFilter;
@@ -7884,8 +7221,6 @@ export interface AstMigrationFilter {
   action?: StringFilter;
   actionId?: UUIDFilter;
   actorId?: UUIDFilter;
-  actionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: AstMigrationFilter[];
   or?: AstMigrationFilter[];
   not?: AstMigrationFilter;
@@ -7932,22 +7267,19 @@ export interface HierarchyModuleFilter {
   getManagersFunction?: StringFilter;
   isManagerOfFunction?: StringFilter;
   createdAt?: DatetimeFilter;
-  chartEdgesTableNameTrgmSimilarity?: FloatFilter;
-  hierarchySprtTableNameTrgmSimilarity?: FloatFilter;
-  chartEdgeGrantsTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  privateSchemaNameTrgmSimilarity?: FloatFilter;
-  sprtTableNameTrgmSimilarity?: FloatFilter;
-  rebuildHierarchyFunctionTrgmSimilarity?: FloatFilter;
-  getSubordinatesFunctionTrgmSimilarity?: FloatFilter;
-  getManagersFunctionTrgmSimilarity?: FloatFilter;
-  isManagerOfFunctionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
   and?: HierarchyModuleFilter[];
   or?: HierarchyModuleFilter[];
   not?: HierarchyModuleFilter;
 }
 // ============ OrderBy Types ============
+export type GetAllRecordsOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC';
 export type OrgGetManagersRecordsOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -7964,14 +7296,6 @@ export type OrgGetSubordinatesRecordsOrderBy =
   | 'USER_ID_DESC'
   | 'DEPTH_ASC'
   | 'DEPTH_DESC';
-export type GetAllRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC';
 export type ObjectOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -7991,11 +7315,7 @@ export type AppPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 export type OrgPermissionOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8005,11 +7325,7 @@ export type OrgPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 export type AppLevelRequirementOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8025,11 +7341,7 @@ export type AppLevelRequirementOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type DatabaseOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8043,15 +7355,7 @@ export type DatabaseOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'SCHEMA_HASH_TRGM_SIMILARITY_ASC'
-  | 'SCHEMA_HASH_TRGM_SIMILARITY_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type SchemaOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8067,19 +7371,7 @@ export type SchemaOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SCHEMA_NAME_TRGM_SIMILARITY_ASC'
-  | 'SCHEMA_NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type TableOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8095,21 +7387,7 @@ export type TableOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'PLURAL_NAME_TRGM_SIMILARITY_ASC'
-  | 'PLURAL_NAME_TRGM_SIMILARITY_DESC'
-  | 'SINGULAR_NAME_TRGM_SIMILARITY_ASC'
-  | 'SINGULAR_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type CheckConstraintOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8125,15 +7403,7 @@ export type CheckConstraintOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type FieldOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8149,21 +7419,7 @@ export type FieldOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'DEFAULT_VALUE_TRGM_SIMILARITY_ASC'
-  | 'DEFAULT_VALUE_TRGM_SIMILARITY_DESC'
-  | 'REGEXP_TRGM_SIMILARITY_ASC'
-  | 'REGEXP_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type ForeignKeyConstraintOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8179,21 +7435,7 @@ export type ForeignKeyConstraintOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_ASC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_DESC'
-  | 'UPDATE_ACTION_TRGM_SIMILARITY_ASC'
-  | 'UPDATE_ACTION_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type FullTextSearchOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8223,15 +7465,7 @@ export type IndexOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'ACCESS_METHOD_TRGM_SIMILARITY_ASC'
-  | 'ACCESS_METHOD_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type PolicyOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8247,19 +7481,7 @@ export type PolicyOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type PrimaryKeyConstraintOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8275,15 +7497,7 @@ export type PrimaryKeyConstraintOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type TableGrantOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8297,13 +7511,7 @@ export type TableGrantOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type TriggerOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8319,17 +7527,7 @@ export type TriggerOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'EVENT_TRGM_SIMILARITY_ASC'
-  | 'EVENT_TRGM_SIMILARITY_DESC'
-  | 'FUNCTION_NAME_TRGM_SIMILARITY_ASC'
-  | 'FUNCTION_NAME_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type UniqueConstraintOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8345,17 +7543,7 @@ export type UniqueConstraintOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type ViewOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8369,17 +7557,7 @@ export type ViewOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'VIEW_TYPE_TRGM_SIMILARITY_ASC'
-  | 'VIEW_TYPE_TRGM_SIMILARITY_DESC'
-  | 'FILTER_TYPE_TRGM_SIMILARITY_ASC'
-  | 'FILTER_TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'TABLE_ID_DESC';
 export type ViewTableOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8405,13 +7583,7 @@ export type ViewGrantOrderBy =
   | 'PRIVILEGE_ASC'
   | 'PRIVILEGE_DESC'
   | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'IS_GRANT_DESC';
 export type ViewRuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8423,15 +7595,23 @@ export type ViewRuleOrderBy =
   | 'VIEW_ID_ASC'
   | 'VIEW_ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'EVENT_TRGM_SIMILARITY_ASC'
-  | 'EVENT_TRGM_SIMILARITY_DESC'
-  | 'ACTION_TRGM_SIMILARITY_ASC'
-  | 'ACTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
+export type EmbeddingChunkOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC'
+  | 'CHUNKS_TABLE_ID_ASC'
+  | 'CHUNKS_TABLE_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type TableTemplateModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8449,13 +7629,7 @@ export type TableTemplateModuleOrderBy =
   | 'OWNER_TABLE_ID_ASC'
   | 'OWNER_TABLE_ID_DESC'
   | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NODE_TYPE_DESC';
 export type SecureTableProvisionOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8467,19 +7641,7 @@ export type SecureTableProvisionOrderBy =
   | 'TABLE_ID_ASC'
   | 'TABLE_ID_DESC'
   | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_ASC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NODE_TYPE_DESC';
 export type RelationProvisionOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8493,29 +7655,7 @@ export type RelationProvisionOrderBy =
   | 'SOURCE_TABLE_ID_ASC'
   | 'SOURCE_TABLE_ID_DESC'
   | 'TARGET_TABLE_ID_ASC'
-  | 'TARGET_TABLE_ID_DESC'
-  | 'RELATION_TYPE_TRGM_SIMILARITY_ASC'
-  | 'RELATION_TYPE_TRGM_SIMILARITY_DESC'
-  | 'FIELD_NAME_TRGM_SIMILARITY_ASC'
-  | 'FIELD_NAME_TRGM_SIMILARITY_DESC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_ASC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_DESC'
-  | 'JUNCTION_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'JUNCTION_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SOURCE_FIELD_NAME_TRGM_SIMILARITY_ASC'
-  | 'SOURCE_FIELD_NAME_TRGM_SIMILARITY_DESC'
-  | 'TARGET_FIELD_NAME_TRGM_SIMILARITY_ASC'
-  | 'TARGET_FIELD_NAME_TRGM_SIMILARITY_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_ASC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'TARGET_TABLE_ID_DESC';
 export type SchemaGrantOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8529,11 +7669,7 @@ export type SchemaGrantOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type DefaultPrivilegeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8551,15 +7687,19 @@ export type DefaultPrivilegeOrderBy =
   | 'GRANTEE_NAME_ASC'
   | 'GRANTEE_NAME_DESC'
   | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'OBJECT_TYPE_TRGM_SIMILARITY_ASC'
-  | 'OBJECT_TYPE_TRGM_SIMILARITY_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'IS_GRANT_DESC';
+export type EnumOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
 export type ApiSchemaOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8583,11 +7723,7 @@ export type ApiModuleOrderBy =
   | 'API_ID_ASC'
   | 'API_ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
 export type DomainOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8613,13 +7749,7 @@ export type SiteMetadatumOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'TITLE_TRGM_SIMILARITY_ASC'
-  | 'TITLE_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'SITE_ID_DESC';
 export type SiteModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8629,11 +7759,7 @@ export type SiteModuleOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'SITE_ID_DESC';
 export type SiteThemeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8657,13 +7783,19 @@ export type TriggerFunctionOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'CODE_TRGM_SIMILARITY_ASC'
-  | 'CODE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
+export type DatabaseTransferOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'TARGET_OWNER_ID_ASC'
+  | 'TARGET_OWNER_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
 export type ApiOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8673,17 +7805,7 @@ export type ApiOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DBNAME_TRGM_SIMILARITY_ASC'
-  | 'DBNAME_TRGM_SIMILARITY_DESC'
-  | 'ROLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'ROLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'ANON_ROLE_TRGM_SIMILARITY_ASC'
-  | 'ANON_ROLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
 export type SiteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8691,15 +7813,7 @@ export type SiteOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TITLE_TRGM_SIMILARITY_ASC'
-  | 'TITLE_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'DBNAME_TRGM_SIMILARITY_ASC'
-  | 'DBNAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type AppOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8709,15 +7823,7 @@ export type AppOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'APP_STORE_ID_TRGM_SIMILARITY_ASC'
-  | 'APP_STORE_ID_TRGM_SIMILARITY_DESC'
-  | 'APP_ID_PREFIX_TRGM_SIMILARITY_ASC'
-  | 'APP_ID_PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'SITE_ID_DESC';
 export type ConnectedAccountsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8725,11 +7831,7 @@ export type ConnectedAccountsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type CryptoAddressesModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8737,13 +7839,7 @@ export type CryptoAddressesModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_ASC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type CryptoAuthModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8751,21 +7847,7 @@ export type CryptoAuthModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'USER_FIELD_TRGM_SIMILARITY_ASC'
-  | 'USER_FIELD_TRGM_SIMILARITY_DESC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_ASC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_RECORD_FAILURE_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_RECORD_FAILURE_TRGM_SIMILARITY_DESC'
-  | 'SIGN_UP_WITH_KEY_TRGM_SIMILARITY_ASC'
-  | 'SIGN_UP_WITH_KEY_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_WITH_CHALLENGE_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_WITH_CHALLENGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type DefaultIdsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8781,11 +7863,7 @@ export type DenormalizedTableFieldOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'FUNC_NAME_TRGM_SIMILARITY_ASC'
-  | 'FUNC_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type EmailsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8793,11 +7871,7 @@ export type EmailsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type EncryptedSecretsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8805,11 +7879,7 @@ export type EncryptedSecretsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type FieldModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8819,11 +7889,7 @@ export type FieldModuleOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NODE_TYPE_DESC';
 export type InvitesModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8831,17 +7897,7 @@ export type InvitesModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'INVITES_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'INVITES_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'CLAIMED_INVITES_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'CLAIMED_INVITES_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type LevelsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8849,39 +7905,7 @@ export type LevelsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STEPS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'STEPS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'ACHIEVEMENTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'ACHIEVEMENTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'LEVELS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'LEVELS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'COMPLETED_STEP_TRGM_SIMILARITY_ASC'
-  | 'COMPLETED_STEP_TRGM_SIMILARITY_DESC'
-  | 'INCOMPLETED_STEP_TRGM_SIMILARITY_ASC'
-  | 'INCOMPLETED_STEP_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_TRGM_SIMILARITY_DESC'
-  | 'UPSERT_ACHIEVEMENT_TRGM_SIMILARITY_ASC'
-  | 'UPSERT_ACHIEVEMENT_TRGM_SIMILARITY_DESC'
-  | 'TG_UPDATE_ACHIEVEMENTS_TRGM_SIMILARITY_ASC'
-  | 'TG_UPDATE_ACHIEVEMENTS_TRGM_SIMILARITY_DESC'
-  | 'STEPS_REQUIRED_TRGM_SIMILARITY_ASC'
-  | 'STEPS_REQUIRED_TRGM_SIMILARITY_DESC'
-  | 'LEVEL_ACHIEVED_TRGM_SIMILARITY_ASC'
-  | 'LEVEL_ACHIEVED_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type LimitsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8889,27 +7913,7 @@ export type LimitsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_INCREMENT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_INCREMENT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_DECREMENT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_DECREMENT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_INCREMENT_TRIGGER_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_INCREMENT_TRIGGER_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_DECREMENT_TRIGGER_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_DECREMENT_TRIGGER_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_UPDATE_TRIGGER_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_UPDATE_TRIGGER_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_CHECK_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_CHECK_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type MembershipTypesModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8917,11 +7921,7 @@ export type MembershipTypesModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type MembershipsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8929,33 +7929,7 @@ export type MembershipsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'MEMBERSHIPS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'MEMBERSHIPS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'MEMBERS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'MEMBERS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'ADMIN_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'ADMIN_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'OWNER_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'OWNER_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'ACTOR_MASK_CHECK_TRGM_SIMILARITY_ASC'
-  | 'ACTOR_MASK_CHECK_TRGM_SIMILARITY_DESC'
-  | 'ACTOR_PERM_CHECK_TRGM_SIMILARITY_ASC'
-  | 'ACTOR_PERM_CHECK_TRGM_SIMILARITY_DESC'
-  | 'ENTITY_IDS_BY_MASK_TRGM_SIMILARITY_ASC'
-  | 'ENTITY_IDS_BY_MASK_TRGM_SIMILARITY_DESC'
-  | 'ENTITY_IDS_BY_PERM_TRGM_SIMILARITY_ASC'
-  | 'ENTITY_IDS_BY_PERM_TRGM_SIMILARITY_DESC'
-  | 'ENTITY_IDS_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'ENTITY_IDS_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type PermissionsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8963,23 +7937,7 @@ export type PermissionsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'GET_PADDED_MASK_TRGM_SIMILARITY_ASC'
-  | 'GET_PADDED_MASK_TRGM_SIMILARITY_DESC'
-  | 'GET_MASK_TRGM_SIMILARITY_ASC'
-  | 'GET_MASK_TRGM_SIMILARITY_DESC'
-  | 'GET_BY_MASK_TRGM_SIMILARITY_ASC'
-  | 'GET_BY_MASK_TRGM_SIMILARITY_DESC'
-  | 'GET_MASK_BY_NAME_TRGM_SIMILARITY_ASC'
-  | 'GET_MASK_BY_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type PhoneNumbersModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -8987,11 +7945,7 @@ export type PhoneNumbersModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type ProfilesModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9001,19 +7955,7 @@ export type ProfilesModuleOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'MEMBERSHIP_TYPE_ASC'
-  | 'MEMBERSHIP_TYPE_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PROFILE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'PROFILE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'MEMBERSHIP_TYPE_DESC';
 export type SecretsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9021,11 +7963,7 @@ export type SecretsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type SessionsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9033,15 +7971,7 @@ export type SessionsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SESSIONS_TABLE_TRGM_SIMILARITY_ASC'
-  | 'SESSIONS_TABLE_TRGM_SIMILARITY_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_TRGM_SIMILARITY_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_TRGM_SIMILARITY_DESC'
-  | 'AUTH_SETTINGS_TABLE_TRGM_SIMILARITY_ASC'
-  | 'AUTH_SETTINGS_TABLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type UserAuthModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9049,41 +7979,7 @@ export type UserAuthModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'AUDITS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'AUDITS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SIGN_UP_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_UP_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SIGN_OUT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_OUT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SET_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SET_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'RESET_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'RESET_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'FORGOT_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'FORGOT_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'VERIFY_EMAIL_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'VERIFY_EMAIL_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'VERIFY_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'VERIFY_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'CHECK_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'CHECK_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'DELETE_ACCOUNT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'DELETE_ACCOUNT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'EXTEND_TOKEN_EXPIRES_TRGM_SIMILARITY_ASC'
-  | 'EXTEND_TOKEN_EXPIRES_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type UsersModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9091,27 +7987,43 @@ export type UsersModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type UuidModuleOrderBy =
+  | 'DATABASE_ID_DESC';
+export type BlueprintOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'UUID_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'UUID_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'UUID_SEED_TRGM_SIMILARITY_ASC'
-  | 'UUID_SEED_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'TEMPLATE_ID_ASC'
+  | 'TEMPLATE_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'DEFINITION_HASH_ASC'
+  | 'DEFINITION_HASH_DESC';
+export type BlueprintTemplateOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'VERSION_ASC'
+  | 'VERSION_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC'
+  | 'FORKED_FROM_ID_ASC'
+  | 'FORKED_FROM_ID_DESC'
+  | 'DEFINITION_HASH_ASC'
+  | 'DEFINITION_HASH_DESC';
 export type DatabaseProvisionModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9123,25 +8035,15 @@ export type DatabaseProvisionModuleOrderBy =
   | 'STATUS_ASC'
   | 'STATUS_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'DATABASE_NAME_TRGM_SIMILARITY_ASC'
-  | 'DATABASE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SUBDOMAIN_TRGM_SIMILARITY_ASC'
-  | 'SUBDOMAIN_TRGM_SIMILARITY_DESC'
-  | 'DOMAIN_TRGM_SIMILARITY_ASC'
-  | 'DOMAIN_TRGM_SIMILARITY_DESC'
-  | 'STATUS_TRGM_SIMILARITY_ASC'
-  | 'STATUS_TRGM_SIMILARITY_DESC'
-  | 'ERROR_MESSAGE_TRGM_SIMILARITY_ASC'
-  | 'ERROR_MESSAGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type AppAdminGrantOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -9154,6 +8056,8 @@ export type AppOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -9166,6 +8070,8 @@ export type AppGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -9214,6 +8120,8 @@ export type OrgAdminGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -9228,6 +8136,8 @@ export type OrgOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -9242,6 +8152,8 @@ export type OrgGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -9265,11 +8177,7 @@ export type OrgChartEdgeOrderBy =
   | 'CHILD_ID_ASC'
   | 'CHILD_ID_DESC'
   | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'PARENT_ID_DESC';
 export type OrgChartEdgeGrantOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9283,11 +8191,15 @@ export type OrgChartEdgeGrantOrderBy =
   | 'PARENT_ID_ASC'
   | 'PARENT_ID_DESC'
   | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'GRANTOR_ID_DESC';
+export type OrgPermissionDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 export type AppLimitOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9338,6 +8250,78 @@ export type AppAchievementOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+export type AppLevelOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type EmailOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type PhoneNumberOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'NUMBER_ASC'
+  | 'NUMBER_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type CryptoAddressOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'ADDRESS_ASC'
+  | 'ADDRESS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type ConnectedAccountOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'SERVICE_ASC'
+  | 'SERVICE_DESC'
+  | 'IDENTIFIER_ASC'
+  | 'IDENTIFIER_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type InviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9357,11 +8341,7 @@ export type InviteOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type ClaimedInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9386,6 +8366,8 @@ export type OrgInviteOrderBy =
   | 'EMAIL_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
   | 'INVITE_TOKEN_ASC'
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
@@ -9397,11 +8379,7 @@ export type OrgInviteOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'ENTITY_ID_DESC';
 export type OrgClaimedInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9415,7 +8393,19 @@ export type OrgClaimedInviteOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
+export type AuditLogOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'EVENT_ASC'
+  | 'EVENT_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC';
 export type RefOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9425,11 +8415,7 @@ export type RefOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'STORE_ID_DESC';
 export type StoreOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9437,33 +8423,13 @@ export type StoreOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type AppPermissionDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC';
-export type CryptoAddressOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'ADDRESS_ASC'
-  | 'ADDRESS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ADDRESS_TRGM_SIMILARITY_ASC'
-  | 'ADDRESS_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
 export type RoleTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9472,30 +8438,6 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
-export type OrgPermissionDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC';
-export type PhoneNumberOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NUMBER_ASC'
-  | 'NUMBER_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CC_TRGM_SIMILARITY_ASC'
-  | 'CC_TRGM_SIMILARITY_DESC'
-  | 'NUMBER_TRGM_SIMILARITY_ASC'
-  | 'NUMBER_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
 export type AppLimitDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9512,26 +8454,6 @@ export type OrgLimitDefaultOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
-export type ConnectedAccountOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'SERVICE_ASC'
-  | 'SERVICE_DESC'
-  | 'IDENTIFIER_ASC'
-  | 'IDENTIFIER_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'SERVICE_TRGM_SIMILARITY_ASC'
-  | 'SERVICE_TRGM_SIMILARITY_DESC'
-  | 'IDENTIFIER_TRGM_SIMILARITY_ASC'
-  | 'IDENTIFIER_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
 export type NodeTypeRegistryOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9541,19 +8463,7 @@ export type NodeTypeRegistryOrderBy =
   | 'SLUG_ASC'
   | 'SLUG_DESC'
   | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SLUG_TRGM_SIMILARITY_ASC'
-  | 'SLUG_TRGM_SIMILARITY_DESC'
-  | 'CATEGORY_TRGM_SIMILARITY_ASC'
-  | 'CATEGORY_TRGM_SIMILARITY_DESC'
-  | 'DISPLAY_NAME_TRGM_SIMILARITY_ASC'
-  | 'DISPLAY_NAME_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'CATEGORY_DESC';
 export type MembershipTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9561,13 +8471,7 @@ export type MembershipTypeOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
 export type CommitOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9575,11 +8479,7 @@ export type CommitOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'MESSAGE_TRGM_SIMILARITY_ASC'
-  | 'MESSAGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type AppMembershipDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9601,17 +8501,7 @@ export type RlsModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'AUTHENTICATE_TRGM_SIMILARITY_ASC'
-  | 'AUTHENTICATE_TRGM_SIMILARITY_DESC'
-  | 'AUTHENTICATE_STRICT_TRGM_SIMILARITY_ASC'
-  | 'AUTHENTICATE_STRICT_TRGM_SIMILARITY_DESC'
-  | 'CURRENT_ROLE_TRGM_SIMILARITY_ASC'
-  | 'CURRENT_ROLE_TRGM_SIMILARITY_DESC'
-  | 'CURRENT_ROLE_ID_TRGM_SIMILARITY_ASC'
-  | 'CURRENT_ROLE_ID_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9628,34 +8518,6 @@ export type OrgMembershipDefaultOrderBy =
   | 'UPDATED_BY_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
-export type AuditLogOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'EVENT_ASC'
-  | 'EVENT_DESC'
-  | 'USER_AGENT_TRGM_SIMILARITY_ASC'
-  | 'USER_AGENT_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type AppLevelOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
 export type SqlMigrationOrderBy =
   | 'NATURAL'
   | 'ID_ASC'
@@ -9679,33 +8541,7 @@ export type SqlMigrationOrderBy =
   | 'ACTION_ID_ASC'
   | 'ACTION_ID_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DEPLOY_TRGM_SIMILARITY_ASC'
-  | 'DEPLOY_TRGM_SIMILARITY_DESC'
-  | 'CONTENT_TRGM_SIMILARITY_ASC'
-  | 'CONTENT_TRGM_SIMILARITY_DESC'
-  | 'REVERT_TRGM_SIMILARITY_ASC'
-  | 'REVERT_TRGM_SIMILARITY_DESC'
-  | 'VERIFY_TRGM_SIMILARITY_ASC'
-  | 'VERIFY_TRGM_SIMILARITY_DESC'
-  | 'ACTION_TRGM_SIMILARITY_ASC'
-  | 'ACTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type EmailOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'ACTOR_ID_DESC';
 export type UserOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9741,11 +8577,7 @@ export type AstMigrationOrderBy =
   | 'ACTION_ID_ASC'
   | 'ACTION_ID_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ACTION_TRGM_SIMILARITY_ASC'
-  | 'ACTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'ACTOR_ID_DESC';
 export type AppMembershipOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -9775,30 +8607,28 @@ export type HierarchyModuleOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'CHART_EDGES_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'CHART_EDGES_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'PRIVATE_SCHEMA_NAME_TRGM_SIMILARITY_ASC'
-  | 'PRIVATE_SCHEMA_NAME_TRGM_SIMILARITY_DESC'
-  | 'SPRT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'SPRT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'REBUILD_HIERARCHY_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'REBUILD_HIERARCHY_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'GET_SUBORDINATES_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'GET_SUBORDINATES_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'GET_MANAGERS_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'GET_MANAGERS_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'IS_MANAGER_OF_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'IS_MANAGER_OF_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 // ============ CRUD Input Types ============
+export interface CreateGetAllRecordInput {
+  clientMutationId?: string;
+  getAllRecord: {
+    path?: string[];
+    data?: Record<string, unknown>;
+  };
+}
+export interface GetAllRecordPatch {
+  path?: string[] | null;
+  data?: Record<string, unknown> | null;
+}
+export interface UpdateGetAllRecordInput {
+  clientMutationId?: string;
+  id: string;
+  getAllRecordPatch: GetAllRecordPatch;
+}
+export interface DeleteGetAllRecordInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateOrgGetManagersRecordInput {
   clientMutationId?: string;
   orgGetManagersRecord: {
@@ -9836,26 +8666,6 @@ export interface UpdateOrgGetSubordinatesRecordInput {
   orgGetSubordinatesRecordPatch: OrgGetSubordinatesRecordPatch;
 }
 export interface DeleteOrgGetSubordinatesRecordInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateGetAllRecordInput {
-  clientMutationId?: string;
-  getAllRecord: {
-    path?: string[];
-    data?: Record<string, unknown>;
-  };
-}
-export interface GetAllRecordPatch {
-  path?: string[] | null;
-  data?: Record<string, unknown> | null;
-}
-export interface UpdateGetAllRecordInput {
-  clientMutationId?: string;
-  id: string;
-  getAllRecordPatch: GetAllRecordPatch;
-}
-export interface DeleteGetAllRecordInput {
   clientMutationId?: string;
   id: string;
 }
@@ -10119,6 +8929,7 @@ export interface CreateFieldInput {
     description?: string;
     smartTags?: Record<string, unknown>;
     isRequired?: boolean;
+    apiRequired?: boolean;
     defaultValue?: string;
     defaultValueAst?: Record<string, unknown>;
     isHidden?: boolean;
@@ -10143,6 +8954,7 @@ export interface FieldPatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   isRequired?: boolean | null;
+  apiRequired?: boolean | null;
   defaultValue?: string | null;
   defaultValueAst?: Record<string, unknown> | null;
   isHidden?: boolean | null;
@@ -10593,6 +9405,52 @@ export interface DeleteViewRuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateEmbeddingChunkInput {
+  clientMutationId?: string;
+  embeddingChunk: {
+    databaseId?: string;
+    tableId: string;
+    embeddingFieldId?: string;
+    chunksTableId?: string;
+    chunksTableName?: string;
+    contentFieldName?: string;
+    dimensions?: number;
+    metric?: string;
+    chunkSize?: number;
+    chunkOverlap?: number;
+    chunkStrategy?: string;
+    metadataFields?: Record<string, unknown>;
+    enqueueChunkingJob?: boolean;
+    chunkingTaskName?: string;
+    parentFkFieldId?: string;
+  };
+}
+export interface EmbeddingChunkPatch {
+  databaseId?: string | null;
+  tableId?: string | null;
+  embeddingFieldId?: string | null;
+  chunksTableId?: string | null;
+  chunksTableName?: string | null;
+  contentFieldName?: string | null;
+  dimensions?: number | null;
+  metric?: string | null;
+  chunkSize?: number | null;
+  chunkOverlap?: number | null;
+  chunkStrategy?: string | null;
+  metadataFields?: Record<string, unknown> | null;
+  enqueueChunkingJob?: boolean | null;
+  chunkingTaskName?: string | null;
+  parentFkFieldId?: string | null;
+}
+export interface UpdateEmbeddingChunkInput {
+  clientMutationId?: string;
+  id: string;
+  embeddingChunkPatch: EmbeddingChunkPatch;
+}
+export interface DeleteEmbeddingChunkInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateTableTemplateModuleInput {
   clientMutationId?: string;
   tableTemplateModule: {
@@ -10635,9 +9493,9 @@ export interface CreateSecureTableProvisionInput {
     nodeType?: string;
     useRls?: boolean;
     nodeData?: Record<string, unknown>;
-    fields?: Record<string, unknown>;
+    fields?: Record<string, unknown>[];
     grantRoles?: string[];
-    grantPrivileges?: Record<string, unknown>;
+    grantPrivileges?: Record<string, unknown>[];
     policyType?: string;
     policyPrivileges?: string[];
     policyRole?: string;
@@ -10655,9 +9513,9 @@ export interface SecureTableProvisionPatch {
   nodeType?: string | null;
   useRls?: boolean | null;
   nodeData?: Record<string, unknown> | null;
-  fields?: Record<string, unknown> | null;
+  fields?: Record<string, unknown>[] | null;
   grantRoles?: string[] | null;
-  grantPrivileges?: Record<string, unknown> | null;
+  grantPrivileges?: Record<string, unknown>[] | null;
   policyType?: string | null;
   policyPrivileges?: string[] | null;
   policyRole?: string | null;
@@ -10685,16 +9543,19 @@ export interface CreateRelationProvisionInput {
     fieldName?: string;
     deleteAction?: string;
     isRequired?: boolean;
+    apiRequired?: boolean;
     junctionTableId?: string;
     junctionTableName?: string;
     junctionSchemaId?: string;
     sourceFieldName?: string;
     targetFieldName?: string;
     useCompositeKey?: boolean;
+    createIndex?: boolean;
+    exposeInApi?: boolean;
     nodeType?: string;
     nodeData?: Record<string, unknown>;
     grantRoles?: string[];
-    grantPrivileges?: Record<string, unknown>;
+    grantPrivileges?: Record<string, unknown>[];
     policyType?: string;
     policyPrivileges?: string[];
     policyRole?: string;
@@ -10715,16 +9576,19 @@ export interface RelationProvisionPatch {
   fieldName?: string | null;
   deleteAction?: string | null;
   isRequired?: boolean | null;
+  apiRequired?: boolean | null;
   junctionTableId?: string | null;
   junctionTableName?: string | null;
   junctionSchemaId?: string | null;
   sourceFieldName?: string | null;
   targetFieldName?: string | null;
   useCompositeKey?: boolean | null;
+  createIndex?: boolean | null;
+  exposeInApi?: boolean | null;
   nodeType?: string | null;
   nodeData?: Record<string, unknown> | null;
   grantRoles?: string[] | null;
-  grantPrivileges?: Record<string, unknown> | null;
+  grantPrivileges?: Record<string, unknown>[] | null;
   policyType?: string | null;
   policyPrivileges?: string[] | null;
   policyRole?: string | null;
@@ -10792,6 +9656,44 @@ export interface UpdateDefaultPrivilegeInput {
   defaultPrivilegePatch: DefaultPrivilegePatch;
 }
 export interface DeleteDefaultPrivilegeInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEnumInput {
+  clientMutationId?: string;
+  enum: {
+    databaseId: string;
+    schemaId: string;
+    name: string;
+    label?: string;
+    description?: string;
+    values?: string[];
+    smartTags?: Record<string, unknown>;
+    category?: ObjectCategory;
+    module?: string;
+    scope?: number;
+    tags?: string[];
+  };
+}
+export interface EnumPatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  name?: string | null;
+  label?: string | null;
+  description?: string | null;
+  values?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
+  module?: string | null;
+  scope?: number | null;
+  tags?: string[] | null;
+}
+export interface UpdateEnumInput {
+  clientMutationId?: string;
+  id: string;
+  enumPatch: EnumPatch;
+}
+export interface DeleteEnumInput {
   clientMutationId?: string;
   id: string;
 }
@@ -10959,6 +9861,44 @@ export interface UpdateTriggerFunctionInput {
   triggerFunctionPatch: TriggerFunctionPatch;
 }
 export interface DeleteTriggerFunctionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDatabaseTransferInput {
+  clientMutationId?: string;
+  databaseTransfer: {
+    databaseId: string;
+    targetOwnerId: string;
+    sourceApproved?: boolean;
+    targetApproved?: boolean;
+    sourceApprovedAt?: string;
+    targetApprovedAt?: string;
+    status?: string;
+    initiatedBy: string;
+    notes?: string;
+    expiresAt?: string;
+    completedAt?: string;
+  };
+}
+export interface DatabaseTransferPatch {
+  databaseId?: string | null;
+  targetOwnerId?: string | null;
+  sourceApproved?: boolean | null;
+  targetApproved?: boolean | null;
+  sourceApprovedAt?: string | null;
+  targetApprovedAt?: string | null;
+  status?: string | null;
+  initiatedBy?: string | null;
+  notes?: string | null;
+  expiresAt?: string | null;
+  completedAt?: string | null;
+}
+export interface UpdateDatabaseTransferInput {
+  clientMutationId?: string;
+  id: string;
+  databaseTransferPatch: DatabaseTransferPatch;
+}
+export interface DeleteDatabaseTransferInput {
   clientMutationId?: string;
   id: string;
 }
@@ -11837,27 +10777,97 @@ export interface DeleteUsersModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateUuidModuleInput {
+export interface CreateBlueprintInput {
   clientMutationId?: string;
-  uuidModule: {
+  blueprint: {
+    ownerId: string;
     databaseId: string;
-    schemaId?: string;
-    uuidFunction?: string;
-    uuidSeed: string;
+    name: string;
+    displayName: string;
+    description?: string;
+    definition: Record<string, unknown>;
+    templateId?: string;
+    status?: string;
+    constructedAt?: string;
+    errorDetails?: string;
+    refMap?: Record<string, unknown>;
+    constructedDefinition?: Record<string, unknown>;
+    definitionHash?: string;
+    tableHashes?: Record<string, unknown>;
   };
 }
-export interface UuidModulePatch {
+export interface BlueprintPatch {
+  ownerId?: string | null;
   databaseId?: string | null;
-  schemaId?: string | null;
-  uuidFunction?: string | null;
-  uuidSeed?: string | null;
+  name?: string | null;
+  displayName?: string | null;
+  description?: string | null;
+  definition?: Record<string, unknown> | null;
+  templateId?: string | null;
+  status?: string | null;
+  constructedAt?: string | null;
+  errorDetails?: string | null;
+  refMap?: Record<string, unknown> | null;
+  constructedDefinition?: Record<string, unknown> | null;
+  definitionHash?: string | null;
+  tableHashes?: Record<string, unknown> | null;
 }
-export interface UpdateUuidModuleInput {
+export interface UpdateBlueprintInput {
   clientMutationId?: string;
   id: string;
-  uuidModulePatch: UuidModulePatch;
+  blueprintPatch: BlueprintPatch;
 }
-export interface DeleteUuidModuleInput {
+export interface DeleteBlueprintInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateBlueprintTemplateInput {
+  clientMutationId?: string;
+  blueprintTemplate: {
+    name: string;
+    version?: string;
+    displayName: string;
+    description?: string;
+    ownerId: string;
+    visibility?: string;
+    categories?: string[];
+    tags?: string[];
+    definition: Record<string, unknown>;
+    definitionSchemaVersion?: string;
+    source?: string;
+    complexity?: string;
+    copyCount?: number;
+    forkCount?: number;
+    forkedFromId?: string;
+    definitionHash?: string;
+    tableHashes?: Record<string, unknown>;
+  };
+}
+export interface BlueprintTemplatePatch {
+  name?: string | null;
+  version?: string | null;
+  displayName?: string | null;
+  description?: string | null;
+  ownerId?: string | null;
+  visibility?: string | null;
+  categories?: string[] | null;
+  tags?: string[] | null;
+  definition?: Record<string, unknown> | null;
+  definitionSchemaVersion?: string | null;
+  source?: string | null;
+  complexity?: string | null;
+  copyCount?: number | null;
+  forkCount?: number | null;
+  forkedFromId?: string | null;
+  definitionHash?: string | null;
+  tableHashes?: Record<string, unknown> | null;
+}
+export interface UpdateBlueprintTemplateInput {
+  clientMutationId?: string;
+  id: string;
+  blueprintTemplatePatch: BlueprintTemplatePatch;
+}
+export interface DeleteBlueprintTemplateInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12137,7 +11147,7 @@ export interface CreateOrgChartEdgeGrantInput {
     entityId: string;
     childId: string;
     parentId?: string;
-    grantorId: string;
+    grantorId?: string;
     isGrant?: boolean;
     positionTitle?: string;
     positionLevel?: number;
@@ -12158,6 +11168,26 @@ export interface UpdateOrgChartEdgeGrantInput {
   orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch;
 }
 export interface DeleteOrgChartEdgeGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateOrgPermissionDefaultInput {
+  clientMutationId?: string;
+  orgPermissionDefault: {
+    permissions?: string;
+    entityId: string;
+  };
+}
+export interface OrgPermissionDefaultPatch {
+  permissions?: string | null;
+  entityId?: string | null;
+}
+export interface UpdateOrgPermissionDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  orgPermissionDefaultPatch: OrgPermissionDefaultPatch;
+}
+export interface DeleteOrgPermissionDefaultInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12252,6 +11282,131 @@ export interface UpdateAppAchievementInput {
   appAchievementPatch: AppAchievementPatch;
 }
 export interface DeleteAppAchievementInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateAppLevelInput {
+  clientMutationId?: string;
+  appLevel: {
+    name: string;
+    description?: string;
+    image?: ConstructiveInternalTypeImage;
+    ownerId?: string;
+  };
+}
+export interface AppLevelPatch {
+  name?: string | null;
+  description?: string | null;
+  image?: ConstructiveInternalTypeImage | null;
+  ownerId?: string | null;
+  imageUpload?: File | null;
+}
+export interface UpdateAppLevelInput {
+  clientMutationId?: string;
+  id: string;
+  appLevelPatch: AppLevelPatch;
+}
+export interface DeleteAppLevelInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmailInput {
+  clientMutationId?: string;
+  email: {
+    ownerId?: string;
+    email: ConstructiveInternalTypeEmail;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface EmailPatch {
+  ownerId?: string | null;
+  email?: ConstructiveInternalTypeEmail | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+}
+export interface UpdateEmailInput {
+  clientMutationId?: string;
+  id: string;
+  emailPatch: EmailPatch;
+}
+export interface DeleteEmailInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePhoneNumberInput {
+  clientMutationId?: string;
+  phoneNumber: {
+    ownerId?: string;
+    cc: string;
+    number: string;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface PhoneNumberPatch {
+  ownerId?: string | null;
+  cc?: string | null;
+  number?: string | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+}
+export interface UpdatePhoneNumberInput {
+  clientMutationId?: string;
+  id: string;
+  phoneNumberPatch: PhoneNumberPatch;
+}
+export interface DeletePhoneNumberInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateCryptoAddressInput {
+  clientMutationId?: string;
+  cryptoAddress: {
+    ownerId?: string;
+    address: string;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface CryptoAddressPatch {
+  ownerId?: string | null;
+  address?: string | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+}
+export interface UpdateCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+  cryptoAddressPatch: CryptoAddressPatch;
+}
+export interface DeleteCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateConnectedAccountInput {
+  clientMutationId?: string;
+  connectedAccount: {
+    ownerId?: string;
+    service: string;
+    identifier: string;
+    details: Record<string, unknown>;
+    isVerified?: boolean;
+  };
+}
+export interface ConnectedAccountPatch {
+  ownerId?: string | null;
+  service?: string | null;
+  identifier?: string | null;
+  details?: Record<string, unknown> | null;
+  isVerified?: boolean | null;
+}
+export interface UpdateConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
+  connectedAccountPatch: ConnectedAccountPatch;
+}
+export interface DeleteConnectedAccountInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12373,6 +11528,34 @@ export interface DeleteOrgClaimedInviteInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateAuditLogInput {
+  clientMutationId?: string;
+  auditLog: {
+    event: string;
+    actorId?: string;
+    origin?: ConstructiveInternalTypeOrigin;
+    userAgent?: string;
+    ipAddress?: string;
+    success: boolean;
+  };
+}
+export interface AuditLogPatch {
+  event?: string | null;
+  actorId?: string | null;
+  origin?: ConstructiveInternalTypeOrigin | null;
+  userAgent?: string | null;
+  ipAddress?: string | null;
+  success?: boolean | null;
+}
+export interface UpdateAuditLogInput {
+  clientMutationId?: string;
+  id: string;
+  auditLogPatch: AuditLogPatch;
+}
+export interface DeleteAuditLogInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateRefInput {
   clientMutationId?: string;
   ref: {
@@ -12437,30 +11620,6 @@ export interface DeleteAppPermissionDefaultInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateCryptoAddressInput {
-  clientMutationId?: string;
-  cryptoAddress: {
-    ownerId?: string;
-    address: string;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface CryptoAddressPatch {
-  ownerId?: string | null;
-  address?: string | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-}
-export interface UpdateCryptoAddressInput {
-  clientMutationId?: string;
-  id: string;
-  cryptoAddressPatch: CryptoAddressPatch;
-}
-export interface DeleteCryptoAddressInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateRoleTypeInput {
   clientMutationId?: string;
   roleType: {
@@ -12478,52 +11637,6 @@ export interface UpdateRoleTypeInput {
 export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
-}
-export interface CreateOrgPermissionDefaultInput {
-  clientMutationId?: string;
-  orgPermissionDefault: {
-    permissions?: string;
-    entityId: string;
-  };
-}
-export interface OrgPermissionDefaultPatch {
-  permissions?: string | null;
-  entityId?: string | null;
-}
-export interface UpdateOrgPermissionDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  orgPermissionDefaultPatch: OrgPermissionDefaultPatch;
-}
-export interface DeleteOrgPermissionDefaultInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreatePhoneNumberInput {
-  clientMutationId?: string;
-  phoneNumber: {
-    ownerId?: string;
-    cc: string;
-    number: string;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface PhoneNumberPatch {
-  ownerId?: string | null;
-  cc?: string | null;
-  number?: string | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-}
-export interface UpdatePhoneNumberInput {
-  clientMutationId?: string;
-  id: string;
-  phoneNumberPatch: PhoneNumberPatch;
-}
-export interface DeletePhoneNumberInput {
-  clientMutationId?: string;
-  id: string;
 }
 export interface CreateAppLimitDefaultInput {
   clientMutationId?: string;
@@ -12562,32 +11675,6 @@ export interface UpdateOrgLimitDefaultInput {
   orgLimitDefaultPatch: OrgLimitDefaultPatch;
 }
 export interface DeleteOrgLimitDefaultInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateConnectedAccountInput {
-  clientMutationId?: string;
-  connectedAccount: {
-    ownerId?: string;
-    service: string;
-    identifier: string;
-    details: Record<string, unknown>;
-    isVerified?: boolean;
-  };
-}
-export interface ConnectedAccountPatch {
-  ownerId?: string | null;
-  service?: string | null;
-  identifier?: string | null;
-  details?: Record<string, unknown> | null;
-  isVerified?: boolean | null;
-}
-export interface UpdateConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-  connectedAccountPatch: ConnectedAccountPatch;
-}
-export interface DeleteConnectedAccountInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12763,59 +11850,6 @@ export interface DeleteOrgMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAuditLogInput {
-  clientMutationId?: string;
-  auditLog: {
-    event: string;
-    actorId?: string;
-    origin?: ConstructiveInternalTypeOrigin;
-    userAgent?: string;
-    ipAddress?: string;
-    success: boolean;
-  };
-}
-export interface AuditLogPatch {
-  event?: string | null;
-  actorId?: string | null;
-  origin?: ConstructiveInternalTypeOrigin | null;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-  success?: boolean | null;
-}
-export interface UpdateAuditLogInput {
-  clientMutationId?: string;
-  id: string;
-  auditLogPatch: AuditLogPatch;
-}
-export interface DeleteAuditLogInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateAppLevelInput {
-  clientMutationId?: string;
-  appLevel: {
-    name: string;
-    description?: string;
-    image?: ConstructiveInternalTypeImage;
-    ownerId?: string;
-  };
-}
-export interface AppLevelPatch {
-  name?: string | null;
-  description?: string | null;
-  image?: ConstructiveInternalTypeImage | null;
-  ownerId?: string | null;
-  imageUpload?: File | null;
-}
-export interface UpdateAppLevelInput {
-  clientMutationId?: string;
-  id: string;
-  appLevelPatch: AppLevelPatch;
-}
-export interface DeleteAppLevelInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateSqlMigrationInput {
   clientMutationId?: string;
   sqlMigration: {
@@ -12844,13 +11878,6 @@ export interface SqlMigrationPatch {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  nameTrgmSimilarity?: number | null;
-  deployTrgmSimilarity?: number | null;
-  contentTrgmSimilarity?: number | null;
-  revertTrgmSimilarity?: number | null;
-  verifyTrgmSimilarity?: number | null;
-  actionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSqlMigrationInput {
   clientMutationId?: string;
@@ -12860,30 +11887,6 @@ export interface UpdateSqlMigrationInput {
 export interface DeleteSqlMigrationInput {
   clientMutationId?: string;
   id: number;
-}
-export interface CreateEmailInput {
-  clientMutationId?: string;
-  email: {
-    ownerId?: string;
-    email: ConstructiveInternalTypeEmail;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface EmailPatch {
-  ownerId?: string | null;
-  email?: ConstructiveInternalTypeEmail | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-}
-export interface UpdateEmailInput {
-  clientMutationId?: string;
-  id: string;
-  emailPatch: EmailPatch;
-}
-export interface DeleteEmailInput {
-  clientMutationId?: string;
-  id: string;
 }
 export interface CreateUserInput {
   clientMutationId?: string;
@@ -12938,8 +11941,6 @@ export interface AstMigrationPatch {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  actionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateAstMigrationInput {
   clientMutationId?: string;
@@ -13065,6 +12066,9 @@ export const connectionFieldsMap = {
     viewGrants: 'ViewGrant',
     viewRules: 'ViewRule',
     defaultPrivileges: 'DefaultPrivilege',
+    enums: 'Enum',
+    embeddingChunks: 'EmbeddingChunk',
+    databaseTransfers: 'DatabaseTransfer',
     apis: 'Api',
     apiModules: 'ApiModule',
     apiSchemas: 'ApiSchema',
@@ -13094,10 +12098,10 @@ export const connectionFieldsMap = {
     sessionsModules: 'SessionsModule',
     userAuthModules: 'UserAuthModule',
     usersModules: 'UsersModule',
-    uuidModules: 'UuidModule',
     tableTemplateModules: 'TableTemplateModule',
     secureTableProvisions: 'SecureTableProvision',
     relationProvisions: 'RelationProvision',
+    blueprints: 'Blueprint',
     databaseProvisionModules: 'DatabaseProvisionModule',
   },
   Schema: {
@@ -13105,6 +12109,7 @@ export const connectionFieldsMap = {
     schemaGrants: 'SchemaGrant',
     views: 'View',
     defaultPrivileges: 'DefaultPrivilege',
+    enums: 'Enum',
     apiSchemas: 'ApiSchema',
     tableTemplateModulesByPrivateSchemaId: 'TableTemplateModule',
     tableTemplateModules: 'TableTemplateModule',
@@ -13122,6 +12127,8 @@ export const connectionFieldsMap = {
     uniqueConstraints: 'UniqueConstraint',
     views: 'View',
     viewTables: 'ViewTable',
+    embeddingChunksByChunksTableId: 'EmbeddingChunk',
+    embeddingChunks: 'EmbeddingChunk',
     tableTemplateModulesByOwnerTableId: 'TableTemplateModule',
     tableTemplateModules: 'TableTemplateModule',
     secureTableProvisions: 'SecureTableProvision',
@@ -13144,19 +12151,29 @@ export const connectionFieldsMap = {
     siteModules: 'SiteModule',
     siteThemes: 'SiteTheme',
   },
+  BlueprintTemplate: {
+    blueprintTemplatesByForkedFromId: 'BlueprintTemplate',
+    blueprintsByTemplateId: 'Blueprint',
+  },
   User: {
     ownedDatabases: 'Database',
+    appAdminGrantsByActorId: 'AppAdminGrant',
     appAdminGrantsByGrantorId: 'AppAdminGrant',
+    appOwnerGrantsByActorId: 'AppOwnerGrant',
     appOwnerGrantsByGrantorId: 'AppOwnerGrant',
+    appGrantsByActorId: 'AppGrant',
     appGrantsByGrantorId: 'AppGrant',
     orgMembershipsByActorId: 'OrgMembership',
     orgMembershipsByEntityId: 'OrgMembership',
     orgMembersByActorId: 'OrgMember',
     orgMembersByEntityId: 'OrgMember',
+    orgAdminGrantsByActorId: 'OrgAdminGrant',
     orgAdminGrantsByEntityId: 'OrgAdminGrant',
     orgAdminGrantsByGrantorId: 'OrgAdminGrant',
+    orgOwnerGrantsByActorId: 'OrgOwnerGrant',
     orgOwnerGrantsByEntityId: 'OrgOwnerGrant',
     orgOwnerGrantsByGrantorId: 'OrgOwnerGrant',
+    orgGrantsByActorId: 'OrgGrant',
     orgGrantsByEntityId: 'OrgGrant',
     orgGrantsByGrantorId: 'OrgGrant',
     parentOrgChartEdges: 'OrgChartEdge',
@@ -13166,30 +12183,47 @@ export const connectionFieldsMap = {
     orgChartEdgeGrantsByEntityId: 'OrgChartEdgeGrant',
     orgChartEdgeGrantsByGrantorId: 'OrgChartEdgeGrant',
     childOrgChartEdgeGrants: 'OrgChartEdgeGrant',
+    orgPermissionDefaultsByEntityId: 'OrgPermissionDefault',
     appLimitsByActorId: 'AppLimit',
     orgLimitsByActorId: 'OrgLimit',
     orgLimitsByEntityId: 'OrgLimit',
     appStepsByActorId: 'AppStep',
     appAchievementsByActorId: 'AppAchievement',
+    ownedAppLevels: 'AppLevel',
+    ownedEmails: 'Email',
+    ownedPhoneNumbers: 'PhoneNumber',
+    ownedCryptoAddresses: 'CryptoAddress',
+    ownedConnectedAccounts: 'ConnectedAccount',
     invitesBySenderId: 'Invite',
     claimedInvitesByReceiverId: 'ClaimedInvite',
     claimedInvitesBySenderId: 'ClaimedInvite',
     orgInvitesByEntityId: 'OrgInvite',
+    orgInvitesByReceiverId: 'OrgInvite',
     orgInvitesBySenderId: 'OrgInvite',
+    orgClaimedInvitesByEntityId: 'OrgClaimedInvite',
     orgClaimedInvitesByReceiverId: 'OrgClaimedInvite',
     orgClaimedInvitesBySenderId: 'OrgClaimedInvite',
+    auditLogsByActorId: 'AuditLog',
   },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
-export interface SignOutInput {
-  clientMutationId?: string;
-}
 export interface SendAccountDeletionEmailInput {
   clientMutationId?: string;
 }
-export interface CheckPasswordInput {
+export interface SignOutInput {
   clientMutationId?: string;
-  password?: string;
+}
+export interface AcceptDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
+}
+export interface CancelDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
+}
+export interface RejectDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
 }
 export interface SubmitInviteCodeInput {
   clientMutationId?: string;
@@ -13199,15 +12233,9 @@ export interface SubmitOrgInviteCodeInput {
   clientMutationId?: string;
   token?: string;
 }
-export interface FreezeObjectsInput {
+export interface CheckPasswordInput {
   clientMutationId?: string;
-  databaseId?: string;
-  id?: string;
-}
-export interface InitEmptyRepoInput {
-  clientMutationId?: string;
-  dbId?: string;
-  storeId?: string;
+  password?: string;
 }
 export interface ConfirmDeleteAccountInput {
   clientMutationId?: string;
@@ -13224,11 +12252,20 @@ export interface VerifyEmailInput {
   emailId?: string;
   token?: string;
 }
-export interface RemoveNodeAtPathInput {
+export interface FreezeObjectsInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  id?: string;
+}
+export interface InitEmptyRepoInput {
   clientMutationId?: string;
   dbId?: string;
-  root?: string;
-  path?: string[];
+  storeId?: string;
+}
+export interface ConstructBlueprintInput {
+  clientMutationId?: string;
+  blueprintId?: string;
+  schemaId?: string;
 }
 export interface ResetPasswordInput {
   clientMutationId?: string;
@@ -13236,19 +12273,11 @@ export interface ResetPasswordInput {
   resetToken?: string;
   newPassword?: string;
 }
-export interface BootstrapUserInput {
+export interface RemoveNodeAtPathInput {
   clientMutationId?: string;
-  targetDatabaseId?: string;
-  password?: string;
-  isAdmin?: boolean;
-  isOwner?: boolean;
-  username?: string;
-  displayName?: string;
-  returnApiKey?: boolean;
-}
-export interface SetFieldOrderInput {
-  clientMutationId?: string;
-  fieldIds?: string[];
+  dbId?: string;
+  root?: string;
+  path?: string[];
 }
 export interface SetDataAtPathInput {
   clientMutationId?: string;
@@ -13265,6 +12294,14 @@ export interface SetPropsAndCommitInput {
   path?: string[];
   data?: Record<string, unknown>;
 }
+export interface CopyTemplateToBlueprintInput {
+  clientMutationId?: string;
+  templateId?: string;
+  databaseId?: string;
+  ownerId?: string;
+  nameOverride?: string;
+  displayNameOverride?: string;
+}
 export interface ProvisionDatabaseWithUserInput {
   clientMutationId?: string;
   pDatabaseName?: string;
@@ -13272,6 +12309,20 @@ export interface ProvisionDatabaseWithUserInput {
   pSubdomain?: string;
   pModules?: string[];
   pOptions?: Record<string, unknown>;
+}
+export interface BootstrapUserInput {
+  clientMutationId?: string;
+  targetDatabaseId?: string;
+  password?: string;
+  isAdmin?: boolean;
+  isOwner?: boolean;
+  username?: string;
+  displayName?: string;
+  returnApiKey?: boolean;
+}
+export interface SetFieldOrderInput {
+  clientMutationId?: string;
+  fieldIds?: string[];
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
@@ -13353,11 +12404,11 @@ export interface OneTimeTokenInput {
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
 }
-export interface ForgotPasswordInput {
+export interface SendVerificationEmailInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
 }
-export interface SendVerificationEmailInput {
+export interface ForgotPasswordInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
 }
@@ -13465,12 +12516,6 @@ export type AppLevelRequirementConnectionSelect = {
   };
   totalCount?: boolean;
 };
-export interface SignOutPayload {
-  clientMutationId?: string | null;
-}
-export type SignOutPayloadSelect = {
-  clientMutationId?: boolean;
-};
 export interface SendAccountDeletionEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -13479,11 +12524,35 @@ export type SendAccountDeletionEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface CheckPasswordPayload {
+export interface SignOutPayload {
   clientMutationId?: string | null;
 }
-export type CheckPasswordPayloadSelect = {
+export type SignOutPayloadSelect = {
   clientMutationId?: boolean;
+};
+export interface AcceptDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type AcceptDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface CancelDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type CancelDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RejectDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RejectDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface SubmitInviteCodePayload {
   clientMutationId?: string | null;
@@ -13501,16 +12570,10 @@ export type SubmitOrgInviteCodePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface FreezeObjectsPayload {
+export interface CheckPasswordPayload {
   clientMutationId?: string | null;
 }
-export type FreezeObjectsPayloadSelect = {
-  clientMutationId?: boolean;
-};
-export interface InitEmptyRepoPayload {
-  clientMutationId?: string | null;
-}
-export type InitEmptyRepoPayloadSelect = {
+export type CheckPasswordPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface ConfirmDeleteAccountPayload {
@@ -13537,11 +12600,23 @@ export type VerifyEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface RemoveNodeAtPathPayload {
+export interface FreezeObjectsPayload {
   clientMutationId?: string | null;
-  result?: string | null;
 }
-export type RemoveNodeAtPathPayloadSelect = {
+export type FreezeObjectsPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface InitEmptyRepoPayload {
+  clientMutationId?: string | null;
+}
+export type InitEmptyRepoPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface ConstructBlueprintPayload {
+  clientMutationId?: string | null;
+  result?: Record<string, unknown> | null;
+}
+export type ConstructBlueprintPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -13553,21 +12628,13 @@ export type ResetPasswordPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface BootstrapUserPayload {
+export interface RemoveNodeAtPathPayload {
   clientMutationId?: string | null;
-  result?: BootstrapUserRecord[] | null;
+  result?: string | null;
 }
-export type BootstrapUserPayloadSelect = {
+export type RemoveNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
-  result?: {
-    select: BootstrapUserRecordSelect;
-  };
-};
-export interface SetFieldOrderPayload {
-  clientMutationId?: string | null;
-}
-export type SetFieldOrderPayloadSelect = {
-  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface SetDataAtPathPayload {
   clientMutationId?: string | null;
@@ -13585,6 +12652,14 @@ export type SetPropsAndCommitPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface CopyTemplateToBlueprintPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CopyTemplateToBlueprintPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ProvisionDatabaseWithUserPayload {
   clientMutationId?: string | null;
   result?: ProvisionDatabaseWithUserRecord[] | null;
@@ -13594,6 +12669,22 @@ export type ProvisionDatabaseWithUserPayloadSelect = {
   result?: {
     select: ProvisionDatabaseWithUserRecordSelect;
   };
+};
+export interface BootstrapUserPayload {
+  clientMutationId?: string | null;
+  result?: BootstrapUserRecord[] | null;
+}
+export type BootstrapUserPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: BootstrapUserRecordSelect;
+  };
+};
+export interface SetFieldOrderPayload {
+  clientMutationId?: string | null;
+}
+export type SetFieldOrderPayloadSelect = {
+  clientMutationId?: boolean;
 };
 export interface InsertNodeAtPathPayload {
   clientMutationId?: string | null;
@@ -13681,12 +12772,6 @@ export type OneTimeTokenPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface ForgotPasswordPayload {
-  clientMutationId?: string | null;
-}
-export type ForgotPasswordPayloadSelect = {
-  clientMutationId?: boolean;
-};
 export interface SendVerificationEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -13694,6 +12779,12 @@ export interface SendVerificationEmailPayload {
 export type SendVerificationEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface ForgotPasswordPayload {
+  clientMutationId?: string | null;
+}
+export type ForgotPasswordPayloadSelect = {
+  clientMutationId?: boolean;
 };
 export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
@@ -14660,6 +13751,51 @@ export type DeleteViewRulePayloadSelect = {
     select: ViewRuleEdgeSelect;
   };
 };
+export interface CreateEmbeddingChunkPayload {
+  clientMutationId?: string | null;
+  /** The `EmbeddingChunk` that was created by this mutation. */
+  embeddingChunk?: EmbeddingChunk | null;
+  embeddingChunkEdge?: EmbeddingChunkEdge | null;
+}
+export type CreateEmbeddingChunkPayloadSelect = {
+  clientMutationId?: boolean;
+  embeddingChunk?: {
+    select: EmbeddingChunkSelect;
+  };
+  embeddingChunkEdge?: {
+    select: EmbeddingChunkEdgeSelect;
+  };
+};
+export interface UpdateEmbeddingChunkPayload {
+  clientMutationId?: string | null;
+  /** The `EmbeddingChunk` that was updated by this mutation. */
+  embeddingChunk?: EmbeddingChunk | null;
+  embeddingChunkEdge?: EmbeddingChunkEdge | null;
+}
+export type UpdateEmbeddingChunkPayloadSelect = {
+  clientMutationId?: boolean;
+  embeddingChunk?: {
+    select: EmbeddingChunkSelect;
+  };
+  embeddingChunkEdge?: {
+    select: EmbeddingChunkEdgeSelect;
+  };
+};
+export interface DeleteEmbeddingChunkPayload {
+  clientMutationId?: string | null;
+  /** The `EmbeddingChunk` that was deleted by this mutation. */
+  embeddingChunk?: EmbeddingChunk | null;
+  embeddingChunkEdge?: EmbeddingChunkEdge | null;
+}
+export type DeleteEmbeddingChunkPayloadSelect = {
+  clientMutationId?: boolean;
+  embeddingChunk?: {
+    select: EmbeddingChunkSelect;
+  };
+  embeddingChunkEdge?: {
+    select: EmbeddingChunkEdgeSelect;
+  };
+};
 export interface CreateTableTemplateModulePayload {
   clientMutationId?: string | null;
   /** The `TableTemplateModule` that was created by this mutation. */
@@ -14883,6 +14019,51 @@ export type DeleteDefaultPrivilegePayloadSelect = {
   };
   defaultPrivilegeEdge?: {
     select: DefaultPrivilegeEdgeSelect;
+  };
+};
+export interface CreateEnumPayload {
+  clientMutationId?: string | null;
+  /** The `Enum` that was created by this mutation. */
+  enum?: Enum | null;
+  enumEdge?: EnumEdge | null;
+}
+export type CreateEnumPayloadSelect = {
+  clientMutationId?: boolean;
+  enum?: {
+    select: EnumSelect;
+  };
+  enumEdge?: {
+    select: EnumEdgeSelect;
+  };
+};
+export interface UpdateEnumPayload {
+  clientMutationId?: string | null;
+  /** The `Enum` that was updated by this mutation. */
+  enum?: Enum | null;
+  enumEdge?: EnumEdge | null;
+}
+export type UpdateEnumPayloadSelect = {
+  clientMutationId?: boolean;
+  enum?: {
+    select: EnumSelect;
+  };
+  enumEdge?: {
+    select: EnumEdgeSelect;
+  };
+};
+export interface DeleteEnumPayload {
+  clientMutationId?: string | null;
+  /** The `Enum` that was deleted by this mutation. */
+  enum?: Enum | null;
+  enumEdge?: EnumEdge | null;
+}
+export type DeleteEnumPayloadSelect = {
+  clientMutationId?: boolean;
+  enum?: {
+    select: EnumSelect;
+  };
+  enumEdge?: {
+    select: EnumEdgeSelect;
   };
 };
 export interface CreateApiSchemaPayload {
@@ -15198,6 +14379,51 @@ export type DeleteTriggerFunctionPayloadSelect = {
   };
   triggerFunctionEdge?: {
     select: TriggerFunctionEdgeSelect;
+  };
+};
+export interface CreateDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseTransfer` that was created by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
+}
+export type CreateDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseTransfer?: {
+    select: DatabaseTransferSelect;
+  };
+  databaseTransferEdge?: {
+    select: DatabaseTransferEdgeSelect;
+  };
+};
+export interface UpdateDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseTransfer` that was updated by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
+}
+export type UpdateDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseTransfer?: {
+    select: DatabaseTransferSelect;
+  };
+  databaseTransferEdge?: {
+    select: DatabaseTransferEdgeSelect;
+  };
+};
+export interface DeleteDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseTransfer` that was deleted by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
+}
+export type DeleteDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseTransfer?: {
+    select: DatabaseTransferSelect;
+  };
+  databaseTransferEdge?: {
+    select: DatabaseTransferEdgeSelect;
   };
 };
 export interface CreateApiPayload {
@@ -16235,49 +15461,94 @@ export type DeleteUsersModulePayloadSelect = {
     select: UsersModuleEdgeSelect;
   };
 };
-export interface CreateUuidModulePayload {
+export interface CreateBlueprintPayload {
   clientMutationId?: string | null;
-  /** The `UuidModule` that was created by this mutation. */
-  uuidModule?: UuidModule | null;
-  uuidModuleEdge?: UuidModuleEdge | null;
+  /** The `Blueprint` that was created by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
-export type CreateUuidModulePayloadSelect = {
+export type CreateBlueprintPayloadSelect = {
   clientMutationId?: boolean;
-  uuidModule?: {
-    select: UuidModuleSelect;
+  blueprint?: {
+    select: BlueprintSelect;
   };
-  uuidModuleEdge?: {
-    select: UuidModuleEdgeSelect;
+  blueprintEdge?: {
+    select: BlueprintEdgeSelect;
   };
 };
-export interface UpdateUuidModulePayload {
+export interface UpdateBlueprintPayload {
   clientMutationId?: string | null;
-  /** The `UuidModule` that was updated by this mutation. */
-  uuidModule?: UuidModule | null;
-  uuidModuleEdge?: UuidModuleEdge | null;
+  /** The `Blueprint` that was updated by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
-export type UpdateUuidModulePayloadSelect = {
+export type UpdateBlueprintPayloadSelect = {
   clientMutationId?: boolean;
-  uuidModule?: {
-    select: UuidModuleSelect;
+  blueprint?: {
+    select: BlueprintSelect;
   };
-  uuidModuleEdge?: {
-    select: UuidModuleEdgeSelect;
+  blueprintEdge?: {
+    select: BlueprintEdgeSelect;
   };
 };
-export interface DeleteUuidModulePayload {
+export interface DeleteBlueprintPayload {
   clientMutationId?: string | null;
-  /** The `UuidModule` that was deleted by this mutation. */
-  uuidModule?: UuidModule | null;
-  uuidModuleEdge?: UuidModuleEdge | null;
+  /** The `Blueprint` that was deleted by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
-export type DeleteUuidModulePayloadSelect = {
+export type DeleteBlueprintPayloadSelect = {
   clientMutationId?: boolean;
-  uuidModule?: {
-    select: UuidModuleSelect;
+  blueprint?: {
+    select: BlueprintSelect;
   };
-  uuidModuleEdge?: {
-    select: UuidModuleEdgeSelect;
+  blueprintEdge?: {
+    select: BlueprintEdgeSelect;
+  };
+};
+export interface CreateBlueprintTemplatePayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintTemplate` that was created by this mutation. */
+  blueprintTemplate?: BlueprintTemplate | null;
+  blueprintTemplateEdge?: BlueprintTemplateEdge | null;
+}
+export type CreateBlueprintTemplatePayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintTemplate?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplateEdge?: {
+    select: BlueprintTemplateEdgeSelect;
+  };
+};
+export interface UpdateBlueprintTemplatePayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintTemplate` that was updated by this mutation. */
+  blueprintTemplate?: BlueprintTemplate | null;
+  blueprintTemplateEdge?: BlueprintTemplateEdge | null;
+}
+export type UpdateBlueprintTemplatePayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintTemplate?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplateEdge?: {
+    select: BlueprintTemplateEdgeSelect;
+  };
+};
+export interface DeleteBlueprintTemplatePayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintTemplate` that was deleted by this mutation. */
+  blueprintTemplate?: BlueprintTemplate | null;
+  blueprintTemplateEdge?: BlueprintTemplateEdge | null;
+}
+export type DeleteBlueprintTemplatePayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintTemplate?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplateEdge?: {
+    select: BlueprintTemplateEdgeSelect;
   };
 };
 export interface CreateDatabaseProvisionModulePayload {
@@ -16775,6 +16046,51 @@ export type DeleteOrgChartEdgeGrantPayloadSelect = {
     select: OrgChartEdgeGrantEdgeSelect;
   };
 };
+export interface CreateOrgPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgPermissionDefault` that was created by this mutation. */
+  orgPermissionDefault?: OrgPermissionDefault | null;
+  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
+}
+export type CreateOrgPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  orgPermissionDefault?: {
+    select: OrgPermissionDefaultSelect;
+  };
+  orgPermissionDefaultEdge?: {
+    select: OrgPermissionDefaultEdgeSelect;
+  };
+};
+export interface UpdateOrgPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgPermissionDefault` that was updated by this mutation. */
+  orgPermissionDefault?: OrgPermissionDefault | null;
+  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
+}
+export type UpdateOrgPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  orgPermissionDefault?: {
+    select: OrgPermissionDefaultSelect;
+  };
+  orgPermissionDefaultEdge?: {
+    select: OrgPermissionDefaultEdgeSelect;
+  };
+};
+export interface DeleteOrgPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgPermissionDefault` that was deleted by this mutation. */
+  orgPermissionDefault?: OrgPermissionDefault | null;
+  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
+}
+export type DeleteOrgPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  orgPermissionDefault?: {
+    select: OrgPermissionDefaultSelect;
+  };
+  orgPermissionDefaultEdge?: {
+    select: OrgPermissionDefaultEdgeSelect;
+  };
+};
 export interface CreateAppLimitPayload {
   clientMutationId?: string | null;
   /** The `AppLimit` that was created by this mutation. */
@@ -16953,6 +16269,231 @@ export type DeleteAppAchievementPayloadSelect = {
   };
   appAchievementEdge?: {
     select: AppAchievementEdgeSelect;
+  };
+};
+export interface CreateAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was created by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+}
+export type CreateAppLevelPayloadSelect = {
+  clientMutationId?: boolean;
+  appLevel?: {
+    select: AppLevelSelect;
+  };
+  appLevelEdge?: {
+    select: AppLevelEdgeSelect;
+  };
+};
+export interface UpdateAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was updated by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+}
+export type UpdateAppLevelPayloadSelect = {
+  clientMutationId?: boolean;
+  appLevel?: {
+    select: AppLevelSelect;
+  };
+  appLevelEdge?: {
+    select: AppLevelEdgeSelect;
+  };
+};
+export interface DeleteAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was deleted by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+}
+export type DeleteAppLevelPayloadSelect = {
+  clientMutationId?: boolean;
+  appLevel?: {
+    select: AppLevelSelect;
+  };
+  appLevelEdge?: {
+    select: AppLevelEdgeSelect;
+  };
+};
+export interface CreateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was created by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type CreateEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface UpdateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was updated by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type UpdateEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface DeleteEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was deleted by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type DeleteEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface CreatePhoneNumberPayload {
+  clientMutationId?: string | null;
+  /** The `PhoneNumber` that was created by this mutation. */
+  phoneNumber?: PhoneNumber | null;
+  phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export type CreatePhoneNumberPayloadSelect = {
+  clientMutationId?: boolean;
+  phoneNumber?: {
+    select: PhoneNumberSelect;
+  };
+  phoneNumberEdge?: {
+    select: PhoneNumberEdgeSelect;
+  };
+};
+export interface UpdatePhoneNumberPayload {
+  clientMutationId?: string | null;
+  /** The `PhoneNumber` that was updated by this mutation. */
+  phoneNumber?: PhoneNumber | null;
+  phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export type UpdatePhoneNumberPayloadSelect = {
+  clientMutationId?: boolean;
+  phoneNumber?: {
+    select: PhoneNumberSelect;
+  };
+  phoneNumberEdge?: {
+    select: PhoneNumberEdgeSelect;
+  };
+};
+export interface DeletePhoneNumberPayload {
+  clientMutationId?: string | null;
+  /** The `PhoneNumber` that was deleted by this mutation. */
+  phoneNumber?: PhoneNumber | null;
+  phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export type DeletePhoneNumberPayloadSelect = {
+  clientMutationId?: boolean;
+  phoneNumber?: {
+    select: PhoneNumberSelect;
+  };
+  phoneNumberEdge?: {
+    select: PhoneNumberEdgeSelect;
+  };
+};
+export interface CreateCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was created by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export type CreateCryptoAddressPayloadSelect = {
+  clientMutationId?: boolean;
+  cryptoAddress?: {
+    select: CryptoAddressSelect;
+  };
+  cryptoAddressEdge?: {
+    select: CryptoAddressEdgeSelect;
+  };
+};
+export interface UpdateCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was updated by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export type UpdateCryptoAddressPayloadSelect = {
+  clientMutationId?: boolean;
+  cryptoAddress?: {
+    select: CryptoAddressSelect;
+  };
+  cryptoAddressEdge?: {
+    select: CryptoAddressEdgeSelect;
+  };
+};
+export interface DeleteCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was deleted by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export type DeleteCryptoAddressPayloadSelect = {
+  clientMutationId?: boolean;
+  cryptoAddress?: {
+    select: CryptoAddressSelect;
+  };
+  cryptoAddressEdge?: {
+    select: CryptoAddressEdgeSelect;
+  };
+};
+export interface CreateConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was created by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
+}
+export type CreateConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  connectedAccount?: {
+    select: ConnectedAccountSelect;
+  };
+  connectedAccountEdge?: {
+    select: ConnectedAccountEdgeSelect;
+  };
+};
+export interface UpdateConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was updated by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
+}
+export type UpdateConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  connectedAccount?: {
+    select: ConnectedAccountSelect;
+  };
+  connectedAccountEdge?: {
+    select: ConnectedAccountEdgeSelect;
+  };
+};
+export interface DeleteConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was deleted by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
+}
+export type DeleteConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  connectedAccount?: {
+    select: ConnectedAccountSelect;
+  };
+  connectedAccountEdge?: {
+    select: ConnectedAccountEdgeSelect;
   };
 };
 export interface CreateInvitePayload {
@@ -17135,6 +16676,51 @@ export type DeleteOrgClaimedInvitePayloadSelect = {
     select: OrgClaimedInviteEdgeSelect;
   };
 };
+export interface CreateAuditLogPayload {
+  clientMutationId?: string | null;
+  /** The `AuditLog` that was created by this mutation. */
+  auditLog?: AuditLog | null;
+  auditLogEdge?: AuditLogEdge | null;
+}
+export type CreateAuditLogPayloadSelect = {
+  clientMutationId?: boolean;
+  auditLog?: {
+    select: AuditLogSelect;
+  };
+  auditLogEdge?: {
+    select: AuditLogEdgeSelect;
+  };
+};
+export interface UpdateAuditLogPayload {
+  clientMutationId?: string | null;
+  /** The `AuditLog` that was updated by this mutation. */
+  auditLog?: AuditLog | null;
+  auditLogEdge?: AuditLogEdge | null;
+}
+export type UpdateAuditLogPayloadSelect = {
+  clientMutationId?: boolean;
+  auditLog?: {
+    select: AuditLogSelect;
+  };
+  auditLogEdge?: {
+    select: AuditLogEdgeSelect;
+  };
+};
+export interface DeleteAuditLogPayload {
+  clientMutationId?: string | null;
+  /** The `AuditLog` that was deleted by this mutation. */
+  auditLog?: AuditLog | null;
+  auditLogEdge?: AuditLogEdge | null;
+}
+export type DeleteAuditLogPayloadSelect = {
+  clientMutationId?: boolean;
+  auditLog?: {
+    select: AuditLogSelect;
+  };
+  auditLogEdge?: {
+    select: AuditLogEdgeSelect;
+  };
+};
 export interface CreateRefPayload {
   clientMutationId?: string | null;
   /** The `Ref` that was created by this mutation. */
@@ -17270,51 +16856,6 @@ export type DeleteAppPermissionDefaultPayloadSelect = {
     select: AppPermissionDefaultEdgeSelect;
   };
 };
-export interface CreateCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was created by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export type CreateCryptoAddressPayloadSelect = {
-  clientMutationId?: boolean;
-  cryptoAddress?: {
-    select: CryptoAddressSelect;
-  };
-  cryptoAddressEdge?: {
-    select: CryptoAddressEdgeSelect;
-  };
-};
-export interface UpdateCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was updated by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export type UpdateCryptoAddressPayloadSelect = {
-  clientMutationId?: boolean;
-  cryptoAddress?: {
-    select: CryptoAddressSelect;
-  };
-  cryptoAddressEdge?: {
-    select: CryptoAddressEdgeSelect;
-  };
-};
-export interface DeleteCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was deleted by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export type DeleteCryptoAddressPayloadSelect = {
-  clientMutationId?: boolean;
-  cryptoAddress?: {
-    select: CryptoAddressSelect;
-  };
-  cryptoAddressEdge?: {
-    select: CryptoAddressEdgeSelect;
-  };
-};
 export interface CreateRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was created by this mutation. */
@@ -17358,96 +16899,6 @@ export type DeleteRoleTypePayloadSelect = {
   };
   roleTypeEdge?: {
     select: RoleTypeEdgeSelect;
-  };
-};
-export interface CreateOrgPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgPermissionDefault` that was created by this mutation. */
-  orgPermissionDefault?: OrgPermissionDefault | null;
-  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
-}
-export type CreateOrgPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  orgPermissionDefault?: {
-    select: OrgPermissionDefaultSelect;
-  };
-  orgPermissionDefaultEdge?: {
-    select: OrgPermissionDefaultEdgeSelect;
-  };
-};
-export interface UpdateOrgPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgPermissionDefault` that was updated by this mutation. */
-  orgPermissionDefault?: OrgPermissionDefault | null;
-  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
-}
-export type UpdateOrgPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  orgPermissionDefault?: {
-    select: OrgPermissionDefaultSelect;
-  };
-  orgPermissionDefaultEdge?: {
-    select: OrgPermissionDefaultEdgeSelect;
-  };
-};
-export interface DeleteOrgPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgPermissionDefault` that was deleted by this mutation. */
-  orgPermissionDefault?: OrgPermissionDefault | null;
-  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
-}
-export type DeleteOrgPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  orgPermissionDefault?: {
-    select: OrgPermissionDefaultSelect;
-  };
-  orgPermissionDefaultEdge?: {
-    select: OrgPermissionDefaultEdgeSelect;
-  };
-};
-export interface CreatePhoneNumberPayload {
-  clientMutationId?: string | null;
-  /** The `PhoneNumber` that was created by this mutation. */
-  phoneNumber?: PhoneNumber | null;
-  phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export type CreatePhoneNumberPayloadSelect = {
-  clientMutationId?: boolean;
-  phoneNumber?: {
-    select: PhoneNumberSelect;
-  };
-  phoneNumberEdge?: {
-    select: PhoneNumberEdgeSelect;
-  };
-};
-export interface UpdatePhoneNumberPayload {
-  clientMutationId?: string | null;
-  /** The `PhoneNumber` that was updated by this mutation. */
-  phoneNumber?: PhoneNumber | null;
-  phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export type UpdatePhoneNumberPayloadSelect = {
-  clientMutationId?: boolean;
-  phoneNumber?: {
-    select: PhoneNumberSelect;
-  };
-  phoneNumberEdge?: {
-    select: PhoneNumberEdgeSelect;
-  };
-};
-export interface DeletePhoneNumberPayload {
-  clientMutationId?: string | null;
-  /** The `PhoneNumber` that was deleted by this mutation. */
-  phoneNumber?: PhoneNumber | null;
-  phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export type DeletePhoneNumberPayloadSelect = {
-  clientMutationId?: boolean;
-  phoneNumber?: {
-    select: PhoneNumberSelect;
-  };
-  phoneNumberEdge?: {
-    select: PhoneNumberEdgeSelect;
   };
 };
 export interface CreateAppLimitDefaultPayload {
@@ -17538,51 +16989,6 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
   };
   orgLimitDefaultEdge?: {
     select: OrgLimitDefaultEdgeSelect;
-  };
-};
-export interface CreateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was created by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type CreateConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
-  };
-};
-export interface UpdateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was updated by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type UpdateConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
-  };
-};
-export interface DeleteConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was deleted by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type DeleteConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
   };
 };
 export interface CreateNodeTypeRegistryPayload {
@@ -17855,96 +17261,6 @@ export type DeleteOrgMembershipDefaultPayloadSelect = {
     select: OrgMembershipDefaultEdgeSelect;
   };
 };
-export interface CreateAuditLogPayload {
-  clientMutationId?: string | null;
-  /** The `AuditLog` that was created by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
-}
-export type CreateAuditLogPayloadSelect = {
-  clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
-  };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
-  };
-};
-export interface UpdateAuditLogPayload {
-  clientMutationId?: string | null;
-  /** The `AuditLog` that was updated by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
-}
-export type UpdateAuditLogPayloadSelect = {
-  clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
-  };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
-  };
-};
-export interface DeleteAuditLogPayload {
-  clientMutationId?: string | null;
-  /** The `AuditLog` that was deleted by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
-}
-export type DeleteAuditLogPayloadSelect = {
-  clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
-  };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
-  };
-};
-export interface CreateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was created by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type CreateAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
-export interface UpdateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was updated by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type UpdateAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
-export interface DeleteAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was deleted by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type DeleteAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
 export interface CreateSqlMigrationPayload {
   clientMutationId?: string | null;
   /** The `SqlMigration` that was created by this mutation. */
@@ -17954,51 +17270,6 @@ export type CreateSqlMigrationPayloadSelect = {
   clientMutationId?: boolean;
   sqlMigration?: {
     select: SqlMigrationSelect;
-  };
-};
-export interface CreateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was created by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type CreateEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
-  };
-};
-export interface UpdateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was updated by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type UpdateEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
-  };
-};
-export interface DeleteEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was deleted by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type DeleteEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
   };
 };
 export interface CreateUserPayload {
@@ -18212,6 +17483,14 @@ export type AppLevelRequirementEdgeSelect = {
     select: AppLevelRequirementSelect;
   };
 };
+export interface ProvisionDatabaseWithUserRecord {
+  outDatabaseId?: string | null;
+  outApiKey?: string | null;
+}
+export type ProvisionDatabaseWithUserRecordSelect = {
+  outDatabaseId?: boolean;
+  outApiKey?: boolean;
+};
 export interface BootstrapUserRecord {
   outUserId?: string | null;
   outEmail?: string | null;
@@ -18221,16 +17500,6 @@ export interface BootstrapUserRecord {
   outIsOwner?: boolean | null;
   outIsSudo?: boolean | null;
   outApiKey?: string | null;
-  /** TRGM similarity when searching `outEmail`. Returns null when no trgm search filter is active. */
-  outEmailTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `outUsername`. Returns null when no trgm search filter is active. */
-  outUsernameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `outDisplayName`. Returns null when no trgm search filter is active. */
-  outDisplayNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `outApiKey`. Returns null when no trgm search filter is active. */
-  outApiKeyTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type BootstrapUserRecordSelect = {
   outUserId?: boolean;
@@ -18241,25 +17510,6 @@ export type BootstrapUserRecordSelect = {
   outIsOwner?: boolean;
   outIsSudo?: boolean;
   outApiKey?: boolean;
-  outEmailTrgmSimilarity?: boolean;
-  outUsernameTrgmSimilarity?: boolean;
-  outDisplayNameTrgmSimilarity?: boolean;
-  outApiKeyTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-};
-export interface ProvisionDatabaseWithUserRecord {
-  outDatabaseId?: string | null;
-  outApiKey?: string | null;
-  /** TRGM similarity when searching `outApiKey`. Returns null when no trgm search filter is active. */
-  outApiKeyTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
-export type ProvisionDatabaseWithUserRecordSelect = {
-  outDatabaseId?: boolean;
-  outApiKey?: boolean;
-  outApiKeyTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export interface SignInOneTimeTokenRecord {
   id?: string | null;
@@ -18268,10 +17518,6 @@ export interface SignInOneTimeTokenRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
-  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
-  accessTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SignInOneTimeTokenRecordSelect = {
   id?: boolean;
@@ -18280,8 +17526,6 @@ export type SignInOneTimeTokenRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
-  accessTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export interface ExtendTokenExpiresRecord {
   id?: string | null;
@@ -18300,10 +17544,6 @@ export interface SignInRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
-  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
-  accessTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SignInRecordSelect = {
   id?: boolean;
@@ -18312,8 +17552,6 @@ export type SignInRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
-  accessTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export interface SignUpRecord {
   id?: string | null;
@@ -18322,10 +17560,6 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
-  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
-  accessTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SignUpRecordSelect = {
   id?: boolean;
@@ -18334,8 +17568,6 @@ export type SignUpRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
-  accessTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 /** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
 export interface Session {
@@ -18364,14 +17596,6 @@ export interface Session {
   csrfSecret?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `uagent`. Returns null when no trgm search filter is active. */
-  uagentTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `fingerprintMode`. Returns null when no trgm search filter is active. */
-  fingerprintModeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `csrfSecret`. Returns null when no trgm search filter is active. */
-  csrfSecretTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SessionSelect = {
   id?: boolean;
@@ -18388,10 +17612,6 @@ export type SessionSelect = {
   csrfSecret?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  uagentTrgmSimilarity?: boolean;
-  fingerprintModeTrgmSimilarity?: boolean;
-  csrfSecretTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 /** A `Database` edge in the connection. */
 export interface DatabaseEdge {
@@ -18597,6 +17817,18 @@ export type ViewRuleEdgeSelect = {
     select: ViewRuleSelect;
   };
 };
+/** A `EmbeddingChunk` edge in the connection. */
+export interface EmbeddingChunkEdge {
+  cursor?: string | null;
+  /** The `EmbeddingChunk` at the end of the edge. */
+  node?: EmbeddingChunk | null;
+}
+export type EmbeddingChunkEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmbeddingChunkSelect;
+  };
+};
 /** A `TableTemplateModule` edge in the connection. */
 export interface TableTemplateModuleEdge {
   cursor?: string | null;
@@ -18655,6 +17887,18 @@ export type DefaultPrivilegeEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DefaultPrivilegeSelect;
+  };
+};
+/** A `Enum` edge in the connection. */
+export interface EnumEdge {
+  cursor?: string | null;
+  /** The `Enum` at the end of the edge. */
+  node?: Enum | null;
+}
+export type EnumEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EnumSelect;
   };
 };
 /** A `ApiSchema` edge in the connection. */
@@ -18739,6 +17983,18 @@ export type TriggerFunctionEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: TriggerFunctionSelect;
+  };
+};
+/** A `DatabaseTransfer` edge in the connection. */
+export interface DatabaseTransferEdge {
+  cursor?: string | null;
+  /** The `DatabaseTransfer` at the end of the edge. */
+  node?: DatabaseTransfer | null;
+}
+export type DatabaseTransferEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DatabaseTransferSelect;
   };
 };
 /** A `Api` edge in the connection. */
@@ -19017,16 +18273,28 @@ export type UsersModuleEdgeSelect = {
     select: UsersModuleSelect;
   };
 };
-/** A `UuidModule` edge in the connection. */
-export interface UuidModuleEdge {
+/** A `Blueprint` edge in the connection. */
+export interface BlueprintEdge {
   cursor?: string | null;
-  /** The `UuidModule` at the end of the edge. */
-  node?: UuidModule | null;
+  /** The `Blueprint` at the end of the edge. */
+  node?: Blueprint | null;
 }
-export type UuidModuleEdgeSelect = {
+export type BlueprintEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: UuidModuleSelect;
+    select: BlueprintSelect;
+  };
+};
+/** A `BlueprintTemplate` edge in the connection. */
+export interface BlueprintTemplateEdge {
+  cursor?: string | null;
+  /** The `BlueprintTemplate` at the end of the edge. */
+  node?: BlueprintTemplate | null;
+}
+export type BlueprintTemplateEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: BlueprintTemplateSelect;
   };
 };
 /** A `DatabaseProvisionModule` edge in the connection. */
@@ -19161,6 +18429,18 @@ export type OrgChartEdgeGrantEdgeSelect = {
     select: OrgChartEdgeGrantSelect;
   };
 };
+/** A `OrgPermissionDefault` edge in the connection. */
+export interface OrgPermissionDefaultEdge {
+  cursor?: string | null;
+  /** The `OrgPermissionDefault` at the end of the edge. */
+  node?: OrgPermissionDefault | null;
+}
+export type OrgPermissionDefaultEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: OrgPermissionDefaultSelect;
+  };
+};
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
   cursor?: string | null;
@@ -19207,6 +18487,66 @@ export type AppAchievementEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: AppAchievementSelect;
+  };
+};
+/** A `AppLevel` edge in the connection. */
+export interface AppLevelEdge {
+  cursor?: string | null;
+  /** The `AppLevel` at the end of the edge. */
+  node?: AppLevel | null;
+}
+export type AppLevelEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AppLevelSelect;
+  };
+};
+/** A `Email` edge in the connection. */
+export interface EmailEdge {
+  cursor?: string | null;
+  /** The `Email` at the end of the edge. */
+  node?: Email | null;
+}
+export type EmailEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmailSelect;
+  };
+};
+/** A `PhoneNumber` edge in the connection. */
+export interface PhoneNumberEdge {
+  cursor?: string | null;
+  /** The `PhoneNumber` at the end of the edge. */
+  node?: PhoneNumber | null;
+}
+export type PhoneNumberEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PhoneNumberSelect;
+  };
+};
+/** A `CryptoAddress` edge in the connection. */
+export interface CryptoAddressEdge {
+  cursor?: string | null;
+  /** The `CryptoAddress` at the end of the edge. */
+  node?: CryptoAddress | null;
+}
+export type CryptoAddressEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: CryptoAddressSelect;
+  };
+};
+/** A `ConnectedAccount` edge in the connection. */
+export interface ConnectedAccountEdge {
+  cursor?: string | null;
+  /** The `ConnectedAccount` at the end of the edge. */
+  node?: ConnectedAccount | null;
+}
+export type ConnectedAccountEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ConnectedAccountSelect;
   };
 };
 /** A `Invite` edge in the connection. */
@@ -19257,6 +18597,18 @@ export type OrgClaimedInviteEdgeSelect = {
     select: OrgClaimedInviteSelect;
   };
 };
+/** A `AuditLog` edge in the connection. */
+export interface AuditLogEdge {
+  cursor?: string | null;
+  /** The `AuditLog` at the end of the edge. */
+  node?: AuditLog | null;
+}
+export type AuditLogEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AuditLogSelect;
+  };
+};
 /** A `Ref` edge in the connection. */
 export interface RefEdge {
   cursor?: string | null;
@@ -19293,18 +18645,6 @@ export type AppPermissionDefaultEdgeSelect = {
     select: AppPermissionDefaultSelect;
   };
 };
-/** A `CryptoAddress` edge in the connection. */
-export interface CryptoAddressEdge {
-  cursor?: string | null;
-  /** The `CryptoAddress` at the end of the edge. */
-  node?: CryptoAddress | null;
-}
-export type CryptoAddressEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: CryptoAddressSelect;
-  };
-};
 /** A `RoleType` edge in the connection. */
 export interface RoleTypeEdge {
   cursor?: string | null;
@@ -19315,30 +18655,6 @@ export type RoleTypeEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: RoleTypeSelect;
-  };
-};
-/** A `OrgPermissionDefault` edge in the connection. */
-export interface OrgPermissionDefaultEdge {
-  cursor?: string | null;
-  /** The `OrgPermissionDefault` at the end of the edge. */
-  node?: OrgPermissionDefault | null;
-}
-export type OrgPermissionDefaultEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: OrgPermissionDefaultSelect;
-  };
-};
-/** A `PhoneNumber` edge in the connection. */
-export interface PhoneNumberEdge {
-  cursor?: string | null;
-  /** The `PhoneNumber` at the end of the edge. */
-  node?: PhoneNumber | null;
-}
-export type PhoneNumberEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PhoneNumberSelect;
   };
 };
 /** A `AppLimitDefault` edge in the connection. */
@@ -19363,18 +18679,6 @@ export type OrgLimitDefaultEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgLimitDefaultSelect;
-  };
-};
-/** A `ConnectedAccount` edge in the connection. */
-export interface ConnectedAccountEdge {
-  cursor?: string | null;
-  /** The `ConnectedAccount` at the end of the edge. */
-  node?: ConnectedAccount | null;
-}
-export type ConnectedAccountEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: ConnectedAccountSelect;
   };
 };
 /** A `NodeTypeRegistry` edge in the connection. */
@@ -19447,42 +18751,6 @@ export type OrgMembershipDefaultEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgMembershipDefaultSelect;
-  };
-};
-/** A `AuditLog` edge in the connection. */
-export interface AuditLogEdge {
-  cursor?: string | null;
-  /** The `AuditLog` at the end of the edge. */
-  node?: AuditLog | null;
-}
-export type AuditLogEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AuditLogSelect;
-  };
-};
-/** A `AppLevel` edge in the connection. */
-export interface AppLevelEdge {
-  cursor?: string | null;
-  /** The `AppLevel` at the end of the edge. */
-  node?: AppLevel | null;
-}
-export type AppLevelEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AppLevelSelect;
-  };
-};
-/** A `Email` edge in the connection. */
-export interface EmailEdge {
-  cursor?: string | null;
-  /** The `Email` at the end of the edge. */
-  node?: Email | null;
-}
-export type EmailEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: EmailSelect;
   };
 };
 /** A `User` edge in the connection. */

@@ -22,11 +22,6 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
-  nameTrgmSimilarity: 'float',
-  eventTrgmSimilarity: 'float',
-  functionNameTrgmSimilarity: 'float',
-  moduleTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\ntrigger <command>\n\nCommands:\n  list                  List all trigger records\n  get                   Get a trigger by ID\n  create                Create a new trigger\n  update                Update an existing trigger\n  delete                Delete a trigger\n\n  --help, -h            Show this help message\n';

@@ -1107,16 +1107,6 @@ type AppPermission {
 
   """Human-readable description of what this permission allows"""
   description: String
-
-  """
-  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
-  """
-  descriptionTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `AppPermission` edge in the connection."""
@@ -1166,16 +1156,6 @@ type OrgPermission {
 
   """Human-readable description of what this permission allows"""
   description: String
-
-  """
-  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
-  """
-  descriptionTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `OrgPermission` edge in the connection."""
@@ -1226,16 +1206,6 @@ type AppLevelRequirement {
   priority: Int!
   createdAt: Datetime
   updatedAt: Datetime
-
-  """
-  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
-  """
-  descriptionTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """
@@ -1603,6 +1573,8 @@ enum OrgPermissionDefaultOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
 }
 
 """A connection to a list of `AppAdminGrant` values."""
@@ -1726,6 +1698,8 @@ enum AppAdminGrantOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   GRANTOR_ID_ASC
   GRANTOR_ID_DESC
   CREATED_AT_ASC
@@ -1813,6 +1787,8 @@ enum AppOwnerGrantOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   GRANTOR_ID_ASC
   GRANTOR_ID_DESC
   CREATED_AT_ASC
@@ -1906,6 +1882,8 @@ enum OrgAdminGrantOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   ENTITY_ID_ASC
   ENTITY_ID_DESC
   GRANTOR_ID_ASC
@@ -2001,6 +1979,8 @@ enum OrgOwnerGrantOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   ENTITY_ID_ASC
   ENTITY_ID_DESC
   GRANTOR_ID_ASC
@@ -2205,29 +2185,6 @@ input StringFilter {
 
   """Greater than or equal to the specified value (case-insensitive)."""
   greaterThanOrEqualToInsensitive: String
-
-  """
-  Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings.
-  """
-  similarTo: TrgmSearchInput
-
-  """
-  Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value.
-  """
-  wordSimilarTo: TrgmSearchInput
-}
-
-"""
-Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold.
-"""
-input TrgmSearchInput {
-  """The text to fuzzy-match against. Typos and misspellings are tolerated."""
-  value: String!
-
-  """
-  Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3.
-  """
-  threshold: Float
 }
 
 """
@@ -2392,8 +2349,10 @@ type OrgChartEdgeGrant {
   """User ID of the manager being assigned; NULL for top-level positions"""
   parentId: UUID
 
-  """User ID of the admin who performed this grant or revocation"""
-  grantorId: UUID!
+  """
+  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
+  """
+  grantorId: UUID
 
   """TRUE to add/update the edge, FALSE to remove it"""
   isGrant: Boolean!
@@ -2406,16 +2365,6 @@ type OrgChartEdgeGrant {
 
   """Timestamp when this grant or revocation was recorded"""
   createdAt: Datetime!
-
-  """
-  TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active.
-  """
-  positionTitleTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `OrgChartEdgeGrant` edge in the connection."""
@@ -2466,17 +2415,6 @@ input OrgChartEdgeGrantFilter {
 
   """Negates the expression."""
   not: OrgChartEdgeGrantFilter
-
-  """TRGM search on the `position_title` column."""
-  trgmPositionTitle: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgChartEdgeGrant`."""
@@ -2494,10 +2432,6 @@ enum OrgChartEdgeGrantOrderBy {
   PARENT_ID_DESC
   GRANTOR_ID_ASC
   GRANTOR_ID_DESC
-  POSITION_TITLE_TRGM_SIMILARITY_ASC
-  POSITION_TITLE_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `MembershipType` values."""
@@ -2536,21 +2470,6 @@ type MembershipType {
   Short prefix used to namespace tables and functions for this membership scope
   """
   prefix: String!
-
-  """
-  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
-  """
-  descriptionTrgmSimilarity: Float
-
-  """
-  TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active.
-  """
-  prefixTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `MembershipType` edge in the connection."""
@@ -2586,20 +2505,6 @@ input MembershipTypeFilter {
 
   """Negates the expression."""
   not: MembershipTypeFilter
-
-  """TRGM search on the `description` column."""
-  trgmDescription: TrgmSearchInput
-
-  """TRGM search on the `prefix` column."""
-  trgmPrefix: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """Methods to use when ordering `MembershipType`."""
@@ -2611,12 +2516,6 @@ enum MembershipTypeOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
-  DESCRIPTION_TRGM_SIMILARITY_ASC
-  DESCRIPTION_TRGM_SIMILARITY_DESC
-  PREFIX_TRGM_SIMILARITY_ASC
-  PREFIX_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """
@@ -2646,17 +2545,6 @@ input AppPermissionFilter {
 
   """Negates the expression."""
   not: AppPermissionFilter
-
-  """TRGM search on the `description` column."""
-  trgmDescription: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """Methods to use when ordering `AppPermission`."""
@@ -2670,10 +2558,6 @@ enum AppPermissionOrderBy {
   NAME_DESC
   BITNUM_ASC
   BITNUM_DESC
-  DESCRIPTION_TRGM_SIMILARITY_ASC
-  DESCRIPTION_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """
@@ -2703,17 +2587,6 @@ input OrgPermissionFilter {
 
   """Negates the expression."""
   not: OrgPermissionFilter
-
-  """TRGM search on the `description` column."""
-  trgmDescription: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgPermission`."""
@@ -2727,10 +2600,6 @@ enum OrgPermissionOrderBy {
   NAME_DESC
   BITNUM_ASC
   BITNUM_DESC
-  DESCRIPTION_TRGM_SIMILARITY_ASC
-  DESCRIPTION_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `AppLimit` values."""
@@ -3182,6 +3051,8 @@ enum AppGrantOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   GRANTOR_ID_ASC
   GRANTOR_ID_DESC
   CREATED_AT_ASC
@@ -3472,6 +3343,8 @@ enum OrgClaimedInviteOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
 }
 
 """A connection to a list of `OrgGrant` values."""
@@ -3567,6 +3440,8 @@ enum OrgGrantOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
   ENTITY_ID_ASC
   ENTITY_ID_DESC
   GRANTOR_ID_ASC
@@ -3618,16 +3493,6 @@ type OrgChartEdge {
 
   """Numeric seniority level for this position (higher = more senior)"""
   positionLevel: Int
-
-  """
-  TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active.
-  """
-  positionTitleTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `OrgChartEdge` edge in the connection."""
@@ -3675,17 +3540,6 @@ input OrgChartEdgeFilter {
 
   """Negates the expression."""
   not: OrgChartEdgeFilter
-
-  """TRGM search on the `position_title` column."""
-  trgmPositionTitle: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgChartEdge`."""
@@ -3705,10 +3559,6 @@ enum OrgChartEdgeOrderBy {
   CHILD_ID_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
-  POSITION_TITLE_TRGM_SIMILARITY_ASC
-  POSITION_TITLE_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `OrgMembershipDefault` values."""
@@ -3862,17 +3712,6 @@ input AppLevelRequirementFilter {
 
   """Negates the expression."""
   not: AppLevelRequirementFilter
-
-  """TRGM search on the `description` column."""
-  trgmDescription: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """Methods to use when ordering `AppLevelRequirement`."""
@@ -3892,10 +3731,6 @@ enum AppLevelRequirementOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
-  DESCRIPTION_TRGM_SIMILARITY_ASC
-  DESCRIPTION_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `AppMembership` values."""
@@ -4273,16 +4108,6 @@ type Invite {
   expiresAt: Datetime!
   createdAt: Datetime
   updatedAt: Datetime
-
-  """
-  TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active.
-  """
-  inviteTokenTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 scalar ConstructiveInternalTypeEmail
@@ -4341,17 +4166,6 @@ input InviteFilter {
 
   """Negates the expression."""
   not: InviteFilter
-
-  """TRGM search on the `invite_token` column."""
-  trgmInviteToken: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -4507,10 +4321,6 @@ enum InviteOrderBy {
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
-  INVITE_TOKEN_TRGM_SIMILARITY_ASC
-  INVITE_TOKEN_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `AppLevel` values."""
@@ -4549,16 +4359,6 @@ type AppLevel {
   ownerId: UUID
   createdAt: Datetime
   updatedAt: Datetime
-
-  """
-  TRGM similarity when searching `description`. Returns null when no trgm search filter is active.
-  """
-  descriptionTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 scalar ConstructiveInternalTypeImage
@@ -4605,17 +4405,6 @@ input AppLevelFilter {
 
   """Negates the expression."""
   not: AppLevelFilter
-
-  """TRGM search on the `description` column."""
-  trgmDescription: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """
@@ -4684,14 +4473,12 @@ enum AppLevelOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
-  DESCRIPTION_TRGM_SIMILARITY_ASC
-  DESCRIPTION_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """A connection to a list of `OrgInvite` values."""
@@ -4749,16 +4536,6 @@ type OrgInvite {
   createdAt: Datetime
   updatedAt: Datetime
   entityId: UUID!
-
-  """
-  TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active.
-  """
-  inviteTokenTrgmSimilarity: Float
-
-  """
-  Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active.
-  """
-  searchScore: Float
 }
 
 """A `OrgInvite` edge in the connection."""
@@ -4821,17 +4598,6 @@ input OrgInviteFilter {
 
   """Negates the expression."""
   not: OrgInviteFilter
-
-  """TRGM search on the `invite_token` column."""
-  trgmInviteToken: TrgmSearchInput
-
-  """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-  simultaneously. Rows matching ANY algorithm are returned. All matching score
-  fields are populated.
-  """
-  fullTextSearch: String
 }
 
 """Methods to use when ordering `OrgInvite`."""
@@ -4845,6 +4611,8 @@ enum OrgInviteOrderBy {
   EMAIL_DESC
   SENDER_ID_ASC
   SENDER_ID_DESC
+  RECEIVER_ID_ASC
+  RECEIVER_ID_DESC
   INVITE_TOKEN_ASC
   INVITE_TOKEN_DESC
   INVITE_VALID_ASC
@@ -4857,10 +4625,6 @@ enum OrgInviteOrderBy {
   UPDATED_AT_DESC
   ENTITY_ID_ASC
   ENTITY_ID_DESC
-  INVITE_TOKEN_TRGM_SIMILARITY_ASC
-  INVITE_TOKEN_TRGM_SIMILARITY_DESC
-  SEARCH_SCORE_ASC
-  SEARCH_SCORE_DESC
 }
 
 """Root meta schema type"""
@@ -6285,8 +6049,10 @@ input OrgChartEdgeGrantInput {
   """User ID of the manager being assigned; NULL for top-level positions"""
   parentId: UUID
 
-  """User ID of the admin who performed this grant or revocation"""
-  grantorId: UUID!
+  """
+  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
+  """
+  grantorId: UUID
 
   """TRUE to add/update the edge, FALSE to remove it"""
   isGrant: Boolean
@@ -7994,7 +7760,9 @@ input OrgChartEdgeGrantPatch {
   """User ID of the manager being assigned; NULL for top-level positions"""
   parentId: UUID
 
-  """User ID of the admin who performed this grant or revocation"""
+  """
+  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
+  """
   grantorId: UUID
 
   """TRUE to add/update the edge, FALSE to remove it"""

@@ -214,7 +214,7 @@ const { data, isLoading } = useOrgGetManagersQuery({
 const { mutate: create } = useCreateOrgGetManagersRecordMutation({
   selection: { fields: { id: true } },
 });
-create({ userId: '<value>', depth: '<value>' });
+create({ userId: '<UUID>', depth: '<Int>' });
 ```
 
 ### OrgGetSubordinatesRecord
@@ -229,7 +229,7 @@ const { data, isLoading } = useOrgGetSubordinatesQuery({
 const { mutate: create } = useCreateOrgGetSubordinatesRecordMutation({
   selection: { fields: { id: true } },
 });
-create({ userId: '<value>', depth: '<value>' });
+create({ userId: '<UUID>', depth: '<Int>' });
 ```
 
 ### AppPermission
@@ -237,20 +237,20 @@ create({ userId: '<value>', depth: '<value>' });
 ```typescript
 // List all appPermissions
 const { data, isLoading } = useAppPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
 });
 
 // Get one appPermission
 const { data: item } = useAppPermissionQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
 });
 
 // Create a appPermission
 const { mutate: create } = useCreateAppPermissionMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' });
 ```
 
 ### OrgPermission
@@ -258,20 +258,20 @@ create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<v
 ```typescript
 // List all orgPermissions
 const { data, isLoading } = useOrgPermissionsQuery({
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
 });
 
 // Get one orgPermission
 const { data: item } = useOrgPermissionQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, bitnum: true, bitstr: true, description: true } },
 });
 
 // Create a orgPermission
 const { mutate: create } = useCreateOrgPermissionMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ name: '<String>', bitnum: '<Int>', bitstr: '<BitString>', description: '<String>' });
 ```
 
 ### AppLevelRequirement
@@ -279,20 +279,20 @@ create({ name: '<value>', bitnum: '<value>', bitstr: '<value>', description: '<v
 ```typescript
 // List all appLevelRequirements
 const { data, isLoading } = useAppLevelRequirementsQuery({
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one appLevelRequirement
 const { data: item } = useAppLevelRequirementQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, level: true, description: true, requiredCount: true, priority: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a appLevelRequirement
 const { mutate: create } = useCreateAppLevelRequirementMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', level: '<value>', description: '<value>', requiredCount: '<value>', priority: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ name: '<String>', level: '<String>', description: '<String>', requiredCount: '<Int>', priority: '<Int>' });
 ```
 
 ### OrgMember
@@ -305,7 +305,7 @@ const { data, isLoading } = useOrgMembersQuery({
 
 // Get one orgMember
 const { data: item } = useOrgMemberQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, isAdmin: true, actorId: true, entityId: true } },
 });
 
@@ -313,7 +313,7 @@ const { data: item } = useOrgMemberQuery({
 const { mutate: create } = useCreateOrgMemberMutation({
   selection: { fields: { id: true } },
 });
-create({ isAdmin: '<value>', actorId: '<value>', entityId: '<value>' });
+create({ isAdmin: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>' });
 ```
 
 ### AppPermissionDefault
@@ -326,7 +326,7 @@ const { data, isLoading } = useAppPermissionDefaultsQuery({
 
 // Get one appPermissionDefault
 const { data: item } = useAppPermissionDefaultQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, permissions: true } },
 });
 
@@ -334,7 +334,7 @@ const { data: item } = useAppPermissionDefaultQuery({
 const { mutate: create } = useCreateAppPermissionDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ permissions: '<value>' });
+create({ permissions: '<BitString>' });
 ```
 
 ### OrgPermissionDefault
@@ -347,7 +347,7 @@ const { data, isLoading } = useOrgPermissionDefaultsQuery({
 
 // Get one orgPermissionDefault
 const { data: item } = useOrgPermissionDefaultQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, permissions: true, entityId: true } },
 });
 
@@ -355,7 +355,7 @@ const { data: item } = useOrgPermissionDefaultQuery({
 const { mutate: create } = useCreateOrgPermissionDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ permissions: '<value>', entityId: '<value>' });
+create({ permissions: '<BitString>', entityId: '<UUID>' });
 ```
 
 ### AppAdminGrant
@@ -368,7 +368,7 @@ const { data, isLoading } = useAppAdminGrantsQuery({
 
 // Get one appAdminGrant
 const { data: item } = useAppAdminGrantQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } },
 });
 
@@ -376,7 +376,7 @@ const { data: item } = useAppAdminGrantQuery({
 const { mutate: create } = useCreateAppAdminGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ isGrant: '<value>', actorId: '<value>', grantorId: '<value>' });
+create({ isGrant: '<Boolean>', actorId: '<UUID>', grantorId: '<UUID>' });
 ```
 
 ### AppOwnerGrant
@@ -389,7 +389,7 @@ const { data, isLoading } = useAppOwnerGrantsQuery({
 
 // Get one appOwnerGrant
 const { data: item } = useAppOwnerGrantQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } },
 });
 
@@ -397,7 +397,7 @@ const { data: item } = useAppOwnerGrantQuery({
 const { mutate: create } = useCreateAppOwnerGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ isGrant: '<value>', actorId: '<value>', grantorId: '<value>' });
+create({ isGrant: '<Boolean>', actorId: '<UUID>', grantorId: '<UUID>' });
 ```
 
 ### OrgAdminGrant
@@ -410,7 +410,7 @@ const { data, isLoading } = useOrgAdminGrantsQuery({
 
 // Get one orgAdminGrant
 const { data: item } = useOrgAdminGrantQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } },
 });
 
@@ -418,7 +418,7 @@ const { data: item } = useOrgAdminGrantQuery({
 const { mutate: create } = useCreateOrgAdminGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' });
+create({ isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
 ```
 
 ### OrgOwnerGrant
@@ -431,7 +431,7 @@ const { data, isLoading } = useOrgOwnerGrantsQuery({
 
 // Get one orgOwnerGrant
 const { data: item } = useOrgOwnerGrantQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } },
 });
 
@@ -439,7 +439,7 @@ const { data: item } = useOrgOwnerGrantQuery({
 const { mutate: create } = useCreateOrgOwnerGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' });
+create({ isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
 ```
 
 ### AppLimitDefault
@@ -452,7 +452,7 @@ const { data, isLoading } = useAppLimitDefaultsQuery({
 
 // Get one appLimitDefault
 const { data: item } = useAppLimitDefaultQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, name: true, max: true } },
 });
 
@@ -460,7 +460,7 @@ const { data: item } = useAppLimitDefaultQuery({
 const { mutate: create } = useCreateAppLimitDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', max: '<value>' });
+create({ name: '<String>', max: '<Int>' });
 ```
 
 ### OrgLimitDefault
@@ -473,7 +473,7 @@ const { data, isLoading } = useOrgLimitDefaultsQuery({
 
 // Get one orgLimitDefault
 const { data: item } = useOrgLimitDefaultQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, name: true, max: true } },
 });
 
@@ -481,7 +481,7 @@ const { data: item } = useOrgLimitDefaultQuery({
 const { mutate: create } = useCreateOrgLimitDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', max: '<value>' });
+create({ name: '<String>', max: '<Int>' });
 ```
 
 ### OrgChartEdgeGrant
@@ -489,20 +489,20 @@ create({ name: '<value>', max: '<value>' });
 ```typescript
 // List all orgChartEdgeGrants
 const { data, isLoading } = useOrgChartEdgeGrantsQuery({
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
 });
 
 // Get one orgChartEdgeGrant
 const { data: item } = useOrgChartEdgeGrantQuery({
-  id: '<value>',
-  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true, positionTitleTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } },
 });
 
 // Create a orgChartEdgeGrant
 const { mutate: create } = useCreateOrgChartEdgeGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId: '<value>', isGrant: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', positionTitle: '<String>', positionLevel: '<Int>' });
 ```
 
 ### MembershipType
@@ -510,20 +510,20 @@ create({ entityId: '<value>', childId: '<value>', parentId: '<value>', grantorId
 ```typescript
 // List all membershipTypes
 const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, name: true, description: true, prefix: true } },
 });
 
 // Get one membershipType
 const { data: item } = useMembershipTypeQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true, descriptionTrgmSimilarity: true, prefixTrgmSimilarity: true, searchScore: true } },
+  id: '<Int>',
+  selection: { fields: { id: true, name: true, description: true, prefix: true } },
 });
 
 // Create a membershipType
 const { mutate: create } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', description: '<value>', prefix: '<value>', descriptionTrgmSimilarity: '<value>', prefixTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ name: '<String>', description: '<String>', prefix: '<String>' });
 ```
 
 ### AppLimit
@@ -536,7 +536,7 @@ const { data, isLoading } = useAppLimitsQuery({
 
 // Get one appLimit
 const { data: item } = useAppLimitQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, name: true, actorId: true, num: true, max: true } },
 });
 
@@ -544,7 +544,7 @@ const { data: item } = useAppLimitQuery({
 const { mutate: create } = useCreateAppLimitMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', actorId: '<value>', num: '<value>', max: '<value>' });
+create({ name: '<String>', actorId: '<UUID>', num: '<Int>', max: '<Int>' });
 ```
 
 ### AppAchievement
@@ -557,7 +557,7 @@ const { data, isLoading } = useAppAchievementsQuery({
 
 // Get one appAchievement
 const { data: item } = useAppAchievementQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
 });
 
@@ -565,7 +565,7 @@ const { data: item } = useAppAchievementQuery({
 const { mutate: create } = useCreateAppAchievementMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<value>', name: '<value>', count: '<value>' });
+create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
 ```
 
 ### AppStep
@@ -578,7 +578,7 @@ const { data, isLoading } = useAppStepsQuery({
 
 // Get one appStep
 const { data: item } = useAppStepQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, actorId: true, name: true, count: true, createdAt: true, updatedAt: true } },
 });
 
@@ -586,7 +586,7 @@ const { data: item } = useAppStepQuery({
 const { mutate: create } = useCreateAppStepMutation({
   selection: { fields: { id: true } },
 });
-create({ actorId: '<value>', name: '<value>', count: '<value>' });
+create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
 ```
 
 ### ClaimedInvite
@@ -599,7 +599,7 @@ const { data, isLoading } = useClaimedInvitesQuery({
 
 // Get one claimedInvite
 const { data: item } = useClaimedInviteQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } },
 });
 
@@ -607,7 +607,7 @@ const { data: item } = useClaimedInviteQuery({
 const { mutate: create } = useCreateClaimedInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ data: '<value>', senderId: '<value>', receiverId: '<value>' });
+create({ data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>' });
 ```
 
 ### AppGrant
@@ -620,7 +620,7 @@ const { data, isLoading } = useAppGrantsQuery({
 
 // Get one appGrant
 const { data: item } = useAppGrantQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, grantorId: true, createdAt: true, updatedAt: true } },
 });
 
@@ -628,7 +628,7 @@ const { data: item } = useAppGrantQuery({
 const { mutate: create } = useCreateAppGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ permissions: '<value>', isGrant: '<value>', actorId: '<value>', grantorId: '<value>' });
+create({ permissions: '<BitString>', isGrant: '<Boolean>', actorId: '<UUID>', grantorId: '<UUID>' });
 ```
 
 ### AppMembershipDefault
@@ -641,7 +641,7 @@ const { data, isLoading } = useAppMembershipDefaultsQuery({
 
 // Get one appMembershipDefault
 const { data: item } = useAppMembershipDefaultQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isVerified: true } },
 });
 
@@ -649,7 +649,7 @@ const { data: item } = useAppMembershipDefaultQuery({
 const { mutate: create } = useCreateAppMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isVerified: '<value>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' });
 ```
 
 ### OrgLimit
@@ -662,7 +662,7 @@ const { data, isLoading } = useOrgLimitsQuery({
 
 // Get one orgLimit
 const { data: item } = useOrgLimitQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } },
 });
 
@@ -670,7 +670,7 @@ const { data: item } = useOrgLimitQuery({
 const { mutate: create } = useCreateOrgLimitMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', actorId: '<value>', num: '<value>', max: '<value>', entityId: '<value>' });
+create({ name: '<String>', actorId: '<UUID>', num: '<Int>', max: '<Int>', entityId: '<UUID>' });
 ```
 
 ### OrgClaimedInvite
@@ -683,7 +683,7 @@ const { data, isLoading } = useOrgClaimedInvitesQuery({
 
 // Get one orgClaimedInvite
 const { data: item } = useOrgClaimedInviteQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true, entityId: true } },
 });
 
@@ -691,7 +691,7 @@ const { data: item } = useOrgClaimedInviteQuery({
 const { mutate: create } = useCreateOrgClaimedInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ data: '<value>', senderId: '<value>', receiverId: '<value>', entityId: '<value>' });
+create({ data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>', entityId: '<UUID>' });
 ```
 
 ### OrgGrant
@@ -704,7 +704,7 @@ const { data, isLoading } = useOrgGrantsQuery({
 
 // Get one orgGrant
 const { data: item } = useOrgGrantQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, permissions: true, isGrant: true, actorId: true, entityId: true, grantorId: true, createdAt: true, updatedAt: true } },
 });
 
@@ -712,7 +712,7 @@ const { data: item } = useOrgGrantQuery({
 const { mutate: create } = useCreateOrgGrantMutation({
   selection: { fields: { id: true } },
 });
-create({ permissions: '<value>', isGrant: '<value>', actorId: '<value>', entityId: '<value>', grantorId: '<value>' });
+create({ permissions: '<BitString>', isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
 ```
 
 ### OrgChartEdge
@@ -720,20 +720,20 @@ create({ permissions: '<value>', isGrant: '<value>', actorId: '<value>', entityI
 ```typescript
 // List all orgChartEdges
 const { data, isLoading } = useOrgChartEdgesQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
 });
 
 // Get one orgChartEdge
 const { data: item } = useOrgChartEdgeQuery({
-  id: '<value>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true, positionTitleTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, entityId: true, childId: true, parentId: true, positionTitle: true, positionLevel: true } },
 });
 
 // Create a orgChartEdge
 const { mutate: create } = useCreateOrgChartEdgeMutation({
   selection: { fields: { id: true } },
 });
-create({ entityId: '<value>', childId: '<value>', parentId: '<value>', positionTitle: '<value>', positionLevel: '<value>', positionTitleTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', positionTitle: '<String>', positionLevel: '<Int>' });
 ```
 
 ### OrgMembershipDefault
@@ -746,7 +746,7 @@ const { data, isLoading } = useOrgMembershipDefaultsQuery({
 
 // Get one orgMembershipDefault
 const { data: item } = useOrgMembershipDefaultQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } },
 });
 
@@ -754,7 +754,7 @@ const { data: item } = useOrgMembershipDefaultQuery({
 const { mutate: create } = useCreateOrgMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', entityId: '<value>', deleteMemberCascadeGroups: '<value>', createGroupsCascadeMembers: '<value>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' });
 ```
 
 ### AppMembership
@@ -767,7 +767,7 @@ const { data, isLoading } = useAppMembershipsQuery({
 
 // Get one appMembership
 const { data: item } = useAppMembershipQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
 });
 
@@ -775,7 +775,7 @@ const { data: item } = useAppMembershipQuery({
 const { mutate: create } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isVerified: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', profileId: '<value>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
 ```
 
 ### OrgMembership
@@ -788,7 +788,7 @@ const { data, isLoading } = useOrgMembershipsQuery({
 
 // Get one orgMembership
 const { data: item } = useOrgMembershipQuery({
-  id: '<value>',
+  id: '<UUID>',
   selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, profileId: true } },
 });
 
@@ -796,7 +796,7 @@ const { data: item } = useOrgMembershipQuery({
 const { mutate: create } = useCreateOrgMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBanned: '<value>', isDisabled: '<value>', isActive: '<value>', isOwner: '<value>', isAdmin: '<value>', permissions: '<value>', granted: '<value>', actorId: '<value>', entityId: '<value>', profileId: '<value>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', entityId: '<UUID>', profileId: '<UUID>' });
 ```
 
 ### Invite
@@ -804,20 +804,20 @@ create({ createdBy: '<value>', updatedBy: '<value>', isApproved: '<value>', isBa
 ```typescript
 // List all invites
 const { data, isLoading } = useInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one invite
 const { data: item } = useInviteQuery({
-  id: '<value>',
-  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a invite
 const { mutate: create } = useCreateInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' });
 ```
 
 ### AppLevel
@@ -825,20 +825,20 @@ create({ email: '<value>', senderId: '<value>', inviteToken: '<value>', inviteVa
 ```typescript
 // List all appLevels
 const { data, isLoading } = useAppLevelsQuery({
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one appLevel
 const { data: item } = useAppLevelQuery({
-  id: '<value>',
-  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true, descriptionTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a appLevel
 const { mutate: create } = useCreateAppLevelMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<value>', descriptionTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ name: '<String>', description: '<String>', image: '<Image>', ownerId: '<UUID>' });
 ```
 
 ### OrgInvite
@@ -846,20 +846,20 @@ create({ name: '<value>', description: '<value>', image: '<value>', ownerId: '<v
 ```typescript
 // List all orgInvites
 const { data, isLoading } = useOrgInvitesQuery({
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
 });
 
 // Get one orgInvite
 const { data: item } = useOrgInviteQuery({
-  id: '<value>',
-  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true, inviteTokenTrgmSimilarity: true, searchScore: true } },
+  id: '<UUID>',
+  selection: { fields: { id: true, email: true, senderId: true, receiverId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true, entityId: true } },
 });
 
 // Create a orgInvite
 const { mutate: create } = useCreateOrgInviteMutation({
   selection: { fields: { id: true } },
 });
-create({ email: '<value>', senderId: '<value>', receiverId: '<value>', inviteToken: '<value>', inviteValid: '<value>', inviteLimit: '<value>', inviteCount: '<value>', multiple: '<value>', data: '<value>', expiresAt: '<value>', entityId: '<value>', inviteTokenTrgmSimilarity: '<value>', searchScore: '<value>' });
+create({ email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>', entityId: '<UUID>' });
 ```
 
 ## Custom Operation Hooks

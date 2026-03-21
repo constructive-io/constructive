@@ -18,8 +18,6 @@ const fieldSchema: FieldSchema = {
   committerId: 'uuid',
   treeId: 'uuid',
   date: 'string',
-  messageTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\ncommit <command>\n\nCommands:\n  list                  List all commit records\n  get                   Get a commit by ID\n  create                Create a new commit\n  update                Update an existing commit\n  delete                Delete a commit\n\n  --help, -h            Show this help message\n';

@@ -27,12 +27,6 @@ const fieldSchema: FieldSchema = {
   permissionsTableId: 'uuid',
   membershipsTableId: 'uuid',
   prefix: 'string',
-  tableNameTrgmSimilarity: 'float',
-  profilePermissionsTableNameTrgmSimilarity: 'float',
-  profileGrantsTableNameTrgmSimilarity: 'float',
-  profileDefinitionGrantsTableNameTrgmSimilarity: 'float',
-  prefixTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nprofiles-module <command>\n\nCommands:\n  list                  List all profilesModule records\n  get                   Get a profilesModule by ID\n  create                Create a new profilesModule\n  update                Update an existing profilesModule\n  delete                Delete a profilesModule\n\n  --help, -h            Show this help message\n';
