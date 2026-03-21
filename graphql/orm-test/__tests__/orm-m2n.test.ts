@@ -3,19 +3,19 @@
  *
  * Tests the full codegen -> ORM runtime chain against a real PostgreSQL database:
  *   1. Seeds DB with M:N tables (posts, tags, post_tags junction)
- *   2. Builds a Graphile schema via graphile-test with ManyToManyOptInPreset
+ *   2. Builds a Graphile schema via graphile-test with ConstructivePreset
  *   3. Runs the codegen pipeline (introspection -> inferTables -> generateOrm)
  *   4. Loads the generated createClient and instantiates models
  *   5. Exercises ORM model methods (findMany, create, delete) via QueryBuilder
  *
  * This validates that the codegen pipeline produces valid ORM code that
- * works against a real PostGraphile schema with +manyToMany enabled.
+ * works against a real PostGraphile schema with ConstructivePreset enabled.
  */
 import path from 'path';
 import { getConnectionsObject, seed } from 'graphile-test';
 import type { GraphQLQueryFnObj, GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
-import { ManyToManyOptInPreset } from 'graphile-settings';
+import { ConstructivePreset } from 'graphile-settings';
 import { runCodegenAndLoad } from './helpers/codegen-helper';
 import { GraphileTestAdapter } from './helpers/graphile-adapter';
 
@@ -46,7 +46,7 @@ describe('ORM M:N integration', () => {
         useRoot: true,
         authRole: 'postgres',
         preset: {
-          extends: [ManyToManyOptInPreset],
+          extends: [ConstructivePreset],
         },
       },
       [
@@ -118,10 +118,10 @@ describe('ORM M:N integration', () => {
       const result = await orm.post
         .findMany({
           select: {
-            rowId: true,
+            id: true,
             title: true,
-            tagsByPostTagPostIdAndTagId: {
-              select: { rowId: true, name: true },
+            tags: {
+              select: { id: true, name: true },
             },
           },
         })
@@ -132,26 +132,26 @@ describe('ORM M:N integration', () => {
       expect(posts).toBeDefined();
       expect(posts.length).toBe(2);
 
-      const post1 = posts.find((p: any) => p.rowId === POST_1);
+      const post1 = posts.find((p: any) => p.id === POST_1);
       expect(post1).toBeDefined();
-      expect(post1.tagsByPostTagPostIdAndTagId.nodes).toHaveLength(1);
-      expect(post1.tagsByPostTagPostIdAndTagId.nodes[0].name).toBe(
+      expect(post1.tags.nodes).toHaveLength(1);
+      expect(post1.tags.nodes[0].name).toBe(
         'Technology',
       );
 
-      const post2 = posts.find((p: any) => p.rowId === POST_2);
+      const post2 = posts.find((p: any) => p.id === POST_2);
       expect(post2).toBeDefined();
-      expect(post2.tagsByPostTagPostIdAndTagId.nodes).toHaveLength(0);
+      expect(post2.tags.nodes).toHaveLength(0);
     });
 
     it('tag.findMany returns tags with M:N posts connection', async () => {
       const result = await orm.tag
         .findMany({
           select: {
-            rowId: true,
+            id: true,
             name: true,
-            postsByPostTagTagIdAndPostId: {
-              select: { rowId: true, title: true },
+            posts: {
+              select: { id: true, title: true },
             },
           },
         })
@@ -163,10 +163,10 @@ describe('ORM M:N integration', () => {
       expect(tags.length).toBe(3);
 
       const tech = tags.find((t: any) => t.name === 'Technology');
-      expect(tech.postsByPostTagTagIdAndPostId.nodes).toHaveLength(1);
+      expect(tech.posts.nodes).toHaveLength(1);
 
       const design = tags.find((t: any) => t.name === 'Design');
-      expect(design.postsByPostTagTagIdAndPostId.nodes).toHaveLength(0);
+      expect(design.posts.nodes).toHaveLength(0);
     });
   });
 
@@ -178,7 +178,7 @@ describe('ORM M:N integration', () => {
       const result = await orm.postTag
         .create({
           data: { postId: POST_1, tagId: TAG_DESIGN },
-          select: { rowId: true, postId: true, tagId: true },
+          select: { id: true, postId: true, tagId: true },
         })
         .execute();
 
@@ -192,18 +192,18 @@ describe('ORM M:N integration', () => {
       const verifyResult = await orm.post
         .findMany({
           select: {
-            rowId: true,
-            tagsByPostTagPostIdAndTagId: {
-              select: { rowId: true, name: true },
+            id: true,
+            tags: {
+              select: { id: true, name: true },
             },
           },
-          condition: { rowId: POST_1 },
+          where: { id: { equalTo: POST_1 } },
         })
         .execute();
 
       expect(verifyResult.ok).toBe(true);
       const post1Tags =
-        unwrapData(verifyResult.data).nodes[0]?.tagsByPostTagPostIdAndTagId
+        unwrapData(verifyResult.data).nodes[0]?.tags
           ?.nodes;
       expect(post1Tags).toHaveLength(2);
       const tagNames = post1Tags.map((t: any) => t.name).sort();
@@ -214,7 +214,7 @@ describe('ORM M:N integration', () => {
       const result = await orm.postTag
         .create({
           data: { postId: POST_2, tagId: TAG_SCIENCE },
-          select: { rowId: true, postId: true, tagId: true },
+          select: { id: true, postId: true, tagId: true },
         })
         .execute();
 
@@ -228,7 +228,7 @@ describe('ORM M:N integration', () => {
       const result = await orm.postTag
         .create({
           data: { postId: POST_1, tagId: TAG_TECH },
-          select: { rowId: true },
+          select: { id: true },
         })
         .execute();
 
@@ -251,8 +251,8 @@ describe('ORM M:N integration', () => {
       // ORM: verify post1 currently has Technology + Design
       const beforeResult = await orm.postTag
         .findMany({
-          select: { rowId: true, postId: true, tagId: true },
-          condition: { postId: POST_1 },
+          select: { id: true, postId: true, tagId: true },
+          where: { postId: { equalTo: POST_1 } },
         })
         .execute();
 
@@ -276,29 +276,29 @@ describe('ORM M:N integration', () => {
       const afterResult = await orm.post
         .findMany({
           select: {
-            rowId: true,
-            tagsByPostTagPostIdAndTagId: {
+            id: true,
+            tags: {
               select: { name: true },
             },
           },
-          condition: { rowId: POST_1 },
+          where: { id: { equalTo: POST_1 } },
         })
         .execute();
 
       expect(afterResult.ok).toBe(true);
       const post1Tags =
-        unwrapData(afterResult.data).nodes[0]?.tagsByPostTagPostIdAndTagId
+        unwrapData(afterResult.data).nodes[0]?.tags
           ?.nodes;
       expect(post1Tags).toHaveLength(1);
       expect(post1Tags[0].name).toBe('Technology');
     });
 
-    it('deletes a junction row by rowId', async () => {
+    it('deletes a junction row by id (PK)', async () => {
       // ORM: find the science junction row
       const findResult = await orm.postTag
         .findMany({
-          select: { rowId: true, postId: true, tagId: true },
-          condition: { postId: POST_2 },
+          select: { id: true, postId: true, tagId: true },
+          where: { postId: { equalTo: POST_2 } },
         })
         .execute();
 
@@ -308,14 +308,14 @@ describe('ORM M:N integration', () => {
       );
       expect(scienceRow).toBeDefined();
 
-      // Raw GraphQL: delete by rowId
-      const deleteResult = await gql<{ deletePostTagByRowId: { postTag: { rowId: string } } }>(`
-        mutation ($rowId: UUID!) {
-          deletePostTagByRowId(input: { rowId: $rowId }) {
-            postTag { rowId }
+      // Raw GraphQL: delete by PK (id)
+      const deleteResult = await gql<{ deletePostTag: { postTag: { id: string } } }>(`
+        mutation ($id: UUID!) {
+          deletePostTag(input: { id: $id }) {
+            postTag { id }
           }
         }
-      `, { rowId: scienceRow.rowId });
+      `, { id: scienceRow.id });
 
       expect(deleteResult.errors).toBeUndefined();
     });
@@ -333,7 +333,7 @@ describe('ORM M:N integration', () => {
             body: 'Created by orm-test',
             isPublished: true,
           },
-          select: { rowId: true, title: true, body: true, isPublished: true },
+          select: { id: true, title: true, body: true, isPublished: true },
         })
         .execute();
 
@@ -349,7 +349,7 @@ describe('ORM M:N integration', () => {
       const tagResult = await orm.tag
         .create({
           data: { name: 'NewTag', color: '#FF0000' },
-          select: { rowId: true, name: true },
+          select: { id: true, name: true },
         })
         .execute();
 
@@ -360,30 +360,30 @@ describe('ORM M:N integration', () => {
       // Link it to post2 via ORM
       const linkResult = await orm.postTag
         .create({
-          data: { postId: POST_2, tagId: newTag.rowId },
+          data: { postId: POST_2, tagId: newTag.id },
           select: { postId: true, tagId: true },
         })
         .execute();
 
       expect(linkResult.ok).toBe(true);
-      expect(unwrapData(linkResult.data).postTag.tagId).toBe(newTag.rowId);
+      expect(unwrapData(linkResult.data).postTag.tagId).toBe(newTag.id);
 
       // Verify via ORM findMany
       const verifyResult = await orm.post
         .findMany({
           select: {
-            rowId: true,
-            tagsByPostTagPostIdAndTagId: {
+            id: true,
+            tags: {
               select: { name: true },
             },
           },
-          condition: { rowId: POST_2 },
+          where: { id: { equalTo: POST_2 } },
         })
         .execute();
 
       expect(verifyResult.ok).toBe(true);
       const post2Tags =
-        unwrapData(verifyResult.data).nodes[0]?.tagsByPostTagPostIdAndTagId
+        unwrapData(verifyResult.data).nodes[0]?.tags
           ?.nodes;
       expect(post2Tags.map((t: any) => t.name)).toContain('NewTag');
     });
@@ -398,7 +398,7 @@ describe('ORM M:N integration', () => {
         .findMany({
           select: {
             name: true,
-            postsByPostTagTagIdAndPostId: {
+            posts: {
               select: { title: true },
             },
           },
@@ -411,7 +411,7 @@ describe('ORM M:N integration', () => {
 
       const tech = tags.find((t: any) => t.name === 'Technology');
       expect(
-        tech.postsByPostTagTagIdAndPostId.nodes.length,
+        tech.posts.nodes.length,
       ).toBeGreaterThanOrEqual(1);
     });
   });
