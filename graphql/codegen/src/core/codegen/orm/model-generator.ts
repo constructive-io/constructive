@@ -17,6 +17,8 @@ import {
   getTableNames,
   hasValidPrimaryKey,
   lcFirst,
+  toPascalCase,
+  ucFirst,
 } from '../utils';
 
 export interface GeneratedModelFile {
@@ -165,6 +167,7 @@ export function generateModelFile(
   table: Table,
   _useSharedTypes: boolean,
   options?: { condition?: boolean },
+  allTables?: Table[],
 ): GeneratedModelFile {
   const conditionEnabled = options?.condition !== false;
   const { typeName, singularName, pluralName } = getTableNames(table);
@@ -196,16 +199,23 @@ export function generateModelFile(
   const statements: t.Statement[] = [];
 
   statements.push(createImportDeclaration('../client', ['OrmClient']));
+  const m2nRels = table.relations.manyToMany.filter(
+    (r) => r.junctionLeftKeyFields?.length && r.junctionRightKeyFields?.length,
+  );
+  const hasM2n = m2nRels.length > 0;
+
+  const queryBuilderImports = [
+    'QueryBuilder',
+    'buildFindManyDocument',
+    'buildFindFirstDocument',
+    'buildFindOneDocument',
+    'buildCreateDocument',
+    'buildUpdateByPkDocument',
+    'buildDeleteByPkDocument',
+    ...(hasM2n ? ['buildJunctionRemoveDocument'] : []),
+  ];
   statements.push(
-    createImportDeclaration('../query-builder', [
-      'QueryBuilder',
-      'buildFindManyDocument',
-      'buildFindFirstDocument',
-      'buildFindOneDocument',
-      'buildCreateDocument',
-      'buildUpdateByPkDocument',
-      'buildDeleteByPkDocument',
-    ]),
+    createImportDeclaration('../query-builder', queryBuilderImports),
   );
   statements.push(
     createImportDeclaration(
@@ -982,6 +992,166 @@ export function generateModelFile(
     );
   }
 
+  // ── M:N add/remove methods ────────────────────────────────────────────
+  for (const rel of m2nRels) {
+    if (!rel.fieldName) continue;
+
+    const junctionTable = allTables?.find((tb) => tb.name === rel.junctionTable);
+    if (!junctionTable) continue;
+
+    const junctionNames = getTableNames(junctionTable);
+    const junctionCreateMutation = junctionTable.query?.create ?? `create${junctionNames.typeName}`;
+    const junctionCreateInputType = `Create${junctionNames.typeName}Input`;
+    const junctionDeleteMutation = junctionTable.query?.delete;
+    const junctionDeleteInputType = `Delete${junctionNames.typeName}Input`;
+    const junctionSingular = junctionNames.singularName;
+
+    // Derive a friendly singular name from the fieldName (e.g., "tags" → "Tag")
+    const relSingular = ucFirst(rel.fieldName.replace(/s$/, ''));
+
+    const leftKeys = rel.junctionLeftKeyFields!;
+    const rightKeys = rel.junctionRightKeyFields!;
+    const leftPkFields = rel.leftKeyFields ?? ['id'];
+    const rightPkFields = rel.rightKeyFields ?? ['id'];
+
+    // ── add<Relation> ───────────────────────────────────────────────
+    {
+      // Parameters: one param per left PK + one param per right PK
+      const params: t.Identifier[] = [];
+      for (const lk of leftPkFields) {
+        const p = t.identifier(lk);
+        p.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+        params.push(p);
+      }
+      for (const rk of rightPkFields) {
+        const p = t.identifier(rk === leftPkFields[0] ? `right${ucFirst(rk)}` : rk);
+        p.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+        params.push(p);
+      }
+
+      // Build the junction row data object: { junctionLeftKey: leftPk, junctionRightKey: rightPk }
+      const dataProps: t.ObjectProperty[] = [];
+      for (let i = 0; i < leftKeys.length; i++) {
+        dataProps.push(
+          t.objectProperty(t.identifier(leftKeys[i]), t.identifier(params[i].name)),
+        );
+      }
+      for (let i = 0; i < rightKeys.length; i++) {
+        dataProps.push(
+          t.objectProperty(
+            t.identifier(rightKeys[i]),
+            t.identifier(params[leftPkFields.length + i].name),
+          ),
+        );
+      }
+
+      const body: t.Statement[] = [
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.objectPattern([
+              t.objectProperty(t.identifier('document'), t.identifier('document'), false, true),
+              t.objectProperty(t.identifier('variables'), t.identifier('variables'), false, true),
+            ]),
+            t.callExpression(t.identifier('buildCreateDocument'), [
+              t.stringLiteral(junctionNames.typeName),
+              t.stringLiteral(junctionCreateMutation),
+              t.stringLiteral(junctionSingular),
+              t.objectExpression([t.objectProperty(t.identifier('id'), t.booleanLiteral(true))]),
+              t.objectExpression(dataProps),
+              t.stringLiteral(junctionCreateInputType),
+            ]),
+          ),
+        ]),
+        t.returnStatement(
+          t.newExpression(t.identifier('QueryBuilder'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('client'),
+                t.memberExpression(t.thisExpression(), t.identifier('client')),
+              ),
+              t.objectProperty(t.identifier('operation'), t.stringLiteral('mutation')),
+              t.objectProperty(t.identifier('operationName'), t.stringLiteral(junctionNames.typeName)),
+              t.objectProperty(t.identifier('fieldName'), t.stringLiteral(junctionCreateMutation)),
+              t.objectProperty(t.identifier('document'), t.identifier('document'), false, true),
+              t.objectProperty(t.identifier('variables'), t.identifier('variables'), false, true),
+            ]),
+          ]),
+        ),
+      ];
+
+      const method = t.classMethod('method', t.identifier(`add${relSingular}`), params, t.blockStatement(body));
+      method.async = true;
+      classBody.push(method);
+    }
+
+    // ── remove<Relation> ────────────────────────────────────────────
+    if (junctionDeleteMutation) {
+      const params: t.Identifier[] = [];
+      for (const lk of leftPkFields) {
+        const p = t.identifier(lk);
+        p.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+        params.push(p);
+      }
+      for (const rk of rightPkFields) {
+        const p = t.identifier(rk === leftPkFields[0] ? `right${ucFirst(rk)}` : rk);
+        p.typeAnnotation = t.tsTypeAnnotation(t.tsStringKeyword());
+        params.push(p);
+      }
+
+      // Build the keys object for junction delete
+      const keysProps: t.ObjectProperty[] = [];
+      for (let i = 0; i < leftKeys.length; i++) {
+        keysProps.push(
+          t.objectProperty(t.identifier(leftKeys[i]), t.identifier(params[i].name)),
+        );
+      }
+      for (let i = 0; i < rightKeys.length; i++) {
+        keysProps.push(
+          t.objectProperty(
+            t.identifier(rightKeys[i]),
+            t.identifier(params[leftPkFields.length + i].name),
+          ),
+        );
+      }
+
+      const body: t.Statement[] = [
+        t.variableDeclaration('const', [
+          t.variableDeclarator(
+            t.objectPattern([
+              t.objectProperty(t.identifier('document'), t.identifier('document'), false, true),
+              t.objectProperty(t.identifier('variables'), t.identifier('variables'), false, true),
+            ]),
+            t.callExpression(t.identifier('buildJunctionRemoveDocument'), [
+              t.stringLiteral(junctionNames.typeName),
+              t.stringLiteral(junctionDeleteMutation),
+              t.objectExpression(keysProps),
+              t.stringLiteral(junctionDeleteInputType),
+            ]),
+          ),
+        ]),
+        t.returnStatement(
+          t.newExpression(t.identifier('QueryBuilder'), [
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('client'),
+                t.memberExpression(t.thisExpression(), t.identifier('client')),
+              ),
+              t.objectProperty(t.identifier('operation'), t.stringLiteral('mutation')),
+              t.objectProperty(t.identifier('operationName'), t.stringLiteral(junctionNames.typeName)),
+              t.objectProperty(t.identifier('fieldName'), t.stringLiteral(junctionDeleteMutation)),
+              t.objectProperty(t.identifier('document'), t.identifier('document'), false, true),
+              t.objectProperty(t.identifier('variables'), t.identifier('variables'), false, true),
+            ]),
+          ]),
+        ),
+      ];
+
+      const method = t.classMethod('method', t.identifier(`remove${relSingular}`), params, t.blockStatement(body));
+      method.async = true;
+      classBody.push(method);
+    }
+  }
+
   const classDecl = t.classDeclaration(
     t.identifier(modelName),
     null,
@@ -1005,5 +1175,5 @@ export function generateAllModelFiles(
   useSharedTypes: boolean,
   options?: { condition?: boolean },
 ): GeneratedModelFile[] {
-  return tables.map((table) => generateModelFile(table, useSharedTypes, options));
+  return tables.map((table) => generateModelFile(table, useSharedTypes, options, tables));
 }
