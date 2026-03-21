@@ -257,18 +257,22 @@ export function getPatchTypeName(table: Table): string {
 
 /**
  * Get PostGraphile update input type name
- * e.g., "UpdateCarInput"
+ * Derives from actual mutation name when available (handles composite PK naming
+ * like UpdatePostTagByPostIdAndTagIdInput), falls back to Update${Entity}Input.
  */
 export function getUpdateInputTypeName(table: Table): string {
-  return `Update${table.name}Input`;
+  const mutationName = table.query?.update;
+  return mutationName ? ucFirst(mutationName) + 'Input' : `Update${table.name}Input`;
 }
 
 /**
  * Get PostGraphile delete input type name
- * e.g., "DeleteCarInput"
+ * Derives from actual mutation name when available (handles composite PK naming
+ * like DeletePostTagByPostIdAndTagIdInput), falls back to Delete${Entity}Input.
  */
 export function getDeleteInputTypeName(table: Table): string {
-  return `Delete${table.name}Input`;
+  const mutationName = table.query?.delete;
+  return mutationName ? ucFirst(mutationName) + 'Input' : `Delete${table.name}Input`;
 }
 
 // ============================================================================

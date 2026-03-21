@@ -136,7 +136,9 @@ export class UserModel {
     const {
       document,
       variables
-    } = buildDeleteByPkDocument("User", "deleteUser", "user", args.where.id, "DeleteUserInput", "id", args.select, connectionFieldsMap);
+    } = buildDeleteByPkDocument("User", "deleteUser", "user", {
+      id: args.where.id
+    }, "DeleteUserInput", args.select, connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
@@ -390,7 +392,9 @@ export class OrganizationModel {
     const {
       document,
       variables
-    } = buildDeleteByPkDocument("Organization", "removeOrganization", "organization", args.where.id, "DeleteOrganizationInput", "id", args.select, connectionFieldsMap);
+    } = buildDeleteByPkDocument("Organization", "removeOrganization", "organization", {
+      id: args.where.id
+    }, "RemoveOrganizationInput", args.select, connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "mutation",
