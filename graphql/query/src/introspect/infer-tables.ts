@@ -722,13 +722,8 @@ function inferConstraints(
 ): TableConstraints {
   const primaryKey: ConstraintInfo[] = [];
 
-  // Derive input type names from actual mutation names (handles composite PK naming)
-  const deleteInputName = mutations?.delete
-    ? ucFirst(mutations.delete) + 'Input'
-    : `Delete${entityName}Input`;
-  const updateInputName = mutations?.update
-    ? ucFirst(mutations.update) + 'Input'
-    : `Update${entityName}Input`;
+  const deleteInputName = inputTypeFromMutation(mutations?.delete, `Delete${entityName}Input`);
+  const updateInputName = inputTypeFromMutation(mutations?.update, `Update${entityName}Input`);
 
   const updateInput = typeMap.get(updateInputName);
   const deleteInput = typeMap.get(deleteInputName);
@@ -828,10 +823,7 @@ function inferPatchFieldName(
   typeMap: Map<string, IntrospectionType>,
   mutations?: MutationOperations,
 ): string {
-  // Derive input type name from actual mutation name (handles composite PK naming)
-  const updateInputName = mutations?.update
-    ? ucFirst(mutations.update) + 'Input'
-    : `Update${entityName}Input`;
+  const updateInputName = inputTypeFromMutation(mutations?.update, `Update${entityName}Input`);
   const updateInput = typeMap.get(updateInputName);
   const inputFields = updateInput?.inputFields ?? [];
 
@@ -960,6 +952,19 @@ function findOrderByType(
 // ============================================================================
 // Utility Functions
 // ============================================================================
+
+/**
+ * Derive the input type name for a mutation.
+ * PostGraphile always generates input types as ${PascalCaseMutationName}Input.
+ * When the actual mutation name is known (e.g. from introspection), we derive
+ * from it directly. Otherwise we fall back to the conventional ${Verb}${Entity}Input.
+ */
+function inputTypeFromMutation(
+  mutationName: string | null | undefined,
+  fallback: string,
+): string {
+  return mutationName ? ucFirst(mutationName) + 'Input' : fallback;
+}
 
 /**
  * Build a map of type name → IntrospectionType for efficient lookup

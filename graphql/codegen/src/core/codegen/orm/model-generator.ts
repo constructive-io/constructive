@@ -200,10 +200,7 @@ export function generateModelFile(
   const updateMutationName = table.query?.update;
   const deleteMutationName = table.query?.delete;
 
-  // Derive delete input type from actual mutation name (handles composite PK naming like DeletePostTagByPostIdAndTagIdInput)
-  const deleteInputTypeName = deleteMutationName
-    ? ucFirst(deleteMutationName) + 'Input'
-    : `Delete${typeName}Input`;
+  const deleteInputTypeName = getDeleteInputTypeName(table);
 
   const statements: t.Statement[] = [];
 
@@ -1025,10 +1022,7 @@ export function generateModelFile(
     const junctionCreateMutation = getCreateMutationName(junctionTable);
     const junctionCreateInputType = getCreateInputTypeName(junctionTable);
     const junctionDeleteMutation = junctionTable.query?.delete ?? getDeleteMutationName(junctionTable);
-    // Derive junction delete input type from actual mutation name (handles composite PK naming)
-    const junctionDeleteInputType = junctionTable.query?.delete
-      ? ucFirst(junctionTable.query.delete) + 'Input'
-      : getDeleteInputTypeName(junctionTable);
+    const junctionDeleteInputType = getDeleteInputTypeName(junctionTable);
     const junctionSingular = junctionNames.singularName;
 
     // Derive a friendly singular name from the fieldName (e.g., "tags" → "Tag", "categories" → "Category")
