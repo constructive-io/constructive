@@ -18,7 +18,7 @@ import type { CliConfig, DbConfig, GraphQLSDKConfigTarget, PgpmConfig, SchemaCon
 import { getConfigOptions } from '../types/config';
 import type { Operation, Table, TypeRegistry } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
-import { generateRootBarrel } from './codegen/barrel';
+import { generateRootBarrel, generateMultiTargetBarrel } from './codegen/barrel';
 import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
 import type { MultiTargetCliTarget } from './codegen/cli';
 import {
@@ -827,16 +827,35 @@ export async function generateMulti(
     }
   }
 
-  // Generate root-root README if multi-target
+  // Generate root-root README and barrel if multi-target
   if (names.length > 1 && targetInfos.length > 0 && !dryRun) {
-    const rootReadme = generateRootRootReadme(targetInfos);
     const { writeGeneratedFiles: writeFiles } = await import('./output');
+
+    const rootReadme = generateRootRootReadme(targetInfos);
     await writeFiles(
       [{ path: rootReadme.fileName, content: rootReadme.content }],
       '.',
       [],
       { pruneStaleFiles: false },
     );
+
+    // Write a root barrel (index.ts) that re-exports each target as a
+    // namespace so the package has a single entry-point.  Derive the
+    // common output root from the first target's output path.
+    const successfulNames = results
+      .filter((r) => r.result.success)
+      .map((r) => r.name);
+    if (successfulNames.length > 0) {
+      const firstOutput = getConfigOptions(configs[successfulNames[0]]).output;
+      const outputRoot = path.dirname(firstOutput);
+      const barrelContent = generateMultiTargetBarrel(successfulNames);
+      await writeFiles(
+        [{ path: 'index.ts', content: barrelContent }],
+        outputRoot,
+        [],
+        { pruneStaleFiles: false },
+      );
+    }
   }
 
   } finally {
