@@ -51,7 +51,6 @@ describe('ORM M:N integration', () => {
       },
       [
         seed.sqlfile([
-          sql('setup.sql'),
           sql('schema.sql'),
           sql('test-data.sql'),
         ]),
