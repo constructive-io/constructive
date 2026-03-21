@@ -60,6 +60,11 @@
         "dependencies": {
           "@jest/test-sequencer": "^29.7.0"
         }
+      },
+      "@graphile-contrib/pg-many-to-many@*": {
+        "peerDependencies": {
+          "grafast": "*"
+        }
       }
     },
     "onlyBuiltDependencies": [
