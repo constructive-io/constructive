@@ -165,8 +165,8 @@ export interface DocsConfig {
   mcp?: boolean;
 
   /**
-   * Generate skills/ directory — per-entity SKILL.md files with YAML frontmatter.
-   * Skills are written to the workspace root skills/ directory (not nested in output).
+   * Generate .agents/skills/ directory — per-entity SKILL.md files with YAML frontmatter.
+   * Skills are written to {workspaceRoot}/.agents/skills/ (not nested in output).
    * Uses composable naming: orm-{target}-{entity}, hooks-{target}-{entity}, cli-{target}-{entity}.
    * @default false
    */
