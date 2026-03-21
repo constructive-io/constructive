@@ -218,9 +218,10 @@ export class OrgLimitDefaultModel {
       'OrgLimitDefault',
       'deleteOrgLimitDefault',
       'orgLimitDefault',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgLimitDefaultInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

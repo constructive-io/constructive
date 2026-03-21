@@ -218,9 +218,10 @@ export class AuditLogModel {
       'AuditLog',
       'deleteAuditLog',
       'auditLog',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAuditLogInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

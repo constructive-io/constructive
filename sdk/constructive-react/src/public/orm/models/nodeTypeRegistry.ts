@@ -218,9 +218,10 @@ export class NodeTypeRegistryModel {
       'NodeTypeRegistry',
       'deleteNodeTypeRegistry',
       'nodeTypeRegistry',
-      args.where.name,
+      {
+        name: args.where.name,
+      },
       'DeleteNodeTypeRegistryInput',
-      'name',
       args.select,
       connectionFieldsMap
     );

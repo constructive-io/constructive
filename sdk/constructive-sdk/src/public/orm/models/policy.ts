@@ -218,9 +218,10 @@ export class PolicyModel {
       'Policy',
       'deletePolicy',
       'policy',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeletePolicyInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

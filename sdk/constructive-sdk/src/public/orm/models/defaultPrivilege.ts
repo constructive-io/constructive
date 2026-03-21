@@ -218,9 +218,10 @@ export class DefaultPrivilegeModel {
       'DefaultPrivilege',
       'deleteDefaultPrivilege',
       'defaultPrivilege',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteDefaultPrivilegeInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

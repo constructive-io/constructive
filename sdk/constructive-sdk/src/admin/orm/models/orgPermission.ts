@@ -218,9 +218,10 @@ export class OrgPermissionModel {
       'OrgPermission',
       'deleteOrgPermission',
       'orgPermission',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgPermissionInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

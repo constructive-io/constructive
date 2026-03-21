@@ -218,9 +218,10 @@ export class SqlActionModel {
       'SqlAction',
       'deleteSqlAction',
       'sqlAction',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSqlActionInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

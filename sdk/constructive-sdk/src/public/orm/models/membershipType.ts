@@ -218,9 +218,10 @@ export class MembershipTypeModel {
       'MembershipType',
       'deleteMembershipType',
       'membershipType',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteMembershipTypeInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

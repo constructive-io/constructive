@@ -218,9 +218,10 @@ export class DefaultIdsModuleModel {
       'DefaultIdsModule',
       'deleteDefaultIdsModule',
       'defaultIdsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteDefaultIdsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

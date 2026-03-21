@@ -220,9 +220,10 @@ export class OrgPermissionDefaultModel {
       'OrgPermissionDefault',
       'deleteOrgPermissionDefault',
       'orgPermissionDefault',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgPermissionDefaultInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

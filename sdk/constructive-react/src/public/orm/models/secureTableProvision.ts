@@ -220,9 +220,10 @@ export class SecureTableProvisionModel {
       'SecureTableProvision',
       'deleteSecureTableProvision',
       'secureTableProvision',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSecureTableProvisionInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

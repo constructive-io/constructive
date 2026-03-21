@@ -218,9 +218,10 @@ export class AppOwnerGrantModel {
       'AppOwnerGrant',
       'deleteAppOwnerGrant',
       'appOwnerGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppOwnerGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

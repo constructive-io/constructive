@@ -218,9 +218,10 @@ export class SiteModuleModel {
       'SiteModule',
       'deleteSiteModule',
       'siteModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSiteModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class BlueprintModel {
       'Blueprint',
       'deleteBlueprint',
       'blueprint',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteBlueprintInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

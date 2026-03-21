@@ -218,9 +218,10 @@ export class AppModel {
       'App',
       'deleteApp',
       'app',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class OrgOwnerGrantModel {
       'OrgOwnerGrant',
       'deleteOrgOwnerGrant',
       'orgOwnerGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgOwnerGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

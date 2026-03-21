@@ -218,9 +218,10 @@ export class DatabaseTransferModel {
       'DatabaseTransfer',
       'deleteDatabaseTransfer',
       'databaseTransfer',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteDatabaseTransferInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

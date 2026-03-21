@@ -218,9 +218,10 @@ export class CryptoAddressModel {
       'CryptoAddress',
       'deleteCryptoAddress',
       'cryptoAddress',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteCryptoAddressInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

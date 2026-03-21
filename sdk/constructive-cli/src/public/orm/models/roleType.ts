@@ -218,9 +218,10 @@ export class RoleTypeModel {
       'RoleType',
       'deleteRoleType',
       'roleType',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteRoleTypeInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

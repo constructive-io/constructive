@@ -218,9 +218,10 @@ export class FullTextSearchModel {
       'FullTextSearch',
       'deleteFullTextSearch',
       'fullTextSearch',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteFullTextSearchInput',
-      'id',
       args.select,
       connectionFieldsMap
     );
