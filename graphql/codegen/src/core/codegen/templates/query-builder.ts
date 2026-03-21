@@ -655,6 +655,25 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
   };
 }
 
+export function buildJunctionRemoveDocument(
+  operationName: string,
+  mutationField: string,
+  keys: Record<string, unknown>,
+  inputTypeName: string,
+): { document: string; variables: Record<string, unknown> } {
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [t.field({ name: 'clientMutationId' })],
+    }),
+    variables: {
+      input: keys,
+    },
+  };
+}
+
 export function buildCustomDocument<TSelect, TArgs>(
   operationType: 'query' | 'mutation',
   operationName: string,
