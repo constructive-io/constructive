@@ -19,7 +19,7 @@ import type {
   TypeRegistry,
 } from '../../../types/schema';
 import { addJSDocComment, addLineComment, generateCode } from '../babel-ast';
-import { SCALAR_NAMES, scalarToFilterType, scalarToTsType } from '../scalars';
+import { BASE_FILTER_TYPE_NAMES, SCALAR_NAMES, scalarToFilterType, scalarToTsType } from '../scalars';
 import { getTypeBaseName } from '../type-resolver';
 import {
   getCreateInputTypeName,
@@ -2016,20 +2016,15 @@ function collectFilterExtraInputTypes(
       continue;
     }
 
-    const tableFieldNames = new Set(
-      table.fields
-        .filter((f) => !isRelationField(f.name, table))
-        .map((f) => f.name),
-    );
-
     for (const field of filterType.inputFields) {
-      // Skip standard column-derived fields and logical operators
-      if (tableFieldNames.has(field.name)) continue;
+      // Skip logical operators (and/or/not reference the table's own filter type)
       if (['and', 'or', 'not'].includes(field.name)) continue;
 
-      // Collect the base type name of this extra field
+      // Collect any filter type that isn't already generated as a base scalar filter
+      // This catches both plugin-injected fields (bm25Body, tsvTsv) AND regular columns
+      // whose custom scalar types have their own filter types (e.g., ConstructiveInternalTypeEmailFilter)
       const baseName = getTypeBaseName(field.type);
-      if (baseName && !SCALAR_NAMES.has(baseName)) {
+      if (baseName && !SCALAR_NAMES.has(baseName) && !BASE_FILTER_TYPE_NAMES.has(baseName)) {
         extraTypes.add(baseName);
       }
     }
