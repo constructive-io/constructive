@@ -220,9 +220,10 @@ export class DatabaseProvisionModuleModel {
       'DatabaseProvisionModule',
       'deleteDatabaseProvisionModule',
       'databaseProvisionModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteDatabaseProvisionModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class SessionsModuleModel {
       'SessionsModule',
       'deleteSessionsModule',
       'sessionsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSessionsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

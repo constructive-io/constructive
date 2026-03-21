@@ -220,9 +220,10 @@ export class ConnectedAccountsModuleModel {
       'ConnectedAccountsModule',
       'deleteConnectedAccountsModule',
       'connectedAccountsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteConnectedAccountsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class UniqueConstraintModel {
       'UniqueConstraint',
       'deleteUniqueConstraint',
       'uniqueConstraint',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteUniqueConstraintInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

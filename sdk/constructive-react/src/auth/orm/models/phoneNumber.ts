@@ -218,9 +218,10 @@ export class PhoneNumberModel {
       'PhoneNumber',
       'deletePhoneNumber',
       'phoneNumber',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeletePhoneNumberInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

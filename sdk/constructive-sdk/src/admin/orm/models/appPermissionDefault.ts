@@ -220,9 +220,10 @@ export class AppPermissionDefaultModel {
       'AppPermissionDefault',
       'deleteAppPermissionDefault',
       'appPermissionDefault',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppPermissionDefaultInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

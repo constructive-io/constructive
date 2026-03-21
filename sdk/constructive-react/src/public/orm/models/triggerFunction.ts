@@ -218,9 +218,10 @@ export class TriggerFunctionModel {
       'TriggerFunction',
       'deleteTriggerFunction',
       'triggerFunction',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteTriggerFunctionInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

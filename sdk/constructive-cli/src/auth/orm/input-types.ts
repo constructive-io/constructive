@@ -490,90 +490,201 @@ export type UserSelect = {
 };
 // ============ Table Filter Types ============
 export interface EmailFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: EmailFilter[];
+  /** Checks for any expressions in this list. */
   or?: EmailFilter[];
+  /** Negates the expression. */
   not?: EmailFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface PhoneNumberFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `cc` field. */
   cc?: StringFilter;
+  /** Filter by the object’s `number` field. */
   number?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: PhoneNumberFilter[];
+  /** Checks for any expressions in this list. */
   or?: PhoneNumberFilter[];
+  /** Negates the expression. */
   not?: PhoneNumberFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface CryptoAddressFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `address` field. */
   address?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: CryptoAddressFilter[];
+  /** Checks for any expressions in this list. */
   or?: CryptoAddressFilter[];
+  /** Negates the expression. */
   not?: CryptoAddressFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface ConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
   service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
   identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
   details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
   or?: ConnectedAccountFilter[];
+  /** Negates the expression. */
   not?: ConnectedAccountFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface AuditLogFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  origin?: StringFilter;
+  /** Filter by the object’s `origin` field. */
+  origin?: ConstructiveInternalTypeOriginFilter;
+  /** Filter by the object’s `userAgent` field. */
   userAgent?: StringFilter;
+  /** Filter by the object’s `ipAddress` field. */
   ipAddress?: InternetAddressFilter;
+  /** Filter by the object’s `success` field. */
   success?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AuditLogFilter[];
+  /** Checks for any expressions in this list. */
   or?: AuditLogFilter[];
+  /** Negates the expression. */
   not?: AuditLogFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
 }
 export interface RoleTypeFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: RoleTypeFilter[];
+  /** Checks for any expressions in this list. */
   or?: RoleTypeFilter[];
+  /** Negates the expression. */
   not?: RoleTypeFilter;
 }
 export interface UserFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  username?: StringFilter;
-  displayName?: StringFilter;
-  profilePicture?: StringFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
   searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
   type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  searchTsvRank?: FloatFilter;
-  displayNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: UserFilter[];
+  /** Checks for any expressions in this list. */
   or?: UserFilter[];
+  /** Negates the expression. */
   not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedConnectedAccounts` relation. */
+  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
+  /** `ownedConnectedAccounts` exist. */
+  ownedConnectedAccountsExist?: boolean;
+  /** Filter by the object’s `auditLogsByActorId` relation. */
+  auditLogsByActorId?: UserToManyAuditLogFilter;
+  /** `auditLogsByActorId` exist. */
+  auditLogsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 // ============ OrderBy Types ============
 export type EmailOrderBy =
@@ -932,6 +1043,328 @@ export interface VerifyTotpInput {
   clientMutationId?: string;
   totpValue: string;
 }
+/** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeEmailFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+}
+/** A filter to be used against ConstructiveInternalTypeOrigin fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeOriginFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeOrigin;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeOrigin;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeOrigin;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeOrigin[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeOrigin[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeOrigin;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeOrigin;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeOrigin;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeOrigin;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeOrigin;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeOrigin;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeOrigin;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeOrigin;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeOrigin;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeOrigin;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
+export interface StringTrgmFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
+  similarTo?: TrgmSearchInput;
+  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
+  wordSimilarTo?: TrgmSearchInput;
+}
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
+}
+/** A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyEmailFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmailFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailFilter;
+}
+/** A filter to be used against many `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyPhoneNumberFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PhoneNumberFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PhoneNumberFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PhoneNumberFilter;
+}
+/** A filter to be used against many `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyCryptoAddressFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAddressFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAddressFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAddressFilter;
+}
+/** A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyConnectedAccountFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ConnectedAccountFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ConnectedAccountFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ConnectedAccountFilter;
+}
+/** A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAuditLogFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AuditLogFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AuditLogFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AuditLogFilter;
+}
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
+}
 /** An interval of time that has passed where the smallest distinct unit is a second. */
 export interface IntervalInput {
   /**
@@ -950,6 +1383,476 @@ export interface IntervalInput {
   months?: number;
   /** A quantity of years. */
   years?: number;
+}
+/** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmailFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmailFilter[];
+  /** Negates the expression. */
+  not?: EmailFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
+export interface PhoneNumberFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `cc` field. */
+  cc?: StringFilter;
+  /** Filter by the object’s `number` field. */
+  number?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PhoneNumberFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PhoneNumberFilter[];
+  /** Negates the expression. */
+  not?: PhoneNumberFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
+export interface CryptoAddressFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `address` field. */
+  address?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAddressFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAddressFilter[];
+  /** Negates the expression. */
+  not?: CryptoAddressFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface ConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
+  service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
+  identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
+  details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ConnectedAccountFilter[];
+  /** Negates the expression. */
+  not?: ConnectedAccountFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `AuditLog` object types. All fields are combined with a logical ‘and.’ */
+export interface AuditLogFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `origin` field. */
+  origin?: ConstructiveInternalTypeOriginFilter;
+  /** Filter by the object’s `userAgent` field. */
+  userAgent?: StringFilter;
+  /** Filter by the object’s `ipAddress` field. */
+  ipAddress?: InternetAddressFilter;
+  /** Filter by the object’s `success` field. */
+  success?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AuditLogFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AuditLogFilter[];
+  /** Negates the expression. */
+  not?: AuditLogFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
+}
+/** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
+export interface UUIDFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
+export interface BooleanFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: boolean;
+  /** Not equal to the specified value. */
+  notEqualTo?: boolean;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: boolean;
+  /** Included in the specified list. */
+  in?: boolean[];
+  /** Not included in the specified list. */
+  notIn?: boolean[];
+  /** Less than the specified value. */
+  lessThan?: boolean;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: boolean;
+  /** Greater than the specified value. */
+  greaterThan?: boolean;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: boolean;
+}
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
+export interface UserFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
+  searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
+  type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserFilter[];
+  /** Negates the expression. */
+  not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedConnectedAccounts` relation. */
+  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
+  /** `ownedConnectedAccounts` exist. */
+  ownedConnectedAccountsExist?: boolean;
+  /** Filter by the object’s `auditLogsByActorId` relation. */
+  auditLogsByActorId?: UserToManyAuditLogFilter;
+  /** `auditLogsByActorId` exist. */
+  auditLogsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
+}
+/** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
+export interface StringFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
+export interface JSONFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: Record<string, unknown>;
+  /** Not equal to the specified value. */
+  notEqualTo?: Record<string, unknown>;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Record<string, unknown>;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Record<string, unknown>;
+  /** Included in the specified list. */
+  in?: Record<string, unknown>[];
+  /** Not included in the specified list. */
+  notIn?: Record<string, unknown>[];
+  /** Less than the specified value. */
+  lessThan?: Record<string, unknown>;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: Record<string, unknown>;
+  /** Greater than the specified value. */
+  greaterThan?: Record<string, unknown>;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: Record<string, unknown>;
+  /** Contains the specified JSON. */
+  contains?: Record<string, unknown>;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: Record<string, unknown>;
+}
+/** A filter to be used against InternetAddress fields. All fields are combined with a logical ‘and.’ */
+export interface InternetAddressFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified internet address. */
+  contains?: string;
+  /** Contains or equal to the specified internet address. */
+  containsOrEqualTo?: string;
+  /** Contained by the specified internet address. */
+  containedBy?: string;
+  /** Contained by or equal to the specified internet address. */
+  containedByOrEqualTo?: string;
+  /** Contains or contained by the specified internet address. */
+  containsOrContainedBy?: string;
+}
+/** A filter to be used against FullText fields. All fields are combined with a logical ‘and.’ */
+export interface FullTextFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Performs a full text search on the field. */
+  matches?: string;
+}
+/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
+export interface IntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+}
+/** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
+export interface RoleTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RoleTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RoleTypeFilter[];
+  /** Negates the expression. */
+  not?: RoleTypeFilter;
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface SignOutPayload {

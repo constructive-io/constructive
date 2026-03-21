@@ -218,9 +218,10 @@ export class OrgMembershipModel {
       'OrgMembership',
       'deleteOrgMembership',
       'orgMembership',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgMembershipInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

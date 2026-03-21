@@ -1049,365 +1049,659 @@ export interface OrgGetSubordinatesRecordFilter {
   not?: OrgGetSubordinatesRecordFilter;
 }
 export interface AppPermissionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `bitnum` field. */
   bitnum?: IntFilter;
+  /** Filter by the object’s `bitstr` field. */
   bitstr?: BitStringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: AppPermissionFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppPermissionFilter[];
+  /** Negates the expression. */
   not?: AppPermissionFilter;
 }
 export interface OrgPermissionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `bitnum` field. */
   bitnum?: IntFilter;
+  /** Filter by the object’s `bitstr` field. */
   bitstr?: BitStringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgPermissionFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgPermissionFilter[];
+  /** Negates the expression. */
   not?: OrgPermissionFilter;
 }
 export interface AppLevelRequirementFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `level` field. */
   level?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `requiredCount` field. */
   requiredCount?: IntFilter;
+  /** Filter by the object’s `priority` field. */
   priority?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLevelRequirementFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLevelRequirementFilter[];
+  /** Negates the expression. */
   not?: AppLevelRequirementFilter;
 }
 export interface OrgMemberFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMemberFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMemberFilter[];
+  /** Negates the expression. */
   not?: OrgMemberFilter;
 }
 export interface AppPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Checks for all expressions in this list. */
   and?: AppPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppPermissionDefaultFilter[];
+  /** Negates the expression. */
   not?: AppPermissionDefaultFilter;
 }
 export interface OrgPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgPermissionDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgPermissionDefaultFilter;
 }
 export interface AppAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppAdminGrantFilter[];
+  /** Negates the expression. */
   not?: AppAdminGrantFilter;
 }
 export interface AppOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppOwnerGrantFilter[];
+  /** Negates the expression. */
   not?: AppOwnerGrantFilter;
 }
 export interface OrgAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgAdminGrantFilter[];
+  /** Negates the expression. */
   not?: OrgAdminGrantFilter;
 }
 export interface OrgOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgOwnerGrantFilter[];
+  /** Negates the expression. */
   not?: OrgOwnerGrantFilter;
 }
 export interface AppLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLimitDefaultFilter[];
+  /** Negates the expression. */
   not?: AppLimitDefaultFilter;
 }
 export interface OrgLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgLimitDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
 export interface OrgChartEdgeGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
   childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
   parentId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `positionTitle` field. */
   positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
   positionLevel?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgChartEdgeGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgChartEdgeGrantFilter[];
+  /** Negates the expression. */
   not?: OrgChartEdgeGrantFilter;
 }
 export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
   or?: MembershipTypeFilter[];
+  /** Negates the expression. */
   not?: MembershipTypeFilter;
 }
 export interface AppLimitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
   num?: IntFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLimitFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLimitFilter[];
+  /** Negates the expression. */
   not?: AppLimitFilter;
 }
 export interface AppAchievementFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `count` field. */
   count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppAchievementFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppAchievementFilter[];
+  /** Negates the expression. */
   not?: AppAchievementFilter;
 }
 export interface AppStepFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `count` field. */
   count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppStepFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppStepFilter[];
+  /** Negates the expression. */
   not?: AppStepFilter;
 }
 export interface ClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: ClaimedInviteFilter[];
+  /** Negates the expression. */
   not?: ClaimedInviteFilter;
 }
 export interface AppGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppGrantFilter[];
+  /** Negates the expression. */
   not?: AppGrantFilter;
 }
 export interface AppMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: AppMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppMembershipDefaultFilter[];
+  /** Negates the expression. */
   not?: AppMembershipDefaultFilter;
 }
 export interface OrgLimitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
   num?: IntFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgLimitFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgLimitFilter[];
+  /** Negates the expression. */
   not?: OrgLimitFilter;
 }
 export interface OrgClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgClaimedInviteFilter[];
+  /** Negates the expression. */
   not?: OrgClaimedInviteFilter;
 }
 export interface OrgGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgGrantFilter[];
+  /** Negates the expression. */
   not?: OrgGrantFilter;
 }
 export interface OrgChartEdgeFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
   childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
   parentId?: UUIDFilter;
+  /** Filter by the object’s `positionTitle` field. */
   positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
   positionLevel?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgChartEdgeFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgChartEdgeFilter[];
+  /** Negates the expression. */
   not?: OrgChartEdgeFilter;
 }
 export interface OrgMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
   deleteMemberCascadeGroups?: BooleanFilter;
+  /** Filter by the object’s `createGroupsCascadeMembers` field. */
   createGroupsCascadeMembers?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMembershipDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgMembershipDefaultFilter;
 }
 export interface AppMembershipFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
   isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
   isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
   granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
   profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: AppMembershipFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppMembershipFilter[];
+  /** Negates the expression. */
   not?: AppMembershipFilter;
 }
 export interface OrgMembershipFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
   isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
   isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
   granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
   profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMembershipFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMembershipFilter[];
+  /** Negates the expression. */
   not?: OrgMembershipFilter;
 }
 export interface InviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
   inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
   inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
   inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
   inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: InviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: InviteFilter[];
+  /** Negates the expression. */
   not?: InviteFilter;
 }
 export interface AppLevelFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  image?: StringFilter;
+  /** Filter by the object’s `image` field. */
+  image?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLevelFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLevelFilter[];
+  /** Negates the expression. */
   not?: AppLevelFilter;
 }
 export interface OrgInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
   inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
   inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
   inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
   inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgInviteFilter[];
+  /** Negates the expression. */
   not?: OrgInviteFilter;
 }
 // ============ OrderBy Types ============
@@ -2665,6 +2959,118 @@ export interface SubmitInviteCodeInput {
 export interface SubmitOrgInviteCodeInput {
   clientMutationId?: string;
   token?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeEmailFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+}
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
 }
 /** A connection to a list of `AppPermission` values. */
 // ============ Payload/Return Types (for custom operations) ============

@@ -220,9 +220,10 @@ export class ForeignKeyConstraintModel {
       'ForeignKeyConstraint',
       'deleteForeignKeyConstraint',
       'foreignKeyConstraint',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteForeignKeyConstraintInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

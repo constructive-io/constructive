@@ -218,9 +218,10 @@ export class AppStepModel {
       'AppStep',
       'deleteAppStep',
       'appStep',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppStepInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class EmbeddingChunkModel {
       'EmbeddingChunk',
       'deleteEmbeddingChunk',
       'embeddingChunk',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteEmbeddingChunkInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

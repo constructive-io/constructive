@@ -218,9 +218,10 @@ export class UserModel {
       'User',
       'deleteUser',
       'user',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteUserInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

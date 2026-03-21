@@ -218,9 +218,10 @@ export class ConnectedAccountModel {
       'ConnectedAccount',
       'deleteConnectedAccount',
       'connectedAccount',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteConnectedAccountInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

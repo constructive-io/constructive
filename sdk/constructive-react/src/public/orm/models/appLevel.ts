@@ -218,9 +218,10 @@ export class AppLevelModel {
       'AppLevel',
       'deleteAppLevel',
       'appLevel',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppLevelInput',
-      'id',
       args.select,
       connectionFieldsMap
     );
