@@ -17,7 +17,6 @@ import {
   getTableNames,
   hasValidPrimaryKey,
   lcFirst,
-  toPascalCase,
   ucFirst,
 } from '../utils';
 
@@ -1079,9 +1078,9 @@ export function generateModelFile(
         ),
       ];
 
-      const method = t.classMethod('method', t.identifier(`add${relSingular}`), params, t.blockStatement(body));
-      method.async = true;
-      classBody.push(method);
+      classBody.push(
+        t.classMethod('method', t.identifier(`add${relSingular}`), params, t.blockStatement(body)),
+      );
     }
 
     // ── remove<Relation> ────────────────────────────────────────────
@@ -1146,9 +1145,9 @@ export function generateModelFile(
         ),
       ];
 
-      const method = t.classMethod('method', t.identifier(`remove${relSingular}`), params, t.blockStatement(body));
-      method.async = true;
-      classBody.push(method);
+      classBody.push(
+        t.classMethod('method', t.identifier(`remove${relSingular}`), params, t.blockStatement(body)),
+      );
     }
   }
 
