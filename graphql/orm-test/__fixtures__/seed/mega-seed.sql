@@ -3,13 +3,7 @@
 --            scalar filters, relation filters, logical operators, M:N
 --
 -- Requires postgres-plus:18 image with: postgis, vector, pg_textsearch, pg_trgm
-
--- Enable extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS postgis;
-CREATE EXTENSION IF NOT EXISTS vector;
-CREATE EXTENSION IF NOT EXISTS pg_textsearch;
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
+-- Extensions are installed via pgsql-test db.extensions config (not inline SQL).
 
 -- Create test schema
 CREATE SCHEMA IF NOT EXISTS mega_test;

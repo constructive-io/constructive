@@ -39,6 +39,9 @@ describe('Mega query integration (ORM)', () => {
         schemas: [SCHEMA],
         preset: { extends: [ConstructivePreset] },
         useRoot: true,
+        db: {
+          extensions: ['postgis', 'vector', 'pg_textsearch', 'pg_trgm'],
+        },
       },
       [seed.sqlfile([seedFile])],
     );
