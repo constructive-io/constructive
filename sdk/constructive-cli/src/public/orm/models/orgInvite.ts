@@ -218,9 +218,10 @@ export class OrgInviteModel {
       'OrgInvite',
       'deleteOrgInvite',
       'orgInvite',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgInviteInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

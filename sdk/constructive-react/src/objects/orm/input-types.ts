@@ -359,50 +359,87 @@ export interface GetAllRecordFilter {
   not?: GetAllRecordFilter;
 }
 export interface ObjectFilter {
-  hashUuid?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
   kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
   ktree?: StringListFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `frzn` field. */
   frzn?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ObjectFilter[];
+  /** Checks for any expressions in this list. */
   or?: ObjectFilter[];
+  /** Negates the expression. */
   not?: ObjectFilter;
 }
 export interface RefFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
+  /** Filter by the object’s `commitId` field. */
   commitId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: RefFilter[];
+  /** Checks for any expressions in this list. */
   or?: RefFilter[];
+  /** Negates the expression. */
   not?: RefFilter;
 }
 export interface StoreFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: StoreFilter[];
+  /** Checks for any expressions in this list. */
   or?: StoreFilter[];
+  /** Negates the expression. */
   not?: StoreFilter;
 }
 export interface CommitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
   message?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
+  /** Filter by the object’s `parentIds` field. */
   parentIds?: UUIDListFilter;
+  /** Filter by the object’s `authorId` field. */
   authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
   committerId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
   treeId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
   date?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: CommitFilter[];
+  /** Checks for any expressions in this list. */
   or?: CommitFilter[];
+  /** Negates the expression. */
   not?: CommitFilter;
 }
 // ============ OrderBy Types ============

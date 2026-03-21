@@ -218,9 +218,10 @@ export class ApiSchemaModel {
       'ApiSchema',
       'deleteApiSchema',
       'apiSchema',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteApiSchemaInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class BlueprintTemplateModel {
       'BlueprintTemplate',
       'deleteBlueprintTemplate',
       'blueprintTemplate',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteBlueprintTemplateInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

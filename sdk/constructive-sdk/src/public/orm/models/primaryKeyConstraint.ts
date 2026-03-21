@@ -220,9 +220,10 @@ export class PrimaryKeyConstraintModel {
       'PrimaryKeyConstraint',
       'deletePrimaryKeyConstraint',
       'primaryKeyConstraint',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeletePrimaryKeyConstraintInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

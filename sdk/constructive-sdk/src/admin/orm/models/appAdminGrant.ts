@@ -218,9 +218,10 @@ export class AppAdminGrantModel {
       'AppAdminGrant',
       'deleteAppAdminGrant',
       'appAdminGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppAdminGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

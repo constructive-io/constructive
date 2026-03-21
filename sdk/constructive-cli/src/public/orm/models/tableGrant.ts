@@ -218,9 +218,10 @@ export class TableGrantModel {
       'TableGrant',
       'deleteTableGrant',
       'tableGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteTableGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

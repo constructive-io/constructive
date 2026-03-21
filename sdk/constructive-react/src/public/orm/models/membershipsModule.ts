@@ -218,9 +218,10 @@ export class MembershipsModuleModel {
       'MembershipsModule',
       'deleteMembershipsModule',
       'membershipsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteMembershipsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

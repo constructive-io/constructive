@@ -218,9 +218,10 @@ export class EmailsModuleModel {
       'EmailsModule',
       'deleteEmailsModule',
       'emailsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteEmailsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

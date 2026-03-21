@@ -218,9 +218,10 @@ export class PermissionsModuleModel {
       'PermissionsModule',
       'deletePermissionsModule',
       'permissionsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeletePermissionsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

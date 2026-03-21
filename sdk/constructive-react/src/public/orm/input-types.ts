@@ -5695,1581 +5695,4125 @@ export interface OrgGetSubordinatesRecordFilter {
   not?: OrgGetSubordinatesRecordFilter;
 }
 export interface ObjectFilter {
-  hashUuid?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `kids` field. */
   kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
   ktree?: StringListFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `frzn` field. */
   frzn?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ObjectFilter[];
+  /** Checks for any expressions in this list. */
   or?: ObjectFilter[];
+  /** Negates the expression. */
   not?: ObjectFilter;
 }
 export interface AppPermissionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `bitnum` field. */
   bitnum?: IntFilter;
+  /** Filter by the object’s `bitstr` field. */
   bitstr?: BitStringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: AppPermissionFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppPermissionFilter[];
+  /** Negates the expression. */
   not?: AppPermissionFilter;
 }
 export interface OrgPermissionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `bitnum` field. */
   bitnum?: IntFilter;
+  /** Filter by the object’s `bitstr` field. */
   bitstr?: BitStringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgPermissionFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgPermissionFilter[];
+  /** Negates the expression. */
   not?: OrgPermissionFilter;
 }
 export interface AppLevelRequirementFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `level` field. */
   level?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `requiredCount` field. */
   requiredCount?: IntFilter;
+  /** Filter by the object’s `priority` field. */
   priority?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLevelRequirementFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLevelRequirementFilter[];
+  /** Negates the expression. */
   not?: AppLevelRequirementFilter;
 }
 export interface DatabaseFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `schemaHash` field. */
   schemaHash?: StringFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: DatabaseFilter[];
+  /** Checks for any expressions in this list. */
   or?: DatabaseFilter[];
+  /** Negates the expression. */
   not?: DatabaseFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
+  /** Filter by the object’s `schemas` relation. */
+  schemas?: DatabaseToManySchemaFilter;
+  /** `schemas` exist. */
+  schemasExist?: boolean;
+  /** Filter by the object’s `tables` relation. */
+  tables?: DatabaseToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: DatabaseToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: DatabaseToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: DatabaseToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: DatabaseToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: DatabaseToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: DatabaseToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: DatabaseToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: DatabaseToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: DatabaseToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggerFunctions` relation. */
+  triggerFunctions?: DatabaseToManyTriggerFunctionFilter;
+  /** `triggerFunctions` exist. */
+  triggerFunctionsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: DatabaseToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: DatabaseToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: DatabaseToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: DatabaseToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: DatabaseToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: DatabaseToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `databaseTransfers` relation. */
+  databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
+  /** `databaseTransfers` exist. */
+  databaseTransfersExist?: boolean;
+  /** Filter by the object’s `apis` relation. */
+  apis?: DatabaseToManyApiFilter;
+  /** `apis` exist. */
+  apisExist?: boolean;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: DatabaseToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: DatabaseToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `sites` relation. */
+  sites?: DatabaseToManySiteFilter;
+  /** `sites` exist. */
+  sitesExist?: boolean;
+  /** Filter by the object’s `apps` relation. */
+  apps?: DatabaseToManyAppFilter;
+  /** `apps` exist. */
+  appsExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: DatabaseToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: DatabaseToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: DatabaseToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: DatabaseToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+  /** Filter by the object’s `connectedAccountsModules` relation. */
+  connectedAccountsModules?: DatabaseToManyConnectedAccountsModuleFilter;
+  /** `connectedAccountsModules` exist. */
+  connectedAccountsModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAddressesModules` relation. */
+  cryptoAddressesModules?: DatabaseToManyCryptoAddressesModuleFilter;
+  /** `cryptoAddressesModules` exist. */
+  cryptoAddressesModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAuthModules` relation. */
+  cryptoAuthModules?: DatabaseToManyCryptoAuthModuleFilter;
+  /** `cryptoAuthModules` exist. */
+  cryptoAuthModulesExist?: boolean;
+  /** Filter by the object’s `defaultIdsModules` relation. */
+  defaultIdsModules?: DatabaseToManyDefaultIdsModuleFilter;
+  /** `defaultIdsModules` exist. */
+  defaultIdsModulesExist?: boolean;
+  /** Filter by the object’s `denormalizedTableFields` relation. */
+  denormalizedTableFields?: DatabaseToManyDenormalizedTableFieldFilter;
+  /** `denormalizedTableFields` exist. */
+  denormalizedTableFieldsExist?: boolean;
+  /** Filter by the object’s `emailsModules` relation. */
+  emailsModules?: DatabaseToManyEmailsModuleFilter;
+  /** `emailsModules` exist. */
+  emailsModulesExist?: boolean;
+  /** Filter by the object’s `encryptedSecretsModules` relation. */
+  encryptedSecretsModules?: DatabaseToManyEncryptedSecretsModuleFilter;
+  /** `encryptedSecretsModules` exist. */
+  encryptedSecretsModulesExist?: boolean;
+  /** Filter by the object’s `fieldModules` relation. */
+  fieldModules?: DatabaseToManyFieldModuleFilter;
+  /** `fieldModules` exist. */
+  fieldModulesExist?: boolean;
+  /** Filter by the object’s `invitesModules` relation. */
+  invitesModules?: DatabaseToManyInvitesModuleFilter;
+  /** `invitesModules` exist. */
+  invitesModulesExist?: boolean;
+  /** Filter by the object’s `levelsModules` relation. */
+  levelsModules?: DatabaseToManyLevelsModuleFilter;
+  /** `levelsModules` exist. */
+  levelsModulesExist?: boolean;
+  /** Filter by the object’s `limitsModules` relation. */
+  limitsModules?: DatabaseToManyLimitsModuleFilter;
+  /** `limitsModules` exist. */
+  limitsModulesExist?: boolean;
+  /** Filter by the object’s `membershipTypesModules` relation. */
+  membershipTypesModules?: DatabaseToManyMembershipTypesModuleFilter;
+  /** `membershipTypesModules` exist. */
+  membershipTypesModulesExist?: boolean;
+  /** Filter by the object’s `membershipsModules` relation. */
+  membershipsModules?: DatabaseToManyMembershipsModuleFilter;
+  /** `membershipsModules` exist. */
+  membershipsModulesExist?: boolean;
+  /** Filter by the object’s `permissionsModules` relation. */
+  permissionsModules?: DatabaseToManyPermissionsModuleFilter;
+  /** `permissionsModules` exist. */
+  permissionsModulesExist?: boolean;
+  /** Filter by the object’s `phoneNumbersModules` relation. */
+  phoneNumbersModules?: DatabaseToManyPhoneNumbersModuleFilter;
+  /** `phoneNumbersModules` exist. */
+  phoneNumbersModulesExist?: boolean;
+  /** Filter by the object’s `profilesModules` relation. */
+  profilesModules?: DatabaseToManyProfilesModuleFilter;
+  /** `profilesModules` exist. */
+  profilesModulesExist?: boolean;
+  /** Filter by the object’s `rlsModule` relation. */
+  rlsModule?: RlsModuleFilter;
+  /** A related `rlsModule` exists. */
+  rlsModuleExists?: boolean;
+  /** Filter by the object’s `secretsModules` relation. */
+  secretsModules?: DatabaseToManySecretsModuleFilter;
+  /** `secretsModules` exist. */
+  secretsModulesExist?: boolean;
+  /** Filter by the object’s `sessionsModules` relation. */
+  sessionsModules?: DatabaseToManySessionsModuleFilter;
+  /** `sessionsModules` exist. */
+  sessionsModulesExist?: boolean;
+  /** Filter by the object’s `userAuthModules` relation. */
+  userAuthModules?: DatabaseToManyUserAuthModuleFilter;
+  /** `userAuthModules` exist. */
+  userAuthModulesExist?: boolean;
+  /** Filter by the object’s `usersModules` relation. */
+  usersModules?: DatabaseToManyUsersModuleFilter;
+  /** `usersModules` exist. */
+  usersModulesExist?: boolean;
+  /** Filter by the object’s `hierarchyModule` relation. */
+  hierarchyModule?: HierarchyModuleFilter;
+  /** A related `hierarchyModule` exists. */
+  hierarchyModuleExists?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: DatabaseToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: DatabaseToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisions` relation. */
+  relationProvisions?: DatabaseToManyRelationProvisionFilter;
+  /** `relationProvisions` exist. */
+  relationProvisionsExist?: boolean;
+  /** Filter by the object’s `blueprints` relation. */
+  blueprints?: DatabaseToManyBlueprintFilter;
+  /** `blueprints` exist. */
+  blueprintsExist?: boolean;
+  /** Filter by the object’s `databaseProvisionModules` relation. */
+  databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
+  /** `databaseProvisionModules` exist. */
+  databaseProvisionModulesExist?: boolean;
 }
 export interface SchemaFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `schemaName` field. */
   schemaName?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: SchemaFilter[];
+  /** Checks for any expressions in this list. */
   or?: SchemaFilter[];
+  /** Negates the expression. */
   not?: SchemaFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `tables` relation. */
+  tables?: SchemaToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: SchemaToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: SchemaToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: SchemaToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: SchemaToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: SchemaToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByPrivateSchemaId` relation. */
+  tableTemplateModulesByPrivateSchemaId?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByPrivateSchemaId` exist. */
+  tableTemplateModulesByPrivateSchemaIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
 }
 export interface TableFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
+  /** Filter by the object’s `timestamps` field. */
   timestamps?: BooleanFilter;
+  /** Filter by the object’s `peoplestamps` field. */
   peoplestamps?: BooleanFilter;
+  /** Filter by the object’s `pluralName` field. */
   pluralName?: StringFilter;
+  /** Filter by the object’s `singularName` field. */
   singularName?: StringFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `inheritsId` field. */
   inheritsId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: TableFilter[];
+  /** Checks for any expressions in this list. */
   or?: TableFilter[];
+  /** Negates the expression. */
   not?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `inherits` relation. */
+  inherits?: TableFilter;
+  /** A related `inherits` exists. */
+  inheritsExists?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: TableToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: TableToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: TableToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: TableToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: TableToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: TableToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: TableToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: TableToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: TableToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: TableToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: TableToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: TableToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `embeddingChunksByChunksTableId` relation. */
+  embeddingChunksByChunksTableId?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunksByChunksTableId` exist. */
+  embeddingChunksByChunksTableIdExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByOwnerTableId` relation. */
+  tableTemplateModulesByOwnerTableId?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByOwnerTableId` exist. */
+  tableTemplateModulesByOwnerTableIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: TableToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisionsBySourceTableId` relation. */
+  relationProvisionsBySourceTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsBySourceTableId` exist. */
+  relationProvisionsBySourceTableIdExist?: boolean;
+  /** Filter by the object’s `relationProvisionsByTargetTableId` relation. */
+  relationProvisionsByTargetTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsByTargetTableId` exist. */
+  relationProvisionsByTargetTableIdExist?: boolean;
 }
 export interface CheckConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `expr` field. */
   expr?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: CheckConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: CheckConstraintFilter[];
+  /** Negates the expression. */
   not?: CheckConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface FieldFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
+  /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
   apiRequired?: BooleanFilter;
+  /** Filter by the object’s `defaultValue` field. */
   defaultValue?: StringFilter;
+  /** Filter by the object’s `defaultValueAst` field. */
   defaultValueAst?: JSONFilter;
+  /** Filter by the object’s `isHidden` field. */
   isHidden?: BooleanFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
+  /** Filter by the object’s `fieldOrder` field. */
   fieldOrder?: IntFilter;
+  /** Filter by the object’s `regexp` field. */
   regexp?: StringFilter;
+  /** Filter by the object’s `chk` field. */
   chk?: JSONFilter;
+  /** Filter by the object’s `chkExpr` field. */
   chkExpr?: JSONFilter;
+  /** Filter by the object’s `min` field. */
   min?: FloatFilter;
+  /** Filter by the object’s `max` field. */
   max?: FloatFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: FieldFilter[];
+  /** Checks for any expressions in this list. */
   or?: FieldFilter[];
+  /** Negates the expression. */
   not?: FieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface ForeignKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
   refTableId?: UUIDFilter;
+  /** Filter by the object’s `refFieldIds` field. */
   refFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `updateAction` field. */
   updateAction?: StringFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ForeignKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: ForeignKeyConstraintFilter[];
+  /** Negates the expression. */
   not?: ForeignKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface FullTextSearchFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
   fieldId?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `weights` field. */
   weights?: StringListFilter;
+  /** Filter by the object’s `langs` field. */
   langs?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: FullTextSearchFilter[];
+  /** Checks for any expressions in this list. */
   or?: FullTextSearchFilter[];
+  /** Negates the expression. */
   not?: FullTextSearchFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface IndexFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `includeFieldIds` field. */
   includeFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `accessMethod` field. */
   accessMethod?: StringFilter;
+  /** Filter by the object’s `indexParams` field. */
   indexParams?: JSONFilter;
+  /** Filter by the object’s `whereClause` field. */
   whereClause?: JSONFilter;
+  /** Filter by the object’s `isUnique` field. */
   isUnique?: BooleanFilter;
+  /** Filter by the object’s `options` field. */
   options?: JSONFilter;
+  /** Filter by the object’s `opClasses` field. */
   opClasses?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: IndexFilter[];
+  /** Checks for any expressions in this list. */
   or?: IndexFilter[];
+  /** Negates the expression. */
   not?: IndexFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface PolicyFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `permissive` field. */
   permissive?: BooleanFilter;
+  /** Filter by the object’s `disabled` field. */
   disabled?: BooleanFilter;
+  /** Filter by the object’s `policyType` field. */
   policyType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: PolicyFilter[];
+  /** Checks for any expressions in this list. */
   or?: PolicyFilter[];
+  /** Negates the expression. */
   not?: PolicyFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface PrimaryKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: PrimaryKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: PrimaryKeyConstraintFilter[];
+  /** Negates the expression. */
   not?: PrimaryKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface TableGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: TableGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: TableGrantFilter[];
+  /** Negates the expression. */
   not?: TableGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface TriggerFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `functionName` field. */
   functionName?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: TriggerFilter[];
+  /** Checks for any expressions in this list. */
   or?: TriggerFilter[];
+  /** Negates the expression. */
   not?: TriggerFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface UniqueConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
   fieldIds?: UUIDListFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: UniqueConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: UniqueConstraintFilter[];
+  /** Negates the expression. */
   not?: UniqueConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface ViewFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `viewType` field. */
   viewType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `filterType` field. */
   filterType?: StringFilter;
+  /** Filter by the object’s `filterData` field. */
   filterData?: JSONFilter;
+  /** Filter by the object’s `securityInvoker` field. */
   securityInvoker?: BooleanFilter;
+  /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewFilter[];
+  /** Negates the expression. */
   not?: ViewFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** A related `table` exists. */
+  tableExists?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: ViewToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: ViewToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: ViewToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
 }
 export interface ViewTableFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `joinOrder` field. */
   joinOrder?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewTableFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewTableFilter[];
+  /** Negates the expression. */
   not?: ViewTableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
 }
 export interface ViewGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `withGrantOption` field. */
   withGrantOption?: BooleanFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewGrantFilter[];
+  /** Negates the expression. */
   not?: ViewGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
 }
 export interface ViewRuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewRuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewRuleFilter[];
+  /** Negates the expression. */
   not?: ViewRuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
 }
 export interface EmbeddingChunkFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `embeddingFieldId` field. */
   embeddingFieldId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableId` field. */
   chunksTableId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableName` field. */
   chunksTableName?: StringFilter;
+  /** Filter by the object’s `contentFieldName` field. */
   contentFieldName?: StringFilter;
+  /** Filter by the object’s `dimensions` field. */
   dimensions?: IntFilter;
+  /** Filter by the object’s `metric` field. */
   metric?: StringFilter;
+  /** Filter by the object’s `chunkSize` field. */
   chunkSize?: IntFilter;
+  /** Filter by the object’s `chunkOverlap` field. */
   chunkOverlap?: IntFilter;
+  /** Filter by the object’s `chunkStrategy` field. */
   chunkStrategy?: StringFilter;
+  /** Filter by the object’s `metadataFields` field. */
   metadataFields?: JSONFilter;
+  /** Filter by the object’s `enqueueChunkingJob` field. */
   enqueueChunkingJob?: BooleanFilter;
+  /** Filter by the object’s `chunkingTaskName` field. */
   chunkingTaskName?: StringFilter;
+  /** Filter by the object’s `parentFkFieldId` field. */
   parentFkFieldId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: EmbeddingChunkFilter[];
+  /** Checks for any expressions in this list. */
   or?: EmbeddingChunkFilter[];
+  /** Negates the expression. */
   not?: EmbeddingChunkFilter;
+  /** Filter by the object’s `chunksTable` relation. */
+  chunksTable?: TableFilter;
+  /** A related `chunksTable` exists. */
+  chunksTableExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `embeddingField` relation. */
+  embeddingField?: FieldFilter;
+  /** A related `embeddingField` exists. */
+  embeddingFieldExists?: boolean;
+  /** Filter by the object’s `parentFkField` relation. */
+  parentFkField?: FieldFilter;
+  /** A related `parentFkField` exists. */
+  parentFkFieldExists?: boolean;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface TableTemplateModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Checks for all expressions in this list. */
   and?: TableTemplateModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: TableTemplateModuleFilter[];
+  /** Negates the expression. */
   not?: TableTemplateModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface SecureTableProvisionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
+  /** Filter by the object’s `nodeData` field. */
   nodeData?: JSONFilter;
-  fields?: StringFilter;
+  /** Filter by the object’s `fields` field. */
+  fields?: JSONListFilter;
+  /** Filter by the object’s `grantRoles` field. */
   grantRoles?: StringListFilter;
-  grantPrivileges?: StringFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
   policyType?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
   policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
   policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
   policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
   policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
   policyData?: JSONFilter;
+  /** Filter by the object’s `outFields` field. */
   outFields?: UUIDListFilter;
+  /** Checks for all expressions in this list. */
   and?: SecureTableProvisionFilter[];
+  /** Checks for any expressions in this list. */
   or?: SecureTableProvisionFilter[];
+  /** Negates the expression. */
   not?: SecureTableProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface RelationProvisionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `relationType` field. */
   relationType?: StringFilter;
+  /** Filter by the object’s `sourceTableId` field. */
   sourceTableId?: UUIDFilter;
+  /** Filter by the object’s `targetTableId` field. */
   targetTableId?: UUIDFilter;
+  /** Filter by the object’s `fieldName` field. */
   fieldName?: StringFilter;
+  /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
   apiRequired?: BooleanFilter;
+  /** Filter by the object’s `junctionTableId` field. */
   junctionTableId?: UUIDFilter;
+  /** Filter by the object’s `junctionTableName` field. */
   junctionTableName?: StringFilter;
+  /** Filter by the object’s `junctionSchemaId` field. */
   junctionSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sourceFieldName` field. */
   sourceFieldName?: StringFilter;
+  /** Filter by the object’s `targetFieldName` field. */
   targetFieldName?: StringFilter;
+  /** Filter by the object’s `useCompositeKey` field. */
   useCompositeKey?: BooleanFilter;
+  /** Filter by the object’s `createIndex` field. */
   createIndex?: BooleanFilter;
+  /** Filter by the object’s `exposeInApi` field. */
   exposeInApi?: BooleanFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `nodeData` field. */
   nodeData?: JSONFilter;
+  /** Filter by the object’s `grantRoles` field. */
   grantRoles?: StringListFilter;
-  grantPrivileges?: StringFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
   policyType?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
   policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
   policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
   policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
   policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
   policyData?: JSONFilter;
+  /** Filter by the object’s `outFieldId` field. */
   outFieldId?: UUIDFilter;
+  /** Filter by the object’s `outJunctionTableId` field. */
   outJunctionTableId?: UUIDFilter;
+  /** Filter by the object’s `outSourceFieldId` field. */
   outSourceFieldId?: UUIDFilter;
+  /** Filter by the object’s `outTargetFieldId` field. */
   outTargetFieldId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: RelationProvisionFilter[];
+  /** Checks for any expressions in this list. */
   or?: RelationProvisionFilter[];
+  /** Negates the expression. */
   not?: RelationProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `sourceTable` relation. */
+  sourceTable?: TableFilter;
+  /** Filter by the object’s `targetTable` relation. */
+  targetTable?: TableFilter;
 }
 export interface SchemaGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: SchemaGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: SchemaGrantFilter[];
+  /** Negates the expression. */
   not?: SchemaGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface DefaultPrivilegeFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `objectType` field. */
   objectType?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: DefaultPrivilegeFilter[];
+  /** Checks for any expressions in this list. */
   or?: DefaultPrivilegeFilter[];
+  /** Negates the expression. */
   not?: DefaultPrivilegeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface EnumFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `values` field. */
   values?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
   and?: EnumFilter[];
+  /** Checks for any expressions in this list. */
   or?: EnumFilter[];
+  /** Negates the expression. */
   not?: EnumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface ApiSchemaFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: ApiSchemaFilter[];
+  /** Checks for any expressions in this list. */
   or?: ApiSchemaFilter[];
+  /** Negates the expression. */
   not?: ApiSchemaFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface ApiModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  data?: JSONFilter;
+  /** Checks for all expressions in this list. */
   and?: ApiModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ApiModuleFilter[];
+  /** Negates the expression. */
   not?: ApiModuleFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface DomainFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
-  subdomain?: StringFilter;
-  domain?: StringFilter;
+  /** Filter by the object’s `subdomain` field. */
+  subdomain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Checks for all expressions in this list. */
   and?: DomainFilter[];
+  /** Checks for any expressions in this list. */
   or?: DomainFilter[];
+  /** Negates the expression. */
   not?: DomainFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** A related `api` exists. */
+  apiExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** A related `site` exists. */
+  siteExists?: boolean;
 }
 export interface SiteMetadatumFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
   title?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  ogImage?: StringFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteMetadatumFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteMetadatumFilter[];
+  /** Negates the expression. */
   not?: SiteMetadatumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
 }
 export interface SiteModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  data?: JSONFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteModuleFilter[];
+  /** Negates the expression. */
   not?: SiteModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
 }
 export interface SiteThemeFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `theme` field. */
   theme?: JSONFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteThemeFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteThemeFilter[];
+  /** Negates the expression. */
   not?: SiteThemeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
 }
 export interface TriggerFunctionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `code` field. */
   code?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: TriggerFunctionFilter[];
+  /** Checks for any expressions in this list. */
   or?: TriggerFunctionFilter[];
+  /** Negates the expression. */
   not?: TriggerFunctionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface DatabaseTransferFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `targetOwnerId` field. */
   targetOwnerId?: UUIDFilter;
+  /** Filter by the object’s `sourceApproved` field. */
   sourceApproved?: BooleanFilter;
+  /** Filter by the object’s `targetApproved` field. */
   targetApproved?: BooleanFilter;
+  /** Filter by the object’s `sourceApprovedAt` field. */
   sourceApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `targetApprovedAt` field. */
   targetApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
   status?: StringFilter;
+  /** Filter by the object’s `initiatedBy` field. */
   initiatedBy?: UUIDFilter;
+  /** Filter by the object’s `notes` field. */
   notes?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
   completedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: DatabaseTransferFilter[];
+  /** Checks for any expressions in this list. */
   or?: DatabaseTransferFilter[];
+  /** Negates the expression. */
   not?: DatabaseTransferFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface ApiFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
+  /** Filter by the object’s `roleName` field. */
   roleName?: StringFilter;
+  /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
+  /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: ApiFilter[];
+  /** Checks for any expressions in this list. */
   or?: ApiFilter[];
+  /** Negates the expression. */
   not?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: ApiToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: ApiToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
 }
 export interface SiteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
   title?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  ogImage?: StringFilter;
-  favicon?: StringFilter;
-  appleTouchIcon?: StringFilter;
-  logo?: StringFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `favicon` field. */
+  favicon?: ConstructiveInternalTypeAttachmentFilter;
+  /** Filter by the object’s `appleTouchIcon` field. */
+  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `logo` field. */
+  logo?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteFilter[];
+  /** Negates the expression. */
   not?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `app` relation. */
+  app?: AppFilter;
+  /** A related `app` exists. */
+  appExists?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: SiteToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: SiteToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: SiteToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: SiteToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
 }
 export interface AppFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  appImage?: StringFilter;
-  appStoreLink?: StringFilter;
+  /** Filter by the object’s `appImage` field. */
+  appImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `appStoreLink` field. */
+  appStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Filter by the object’s `appStoreId` field. */
   appStoreId?: StringFilter;
+  /** Filter by the object’s `appIdPrefix` field. */
   appIdPrefix?: StringFilter;
-  playStoreLink?: StringFilter;
+  /** Filter by the object’s `playStoreLink` field. */
+  playStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Checks for all expressions in this list. */
   and?: AppFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppFilter[];
+  /** Negates the expression. */
   not?: AppFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface ConnectedAccountsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: ConnectedAccountsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ConnectedAccountsModuleFilter[];
+  /** Negates the expression. */
   not?: ConnectedAccountsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface CryptoAddressesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
   cryptoNetwork?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: CryptoAddressesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: CryptoAddressesModuleFilter[];
+  /** Negates the expression. */
   not?: CryptoAddressesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface CryptoAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
   secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `addressesTableId` field. */
   addressesTableId?: UUIDFilter;
+  /** Filter by the object’s `userField` field. */
   userField?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
   cryptoNetwork?: StringFilter;
+  /** Filter by the object’s `signInRequestChallenge` field. */
   signInRequestChallenge?: StringFilter;
+  /** Filter by the object’s `signInRecordFailure` field. */
   signInRecordFailure?: StringFilter;
+  /** Filter by the object’s `signUpWithKey` field. */
   signUpWithKey?: StringFilter;
+  /** Filter by the object’s `signInWithChallenge` field. */
   signInWithChallenge?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: CryptoAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: CryptoAuthModuleFilter[];
+  /** Negates the expression. */
   not?: CryptoAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface DefaultIdsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: DefaultIdsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: DefaultIdsModuleFilter[];
+  /** Negates the expression. */
   not?: DefaultIdsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface DenormalizedTableFieldFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
   fieldId?: UUIDFilter;
+  /** Filter by the object’s `setIds` field. */
   setIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
   refTableId?: UUIDFilter;
+  /** Filter by the object’s `refFieldId` field. */
   refFieldId?: UUIDFilter;
+  /** Filter by the object’s `refIds` field. */
   refIds?: UUIDListFilter;
+  /** Filter by the object’s `useUpdates` field. */
   useUpdates?: BooleanFilter;
+  /** Filter by the object’s `updateDefaults` field. */
   updateDefaults?: BooleanFilter;
+  /** Filter by the object’s `funcName` field. */
   funcName?: StringFilter;
+  /** Filter by the object’s `funcOrder` field. */
   funcOrder?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: DenormalizedTableFieldFilter[];
+  /** Checks for any expressions in this list. */
   or?: DenormalizedTableFieldFilter[];
+  /** Negates the expression. */
   not?: DenormalizedTableFieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `refField` relation. */
+  refField?: FieldFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface EmailsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: EmailsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: EmailsModuleFilter[];
+  /** Negates the expression. */
   not?: EmailsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface EncryptedSecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: EncryptedSecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: EncryptedSecretsModuleFilter[];
+  /** Negates the expression. */
   not?: EncryptedSecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface FieldModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
   fieldId?: UUIDFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `triggers` field. */
   triggers?: StringListFilter;
+  /** Filter by the object’s `functions` field. */
   functions?: StringListFilter;
+  /** Checks for all expressions in this list. */
   and?: FieldModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: FieldModuleFilter[];
+  /** Negates the expression. */
   not?: FieldModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface InvitesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
   emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableId` field. */
   invitesTableId?: UUIDFilter;
+  /** Filter by the object’s `claimedInvitesTableId` field. */
   claimedInvitesTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableName` field. */
   invitesTableName?: StringFilter;
+  /** Filter by the object’s `claimedInvitesTableName` field. */
   claimedInvitesTableName?: StringFilter;
+  /** Filter by the object’s `submitInviteCodeFunction` field. */
   submitInviteCodeFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: InvitesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: InvitesModuleFilter[];
+  /** Negates the expression. */
   not?: InvitesModuleFilter;
+  /** Filter by the object’s `claimedInvitesTable` relation. */
+  claimedInvitesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `invitesTable` relation. */
+  invitesTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface LevelsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableId` field. */
   stepsTableId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableName` field. */
   stepsTableName?: StringFilter;
+  /** Filter by the object’s `achievementsTableId` field. */
   achievementsTableId?: UUIDFilter;
+  /** Filter by the object’s `achievementsTableName` field. */
   achievementsTableName?: StringFilter;
+  /** Filter by the object’s `levelsTableId` field. */
   levelsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelsTableName` field. */
   levelsTableName?: StringFilter;
+  /** Filter by the object’s `levelRequirementsTableId` field. */
   levelRequirementsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelRequirementsTableName` field. */
   levelRequirementsTableName?: StringFilter;
+  /** Filter by the object’s `completedStep` field. */
   completedStep?: StringFilter;
+  /** Filter by the object’s `incompletedStep` field. */
   incompletedStep?: StringFilter;
+  /** Filter by the object’s `tgAchievement` field. */
   tgAchievement?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggle` field. */
   tgAchievementToggle?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggleBoolean` field. */
   tgAchievementToggleBoolean?: StringFilter;
+  /** Filter by the object’s `tgAchievementBoolean` field. */
   tgAchievementBoolean?: StringFilter;
+  /** Filter by the object’s `upsertAchievement` field. */
   upsertAchievement?: StringFilter;
+  /** Filter by the object’s `tgUpdateAchievements` field. */
   tgUpdateAchievements?: StringFilter;
+  /** Filter by the object’s `stepsRequired` field. */
   stepsRequired?: StringFilter;
+  /** Filter by the object’s `levelAchieved` field. */
   levelAchieved?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: LevelsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: LevelsModuleFilter[];
+  /** Negates the expression. */
   not?: LevelsModuleFilter;
+  /** Filter by the object’s `achievementsTable` relation. */
+  achievementsTable?: TableFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `levelRequirementsTable` relation. */
+  levelRequirementsTable?: TableFilter;
+  /** Filter by the object’s `levelsTable` relation. */
+  levelsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `stepsTable` relation. */
+  stepsTable?: TableFilter;
 }
 export interface LimitsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
   defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
   defaultTableName?: StringFilter;
+  /** Filter by the object’s `limitIncrementFunction` field. */
   limitIncrementFunction?: StringFilter;
+  /** Filter by the object’s `limitDecrementFunction` field. */
   limitDecrementFunction?: StringFilter;
+  /** Filter by the object’s `limitIncrementTrigger` field. */
   limitIncrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitDecrementTrigger` field. */
   limitDecrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitUpdateTrigger` field. */
   limitUpdateTrigger?: StringFilter;
+  /** Filter by the object’s `limitCheckFunction` field. */
   limitCheckFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: LimitsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: LimitsModuleFilter[];
+  /** Negates the expression. */
   not?: LimitsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface MembershipTypesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: MembershipTypesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: MembershipTypesModuleFilter[];
+  /** Negates the expression. */
   not?: MembershipTypesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface MembershipsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
   membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableName` field. */
   membershipsTableName?: StringFilter;
+  /** Filter by the object’s `membersTableId` field. */
   membersTableId?: UUIDFilter;
+  /** Filter by the object’s `membersTableName` field. */
   membersTableName?: StringFilter;
+  /** Filter by the object’s `membershipDefaultsTableId` field. */
   membershipDefaultsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipDefaultsTableName` field. */
   membershipDefaultsTableName?: StringFilter;
+  /** Filter by the object’s `grantsTableId` field. */
   grantsTableId?: UUIDFilter;
+  /** Filter by the object’s `grantsTableName` field. */
   grantsTableName?: StringFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Filter by the object’s `limitsTableId` field. */
   limitsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultLimitsTableId` field. */
   defaultLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
   permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissionsTableId` field. */
   defaultPermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sprtTableId` field. */
   sprtTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableId` field. */
   adminGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableName` field. */
   adminGrantsTableName?: StringFilter;
+  /** Filter by the object’s `ownerGrantsTableId` field. */
   ownerGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `ownerGrantsTableName` field. */
   ownerGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `entityTableOwnerId` field. */
   entityTableOwnerId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `actorMaskCheck` field. */
   actorMaskCheck?: StringFilter;
+  /** Filter by the object’s `actorPermCheck` field. */
   actorPermCheck?: StringFilter;
+  /** Filter by the object’s `entityIdsByMask` field. */
   entityIdsByMask?: StringFilter;
+  /** Filter by the object’s `entityIdsByPerm` field. */
   entityIdsByPerm?: StringFilter;
+  /** Filter by the object’s `entityIdsFunction` field. */
   entityIdsFunction?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: MembershipsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: MembershipsModuleFilter[];
+  /** Negates the expression. */
   not?: MembershipsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultLimitsTable` relation. */
+  defaultLimitsTable?: TableFilter;
+  /** Filter by the object’s `defaultPermissionsTable` relation. */
+  defaultPermissionsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `entityTableOwner` relation. */
+  entityTableOwner?: FieldFilter;
+  /** A related `entityTableOwner` exists. */
+  entityTableOwnerExists?: boolean;
+  /** Filter by the object’s `grantsTable` relation. */
+  grantsTable?: TableFilter;
+  /** Filter by the object’s `limitsTable` relation. */
+  limitsTable?: TableFilter;
+  /** Filter by the object’s `membersTable` relation. */
+  membersTable?: TableFilter;
+  /** Filter by the object’s `membershipDefaultsTable` relation. */
+  membershipDefaultsTable?: TableFilter;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sprtTable` relation. */
+  sprtTable?: TableFilter;
 }
 export interface PermissionsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
   defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
   defaultTableName?: StringFilter;
+  /** Filter by the object’s `bitlen` field. */
   bitlen?: IntFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `getPaddedMask` field. */
   getPaddedMask?: StringFilter;
+  /** Filter by the object’s `getMask` field. */
   getMask?: StringFilter;
+  /** Filter by the object’s `getByMask` field. */
   getByMask?: StringFilter;
+  /** Filter by the object’s `getMaskByName` field. */
   getMaskByName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: PermissionsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: PermissionsModuleFilter[];
+  /** Negates the expression. */
   not?: PermissionsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface PhoneNumbersModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: PhoneNumbersModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: PhoneNumbersModuleFilter[];
+  /** Negates the expression. */
   not?: PhoneNumbersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface ProfilesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `profilePermissionsTableId` field. */
   profilePermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `profilePermissionsTableName` field. */
   profilePermissionsTableName?: StringFilter;
+  /** Filter by the object’s `profileGrantsTableId` field. */
   profileGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileGrantsTableName` field. */
   profileGrantsTableName?: StringFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableId` field. */
   profileDefinitionGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableName` field. */
   profileDefinitionGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
   permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
   membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: ProfilesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ProfilesModuleFilter[];
+  /** Negates the expression. */
   not?: ProfilesModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTable` relation. */
+  profileDefinitionGrantsTable?: TableFilter;
+  /** Filter by the object’s `profileGrantsTable` relation. */
+  profileGrantsTable?: TableFilter;
+  /** Filter by the object’s `profilePermissionsTable` relation. */
+  profilePermissionsTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface SecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: SecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: SecretsModuleFilter[];
+  /** Negates the expression. */
   not?: SecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface SessionsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `authSettingsTableId` field. */
   authSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
-  sessionsDefaultExpiration?: StringFilter;
+  /** Filter by the object’s `sessionsDefaultExpiration` field. */
+  sessionsDefaultExpiration?: IntervalFilter;
+  /** Filter by the object’s `sessionsTable` field. */
   sessionsTable?: StringFilter;
+  /** Filter by the object’s `sessionCredentialsTable` field. */
   sessionCredentialsTable?: StringFilter;
+  /** Filter by the object’s `authSettingsTable` field. */
   authSettingsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: SessionsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: SessionsModuleFilter[];
+  /** Negates the expression. */
   not?: SessionsModuleFilter;
+  /** Filter by the object’s `authSettingsTableByAuthSettingsTableId` relation. */
+  authSettingsTableByAuthSettingsTableId?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTableBySessionCredentialsTableId` relation. */
+  sessionCredentialsTableBySessionCredentialsTableId?: TableFilter;
+  /** Filter by the object’s `sessionsTableBySessionsTableId` relation. */
+  sessionsTableBySessionsTableId?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface UserAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
   emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
   secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `encryptedTableId` field. */
   encryptedTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableId` field. */
   auditsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableName` field. */
   auditsTableName?: StringFilter;
+  /** Filter by the object’s `signInFunction` field. */
   signInFunction?: StringFilter;
+  /** Filter by the object’s `signUpFunction` field. */
   signUpFunction?: StringFilter;
+  /** Filter by the object’s `signOutFunction` field. */
   signOutFunction?: StringFilter;
+  /** Filter by the object’s `setPasswordFunction` field. */
   setPasswordFunction?: StringFilter;
+  /** Filter by the object’s `resetPasswordFunction` field. */
   resetPasswordFunction?: StringFilter;
+  /** Filter by the object’s `forgotPasswordFunction` field. */
   forgotPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendVerificationEmailFunction` field. */
   sendVerificationEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyEmailFunction` field. */
   verifyEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyPasswordFunction` field. */
   verifyPasswordFunction?: StringFilter;
+  /** Filter by the object’s `checkPasswordFunction` field. */
   checkPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendAccountDeletionEmailFunction` field. */
   sendAccountDeletionEmailFunction?: StringFilter;
+  /** Filter by the object’s `deleteAccountFunction` field. */
   deleteAccountFunction?: StringFilter;
+  /** Filter by the object’s `signInOneTimeTokenFunction` field. */
   signInOneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `oneTimeTokenFunction` field. */
   oneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `extendTokenExpires` field. */
   extendTokenExpires?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: UserAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: UserAuthModuleFilter[];
+  /** Negates the expression. */
   not?: UserAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `encryptedTable` relation. */
+  encryptedTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface UsersModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `typeTableId` field. */
   typeTableId?: UUIDFilter;
+  /** Filter by the object’s `typeTableName` field. */
   typeTableName?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: UsersModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: UsersModuleFilter[];
+  /** Negates the expression. */
   not?: UsersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `typeTable` relation. */
+  typeTable?: TableFilter;
 }
 export interface BlueprintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
   displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `definition` field. */
   definition?: JSONFilter;
+  /** Filter by the object’s `templateId` field. */
   templateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
   status?: StringFilter;
+  /** Filter by the object’s `constructedAt` field. */
   constructedAt?: DatetimeFilter;
+  /** Filter by the object’s `errorDetails` field. */
   errorDetails?: StringFilter;
+  /** Filter by the object’s `refMap` field. */
   refMap?: JSONFilter;
+  /** Filter by the object’s `constructedDefinition` field. */
   constructedDefinition?: JSONFilter;
+  /** Filter by the object’s `definitionHash` field. */
   definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
   tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: BlueprintFilter[];
+  /** Checks for any expressions in this list. */
   or?: BlueprintFilter[];
+  /** Negates the expression. */
   not?: BlueprintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `template` relation. */
+  template?: BlueprintTemplateFilter;
+  /** A related `template` exists. */
+  templateExists?: boolean;
 }
 export interface BlueprintTemplateFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `version` field. */
   version?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
   displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `visibility` field. */
   visibility?: StringFilter;
+  /** Filter by the object’s `categories` field. */
   categories?: StringListFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `definition` field. */
   definition?: JSONFilter;
+  /** Filter by the object’s `definitionSchemaVersion` field. */
   definitionSchemaVersion?: StringFilter;
+  /** Filter by the object’s `source` field. */
   source?: StringFilter;
+  /** Filter by the object’s `complexity` field. */
   complexity?: StringFilter;
+  /** Filter by the object’s `copyCount` field. */
   copyCount?: IntFilter;
+  /** Filter by the object’s `forkCount` field. */
   forkCount?: IntFilter;
+  /** Filter by the object’s `forkedFromId` field. */
   forkedFromId?: UUIDFilter;
+  /** Filter by the object’s `definitionHash` field. */
   definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
   tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: BlueprintTemplateFilter[];
+  /** Checks for any expressions in this list. */
   or?: BlueprintTemplateFilter[];
+  /** Negates the expression. */
   not?: BlueprintTemplateFilter;
+  /** Filter by the object’s `forkedFrom` relation. */
+  forkedFrom?: BlueprintTemplateFilter;
+  /** A related `forkedFrom` exists. */
+  forkedFromExists?: boolean;
+  /** Filter by the object’s `blueprintTemplatesByForkedFromId` relation. */
+  blueprintTemplatesByForkedFromId?: BlueprintTemplateToManyBlueprintTemplateFilter;
+  /** `blueprintTemplatesByForkedFromId` exist. */
+  blueprintTemplatesByForkedFromIdExist?: boolean;
+  /** Filter by the object’s `blueprintsByTemplateId` relation. */
+  blueprintsByTemplateId?: BlueprintTemplateToManyBlueprintFilter;
+  /** `blueprintsByTemplateId` exist. */
+  blueprintsByTemplateIdExist?: boolean;
 }
 export interface DatabaseProvisionModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseName` field. */
   databaseName?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `subdomain` field. */
   subdomain?: StringFilter;
+  /** Filter by the object’s `domain` field. */
   domain?: StringFilter;
+  /** Filter by the object’s `modules` field. */
   modules?: StringListFilter;
+  /** Filter by the object’s `options` field. */
   options?: JSONFilter;
+  /** Filter by the object’s `bootstrapUser` field. */
   bootstrapUser?: BooleanFilter;
+  /** Filter by the object’s `status` field. */
   status?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
   errorMessage?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
   completedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: DatabaseProvisionModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: DatabaseProvisionModuleFilter[];
+  /** Negates the expression. */
   not?: DatabaseProvisionModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** A related `database` exists. */
+  databaseExists?: boolean;
 }
 export interface AppAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppAdminGrantFilter[];
+  /** Negates the expression. */
   not?: AppAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface AppOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppOwnerGrantFilter[];
+  /** Negates the expression. */
   not?: AppOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface AppGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppGrantFilter[];
+  /** Negates the expression. */
   not?: AppGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgMembershipFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
   isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
   isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
   granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
   profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMembershipFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMembershipFilter[];
+  /** Negates the expression. */
   not?: OrgMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface OrgMemberFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMemberFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMemberFilter[];
+  /** Negates the expression. */
   not?: OrgMemberFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface OrgAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgAdminGrantFilter[];
+  /** Negates the expression. */
   not?: OrgAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgOwnerGrantFilter[];
+  /** Negates the expression. */
   not?: OrgOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgGrantFilter[];
+  /** Negates the expression. */
   not?: OrgGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgChartEdgeFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
   childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
   parentId?: UUIDFilter;
+  /** Filter by the object’s `positionTitle` field. */
   positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
   positionLevel?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgChartEdgeFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgChartEdgeFilter[];
+  /** Negates the expression. */
   not?: OrgChartEdgeFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
 }
 export interface OrgChartEdgeGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
   childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
   parentId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `positionTitle` field. */
   positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
   positionLevel?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgChartEdgeGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgChartEdgeGrantFilter[];
+  /** Negates the expression. */
   not?: OrgChartEdgeGrantFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
 }
 export interface OrgPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgPermissionDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgPermissionDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface AppLimitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
   num?: IntFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLimitFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLimitFilter[];
+  /** Negates the expression. */
   not?: AppLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
 }
 export interface OrgLimitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
   num?: IntFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgLimitFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgLimitFilter[];
+  /** Negates the expression. */
   not?: OrgLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface AppStepFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `count` field. */
   count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppStepFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppStepFilter[];
+  /** Negates the expression. */
   not?: AppStepFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
 }
 export interface AppAchievementFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `count` field. */
   count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppAchievementFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppAchievementFilter[];
+  /** Negates the expression. */
   not?: AppAchievementFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
 }
 export interface AppLevelFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  image?: StringFilter;
+  /** Filter by the object’s `image` field. */
+  image?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLevelFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLevelFilter[];
+  /** Negates the expression. */
   not?: AppLevelFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
 }
 export interface EmailFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: EmailFilter[];
+  /** Checks for any expressions in this list. */
   or?: EmailFilter[];
+  /** Negates the expression. */
   not?: EmailFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface PhoneNumberFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `cc` field. */
   cc?: StringFilter;
+  /** Filter by the object’s `number` field. */
   number?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: PhoneNumberFilter[];
+  /** Checks for any expressions in this list. */
   or?: PhoneNumberFilter[];
+  /** Negates the expression. */
   not?: PhoneNumberFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface CryptoAddressFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `address` field. */
   address?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: CryptoAddressFilter[];
+  /** Checks for any expressions in this list. */
   or?: CryptoAddressFilter[];
+  /** Negates the expression. */
   not?: CryptoAddressFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface ConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
   service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
   identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
   details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
   or?: ConnectedAccountFilter[];
+  /** Negates the expression. */
   not?: ConnectedAccountFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface InviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
   inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
   inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
   inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
   inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: InviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: InviteFilter[];
+  /** Negates the expression. */
   not?: InviteFilter;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
 }
 export interface ClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: ClaimedInviteFilter[];
+  /** Negates the expression. */
   not?: ClaimedInviteFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
 }
 export interface OrgInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
   inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
   inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
   inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
   inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgInviteFilter[];
+  /** Negates the expression. */
   not?: OrgInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
 }
 export interface OrgClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgClaimedInviteFilter[];
+  /** Negates the expression. */
   not?: OrgClaimedInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
 }
 export interface AuditLogFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  origin?: StringFilter;
+  /** Filter by the object’s `origin` field. */
+  origin?: ConstructiveInternalTypeOriginFilter;
+  /** Filter by the object’s `userAgent` field. */
   userAgent?: StringFilter;
+  /** Filter by the object’s `ipAddress` field. */
   ipAddress?: InternetAddressFilter;
+  /** Filter by the object’s `success` field. */
   success?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AuditLogFilter[];
+  /** Checks for any expressions in this list. */
   or?: AuditLogFilter[];
+  /** Negates the expression. */
   not?: AuditLogFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
 }
 export interface RefFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
+  /** Filter by the object’s `commitId` field. */
   commitId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: RefFilter[];
+  /** Checks for any expressions in this list. */
   or?: RefFilter[];
+  /** Negates the expression. */
   not?: RefFilter;
 }
 export interface StoreFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: StoreFilter[];
+  /** Checks for any expressions in this list. */
   or?: StoreFilter[];
+  /** Negates the expression. */
   not?: StoreFilter;
 }
 export interface AppPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Checks for all expressions in this list. */
   and?: AppPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppPermissionDefaultFilter[];
+  /** Negates the expression. */
   not?: AppPermissionDefaultFilter;
 }
 export interface RoleTypeFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: RoleTypeFilter[];
+  /** Checks for any expressions in this list. */
   or?: RoleTypeFilter[];
+  /** Negates the expression. */
   not?: RoleTypeFilter;
 }
 export interface AppLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLimitDefaultFilter[];
+  /** Negates the expression. */
   not?: AppLimitDefaultFilter;
 }
 export interface OrgLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgLimitDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
 export interface NodeTypeRegistryFilter {
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
+  /** Filter by the object’s `category` field. */
   category?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
   displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `parameterSchema` field. */
   parameterSchema?: JSONFilter;
+  /** Filter by the object’s `tags` field. */
   tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: NodeTypeRegistryFilter[];
+  /** Checks for any expressions in this list. */
   or?: NodeTypeRegistryFilter[];
+  /** Negates the expression. */
   not?: NodeTypeRegistryFilter;
 }
 export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
   or?: MembershipTypeFilter[];
+  /** Negates the expression. */
   not?: MembershipTypeFilter;
 }
 export interface CommitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
   message?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
+  /** Filter by the object’s `parentIds` field. */
   parentIds?: UUIDListFilter;
+  /** Filter by the object’s `authorId` field. */
   authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
   committerId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
   treeId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
   date?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: CommitFilter[];
+  /** Checks for any expressions in this list. */
   or?: CommitFilter[];
+  /** Negates the expression. */
   not?: CommitFilter;
 }
 export interface AppMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: AppMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppMembershipDefaultFilter[];
+  /** Negates the expression. */
   not?: AppMembershipDefaultFilter;
 }
 export interface RlsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `authenticate` field. */
   authenticate?: StringFilter;
+  /** Filter by the object’s `authenticateStrict` field. */
   authenticateStrict?: StringFilter;
+  /** Filter by the object’s `currentRole` field. */
   currentRole?: StringFilter;
+  /** Filter by the object’s `currentRoleId` field. */
   currentRoleId?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: RlsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: RlsModuleFilter[];
+  /** Negates the expression. */
   not?: RlsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface OrgMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
   deleteMemberCascadeGroups?: BooleanFilter;
+  /** Filter by the object’s `createGroupsCascadeMembers` field. */
   createGroupsCascadeMembers?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMembershipDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgMembershipDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface SqlMigrationFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploy` field. */
   deploy?: StringFilter;
+  /** Filter by the object’s `deps` field. */
   deps?: StringListFilter;
-  payload?: JSONFilter;
+  /** Filter by the object’s `content` field. */
   content?: StringFilter;
+  /** Filter by the object’s `revert` field. */
   revert?: StringFilter;
+  /** Filter by the object’s `verify` field. */
   verify?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
+  /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: SqlMigrationFilter[];
+  /** Checks for any expressions in this list. */
   or?: SqlMigrationFilter[];
+  /** Negates the expression. */
   not?: SqlMigrationFilter;
 }
 export interface UserFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  username?: StringFilter;
-  displayName?: StringFilter;
-  profilePicture?: StringFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
   searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
   type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  searchTsvRank?: FloatFilter;
-  displayNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: UserFilter[];
+  /** Checks for any expressions in this list. */
   or?: UserFilter[];
+  /** Negates the expression. */
   not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedDatabases` relation. */
+  ownedDatabases?: UserToManyDatabaseFilter;
+  /** `ownedDatabases` exist. */
+  ownedDatabasesExist?: boolean;
+  /** Filter by the object’s `appMembershipByActorId` relation. */
+  appMembershipByActorId?: AppMembershipFilter;
+  /** A related `appMembershipByActorId` exists. */
+  appMembershipByActorIdExists?: boolean;
+  /** Filter by the object’s `appAdminGrantsByActorId` relation. */
+  appAdminGrantsByActorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByActorId` exist. */
+  appAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAdminGrantsByGrantorId` relation. */
+  appAdminGrantsByGrantorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByGrantorId` exist. */
+  appAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByActorId` relation. */
+  appOwnerGrantsByActorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByActorId` exist. */
+  appOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByGrantorId` relation. */
+  appOwnerGrantsByGrantorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByGrantorId` exist. */
+  appOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByActorId` relation. */
+  appGrantsByActorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByActorId` exist. */
+  appGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByGrantorId` relation. */
+  appGrantsByGrantorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByGrantorId` exist. */
+  appGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByActorId` relation. */
+  orgMembershipsByActorId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByActorId` exist. */
+  orgMembershipsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByEntityId` relation. */
+  orgMembershipsByEntityId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByEntityId` exist. */
+  orgMembershipsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipDefaultByEntityId` relation. */
+  orgMembershipDefaultByEntityId?: OrgMembershipDefaultFilter;
+  /** A related `orgMembershipDefaultByEntityId` exists. */
+  orgMembershipDefaultByEntityIdExists?: boolean;
+  /** Filter by the object’s `orgMembersByActorId` relation. */
+  orgMembersByActorId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByActorId` exist. */
+  orgMembersByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembersByEntityId` relation. */
+  orgMembersByEntityId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByEntityId` exist. */
+  orgMembersByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByActorId` relation. */
+  orgAdminGrantsByActorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByActorId` exist. */
+  orgAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByEntityId` relation. */
+  orgAdminGrantsByEntityId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByEntityId` exist. */
+  orgAdminGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByGrantorId` relation. */
+  orgAdminGrantsByGrantorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByGrantorId` exist. */
+  orgAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByActorId` relation. */
+  orgOwnerGrantsByActorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByActorId` exist. */
+  orgOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByEntityId` relation. */
+  orgOwnerGrantsByEntityId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByEntityId` exist. */
+  orgOwnerGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByGrantorId` relation. */
+  orgOwnerGrantsByGrantorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByGrantorId` exist. */
+  orgOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByActorId` relation. */
+  orgGrantsByActorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByActorId` exist. */
+  orgGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByEntityId` relation. */
+  orgGrantsByEntityId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByEntityId` exist. */
+  orgGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByGrantorId` relation. */
+  orgGrantsByGrantorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByGrantorId` exist. */
+  orgGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdges` relation. */
+  parentOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `parentOrgChartEdges` exist. */
+  parentOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `orgChartEdgesByEntityId` relation. */
+  orgChartEdgesByEntityId?: UserToManyOrgChartEdgeFilter;
+  /** `orgChartEdgesByEntityId` exist. */
+  orgChartEdgesByEntityIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdges` relation. */
+  childOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `childOrgChartEdges` exist. */
+  childOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdgeGrants` relation. */
+  parentOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `parentOrgChartEdgeGrants` exist. */
+  parentOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByEntityId` relation. */
+  orgChartEdgeGrantsByEntityId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByEntityId` exist. */
+  orgChartEdgeGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByGrantorId` relation. */
+  orgChartEdgeGrantsByGrantorId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByGrantorId` exist. */
+  orgChartEdgeGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdgeGrants` relation. */
+  childOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `childOrgChartEdgeGrants` exist. */
+  childOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgPermissionDefaultsByEntityId` relation. */
+  orgPermissionDefaultsByEntityId?: UserToManyOrgPermissionDefaultFilter;
+  /** `orgPermissionDefaultsByEntityId` exist. */
+  orgPermissionDefaultsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appLimitsByActorId` relation. */
+  appLimitsByActorId?: UserToManyAppLimitFilter;
+  /** `appLimitsByActorId` exist. */
+  appLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByActorId` relation. */
+  orgLimitsByActorId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByActorId` exist. */
+  orgLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByEntityId` relation. */
+  orgLimitsByEntityId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByEntityId` exist. */
+  orgLimitsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appStepsByActorId` relation. */
+  appStepsByActorId?: UserToManyAppStepFilter;
+  /** `appStepsByActorId` exist. */
+  appStepsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAchievementsByActorId` relation. */
+  appAchievementsByActorId?: UserToManyAppAchievementFilter;
+  /** `appAchievementsByActorId` exist. */
+  appAchievementsByActorIdExist?: boolean;
+  /** Filter by the object’s `ownedAppLevels` relation. */
+  ownedAppLevels?: UserToManyAppLevelFilter;
+  /** `ownedAppLevels` exist. */
+  ownedAppLevelsExist?: boolean;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedConnectedAccounts` relation. */
+  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
+  /** `ownedConnectedAccounts` exist. */
+  ownedConnectedAccountsExist?: boolean;
+  /** Filter by the object’s `invitesBySenderId` relation. */
+  invitesBySenderId?: UserToManyInviteFilter;
+  /** `invitesBySenderId` exist. */
+  invitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesByReceiverId` relation. */
+  claimedInvitesByReceiverId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesByReceiverId` exist. */
+  claimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesBySenderId` relation. */
+  claimedInvitesBySenderId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesBySenderId` exist. */
+  claimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByEntityId` relation. */
+  orgInvitesByEntityId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByEntityId` exist. */
+  orgInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByReceiverId` relation. */
+  orgInvitesByReceiverId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByReceiverId` exist. */
+  orgInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesBySenderId` relation. */
+  orgInvitesBySenderId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesBySenderId` exist. */
+  orgInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByEntityId` relation. */
+  orgClaimedInvitesByEntityId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByEntityId` exist. */
+  orgClaimedInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByReceiverId` relation. */
+  orgClaimedInvitesByReceiverId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByReceiverId` exist. */
+  orgClaimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesBySenderId` relation. */
+  orgClaimedInvitesBySenderId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesBySenderId` exist. */
+  orgClaimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `auditLogsByActorId` relation. */
+  auditLogsByActorId?: UserToManyAuditLogFilter;
+  /** `auditLogsByActorId` exist. */
+  auditLogsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 export interface AstMigrationFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `requires` field. */
   requires?: StringListFilter;
+  /** Filter by the object’s `payload` field. */
   payload?: JSONFilter;
+  /** Filter by the object’s `deploys` field. */
   deploys?: StringFilter;
+  /** Filter by the object’s `deploy` field. */
   deploy?: JSONFilter;
+  /** Filter by the object’s `revert` field. */
   revert?: JSONFilter;
+  /** Filter by the object’s `verify` field. */
   verify?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
+  /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: AstMigrationFilter[];
+  /** Checks for any expressions in this list. */
   or?: AstMigrationFilter[];
+  /** Negates the expression. */
   not?: AstMigrationFilter;
 }
 export interface AppMembershipFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
   isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
   isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
   granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
   profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: AppMembershipFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppMembershipFilter[];
+  /** Negates the expression. */
   not?: AppMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
 }
 export interface HierarchyModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableId` field. */
   chartEdgesTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableName` field. */
   chartEdgesTableName?: StringFilter;
+  /** Filter by the object’s `hierarchySprtTableId` field. */
   hierarchySprtTableId?: UUIDFilter;
+  /** Filter by the object’s `hierarchySprtTableName` field. */
   hierarchySprtTableName?: StringFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableId` field. */
   chartEdgeGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableName` field. */
   chartEdgeGrantsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
   privateSchemaName?: StringFilter;
+  /** Filter by the object’s `sprtTableName` field. */
   sprtTableName?: StringFilter;
+  /** Filter by the object’s `rebuildHierarchyFunction` field. */
   rebuildHierarchyFunction?: StringFilter;
+  /** Filter by the object’s `getSubordinatesFunction` field. */
   getSubordinatesFunction?: StringFilter;
+  /** Filter by the object’s `getManagersFunction` field. */
   getManagersFunction?: StringFilter;
+  /** Filter by the object’s `isManagerOfFunction` field. */
   isManagerOfFunction?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: HierarchyModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: HierarchyModuleFilter[];
+  /** Negates the expression. */
   not?: HierarchyModuleFilter;
+  /** Filter by the object’s `chartEdgeGrantsTable` relation. */
+  chartEdgeGrantsTable?: TableFilter;
+  /** Filter by the object’s `chartEdgesTable` relation. */
+  chartEdgesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** Filter by the object’s `hierarchySprtTable` relation. */
+  hierarchySprtTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 // ============ OrderBy Types ============
 export type GetAllRecordsOrderBy =
@@ -12420,6 +14964,1057 @@ export interface VerifyTotpInput {
   clientMutationId?: string;
   totpValue: string;
 }
+/** A filter to be used against many `Schema` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SchemaFilter;
+}
+/** A filter to be used against many `Table` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableFilter;
+}
+/** A filter to be used against many `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCheckConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CheckConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CheckConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CheckConstraintFilter;
+}
+/** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyFieldFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FieldFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FieldFilter;
+}
+/** A filter to be used against many `ForeignKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyForeignKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ForeignKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ForeignKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ForeignKeyConstraintFilter;
+}
+/** A filter to be used against many `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyFullTextSearchFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FullTextSearchFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FullTextSearchFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FullTextSearchFilter;
+}
+/** A filter to be used against many `Index` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyIndexFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: IndexFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: IndexFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: IndexFilter;
+}
+/** A filter to be used against many `Policy` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPolicyFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PolicyFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PolicyFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PolicyFilter;
+}
+/** A filter to be used against many `PrimaryKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPrimaryKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrimaryKeyConstraintFilter;
+}
+/** A filter to be used against many `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySchemaGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SchemaGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SchemaGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SchemaGrantFilter;
+}
+/** A filter to be used against many `TableGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTableGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableGrantFilter;
+}
+/** A filter to be used against many `TriggerFunction` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTriggerFunctionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TriggerFunctionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TriggerFunctionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TriggerFunctionFilter;
+}
+/** A filter to be used against many `Trigger` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTriggerFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TriggerFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TriggerFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TriggerFilter;
+}
+/** A filter to be used against many `UniqueConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyUniqueConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UniqueConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UniqueConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UniqueConstraintFilter;
+}
+/** A filter to be used against many `View` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyViewFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewFilter;
+}
+/** A filter to be used against many `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyViewGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewGrantFilter;
+}
+/** A filter to be used against many `ViewRule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyViewRuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewRuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewRuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewRuleFilter;
+}
+/** A filter to be used against many `DefaultPrivilege` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDefaultPrivilegeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DefaultPrivilegeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DefaultPrivilegeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DefaultPrivilegeFilter;
+}
+/** A filter to be used against many `Enum` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEnumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EnumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EnumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EnumFilter;
+}
+/** A filter to be used against many `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEmbeddingChunkFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmbeddingChunkFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmbeddingChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmbeddingChunkFilter;
+}
+/** A filter to be used against many `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDatabaseTransferFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DatabaseTransferFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DatabaseTransferFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DatabaseTransferFilter;
+}
+/** A filter to be used against many `Api` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyApiFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiFilter;
+}
+/** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyApiModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiModuleFilter;
+}
+/** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyApiSchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSchemaFilter;
+}
+/** A filter to be used against many `Site` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteFilter;
+}
+/** A filter to be used against many `App` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyAppFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppFilter;
+}
+/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDomainFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DomainFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainFilter;
+}
+/** A filter to be used against many `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteMetadatumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteMetadatumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteMetadatumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteMetadatumFilter;
+}
+/** A filter to be used against many `SiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteModuleFilter;
+}
+/** A filter to be used against many `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteThemeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteThemeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteThemeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteThemeFilter;
+}
+/** A filter to be used against many `ConnectedAccountsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyConnectedAccountsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ConnectedAccountsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ConnectedAccountsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ConnectedAccountsModuleFilter;
+}
+/** A filter to be used against many `CryptoAddressesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCryptoAddressesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAddressesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAddressesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAddressesModuleFilter;
+}
+/** A filter to be used against many `CryptoAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCryptoAuthModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAuthModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAuthModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAuthModuleFilter;
+}
+/** A filter to be used against many `DefaultIdsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDefaultIdsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DefaultIdsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DefaultIdsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DefaultIdsModuleFilter;
+}
+/** A filter to be used against many `DenormalizedTableField` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDenormalizedTableFieldFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DenormalizedTableFieldFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DenormalizedTableFieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DenormalizedTableFieldFilter;
+}
+/** A filter to be used against many `EmailsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEmailsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmailsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailsModuleFilter;
+}
+/** A filter to be used against many `EncryptedSecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEncryptedSecretsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EncryptedSecretsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EncryptedSecretsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EncryptedSecretsModuleFilter;
+}
+/** A filter to be used against many `FieldModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyFieldModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FieldModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FieldModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FieldModuleFilter;
+}
+/** A filter to be used against many `InvitesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyInvitesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: InvitesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: InvitesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: InvitesModuleFilter;
+}
+/** A filter to be used against many `LevelsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyLevelsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: LevelsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: LevelsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: LevelsModuleFilter;
+}
+/** A filter to be used against many `LimitsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyLimitsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: LimitsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: LimitsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: LimitsModuleFilter;
+}
+/** A filter to be used against many `MembershipTypesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyMembershipTypesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: MembershipTypesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: MembershipTypesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: MembershipTypesModuleFilter;
+}
+/** A filter to be used against many `MembershipsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyMembershipsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: MembershipsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: MembershipsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: MembershipsModuleFilter;
+}
+/** A filter to be used against many `PermissionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPermissionsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PermissionsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PermissionsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PermissionsModuleFilter;
+}
+/** A filter to be used against many `PhoneNumbersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPhoneNumbersModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PhoneNumbersModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PhoneNumbersModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PhoneNumbersModuleFilter;
+}
+/** A filter to be used against many `ProfilesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyProfilesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProfilesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ProfilesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProfilesModuleFilter;
+}
+/** A filter to be used against many `SecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySecretsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SecretsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SecretsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SecretsModuleFilter;
+}
+/** A filter to be used against many `SessionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySessionsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SessionsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SessionsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SessionsModuleFilter;
+}
+/** A filter to be used against many `UserAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyUserAuthModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UserAuthModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UserAuthModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UserAuthModuleFilter;
+}
+/** A filter to be used against many `UsersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyUsersModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UsersModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UsersModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UsersModuleFilter;
+}
+/** A filter to be used against many `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTableTemplateModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableTemplateModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableTemplateModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableTemplateModuleFilter;
+}
+/** A filter to be used against many `SecureTableProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySecureTableProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SecureTableProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SecureTableProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SecureTableProvisionFilter;
+}
+/** A filter to be used against many `RelationProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyRelationProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: RelationProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: RelationProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RelationProvisionFilter;
+}
+/** A filter to be used against many `Blueprint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyBlueprintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintFilter;
+}
+/** A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDatabaseProvisionModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DatabaseProvisionModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DatabaseProvisionModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DatabaseProvisionModuleFilter;
+}
+/** A filter to be used against many `Table` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableFilter;
+}
+/** A filter to be used against many `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManySchemaGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SchemaGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SchemaGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SchemaGrantFilter;
+}
+/** A filter to be used against many `View` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyViewFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewFilter;
+}
+/** A filter to be used against many `DefaultPrivilege` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyDefaultPrivilegeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DefaultPrivilegeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DefaultPrivilegeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DefaultPrivilegeFilter;
+}
+/** A filter to be used against many `Enum` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyEnumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EnumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EnumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EnumFilter;
+}
+/** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyApiSchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSchemaFilter;
+}
+/** A filter to be used against many `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyTableTemplateModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableTemplateModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableTemplateModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableTemplateModuleFilter;
+}
+/** A filter to be used against many `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyCheckConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CheckConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CheckConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CheckConstraintFilter;
+}
+/** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyFieldFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FieldFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FieldFilter;
+}
+/** A filter to be used against many `ForeignKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyForeignKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ForeignKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ForeignKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ForeignKeyConstraintFilter;
+}
+/** A filter to be used against many `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyFullTextSearchFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FullTextSearchFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FullTextSearchFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FullTextSearchFilter;
+}
+/** A filter to be used against many `Index` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyIndexFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: IndexFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: IndexFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: IndexFilter;
+}
+/** A filter to be used against many `Policy` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyPolicyFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PolicyFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PolicyFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PolicyFilter;
+}
+/** A filter to be used against many `PrimaryKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyPrimaryKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrimaryKeyConstraintFilter;
+}
+/** A filter to be used against many `TableGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyTableGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableGrantFilter;
+}
+/** A filter to be used against many `Trigger` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyTriggerFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TriggerFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TriggerFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TriggerFilter;
+}
+/** A filter to be used against many `UniqueConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyUniqueConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UniqueConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UniqueConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UniqueConstraintFilter;
+}
+/** A filter to be used against many `View` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyViewFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewFilter;
+}
+/** A filter to be used against many `ViewTable` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyViewTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewTableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewTableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewTableFilter;
+}
+/** A filter to be used against many `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyEmbeddingChunkFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmbeddingChunkFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmbeddingChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmbeddingChunkFilter;
+}
+/** A filter to be used against many `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyTableTemplateModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableTemplateModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableTemplateModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableTemplateModuleFilter;
+}
+/** A filter to be used against many `SecureTableProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManySecureTableProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SecureTableProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SecureTableProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SecureTableProvisionFilter;
+}
+/** A filter to be used against many `RelationProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyRelationProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: RelationProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: RelationProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RelationProvisionFilter;
+}
+/** A filter to be used against many `ViewTable` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewToManyViewTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewTableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewTableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewTableFilter;
+}
+/** A filter to be used against many `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewToManyViewGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewGrantFilter;
+}
+/** A filter to be used against many `ViewRule` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewToManyViewRuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewRuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewRuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewRuleFilter;
+}
+/** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiToManyApiModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiModuleFilter;
+}
+/** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiToManyApiSchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSchemaFilter;
+}
+/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiToManyDomainFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DomainFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainFilter;
+}
+/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManyDomainFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DomainFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainFilter;
+}
+/** A filter to be used against many `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManySiteMetadatumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteMetadatumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteMetadatumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteMetadatumFilter;
+}
+/** A filter to be used against many `SiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManySiteModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteModuleFilter;
+}
+/** A filter to be used against many `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManySiteThemeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteThemeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteThemeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteThemeFilter;
+}
+/** A filter to be used against many `BlueprintTemplate` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintTemplateToManyBlueprintTemplateFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintTemplateFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintTemplateFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintTemplateFilter;
+}
+/** A filter to be used against many `Blueprint` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintTemplateToManyBlueprintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintFilter;
+}
+/** A filter to be used against many `Database` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyDatabaseFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DatabaseFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DatabaseFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DatabaseFilter;
+}
+/** A filter to be used against many `AppAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppAdminGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppAdminGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppAdminGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppAdminGrantFilter;
+}
+/** A filter to be used against many `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppOwnerGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppOwnerGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppOwnerGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppOwnerGrantFilter;
+}
+/** A filter to be used against many `AppGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppGrantFilter;
+}
+/** A filter to be used against many `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgMembershipFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgMembershipFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgMembershipFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgMembershipFilter;
+}
+/** A filter to be used against many `OrgMember` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgMemberFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgMemberFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgMemberFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgMemberFilter;
+}
+/** A filter to be used against many `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgAdminGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgAdminGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgAdminGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgAdminGrantFilter;
+}
+/** A filter to be used against many `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgOwnerGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgOwnerGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgOwnerGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgOwnerGrantFilter;
+}
+/** A filter to be used against many `OrgGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgGrantFilter;
+}
+/** A filter to be used against many `OrgChartEdge` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgChartEdgeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgChartEdgeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgChartEdgeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgChartEdgeFilter;
+}
+/** A filter to be used against many `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgChartEdgeGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgChartEdgeGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgChartEdgeGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgChartEdgeGrantFilter;
+}
+/** A filter to be used against many `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgPermissionDefaultFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgPermissionDefaultFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgPermissionDefaultFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgPermissionDefaultFilter;
+}
+/** A filter to be used against many `AppLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppLimitFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitFilter;
+}
+/** A filter to be used against many `OrgLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgLimitFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgLimitFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgLimitFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgLimitFilter;
+}
+/** A filter to be used against many `AppStep` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppStepFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppStepFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppStepFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppStepFilter;
+}
+/** A filter to be used against many `AppAchievement` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppAchievementFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppAchievementFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppAchievementFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppAchievementFilter;
+}
+/** A filter to be used against many `AppLevel` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppLevelFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLevelFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLevelFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLevelFilter;
+}
+/** A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyEmailFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmailFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailFilter;
+}
+/** A filter to be used against many `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyPhoneNumberFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PhoneNumberFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PhoneNumberFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PhoneNumberFilter;
+}
+/** A filter to be used against many `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyCryptoAddressFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAddressFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAddressFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAddressFilter;
+}
+/** A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyConnectedAccountFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ConnectedAccountFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ConnectedAccountFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ConnectedAccountFilter;
+}
+/** A filter to be used against many `Invite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: InviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: InviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: InviteFilter;
+}
+/** A filter to be used against many `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyClaimedInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ClaimedInviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ClaimedInviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ClaimedInviteFilter;
+}
+/** A filter to be used against many `OrgInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgInviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgInviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgInviteFilter;
+}
+/** A filter to be used against many `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgClaimedInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgClaimedInviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgClaimedInviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgClaimedInviteFilter;
+}
+/** A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAuditLogFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AuditLogFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AuditLogFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AuditLogFilter;
+}
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
+}
 /** An interval of time that has passed where the smallest distinct unit is a second. */
 export interface IntervalInput {
   /**
@@ -12438,6 +16033,4886 @@ export interface IntervalInput {
   months?: number;
   /** A quantity of years. */
   years?: number;
+}
+/** A filter to be used against `Schema` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `schemaName` field. */
+  schemaName?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `isPublic` field. */
+  isPublic?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: SchemaFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SchemaFilter[];
+  /** Negates the expression. */
+  not?: SchemaFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `tables` relation. */
+  tables?: SchemaToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: SchemaToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: SchemaToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: SchemaToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: SchemaToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: SchemaToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByPrivateSchemaId` relation. */
+  tableTemplateModulesByPrivateSchemaId?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByPrivateSchemaId` exist. */
+  tableTemplateModulesByPrivateSchemaIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+}
+/** A filter to be used against `Table` object types. All fields are combined with a logical ‘and.’ */
+export interface TableFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `useRls` field. */
+  useRls?: BooleanFilter;
+  /** Filter by the object’s `timestamps` field. */
+  timestamps?: BooleanFilter;
+  /** Filter by the object’s `peoplestamps` field. */
+  peoplestamps?: BooleanFilter;
+  /** Filter by the object’s `pluralName` field. */
+  pluralName?: StringFilter;
+  /** Filter by the object’s `singularName` field. */
+  singularName?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `inheritsId` field. */
+  inheritsId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TableFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TableFilter[];
+  /** Negates the expression. */
+  not?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `inherits` relation. */
+  inherits?: TableFilter;
+  /** A related `inherits` exists. */
+  inheritsExists?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: TableToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: TableToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: TableToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: TableToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: TableToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: TableToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: TableToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: TableToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: TableToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: TableToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: TableToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: TableToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `embeddingChunksByChunksTableId` relation. */
+  embeddingChunksByChunksTableId?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunksByChunksTableId` exist. */
+  embeddingChunksByChunksTableIdExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByOwnerTableId` relation. */
+  tableTemplateModulesByOwnerTableId?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByOwnerTableId` exist. */
+  tableTemplateModulesByOwnerTableIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: TableToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisionsBySourceTableId` relation. */
+  relationProvisionsBySourceTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsBySourceTableId` exist. */
+  relationProvisionsBySourceTableIdExist?: boolean;
+  /** Filter by the object’s `relationProvisionsByTargetTableId` relation. */
+  relationProvisionsByTargetTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsByTargetTableId` exist. */
+  relationProvisionsByTargetTableIdExist?: boolean;
+}
+/** A filter to be used against `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface CheckConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `expr` field. */
+  expr?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: CheckConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CheckConstraintFilter[];
+  /** Negates the expression. */
+  not?: CheckConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `Field` object types. All fields are combined with a logical ‘and.’ */
+export interface FieldFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `isRequired` field. */
+  isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
+  apiRequired?: BooleanFilter;
+  /** Filter by the object’s `defaultValue` field. */
+  defaultValue?: StringFilter;
+  /** Filter by the object’s `defaultValueAst` field. */
+  defaultValueAst?: JSONFilter;
+  /** Filter by the object’s `isHidden` field. */
+  isHidden?: BooleanFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldOrder` field. */
+  fieldOrder?: IntFilter;
+  /** Filter by the object’s `regexp` field. */
+  regexp?: StringFilter;
+  /** Filter by the object’s `chk` field. */
+  chk?: JSONFilter;
+  /** Filter by the object’s `chkExpr` field. */
+  chkExpr?: JSONFilter;
+  /** Filter by the object’s `min` field. */
+  min?: FloatFilter;
+  /** Filter by the object’s `max` field. */
+  max?: FloatFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: FieldFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FieldFilter[];
+  /** Negates the expression. */
+  not?: FieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `ForeignKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface ForeignKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
+  refTableId?: UUIDFilter;
+  /** Filter by the object’s `refFieldIds` field. */
+  refFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `deleteAction` field. */
+  deleteAction?: StringFilter;
+  /** Filter by the object’s `updateAction` field. */
+  updateAction?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ForeignKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ForeignKeyConstraintFilter[];
+  /** Negates the expression. */
+  not?: ForeignKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
+export interface FullTextSearchFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `weights` field. */
+  weights?: StringListFilter;
+  /** Filter by the object’s `langs` field. */
+  langs?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: FullTextSearchFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FullTextSearchFilter[];
+  /** Negates the expression. */
+  not?: FullTextSearchFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `Index` object types. All fields are combined with a logical ‘and.’ */
+export interface IndexFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `includeFieldIds` field. */
+  includeFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `accessMethod` field. */
+  accessMethod?: StringFilter;
+  /** Filter by the object’s `indexParams` field. */
+  indexParams?: JSONFilter;
+  /** Filter by the object’s `whereClause` field. */
+  whereClause?: JSONFilter;
+  /** Filter by the object’s `isUnique` field. */
+  isUnique?: BooleanFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Filter by the object’s `opClasses` field. */
+  opClasses?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: IndexFilter[];
+  /** Checks for any expressions in this list. */
+  or?: IndexFilter[];
+  /** Negates the expression. */
+  not?: IndexFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `Policy` object types. All fields are combined with a logical ‘and.’ */
+export interface PolicyFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `permissive` field. */
+  permissive?: BooleanFilter;
+  /** Filter by the object’s `disabled` field. */
+  disabled?: BooleanFilter;
+  /** Filter by the object’s `policyType` field. */
+  policyType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PolicyFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PolicyFilter[];
+  /** Negates the expression. */
+  not?: PolicyFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `PrimaryKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface PrimaryKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrimaryKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrimaryKeyConstraintFilter[];
+  /** Negates the expression. */
+  not?: PrimaryKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: SchemaGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SchemaGrantFilter[];
+  /** Negates the expression. */
+  not?: SchemaGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `TableGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface TableGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TableGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TableGrantFilter[];
+  /** Negates the expression. */
+  not?: TableGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `TriggerFunction` object types. All fields are combined with a logical ‘and.’ */
+export interface TriggerFunctionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `code` field. */
+  code?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TriggerFunctionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TriggerFunctionFilter[];
+  /** Negates the expression. */
+  not?: TriggerFunctionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `Trigger` object types. All fields are combined with a logical ‘and.’ */
+export interface TriggerFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `functionName` field. */
+  functionName?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TriggerFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TriggerFilter[];
+  /** Negates the expression. */
+  not?: TriggerFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `UniqueConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface UniqueConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UniqueConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UniqueConstraintFilter[];
+  /** Negates the expression. */
+  not?: UniqueConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `View` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `viewType` field. */
+  viewType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `filterType` field. */
+  filterType?: StringFilter;
+  /** Filter by the object’s `filterData` field. */
+  filterData?: JSONFilter;
+  /** Filter by the object’s `securityInvoker` field. */
+  securityInvoker?: BooleanFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewFilter[];
+  /** Negates the expression. */
+  not?: ViewFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** A related `table` exists. */
+  tableExists?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: ViewToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: ViewToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: ViewToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
+}
+/** A filter to be used against `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
+  viewId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `withGrantOption` field. */
+  withGrantOption?: BooleanFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewGrantFilter[];
+  /** Negates the expression. */
+  not?: ViewGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
+}
+/** A filter to be used against `ViewRule` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewRuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
+  viewId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `action` field. */
+  action?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewRuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewRuleFilter[];
+  /** Negates the expression. */
+  not?: ViewRuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
+}
+/** A filter to be used against `DefaultPrivilege` object types. All fields are combined with a logical ‘and.’ */
+export interface DefaultPrivilegeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `objectType` field. */
+  objectType?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: DefaultPrivilegeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DefaultPrivilegeFilter[];
+  /** Negates the expression. */
+  not?: DefaultPrivilegeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `Enum` object types. All fields are combined with a logical ‘and.’ */
+export interface EnumFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `values` field. */
+  values?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: EnumFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EnumFilter[];
+  /** Negates the expression. */
+  not?: EnumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface EmbeddingChunkFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `embeddingFieldId` field. */
+  embeddingFieldId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableId` field. */
+  chunksTableId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableName` field. */
+  chunksTableName?: StringFilter;
+  /** Filter by the object’s `contentFieldName` field. */
+  contentFieldName?: StringFilter;
+  /** Filter by the object’s `dimensions` field. */
+  dimensions?: IntFilter;
+  /** Filter by the object’s `metric` field. */
+  metric?: StringFilter;
+  /** Filter by the object’s `chunkSize` field. */
+  chunkSize?: IntFilter;
+  /** Filter by the object’s `chunkOverlap` field. */
+  chunkOverlap?: IntFilter;
+  /** Filter by the object’s `chunkStrategy` field. */
+  chunkStrategy?: StringFilter;
+  /** Filter by the object’s `metadataFields` field. */
+  metadataFields?: JSONFilter;
+  /** Filter by the object’s `enqueueChunkingJob` field. */
+  enqueueChunkingJob?: BooleanFilter;
+  /** Filter by the object’s `chunkingTaskName` field. */
+  chunkingTaskName?: StringFilter;
+  /** Filter by the object’s `parentFkFieldId` field. */
+  parentFkFieldId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmbeddingChunkFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmbeddingChunkFilter[];
+  /** Negates the expression. */
+  not?: EmbeddingChunkFilter;
+  /** Filter by the object’s `chunksTable` relation. */
+  chunksTable?: TableFilter;
+  /** A related `chunksTable` exists. */
+  chunksTableExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `embeddingField` relation. */
+  embeddingField?: FieldFilter;
+  /** A related `embeddingField` exists. */
+  embeddingFieldExists?: boolean;
+  /** Filter by the object’s `parentFkField` relation. */
+  parentFkField?: FieldFilter;
+  /** A related `parentFkField` exists. */
+  parentFkFieldExists?: boolean;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseTransferFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `targetOwnerId` field. */
+  targetOwnerId?: UUIDFilter;
+  /** Filter by the object’s `sourceApproved` field. */
+  sourceApproved?: BooleanFilter;
+  /** Filter by the object’s `targetApproved` field. */
+  targetApproved?: BooleanFilter;
+  /** Filter by the object’s `sourceApprovedAt` field. */
+  sourceApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `targetApprovedAt` field. */
+  targetApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `initiatedBy` field. */
+  initiatedBy?: UUIDFilter;
+  /** Filter by the object’s `notes` field. */
+  notes?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseTransferFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseTransferFilter[];
+  /** Negates the expression. */
+  not?: DatabaseTransferFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `isPublic` field. */
+  isPublic?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: ApiFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ApiFilter[];
+  /** Negates the expression. */
+  not?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: ApiToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: ApiToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+}
+/** A filter to be used against `ApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ApiModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ApiModuleFilter[];
+  /** Negates the expression. */
+  not?: ApiModuleFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiSchemaFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ApiSchemaFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ApiSchemaFilter[];
+  /** Negates the expression. */
+  not?: ApiSchemaFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `Site` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `favicon` field. */
+  favicon?: ConstructiveInternalTypeAttachmentFilter;
+  /** Filter by the object’s `appleTouchIcon` field. */
+  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `logo` field. */
+  logo?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteFilter[];
+  /** Negates the expression. */
+  not?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `app` relation. */
+  app?: AppFilter;
+  /** A related `app` exists. */
+  appExists?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: SiteToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: SiteToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: SiteToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: SiteToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+}
+/** A filter to be used against `App` object types. All fields are combined with a logical ‘and.’ */
+export interface AppFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `appImage` field. */
+  appImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `appStoreLink` field. */
+  appStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Filter by the object’s `appStoreId` field. */
+  appStoreId?: StringFilter;
+  /** Filter by the object’s `appIdPrefix` field. */
+  appIdPrefix?: StringFilter;
+  /** Filter by the object’s `playStoreLink` field. */
+  playStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppFilter[];
+  /** Negates the expression. */
+  not?: AppFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `subdomain` field. */
+  subdomain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DomainFilter[];
+  /** Negates the expression. */
+  not?: DomainFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** A related `api` exists. */
+  apiExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** A related `site` exists. */
+  siteExists?: boolean;
+}
+/** A filter to be used against `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteMetadatumFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteMetadatumFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteMetadatumFilter[];
+  /** Negates the expression. */
+  not?: SiteMetadatumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+}
+/** A filter to be used against `SiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteModuleFilter[];
+  /** Negates the expression. */
+  not?: SiteModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+}
+/** A filter to be used against `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteThemeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `theme` field. */
+  theme?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteThemeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteThemeFilter[];
+  /** Negates the expression. */
+  not?: SiteThemeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+}
+/** A filter to be used against `ConnectedAccountsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ConnectedAccountsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ConnectedAccountsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ConnectedAccountsModuleFilter[];
+  /** Negates the expression. */
+  not?: ConnectedAccountsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `CryptoAddressesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CryptoAddressesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
+  cryptoNetwork?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAddressesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAddressesModuleFilter[];
+  /** Negates the expression. */
+  not?: CryptoAddressesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `CryptoAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CryptoAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
+  secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `addressesTableId` field. */
+  addressesTableId?: UUIDFilter;
+  /** Filter by the object’s `userField` field. */
+  userField?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
+  cryptoNetwork?: StringFilter;
+  /** Filter by the object’s `signInRequestChallenge` field. */
+  signInRequestChallenge?: StringFilter;
+  /** Filter by the object’s `signInRecordFailure` field. */
+  signInRecordFailure?: StringFilter;
+  /** Filter by the object’s `signUpWithKey` field. */
+  signUpWithKey?: StringFilter;
+  /** Filter by the object’s `signInWithChallenge` field. */
+  signInWithChallenge?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAuthModuleFilter[];
+  /** Negates the expression. */
+  not?: CryptoAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `DefaultIdsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DefaultIdsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DefaultIdsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DefaultIdsModuleFilter[];
+  /** Negates the expression. */
+  not?: DefaultIdsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `DenormalizedTableField` object types. All fields are combined with a logical ‘and.’ */
+export interface DenormalizedTableFieldFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `setIds` field. */
+  setIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
+  refTableId?: UUIDFilter;
+  /** Filter by the object’s `refFieldId` field. */
+  refFieldId?: UUIDFilter;
+  /** Filter by the object’s `refIds` field. */
+  refIds?: UUIDListFilter;
+  /** Filter by the object’s `useUpdates` field. */
+  useUpdates?: BooleanFilter;
+  /** Filter by the object’s `updateDefaults` field. */
+  updateDefaults?: BooleanFilter;
+  /** Filter by the object’s `funcName` field. */
+  funcName?: StringFilter;
+  /** Filter by the object’s `funcOrder` field. */
+  funcOrder?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: DenormalizedTableFieldFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DenormalizedTableFieldFilter[];
+  /** Negates the expression. */
+  not?: DenormalizedTableFieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `refField` relation. */
+  refField?: FieldFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `EmailsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmailsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmailsModuleFilter[];
+  /** Negates the expression. */
+  not?: EmailsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `EncryptedSecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface EncryptedSecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: EncryptedSecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EncryptedSecretsModuleFilter[];
+  /** Negates the expression. */
+  not?: EncryptedSecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `FieldModule` object types. All fields are combined with a logical ‘and.’ */
+export interface FieldModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `triggers` field. */
+  triggers?: StringListFilter;
+  /** Filter by the object’s `functions` field. */
+  functions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: FieldModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FieldModuleFilter[];
+  /** Negates the expression. */
+  not?: FieldModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `InvitesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface InvitesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
+  emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableId` field. */
+  invitesTableId?: UUIDFilter;
+  /** Filter by the object’s `claimedInvitesTableId` field. */
+  claimedInvitesTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableName` field. */
+  invitesTableName?: StringFilter;
+  /** Filter by the object’s `claimedInvitesTableName` field. */
+  claimedInvitesTableName?: StringFilter;
+  /** Filter by the object’s `submitInviteCodeFunction` field. */
+  submitInviteCodeFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: InvitesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: InvitesModuleFilter[];
+  /** Negates the expression. */
+  not?: InvitesModuleFilter;
+  /** Filter by the object’s `claimedInvitesTable` relation. */
+  claimedInvitesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `invitesTable` relation. */
+  invitesTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `LevelsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface LevelsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableId` field. */
+  stepsTableId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableName` field. */
+  stepsTableName?: StringFilter;
+  /** Filter by the object’s `achievementsTableId` field. */
+  achievementsTableId?: UUIDFilter;
+  /** Filter by the object’s `achievementsTableName` field. */
+  achievementsTableName?: StringFilter;
+  /** Filter by the object’s `levelsTableId` field. */
+  levelsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelsTableName` field. */
+  levelsTableName?: StringFilter;
+  /** Filter by the object’s `levelRequirementsTableId` field. */
+  levelRequirementsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelRequirementsTableName` field. */
+  levelRequirementsTableName?: StringFilter;
+  /** Filter by the object’s `completedStep` field. */
+  completedStep?: StringFilter;
+  /** Filter by the object’s `incompletedStep` field. */
+  incompletedStep?: StringFilter;
+  /** Filter by the object’s `tgAchievement` field. */
+  tgAchievement?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggle` field. */
+  tgAchievementToggle?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggleBoolean` field. */
+  tgAchievementToggleBoolean?: StringFilter;
+  /** Filter by the object’s `tgAchievementBoolean` field. */
+  tgAchievementBoolean?: StringFilter;
+  /** Filter by the object’s `upsertAchievement` field. */
+  upsertAchievement?: StringFilter;
+  /** Filter by the object’s `tgUpdateAchievements` field. */
+  tgUpdateAchievements?: StringFilter;
+  /** Filter by the object’s `stepsRequired` field. */
+  stepsRequired?: StringFilter;
+  /** Filter by the object’s `levelAchieved` field. */
+  levelAchieved?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: LevelsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: LevelsModuleFilter[];
+  /** Negates the expression. */
+  not?: LevelsModuleFilter;
+  /** Filter by the object’s `achievementsTable` relation. */
+  achievementsTable?: TableFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `levelRequirementsTable` relation. */
+  levelRequirementsTable?: TableFilter;
+  /** Filter by the object’s `levelsTable` relation. */
+  levelsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `stepsTable` relation. */
+  stepsTable?: TableFilter;
+}
+/** A filter to be used against `LimitsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface LimitsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
+  defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
+  defaultTableName?: StringFilter;
+  /** Filter by the object’s `limitIncrementFunction` field. */
+  limitIncrementFunction?: StringFilter;
+  /** Filter by the object’s `limitDecrementFunction` field. */
+  limitDecrementFunction?: StringFilter;
+  /** Filter by the object’s `limitIncrementTrigger` field. */
+  limitIncrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitDecrementTrigger` field. */
+  limitDecrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitUpdateTrigger` field. */
+  limitUpdateTrigger?: StringFilter;
+  /** Filter by the object’s `limitCheckFunction` field. */
+  limitCheckFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: LimitsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: LimitsModuleFilter[];
+  /** Negates the expression. */
+  not?: LimitsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `MembershipTypesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface MembershipTypesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipTypesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipTypesModuleFilter[];
+  /** Negates the expression. */
+  not?: MembershipTypesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `MembershipsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface MembershipsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
+  membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableName` field. */
+  membershipsTableName?: StringFilter;
+  /** Filter by the object’s `membersTableId` field. */
+  membersTableId?: UUIDFilter;
+  /** Filter by the object’s `membersTableName` field. */
+  membersTableName?: StringFilter;
+  /** Filter by the object’s `membershipDefaultsTableId` field. */
+  membershipDefaultsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipDefaultsTableName` field. */
+  membershipDefaultsTableName?: StringFilter;
+  /** Filter by the object’s `grantsTableId` field. */
+  grantsTableId?: UUIDFilter;
+  /** Filter by the object’s `grantsTableName` field. */
+  grantsTableName?: StringFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Filter by the object’s `limitsTableId` field. */
+  limitsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultLimitsTableId` field. */
+  defaultLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
+  permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissionsTableId` field. */
+  defaultPermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sprtTableId` field. */
+  sprtTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableId` field. */
+  adminGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableName` field. */
+  adminGrantsTableName?: StringFilter;
+  /** Filter by the object’s `ownerGrantsTableId` field. */
+  ownerGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `ownerGrantsTableName` field. */
+  ownerGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `entityTableOwnerId` field. */
+  entityTableOwnerId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `actorMaskCheck` field. */
+  actorMaskCheck?: StringFilter;
+  /** Filter by the object’s `actorPermCheck` field. */
+  actorPermCheck?: StringFilter;
+  /** Filter by the object’s `entityIdsByMask` field. */
+  entityIdsByMask?: StringFilter;
+  /** Filter by the object’s `entityIdsByPerm` field. */
+  entityIdsByPerm?: StringFilter;
+  /** Filter by the object’s `entityIdsFunction` field. */
+  entityIdsFunction?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipsModuleFilter[];
+  /** Negates the expression. */
+  not?: MembershipsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultLimitsTable` relation. */
+  defaultLimitsTable?: TableFilter;
+  /** Filter by the object’s `defaultPermissionsTable` relation. */
+  defaultPermissionsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `entityTableOwner` relation. */
+  entityTableOwner?: FieldFilter;
+  /** A related `entityTableOwner` exists. */
+  entityTableOwnerExists?: boolean;
+  /** Filter by the object’s `grantsTable` relation. */
+  grantsTable?: TableFilter;
+  /** Filter by the object’s `limitsTable` relation. */
+  limitsTable?: TableFilter;
+  /** Filter by the object’s `membersTable` relation. */
+  membersTable?: TableFilter;
+  /** Filter by the object’s `membershipDefaultsTable` relation. */
+  membershipDefaultsTable?: TableFilter;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sprtTable` relation. */
+  sprtTable?: TableFilter;
+}
+/** A filter to be used against `PermissionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PermissionsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
+  defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
+  defaultTableName?: StringFilter;
+  /** Filter by the object’s `bitlen` field. */
+  bitlen?: IntFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `getPaddedMask` field. */
+  getPaddedMask?: StringFilter;
+  /** Filter by the object’s `getMask` field. */
+  getMask?: StringFilter;
+  /** Filter by the object’s `getByMask` field. */
+  getByMask?: StringFilter;
+  /** Filter by the object’s `getMaskByName` field. */
+  getMaskByName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: PermissionsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PermissionsModuleFilter[];
+  /** Negates the expression. */
+  not?: PermissionsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `PhoneNumbersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PhoneNumbersModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: PhoneNumbersModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PhoneNumbersModuleFilter[];
+  /** Negates the expression. */
+  not?: PhoneNumbersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `ProfilesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ProfilesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `profilePermissionsTableId` field. */
+  profilePermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `profilePermissionsTableName` field. */
+  profilePermissionsTableName?: StringFilter;
+  /** Filter by the object’s `profileGrantsTableId` field. */
+  profileGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileGrantsTableName` field. */
+  profileGrantsTableName?: StringFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableId` field. */
+  profileDefinitionGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableName` field. */
+  profileDefinitionGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
+  permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
+  membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ProfilesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ProfilesModuleFilter[];
+  /** Negates the expression. */
+  not?: ProfilesModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTable` relation. */
+  profileDefinitionGrantsTable?: TableFilter;
+  /** Filter by the object’s `profileGrantsTable` relation. */
+  profileGrantsTable?: TableFilter;
+  /** Filter by the object’s `profilePermissionsTable` relation. */
+  profilePermissionsTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SecretsModuleFilter[];
+  /** Negates the expression. */
+  not?: SecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SessionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SessionsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `authSettingsTableId` field. */
+  authSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsDefaultExpiration` field. */
+  sessionsDefaultExpiration?: IntervalFilter;
+  /** Filter by the object’s `sessionsTable` field. */
+  sessionsTable?: StringFilter;
+  /** Filter by the object’s `sessionCredentialsTable` field. */
+  sessionCredentialsTable?: StringFilter;
+  /** Filter by the object’s `authSettingsTable` field. */
+  authSettingsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SessionsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SessionsModuleFilter[];
+  /** Negates the expression. */
+  not?: SessionsModuleFilter;
+  /** Filter by the object’s `authSettingsTableByAuthSettingsTableId` relation. */
+  authSettingsTableByAuthSettingsTableId?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTableBySessionCredentialsTableId` relation. */
+  sessionCredentialsTableBySessionCredentialsTableId?: TableFilter;
+  /** Filter by the object’s `sessionsTableBySessionsTableId` relation. */
+  sessionsTableBySessionsTableId?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `UserAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface UserAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
+  emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
+  secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `encryptedTableId` field. */
+  encryptedTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableId` field. */
+  auditsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableName` field. */
+  auditsTableName?: StringFilter;
+  /** Filter by the object’s `signInFunction` field. */
+  signInFunction?: StringFilter;
+  /** Filter by the object’s `signUpFunction` field. */
+  signUpFunction?: StringFilter;
+  /** Filter by the object’s `signOutFunction` field. */
+  signOutFunction?: StringFilter;
+  /** Filter by the object’s `setPasswordFunction` field. */
+  setPasswordFunction?: StringFilter;
+  /** Filter by the object’s `resetPasswordFunction` field. */
+  resetPasswordFunction?: StringFilter;
+  /** Filter by the object’s `forgotPasswordFunction` field. */
+  forgotPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendVerificationEmailFunction` field. */
+  sendVerificationEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyEmailFunction` field. */
+  verifyEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyPasswordFunction` field. */
+  verifyPasswordFunction?: StringFilter;
+  /** Filter by the object’s `checkPasswordFunction` field. */
+  checkPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendAccountDeletionEmailFunction` field. */
+  sendAccountDeletionEmailFunction?: StringFilter;
+  /** Filter by the object’s `deleteAccountFunction` field. */
+  deleteAccountFunction?: StringFilter;
+  /** Filter by the object’s `signInOneTimeTokenFunction` field. */
+  signInOneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `oneTimeTokenFunction` field. */
+  oneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `extendTokenExpires` field. */
+  extendTokenExpires?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserAuthModuleFilter[];
+  /** Negates the expression. */
+  not?: UserAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `encryptedTable` relation. */
+  encryptedTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `UsersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface UsersModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `typeTableId` field. */
+  typeTableId?: UUIDFilter;
+  /** Filter by the object’s `typeTableName` field. */
+  typeTableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: UsersModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UsersModuleFilter[];
+  /** Negates the expression. */
+  not?: UsersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `typeTable` relation. */
+  typeTable?: TableFilter;
+}
+/** A filter to be used against `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface TableTemplateModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: TableTemplateModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TableTemplateModuleFilter[];
+  /** Negates the expression. */
+  not?: TableTemplateModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SecureTableProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface SecureTableProvisionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `useRls` field. */
+  useRls?: BooleanFilter;
+  /** Filter by the object’s `nodeData` field. */
+  nodeData?: JSONFilter;
+  /** Filter by the object’s `fields` field. */
+  fields?: JSONListFilter;
+  /** Filter by the object’s `grantRoles` field. */
+  grantRoles?: StringListFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
+  policyType?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
+  policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
+  policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
+  policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
+  policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
+  policyData?: JSONFilter;
+  /** Filter by the object’s `outFields` field. */
+  outFields?: UUIDListFilter;
+  /** Checks for all expressions in this list. */
+  and?: SecureTableProvisionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SecureTableProvisionFilter[];
+  /** Negates the expression. */
+  not?: SecureTableProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `RelationProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface RelationProvisionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `relationType` field. */
+  relationType?: StringFilter;
+  /** Filter by the object’s `sourceTableId` field. */
+  sourceTableId?: UUIDFilter;
+  /** Filter by the object’s `targetTableId` field. */
+  targetTableId?: UUIDFilter;
+  /** Filter by the object’s `fieldName` field. */
+  fieldName?: StringFilter;
+  /** Filter by the object’s `deleteAction` field. */
+  deleteAction?: StringFilter;
+  /** Filter by the object’s `isRequired` field. */
+  isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
+  apiRequired?: BooleanFilter;
+  /** Filter by the object’s `junctionTableId` field. */
+  junctionTableId?: UUIDFilter;
+  /** Filter by the object’s `junctionTableName` field. */
+  junctionTableName?: StringFilter;
+  /** Filter by the object’s `junctionSchemaId` field. */
+  junctionSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sourceFieldName` field. */
+  sourceFieldName?: StringFilter;
+  /** Filter by the object’s `targetFieldName` field. */
+  targetFieldName?: StringFilter;
+  /** Filter by the object’s `useCompositeKey` field. */
+  useCompositeKey?: BooleanFilter;
+  /** Filter by the object’s `createIndex` field. */
+  createIndex?: BooleanFilter;
+  /** Filter by the object’s `exposeInApi` field. */
+  exposeInApi?: BooleanFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `nodeData` field. */
+  nodeData?: JSONFilter;
+  /** Filter by the object’s `grantRoles` field. */
+  grantRoles?: StringListFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
+  policyType?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
+  policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
+  policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
+  policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
+  policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
+  policyData?: JSONFilter;
+  /** Filter by the object’s `outFieldId` field. */
+  outFieldId?: UUIDFilter;
+  /** Filter by the object’s `outJunctionTableId` field. */
+  outJunctionTableId?: UUIDFilter;
+  /** Filter by the object’s `outSourceFieldId` field. */
+  outSourceFieldId?: UUIDFilter;
+  /** Filter by the object’s `outTargetFieldId` field. */
+  outTargetFieldId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: RelationProvisionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RelationProvisionFilter[];
+  /** Negates the expression. */
+  not?: RelationProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `sourceTable` relation. */
+  sourceTable?: TableFilter;
+  /** Filter by the object’s `targetTable` relation. */
+  targetTable?: TableFilter;
+}
+/** A filter to be used against `Blueprint` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `templateId` field. */
+  templateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `constructedAt` field. */
+  constructedAt?: DatetimeFilter;
+  /** Filter by the object’s `errorDetails` field. */
+  errorDetails?: StringFilter;
+  /** Filter by the object’s `refMap` field. */
+  refMap?: JSONFilter;
+  /** Filter by the object’s `constructedDefinition` field. */
+  constructedDefinition?: JSONFilter;
+  /** Filter by the object’s `definitionHash` field. */
+  definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
+  tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintFilter[];
+  /** Negates the expression. */
+  not?: BlueprintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `template` relation. */
+  template?: BlueprintTemplateFilter;
+  /** A related `template` exists. */
+  templateExists?: boolean;
+}
+/** A filter to be used against `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseProvisionModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseName` field. */
+  databaseName?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `subdomain` field. */
+  subdomain?: StringFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: StringFilter;
+  /** Filter by the object’s `modules` field. */
+  modules?: StringListFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Filter by the object’s `bootstrapUser` field. */
+  bootstrapUser?: BooleanFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
+  errorMessage?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseProvisionModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseProvisionModuleFilter[];
+  /** Negates the expression. */
+  not?: DatabaseProvisionModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** A related `database` exists. */
+  databaseExists?: boolean;
+}
+/** A filter to be used against `ViewTable` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewTableFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
+  viewId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `joinOrder` field. */
+  joinOrder?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewTableFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewTableFilter[];
+  /** Negates the expression. */
+  not?: ViewTableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
+}
+/** A filter to be used against `BlueprintTemplate` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintTemplateFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `version` field. */
+  version?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+  /** Filter by the object’s `categories` field. */
+  categories?: StringListFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `definitionSchemaVersion` field. */
+  definitionSchemaVersion?: StringFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `complexity` field. */
+  complexity?: StringFilter;
+  /** Filter by the object’s `copyCount` field. */
+  copyCount?: IntFilter;
+  /** Filter by the object’s `forkCount` field. */
+  forkCount?: IntFilter;
+  /** Filter by the object’s `forkedFromId` field. */
+  forkedFromId?: UUIDFilter;
+  /** Filter by the object’s `definitionHash` field. */
+  definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
+  tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintTemplateFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintTemplateFilter[];
+  /** Negates the expression. */
+  not?: BlueprintTemplateFilter;
+  /** Filter by the object’s `forkedFrom` relation. */
+  forkedFrom?: BlueprintTemplateFilter;
+  /** A related `forkedFrom` exists. */
+  forkedFromExists?: boolean;
+  /** Filter by the object’s `blueprintTemplatesByForkedFromId` relation. */
+  blueprintTemplatesByForkedFromId?: BlueprintTemplateToManyBlueprintTemplateFilter;
+  /** `blueprintTemplatesByForkedFromId` exist. */
+  blueprintTemplatesByForkedFromIdExist?: boolean;
+  /** Filter by the object’s `blueprintsByTemplateId` relation. */
+  blueprintsByTemplateId?: BlueprintTemplateToManyBlueprintFilter;
+  /** `blueprintsByTemplateId` exist. */
+  blueprintsByTemplateIdExist?: boolean;
+}
+/** A filter to be used against `Database` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `schemaHash` field. */
+  schemaHash?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseFilter[];
+  /** Negates the expression. */
+  not?: DatabaseFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
+  /** Filter by the object’s `schemas` relation. */
+  schemas?: DatabaseToManySchemaFilter;
+  /** `schemas` exist. */
+  schemasExist?: boolean;
+  /** Filter by the object’s `tables` relation. */
+  tables?: DatabaseToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: DatabaseToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: DatabaseToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: DatabaseToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: DatabaseToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: DatabaseToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: DatabaseToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: DatabaseToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: DatabaseToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: DatabaseToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggerFunctions` relation. */
+  triggerFunctions?: DatabaseToManyTriggerFunctionFilter;
+  /** `triggerFunctions` exist. */
+  triggerFunctionsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: DatabaseToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: DatabaseToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: DatabaseToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: DatabaseToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: DatabaseToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: DatabaseToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `databaseTransfers` relation. */
+  databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
+  /** `databaseTransfers` exist. */
+  databaseTransfersExist?: boolean;
+  /** Filter by the object’s `apis` relation. */
+  apis?: DatabaseToManyApiFilter;
+  /** `apis` exist. */
+  apisExist?: boolean;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: DatabaseToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: DatabaseToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `sites` relation. */
+  sites?: DatabaseToManySiteFilter;
+  /** `sites` exist. */
+  sitesExist?: boolean;
+  /** Filter by the object’s `apps` relation. */
+  apps?: DatabaseToManyAppFilter;
+  /** `apps` exist. */
+  appsExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: DatabaseToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: DatabaseToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: DatabaseToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: DatabaseToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+  /** Filter by the object’s `connectedAccountsModules` relation. */
+  connectedAccountsModules?: DatabaseToManyConnectedAccountsModuleFilter;
+  /** `connectedAccountsModules` exist. */
+  connectedAccountsModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAddressesModules` relation. */
+  cryptoAddressesModules?: DatabaseToManyCryptoAddressesModuleFilter;
+  /** `cryptoAddressesModules` exist. */
+  cryptoAddressesModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAuthModules` relation. */
+  cryptoAuthModules?: DatabaseToManyCryptoAuthModuleFilter;
+  /** `cryptoAuthModules` exist. */
+  cryptoAuthModulesExist?: boolean;
+  /** Filter by the object’s `defaultIdsModules` relation. */
+  defaultIdsModules?: DatabaseToManyDefaultIdsModuleFilter;
+  /** `defaultIdsModules` exist. */
+  defaultIdsModulesExist?: boolean;
+  /** Filter by the object’s `denormalizedTableFields` relation. */
+  denormalizedTableFields?: DatabaseToManyDenormalizedTableFieldFilter;
+  /** `denormalizedTableFields` exist. */
+  denormalizedTableFieldsExist?: boolean;
+  /** Filter by the object’s `emailsModules` relation. */
+  emailsModules?: DatabaseToManyEmailsModuleFilter;
+  /** `emailsModules` exist. */
+  emailsModulesExist?: boolean;
+  /** Filter by the object’s `encryptedSecretsModules` relation. */
+  encryptedSecretsModules?: DatabaseToManyEncryptedSecretsModuleFilter;
+  /** `encryptedSecretsModules` exist. */
+  encryptedSecretsModulesExist?: boolean;
+  /** Filter by the object’s `fieldModules` relation. */
+  fieldModules?: DatabaseToManyFieldModuleFilter;
+  /** `fieldModules` exist. */
+  fieldModulesExist?: boolean;
+  /** Filter by the object’s `invitesModules` relation. */
+  invitesModules?: DatabaseToManyInvitesModuleFilter;
+  /** `invitesModules` exist. */
+  invitesModulesExist?: boolean;
+  /** Filter by the object’s `levelsModules` relation. */
+  levelsModules?: DatabaseToManyLevelsModuleFilter;
+  /** `levelsModules` exist. */
+  levelsModulesExist?: boolean;
+  /** Filter by the object’s `limitsModules` relation. */
+  limitsModules?: DatabaseToManyLimitsModuleFilter;
+  /** `limitsModules` exist. */
+  limitsModulesExist?: boolean;
+  /** Filter by the object’s `membershipTypesModules` relation. */
+  membershipTypesModules?: DatabaseToManyMembershipTypesModuleFilter;
+  /** `membershipTypesModules` exist. */
+  membershipTypesModulesExist?: boolean;
+  /** Filter by the object’s `membershipsModules` relation. */
+  membershipsModules?: DatabaseToManyMembershipsModuleFilter;
+  /** `membershipsModules` exist. */
+  membershipsModulesExist?: boolean;
+  /** Filter by the object’s `permissionsModules` relation. */
+  permissionsModules?: DatabaseToManyPermissionsModuleFilter;
+  /** `permissionsModules` exist. */
+  permissionsModulesExist?: boolean;
+  /** Filter by the object’s `phoneNumbersModules` relation. */
+  phoneNumbersModules?: DatabaseToManyPhoneNumbersModuleFilter;
+  /** `phoneNumbersModules` exist. */
+  phoneNumbersModulesExist?: boolean;
+  /** Filter by the object’s `profilesModules` relation. */
+  profilesModules?: DatabaseToManyProfilesModuleFilter;
+  /** `profilesModules` exist. */
+  profilesModulesExist?: boolean;
+  /** Filter by the object’s `rlsModule` relation. */
+  rlsModule?: RlsModuleFilter;
+  /** A related `rlsModule` exists. */
+  rlsModuleExists?: boolean;
+  /** Filter by the object’s `secretsModules` relation. */
+  secretsModules?: DatabaseToManySecretsModuleFilter;
+  /** `secretsModules` exist. */
+  secretsModulesExist?: boolean;
+  /** Filter by the object’s `sessionsModules` relation. */
+  sessionsModules?: DatabaseToManySessionsModuleFilter;
+  /** `sessionsModules` exist. */
+  sessionsModulesExist?: boolean;
+  /** Filter by the object’s `userAuthModules` relation. */
+  userAuthModules?: DatabaseToManyUserAuthModuleFilter;
+  /** `userAuthModules` exist. */
+  userAuthModulesExist?: boolean;
+  /** Filter by the object’s `usersModules` relation. */
+  usersModules?: DatabaseToManyUsersModuleFilter;
+  /** `usersModules` exist. */
+  usersModulesExist?: boolean;
+  /** Filter by the object’s `hierarchyModule` relation. */
+  hierarchyModule?: HierarchyModuleFilter;
+  /** A related `hierarchyModule` exists. */
+  hierarchyModuleExists?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: DatabaseToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: DatabaseToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisions` relation. */
+  relationProvisions?: DatabaseToManyRelationProvisionFilter;
+  /** `relationProvisions` exist. */
+  relationProvisionsExist?: boolean;
+  /** Filter by the object’s `blueprints` relation. */
+  blueprints?: DatabaseToManyBlueprintFilter;
+  /** `blueprints` exist. */
+  blueprintsExist?: boolean;
+  /** Filter by the object’s `databaseProvisionModules` relation. */
+  databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
+  /** `databaseProvisionModules` exist. */
+  databaseProvisionModulesExist?: boolean;
+}
+/** A filter to be used against `AppAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface AppAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppAdminGrantFilter[];
+  /** Negates the expression. */
+  not?: AppAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface AppOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppOwnerGrantFilter[];
+  /** Negates the expression. */
+  not?: AppOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `AppGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface AppGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppGrantFilter[];
+  /** Negates the expression. */
+  not?: AppGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `OrgMember` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMemberFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMemberFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMemberFilter[];
+  /** Negates the expression. */
+  not?: OrgMemberFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgAdminGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgOwnerGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgChartEdge` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgChartEdgeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
+  childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `positionTitle` field. */
+  positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
+  positionLevel?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgChartEdgeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgChartEdgeFilter[];
+  /** Negates the expression. */
+  not?: OrgChartEdgeFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+}
+/** A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgChartEdgeGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
+  childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `positionTitle` field. */
+  positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
+  positionLevel?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgChartEdgeGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgChartEdgeGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgChartEdgeGrantFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+}
+/** A filter to be used against `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgPermissionDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgPermissionDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `AppLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
+  num?: IntFilter;
+  /** Filter by the object’s `max` field. */
+  max?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitFilter[];
+  /** Negates the expression. */
+  not?: AppLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
+  num?: IntFilter;
+  /** Filter by the object’s `max` field. */
+  max?: IntFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitFilter[];
+  /** Negates the expression. */
+  not?: OrgLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `AppStep` object types. All fields are combined with a logical ‘and.’ */
+export interface AppStepFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `count` field. */
+  count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppStepFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppStepFilter[];
+  /** Negates the expression. */
+  not?: AppStepFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `AppAchievement` object types. All fields are combined with a logical ‘and.’ */
+export interface AppAchievementFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `count` field. */
+  count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppAchievementFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppAchievementFilter[];
+  /** Negates the expression. */
+  not?: AppAchievementFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLevelFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `image` field. */
+  image?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLevelFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLevelFilter[];
+  /** Negates the expression. */
+  not?: AppLevelFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
+}
+/** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmailFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmailFilter[];
+  /** Negates the expression. */
+  not?: EmailFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
+export interface PhoneNumberFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `cc` field. */
+  cc?: StringFilter;
+  /** Filter by the object’s `number` field. */
+  number?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PhoneNumberFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PhoneNumberFilter[];
+  /** Negates the expression. */
+  not?: PhoneNumberFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
+export interface CryptoAddressFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `address` field. */
+  address?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAddressFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAddressFilter[];
+  /** Negates the expression. */
+  not?: CryptoAddressFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface ConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
+  service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
+  identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
+  details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ConnectedAccountFilter[];
+  /** Negates the expression. */
+  not?: ConnectedAccountFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’ */
+export interface InviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
+  inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
+  inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
+  inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
+  inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
+  multiple?: BooleanFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: InviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: InviteFilter[];
+  /** Negates the expression. */
+  not?: InviteFilter;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+}
+/** A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface ClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
+  receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ClaimedInviteFilter[];
+  /** Negates the expression. */
+  not?: ClaimedInviteFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
+}
+/** A filter to be used against `OrgInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgInviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
+  receiverId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
+  inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
+  inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
+  inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
+  inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
+  multiple?: BooleanFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgInviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgInviteFilter[];
+  /** Negates the expression. */
+  not?: OrgInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+}
+/** A filter to be used against `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
+  receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgClaimedInviteFilter[];
+  /** Negates the expression. */
+  not?: OrgClaimedInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
+}
+/** A filter to be used against `AuditLog` object types. All fields are combined with a logical ‘and.’ */
+export interface AuditLogFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `origin` field. */
+  origin?: ConstructiveInternalTypeOriginFilter;
+  /** Filter by the object’s `userAgent` field. */
+  userAgent?: StringFilter;
+  /** Filter by the object’s `ipAddress` field. */
+  ipAddress?: InternetAddressFilter;
+  /** Filter by the object’s `success` field. */
+  success?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AuditLogFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AuditLogFilter[];
+  /** Negates the expression. */
+  not?: AuditLogFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
+}
+/** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
+export interface UUIDFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
+export interface StringFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
+export interface JSONFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: Record<string, unknown>;
+  /** Not equal to the specified value. */
+  notEqualTo?: Record<string, unknown>;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Record<string, unknown>;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Record<string, unknown>;
+  /** Included in the specified list. */
+  in?: Record<string, unknown>[];
+  /** Not included in the specified list. */
+  notIn?: Record<string, unknown>[];
+  /** Less than the specified value. */
+  lessThan?: Record<string, unknown>;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: Record<string, unknown>;
+  /** Greater than the specified value. */
+  greaterThan?: Record<string, unknown>;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: Record<string, unknown>;
+  /** Contains the specified JSON. */
+  contains?: Record<string, unknown>;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: Record<string, unknown>;
+}
+/** A filter to be used against ObjectCategory fields. All fields are combined with a logical ‘and.’ */
+export interface ObjectCategoryFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ObjectCategory;
+  /** Not equal to the specified value. */
+  notEqualTo?: ObjectCategory;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ObjectCategory;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ObjectCategory;
+  /** Included in the specified list. */
+  in?: ObjectCategory[];
+  /** Not included in the specified list. */
+  notIn?: ObjectCategory[];
+  /** Less than the specified value. */
+  lessThan?: ObjectCategory;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ObjectCategory;
+  /** Greater than the specified value. */
+  greaterThan?: ObjectCategory;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ObjectCategory;
+}
+/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
+export interface IntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+}
+/** A filter to be used against String List fields. All fields are combined with a logical ‘and.’ */
+export interface StringListFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string[];
+  /** Not equal to the specified value. */
+  notEqualTo?: string[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string[];
+  /** Less than the specified value. */
+  lessThan?: string[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string[];
+  /** Greater than the specified value. */
+  greaterThan?: string[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string[];
+  /** Contains the specified list of values. */
+  contains?: string[];
+  /** Contained by the specified list of values. */
+  containedBy?: string[];
+  /** Overlaps the specified list of values. */
+  overlaps?: string[];
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: string;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: string;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: string;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: string;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: string;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: string;
+}
+/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
+export interface BooleanFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: boolean;
+  /** Not equal to the specified value. */
+  notEqualTo?: boolean;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: boolean;
+  /** Included in the specified list. */
+  in?: boolean[];
+  /** Not included in the specified list. */
+  notIn?: boolean[];
+  /** Less than the specified value. */
+  lessThan?: boolean;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: boolean;
+  /** Greater than the specified value. */
+  greaterThan?: boolean;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: boolean;
+}
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against UUID List fields. All fields are combined with a logical ‘and.’ */
+export interface UUIDListFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string[];
+  /** Not equal to the specified value. */
+  notEqualTo?: string[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string[];
+  /** Less than the specified value. */
+  lessThan?: string[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string[];
+  /** Greater than the specified value. */
+  greaterThan?: string[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string[];
+  /** Contains the specified list of values. */
+  contains?: string[];
+  /** Contained by the specified list of values. */
+  containedBy?: string[];
+  /** Overlaps the specified list of values. */
+  overlaps?: string[];
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: string;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: string;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: string;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: string;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: string;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: string;
+}
+/** A filter to be used against Float fields. All fields are combined with a logical ‘and.’ */
+export interface FloatFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+}
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
+}
+/** A filter to be used against ConstructiveInternalTypeAttachment fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeAttachmentFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeAttachment;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeAttachment;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeAttachment;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeAttachment;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeAttachment[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeAttachment[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeAttachment;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeAttachment;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeAttachment;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeAttachment;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeAttachment;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeAttachment;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeAttachment;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeAttachment;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeAttachment;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeAttachment;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeAttachment;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeAttachment;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeUrl fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeUrlFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeUrl;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeUrl;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeUrl;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeUrl;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeUrl[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeUrl[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeUrl;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeUrl;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeUrl;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeUrl;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeUrl;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeUrl;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeUrl;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeUrl;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeUrl;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeUrl;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeUrl;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeUrl;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeUrl;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeUrl;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeHostname fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeHostnameFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeHostname;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeHostname;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeHostname;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeHostname;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeHostname[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeHostname[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeHostname;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeHostname;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeHostname;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeHostname;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeHostname;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeHostname;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeHostname;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeHostname;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeHostname;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeHostname;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeHostname;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeHostname;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeHostname;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeHostname;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against Interval fields. All fields are combined with a logical ‘and.’ */
+export interface IntervalFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: IntervalInput;
+  /** Not equal to the specified value. */
+  notEqualTo?: IntervalInput;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: IntervalInput;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: IntervalInput;
+  /** Included in the specified list. */
+  in?: IntervalInput[];
+  /** Not included in the specified list. */
+  notIn?: IntervalInput[];
+  /** Less than the specified value. */
+  lessThan?: IntervalInput;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: IntervalInput;
+  /** Greater than the specified value. */
+  greaterThan?: IntervalInput;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: IntervalInput;
+}
+/** A filter to be used against JSON List fields. All fields are combined with a logical ‘and.’ */
+export interface JSONListFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: Record<string, unknown>[];
+  /** Not equal to the specified value. */
+  notEqualTo?: Record<string, unknown>[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Record<string, unknown>[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Record<string, unknown>[];
+  /** Less than the specified value. */
+  lessThan?: Record<string, unknown>[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: Record<string, unknown>[];
+  /** Greater than the specified value. */
+  greaterThan?: Record<string, unknown>[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: Record<string, unknown>[];
+  /** Contains the specified list of values. */
+  contains?: Record<string, unknown>[];
+  /** Contained by the specified list of values. */
+  containedBy?: Record<string, unknown>[];
+  /** Overlaps the specified list of values. */
+  overlaps?: Record<string, unknown>[];
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: Record<string, unknown>;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: Record<string, unknown>;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: Record<string, unknown>;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: Record<string, unknown>;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: Record<string, unknown>;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: Record<string, unknown>;
+}
+/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
+export interface UserFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
+  searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
+  type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserFilter[];
+  /** Negates the expression. */
+  not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedDatabases` relation. */
+  ownedDatabases?: UserToManyDatabaseFilter;
+  /** `ownedDatabases` exist. */
+  ownedDatabasesExist?: boolean;
+  /** Filter by the object’s `appMembershipByActorId` relation. */
+  appMembershipByActorId?: AppMembershipFilter;
+  /** A related `appMembershipByActorId` exists. */
+  appMembershipByActorIdExists?: boolean;
+  /** Filter by the object’s `appAdminGrantsByActorId` relation. */
+  appAdminGrantsByActorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByActorId` exist. */
+  appAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAdminGrantsByGrantorId` relation. */
+  appAdminGrantsByGrantorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByGrantorId` exist. */
+  appAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByActorId` relation. */
+  appOwnerGrantsByActorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByActorId` exist. */
+  appOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByGrantorId` relation. */
+  appOwnerGrantsByGrantorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByGrantorId` exist. */
+  appOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByActorId` relation. */
+  appGrantsByActorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByActorId` exist. */
+  appGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByGrantorId` relation. */
+  appGrantsByGrantorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByGrantorId` exist. */
+  appGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByActorId` relation. */
+  orgMembershipsByActorId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByActorId` exist. */
+  orgMembershipsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByEntityId` relation. */
+  orgMembershipsByEntityId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByEntityId` exist. */
+  orgMembershipsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipDefaultByEntityId` relation. */
+  orgMembershipDefaultByEntityId?: OrgMembershipDefaultFilter;
+  /** A related `orgMembershipDefaultByEntityId` exists. */
+  orgMembershipDefaultByEntityIdExists?: boolean;
+  /** Filter by the object’s `orgMembersByActorId` relation. */
+  orgMembersByActorId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByActorId` exist. */
+  orgMembersByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembersByEntityId` relation. */
+  orgMembersByEntityId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByEntityId` exist. */
+  orgMembersByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByActorId` relation. */
+  orgAdminGrantsByActorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByActorId` exist. */
+  orgAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByEntityId` relation. */
+  orgAdminGrantsByEntityId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByEntityId` exist. */
+  orgAdminGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByGrantorId` relation. */
+  orgAdminGrantsByGrantorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByGrantorId` exist. */
+  orgAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByActorId` relation. */
+  orgOwnerGrantsByActorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByActorId` exist. */
+  orgOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByEntityId` relation. */
+  orgOwnerGrantsByEntityId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByEntityId` exist. */
+  orgOwnerGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByGrantorId` relation. */
+  orgOwnerGrantsByGrantorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByGrantorId` exist. */
+  orgOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByActorId` relation. */
+  orgGrantsByActorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByActorId` exist. */
+  orgGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByEntityId` relation. */
+  orgGrantsByEntityId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByEntityId` exist. */
+  orgGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByGrantorId` relation. */
+  orgGrantsByGrantorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByGrantorId` exist. */
+  orgGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdges` relation. */
+  parentOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `parentOrgChartEdges` exist. */
+  parentOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `orgChartEdgesByEntityId` relation. */
+  orgChartEdgesByEntityId?: UserToManyOrgChartEdgeFilter;
+  /** `orgChartEdgesByEntityId` exist. */
+  orgChartEdgesByEntityIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdges` relation. */
+  childOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `childOrgChartEdges` exist. */
+  childOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdgeGrants` relation. */
+  parentOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `parentOrgChartEdgeGrants` exist. */
+  parentOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByEntityId` relation. */
+  orgChartEdgeGrantsByEntityId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByEntityId` exist. */
+  orgChartEdgeGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByGrantorId` relation. */
+  orgChartEdgeGrantsByGrantorId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByGrantorId` exist. */
+  orgChartEdgeGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdgeGrants` relation. */
+  childOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `childOrgChartEdgeGrants` exist. */
+  childOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgPermissionDefaultsByEntityId` relation. */
+  orgPermissionDefaultsByEntityId?: UserToManyOrgPermissionDefaultFilter;
+  /** `orgPermissionDefaultsByEntityId` exist. */
+  orgPermissionDefaultsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appLimitsByActorId` relation. */
+  appLimitsByActorId?: UserToManyAppLimitFilter;
+  /** `appLimitsByActorId` exist. */
+  appLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByActorId` relation. */
+  orgLimitsByActorId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByActorId` exist. */
+  orgLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByEntityId` relation. */
+  orgLimitsByEntityId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByEntityId` exist. */
+  orgLimitsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appStepsByActorId` relation. */
+  appStepsByActorId?: UserToManyAppStepFilter;
+  /** `appStepsByActorId` exist. */
+  appStepsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAchievementsByActorId` relation. */
+  appAchievementsByActorId?: UserToManyAppAchievementFilter;
+  /** `appAchievementsByActorId` exist. */
+  appAchievementsByActorIdExist?: boolean;
+  /** Filter by the object’s `ownedAppLevels` relation. */
+  ownedAppLevels?: UserToManyAppLevelFilter;
+  /** `ownedAppLevels` exist. */
+  ownedAppLevelsExist?: boolean;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedConnectedAccounts` relation. */
+  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
+  /** `ownedConnectedAccounts` exist. */
+  ownedConnectedAccountsExist?: boolean;
+  /** Filter by the object’s `invitesBySenderId` relation. */
+  invitesBySenderId?: UserToManyInviteFilter;
+  /** `invitesBySenderId` exist. */
+  invitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesByReceiverId` relation. */
+  claimedInvitesByReceiverId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesByReceiverId` exist. */
+  claimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesBySenderId` relation. */
+  claimedInvitesBySenderId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesBySenderId` exist. */
+  claimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByEntityId` relation. */
+  orgInvitesByEntityId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByEntityId` exist. */
+  orgInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByReceiverId` relation. */
+  orgInvitesByReceiverId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByReceiverId` exist. */
+  orgInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesBySenderId` relation. */
+  orgInvitesBySenderId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesBySenderId` exist. */
+  orgInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByEntityId` relation. */
+  orgClaimedInvitesByEntityId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByEntityId` exist. */
+  orgClaimedInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByReceiverId` relation. */
+  orgClaimedInvitesByReceiverId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByReceiverId` exist. */
+  orgClaimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesBySenderId` relation. */
+  orgClaimedInvitesBySenderId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesBySenderId` exist. */
+  orgClaimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `auditLogsByActorId` relation. */
+  auditLogsByActorId?: UserToManyAuditLogFilter;
+  /** `auditLogsByActorId` exist. */
+  auditLogsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
+}
+/** A filter to be used against `RlsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface RlsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `authenticate` field. */
+  authenticate?: StringFilter;
+  /** Filter by the object’s `authenticateStrict` field. */
+  authenticateStrict?: StringFilter;
+  /** Filter by the object’s `currentRole` field. */
+  currentRole?: StringFilter;
+  /** Filter by the object’s `currentRoleId` field. */
+  currentRoleId?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RlsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RlsModuleFilter[];
+  /** Negates the expression. */
+  not?: RlsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `HierarchyModule` object types. All fields are combined with a logical ‘and.’ */
+export interface HierarchyModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableId` field. */
+  chartEdgesTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableName` field. */
+  chartEdgesTableName?: StringFilter;
+  /** Filter by the object’s `hierarchySprtTableId` field. */
+  hierarchySprtTableId?: UUIDFilter;
+  /** Filter by the object’s `hierarchySprtTableName` field. */
+  hierarchySprtTableName?: StringFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableId` field. */
+  chartEdgeGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableName` field. */
+  chartEdgeGrantsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `sprtTableName` field. */
+  sprtTableName?: StringFilter;
+  /** Filter by the object’s `rebuildHierarchyFunction` field. */
+  rebuildHierarchyFunction?: StringFilter;
+  /** Filter by the object’s `getSubordinatesFunction` field. */
+  getSubordinatesFunction?: StringFilter;
+  /** Filter by the object’s `getManagersFunction` field. */
+  getManagersFunction?: StringFilter;
+  /** Filter by the object’s `isManagerOfFunction` field. */
+  isManagerOfFunction?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: HierarchyModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: HierarchyModuleFilter[];
+  /** Negates the expression. */
+  not?: HierarchyModuleFilter;
+  /** Filter by the object’s `chartEdgeGrantsTable` relation. */
+  chartEdgeGrantsTable?: TableFilter;
+  /** Filter by the object’s `chartEdgesTable` relation. */
+  chartEdgesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** Filter by the object’s `hierarchySprtTable` relation. */
+  hierarchySprtTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against BitString fields. All fields are combined with a logical ‘and.’ */
+export interface BitStringFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeEmailFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+}
+/** A filter to be used against ConstructiveInternalTypeOrigin fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeOriginFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeOrigin;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeOrigin;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeOrigin;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeOrigin[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeOrigin[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeOrigin;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeOrigin;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeOrigin;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeOrigin;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeOrigin;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeOrigin;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeOrigin;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeOrigin;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeOrigin;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeOrigin;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against InternetAddress fields. All fields are combined with a logical ‘and.’ */
+export interface InternetAddressFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified internet address. */
+  contains?: string;
+  /** Contains or equal to the specified internet address. */
+  containsOrEqualTo?: string;
+  /** Contained by the specified internet address. */
+  containedBy?: string;
+  /** Contained by or equal to the specified internet address. */
+  containedByOrEqualTo?: string;
+  /** Contains or contained by the specified internet address. */
+  containsOrContainedBy?: string;
+}
+/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
+export interface StringTrgmFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
+  similarTo?: TrgmSearchInput;
+  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
+  wordSimilarTo?: TrgmSearchInput;
+}
+/** A filter to be used against FullText fields. All fields are combined with a logical ‘and.’ */
+export interface FullTextFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Performs a full text search on the field. */
+  matches?: string;
+}
+/** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
+export interface RoleTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RoleTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RoleTypeFilter[];
+  /** Negates the expression. */
+  not?: RoleTypeFilter;
+}
+/** A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface AppMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppMembershipFilter[];
+  /** Negates the expression. */
+  not?: AppMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
+  deleteMemberCascadeGroups?: BooleanFilter;
+  /** Filter by the object’s `createGroupsCascadeMembers` field. */
+  createGroupsCascadeMembers?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 /** A connection to a list of `Object` values. */
 // ============ Payload/Return Types (for custom operations) ============

@@ -218,9 +218,10 @@ export class UserAuthModuleModel {
       'UserAuthModule',
       'deleteUserAuthModule',
       'userAuthModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteUserAuthModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

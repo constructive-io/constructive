@@ -218,9 +218,10 @@ export class AppGrantModel {
       'AppGrant',
       'deleteAppGrant',
       'appGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

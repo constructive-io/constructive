@@ -218,9 +218,10 @@ export class CryptoAuthModuleModel {
       'CryptoAuthModule',
       'deleteCryptoAuthModule',
       'cryptoAuthModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteCryptoAuthModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

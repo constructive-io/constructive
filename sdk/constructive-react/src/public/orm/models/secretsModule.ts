@@ -218,9 +218,10 @@ export class SecretsModuleModel {
       'SecretsModule',
       'deleteSecretsModule',
       'secretsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSecretsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

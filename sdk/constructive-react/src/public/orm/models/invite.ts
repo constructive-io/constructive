@@ -218,9 +218,10 @@ export class InviteModel {
       'Invite',
       'deleteInvite',
       'invite',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteInviteInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

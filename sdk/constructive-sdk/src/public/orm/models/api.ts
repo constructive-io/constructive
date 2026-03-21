@@ -218,9 +218,10 @@ export class ApiModel {
       'Api',
       'deleteApi',
       'api',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteApiInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

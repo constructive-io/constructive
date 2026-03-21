@@ -218,9 +218,10 @@ export class DomainModel {
       'Domain',
       'deleteDomain',
       'domain',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteDomainInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -294,29 +294,49 @@ export type SqlActionSelect = {
 };
 // ============ Table Filter Types ============
 export interface MigrateFileFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  upload?: StringFilter;
+  /** Filter by the object’s `upload` field. */
+  upload?: ConstructiveInternalTypeUploadFilter;
+  /** Checks for all expressions in this list. */
   and?: MigrateFileFilter[];
+  /** Checks for any expressions in this list. */
   or?: MigrateFileFilter[];
+  /** Negates the expression. */
   not?: MigrateFileFilter;
 }
 export interface SqlActionFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploy` field. */
   deploy?: StringFilter;
+  /** Filter by the object’s `deps` field. */
   deps?: StringListFilter;
-  payload?: JSONFilter;
+  /** Filter by the object’s `content` field. */
   content?: StringFilter;
+  /** Filter by the object’s `revert` field. */
   revert?: StringFilter;
+  /** Filter by the object’s `verify` field. */
   verify?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
+  /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: SqlActionFilter[];
+  /** Checks for any expressions in this list. */
   or?: SqlActionFilter[];
+  /** Negates the expression. */
   not?: SqlActionFilter;
 }
 // ============ OrderBy Types ============

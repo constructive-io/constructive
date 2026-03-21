@@ -218,9 +218,10 @@ export class ApiModuleModel {
       'ApiModule',
       'deleteApiModule',
       'apiModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteApiModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -220,9 +220,10 @@ export class AppMembershipDefaultModel {
       'AppMembershipDefault',
       'deleteAppMembershipDefault',
       'appMembershipDefault',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppMembershipDefaultInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

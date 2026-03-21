@@ -218,9 +218,10 @@ export class LimitsModuleModel {
       'LimitsModule',
       'deleteLimitsModule',
       'limitsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteLimitsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

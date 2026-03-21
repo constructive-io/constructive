@@ -218,9 +218,10 @@ export class EnumModel {
       'Enum',
       'deleteEnum',
       'enum',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteEnumInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class OrgLimitModel {
       'OrgLimit',
       'deleteOrgLimit',
       'orgLimit',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgLimitInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

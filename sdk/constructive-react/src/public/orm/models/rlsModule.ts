@@ -218,9 +218,10 @@ export class RlsModuleModel {
       'RlsModule',
       'deleteRlsModule',
       'rlsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteRlsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );
