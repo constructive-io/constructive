@@ -1,0 +1,20 @@
+{
+  "name": "graphql-orm-test",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Constructive <developers@constructive.io>",
+  "description": "ORM integration tests against real PostgreSQL via graphile-test",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@constructive-io/graphql-codegen": "workspace:^",
+    "@types/pg": "^8.18.0",
+    "graphile-settings": "workspace:^",
+    "graphile-test": "workspace:^",
+    "pgsql-test": "workspace:^",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  }
+}
