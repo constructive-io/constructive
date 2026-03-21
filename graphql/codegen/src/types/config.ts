@@ -426,7 +426,7 @@ export interface GraphQLSDKConfigTarget {
   /**
    * Custom path for generated skill files.
    * When set, skills are written to this directory.
-   * When undefined (default), skills are written to {workspaceRoot}/skills/
+   * When undefined (default), skills are written to {workspaceRoot}/.agents/skills/
    * where workspaceRoot is auto-detected by walking up from the output directory
    * looking for pnpm-workspace.yaml, lerna.json, or package.json with workspaces.
    */
