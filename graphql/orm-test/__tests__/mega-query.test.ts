@@ -72,7 +72,7 @@ describe('Mega query integration (ORM)', () => {
   }
 
   // ==========================================================================
-  // SCHEMA INTROSPECTION (raw GraphQL — testing schema shape, not ORM)
+  // SCHEMA INTROSPECTION (raw GraphQL \u2014 testing schema shape, not ORM)
   // ==========================================================================
   describe('schema introspection', () => {
     it('LocationFilter has scalar, relation, tsvector, BM25, trgm, vector, and PostGIS fields', async () => {
@@ -228,21 +228,7 @@ describe('Mega query integration (ORM)', () => {
       expect(nodes[0].name).toBe('Central Park Cafe');
     });
 
-    it('broad term matches multiple rows', async () => {
-      const result = await orm.location
-        .findMany({
-          select: { name: true },
-          where: { tsvTsv: 'park' },
-        })
-        .execute();
-
-      expect(result.ok).toBe(true);
-      const names = unwrapData(result.data).nodes.map((n: any) => n.name).sort();
-      expect(names).toContain('Central Park Cafe');
-      expect(names).toContain('Brooklyn Bridge Park');
-    });
-
-    it('tsvRank populated when filter active', async () => {
+    it('broad term matches multiple rows with ranks', async () => {
       const result = await orm.location
         .findMany({
           select: { name: true, tsvRank: true },
@@ -251,9 +237,40 @@ describe('Mega query integration (ORM)', () => {
         .execute();
 
       expect(result.ok).toBe(true);
-      for (const node of unwrapData(result.data).nodes) {
-        expect(typeof node.tsvRank).toBe('number');
-        expect(node.tsvRank).toBeGreaterThan(0);
+      const nodes = unwrapData(result.data).nodes;
+      expect(nodes).toHaveLength(4);
+      const names = nodes.map((n: any) => n.name).sort();
+      expect(names).toEqual([
+        'Brooklyn Bridge Park',
+        'Central Park Cafe',
+        'High Line Park',
+        'Prospect Park',
+      ]);
+    });
+
+    it('tsvRank reflects term density \u2014 Prospect Park ranks highest for "park"', async () => {
+      const result = await orm.location
+        .findMany({
+          select: { name: true, tsvRank: true },
+          where: { tsvTsv: 'park' },
+        })
+        .execute();
+
+      expect(result.ok).toBe(true);
+      const nodes = unwrapData(result.data).nodes as { name: string; tsvRank: number }[];
+
+      // Prospect Park's tsv has "park" 3x \u2014 highest rank (~0.083)
+      const prospect = nodes.find((n) => n.name === 'Prospect Park')!;
+      const centralCafe = nodes.find((n) => n.name === 'Central Park Cafe')!;
+      const brooklyn = nodes.find((n) => n.name === 'Brooklyn Bridge Park')!;
+
+      expect(prospect.tsvRank).toBeGreaterThan(centralCafe.tsvRank);
+      expect(centralCafe.tsvRank).toBeGreaterThanOrEqual(brooklyn.tsvRank);
+
+      // All ranks are in the expected range
+      for (const node of nodes) {
+        expect(node.tsvRank).toBeGreaterThan(0.05);
+        expect(node.tsvRank).toBeLessThan(0.1);
       }
     });
 
@@ -284,24 +301,7 @@ describe('Mega query integration (ORM)', () => {
       expect(fieldNames).toContain('bm25Body');
     });
 
-    it('BM25 search populates scores for matching rows', async () => {
-      const result = await orm.location
-        .findMany({
-          select: { name: true, bodyBm25Score: true },
-          where: { bm25Body: { query: 'museum art' } },
-        })
-        .execute();
-
-      expect(result.ok).toBe(true);
-      const nodes = unwrapData(result.data).nodes;
-      // BM25 returns ALL rows; matching rows have negative scores, non-matches get 0
-      const matches = nodes.filter((n: any) => n.bodyBm25Score < 0);
-      expect(matches.length).toBeGreaterThan(0);
-      const names = matches.map((n: any) => n.name);
-      expect(names).toContain('MoMA');
-    });
-
-    it('bodyBm25Score populated when filter active', async () => {
+    it('BM25 ranks by relevance \u2014 Prospect Park dominates for "park"', async () => {
       const result = await orm.location
         .findMany({
           select: { name: true, bodyBm25Score: true },
@@ -310,14 +310,74 @@ describe('Mega query integration (ORM)', () => {
         .execute();
 
       expect(result.ok).toBe(true);
-      const nodes = unwrapData(result.data).nodes;
-      // BM25 returns all rows; matching rows get negative scores
-      const matches = nodes.filter((n: any) => n.bodyBm25Score !== 0);
-      expect(matches.length).toBeGreaterThan(0);
-      for (const node of matches) {
-        expect(typeof node.bodyBm25Score).toBe('number');
-        expect(node.bodyBm25Score).toBeLessThan(0);
+      const nodes = unwrapData(result.data).nodes as { name: string; bodyBm25Score: number }[];
+
+      // Separate matches (negative score) from non-matches (zero)
+      const matches = nodes.filter((n) => n.bodyBm25Score < 0);
+      const nonMatches = nodes.filter((n) => n.bodyBm25Score === 0);
+
+      expect(matches).toHaveLength(4); // 4 locations mention "park"
+      expect(nonMatches).toHaveLength(3); // MoMA, Times Square Diner, Met Museum
+
+      // Prospect Park (3x "park") has the strongest (most negative) BM25 score
+      const prospect = matches.find((n) => n.name === 'Prospect Park')!;
+      const centralCafe = matches.find((n) => n.name === 'Central Park Cafe')!;
+      const brooklyn = matches.find((n) => n.name === 'Brooklyn Bridge Park')!;
+      const highLine = matches.find((n) => n.name === 'High Line Park')!;
+
+      expect(prospect.bodyBm25Score).toBeLessThan(centralCafe.bodyBm25Score);
+      expect(centralCafe.bodyBm25Score).toBeLessThan(brooklyn.bodyBm25Score);
+      expect(brooklyn.bodyBm25Score).toBeLessThan(highLine.bodyBm25Score);
+
+      // All match scores are meaningfully negative
+      for (const m of matches) {
+        expect(m.bodyBm25Score).toBeLessThan(-0.5);
       }
+    });
+
+    it('multi-term BM25 \u2014 MoMA and Met Museum both score for "museum art"', async () => {
+      const result = await orm.location
+        .findMany({
+          select: { name: true, bodyBm25Score: true },
+          where: { bm25Body: { query: 'museum art' } },
+        })
+        .execute();
+
+      expect(result.ok).toBe(true);
+      const nodes = unwrapData(result.data).nodes as { name: string; bodyBm25Score: number }[];
+
+      const moma = nodes.find((n) => n.name === 'MoMA')!;
+      const met = nodes.find((n) => n.name === 'Met Museum')!;
+      const highLine = nodes.find((n) => n.name === 'High Line Park')!;
+      const diner = nodes.find((n) => n.name === 'Times Square Diner')!;
+
+      // Both museums score strongly (body has "museum" + "art" multiple times)
+      expect(moma.bodyBm25Score).toBeLessThan(-2);
+      expect(met.bodyBm25Score).toBeLessThan(-2);
+
+      // High Line mentions "art" once \u2014 weaker but nonzero
+      expect(highLine.bodyBm25Score).toBeLessThan(0);
+      expect(highLine.bodyBm25Score).toBeGreaterThan(met.bodyBm25Score);
+
+      // Diner has no museum/art terms \u2014 zero
+      expect(diner.bodyBm25Score).toBe(0);
+    });
+
+    it('single-result BM25 \u2014 "cafe coffee" matches only Central Park Cafe', async () => {
+      const result = await orm.location
+        .findMany({
+          select: { name: true, bodyBm25Score: true },
+          where: { bm25Body: { query: 'cafe coffee' } },
+        })
+        .execute();
+
+      expect(result.ok).toBe(true);
+      const nodes = unwrapData(result.data).nodes as { name: string; bodyBm25Score: number }[];
+
+      const matches = nodes.filter((n) => n.bodyBm25Score < 0);
+      expect(matches).toHaveLength(1);
+      expect(matches[0].name).toBe('Central Park Cafe');
+      expect(matches[0].bodyBm25Score).toBeLessThan(-3); // strong multi-term match
     });
 
     it('bodyBm25Score is null when no BM25 filter active', async () => {
@@ -331,33 +391,13 @@ describe('Mega query integration (ORM)', () => {
       expect(result.ok).toBe(true);
       expect(unwrapData(result.data).nodes[0].bodyBm25Score).toBeNull();
     });
-
-    it('BM25 score distinguishes matching from non-matching rows', async () => {
-      const result = await orm.location
-        .findMany({
-          select: { name: true, bodyBm25Score: true },
-          where: { bm25Body: { query: 'park' } },
-        })
-        .execute();
-
-      expect(result.ok).toBe(true);
-      const nodes = unwrapData(result.data).nodes;
-      const matches = nodes.filter((n: any) => n.bodyBm25Score < 0);
-      const nonMatches = nodes.filter((n: any) => n.bodyBm25Score === 0);
-      // "park" appears in several location bodies
-      expect(matches.length).toBeGreaterThan(1);
-      expect(nonMatches.length).toBeGreaterThan(0);
-      // Matching rows have names that contain 'Park' or reference parks
-      const matchNames = matches.map((n: any) => n.name);
-      expect(matchNames).toContain('Prospect Park');
-    });
   });
 
   // ==========================================================================
   // PG_TRGM FUZZY MATCHING via ORM
   // ==========================================================================
   describe('pg_trgm fuzzy matching', () => {
-    it('trgmName filters by trigram similarity', async () => {
+    it('trgm ranks by similarity \u2014 Prospect Park tops for "park"', async () => {
       const result = await orm.location
         .findMany({
           select: { name: true, nameTrgmSimilarity: true },
@@ -366,15 +406,48 @@ describe('Mega query integration (ORM)', () => {
         .execute();
 
       expect(result.ok).toBe(true);
-      const nodes = unwrapData(result.data).nodes;
-      expect(nodes.length).toBeGreaterThan(0);
-      for (const node of nodes) {
-        expect(typeof node.nameTrgmSimilarity).toBe('number');
-        expect(node.nameTrgmSimilarity).toBeGreaterThan(0);
-      }
+      const nodes = unwrapData(result.data).nodes as {
+        name: string;
+        nameTrgmSimilarity: number;
+      }[];
+
+      // trgm threshold filtering: only names with similarity > 0.1 returned
+      expect(nodes).toHaveLength(4);
+
+      // Verify ordering by similarity
+      const prospect = nodes.find((n) => n.name === 'Prospect Park')!;
+      const highLine = nodes.find((n) => n.name === 'High Line Park')!;
+      const centralCafe = nodes.find((n) => n.name === 'Central Park Cafe')!;
+      const brooklyn = nodes.find((n) => n.name === 'Brooklyn Bridge Park')!;
+
+      // Prospect Park (shortest name containing "Park") \u2014 highest similarity
+      expect(prospect.nameTrgmSimilarity).toBeGreaterThan(0.35);
+      expect(prospect.nameTrgmSimilarity).toBeGreaterThan(highLine.nameTrgmSimilarity);
+      expect(highLine.nameTrgmSimilarity).toBeGreaterThan(centralCafe.nameTrgmSimilarity);
+      expect(centralCafe.nameTrgmSimilarity).toBeGreaterThan(brooklyn.nameTrgmSimilarity);
     });
 
-    it('handles typos gracefully', async () => {
+    it('exact substring match scores high \u2014 "museum" finds Met Museum at ~0.7', async () => {
+      const result = await orm.location
+        .findMany({
+          select: { name: true, nameTrgmSimilarity: true },
+          where: { trgmName: { value: 'museum', threshold: 0.1 } },
+        })
+        .execute();
+
+      expect(result.ok).toBe(true);
+      const nodes = unwrapData(result.data).nodes as {
+        name: string;
+        nameTrgmSimilarity: number;
+      }[];
+
+      // Only "Met Museum" exceeds the threshold \u2014 "museum" is 60% of its name
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].name).toBe('Met Museum');
+      expect(nodes[0].nameTrgmSimilarity).toBeCloseTo(0.7, 1);
+    });
+
+    it('handles typos gracefully \u2014 "Broklyn" finds Brooklyn Bridge Park', async () => {
       const result = await orm.location
         .findMany({
           select: { name: true, nameTrgmSimilarity: true },
@@ -383,23 +456,32 @@ describe('Mega query integration (ORM)', () => {
         .execute();
 
       expect(result.ok).toBe(true);
-      expect(unwrapData(result.data).nodes.length).toBeGreaterThan(0);
+      const nodes = unwrapData(result.data).nodes;
+      const names = nodes.map((n: any) => n.name);
+      expect(names).toContain('Brooklyn Bridge Park');
     });
 
-    it('trgm similarity scores are all above threshold', async () => {
+    it('higher threshold filters strictly \u2014 0.3 excludes weaker matches', async () => {
       const result = await orm.location
         .findMany({
           select: { name: true, nameTrgmSimilarity: true },
-          where: { trgmName: { value: 'park', threshold: 0.05 } },
+          where: { trgmName: { value: 'park', threshold: 0.3 } },
         })
         .execute();
 
       expect(result.ok).toBe(true);
-      const nodes = unwrapData(result.data).nodes;
-      expect(nodes.length).toBeGreaterThan(1);
+      const nodes = unwrapData(result.data).nodes as {
+        name: string;
+        nameTrgmSimilarity: number;
+      }[];
+
+      // threshold=0.3 drops Central Park Cafe (~0.29) and Brooklyn Bridge Park (~0.26)
+      expect(nodes).toHaveLength(2);
+      const names = nodes.map((n) => n.name).sort();
+      expect(names).toEqual(['High Line Park', 'Prospect Park']);
+
       for (const node of nodes) {
-        expect(typeof node.nameTrgmSimilarity).toBe('number');
-        expect(node.nameTrgmSimilarity).toBeGreaterThan(0.05);
+        expect(node.nameTrgmSimilarity).toBeGreaterThanOrEqual(0.3);
       }
     });
   });
@@ -421,7 +503,7 @@ describe('Mega query integration (ORM)', () => {
     });
 
     it('search function returns results ordered by similarity', async () => {
-      // searchLocations is a custom Postgres function, not a table — use raw GraphQL
+      // searchLocations is a custom Postgres function, not a table \u2014 use raw GraphQL
       const result = await gql<{ searchLocations: { nodes: { name: string }[] } }>(`
         query { searchLocations(queryEmbedding: [1, 0, 0]) { nodes { name } } }
       `);
@@ -430,22 +512,59 @@ describe('Mega query integration (ORM)', () => {
       const nodes = result.data?.searchLocations?.nodes;
       expect(nodes).toBeDefined();
       expect(nodes!.length).toBeGreaterThan(0);
+      // Central Park Cafe has [1,0,0] \u2014 exact match, closest neighbor
       expect(nodes![0].name).toBe('Central Park Cafe');
     });
 
-    it('vectorEmbedding filter narrows results by distance', async () => {
+    it('vectorEmbedding filter clusters by semantic distance', async () => {
+      // Query "restaurant" direction [1,0,0] \u2014 should find restaurant-cluster locations
       const result = await orm.location
         .findMany({
-          select: { name: true, embedding: true },
+          select: { name: true },
           where: { vectorEmbedding: { vector: [1, 0, 0], distance: 0.5 } },
         })
         .execute();
 
       expect(result.ok).toBe(true);
       const nodes = unwrapData(result.data).nodes;
+
+      // [1,0,0] with dist<=0.5 \u2014 Central Park Cafe [1,0,0] (dist=0) + Times Square Diner [0.8,0.6,0] (dist~0.2)
       expect(nodes.length).toBeGreaterThanOrEqual(1);
-      // Central Park Cafe has embedding [1,0,0] — exact match, distance 0
-      expect(nodes.map((n: any) => n.name)).toContain('Central Park Cafe');
+      expect(nodes[0].name).toBe('Central Park Cafe');
+    });
+
+    it('park-cluster vectors: [0,1,0] finds parks by cosine distance', async () => {
+      const result = await orm.location
+        .findMany({
+          select: { name: true },
+          where: { vectorEmbedding: { vector: [0, 1, 0], distance: 0.5 } },
+        })
+        .execute();
+
+      expect(result.ok).toBe(true);
+      const nodes = unwrapData(result.data).nodes;
+
+      // [0,1,0] \u2014 Brooklyn Bridge Park (0), Prospect Park (~0.01), High Line (~0.14)
+      expect(nodes.length).toBeGreaterThanOrEqual(3);
+      const names = nodes.map((n: any) => n.name);
+      expect(names).toContain('Brooklyn Bridge Park');
+      expect(names).toContain('Prospect Park');
+    });
+
+    it('museum-cluster vectors: [0,0,1] finds both museums', async () => {
+      const result = await orm.location
+        .findMany({
+          select: { name: true },
+          where: { vectorEmbedding: { vector: [0, 0, 1], distance: 0.5 } },
+        })
+        .execute();
+
+      expect(result.ok).toBe(true);
+      const nodes = unwrapData(result.data).nodes;
+
+      const names = nodes.map((n: any) => n.name);
+      expect(names).toContain('MoMA');
+      expect(names).toContain('Met Museum');
     });
   });
 
@@ -614,7 +733,7 @@ describe('Mega query integration (ORM)', () => {
       expect(unwrapData(result.data).nodes.length).toBeGreaterThanOrEqual(2);
     });
 
-    it('combines BM25 + scalar filter', async () => {
+    it('combines BM25 + scalar filter with concrete scores', async () => {
       const result = await orm.location
         .findMany({
           select: { name: true, bodyBm25Score: true },
@@ -626,13 +745,16 @@ describe('Mega query integration (ORM)', () => {
         .execute();
 
       expect(result.ok).toBe(true);
-      const nodes = unwrapData(result.data).nodes;
-      // BM25 returns all rows; matching rows get negative scores
-      const matches = nodes.filter((n: any) => n.bodyBm25Score < 0);
-      expect(matches.length).toBeGreaterThan(0);
-      for (const node of matches) {
-        expect(typeof node.bodyBm25Score).toBe('number');
-      }
+      const nodes = unwrapData(result.data).nodes as { name: string; bodyBm25Score: number }[];
+
+      // isActive=true excludes Times Square Diner; BM25 returns all remaining
+      const matches = nodes.filter((n) => n.bodyBm25Score < 0);
+      expect(matches.length).toBeGreaterThanOrEqual(2);
+
+      // Both museums should be in the match set
+      const matchNames = matches.map((n) => n.name);
+      expect(matchNames).toContain('MoMA');
+      expect(matchNames).toContain('Met Museum');
     });
 
     it('combines OR with tsvector and scalar', async () => {
@@ -650,8 +772,8 @@ describe('Mega query integration (ORM)', () => {
       expect(names).toEqual(['Central Park Cafe', 'MoMA']);
     });
 
-    it('vector search returns ordered neighbors', async () => {
-      // searchLocations is a custom Postgres function — use raw GraphQL
+    it('vector search returns ordered neighbors from park cluster', async () => {
+      // searchLocations is a custom Postgres function \u2014 use raw GraphQL
       const result = await gql<{ searchLocations: { nodes: { name: string }[] } }>(`
         query { searchLocations(queryEmbedding: [0, 1, 0], resultLimit: 3) { nodes { name } } }
       `);
@@ -659,12 +781,56 @@ describe('Mega query integration (ORM)', () => {
       expect(result.errors).toBeUndefined();
       const nodes = result.data?.searchLocations?.nodes ?? [];
       expect(nodes).toHaveLength(3);
+      // [0,1,0] \u2014 Brooklyn Bridge Park [0,1,0] is exact match
       expect(nodes[0].name).toBe('Brooklyn Bridge Park');
+    });
+
+    it('searchScore composite signal from tsvector + BM25 + trgm', async () => {
+      const result = await orm.location
+        .findMany({
+          select: {
+            name: true,
+            searchScore: true,
+            tsvRank: true,
+            bodyBm25Score: true,
+            nameTrgmSimilarity: true,
+          },
+          where: {
+            tsvTsv: 'park',
+            bm25Body: { query: 'park' },
+            trgmName: { value: 'park', threshold: 0.1 },
+          },
+        })
+        .execute();
+
+      expect(result.ok).toBe(true);
+      const nodes = unwrapData(result.data).nodes as {
+        name: string;
+        searchScore: number;
+        tsvRank: number;
+        bodyBm25Score: number;
+        nameTrgmSimilarity: number;
+      }[];
+
+      // Only 4 locations pass the trgm threshold for "park"
+      expect(nodes).toHaveLength(4);
+
+      for (const node of nodes) {
+        // searchScore is a composite of the individual signals
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThan(0);
+        expect(node.searchScore).toBeLessThan(1);
+
+        // All three individual signals are populated
+        expect(node.tsvRank).toBeGreaterThan(0);
+        expect(node.bodyBm25Score).toBeLessThan(0);
+        expect(node.nameTrgmSimilarity).toBeGreaterThan(0.1);
+      }
     });
   });
 
   // ==========================================================================
-  // THE MEGA QUERY — all 7 plugin types + multi-signal ORDER BY via ORM
+  // THE MEGA QUERY \u2014 all 7 plugin types + multi-signal ORDER BY via ORM
   // ==========================================================================
   describe('mega query', () => {
     /**
@@ -702,6 +868,7 @@ describe('Mega query integration (ORM)', () => {
             bodyBm25Score: true,
             tsvRank: true,
             nameTrgmSimilarity: true,
+            searchScore: true,
             embedding: true,
             geom: { select: { geojson: true } },
             category: { select: { name: true } },
@@ -712,14 +879,14 @@ describe('Mega query integration (ORM)', () => {
             // 1. tsvector full-text search
             tsvTsv: 'park',
             // 2. BM25 relevance search (pg_textsearch)
-            bm25Body: { query: 'park green' },
+            bm25Body: { query: 'park' },
             // 3. pg_trgm fuzzy matching
             trgmName: { value: 'park', threshold: 0.1 },
             // 4. Relation filter (FK -> categories)
             category: { name: { equalTo: 'Parks' } },
             // 5. Scalar filter
             isActive: { equalTo: true },
-            // 6. pgvector similarity (VectorNearbyInput: flat shape, field is 'vector')
+            // 6. pgvector similarity
             vectorEmbedding: { vector: [0, 1, 0], distance: 2.0 },
             // 7. PostGIS spatial
             geom: { intersects: nycBbox },
@@ -732,18 +899,29 @@ describe('Mega query integration (ORM)', () => {
       const nodes = unwrapData(result.data).nodes;
 
       // Active NYC parks matching all 7 filters simultaneously
-      expect(nodes.length).toBeGreaterThanOrEqual(2);
+      expect(nodes).toHaveLength(3);
+
+      // Verify the 3 expected parks
+      const names = nodes.map((n: any) => n.name).sort();
+      expect(names).toEqual(['Brooklyn Bridge Park', 'High Line Park', 'Prospect Park']);
 
       for (const node of nodes) {
-        // BM25 score (negative = match, 0 = no match)
+        // BM25 score \u2014 all park-mentioning bodies score negative
         expect(typeof node.bodyBm25Score).toBe('number');
+        expect(node.bodyBm25Score).toBeLessThan(0);
 
-        // tsvector rank (0..~1, higher = better match)
+        // tsvector rank \u2014 all match "park" in their tsv
         expect(typeof node.tsvRank).toBe('number');
+        expect(node.tsvRank).toBeGreaterThan(0.05);
 
-        // pg_trgm similarity (0..1, > 0 since threshold filter passed)
+        // pg_trgm similarity \u2014 all names contain "Park"
         expect(typeof node.nameTrgmSimilarity).toBe('number');
-        expect(node.nameTrgmSimilarity).toBeGreaterThan(0);
+        expect(node.nameTrgmSimilarity).toBeGreaterThan(0.2);
+
+        // searchScore \u2014 composite signal combining all active search signals
+        expect(typeof node.searchScore).toBe('number');
+        expect(node.searchScore).toBeGreaterThan(0);
+        expect(node.searchScore).toBeLessThan(1);
 
         // pgvector embedding (float array)
         expect(Array.isArray(node.embedding)).toBe(true);
@@ -764,6 +942,14 @@ describe('Mega query integration (ORM)', () => {
         // Tags present (backward relation)
         expect(node.tags.nodes.length).toBeGreaterThan(0);
       }
+
+      // Prospect Park should have the strongest BM25 signal (most negative)
+      const prospect = nodes.find((n: any) => n.name === 'Prospect Park');
+      const brooklyn = nodes.find((n: any) => n.name === 'Brooklyn Bridge Park');
+      expect(prospect.bodyBm25Score).toBeLessThan(brooklyn.bodyBm25Score);
+
+      // Prospect Park should have the highest trgm similarity
+      expect(prospect.nameTrgmSimilarity).toBeGreaterThan(brooklyn.nameTrgmSimilarity);
     });
 
     it('pagination works with filters', async () => {

@@ -111,55 +111,64 @@ INSERT INTO mega_test.categories (id, name, description) VALUES
   (3, 'Museums', 'Cultural institutions');
 
 -- Locations
+--
+-- Embedding semantics: dim 0 = restaurant/food, dim 1 = park/nature, dim 2 = museum/art.
+-- This gives vector queries meaningful cluster behaviour.
+--
+-- Body texts are tuned so BM25 produces clear score separation:
+--   • "park" query  → Prospect Park dominates (3× "park" in a short body)
+--   • "museum art"  → MoMA edges out Met Museum (more concentrated terms)
+--   • "cafe coffee" → Central Park Cafe is the sole match
+--
 INSERT INTO mega_test.locations (id, name, body, category_id, geom, embedding, tsv, is_active, rating) VALUES
   (1, 'Central Park Cafe',
-   'A cozy cafe in the heart of Central Park serving organic coffee and pastries',
+   'A cozy cafe in the heart of Central Park with organic coffee, fresh pastries, and beautiful park-side seating',
    1,
    ST_SetSRID(ST_MakePoint(-73.968, 40.785), 4326),
    '[1, 0, 0]',
-   to_tsvector('english', 'cozy cafe central park organic coffee pastries'),
+   to_tsvector('english', 'cozy cafe central park organic coffee fresh pastries beautiful park-side seating'),
    true, 4.5),
   (2, 'Brooklyn Bridge Park',
-   'A scenic waterfront park with stunning views of the Manhattan skyline',
+   'A scenic waterfront park with stunning views of the Manhattan skyline and playgrounds along the East River',
    2,
    ST_SetSRID(ST_MakePoint(-73.996, 40.698), 4326),
    '[0, 1, 0]',
-   to_tsvector('english', 'scenic waterfront park stunning views manhattan skyline'),
+   to_tsvector('english', 'scenic waterfront park stunning views manhattan skyline playgrounds east river'),
    true, 4.8),
   (3, 'MoMA',
-   'The Museum of Modern Art featuring contemporary and modern art collections',
+   'The Museum of Modern Art is a world-renowned institution of contemporary art and modern art, housing paintings, sculptures, film, and groundbreaking design',
    3,
    ST_SetSRID(ST_MakePoint(-73.978, 40.761), 4326),
    '[0, 0, 1]',
-   to_tsvector('english', 'museum modern art contemporary collections'),
+   to_tsvector('english', 'museum modern art world-renowned institution contemporary art modern art paintings sculptures film groundbreaking design'),
    true, 4.7),
   (4, 'Times Square Diner',
-   'A classic American diner near Times Square open twenty four hours',
+   'A classic American diner in the bustling heart of Times Square serving breakfast around the clock',
    1,
    ST_SetSRID(ST_MakePoint(-73.985, 40.758), 4326),
-   '[0.707, 0.707, 0]',
-   to_tsvector('english', 'classic american diner times square twenty four hours'),
+   '[0.8, 0.6, 0]',
+   to_tsvector('english', 'classic american diner bustling heart times square serving breakfast around clock'),
    false, 3.2),
   (5, 'High Line Park',
-   'An elevated linear park built on historic freight rail lines above the streets',
+   'An elevated linear park on a historic freight rail line with gardens, art installations, and sweeping Hudson River views',
    2,
    ST_SetSRID(ST_MakePoint(-74.005, 40.748), 4326),
-   '[0.577, 0.577, 0.577]',
-   to_tsvector('english', 'elevated linear park historic freight rail lines streets'),
+   '[0.3, 0.7, 0.3]',
+   to_tsvector('english', 'elevated linear park historic freight rail line gardens art installations sweeping hudson river views'),
    true, 4.9),
   (6, 'Met Museum',
-   'The Metropolitan Museum of Art with encyclopedic art collections spanning five thousand years',
+   'The Metropolitan Museum of Art spans five thousand years of art from every corner of the world, with over two million works of art in its collection',
    3,
    ST_SetSRID(ST_MakePoint(-73.963, 40.779), 4326),
-   '[0, 0.707, 0.707]',
-   to_tsvector('english', 'metropolitan museum art encyclopedic collections spanning five thousand years'),
+   '[0.1, 0.1, 0.9]',
+   to_tsvector('english', 'metropolitan museum art five thousand years art every corner world two million works art collection'),
    true, 4.6),
   (7, 'Prospect Park',
-   'A large public park in Brooklyn designed by the creators of Central Park',
+   'A sprawling urban park designed by Olmsted and Vaux, this beloved Brooklyn park features a lake, meadows, wooded ravines, and miles of park trails',
    2,
    ST_SetSRID(ST_MakePoint(-73.969, 40.660), 4326),
-   '[0.333, 0.333, 0.333]',
-   to_tsvector('english', 'large public park brooklyn creators central park'),
+   '[0.1, 0.9, 0.1]',
+   to_tsvector('english', 'sprawling urban park designed olmsted vaux beloved brooklyn park features lake meadows wooded ravines miles park trails'),
    true, NULL);
 
 -- Tags (backward relation filter)
