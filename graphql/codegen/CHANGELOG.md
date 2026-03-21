@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.21.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.21.0...@constructive-io/graphql-codegen@4.21.1) (2026-03-21)
+
+### Bug Fixes
+
+- collect custom scalar filter types (ConstructiveInternalTypeEmailFilter etc.) from all filter fields, not just plugin-injected ones ([bedad3b](https://github.com/constructive-io/constructive/commit/bedad3b97392d73f5e566d3af4560a9a68ce6063))
+
 # [4.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.20.0...@constructive-io/graphql-codegen@4.21.0) (2026-03-21)
 
 ### Bug Fixes
