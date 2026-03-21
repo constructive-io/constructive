@@ -723,19 +723,19 @@ function inferConstraints(
   const updateInput = typeMap.get(updateInputName);
   const deleteInput = typeMap.get(deleteInputName);
 
-  const keyInputField =
-    inferPrimaryKeyFromInputObject(updateInput) ||
-    inferPrimaryKeyFromInputObject(deleteInput);
+  // Prefer Delete input (fewer non-PK fields) over Update input
+  const keyFields =
+    inferPrimaryKeyFromInputObject(deleteInput).length > 0
+      ? inferPrimaryKeyFromInputObject(deleteInput)
+      : inferPrimaryKeyFromInputObject(updateInput);
 
-  if (keyInputField) {
+  if (keyFields.length > 0) {
     primaryKey.push({
       name: 'primary',
-      fields: [
-        {
-          name: keyInputField.name,
-          type: convertToCleanFieldType(keyInputField.type),
-        },
-      ],
+      fields: keyFields.map((f) => ({
+        name: f.name,
+        type: convertToCleanFieldType(f.type),
+      })),
     });
   }
 
@@ -769,27 +769,28 @@ function inferConstraints(
 }
 
 /**
- * Infer a single-row lookup key from an Update/Delete input object.
+ * Infer primary key fields from an Update/Delete input object.
  *
  * Priority:
  * 1. Canonical keys: id, nodeId, rowId
- * 2. Single non-patch/non-clientMutationId scalar-ish field
+ * 2. All non-patch/non-clientMutationId fields (supports composite keys)
  *
- * If multiple possible key fields remain, return null to avoid guessing.
+ * Returns all candidate key fields, enabling composite PK detection
+ * for junction tables like PostTag(postId, tagId).
  */
 function inferPrimaryKeyFromInputObject(
   inputType: IntrospectionType | undefined,
-): IntrospectionInputValue | null {
+): IntrospectionInputValue[] {
   const inputFields = inputType?.inputFields ?? [];
-  if (inputFields.length === 0) return null;
+  if (inputFields.length === 0) return [];
 
   const canonicalKey = inputFields.find(
     (field) =>
       field.name === 'id' || field.name === 'nodeId' || field.name === 'rowId',
   );
-  if (canonicalKey) return canonicalKey;
+  if (canonicalKey) return [canonicalKey];
 
-  const candidates = inputFields.filter((field) => {
+  return inputFields.filter((field) => {
     if (field.name === 'clientMutationId') return false;
 
     const baseTypeName = getBaseTypeName(field.type);
@@ -801,8 +802,6 @@ function inferPrimaryKeyFromInputObject(
 
     return true;
   });
-
-  return candidates.length === 1 ? candidates[0] : null;
 }
 
 /**
