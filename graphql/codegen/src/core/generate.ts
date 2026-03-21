@@ -113,7 +113,7 @@ function resolveSkillsOutputDir(
       : path.resolve(workspaceRoot, config.skillsPath);
   }
 
-  return path.resolve(workspaceRoot, 'skills');
+  return path.resolve(workspaceRoot, '.agents/skills');
 }
 
 export async function generate(
