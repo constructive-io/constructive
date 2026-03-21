@@ -176,10 +176,7 @@ CRUD operations for AppPermission records.
 | `bitnum` | Int |
 | `bitstr` | BitString |
 | `description` | String |
-| `descriptionTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `descriptionTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `org-permission`
@@ -203,10 +200,7 @@ CRUD operations for OrgPermission records.
 | `bitnum` | Int |
 | `bitstr` | BitString |
 | `description` | String |
-| `descriptionTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `descriptionTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `name`, `bitnum`, `bitstr`, `description`
 
 ### `app-level-requirement`
@@ -233,10 +227,8 @@ CRUD operations for AppLevelRequirement records.
 | `priority` | Int |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
-| `descriptionTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `name`, `level`, `descriptionTrgmSimilarity`, `searchScore`
+**Required create fields:** `name`, `level`
 **Optional create fields (backend defaults):** `description`, `requiredCount`, `priority`
 
 ### `org-member`
@@ -484,11 +476,9 @@ CRUD operations for OrgChartEdgeGrant records.
 | `positionTitle` | String |
 | `positionLevel` | Int |
 | `createdAt` | Datetime |
-| `positionTitleTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `entityId`, `childId`, `grantorId`, `positionTitleTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `parentId`, `isGrant`, `positionTitle`, `positionLevel`
+**Required create fields:** `entityId`, `childId`
+**Optional create fields (backend defaults):** `parentId`, `grantorId`, `isGrant`, `positionTitle`, `positionLevel`
 
 ### `membership-type`
 
@@ -510,11 +500,8 @@ CRUD operations for MembershipType records.
 | `name` | String |
 | `description` | String |
 | `prefix` | String |
-| `descriptionTrgmSimilarity` | Float |
-| `prefixTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `name`, `description`, `prefix`, `descriptionTrgmSimilarity`, `prefixTrgmSimilarity`, `searchScore`
+**Required create fields:** `name`, `description`, `prefix`
 
 ### `app-limit`
 
@@ -776,10 +763,8 @@ CRUD operations for OrgChartEdge records.
 | `parentId` | UUID |
 | `positionTitle` | String |
 | `positionLevel` | Int |
-| `positionTitleTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `entityId`, `childId`, `positionTitleTrgmSimilarity`, `searchScore`
+**Required create fields:** `entityId`, `childId`
 **Optional create fields (backend defaults):** `parentId`, `positionTitle`, `positionLevel`
 
 ### `org-membership-default`
@@ -911,10 +896,7 @@ CRUD operations for Invite records.
 | `expiresAt` | Datetime |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
-| `inviteTokenTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `inviteTokenTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ### `app-level`
@@ -940,10 +922,8 @@ CRUD operations for AppLevel records.
 | `ownerId` | UUID |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
-| `descriptionTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `name`, `descriptionTrgmSimilarity`, `searchScore`
+**Required create fields:** `name`
 **Optional create fields (backend defaults):** `description`, `image`, `ownerId`
 
 ### `org-invite`
@@ -976,10 +956,8 @@ CRUD operations for OrgInvite records.
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 | `entityId` | UUID |
-| `inviteTokenTrgmSimilarity` | Float |
-| `searchScore` | Float |
 
-**Required create fields:** `entityId`, `inviteTokenTrgmSimilarity`, `searchScore`
+**Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
 ## Custom Operations

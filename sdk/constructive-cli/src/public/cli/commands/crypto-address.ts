@@ -16,8 +16,6 @@ const fieldSchema: FieldSchema = {
   isPrimary: 'boolean',
   createdAt: 'string',
   updatedAt: 'string',
-  addressTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\ncrypto-address <command>\n\nCommands:\n  list                  List all cryptoAddress records\n  get                   Get a cryptoAddress by ID\n  create                Create a new cryptoAddress\n  update                Update an existing cryptoAddress\n  delete                Delete a cryptoAddress\n\n  --help, -h            Show this help message\n';

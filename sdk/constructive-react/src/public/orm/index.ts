@@ -5,9 +5,9 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
+import { GetAllRecordModel } from './models/getAllRecord';
 import { OrgGetManagersRecordModel } from './models/orgGetManagersRecord';
 import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord';
-import { GetAllRecordModel } from './models/getAllRecord';
 import { ObjectModel } from './models/object';
 import { AppPermissionModel } from './models/appPermission';
 import { OrgPermissionModel } from './models/orgPermission';
@@ -29,11 +29,13 @@ import { ViewModel } from './models/view';
 import { ViewTableModel } from './models/viewTable';
 import { ViewGrantModel } from './models/viewGrant';
 import { ViewRuleModel } from './models/viewRule';
+import { EmbeddingChunkModel } from './models/embeddingChunk';
 import { TableTemplateModuleModel } from './models/tableTemplateModule';
 import { SecureTableProvisionModel } from './models/secureTableProvision';
 import { RelationProvisionModel } from './models/relationProvision';
 import { SchemaGrantModel } from './models/schemaGrant';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
+import { EnumModel } from './models/enum';
 import { ApiSchemaModel } from './models/apiSchema';
 import { ApiModuleModel } from './models/apiModule';
 import { DomainModel } from './models/domain';
@@ -41,6 +43,7 @@ import { SiteMetadatumModel } from './models/siteMetadatum';
 import { SiteModuleModel } from './models/siteModule';
 import { SiteThemeModel } from './models/siteTheme';
 import { TriggerFunctionModel } from './models/triggerFunction';
+import { DatabaseTransferModel } from './models/databaseTransfer';
 import { ApiModel } from './models/api';
 import { SiteModel } from './models/site';
 import { AppModel } from './models/app';
@@ -64,7 +67,8 @@ import { SecretsModuleModel } from './models/secretsModule';
 import { SessionsModuleModel } from './models/sessionsModule';
 import { UserAuthModuleModel } from './models/userAuthModule';
 import { UsersModuleModel } from './models/usersModule';
-import { UuidModuleModel } from './models/uuidModule';
+import { BlueprintModel } from './models/blueprint';
+import { BlueprintTemplateModel } from './models/blueprintTemplate';
 import { DatabaseProvisionModuleModel } from './models/databaseProvisionModule';
 import { AppAdminGrantModel } from './models/appAdminGrant';
 import { AppOwnerGrantModel } from './models/appOwnerGrant';
@@ -76,34 +80,34 @@ import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
+import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
 import { AppLimitModel } from './models/appLimit';
 import { OrgLimitModel } from './models/orgLimit';
 import { AppStepModel } from './models/appStep';
 import { AppAchievementModel } from './models/appAchievement';
+import { AppLevelModel } from './models/appLevel';
+import { EmailModel } from './models/email';
+import { PhoneNumberModel } from './models/phoneNumber';
+import { CryptoAddressModel } from './models/cryptoAddress';
+import { ConnectedAccountModel } from './models/connectedAccount';
 import { InviteModel } from './models/invite';
 import { ClaimedInviteModel } from './models/claimedInvite';
 import { OrgInviteModel } from './models/orgInvite';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
+import { AuditLogModel } from './models/auditLog';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
-import { CryptoAddressModel } from './models/cryptoAddress';
 import { RoleTypeModel } from './models/roleType';
-import { OrgPermissionDefaultModel } from './models/orgPermissionDefault';
-import { PhoneNumberModel } from './models/phoneNumber';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
-import { ConnectedAccountModel } from './models/connectedAccount';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { MembershipTypeModel } from './models/membershipType';
 import { CommitModel } from './models/commit';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { RlsModuleModel } from './models/rlsModule';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
-import { AuditLogModel } from './models/auditLog';
-import { AppLevelModel } from './models/appLevel';
 import { SqlMigrationModel } from './models/sqlMigration';
-import { EmailModel } from './models/email';
 import { UserModel } from './models/user';
 import { AstMigrationModel } from './models/astMigration';
 import { AppMembershipModel } from './models/appMembership';
@@ -143,9 +147,9 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
+    getAllRecord: new GetAllRecordModel(client),
     orgGetManagersRecord: new OrgGetManagersRecordModel(client),
     orgGetSubordinatesRecord: new OrgGetSubordinatesRecordModel(client),
-    getAllRecord: new GetAllRecordModel(client),
     object: new ObjectModel(client),
     appPermission: new AppPermissionModel(client),
     orgPermission: new OrgPermissionModel(client),
@@ -167,11 +171,13 @@ export function createClient(config: OrmClientConfig) {
     viewTable: new ViewTableModel(client),
     viewGrant: new ViewGrantModel(client),
     viewRule: new ViewRuleModel(client),
+    embeddingChunk: new EmbeddingChunkModel(client),
     tableTemplateModule: new TableTemplateModuleModel(client),
     secureTableProvision: new SecureTableProvisionModel(client),
     relationProvision: new RelationProvisionModel(client),
     schemaGrant: new SchemaGrantModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
+    enum: new EnumModel(client),
     apiSchema: new ApiSchemaModel(client),
     apiModule: new ApiModuleModel(client),
     domain: new DomainModel(client),
@@ -179,6 +185,7 @@ export function createClient(config: OrmClientConfig) {
     siteModule: new SiteModuleModel(client),
     siteTheme: new SiteThemeModel(client),
     triggerFunction: new TriggerFunctionModel(client),
+    databaseTransfer: new DatabaseTransferModel(client),
     api: new ApiModel(client),
     site: new SiteModel(client),
     app: new AppModel(client),
@@ -202,7 +209,8 @@ export function createClient(config: OrmClientConfig) {
     sessionsModule: new SessionsModuleModel(client),
     userAuthModule: new UserAuthModuleModel(client),
     usersModule: new UsersModuleModel(client),
-    uuidModule: new UuidModuleModel(client),
+    blueprint: new BlueprintModel(client),
+    blueprintTemplate: new BlueprintTemplateModel(client),
     databaseProvisionModule: new DatabaseProvisionModuleModel(client),
     appAdminGrant: new AppAdminGrantModel(client),
     appOwnerGrant: new AppOwnerGrantModel(client),
@@ -214,34 +222,34 @@ export function createClient(config: OrmClientConfig) {
     orgGrant: new OrgGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
+    orgPermissionDefault: new OrgPermissionDefaultModel(client),
     appLimit: new AppLimitModel(client),
     orgLimit: new OrgLimitModel(client),
     appStep: new AppStepModel(client),
     appAchievement: new AppAchievementModel(client),
+    appLevel: new AppLevelModel(client),
+    email: new EmailModel(client),
+    phoneNumber: new PhoneNumberModel(client),
+    cryptoAddress: new CryptoAddressModel(client),
+    connectedAccount: new ConnectedAccountModel(client),
     invite: new InviteModel(client),
     claimedInvite: new ClaimedInviteModel(client),
     orgInvite: new OrgInviteModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
+    auditLog: new AuditLogModel(client),
     ref: new RefModel(client),
     store: new StoreModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
-    cryptoAddress: new CryptoAddressModel(client),
     roleType: new RoleTypeModel(client),
-    orgPermissionDefault: new OrgPermissionDefaultModel(client),
-    phoneNumber: new PhoneNumberModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
-    connectedAccount: new ConnectedAccountModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
     membershipType: new MembershipTypeModel(client),
     commit: new CommitModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     rlsModule: new RlsModuleModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
-    auditLog: new AuditLogModel(client),
-    appLevel: new AppLevelModel(client),
     sqlMigration: new SqlMigrationModel(client),
-    email: new EmailModel(client),
     user: new UserModel(client),
     astMigration: new AstMigrationModel(client),
     appMembership: new AppMembershipModel(client),

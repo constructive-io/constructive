@@ -30,12 +30,6 @@ const fieldSchema: FieldSchema = {
   policyName: 'string',
   policyData: 'json',
   outFields: 'uuid',
-  tableNameTrgmSimilarity: 'float',
-  nodeTypeTrgmSimilarity: 'float',
-  policyTypeTrgmSimilarity: 'float',
-  policyRoleTrgmSimilarity: 'float',
-  policyNameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nsecure-table-provision <command>\n\nCommands:\n  list                  List all secureTableProvision records\n  get                   Get a secureTableProvision by ID\n  create                Create a new secureTableProvision\n  update                Update an existing secureTableProvision\n  delete                Delete a secureTableProvision\n\n  --help, -h            Show this help message\n';

@@ -28,13 +28,6 @@ const fieldSchema: FieldSchema = {
   inheritsId: 'uuid',
   createdAt: 'string',
   updatedAt: 'string',
-  nameTrgmSimilarity: 'float',
-  labelTrgmSimilarity: 'float',
-  descriptionTrgmSimilarity: 'float',
-  moduleTrgmSimilarity: 'float',
-  pluralNameTrgmSimilarity: 'float',
-  singularNameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\ntable <command>\n\nCommands:\n  list                  List all table records\n  get                   Get a table by ID\n  create                Create a new table\n  update                Update an existing table\n  delete                Delete a table\n\n  --help, -h            Show this help message\n';

@@ -38,11 +38,7 @@ export type RefOrderBy =
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'STORE_ID_DESC';
 /** Methods to use when ordering `Store`. */
 export type StoreOrderBy =
   | 'NATURAL'
@@ -51,11 +47,7 @@ export type StoreOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 /** Methods to use when ordering `Commit`. */
 export type CommitOrderBy =
   | 'NATURAL'
@@ -64,11 +56,7 @@ export type CommitOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'MESSAGE_TRGM_SIMILARITY_ASC'
-  | 'MESSAGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 /** Methods to use when ordering `Object`. */
 export type ObjectOrderBy =
   | 'NATURAL'
@@ -98,22 +86,6 @@ export interface RefFilter {
   or?: RefFilter[];
   /** Negates the expression. */
   not?: RefFilter;
-  /** TRGM search on the `name` column. */
-  trgmName?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
-}
-/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
-export interface TrgmSearchInput {
-  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
-  value: string;
-  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
-  threshold?: number;
 }
 /** A filter to be used against `Store` object types. All fields are combined with a logical ‘and.’ */
 export interface StoreFilter {
@@ -133,15 +105,6 @@ export interface StoreFilter {
   or?: StoreFilter[];
   /** Negates the expression. */
   not?: StoreFilter;
-  /** TRGM search on the `name` column. */
-  trgmName?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `Commit` object types. All fields are combined with a logical ‘and.’ */
 export interface CommitFilter {
@@ -169,15 +132,6 @@ export interface CommitFilter {
   or?: CommitFilter[];
   /** Negates the expression. */
   not?: CommitFilter;
-  /** TRGM search on the `message` column. */
-  trgmMessage?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’ */
 export interface ObjectFilter {

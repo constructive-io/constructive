@@ -17,8 +17,6 @@ const fieldSchema: FieldSchema = {
   ipAddress: 'string',
   success: 'boolean',
   createdAt: 'string',
-  userAgentTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\naudit-log <command>\n\nCommands:\n  list                  List all auditLog records\n  get                   Get a auditLog by ID\n  create                Create a new auditLog\n  update                Update an existing auditLog\n  delete                Delete a auditLog\n\n  --help, -h            Show this help message\n';

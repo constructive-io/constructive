@@ -83,7 +83,9 @@ export type OrgPermissionDefaultOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
-  | 'ID_DESC';
+  | 'ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `AppAdminGrant`. */
 export type AppAdminGrantOrderBy =
   | 'NATURAL'
@@ -91,6 +93,8 @@ export type AppAdminGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -104,6 +108,8 @@ export type AppOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -117,6 +123,8 @@ export type OrgAdminGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -132,6 +140,8 @@ export type OrgOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -172,11 +182,7 @@ export type OrgChartEdgeGrantOrderBy =
   | 'PARENT_ID_ASC'
   | 'PARENT_ID_DESC'
   | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'GRANTOR_ID_DESC';
 /** Methods to use when ordering `MembershipType`. */
 export type MembershipTypeOrderBy =
   | 'NATURAL'
@@ -185,13 +191,7 @@ export type MembershipTypeOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
 /** Methods to use when ordering `AppPermission`. */
 export type AppPermissionOrderBy =
   | 'NATURAL'
@@ -202,11 +202,7 @@ export type AppPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 /** Methods to use when ordering `OrgPermission`. */
 export type OrgPermissionOrderBy =
   | 'NATURAL'
@@ -217,11 +213,7 @@ export type OrgPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 /** Methods to use when ordering `AppLimit`. */
 export type AppLimitOrderBy =
   | 'NATURAL'
@@ -285,6 +277,8 @@ export type AppGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
   | 'GRANTOR_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -333,7 +327,9 @@ export type OrgClaimedInviteOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'UPDATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `OrgGrant`. */
 export type OrgGrantOrderBy =
   | 'NATURAL'
@@ -341,6 +337,8 @@ export type OrgGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -365,11 +363,7 @@ export type OrgChartEdgeOrderBy =
   | 'CHILD_ID_ASC'
   | 'CHILD_ID_DESC'
   | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'PARENT_ID_DESC';
 /** Methods to use when ordering `OrgMembershipDefault`. */
 export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
@@ -403,11 +397,7 @@ export type AppLevelRequirementOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `AppMembership`. */
 export type AppMembershipOrderBy =
   | 'NATURAL'
@@ -476,11 +466,7 @@ export type InviteOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `AppLevel`. */
 export type AppLevelOrderBy =
   | 'NATURAL'
@@ -490,14 +476,12 @@ export type AppLevelOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `OrgInvite`. */
 export type OrgInviteOrderBy =
   | 'NATURAL'
@@ -509,6 +493,8 @@ export type OrgInviteOrderBy =
   | 'EMAIL_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
   | 'INVITE_TOKEN_ASC'
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
@@ -520,11 +506,7 @@ export type OrgInviteOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'ENTITY_ID_DESC';
 /** A filter to be used against `OrgMember` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgMemberFilter {
   /** Filter by the object’s `id` field. */
@@ -673,13 +655,6 @@ export interface AppLimitDefaultFilter {
   /** Negates the expression. */
   not?: AppLimitDefaultFilter;
 }
-/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
-export interface TrgmSearchInput {
-  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
-  value: string;
-  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
-  threshold?: number;
-}
 /** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgLimitDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -721,15 +696,6 @@ export interface OrgChartEdgeGrantFilter {
   or?: OrgChartEdgeGrantFilter[];
   /** Negates the expression. */
   not?: OrgChartEdgeGrantFilter;
-  /** TRGM search on the `position_title` column. */
-  trgmPositionTitle?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
 export interface MembershipTypeFilter {
@@ -747,17 +713,6 @@ export interface MembershipTypeFilter {
   or?: MembershipTypeFilter[];
   /** Negates the expression. */
   not?: MembershipTypeFilter;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /** TRGM search on the `prefix` column. */
-  trgmPrefix?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `AppPermission` object types. All fields are combined with a logical ‘and.’ */
 export interface AppPermissionFilter {
@@ -777,15 +732,6 @@ export interface AppPermissionFilter {
   or?: AppPermissionFilter[];
   /** Negates the expression. */
   not?: AppPermissionFilter;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `OrgPermission` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgPermissionFilter {
@@ -805,15 +751,6 @@ export interface OrgPermissionFilter {
   or?: OrgPermissionFilter[];
   /** Negates the expression. */
   not?: OrgPermissionFilter;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `AppLimit` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitFilter {
@@ -1032,15 +969,6 @@ export interface OrgChartEdgeFilter {
   or?: OrgChartEdgeFilter[];
   /** Negates the expression. */
   not?: OrgChartEdgeFilter;
-  /** TRGM search on the `position_title` column. */
-  trgmPositionTitle?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgMembershipDefaultFilter {
@@ -1093,15 +1021,6 @@ export interface AppLevelRequirementFilter {
   or?: AppLevelRequirementFilter[];
   /** Negates the expression. */
   not?: AppLevelRequirementFilter;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’ */
 export interface AppMembershipFilter {
@@ -1215,15 +1134,6 @@ export interface InviteFilter {
   or?: InviteFilter[];
   /** Negates the expression. */
   not?: InviteFilter;
-  /** TRGM search on the `invite_token` column. */
-  trgmInviteToken?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -1324,15 +1234,6 @@ export interface AppLevelFilter {
   or?: AppLevelFilter[];
   /** Negates the expression. */
   not?: AppLevelFilter;
-  /** TRGM search on the `description` column. */
-  trgmDescription?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 /** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeImageFilter {
@@ -1403,15 +1304,6 @@ export interface OrgInviteFilter {
   or?: OrgInviteFilter[];
   /** Negates the expression. */
   not?: OrgInviteFilter;
-  /** TRGM search on the `invite_token` column. */
-  trgmInviteToken?: TrgmSearchInput;
-  /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  fullTextSearch?: string;
 }
 export interface SubmitInviteCodeInput {
   clientMutationId?: string;
@@ -1568,8 +1460,8 @@ export interface OrgChartEdgeGrantInput {
   childId: string;
   /** User ID of the manager being assigned; NULL for top-level positions */
   parentId?: string;
-  /** User ID of the admin who performed this grant or revocation */
-  grantorId: string;
+  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
+  grantorId?: string;
   /** TRUE to add/update the edge, FALSE to remove it */
   isGrant?: boolean;
   /** Job title or role name being assigned in this grant */
@@ -2154,7 +2046,7 @@ export interface OrgChartEdgeGrantPatch {
   childId?: string;
   /** User ID of the manager being assigned; NULL for top-level positions */
   parentId?: string;
-  /** User ID of the admin who performed this grant or revocation */
+  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
   grantorId?: string;
   /** TRUE to add/update the edge, FALSE to remove it */
   isGrant?: boolean;
