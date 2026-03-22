@@ -11443,9 +11443,6 @@ input FieldFilter {
   """Filter by the object’s `defaultValueAst` field."""
   defaultValueAst: JSONFilter
 
-  """Filter by the object’s `isHidden` field."""
-  isHidden: BooleanFilter
-
   """Filter by the object’s `type` field."""
   type: StringFilter
 
@@ -16797,7 +16794,6 @@ type Field {
   apiRequired: Boolean!
   defaultValue: String
   defaultValueAst: JSON
-  isHidden: Boolean!
   type: String!
   fieldOrder: Int!
   regexp: String
@@ -34446,7 +34442,6 @@ input FieldInput {
   apiRequired: Boolean
   defaultValue: String
   defaultValueAst: JSON
-  isHidden: Boolean
   type: String!
   fieldOrder: Int
   regexp: String
@@ -40872,7 +40867,6 @@ input FieldPatch {
   apiRequired: Boolean
   defaultValue: String
   defaultValueAst: JSON
-  isHidden: Boolean
   type: String
   fieldOrder: Int
   regexp: String

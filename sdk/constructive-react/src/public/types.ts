@@ -131,7 +131,6 @@ export interface Field {
   apiRequired: boolean | null;
   defaultValue: string | null;
   defaultValueAst: unknown | null;
-  isHidden: boolean | null;
   type: string | null;
   fieldOrder: number | null;
   regexp: string | null;
