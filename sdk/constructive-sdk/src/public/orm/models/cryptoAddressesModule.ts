@@ -220,9 +220,10 @@ export class CryptoAddressesModuleModel {
       'CryptoAddressesModule',
       'deleteCryptoAddressesModule',
       'cryptoAddressesModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteCryptoAddressesModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class TableTemplateModuleModel {
       'TableTemplateModule',
       'deleteTableTemplateModule',
       'tableTemplateModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteTableTemplateModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

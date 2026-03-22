@@ -218,9 +218,10 @@ export class CheckConstraintModel {
       'CheckConstraint',
       'deleteCheckConstraint',
       'checkConstraint',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteCheckConstraintInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

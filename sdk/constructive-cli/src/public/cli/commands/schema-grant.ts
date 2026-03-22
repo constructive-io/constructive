@@ -15,8 +15,6 @@ const fieldSchema: FieldSchema = {
   granteeName: 'string',
   createdAt: 'string',
   updatedAt: 'string',
-  granteeNameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nschema-grant <command>\n\nCommands:\n  list                  List all schemaGrant records\n  get                   Get a schemaGrant by ID\n  create                Create a new schemaGrant\n  update                Update an existing schemaGrant\n  delete                Delete a schemaGrant\n\n  --help, -h            Show this help message\n';

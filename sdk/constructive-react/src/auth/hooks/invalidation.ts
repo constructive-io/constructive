@@ -15,12 +15,12 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  cryptoAddressKeys,
-  roleTypeKeys,
+  emailKeys,
   phoneNumberKeys,
+  cryptoAddressKeys,
   connectedAccountKeys,
   auditLogKeys,
-  emailKeys,
+  roleTypeKeys,
   userKeys,
 } from './query-keys';
 /**
@@ -43,35 +43,18 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate cryptoAddress queries */ cryptoAddress: {
-    /** Invalidate all cryptoAddress queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate email queries */ email: {
+    /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: cryptoAddressKeys.all,
+        queryKey: emailKeys.all,
       }),
-    /** Invalidate cryptoAddress list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate email list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: cryptoAddressKeys.lists(),
+        queryKey: emailKeys.lists(),
       }),
-    /** Invalidate a specific cryptoAddress */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
+    /** Invalidate a specific email */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
-        queryKey: cryptoAddressKeys.detail(id),
-      }),
-  },
-  /** Invalidate roleType queries */ roleType: {
-    /** Invalidate all roleType queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: roleTypeKeys.all,
-      }),
-    /** Invalidate roleType list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: roleTypeKeys.lists(),
-      }),
-    /** Invalidate a specific roleType */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: roleTypeKeys.detail(id),
+        queryKey: emailKeys.detail(id),
       }),
   },
   /** Invalidate phoneNumber queries */ phoneNumber: {
@@ -89,6 +72,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: phoneNumberKeys.detail(id),
+      }),
+  },
+  /** Invalidate cryptoAddress queries */ cryptoAddress: {
+    /** Invalidate all cryptoAddress queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: cryptoAddressKeys.all,
+      }),
+    /** Invalidate cryptoAddress list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: cryptoAddressKeys.lists(),
+      }),
+    /** Invalidate a specific cryptoAddress */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: cryptoAddressKeys.detail(id),
       }),
   },
   /** Invalidate connectedAccount queries */ connectedAccount: {
@@ -122,18 +122,18 @@ export const invalidate = {
         queryKey: auditLogKeys.detail(id),
       }),
   },
-  /** Invalidate email queries */ email: {
-    /** Invalidate all email queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate roleType queries */ roleType: {
+    /** Invalidate all roleType queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: emailKeys.all,
+        queryKey: roleTypeKeys.all,
       }),
-    /** Invalidate email list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate roleType list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: emailKeys.lists(),
+        queryKey: roleTypeKeys.lists(),
       }),
-    /** Invalidate a specific email */ detail: (queryClient: QueryClient, id: string | number) =>
+    /** Invalidate a specific roleType */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
-        queryKey: emailKeys.detail(id),
+        queryKey: roleTypeKeys.detail(id),
       }),
   },
   /** Invalidate user queries */ user: {
@@ -163,17 +163,9 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove cryptoAddress from cache */ cryptoAddress: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: cryptoAddressKeys.detail(id),
-    });
-  },
-  /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: roleTypeKeys.detail(id),
+      queryKey: emailKeys.detail(id),
     });
   },
   /** Remove phoneNumber from cache */ phoneNumber: (
@@ -182,6 +174,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: phoneNumberKeys.detail(id),
+    });
+  },
+  /** Remove cryptoAddress from cache */ cryptoAddress: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: cryptoAddressKeys.detail(id),
     });
   },
   /** Remove connectedAccount from cache */ connectedAccount: (
@@ -197,9 +197,9 @@ export const remove = {
       queryKey: auditLogKeys.detail(id),
     });
   },
-  /** Remove email from cache */ email: (queryClient: QueryClient, id: string | number) => {
+  /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: emailKeys.detail(id),
+      queryKey: roleTypeKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

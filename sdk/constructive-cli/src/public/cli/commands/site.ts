@@ -18,10 +18,6 @@ const fieldSchema: FieldSchema = {
   appleTouchIcon: 'string',
   logo: 'string',
   dbname: 'string',
-  titleTrgmSimilarity: 'float',
-  descriptionTrgmSimilarity: 'float',
-  dbnameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nsite <command>\n\nCommands:\n  list                  List all site records\n  get                   Get a site by ID\n  create                Create a new site\n  update                Update an existing site\n  delete                Delete a site\n\n  --help, -h            Show this help message\n';

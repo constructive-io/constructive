@@ -218,9 +218,10 @@ export class ViewGrantModel {
       'ViewGrant',
       'deleteViewGrant',
       'viewGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteViewGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

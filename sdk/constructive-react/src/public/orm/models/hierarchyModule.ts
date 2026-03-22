@@ -218,9 +218,10 @@ export class HierarchyModuleModel {
       'HierarchyModule',
       'deleteHierarchyModule',
       'hierarchyModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteHierarchyModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

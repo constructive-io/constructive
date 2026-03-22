@@ -218,9 +218,10 @@ export class ProfilesModuleModel {
       'ProfilesModule',
       'deleteProfilesModule',
       'profilesModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteProfilesModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

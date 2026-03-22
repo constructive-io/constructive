@@ -204,9 +204,10 @@ export class ObjectModel {
       'Object',
       'deleteObject',
       'object',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteObjectInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

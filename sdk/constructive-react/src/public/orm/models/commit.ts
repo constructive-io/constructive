@@ -218,9 +218,10 @@ export class CommitModel {
       'Commit',
       'deleteCommit',
       'commit',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteCommitInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

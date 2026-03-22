@@ -240,6 +240,10 @@ export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 // ============ Entity Types ============
+export interface GetAllRecord {
+  path?: string[] | null;
+  data?: Record<string, unknown> | null;
+}
 export interface OrgGetManagersRecord {
   userId?: string | null;
   depth?: number | null;
@@ -248,16 +252,12 @@ export interface OrgGetSubordinatesRecord {
   userId?: string | null;
   depth?: number | null;
 }
-export interface GetAllRecord {
-  path?: string | null;
-  data?: Record<string, unknown> | null;
-}
 export interface Object {
   hashUuid?: string | null;
   id: string;
   databaseId?: string | null;
-  kids?: string | null;
-  ktree?: string | null;
+  kids?: string[] | null;
+  ktree?: string[] | null;
   data?: Record<string, unknown> | null;
   frzn?: boolean | null;
   createdAt?: string | null;
@@ -273,10 +273,6 @@ export interface AppPermission {
   bitstr?: string | null;
   /** Human-readable description of what this permission allows */
   description?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines available permissions as named bits within a bitmask, used by the RBAC system for access control */
 export interface OrgPermission {
@@ -289,10 +285,6 @@ export interface OrgPermission {
   bitstr?: string | null;
   /** Human-readable description of what this permission allows */
   description?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines the specific requirements that must be met to achieve a level */
 export interface AppLevelRequirement {
@@ -309,10 +301,6 @@ export interface AppLevelRequirement {
   priority?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Database {
   id: string;
@@ -323,14 +311,6 @@ export interface Database {
   hash?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `schemaHash`. Returns null when no trgm search filter is active. */
-  schemaHashTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Schema {
   id: string;
@@ -343,22 +323,10 @@ export interface Schema {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   isPublic?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `schemaName`. Returns null when no trgm search filter is active. */
-  schemaNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Table {
   id: string;
@@ -376,24 +344,10 @@ export interface Table {
   peoplestamps?: boolean | null;
   pluralName?: string | null;
   singularName?: string | null;
-  tags?: string | null;
+  tags?: string[] | null;
   inheritsId?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `pluralName`. Returns null when no trgm search filter is active. */
-  pluralNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `singularName`. Returns null when no trgm search filter is active. */
-  singularNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface CheckConstraint {
   id: string;
@@ -401,23 +355,15 @@ export interface CheckConstraint {
   tableId?: string | null;
   name?: string | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   expr?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Field {
   id: string;
@@ -428,6 +374,7 @@ export interface Field {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   isRequired?: boolean | null;
+  apiRequired?: boolean | null;
   defaultValue?: string | null;
   defaultValueAst?: Record<string, unknown> | null;
   isHidden?: boolean | null;
@@ -438,26 +385,12 @@ export interface Field {
   chkExpr?: Record<string, unknown> | null;
   min?: number | null;
   max?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `label`. Returns null when no trgm search filter is active. */
-  labelTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `defaultValue`. Returns null when no trgm search filter is active. */
-  defaultValueTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `regexp`. Returns null when no trgm search filter is active. */
-  regexpTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface ForeignKeyConstraint {
   id: string;
@@ -467,40 +400,26 @@ export interface ForeignKeyConstraint {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   refTableId?: string | null;
-  refFieldIds?: string | null;
+  refFieldIds?: string[] | null;
   deleteAction?: string | null;
   updateAction?: string | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deleteAction`. Returns null when no trgm search filter is active. */
-  deleteActionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `updateAction`. Returns null when no trgm search filter is active. */
-  updateActionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface FullTextSearch {
   id: string;
   databaseId?: string | null;
   tableId?: string | null;
   fieldId?: string | null;
-  fieldIds?: string | null;
-  weights?: string | null;
-  langs?: string | null;
+  fieldIds?: string[] | null;
+  weights?: string[] | null;
+  langs?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -509,29 +428,21 @@ export interface Index {
   databaseId?: string | null;
   tableId?: string | null;
   name?: string | null;
-  fieldIds?: string | null;
-  includeFieldIds?: string | null;
+  fieldIds?: string[] | null;
+  includeFieldIds?: string[] | null;
   accessMethod?: string | null;
   indexParams?: Record<string, unknown> | null;
   whereClause?: Record<string, unknown> | null;
   isUnique?: boolean | null;
   options?: Record<string, unknown> | null;
-  opClasses?: string | null;
+  opClasses?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `accessMethod`. Returns null when no trgm search filter is active. */
-  accessMethodTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Policy {
   id: string;
@@ -548,21 +459,9 @@ export interface Policy {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyType`. Returns null when no trgm search filter is active. */
-  policyTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface PrimaryKeyConstraint {
   id: string;
@@ -570,22 +469,14 @@ export interface PrimaryKeyConstraint {
   tableId?: string | null;
   name?: string | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface TableGrant {
   id: string;
@@ -593,16 +484,10 @@ export interface TableGrant {
   tableId?: string | null;
   privilege?: string | null;
   granteeName?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   isGrant?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface Trigger {
   id: string;
@@ -615,19 +500,9 @@ export interface Trigger {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `event`. Returns null when no trgm search filter is active. */
-  eventTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `functionName`. Returns null when no trgm search filter is active. */
-  functionNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface UniqueConstraint {
   id: string;
@@ -637,23 +512,13 @@ export interface UniqueConstraint {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `type`. Returns null when no trgm search filter is active. */
-  typeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface View {
   id: string;
@@ -671,17 +536,7 @@ export interface View {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `viewType`. Returns null when no trgm search filter is active. */
-  viewTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `filterType`. Returns null when no trgm search filter is active. */
-  filterTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `module`. Returns null when no trgm search filter is active. */
-  moduleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 /** Junction table linking views to their joined tables for referential integrity */
 export interface ViewTable {
@@ -698,12 +553,6 @@ export interface ViewGrant {
   privilege?: string | null;
   withGrantOption?: boolean | null;
   isGrant?: boolean | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** DO INSTEAD rules for views (e.g., read-only enforcement) */
 export interface ViewRule {
@@ -715,14 +564,26 @@ export interface ViewRule {
   event?: string | null;
   /** NOTHING (for read-only) or custom action */
   action?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `event`. Returns null when no trgm search filter is active. */
-  eventTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `action`. Returns null when no trgm search filter is active. */
-  actionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+export interface EmbeddingChunk {
+  id: string;
+  databaseId?: string | null;
+  tableId?: string | null;
+  embeddingFieldId?: string | null;
+  chunksTableId?: string | null;
+  chunksTableName?: string | null;
+  contentFieldName?: string | null;
+  dimensions?: number | null;
+  metric?: string | null;
+  chunkSize?: number | null;
+  chunkOverlap?: number | null;
+  chunkStrategy?: string | null;
+  metadataFields?: Record<string, unknown> | null;
+  enqueueChunkingJob?: boolean | null;
+  chunkingTaskName?: string | null;
+  parentFkFieldId?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 export interface TableTemplateModule {
   id: string;
@@ -734,12 +595,6 @@ export interface TableTemplateModule {
   tableName?: string | null;
   nodeType?: string | null;
   data?: Record<string, unknown> | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. */
 export interface SecureTableProvision {
@@ -757,18 +612,18 @@ export interface SecureTableProvision {
   nodeType?: string | null;
   /** If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true. */
   useRls?: boolean | null;
-  /** Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table. Defaults to '{}'. */
+  /** Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'. */
   nodeData?: Record<string, unknown> | null;
-  /** JSON array of field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: [{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"},{"name":"score","type":"integer","min":0,"max":100}]. Defaults to '[]' (no additional fields). */
-  fields?: Record<string, unknown> | null;
+  /** PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields). */
+  fields?: Record<string, unknown>[] | null;
   /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
-  grantRoles?: string | null;
-  /** Array of [privilege, columns] tuples defining table grants. Examples: [["select","*"],["insert","*"]] for full access, or [["update",["name","bio"]]] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '[]' (no grants). The trigger validates this is a proper jsonb array. */
-  grantPrivileges?: Record<string, unknown> | null;
+  grantRoles?: string[] | null;
+  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants). Type safety is enforced by PostgreSQL at INSERT time. */
+  grantPrivileges?: Record<string, unknown>[] | null;
   /** Policy generator type, e.g. 'AuthzEntityMembership', 'AuthzMembership', 'AuthzAllowAll'. NULL means no policy is created. When set, the trigger automatically enables RLS on the target table. */
   policyType?: string | null;
   /** Privileges the policy applies to, e.g. ARRAY['select','update']. NULL means privileges are derived from the grant_privileges verbs. */
-  policyPrivileges?: string | null;
+  policyPrivileges?: string[] | null;
   /** Role the policy targets. NULL means it falls back to the first role in grant_roles. */
   policyRole?: string | null;
   /** Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Defaults to true. */
@@ -778,19 +633,7 @@ export interface SecureTableProvision {
   /** Opaque configuration passed through to metaschema.create_policy(). Structure varies by policy_type and is not interpreted by this trigger. Defaults to '{}'. */
   policyData?: Record<string, unknown> | null;
   /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly. */
-  outFields?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyType`. Returns null when no trgm search filter is active. */
-  policyTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyRole`. Returns null when no trgm search filter is active. */
-  policyRoleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyName`. Returns null when no trgm search filter is active. */
-  policyNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+  outFields?: string[] | null;
 }
 /**
  * Provisions relational structure between tables. Supports four relation types:
@@ -851,6 +694,13 @@ export interface RelationProvision {
    */
   isRequired?: boolean | null;
   /**
+   * Whether the FK field should be required at the API level even though it is nullable at the database level. Defaults to false.
+   *      When true and is_required is false, the field is created as nullable (allowing SET NULL cascade) but a @requiredInput smart tag is added so PostGraphile treats it as non-null in create/update input types.
+   *      When is_required is true, api_required is ignored (the field is already required at both levels).
+   *      Ignored for RelationManyToMany (junction FK fields are always required).
+   */
+  apiRequired?: boolean | null;
+  /**
    * For RelationManyToMany: an existing junction table to use. Defaults to uuid_nil().
    *      - When uuid_nil(): the trigger creates a new junction table via secure_table_provision using junction_table_name.
    *      - When set to a valid table UUID: the trigger skips table creation and only adds FK fields, composite key (if use_composite_key is true), and security to the existing table.
@@ -874,6 +724,26 @@ export interface RelationProvision {
    */
   useCompositeKey?: boolean | null;
   /**
+   * Whether to create a btree index on FK fields created by this relation. Defaults to true.
+   *      PostgreSQL does not automatically index foreign key columns (only the referenced PK side is indexed).
+   *      Without indexes on FK columns, JOINs, CASCADE deletes, and RLS policy lookups perform sequential scans.
+   *      - RelationBelongsTo: creates an index on the FK field on the source table.
+   *      - RelationHasMany: creates an index on the FK field on the target table.
+   *      - RelationHasOne: skipped — the unique constraint already creates an implicit index.
+   *      - RelationManyToMany: creates indexes on both FK fields on the junction table.
+   *      Set to false only for very small tables or write-heavy tables where index maintenance cost outweighs read performance.
+   */
+  createIndex?: boolean | null;
+  /**
+   * For RelationManyToMany: whether to expose the M:N shortcut fields in the GraphQL API. Defaults to true.
+   *      When true, sets @behavior +manyToMany on the junction table smart_tags so PostGraphile generates
+   *      clean M:N connection fields (e.g., event.contacts instead of event.contactEventsByEventId).
+   *      When false (or toggled off via UPDATE), the behavior tag is removed and the M:N fields disappear from GraphQL.
+   *      Toggling is supported: UPDATE expose_in_api to true/false and the smart tag is added/removed automatically.
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
+   */
+  exposeInApi?: boolean | null;
+  /**
    * For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
    *      Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
    *      NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
@@ -891,9 +761,9 @@ export interface RelationProvision {
    */
   nodeData?: Record<string, unknown> | null;
   /** For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne. */
-  grantRoles?: string | null;
-  /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: array of [privilege, columns] tuples. Examples: [["select","*"],["insert","*"]] for full access, or [["update",["name","bio"]]] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne. */
-  grantPrivileges?: Record<string, unknown> | null;
+  grantRoles?: string[] | null;
+  /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne. */
+  grantPrivileges?: Record<string, unknown>[] | null;
   /**
    * For RelationManyToMany: RLS policy type for the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
    *      Examples: AuthzEntityMembership, AuthzMembership, AuthzAllowAll, AuthzDirectOwner, AuthzOrgHierarchy.
@@ -902,7 +772,7 @@ export interface RelationProvision {
    */
   policyType?: string | null;
   /** For RelationManyToMany: privileges the policy applies to, e.g. ARRAY['select','insert','delete']. Forwarded to secure_table_provision as-is. NULL means privileges are derived from the grant_privileges verbs by secure_table_provision. Ignored for RelationBelongsTo/RelationHasOne. */
-  policyPrivileges?: string | null;
+  policyPrivileges?: string[] | null;
   /** For RelationManyToMany: database role the policy targets, e.g. 'authenticated'. Forwarded to secure_table_provision as-is. NULL means secure_table_provision falls back to the first role in grant_roles. Ignored for RelationBelongsTo/RelationHasOne. */
   policyRole?: string | null;
   /** For RelationManyToMany: whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Forwarded to secure_table_provision as-is. Defaults to true. Ignored for RelationBelongsTo/RelationHasOne. */
@@ -926,28 +796,6 @@ export interface RelationProvision {
   outSourceFieldId?: string | null;
   /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
   outTargetFieldId?: string | null;
-  /** TRGM similarity when searching `relationType`. Returns null when no trgm search filter is active. */
-  relationTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `fieldName`. Returns null when no trgm search filter is active. */
-  fieldNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deleteAction`. Returns null when no trgm search filter is active. */
-  deleteActionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `junctionTableName`. Returns null when no trgm search filter is active. */
-  junctionTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sourceFieldName`. Returns null when no trgm search filter is active. */
-  sourceFieldNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `targetFieldName`. Returns null when no trgm search filter is active. */
-  targetFieldNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyType`. Returns null when no trgm search filter is active. */
-  policyTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyRole`. Returns null when no trgm search filter is active. */
-  policyRoleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `policyName`. Returns null when no trgm search filter is active. */
-  policyNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface SchemaGrant {
   id: string;
@@ -956,10 +804,6 @@ export interface SchemaGrant {
   granteeName?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface DefaultPrivilege {
   id: string;
@@ -969,14 +813,20 @@ export interface DefaultPrivilege {
   privilege?: string | null;
   granteeName?: string | null;
   isGrant?: boolean | null;
-  /** TRGM similarity when searching `objectType`. Returns null when no trgm search filter is active. */
-  objectTypeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privilege`. Returns null when no trgm search filter is active. */
-  privilegeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `granteeName`. Returns null when no trgm search filter is active. */
-  granteeNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+export interface Enum {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  name?: string | null;
+  label?: string | null;
+  description?: string | null;
+  values?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
+  module?: string | null;
+  scope?: number | null;
+  tags?: string[] | null;
 }
 /** Join table linking APIs to the database schemas they expose; controls which schemas are accessible through each API */
 export interface ApiSchema {
@@ -1001,10 +851,6 @@ export interface ApiModule {
   name?: string | null;
   /** JSON configuration data for this module */
   data?: Record<string, unknown> | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** DNS domain and subdomain routing: maps hostnames to either an API endpoint or a site */
 export interface Domain {
@@ -1035,12 +881,6 @@ export interface SiteMetadatum {
   description?: string | null;
   /** Open Graph image for social media previews */
   ogImage?: ConstructiveInternalTypeImage | null;
-  /** TRGM similarity when searching `title`. Returns null when no trgm search filter is active. */
-  titleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Site-level module configuration; stores module name and JSON settings used by the frontend or server for each site */
 export interface SiteModule {
@@ -1054,10 +894,6 @@ export interface SiteModule {
   name?: string | null;
   /** JSON configuration data for this module */
   data?: Record<string, unknown> | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Theme configuration for a site; stores design tokens, colors, and typography as JSONB */
 export interface SiteTheme {
@@ -1077,12 +913,22 @@ export interface TriggerFunction {
   code?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `code`. Returns null when no trgm search filter is active. */
-  codeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+export interface DatabaseTransfer {
+  id: string;
+  databaseId?: string | null;
+  targetOwnerId?: string | null;
+  sourceApproved?: boolean | null;
+  targetApproved?: boolean | null;
+  sourceApprovedAt?: string | null;
+  targetApprovedAt?: string | null;
+  status?: string | null;
+  initiatedBy?: string | null;
+  notes?: string | null;
+  expiresAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  completedAt?: string | null;
 }
 /** API endpoint configurations: each record defines a PostGraphile/PostgREST API with its database role and public access settings */
 export interface Api {
@@ -1100,16 +946,6 @@ export interface Api {
   anonRole?: string | null;
   /** Whether this API is publicly accessible without authentication */
   isPublic?: boolean | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `dbname`. Returns null when no trgm search filter is active. */
-  dbnameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `roleName`. Returns null when no trgm search filter is active. */
-  roleNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `anonRole`. Returns null when no trgm search filter is active. */
-  anonRoleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Top-level site configuration: branding assets, title, and description for a deployed application */
 export interface Site {
@@ -1131,14 +967,6 @@ export interface Site {
   logo?: ConstructiveInternalTypeImage | null;
   /** PostgreSQL database name this site connects to */
   dbname?: string | null;
-  /** TRGM similarity when searching `title`. Returns null when no trgm search filter is active. */
-  titleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `dbname`. Returns null when no trgm search filter is active. */
-  dbnameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Mobile and native app configuration linked to a site, including store links and identifiers */
 export interface App {
@@ -1160,14 +988,6 @@ export interface App {
   appIdPrefix?: string | null;
   /** URL to the Google Play Store listing */
   playStoreLink?: ConstructiveInternalTypeUrl | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `appStoreId`. Returns null when no trgm search filter is active. */
-  appStoreIdTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `appIdPrefix`. Returns null when no trgm search filter is active. */
-  appIdPrefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface ConnectedAccountsModule {
   id: string;
@@ -1177,10 +997,6 @@ export interface ConnectedAccountsModule {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface CryptoAddressesModule {
   id: string;
@@ -1191,12 +1007,6 @@ export interface CryptoAddressesModule {
   ownerTableId?: string | null;
   tableName?: string | null;
   cryptoNetwork?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `cryptoNetwork`. Returns null when no trgm search filter is active. */
-  cryptoNetworkTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface CryptoAuthModule {
   id: string;
@@ -1213,20 +1023,6 @@ export interface CryptoAuthModule {
   signInRecordFailure?: string | null;
   signUpWithKey?: string | null;
   signInWithChallenge?: string | null;
-  /** TRGM similarity when searching `userField`. Returns null when no trgm search filter is active. */
-  userFieldTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `cryptoNetwork`. Returns null when no trgm search filter is active. */
-  cryptoNetworkTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInRequestChallenge`. Returns null when no trgm search filter is active. */
-  signInRequestChallengeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInRecordFailure`. Returns null when no trgm search filter is active. */
-  signInRecordFailureTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signUpWithKey`. Returns null when no trgm search filter is active. */
-  signUpWithKeyTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInWithChallenge`. Returns null when no trgm search filter is active. */
-  signInWithChallengeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface DefaultIdsModule {
   id: string;
@@ -1237,18 +1033,14 @@ export interface DenormalizedTableField {
   databaseId?: string | null;
   tableId?: string | null;
   fieldId?: string | null;
-  setIds?: string | null;
+  setIds?: string[] | null;
   refTableId?: string | null;
   refFieldId?: string | null;
-  refIds?: string | null;
+  refIds?: string[] | null;
   useUpdates?: boolean | null;
   updateDefaults?: boolean | null;
   funcName?: string | null;
   funcOrder?: number | null;
-  /** TRGM similarity when searching `funcName`. Returns null when no trgm search filter is active. */
-  funcNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface EmailsModule {
   id: string;
@@ -1258,10 +1050,6 @@ export interface EmailsModule {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface EncryptedSecretsModule {
   id: string;
@@ -1269,10 +1057,6 @@ export interface EncryptedSecretsModule {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface FieldModule {
   id: string;
@@ -1282,12 +1066,8 @@ export interface FieldModule {
   fieldId?: string | null;
   nodeType?: string | null;
   data?: Record<string, unknown> | null;
-  triggers?: string | null;
-  functions?: string | null;
-  /** TRGM similarity when searching `nodeType`. Returns null when no trgm search filter is active. */
-  nodeTypeTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+  triggers?: string[] | null;
+  functions?: string[] | null;
 }
 export interface InvitesModule {
   id: string;
@@ -1304,16 +1084,6 @@ export interface InvitesModule {
   prefix?: string | null;
   membershipType?: number | null;
   entityTableId?: string | null;
-  /** TRGM similarity when searching `invitesTableName`. Returns null when no trgm search filter is active. */
-  invitesTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `claimedInvitesTableName`. Returns null when no trgm search filter is active. */
-  claimedInvitesTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `submitInviteCodeFunction`. Returns null when no trgm search filter is active. */
-  submitInviteCodeFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface LevelsModule {
   id: string;
@@ -1342,38 +1112,6 @@ export interface LevelsModule {
   membershipType?: number | null;
   entityTableId?: string | null;
   actorTableId?: string | null;
-  /** TRGM similarity when searching `stepsTableName`. Returns null when no trgm search filter is active. */
-  stepsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `achievementsTableName`. Returns null when no trgm search filter is active. */
-  achievementsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `levelsTableName`. Returns null when no trgm search filter is active. */
-  levelsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `levelRequirementsTableName`. Returns null when no trgm search filter is active. */
-  levelRequirementsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `completedStep`. Returns null when no trgm search filter is active. */
-  completedStepTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `incompletedStep`. Returns null when no trgm search filter is active. */
-  incompletedStepTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievement`. Returns null when no trgm search filter is active. */
-  tgAchievementTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievementToggle`. Returns null when no trgm search filter is active. */
-  tgAchievementToggleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievementToggleBoolean`. Returns null when no trgm search filter is active. */
-  tgAchievementToggleBooleanTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgAchievementBoolean`. Returns null when no trgm search filter is active. */
-  tgAchievementBooleanTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `upsertAchievement`. Returns null when no trgm search filter is active. */
-  upsertAchievementTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `tgUpdateAchievements`. Returns null when no trgm search filter is active. */
-  tgUpdateAchievementsTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `stepsRequired`. Returns null when no trgm search filter is active. */
-  stepsRequiredTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `levelAchieved`. Returns null when no trgm search filter is active. */
-  levelAchievedTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface LimitsModule {
   id: string;
@@ -1394,26 +1132,6 @@ export interface LimitsModule {
   membershipType?: number | null;
   entityTableId?: string | null;
   actorTableId?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `defaultTableName`. Returns null when no trgm search filter is active. */
-  defaultTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitIncrementFunction`. Returns null when no trgm search filter is active. */
-  limitIncrementFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitDecrementFunction`. Returns null when no trgm search filter is active. */
-  limitDecrementFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitIncrementTrigger`. Returns null when no trgm search filter is active. */
-  limitIncrementTriggerTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitDecrementTrigger`. Returns null when no trgm search filter is active. */
-  limitDecrementTriggerTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitUpdateTrigger`. Returns null when no trgm search filter is active. */
-  limitUpdateTriggerTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `limitCheckFunction`. Returns null when no trgm search filter is active. */
-  limitCheckFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface MembershipTypesModule {
   id: string;
@@ -1421,10 +1139,6 @@ export interface MembershipTypesModule {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface MembershipsModule {
   id: string;
@@ -1458,32 +1172,6 @@ export interface MembershipsModule {
   entityIdsByMask?: string | null;
   entityIdsByPerm?: string | null;
   entityIdsFunction?: string | null;
-  /** TRGM similarity when searching `membershipsTableName`. Returns null when no trgm search filter is active. */
-  membershipsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `membersTableName`. Returns null when no trgm search filter is active. */
-  membersTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `membershipDefaultsTableName`. Returns null when no trgm search filter is active. */
-  membershipDefaultsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `grantsTableName`. Returns null when no trgm search filter is active. */
-  grantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `adminGrantsTableName`. Returns null when no trgm search filter is active. */
-  adminGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `ownerGrantsTableName`. Returns null when no trgm search filter is active. */
-  ownerGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `actorMaskCheck`. Returns null when no trgm search filter is active. */
-  actorMaskCheckTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `actorPermCheck`. Returns null when no trgm search filter is active. */
-  actorPermCheckTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `entityIdsByMask`. Returns null when no trgm search filter is active. */
-  entityIdsByMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `entityIdsByPerm`. Returns null when no trgm search filter is active. */
-  entityIdsByPermTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `entityIdsFunction`. Returns null when no trgm search filter is active. */
-  entityIdsFunctionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface PermissionsModule {
   id: string;
@@ -1503,22 +1191,6 @@ export interface PermissionsModule {
   getMask?: string | null;
   getByMask?: string | null;
   getMaskByName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `defaultTableName`. Returns null when no trgm search filter is active. */
-  defaultTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getPaddedMask`. Returns null when no trgm search filter is active. */
-  getPaddedMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getMask`. Returns null when no trgm search filter is active. */
-  getMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getByMask`. Returns null when no trgm search filter is active. */
-  getByMaskTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getMaskByName`. Returns null when no trgm search filter is active. */
-  getMaskByNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface PhoneNumbersModule {
   id: string;
@@ -1528,10 +1200,6 @@ export interface PhoneNumbersModule {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface ProfilesModule {
   id: string;
@@ -1552,18 +1220,6 @@ export interface ProfilesModule {
   permissionsTableId?: string | null;
   membershipsTableId?: string | null;
   prefix?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `profilePermissionsTableName`. Returns null when no trgm search filter is active. */
-  profilePermissionsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `profileGrantsTableName`. Returns null when no trgm search filter is active. */
-  profileGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `profileDefinitionGrantsTableName`. Returns null when no trgm search filter is active. */
-  profileDefinitionGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface SecretsModule {
   id: string;
@@ -1571,10 +1227,6 @@ export interface SecretsModule {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface SessionsModule {
   id: string;
@@ -1588,14 +1240,6 @@ export interface SessionsModule {
   sessionsTable?: string | null;
   sessionCredentialsTable?: string | null;
   authSettingsTable?: string | null;
-  /** TRGM similarity when searching `sessionsTable`. Returns null when no trgm search filter is active. */
-  sessionsTableTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sessionCredentialsTable`. Returns null when no trgm search filter is active. */
-  sessionCredentialsTableTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `authSettingsTable`. Returns null when no trgm search filter is active. */
-  authSettingsTableTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface UserAuthModule {
   id: string;
@@ -1624,40 +1268,6 @@ export interface UserAuthModule {
   signInOneTimeTokenFunction?: string | null;
   oneTimeTokenFunction?: string | null;
   extendTokenExpires?: string | null;
-  /** TRGM similarity when searching `auditsTableName`. Returns null when no trgm search filter is active. */
-  auditsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInFunction`. Returns null when no trgm search filter is active. */
-  signInFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signUpFunction`. Returns null when no trgm search filter is active. */
-  signUpFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signOutFunction`. Returns null when no trgm search filter is active. */
-  signOutFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `setPasswordFunction`. Returns null when no trgm search filter is active. */
-  setPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `resetPasswordFunction`. Returns null when no trgm search filter is active. */
-  resetPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `forgotPasswordFunction`. Returns null when no trgm search filter is active. */
-  forgotPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sendVerificationEmailFunction`. Returns null when no trgm search filter is active. */
-  sendVerificationEmailFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `verifyEmailFunction`. Returns null when no trgm search filter is active. */
-  verifyEmailFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `verifyPasswordFunction`. Returns null when no trgm search filter is active. */
-  verifyPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `checkPasswordFunction`. Returns null when no trgm search filter is active. */
-  checkPasswordFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sendAccountDeletionEmailFunction`. Returns null when no trgm search filter is active. */
-  sendAccountDeletionEmailFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deleteAccountFunction`. Returns null when no trgm search filter is active. */
-  deleteAccountFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `signInOneTimeTokenFunction`. Returns null when no trgm search filter is active. */
-  signInOneTimeTokenFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `oneTimeTokenFunction`. Returns null when no trgm search filter is active. */
-  oneTimeTokenFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `extendTokenExpires`. Returns null when no trgm search filter is active. */
-  extendTokenExpiresTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export interface UsersModule {
   id: string;
@@ -1667,25 +1277,86 @@ export interface UsersModule {
   tableName?: string | null;
   typeTableId?: string | null;
   typeTableName?: string | null;
-  /** TRGM similarity when searching `tableName`. Returns null when no trgm search filter is active. */
-  tableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `typeTableName`. Returns null when no trgm search filter is active. */
-  typeTableNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
-export interface UuidModule {
+/** An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. */
+export interface Blueprint {
+  /** Unique identifier for this blueprint. */
   id: string;
+  /** The user who owns this blueprint. */
+  ownerId?: string | null;
+  /** The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database. */
   databaseId?: string | null;
-  schemaId?: string | null;
-  uuidFunction?: string | null;
-  uuidSeed?: string | null;
-  /** TRGM similarity when searching `uuidFunction`. Returns null when no trgm search filter is active. */
-  uuidFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `uuidSeed`. Returns null when no trgm search filter is active. */
-  uuidSeedTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+  /** Machine-readable name for the blueprint. Must be unique per database. */
+  name?: string | null;
+  /** Human-readable display name for the blueprint. */
+  displayName?: string | null;
+  /** Optional description of the blueprint. */
+  description?: string | null;
+  /** The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing. */
+  definition?: Record<string, unknown> | null;
+  /** If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch. */
+  templateId?: string | null;
+  /** Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft. */
+  status?: string | null;
+  /** Timestamp when construct_blueprint() successfully completed. NULL until constructed. */
+  constructedAt?: string | null;
+  /** Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed. */
+  errorDetails?: string | null;
+  /** Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
+  refMap?: Record<string, unknown> | null;
+  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed. */
+  constructedDefinition?: Record<string, unknown> | null;
+  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly. */
+  definitionHash?: string | null;
+  /** JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
+  tableHashes?: Record<string, unknown> | null;
+  /** Timestamp when this blueprint was created. */
+  createdAt?: string | null;
+  /** Timestamp when this blueprint was last modified. */
+  updatedAt?: string | null;
+}
+/** A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible). */
+export interface BlueprintTemplate {
+  /** Unique identifier for this template. */
+  id: string;
+  /** Machine-readable name for the template (e.g. e_commerce_basic). Must be unique per owner + version. */
+  name?: string | null;
+  /** Semantic version string. Defaults to 1.0.0. */
+  version?: string | null;
+  /** Human-readable display name for the template (e.g. E-Commerce Basic). */
+  displayName?: string | null;
+  /** Optional description of what the template provisions. */
+  description?: string | null;
+  /** The user who created or published this template. */
+  ownerId?: string | null;
+  /** Access control for the template. private: only the owner can see and copy. public: anyone can browse and copy from the marketplace. Defaults to private. */
+  visibility?: string | null;
+  /** Domain categories for marketplace browsing (e.g. e-commerce, healthcare, social). Defaults to empty array. */
+  categories?: string[] | null;
+  /** Freeform tags for search and discovery (e.g. products, orders, payments). Defaults to empty array. */
+  tags?: string[] | null;
+  /** The blueprint definition as a JSONB document. Contains tables[] (each with nodes[] for data behaviors via string shorthand or {"$type": "...", "data": {...}} objects, fields[], grants[], and policies[] using {"$type": "...", "data": {...}}), and relations[] (using $type for relation_type with junction config in data). This is the core payload that gets copied into a blueprint for execution. */
+  definition?: Record<string, unknown> | null;
+  /** Version of the definition format schema. Used for forward-compatible parsing. Defaults to 1. */
+  definitionSchemaVersion?: string | null;
+  /** Provenance of the template. user: manually created by a human. system: official curated template from the Constructive team. agent: AI-generated. Defaults to user. */
+  source?: string | null;
+  /** Complexity indicator for marketplace filtering. simple: 3-5 tables. moderate: 6-12 tables. complex: 13+ tables. NULL if not categorized. */
+  complexity?: string | null;
+  /** Denormalized count of how many blueprints have been created from this template via copy_template_to_blueprint(). Incremented automatically. Defaults to 0. */
+  copyCount?: number | null;
+  /** Denormalized count of how many derivative templates have been forked from this template. Defaults to 0. */
+  forkCount?: number | null;
+  /** If this template was forked from another template, the ID of the parent. NULL for original templates. */
+  forkedFromId?: string | null;
+  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication, provenance tracking, and cross-blueprint structural comparison. NULL columns are backend-computed — clients should never set this directly. */
+  definitionHash?: string | null;
+  /** JSONB map of table ref names to their individual UUIDv5 content hashes (e.g. {"products": "uuid", "categories": "uuid"}). Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across different blueprints. Backend-computed via trigger. */
+  tableHashes?: Record<string, unknown> | null;
+  /** Timestamp when this template was created. */
+  createdAt?: string | null;
+  /** Timestamp when this template was last modified. */
+  updatedAt?: string | null;
 }
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
@@ -1699,7 +1370,7 @@ export interface DatabaseProvisionModule {
   /** Base domain for the database (e.g., example.com) */
   domain?: string | null;
   /** Array of module IDs to install, or ["all"] for all modules */
-  modules?: string | null;
+  modules?: string[] | null;
   /** Additional configuration options for provisioning */
   options?: Record<string, unknown> | null;
   /** When true, copies the owner user and password hash from source database to the newly provisioned database */
@@ -1712,18 +1383,6 @@ export interface DatabaseProvisionModule {
   createdAt?: string | null;
   updatedAt?: string | null;
   completedAt?: string | null;
-  /** TRGM similarity when searching `databaseName`. Returns null when no trgm search filter is active. */
-  databaseNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `subdomain`. Returns null when no trgm search filter is active. */
-  subdomainTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `domain`. Returns null when no trgm search filter is active. */
-  domainTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `status`. Returns null when no trgm search filter is active. */
-  statusTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `errorMessage`. Returns null when no trgm search filter is active. */
-  errorMessageTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Records of admin role grants and revocations between members */
 export interface AppAdminGrant {
@@ -1855,10 +1514,6 @@ export interface OrgChartEdge {
   positionTitle?: string | null;
   /** Numeric seniority level for this position (higher = more senior) */
   positionLevel?: number | null;
-  /** TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active. */
-  positionTitleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table */
 export interface OrgChartEdgeGrant {
@@ -1869,7 +1524,7 @@ export interface OrgChartEdgeGrant {
   childId?: string | null;
   /** User ID of the manager being assigned; NULL for top-level positions */
   parentId?: string | null;
-  /** User ID of the admin who performed this grant or revocation */
+  /** User ID of the admin who performed this grant or revocation; NULL if grantor was deleted */
   grantorId?: string | null;
   /** TRUE to add/update the edge, FALSE to remove it */
   isGrant?: boolean | null;
@@ -1879,10 +1534,14 @@ export interface OrgChartEdgeGrant {
   positionLevel?: number | null;
   /** Timestamp when this grant or revocation was recorded */
   createdAt?: string | null;
-  /** TRGM similarity when searching `positionTitle`. Returns null when no trgm search filter is active. */
-  positionTitleTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
+}
+/** Stores the default permission bitmask assigned to new members upon joining */
+export interface OrgPermissionDefault {
+  id: string;
+  /** Default permission bitmask applied to new members */
+  permissions?: string | null;
+  /** References the entity these default permissions apply to */
+  entityId?: string | null;
 }
 /** Tracks per-actor usage counts against configurable maximum limits */
 export interface AppLimit {
@@ -1931,6 +1590,76 @@ export interface AppAchievement {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+/** Defines available levels that users can achieve by completing requirements */
+export interface AppLevel {
+  id: string;
+  /** Unique name of the level */
+  name?: string | null;
+  /** Human-readable description of what this level represents */
+  description?: string | null;
+  /** Badge or icon image associated with this level */
+  image?: ConstructiveInternalTypeImage | null;
+  /** Optional owner (actor) who created or manages this level */
+  ownerId?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** User email addresses with verification and primary-email management */
+export interface Email {
+  id: string;
+  ownerId?: string | null;
+  /** The email address */
+  email?: ConstructiveInternalTypeEmail | null;
+  /** Whether the email address has been verified via confirmation link */
+  isVerified?: boolean | null;
+  /** Whether this is the user's primary email address */
+  isPrimary?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** User phone numbers with country code, verification, and primary-number management */
+export interface PhoneNumber {
+  id: string;
+  ownerId?: string | null;
+  /** Country calling code (e.g. +1, +44) */
+  cc?: string | null;
+  /** The phone number without country code */
+  number?: string | null;
+  /** Whether the phone number has been verified via SMS code */
+  isVerified?: boolean | null;
+  /** Whether this is the user's primary phone number */
+  isPrimary?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** Cryptocurrency wallet addresses owned by users, with network-specific validation and verification */
+export interface CryptoAddress {
+  id: string;
+  ownerId?: string | null;
+  /** The cryptocurrency wallet address, validated against network-specific patterns */
+  address?: string | null;
+  /** Whether ownership of this address has been cryptographically verified */
+  isVerified?: boolean | null;
+  /** Whether this is the user's primary cryptocurrency address */
+  isPrimary?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+/** OAuth and social login connections linking external service accounts to users */
+export interface ConnectedAccount {
+  id: string;
+  ownerId?: string | null;
+  /** The service used, e.g. `twitter` or `github`. */
+  service?: string | null;
+  /** A unique identifier for the user within the service */
+  identifier?: string | null;
+  /** Additional profile details extracted from this login method */
+  details?: Record<string, unknown> | null;
+  /** Whether this connected account has been verified */
+  isVerified?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
 /** Invitation records sent to prospective members via email, with token-based redemption and expiration */
 export interface Invite {
   id: string;
@@ -1954,10 +1683,6 @@ export interface Invite {
   expiresAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active. */
-  inviteTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Records of successfully claimed invitations, linking senders to receivers */
 export interface ClaimedInvite {
@@ -1997,10 +1722,6 @@ export interface OrgInvite {
   createdAt?: string | null;
   updatedAt?: string | null;
   entityId?: string | null;
-  /** TRGM similarity when searching `inviteToken`. Returns null when no trgm search filter is active. */
-  inviteTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Records of successfully claimed invitations, linking senders to receivers */
 export interface OrgClaimedInvite {
@@ -2015,6 +1736,24 @@ export interface OrgClaimedInvite {
   updatedAt?: string | null;
   entityId?: string | null;
 }
+/** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
+export interface AuditLog {
+  id: string;
+  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
+  event?: string | null;
+  /** User who performed the authentication action; NULL if user was deleted */
+  actorId?: string | null;
+  /** Request origin (domain) where the auth event occurred */
+  origin?: ConstructiveInternalTypeOrigin | null;
+  /** Browser or client user-agent string from the request */
+  userAgent?: string | null;
+  /** IP address of the client that initiated the auth event */
+  ipAddress?: string | null;
+  /** Whether the authentication attempt succeeded */
+  success?: boolean | null;
+  /** Timestamp when the audit event was recorded */
+  createdAt?: string | null;
+}
 /** A ref is a data structure for pointing to a commit. */
 export interface Ref {
   /** The primary unique identifier for the ref. */
@@ -2024,10 +1763,6 @@ export interface Ref {
   databaseId?: string | null;
   storeId?: string | null;
   commitId?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A store represents an isolated object repository within a database. */
 export interface Store {
@@ -2040,10 +1775,6 @@ export interface Store {
   /** The current head tree_id for this store. */
   hash?: string | null;
   createdAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Stores the default permission bitmask assigned to new members upon joining */
 export interface AppPermissionDefault {
@@ -2051,55 +1782,9 @@ export interface AppPermissionDefault {
   /** Default permission bitmask applied to new members */
   permissions?: string | null;
 }
-/** Cryptocurrency wallet addresses owned by users, with network-specific validation and verification */
-export interface CryptoAddress {
-  id: string;
-  ownerId?: string | null;
-  /** The cryptocurrency wallet address, validated against network-specific patterns */
-  address?: string | null;
-  /** Whether ownership of this address has been cryptographically verified */
-  isVerified?: boolean | null;
-  /** Whether this is the user's primary cryptocurrency address */
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `address`. Returns null when no trgm search filter is active. */
-  addressTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
 export interface RoleType {
   id: number;
   name?: string | null;
-}
-/** Stores the default permission bitmask assigned to new members upon joining */
-export interface OrgPermissionDefault {
-  id: string;
-  /** Default permission bitmask applied to new members */
-  permissions?: string | null;
-  /** References the entity these default permissions apply to */
-  entityId?: string | null;
-}
-/** User phone numbers with country code, verification, and primary-number management */
-export interface PhoneNumber {
-  id: string;
-  ownerId?: string | null;
-  /** Country calling code (e.g. +1, +44) */
-  cc?: string | null;
-  /** The phone number without country code */
-  number?: string | null;
-  /** Whether the phone number has been verified via SMS code */
-  isVerified?: boolean | null;
-  /** Whether this is the user's primary phone number */
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `cc`. Returns null when no trgm search filter is active. */
-  ccTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `number`. Returns null when no trgm search filter is active. */
-  numberTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Default maximum values for each named limit, applied when no per-actor override exists */
 export interface AppLimitDefault {
@@ -2117,27 +1802,6 @@ export interface OrgLimitDefault {
   /** Default maximum usage allowed for this limit */
   max?: number | null;
 }
-/** OAuth and social login connections linking external service accounts to users */
-export interface ConnectedAccount {
-  id: string;
-  ownerId?: string | null;
-  /** The service used, e.g. `twitter` or `github`. */
-  service?: string | null;
-  /** A unique identifier for the user within the service */
-  identifier?: string | null;
-  /** Additional profile details extracted from this login method */
-  details?: Record<string, unknown> | null;
-  /** Whether this connected account has been verified */
-  isVerified?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `service`. Returns null when no trgm search filter is active. */
-  serviceTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `identifier`. Returns null when no trgm search filter is active. */
-  identifierTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
 /** Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). */
 export interface NodeTypeRegistry {
   /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, FieldImmutable) */
@@ -2153,21 +1817,9 @@ export interface NodeTypeRegistry {
   /** JSON Schema defining valid parameters for this node type */
   parameterSchema?: Record<string, unknown> | null;
   /** Tags for categorization and filtering (e.g., ownership, membership, temporal, rls) */
-  tags?: string | null;
+  tags?: string[] | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `slug`. Returns null when no trgm search filter is active. */
-  slugTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `category`. Returns null when no trgm search filter is active. */
-  categoryTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active. */
-  displayNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
 export interface MembershipType {
@@ -2179,12 +1831,6 @@ export interface MembershipType {
   description?: string | null;
   /** Short prefix used to namespace tables and functions for this membership scope */
   prefix?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A commit records changes to the repository. */
 export interface Commit {
@@ -2196,7 +1842,7 @@ export interface Commit {
   databaseId?: string | null;
   storeId?: string | null;
   /** Parent commits */
-  parentIds?: string | null;
+  parentIds?: string[] | null;
   /** The author of the commit */
   authorId?: string | null;
   /** The committer of the commit */
@@ -2204,10 +1850,6 @@ export interface Commit {
   /** The root of the tree */
   treeId?: string | null;
   date?: string | null;
-  /** TRGM similarity when searching `message`. Returns null when no trgm search filter is active. */
-  messageTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface AppMembershipDefault {
@@ -2233,16 +1875,6 @@ export interface RlsModule {
   authenticateStrict?: string | null;
   currentRole?: string | null;
   currentRoleId?: string | null;
-  /** TRGM similarity when searching `authenticate`. Returns null when no trgm search filter is active. */
-  authenticateTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `authenticateStrict`. Returns null when no trgm search filter is active. */
-  authenticateStrictTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `currentRole`. Returns null when no trgm search filter is active. */
-  currentRoleTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `currentRoleId`. Returns null when no trgm search filter is active. */
-  currentRoleIdTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface OrgMembershipDefault {
@@ -2260,52 +1892,12 @@ export interface OrgMembershipDefault {
   /** When a group is created, whether to auto-add existing org members as group members */
   createGroupsCascadeMembers?: boolean | null;
 }
-/** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
-export interface AuditLog {
-  id: string;
-  /** Type of authentication event (e.g. sign_in, sign_up, password_change, verify_email) */
-  event?: string | null;
-  /** User who performed the authentication action */
-  actorId?: string | null;
-  /** Request origin (domain) where the auth event occurred */
-  origin?: ConstructiveInternalTypeOrigin | null;
-  /** Browser or client user-agent string from the request */
-  userAgent?: string | null;
-  /** IP address of the client that initiated the auth event */
-  ipAddress?: string | null;
-  /** Whether the authentication attempt succeeded */
-  success?: boolean | null;
-  /** Timestamp when the audit event was recorded */
-  createdAt?: string | null;
-  /** TRGM similarity when searching `userAgent`. Returns null when no trgm search filter is active. */
-  userAgentTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
-/** Defines available levels that users can achieve by completing requirements */
-export interface AppLevel {
-  id: string;
-  /** Unique name of the level */
-  name?: string | null;
-  /** Human-readable description of what this level represents */
-  description?: string | null;
-  /** Badge or icon image associated with this level */
-  image?: ConstructiveInternalTypeImage | null;
-  /** Optional owner (actor) who created or manages this level */
-  ownerId?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  /** TRGM similarity when searching `description`. Returns null when no trgm search filter is active. */
-  descriptionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
 export interface SqlMigration {
   id: number;
   name?: string | null;
   databaseId?: string | null;
   deploy?: string | null;
-  deps?: string | null;
+  deps?: string[] | null;
   payload?: Record<string, unknown> | null;
   content?: string | null;
   revert?: string | null;
@@ -2314,33 +1906,6 @@ export interface SqlMigration {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `deploy`. Returns null when no trgm search filter is active. */
-  deployTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `content`. Returns null when no trgm search filter is active. */
-  contentTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `revert`. Returns null when no trgm search filter is active. */
-  revertTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `verify`. Returns null when no trgm search filter is active. */
-  verifyTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `action`. Returns null when no trgm search filter is active. */
-  actionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
-/** User email addresses with verification and primary-email management */
-export interface Email {
-  id: string;
-  ownerId?: string | null;
-  /** The email address */
-  email?: ConstructiveInternalTypeEmail | null;
-  /** Whether the email address has been verified via confirmation link */
-  isVerified?: boolean | null;
-  /** Whether this is the user's primary email address */
-  isPrimary?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
 }
 export interface User {
   id: string;
@@ -2355,14 +1920,14 @@ export interface User {
   searchTsvRank?: number | null;
   /** TRGM similarity when searching `displayName`. Returns null when no trgm search filter is active. */
   displayNameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
+  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Supports per-table weight customization via @searchConfig smart tag. Returns null when no search filters are active. */
   searchScore?: number | null;
 }
 export interface AstMigration {
   id: number;
   databaseId?: string | null;
   name?: string | null;
-  requires?: string | null;
+  requires?: string[] | null;
   payload?: Record<string, unknown> | null;
   deploys?: string | null;
   deploy?: Record<string, unknown> | null;
@@ -2372,10 +1937,6 @@ export interface AstMigration {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  /** TRGM similarity when searching `action`. Returns null when no trgm search filter is active. */
-  actionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status */
 export interface AppMembership {
@@ -2427,28 +1988,6 @@ export interface HierarchyModule {
   getManagersFunction?: string | null;
   isManagerOfFunction?: string | null;
   createdAt?: string | null;
-  /** TRGM similarity when searching `chartEdgesTableName`. Returns null when no trgm search filter is active. */
-  chartEdgesTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `hierarchySprtTableName`. Returns null when no trgm search filter is active. */
-  hierarchySprtTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `chartEdgeGrantsTableName`. Returns null when no trgm search filter is active. */
-  chartEdgeGrantsTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `prefix`. Returns null when no trgm search filter is active. */
-  prefixTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `privateSchemaName`. Returns null when no trgm search filter is active. */
-  privateSchemaNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `sprtTableName`. Returns null when no trgm search filter is active. */
-  sprtTableNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `rebuildHierarchyFunction`. Returns null when no trgm search filter is active. */
-  rebuildHierarchyFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getSubordinatesFunction`. Returns null when no trgm search filter is active. */
-  getSubordinatesFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `getManagersFunction`. Returns null when no trgm search filter is active. */
-  getManagersFunctionTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `isManagerOfFunction`. Returns null when no trgm search filter is active. */
-  isManagerOfFunctionTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -2463,9 +2002,9 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
+export interface GetAllRecordRelations {}
 export interface OrgGetManagersRecordRelations {}
 export interface OrgGetSubordinatesRecordRelations {}
-export interface GetAllRecordRelations {}
 export interface ObjectRelations {}
 export interface AppPermissionRelations {}
 export interface OrgPermissionRelations {}
@@ -2492,6 +2031,9 @@ export interface DatabaseRelations {
   viewGrants?: ConnectionResult<ViewGrant>;
   viewRules?: ConnectionResult<ViewRule>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
+  enums?: ConnectionResult<Enum>;
+  embeddingChunks?: ConnectionResult<EmbeddingChunk>;
+  databaseTransfers?: ConnectionResult<DatabaseTransfer>;
   apis?: ConnectionResult<Api>;
   apiModules?: ConnectionResult<ApiModule>;
   apiSchemas?: ConnectionResult<ApiSchema>;
@@ -2521,10 +2063,10 @@ export interface DatabaseRelations {
   sessionsModules?: ConnectionResult<SessionsModule>;
   userAuthModules?: ConnectionResult<UserAuthModule>;
   usersModules?: ConnectionResult<UsersModule>;
-  uuidModules?: ConnectionResult<UuidModule>;
   tableTemplateModules?: ConnectionResult<TableTemplateModule>;
   secureTableProvisions?: ConnectionResult<SecureTableProvision>;
   relationProvisions?: ConnectionResult<RelationProvision>;
+  blueprints?: ConnectionResult<Blueprint>;
   databaseProvisionModules?: ConnectionResult<DatabaseProvisionModule>;
 }
 export interface SchemaRelations {
@@ -2533,6 +2075,7 @@ export interface SchemaRelations {
   schemaGrants?: ConnectionResult<SchemaGrant>;
   views?: ConnectionResult<View>;
   defaultPrivileges?: ConnectionResult<DefaultPrivilege>;
+  enums?: ConnectionResult<Enum>;
   apiSchemas?: ConnectionResult<ApiSchema>;
   tableTemplateModulesByPrivateSchemaId?: ConnectionResult<TableTemplateModule>;
   tableTemplateModules?: ConnectionResult<TableTemplateModule>;
@@ -2553,6 +2096,8 @@ export interface TableRelations {
   uniqueConstraints?: ConnectionResult<UniqueConstraint>;
   views?: ConnectionResult<View>;
   viewTables?: ConnectionResult<ViewTable>;
+  embeddingChunksByChunksTableId?: ConnectionResult<EmbeddingChunk>;
+  embeddingChunks?: ConnectionResult<EmbeddingChunk>;
   tableTemplateModulesByOwnerTableId?: ConnectionResult<TableTemplateModule>;
   tableTemplateModules?: ConnectionResult<TableTemplateModule>;
   secureTableProvisions?: ConnectionResult<SecureTableProvision>;
@@ -2620,6 +2165,13 @@ export interface ViewRuleRelations {
   database?: Database | null;
   view?: View | null;
 }
+export interface EmbeddingChunkRelations {
+  chunksTable?: Table | null;
+  database?: Database | null;
+  embeddingField?: Field | null;
+  parentFkField?: Field | null;
+  table?: Table | null;
+}
 export interface TableTemplateModuleRelations {
   database?: Database | null;
   ownerTable?: Table | null;
@@ -2642,6 +2194,10 @@ export interface SchemaGrantRelations {
   schema?: Schema | null;
 }
 export interface DefaultPrivilegeRelations {
+  database?: Database | null;
+  schema?: Schema | null;
+}
+export interface EnumRelations {
   database?: Database | null;
   schema?: Schema | null;
 }
@@ -2672,6 +2228,9 @@ export interface SiteThemeRelations {
   site?: Site | null;
 }
 export interface TriggerFunctionRelations {
+  database?: Database | null;
+}
+export interface DatabaseTransferRelations {
   database?: Database | null;
 }
 export interface ApiRelations {
@@ -2852,9 +2411,14 @@ export interface UsersModuleRelations {
   table?: Table | null;
   typeTable?: Table | null;
 }
-export interface UuidModuleRelations {
+export interface BlueprintRelations {
   database?: Database | null;
-  schema?: Schema | null;
+  template?: BlueprintTemplate | null;
+}
+export interface BlueprintTemplateRelations {
+  forkedFrom?: BlueprintTemplate | null;
+  blueprintTemplatesByForkedFromId?: ConnectionResult<BlueprintTemplate>;
+  blueprintsByTemplateId?: ConnectionResult<Blueprint>;
 }
 export interface DatabaseProvisionModuleRelations {
   database?: Database | null;
@@ -2905,6 +2469,9 @@ export interface OrgChartEdgeGrantRelations {
   grantor?: User | null;
   parent?: User | null;
 }
+export interface OrgPermissionDefaultRelations {
+  entity?: User | null;
+}
 export interface AppLimitRelations {
   actor?: User | null;
 }
@@ -2917,6 +2484,21 @@ export interface AppStepRelations {
 }
 export interface AppAchievementRelations {
   actor?: User | null;
+}
+export interface AppLevelRelations {
+  owner?: User | null;
+}
+export interface EmailRelations {
+  owner?: User | null;
+}
+export interface PhoneNumberRelations {
+  owner?: User | null;
+}
+export interface CryptoAddressRelations {
+  owner?: User | null;
+}
+export interface ConnectedAccountRelations {
+  owner?: User | null;
 }
 export interface InviteRelations {
   sender?: User | null;
@@ -2935,24 +2517,15 @@ export interface OrgClaimedInviteRelations {
   receiver?: User | null;
   sender?: User | null;
 }
+export interface AuditLogRelations {
+  actor?: User | null;
+}
 export interface RefRelations {}
 export interface StoreRelations {}
 export interface AppPermissionDefaultRelations {}
-export interface CryptoAddressRelations {
-  owner?: User | null;
-}
 export interface RoleTypeRelations {}
-export interface OrgPermissionDefaultRelations {
-  entity?: User | null;
-}
-export interface PhoneNumberRelations {
-  owner?: User | null;
-}
 export interface AppLimitDefaultRelations {}
 export interface OrgLimitDefaultRelations {}
-export interface ConnectedAccountRelations {
-  owner?: User | null;
-}
 export interface NodeTypeRegistryRelations {}
 export interface MembershipTypeRelations {}
 export interface CommitRelations {}
@@ -2968,32 +2541,29 @@ export interface RlsModuleRelations {
 export interface OrgMembershipDefaultRelations {
   entity?: User | null;
 }
-export interface AuditLogRelations {
-  actor?: User | null;
-}
-export interface AppLevelRelations {
-  owner?: User | null;
-}
 export interface SqlMigrationRelations {}
-export interface EmailRelations {
-  owner?: User | null;
-}
 export interface UserRelations {
   roleType?: RoleType | null;
   appMembershipByActorId?: AppMembership | null;
   orgMembershipDefaultByEntityId?: OrgMembershipDefault | null;
   ownedDatabases?: ConnectionResult<Database>;
+  appAdminGrantsByActorId?: ConnectionResult<AppAdminGrant>;
   appAdminGrantsByGrantorId?: ConnectionResult<AppAdminGrant>;
+  appOwnerGrantsByActorId?: ConnectionResult<AppOwnerGrant>;
   appOwnerGrantsByGrantorId?: ConnectionResult<AppOwnerGrant>;
+  appGrantsByActorId?: ConnectionResult<AppGrant>;
   appGrantsByGrantorId?: ConnectionResult<AppGrant>;
   orgMembershipsByActorId?: ConnectionResult<OrgMembership>;
   orgMembershipsByEntityId?: ConnectionResult<OrgMembership>;
   orgMembersByActorId?: ConnectionResult<OrgMember>;
   orgMembersByEntityId?: ConnectionResult<OrgMember>;
+  orgAdminGrantsByActorId?: ConnectionResult<OrgAdminGrant>;
   orgAdminGrantsByEntityId?: ConnectionResult<OrgAdminGrant>;
   orgAdminGrantsByGrantorId?: ConnectionResult<OrgAdminGrant>;
+  orgOwnerGrantsByActorId?: ConnectionResult<OrgOwnerGrant>;
   orgOwnerGrantsByEntityId?: ConnectionResult<OrgOwnerGrant>;
   orgOwnerGrantsByGrantorId?: ConnectionResult<OrgOwnerGrant>;
+  orgGrantsByActorId?: ConnectionResult<OrgGrant>;
   orgGrantsByEntityId?: ConnectionResult<OrgGrant>;
   orgGrantsByGrantorId?: ConnectionResult<OrgGrant>;
   parentOrgChartEdges?: ConnectionResult<OrgChartEdge>;
@@ -3003,18 +2573,27 @@ export interface UserRelations {
   orgChartEdgeGrantsByEntityId?: ConnectionResult<OrgChartEdgeGrant>;
   orgChartEdgeGrantsByGrantorId?: ConnectionResult<OrgChartEdgeGrant>;
   childOrgChartEdgeGrants?: ConnectionResult<OrgChartEdgeGrant>;
+  orgPermissionDefaultsByEntityId?: ConnectionResult<OrgPermissionDefault>;
   appLimitsByActorId?: ConnectionResult<AppLimit>;
   orgLimitsByActorId?: ConnectionResult<OrgLimit>;
   orgLimitsByEntityId?: ConnectionResult<OrgLimit>;
   appStepsByActorId?: ConnectionResult<AppStep>;
   appAchievementsByActorId?: ConnectionResult<AppAchievement>;
+  ownedAppLevels?: ConnectionResult<AppLevel>;
+  ownedEmails?: ConnectionResult<Email>;
+  ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
+  ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
+  ownedConnectedAccounts?: ConnectionResult<ConnectedAccount>;
   invitesBySenderId?: ConnectionResult<Invite>;
   claimedInvitesByReceiverId?: ConnectionResult<ClaimedInvite>;
   claimedInvitesBySenderId?: ConnectionResult<ClaimedInvite>;
   orgInvitesByEntityId?: ConnectionResult<OrgInvite>;
+  orgInvitesByReceiverId?: ConnectionResult<OrgInvite>;
   orgInvitesBySenderId?: ConnectionResult<OrgInvite>;
+  orgClaimedInvitesByEntityId?: ConnectionResult<OrgClaimedInvite>;
   orgClaimedInvitesByReceiverId?: ConnectionResult<OrgClaimedInvite>;
   orgClaimedInvitesBySenderId?: ConnectionResult<OrgClaimedInvite>;
+  auditLogsByActorId?: ConnectionResult<AuditLog>;
 }
 export interface AstMigrationRelations {}
 export interface AppMembershipRelations {
@@ -3031,11 +2610,11 @@ export interface HierarchyModuleRelations {
   usersTable?: Table | null;
 }
 // ============ Entity Types With Relations ============
+export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type OrgGetManagersRecordWithRelations = OrgGetManagersRecord &
   OrgGetManagersRecordRelations;
 export type OrgGetSubordinatesRecordWithRelations = OrgGetSubordinatesRecord &
   OrgGetSubordinatesRecordRelations;
-export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type ObjectWithRelations = Object & ObjectRelations;
 export type AppPermissionWithRelations = AppPermission & AppPermissionRelations;
 export type OrgPermissionWithRelations = OrgPermission & OrgPermissionRelations;
@@ -3059,12 +2638,14 @@ export type ViewWithRelations = View & ViewRelations;
 export type ViewTableWithRelations = ViewTable & ViewTableRelations;
 export type ViewGrantWithRelations = ViewGrant & ViewGrantRelations;
 export type ViewRuleWithRelations = ViewRule & ViewRuleRelations;
+export type EmbeddingChunkWithRelations = EmbeddingChunk & EmbeddingChunkRelations;
 export type TableTemplateModuleWithRelations = TableTemplateModule & TableTemplateModuleRelations;
 export type SecureTableProvisionWithRelations = SecureTableProvision &
   SecureTableProvisionRelations;
 export type RelationProvisionWithRelations = RelationProvision & RelationProvisionRelations;
 export type SchemaGrantWithRelations = SchemaGrant & SchemaGrantRelations;
 export type DefaultPrivilegeWithRelations = DefaultPrivilege & DefaultPrivilegeRelations;
+export type EnumWithRelations = Enum & EnumRelations;
 export type ApiSchemaWithRelations = ApiSchema & ApiSchemaRelations;
 export type ApiModuleWithRelations = ApiModule & ApiModuleRelations;
 export type DomainWithRelations = Domain & DomainRelations;
@@ -3072,6 +2653,7 @@ export type SiteMetadatumWithRelations = SiteMetadatum & SiteMetadatumRelations;
 export type SiteModuleWithRelations = SiteModule & SiteModuleRelations;
 export type SiteThemeWithRelations = SiteTheme & SiteThemeRelations;
 export type TriggerFunctionWithRelations = TriggerFunction & TriggerFunctionRelations;
+export type DatabaseTransferWithRelations = DatabaseTransfer & DatabaseTransferRelations;
 export type ApiWithRelations = Api & ApiRelations;
 export type SiteWithRelations = Site & SiteRelations;
 export type AppWithRelations = App & AppRelations;
@@ -3100,7 +2682,8 @@ export type SecretsModuleWithRelations = SecretsModule & SecretsModuleRelations;
 export type SessionsModuleWithRelations = SessionsModule & SessionsModuleRelations;
 export type UserAuthModuleWithRelations = UserAuthModule & UserAuthModuleRelations;
 export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
-export type UuidModuleWithRelations = UuidModule & UuidModuleRelations;
+export type BlueprintWithRelations = Blueprint & BlueprintRelations;
+export type BlueprintTemplateWithRelations = BlueprintTemplate & BlueprintTemplateRelations;
 export type DatabaseProvisionModuleWithRelations = DatabaseProvisionModule &
   DatabaseProvisionModuleRelations;
 export type AppAdminGrantWithRelations = AppAdminGrant & AppAdminGrantRelations;
@@ -3113,26 +2696,29 @@ export type OrgOwnerGrantWithRelations = OrgOwnerGrant & OrgOwnerGrantRelations;
 export type OrgGrantWithRelations = OrgGrant & OrgGrantRelations;
 export type OrgChartEdgeWithRelations = OrgChartEdge & OrgChartEdgeRelations;
 export type OrgChartEdgeGrantWithRelations = OrgChartEdgeGrant & OrgChartEdgeGrantRelations;
+export type OrgPermissionDefaultWithRelations = OrgPermissionDefault &
+  OrgPermissionDefaultRelations;
 export type AppLimitWithRelations = AppLimit & AppLimitRelations;
 export type OrgLimitWithRelations = OrgLimit & OrgLimitRelations;
 export type AppStepWithRelations = AppStep & AppStepRelations;
 export type AppAchievementWithRelations = AppAchievement & AppAchievementRelations;
+export type AppLevelWithRelations = AppLevel & AppLevelRelations;
+export type EmailWithRelations = Email & EmailRelations;
+export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
+export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
+export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
 export type InviteWithRelations = Invite & InviteRelations;
 export type ClaimedInviteWithRelations = ClaimedInvite & ClaimedInviteRelations;
 export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type OrgClaimedInviteWithRelations = OrgClaimedInvite & OrgClaimedInviteRelations;
+export type AuditLogWithRelations = AuditLog & AuditLogRelations;
 export type RefWithRelations = Ref & RefRelations;
 export type StoreWithRelations = Store & StoreRelations;
 export type AppPermissionDefaultWithRelations = AppPermissionDefault &
   AppPermissionDefaultRelations;
-export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
-export type OrgPermissionDefaultWithRelations = OrgPermissionDefault &
-  OrgPermissionDefaultRelations;
-export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
-export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
 export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
 export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type CommitWithRelations = Commit & CommitRelations;
@@ -3141,15 +2727,16 @@ export type AppMembershipDefaultWithRelations = AppMembershipDefault &
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
 export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
   OrgMembershipDefaultRelations;
-export type AuditLogWithRelations = AuditLog & AuditLogRelations;
-export type AppLevelWithRelations = AppLevel & AppLevelRelations;
 export type SqlMigrationWithRelations = SqlMigration & SqlMigrationRelations;
-export type EmailWithRelations = Email & EmailRelations;
 export type UserWithRelations = User & UserRelations;
 export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
 export type AppMembershipWithRelations = AppMembership & AppMembershipRelations;
 export type HierarchyModuleWithRelations = HierarchyModule & HierarchyModuleRelations;
 // ============ Entity Select Types ============
+export type GetAllRecordSelect = {
+  path?: boolean;
+  data?: boolean;
+};
 export type OrgGetManagersRecordSelect = {
   userId?: boolean;
   depth?: boolean;
@@ -3157,10 +2744,6 @@ export type OrgGetManagersRecordSelect = {
 export type OrgGetSubordinatesRecordSelect = {
   userId?: boolean;
   depth?: boolean;
-};
-export type GetAllRecordSelect = {
-  path?: boolean;
-  data?: boolean;
 };
 export type ObjectSelect = {
   hashUuid?: boolean;
@@ -3178,8 +2761,6 @@ export type AppPermissionSelect = {
   bitnum?: boolean;
   bitstr?: boolean;
   description?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type OrgPermissionSelect = {
   id?: boolean;
@@ -3187,8 +2768,6 @@ export type OrgPermissionSelect = {
   bitnum?: boolean;
   bitstr?: boolean;
   description?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppLevelRequirementSelect = {
   id?: boolean;
@@ -3199,8 +2778,6 @@ export type AppLevelRequirementSelect = {
   priority?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type DatabaseSelect = {
   id?: boolean;
@@ -3211,10 +2788,6 @@ export type DatabaseSelect = {
   hash?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  schemaHashTrgmSimilarity?: boolean;
-  nameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   owner?: {
     select: UserSelect;
   };
@@ -3331,6 +2904,24 @@ export type DatabaseSelect = {
     first?: number;
     filter?: DefaultPrivilegeFilter;
     orderBy?: DefaultPrivilegeOrderBy[];
+  };
+  enums?: {
+    select: EnumSelect;
+    first?: number;
+    filter?: EnumFilter;
+    orderBy?: EnumOrderBy[];
+  };
+  embeddingChunks?: {
+    select: EmbeddingChunkSelect;
+    first?: number;
+    filter?: EmbeddingChunkFilter;
+    orderBy?: EmbeddingChunkOrderBy[];
+  };
+  databaseTransfers?: {
+    select: DatabaseTransferSelect;
+    first?: number;
+    filter?: DatabaseTransferFilter;
+    orderBy?: DatabaseTransferOrderBy[];
   };
   apis?: {
     select: ApiSelect;
@@ -3506,12 +3097,6 @@ export type DatabaseSelect = {
     filter?: UsersModuleFilter;
     orderBy?: UsersModuleOrderBy[];
   };
-  uuidModules?: {
-    select: UuidModuleSelect;
-    first?: number;
-    filter?: UuidModuleFilter;
-    orderBy?: UuidModuleOrderBy[];
-  };
   tableTemplateModules?: {
     select: TableTemplateModuleSelect;
     first?: number;
@@ -3529,6 +3114,12 @@ export type DatabaseSelect = {
     first?: number;
     filter?: RelationProvisionFilter;
     orderBy?: RelationProvisionOrderBy[];
+  };
+  blueprints?: {
+    select: BlueprintSelect;
+    first?: number;
+    filter?: BlueprintFilter;
+    orderBy?: BlueprintOrderBy[];
   };
   databaseProvisionModules?: {
     select: DatabaseProvisionModuleSelect;
@@ -3552,12 +3143,6 @@ export type SchemaSelect = {
   isPublic?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  schemaNameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3584,6 +3169,12 @@ export type SchemaSelect = {
     first?: number;
     filter?: DefaultPrivilegeFilter;
     orderBy?: DefaultPrivilegeOrderBy[];
+  };
+  enums?: {
+    select: EnumSelect;
+    first?: number;
+    filter?: EnumFilter;
+    orderBy?: EnumOrderBy[];
   };
   apiSchemas?: {
     select: ApiSchemaSelect;
@@ -3624,13 +3215,6 @@ export type TableSelect = {
   inheritsId?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  pluralNameTrgmSimilarity?: boolean;
-  singularNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3712,6 +3296,18 @@ export type TableSelect = {
     filter?: ViewTableFilter;
     orderBy?: ViewTableOrderBy[];
   };
+  embeddingChunksByChunksTableId?: {
+    select: EmbeddingChunkSelect;
+    first?: number;
+    filter?: EmbeddingChunkFilter;
+    orderBy?: EmbeddingChunkOrderBy[];
+  };
+  embeddingChunks?: {
+    select: EmbeddingChunkSelect;
+    first?: number;
+    filter?: EmbeddingChunkFilter;
+    orderBy?: EmbeddingChunkOrderBy[];
+  };
   tableTemplateModulesByOwnerTableId?: {
     select: TableTemplateModuleSelect;
     first?: number;
@@ -3758,10 +3354,6 @@ export type CheckConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3778,6 +3370,7 @@ export type FieldSelect = {
   description?: boolean;
   smartTags?: boolean;
   isRequired?: boolean;
+  apiRequired?: boolean;
   defaultValue?: boolean;
   defaultValueAst?: boolean;
   isHidden?: boolean;
@@ -3794,13 +3387,6 @@ export type FieldSelect = {
   scope?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  labelTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  defaultValueTrgmSimilarity?: boolean;
-  regexpTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3827,13 +3413,6 @@ export type ForeignKeyConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  deleteActionTrgmSimilarity?: boolean;
-  updateActionTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3881,10 +3460,6 @@ export type IndexSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  accessMethodTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3910,12 +3485,6 @@ export type PolicySelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  policyTypeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3937,10 +3506,6 @@ export type PrimaryKeyConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3958,9 +3523,6 @@ export type TableGrantSelect = {
   isGrant?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -3982,11 +3544,6 @@ export type TriggerSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  eventTrgmSimilarity?: boolean;
-  functionNameTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4009,11 +3566,6 @@ export type UniqueConstraintSelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  typeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4038,11 +3590,6 @@ export type ViewSelect = {
   module?: boolean;
   scope?: boolean;
   tags?: boolean;
-  nameTrgmSimilarity?: boolean;
-  viewTypeTrgmSimilarity?: boolean;
-  filterTypeTrgmSimilarity?: boolean;
-  moduleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4091,9 +3638,6 @@ export type ViewGrantSelect = {
   privilege?: boolean;
   withGrantOption?: boolean;
   isGrant?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4108,15 +3652,46 @@ export type ViewRuleSelect = {
   name?: boolean;
   event?: boolean;
   action?: boolean;
-  nameTrgmSimilarity?: boolean;
-  eventTrgmSimilarity?: boolean;
-  actionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
   view?: {
     select: ViewSelect;
+  };
+};
+export type EmbeddingChunkSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  tableId?: boolean;
+  embeddingFieldId?: boolean;
+  chunksTableId?: boolean;
+  chunksTableName?: boolean;
+  contentFieldName?: boolean;
+  dimensions?: boolean;
+  metric?: boolean;
+  chunkSize?: boolean;
+  chunkOverlap?: boolean;
+  chunkStrategy?: boolean;
+  metadataFields?: boolean;
+  enqueueChunkingJob?: boolean;
+  chunkingTaskName?: boolean;
+  parentFkFieldId?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  chunksTable?: {
+    select: TableSelect;
+  };
+  database?: {
+    select: DatabaseSelect;
+  };
+  embeddingField?: {
+    select: FieldSelect;
+  };
+  parentFkField?: {
+    select: FieldSelect;
+  };
+  table?: {
+    select: TableSelect;
   };
 };
 export type TableTemplateModuleSelect = {
@@ -4129,9 +3704,6 @@ export type TableTemplateModuleSelect = {
   tableName?: boolean;
   nodeType?: boolean;
   data?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4167,12 +3739,6 @@ export type SecureTableProvisionSelect = {
   policyName?: boolean;
   policyData?: boolean;
   outFields?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  policyTypeTrgmSimilarity?: boolean;
-  policyRoleTrgmSimilarity?: boolean;
-  policyNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4192,12 +3758,15 @@ export type RelationProvisionSelect = {
   fieldName?: boolean;
   deleteAction?: boolean;
   isRequired?: boolean;
+  apiRequired?: boolean;
   junctionTableId?: boolean;
   junctionTableName?: boolean;
   junctionSchemaId?: boolean;
   sourceFieldName?: boolean;
   targetFieldName?: boolean;
   useCompositeKey?: boolean;
+  createIndex?: boolean;
+  exposeInApi?: boolean;
   nodeType?: boolean;
   nodeData?: boolean;
   grantRoles?: boolean;
@@ -4212,17 +3781,6 @@ export type RelationProvisionSelect = {
   outJunctionTableId?: boolean;
   outSourceFieldId?: boolean;
   outTargetFieldId?: boolean;
-  relationTypeTrgmSimilarity?: boolean;
-  fieldNameTrgmSimilarity?: boolean;
-  deleteActionTrgmSimilarity?: boolean;
-  junctionTableNameTrgmSimilarity?: boolean;
-  sourceFieldNameTrgmSimilarity?: boolean;
-  targetFieldNameTrgmSimilarity?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  policyTypeTrgmSimilarity?: boolean;
-  policyRoleTrgmSimilarity?: boolean;
-  policyNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4240,8 +3798,6 @@ export type SchemaGrantSelect = {
   granteeName?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4257,10 +3813,26 @@ export type DefaultPrivilegeSelect = {
   privilege?: boolean;
   granteeName?: boolean;
   isGrant?: boolean;
-  objectTypeTrgmSimilarity?: boolean;
-  privilegeTrgmSimilarity?: boolean;
-  granteeNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
+  };
+};
+export type EnumSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  name?: boolean;
+  label?: boolean;
+  description?: boolean;
+  values?: boolean;
+  smartTags?: boolean;
+  category?: boolean;
+  module?: boolean;
+  scope?: boolean;
+  tags?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4289,8 +3861,6 @@ export type ApiModuleSelect = {
   apiId?: boolean;
   name?: boolean;
   data?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   api?: {
     select: ApiSelect;
   };
@@ -4322,9 +3892,6 @@ export type SiteMetadatumSelect = {
   title?: boolean;
   description?: boolean;
   ogImage?: boolean;
-  titleTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4338,8 +3905,6 @@ export type SiteModuleSelect = {
   siteId?: boolean;
   name?: boolean;
   data?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4366,9 +3931,25 @@ export type TriggerFunctionSelect = {
   code?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  codeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+};
+export type DatabaseTransferSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  targetOwnerId?: boolean;
+  sourceApproved?: boolean;
+  targetApproved?: boolean;
+  sourceApprovedAt?: boolean;
+  targetApprovedAt?: boolean;
+  status?: boolean;
+  initiatedBy?: boolean;
+  notes?: boolean;
+  expiresAt?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  completedAt?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4381,11 +3962,6 @@ export type ApiSelect = {
   roleName?: boolean;
   anonRole?: boolean;
   isPublic?: boolean;
-  nameTrgmSimilarity?: boolean;
-  dbnameTrgmSimilarity?: boolean;
-  roleNameTrgmSimilarity?: boolean;
-  anonRoleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4418,10 +3994,6 @@ export type SiteSelect = {
   appleTouchIcon?: boolean;
   logo?: boolean;
   dbname?: boolean;
-  titleTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  dbnameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4463,10 +4035,6 @@ export type AppSelect = {
   appStoreId?: boolean;
   appIdPrefix?: boolean;
   playStoreLink?: boolean;
-  nameTrgmSimilarity?: boolean;
-  appStoreIdTrgmSimilarity?: boolean;
-  appIdPrefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   site?: {
     select: SiteSelect;
   };
@@ -4482,8 +4050,6 @@ export type ConnectedAccountsModuleSelect = {
   tableId?: boolean;
   ownerTableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4509,9 +4075,6 @@ export type CryptoAddressesModuleSelect = {
   ownerTableId?: boolean;
   tableName?: boolean;
   cryptoNetwork?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  cryptoNetworkTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4543,13 +4106,6 @@ export type CryptoAuthModuleSelect = {
   signInRecordFailure?: boolean;
   signUpWithKey?: boolean;
   signInWithChallenge?: boolean;
-  userFieldTrgmSimilarity?: boolean;
-  cryptoNetworkTrgmSimilarity?: boolean;
-  signInRequestChallengeTrgmSimilarity?: boolean;
-  signInRecordFailureTrgmSimilarity?: boolean;
-  signUpWithKeyTrgmSimilarity?: boolean;
-  signInWithChallengeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4589,8 +4145,6 @@ export type DenormalizedTableFieldSelect = {
   updateDefaults?: boolean;
   funcName?: boolean;
   funcOrder?: boolean;
-  funcNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4615,8 +4169,6 @@ export type EmailsModuleSelect = {
   tableId?: boolean;
   ownerTableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4639,8 +4191,6 @@ export type EncryptedSecretsModuleSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4661,8 +4211,6 @@ export type FieldModuleSelect = {
   data?: boolean;
   triggers?: boolean;
   functions?: boolean;
-  nodeTypeTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4691,11 +4239,6 @@ export type InvitesModuleSelect = {
   prefix?: boolean;
   membershipType?: boolean;
   entityTableId?: boolean;
-  invitesTableNameTrgmSimilarity?: boolean;
-  claimedInvitesTableNameTrgmSimilarity?: boolean;
-  submitInviteCodeFunctionTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   claimedInvitesTable?: {
     select: TableSelect;
   };
@@ -4748,22 +4291,6 @@ export type LevelsModuleSelect = {
   membershipType?: boolean;
   entityTableId?: boolean;
   actorTableId?: boolean;
-  stepsTableNameTrgmSimilarity?: boolean;
-  achievementsTableNameTrgmSimilarity?: boolean;
-  levelsTableNameTrgmSimilarity?: boolean;
-  levelRequirementsTableNameTrgmSimilarity?: boolean;
-  completedStepTrgmSimilarity?: boolean;
-  incompletedStepTrgmSimilarity?: boolean;
-  tgAchievementTrgmSimilarity?: boolean;
-  tgAchievementToggleTrgmSimilarity?: boolean;
-  tgAchievementToggleBooleanTrgmSimilarity?: boolean;
-  tgAchievementBooleanTrgmSimilarity?: boolean;
-  upsertAchievementTrgmSimilarity?: boolean;
-  tgUpdateAchievementsTrgmSimilarity?: boolean;
-  stepsRequiredTrgmSimilarity?: boolean;
-  levelAchievedTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   achievementsTable?: {
     select: TableSelect;
   };
@@ -4811,16 +4338,6 @@ export type LimitsModuleSelect = {
   membershipType?: boolean;
   entityTableId?: boolean;
   actorTableId?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  defaultTableNameTrgmSimilarity?: boolean;
-  limitIncrementFunctionTrgmSimilarity?: boolean;
-  limitDecrementFunctionTrgmSimilarity?: boolean;
-  limitIncrementTriggerTrgmSimilarity?: boolean;
-  limitDecrementTriggerTrgmSimilarity?: boolean;
-  limitUpdateTriggerTrgmSimilarity?: boolean;
-  limitCheckFunctionTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -4849,8 +4366,6 @@ export type MembershipTypesModuleSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -4893,19 +4408,6 @@ export type MembershipsModuleSelect = {
   entityIdsByMask?: boolean;
   entityIdsByPerm?: boolean;
   entityIdsFunction?: boolean;
-  membershipsTableNameTrgmSimilarity?: boolean;
-  membersTableNameTrgmSimilarity?: boolean;
-  membershipDefaultsTableNameTrgmSimilarity?: boolean;
-  grantsTableNameTrgmSimilarity?: boolean;
-  adminGrantsTableNameTrgmSimilarity?: boolean;
-  ownerGrantsTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  actorMaskCheckTrgmSimilarity?: boolean;
-  actorPermCheckTrgmSimilarity?: boolean;
-  entityIdsByMaskTrgmSimilarity?: boolean;
-  entityIdsByPermTrgmSimilarity?: boolean;
-  entityIdsFunctionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -4970,14 +4472,6 @@ export type PermissionsModuleSelect = {
   getMask?: boolean;
   getByMask?: boolean;
   getMaskByName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  defaultTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  getPaddedMaskTrgmSimilarity?: boolean;
-  getMaskTrgmSimilarity?: boolean;
-  getByMaskTrgmSimilarity?: boolean;
-  getMaskByNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -5008,8 +4502,6 @@ export type PhoneNumbersModuleSelect = {
   tableId?: boolean;
   ownerTableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5045,12 +4537,6 @@ export type ProfilesModuleSelect = {
   permissionsTableId?: boolean;
   membershipsTableId?: boolean;
   prefix?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  profilePermissionsTableNameTrgmSimilarity?: boolean;
-  profileGrantsTableNameTrgmSimilarity?: boolean;
-  profileDefinitionGrantsTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   actorTable?: {
     select: TableSelect;
   };
@@ -5091,8 +4577,6 @@ export type SecretsModuleSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5115,10 +4599,6 @@ export type SessionsModuleSelect = {
   sessionsTable?: boolean;
   sessionCredentialsTable?: boolean;
   authSettingsTable?: boolean;
-  sessionsTableTrgmSimilarity?: boolean;
-  sessionCredentialsTableTrgmSimilarity?: boolean;
-  authSettingsTableTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   authSettingsTableByAuthSettingsTableId?: {
     select: TableSelect;
   };
@@ -5165,23 +4645,6 @@ export type UserAuthModuleSelect = {
   signInOneTimeTokenFunction?: boolean;
   oneTimeTokenFunction?: boolean;
   extendTokenExpires?: boolean;
-  auditsTableNameTrgmSimilarity?: boolean;
-  signInFunctionTrgmSimilarity?: boolean;
-  signUpFunctionTrgmSimilarity?: boolean;
-  signOutFunctionTrgmSimilarity?: boolean;
-  setPasswordFunctionTrgmSimilarity?: boolean;
-  resetPasswordFunctionTrgmSimilarity?: boolean;
-  forgotPasswordFunctionTrgmSimilarity?: boolean;
-  sendVerificationEmailFunctionTrgmSimilarity?: boolean;
-  verifyEmailFunctionTrgmSimilarity?: boolean;
-  verifyPasswordFunctionTrgmSimilarity?: boolean;
-  checkPasswordFunctionTrgmSimilarity?: boolean;
-  sendAccountDeletionEmailFunctionTrgmSimilarity?: boolean;
-  deleteAccountFunctionTrgmSimilarity?: boolean;
-  signInOneTimeTokenFunctionTrgmSimilarity?: boolean;
-  oneTimeTokenFunctionTrgmSimilarity?: boolean;
-  extendTokenExpiresTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5215,9 +4678,6 @@ export type UsersModuleSelect = {
   tableName?: boolean;
   typeTableId?: boolean;
   typeTableName?: boolean;
-  tableNameTrgmSimilarity?: boolean;
-  typeTableNameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5231,20 +4691,66 @@ export type UsersModuleSelect = {
     select: TableSelect;
   };
 };
-export type UuidModuleSelect = {
+export type BlueprintSelect = {
   id?: boolean;
+  ownerId?: boolean;
   databaseId?: boolean;
-  schemaId?: boolean;
-  uuidFunction?: boolean;
-  uuidSeed?: boolean;
-  uuidFunctionTrgmSimilarity?: boolean;
-  uuidSeedTrgmSimilarity?: boolean;
-  searchScore?: boolean;
+  name?: boolean;
+  displayName?: boolean;
+  description?: boolean;
+  definition?: boolean;
+  templateId?: boolean;
+  status?: boolean;
+  constructedAt?: boolean;
+  errorDetails?: boolean;
+  refMap?: boolean;
+  constructedDefinition?: boolean;
+  definitionHash?: boolean;
+  tableHashes?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
   database?: {
     select: DatabaseSelect;
   };
-  schema?: {
-    select: SchemaSelect;
+  template?: {
+    select: BlueprintTemplateSelect;
+  };
+};
+export type BlueprintTemplateSelect = {
+  id?: boolean;
+  name?: boolean;
+  version?: boolean;
+  displayName?: boolean;
+  description?: boolean;
+  ownerId?: boolean;
+  visibility?: boolean;
+  categories?: boolean;
+  tags?: boolean;
+  definition?: boolean;
+  definitionSchemaVersion?: boolean;
+  source?: boolean;
+  complexity?: boolean;
+  copyCount?: boolean;
+  forkCount?: boolean;
+  forkedFromId?: boolean;
+  definitionHash?: boolean;
+  tableHashes?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  forkedFrom?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplatesByForkedFromId?: {
+    select: BlueprintTemplateSelect;
+    first?: number;
+    filter?: BlueprintTemplateFilter;
+    orderBy?: BlueprintTemplateOrderBy[];
+  };
+  blueprintsByTemplateId?: {
+    select: BlueprintSelect;
+    first?: number;
+    filter?: BlueprintFilter;
+    orderBy?: BlueprintOrderBy[];
   };
 };
 export type DatabaseProvisionModuleSelect = {
@@ -5262,12 +4768,6 @@ export type DatabaseProvisionModuleSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   completedAt?: boolean;
-  databaseNameTrgmSimilarity?: boolean;
-  subdomainTrgmSimilarity?: boolean;
-  domainTrgmSimilarity?: boolean;
-  statusTrgmSimilarity?: boolean;
-  errorMessageTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5415,8 +4915,6 @@ export type OrgChartEdgeSelect = {
   parentId?: boolean;
   positionTitle?: boolean;
   positionLevel?: boolean;
-  positionTitleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   child?: {
     select: UserSelect;
   };
@@ -5437,8 +4935,6 @@ export type OrgChartEdgeGrantSelect = {
   positionTitle?: boolean;
   positionLevel?: boolean;
   createdAt?: boolean;
-  positionTitleTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   child?: {
     select: UserSelect;
   };
@@ -5449,6 +4945,14 @@ export type OrgChartEdgeGrantSelect = {
     select: UserSelect;
   };
   parent?: {
+    select: UserSelect;
+  };
+};
+export type OrgPermissionDefaultSelect = {
+  id?: boolean;
+  permissions?: boolean;
+  entityId?: boolean;
+  entity?: {
     select: UserSelect;
   };
 };
@@ -5498,6 +5002,68 @@ export type AppAchievementSelect = {
     select: UserSelect;
   };
 };
+export type AppLevelSelect = {
+  id?: boolean;
+  name?: boolean;
+  description?: boolean;
+  image?: boolean;
+  ownerId?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type EmailSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  email?: boolean;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type PhoneNumberSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  cc?: boolean;
+  number?: boolean;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type CryptoAddressSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  address?: boolean;
+  isVerified?: boolean;
+  isPrimary?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
+export type ConnectedAccountSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  service?: boolean;
+  identifier?: boolean;
+  details?: boolean;
+  isVerified?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  owner?: {
+    select: UserSelect;
+  };
+};
 export type InviteSelect = {
   id?: boolean;
   email?: boolean;
@@ -5511,8 +5077,6 @@ export type InviteSelect = {
   expiresAt?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  inviteTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   sender?: {
     select: UserSelect;
   };
@@ -5546,8 +5110,6 @@ export type OrgInviteSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
   entityId?: boolean;
-  inviteTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   entity?: {
     select: UserSelect;
   };
@@ -5576,14 +5138,25 @@ export type OrgClaimedInviteSelect = {
     select: UserSelect;
   };
 };
+export type AuditLogSelect = {
+  id?: boolean;
+  event?: boolean;
+  actorId?: boolean;
+  origin?: boolean;
+  userAgent?: boolean;
+  ipAddress?: boolean;
+  success?: boolean;
+  createdAt?: boolean;
+  actor?: {
+    select: UserSelect;
+  };
+};
 export type RefSelect = {
   id?: boolean;
   name?: boolean;
   databaseId?: boolean;
   storeId?: boolean;
   commitId?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type StoreSelect = {
   id?: boolean;
@@ -5591,54 +5164,14 @@ export type StoreSelect = {
   databaseId?: boolean;
   hash?: boolean;
   createdAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppPermissionDefaultSelect = {
   id?: boolean;
   permissions?: boolean;
 };
-export type CryptoAddressSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  address?: boolean;
-  isVerified?: boolean;
-  isPrimary?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  addressTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type RoleTypeSelect = {
   id?: boolean;
   name?: boolean;
-};
-export type OrgPermissionDefaultSelect = {
-  id?: boolean;
-  permissions?: boolean;
-  entityId?: boolean;
-  entity?: {
-    select: UserSelect;
-  };
-};
-export type PhoneNumberSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  cc?: boolean;
-  number?: boolean;
-  isVerified?: boolean;
-  isPrimary?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  ccTrgmSimilarity?: boolean;
-  numberTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
 };
 export type AppLimitDefaultSelect = {
   id?: boolean;
@@ -5650,22 +5183,6 @@ export type OrgLimitDefaultSelect = {
   name?: boolean;
   max?: boolean;
 };
-export type ConnectedAccountSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  service?: boolean;
-  identifier?: boolean;
-  details?: boolean;
-  isVerified?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  serviceTrgmSimilarity?: boolean;
-  identifierTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type NodeTypeRegistrySelect = {
   name?: boolean;
   slug?: boolean;
@@ -5676,21 +5193,12 @@ export type NodeTypeRegistrySelect = {
   tags?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  slugTrgmSimilarity?: boolean;
-  categoryTrgmSimilarity?: boolean;
-  displayNameTrgmSimilarity?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type MembershipTypeSelect = {
   id?: boolean;
   name?: boolean;
   description?: boolean;
   prefix?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type CommitSelect = {
   id?: boolean;
@@ -5702,8 +5210,6 @@ export type CommitSelect = {
   committerId?: boolean;
   treeId?: boolean;
   date?: boolean;
-  messageTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppMembershipDefaultSelect = {
   id?: boolean;
@@ -5726,11 +5232,6 @@ export type RlsModuleSelect = {
   authenticateStrict?: boolean;
   currentRole?: boolean;
   currentRoleId?: boolean;
-  authenticateTrgmSimilarity?: boolean;
-  authenticateStrictTrgmSimilarity?: boolean;
-  currentRoleTrgmSimilarity?: boolean;
-  currentRoleIdTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -5764,35 +5265,6 @@ export type OrgMembershipDefaultSelect = {
     select: UserSelect;
   };
 };
-export type AuditLogSelect = {
-  id?: boolean;
-  event?: boolean;
-  actorId?: boolean;
-  origin?: boolean;
-  userAgent?: boolean;
-  ipAddress?: boolean;
-  success?: boolean;
-  createdAt?: boolean;
-  userAgentTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  actor?: {
-    select: UserSelect;
-  };
-};
-export type AppLevelSelect = {
-  id?: boolean;
-  name?: boolean;
-  description?: boolean;
-  image?: boolean;
-  ownerId?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  descriptionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type SqlMigrationSelect = {
   id?: boolean;
   name?: boolean;
@@ -5807,25 +5279,6 @@ export type SqlMigrationSelect = {
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
-  nameTrgmSimilarity?: boolean;
-  deployTrgmSimilarity?: boolean;
-  contentTrgmSimilarity?: boolean;
-  revertTrgmSimilarity?: boolean;
-  verifyTrgmSimilarity?: boolean;
-  actionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-};
-export type EmailSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  email?: boolean;
-  isVerified?: boolean;
-  isPrimary?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
 };
 export type UserSelect = {
   id?: boolean;
@@ -5854,17 +5307,35 @@ export type UserSelect = {
     filter?: DatabaseFilter;
     orderBy?: DatabaseOrderBy[];
   };
+  appAdminGrantsByActorId?: {
+    select: AppAdminGrantSelect;
+    first?: number;
+    filter?: AppAdminGrantFilter;
+    orderBy?: AppAdminGrantOrderBy[];
+  };
   appAdminGrantsByGrantorId?: {
     select: AppAdminGrantSelect;
     first?: number;
     filter?: AppAdminGrantFilter;
     orderBy?: AppAdminGrantOrderBy[];
   };
+  appOwnerGrantsByActorId?: {
+    select: AppOwnerGrantSelect;
+    first?: number;
+    filter?: AppOwnerGrantFilter;
+    orderBy?: AppOwnerGrantOrderBy[];
+  };
   appOwnerGrantsByGrantorId?: {
     select: AppOwnerGrantSelect;
     first?: number;
     filter?: AppOwnerGrantFilter;
     orderBy?: AppOwnerGrantOrderBy[];
+  };
+  appGrantsByActorId?: {
+    select: AppGrantSelect;
+    first?: number;
+    filter?: AppGrantFilter;
+    orderBy?: AppGrantOrderBy[];
   };
   appGrantsByGrantorId?: {
     select: AppGrantSelect;
@@ -5896,6 +5367,12 @@ export type UserSelect = {
     filter?: OrgMemberFilter;
     orderBy?: OrgMemberOrderBy[];
   };
+  orgAdminGrantsByActorId?: {
+    select: OrgAdminGrantSelect;
+    first?: number;
+    filter?: OrgAdminGrantFilter;
+    orderBy?: OrgAdminGrantOrderBy[];
+  };
   orgAdminGrantsByEntityId?: {
     select: OrgAdminGrantSelect;
     first?: number;
@@ -5908,6 +5385,12 @@ export type UserSelect = {
     filter?: OrgAdminGrantFilter;
     orderBy?: OrgAdminGrantOrderBy[];
   };
+  orgOwnerGrantsByActorId?: {
+    select: OrgOwnerGrantSelect;
+    first?: number;
+    filter?: OrgOwnerGrantFilter;
+    orderBy?: OrgOwnerGrantOrderBy[];
+  };
   orgOwnerGrantsByEntityId?: {
     select: OrgOwnerGrantSelect;
     first?: number;
@@ -5919,6 +5402,12 @@ export type UserSelect = {
     first?: number;
     filter?: OrgOwnerGrantFilter;
     orderBy?: OrgOwnerGrantOrderBy[];
+  };
+  orgGrantsByActorId?: {
+    select: OrgGrantSelect;
+    first?: number;
+    filter?: OrgGrantFilter;
+    orderBy?: OrgGrantOrderBy[];
   };
   orgGrantsByEntityId?: {
     select: OrgGrantSelect;
@@ -5974,6 +5463,12 @@ export type UserSelect = {
     filter?: OrgChartEdgeGrantFilter;
     orderBy?: OrgChartEdgeGrantOrderBy[];
   };
+  orgPermissionDefaultsByEntityId?: {
+    select: OrgPermissionDefaultSelect;
+    first?: number;
+    filter?: OrgPermissionDefaultFilter;
+    orderBy?: OrgPermissionDefaultOrderBy[];
+  };
   appLimitsByActorId?: {
     select: AppLimitSelect;
     first?: number;
@@ -6004,6 +5499,36 @@ export type UserSelect = {
     filter?: AppAchievementFilter;
     orderBy?: AppAchievementOrderBy[];
   };
+  ownedAppLevels?: {
+    select: AppLevelSelect;
+    first?: number;
+    filter?: AppLevelFilter;
+    orderBy?: AppLevelOrderBy[];
+  };
+  ownedEmails?: {
+    select: EmailSelect;
+    first?: number;
+    filter?: EmailFilter;
+    orderBy?: EmailOrderBy[];
+  };
+  ownedPhoneNumbers?: {
+    select: PhoneNumberSelect;
+    first?: number;
+    filter?: PhoneNumberFilter;
+    orderBy?: PhoneNumberOrderBy[];
+  };
+  ownedCryptoAddresses?: {
+    select: CryptoAddressSelect;
+    first?: number;
+    filter?: CryptoAddressFilter;
+    orderBy?: CryptoAddressOrderBy[];
+  };
+  ownedConnectedAccounts?: {
+    select: ConnectedAccountSelect;
+    first?: number;
+    filter?: ConnectedAccountFilter;
+    orderBy?: ConnectedAccountOrderBy[];
+  };
   invitesBySenderId?: {
     select: InviteSelect;
     first?: number;
@@ -6028,11 +5553,23 @@ export type UserSelect = {
     filter?: OrgInviteFilter;
     orderBy?: OrgInviteOrderBy[];
   };
+  orgInvitesByReceiverId?: {
+    select: OrgInviteSelect;
+    first?: number;
+    filter?: OrgInviteFilter;
+    orderBy?: OrgInviteOrderBy[];
+  };
   orgInvitesBySenderId?: {
     select: OrgInviteSelect;
     first?: number;
     filter?: OrgInviteFilter;
     orderBy?: OrgInviteOrderBy[];
+  };
+  orgClaimedInvitesByEntityId?: {
+    select: OrgClaimedInviteSelect;
+    first?: number;
+    filter?: OrgClaimedInviteFilter;
+    orderBy?: OrgClaimedInviteOrderBy[];
   };
   orgClaimedInvitesByReceiverId?: {
     select: OrgClaimedInviteSelect;
@@ -6045,6 +5582,12 @@ export type UserSelect = {
     first?: number;
     filter?: OrgClaimedInviteFilter;
     orderBy?: OrgClaimedInviteOrderBy[];
+  };
+  auditLogsByActorId?: {
+    select: AuditLogSelect;
+    first?: number;
+    filter?: AuditLogFilter;
+    orderBy?: AuditLogOrderBy[];
   };
 };
 export type AstMigrationSelect = {
@@ -6061,8 +5604,6 @@ export type AstMigrationSelect = {
   action?: boolean;
   actionId?: boolean;
   actorId?: boolean;
-  actionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type AppMembershipSelect = {
   id?: boolean;
@@ -6106,17 +5647,6 @@ export type HierarchyModuleSelect = {
   getManagersFunction?: boolean;
   isManagerOfFunction?: boolean;
   createdAt?: boolean;
-  chartEdgesTableNameTrgmSimilarity?: boolean;
-  hierarchySprtTableNameTrgmSimilarity?: boolean;
-  chartEdgeGrantsTableNameTrgmSimilarity?: boolean;
-  prefixTrgmSimilarity?: boolean;
-  privateSchemaNameTrgmSimilarity?: boolean;
-  sprtTableNameTrgmSimilarity?: boolean;
-  rebuildHierarchyFunctionTrgmSimilarity?: boolean;
-  getSubordinatesFunctionTrgmSimilarity?: boolean;
-  getManagersFunctionTrgmSimilarity?: boolean;
-  isManagerOfFunctionTrgmSimilarity?: boolean;
-  searchScore?: boolean;
   chartEdgeGrantsTable?: {
     select: TableSelect;
   };
@@ -6143,6 +5673,13 @@ export type HierarchyModuleSelect = {
   };
 };
 // ============ Table Filter Types ============
+export interface GetAllRecordFilter {
+  path?: StringListFilter;
+  data?: JSONFilter;
+  and?: GetAllRecordFilter[];
+  or?: GetAllRecordFilter[];
+  not?: GetAllRecordFilter;
+}
 export interface OrgGetManagersRecordFilter {
   userId?: UUIDFilter;
   depth?: IntFilter;
@@ -6157,1797 +5694,4136 @@ export interface OrgGetSubordinatesRecordFilter {
   or?: OrgGetSubordinatesRecordFilter[];
   not?: OrgGetSubordinatesRecordFilter;
 }
-export interface GetAllRecordFilter {
-  path?: StringFilter;
-  data?: JSONFilter;
-  and?: GetAllRecordFilter[];
-  or?: GetAllRecordFilter[];
-  not?: GetAllRecordFilter;
-}
 export interface ObjectFilter {
-  hashUuid?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  kids?: UUIDFilter;
-  ktree?: StringFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `frzn` field. */
   frzn?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ObjectFilter[];
+  /** Checks for any expressions in this list. */
   or?: ObjectFilter[];
+  /** Negates the expression. */
   not?: ObjectFilter;
 }
 export interface AppPermissionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `bitnum` field. */
   bitnum?: IntFilter;
+  /** Filter by the object’s `bitstr` field. */
   bitstr?: BitStringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: AppPermissionFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppPermissionFilter[];
+  /** Negates the expression. */
   not?: AppPermissionFilter;
 }
 export interface OrgPermissionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `bitnum` field. */
   bitnum?: IntFilter;
+  /** Filter by the object’s `bitstr` field. */
   bitstr?: BitStringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgPermissionFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgPermissionFilter[];
+  /** Negates the expression. */
   not?: OrgPermissionFilter;
 }
 export interface AppLevelRequirementFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `level` field. */
   level?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `requiredCount` field. */
   requiredCount?: IntFilter;
+  /** Filter by the object’s `priority` field. */
   priority?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLevelRequirementFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLevelRequirementFilter[];
+  /** Negates the expression. */
   not?: AppLevelRequirementFilter;
 }
 export interface DatabaseFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `schemaHash` field. */
   schemaHash?: StringFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  schemaHashTrgmSimilarity?: FloatFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: DatabaseFilter[];
+  /** Checks for any expressions in this list. */
   or?: DatabaseFilter[];
+  /** Negates the expression. */
   not?: DatabaseFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
+  /** Filter by the object’s `schemas` relation. */
+  schemas?: DatabaseToManySchemaFilter;
+  /** `schemas` exist. */
+  schemasExist?: boolean;
+  /** Filter by the object’s `tables` relation. */
+  tables?: DatabaseToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: DatabaseToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: DatabaseToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: DatabaseToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: DatabaseToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: DatabaseToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: DatabaseToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: DatabaseToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: DatabaseToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: DatabaseToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggerFunctions` relation. */
+  triggerFunctions?: DatabaseToManyTriggerFunctionFilter;
+  /** `triggerFunctions` exist. */
+  triggerFunctionsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: DatabaseToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: DatabaseToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: DatabaseToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: DatabaseToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: DatabaseToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: DatabaseToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `databaseTransfers` relation. */
+  databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
+  /** `databaseTransfers` exist. */
+  databaseTransfersExist?: boolean;
+  /** Filter by the object’s `apis` relation. */
+  apis?: DatabaseToManyApiFilter;
+  /** `apis` exist. */
+  apisExist?: boolean;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: DatabaseToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: DatabaseToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `sites` relation. */
+  sites?: DatabaseToManySiteFilter;
+  /** `sites` exist. */
+  sitesExist?: boolean;
+  /** Filter by the object’s `apps` relation. */
+  apps?: DatabaseToManyAppFilter;
+  /** `apps` exist. */
+  appsExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: DatabaseToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: DatabaseToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: DatabaseToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: DatabaseToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+  /** Filter by the object’s `connectedAccountsModules` relation. */
+  connectedAccountsModules?: DatabaseToManyConnectedAccountsModuleFilter;
+  /** `connectedAccountsModules` exist. */
+  connectedAccountsModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAddressesModules` relation. */
+  cryptoAddressesModules?: DatabaseToManyCryptoAddressesModuleFilter;
+  /** `cryptoAddressesModules` exist. */
+  cryptoAddressesModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAuthModules` relation. */
+  cryptoAuthModules?: DatabaseToManyCryptoAuthModuleFilter;
+  /** `cryptoAuthModules` exist. */
+  cryptoAuthModulesExist?: boolean;
+  /** Filter by the object’s `defaultIdsModules` relation. */
+  defaultIdsModules?: DatabaseToManyDefaultIdsModuleFilter;
+  /** `defaultIdsModules` exist. */
+  defaultIdsModulesExist?: boolean;
+  /** Filter by the object’s `denormalizedTableFields` relation. */
+  denormalizedTableFields?: DatabaseToManyDenormalizedTableFieldFilter;
+  /** `denormalizedTableFields` exist. */
+  denormalizedTableFieldsExist?: boolean;
+  /** Filter by the object’s `emailsModules` relation. */
+  emailsModules?: DatabaseToManyEmailsModuleFilter;
+  /** `emailsModules` exist. */
+  emailsModulesExist?: boolean;
+  /** Filter by the object’s `encryptedSecretsModules` relation. */
+  encryptedSecretsModules?: DatabaseToManyEncryptedSecretsModuleFilter;
+  /** `encryptedSecretsModules` exist. */
+  encryptedSecretsModulesExist?: boolean;
+  /** Filter by the object’s `fieldModules` relation. */
+  fieldModules?: DatabaseToManyFieldModuleFilter;
+  /** `fieldModules` exist. */
+  fieldModulesExist?: boolean;
+  /** Filter by the object’s `invitesModules` relation. */
+  invitesModules?: DatabaseToManyInvitesModuleFilter;
+  /** `invitesModules` exist. */
+  invitesModulesExist?: boolean;
+  /** Filter by the object’s `levelsModules` relation. */
+  levelsModules?: DatabaseToManyLevelsModuleFilter;
+  /** `levelsModules` exist. */
+  levelsModulesExist?: boolean;
+  /** Filter by the object’s `limitsModules` relation. */
+  limitsModules?: DatabaseToManyLimitsModuleFilter;
+  /** `limitsModules` exist. */
+  limitsModulesExist?: boolean;
+  /** Filter by the object’s `membershipTypesModules` relation. */
+  membershipTypesModules?: DatabaseToManyMembershipTypesModuleFilter;
+  /** `membershipTypesModules` exist. */
+  membershipTypesModulesExist?: boolean;
+  /** Filter by the object’s `membershipsModules` relation. */
+  membershipsModules?: DatabaseToManyMembershipsModuleFilter;
+  /** `membershipsModules` exist. */
+  membershipsModulesExist?: boolean;
+  /** Filter by the object’s `permissionsModules` relation. */
+  permissionsModules?: DatabaseToManyPermissionsModuleFilter;
+  /** `permissionsModules` exist. */
+  permissionsModulesExist?: boolean;
+  /** Filter by the object’s `phoneNumbersModules` relation. */
+  phoneNumbersModules?: DatabaseToManyPhoneNumbersModuleFilter;
+  /** `phoneNumbersModules` exist. */
+  phoneNumbersModulesExist?: boolean;
+  /** Filter by the object’s `profilesModules` relation. */
+  profilesModules?: DatabaseToManyProfilesModuleFilter;
+  /** `profilesModules` exist. */
+  profilesModulesExist?: boolean;
+  /** Filter by the object’s `rlsModule` relation. */
+  rlsModule?: RlsModuleFilter;
+  /** A related `rlsModule` exists. */
+  rlsModuleExists?: boolean;
+  /** Filter by the object’s `secretsModules` relation. */
+  secretsModules?: DatabaseToManySecretsModuleFilter;
+  /** `secretsModules` exist. */
+  secretsModulesExist?: boolean;
+  /** Filter by the object’s `sessionsModules` relation. */
+  sessionsModules?: DatabaseToManySessionsModuleFilter;
+  /** `sessionsModules` exist. */
+  sessionsModulesExist?: boolean;
+  /** Filter by the object’s `userAuthModules` relation. */
+  userAuthModules?: DatabaseToManyUserAuthModuleFilter;
+  /** `userAuthModules` exist. */
+  userAuthModulesExist?: boolean;
+  /** Filter by the object’s `usersModules` relation. */
+  usersModules?: DatabaseToManyUsersModuleFilter;
+  /** `usersModules` exist. */
+  usersModulesExist?: boolean;
+  /** Filter by the object’s `hierarchyModule` relation. */
+  hierarchyModule?: HierarchyModuleFilter;
+  /** A related `hierarchyModule` exists. */
+  hierarchyModuleExists?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: DatabaseToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: DatabaseToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisions` relation. */
+  relationProvisions?: DatabaseToManyRelationProvisionFilter;
+  /** `relationProvisions` exist. */
+  relationProvisionsExist?: boolean;
+  /** Filter by the object’s `blueprints` relation. */
+  blueprints?: DatabaseToManyBlueprintFilter;
+  /** `blueprints` exist. */
+  blueprintsExist?: boolean;
+  /** Filter by the object’s `databaseProvisionModules` relation. */
+  databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
+  /** `databaseProvisionModules` exist. */
+  databaseProvisionModulesExist?: boolean;
 }
 export interface SchemaFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `schemaName` field. */
   schemaName?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  schemaNameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: SchemaFilter[];
+  /** Checks for any expressions in this list. */
   or?: SchemaFilter[];
+  /** Negates the expression. */
   not?: SchemaFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `tables` relation. */
+  tables?: SchemaToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: SchemaToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: SchemaToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: SchemaToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: SchemaToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: SchemaToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByPrivateSchemaId` relation. */
+  tableTemplateModulesByPrivateSchemaId?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByPrivateSchemaId` exist. */
+  tableTemplateModulesByPrivateSchemaIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
 }
 export interface TableFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
+  /** Filter by the object’s `timestamps` field. */
   timestamps?: BooleanFilter;
+  /** Filter by the object’s `peoplestamps` field. */
   peoplestamps?: BooleanFilter;
+  /** Filter by the object’s `pluralName` field. */
   pluralName?: StringFilter;
+  /** Filter by the object’s `singularName` field. */
   singularName?: StringFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `inheritsId` field. */
   inheritsId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  pluralNameTrgmSimilarity?: FloatFilter;
-  singularNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: TableFilter[];
+  /** Checks for any expressions in this list. */
   or?: TableFilter[];
+  /** Negates the expression. */
   not?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `inherits` relation. */
+  inherits?: TableFilter;
+  /** A related `inherits` exists. */
+  inheritsExists?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: TableToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: TableToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: TableToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: TableToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: TableToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: TableToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: TableToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: TableToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: TableToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: TableToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: TableToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: TableToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `embeddingChunksByChunksTableId` relation. */
+  embeddingChunksByChunksTableId?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunksByChunksTableId` exist. */
+  embeddingChunksByChunksTableIdExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByOwnerTableId` relation. */
+  tableTemplateModulesByOwnerTableId?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByOwnerTableId` exist. */
+  tableTemplateModulesByOwnerTableIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: TableToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisionsBySourceTableId` relation. */
+  relationProvisionsBySourceTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsBySourceTableId` exist. */
+  relationProvisionsBySourceTableIdExist?: boolean;
+  /** Filter by the object’s `relationProvisionsByTargetTableId` relation. */
+  relationProvisionsByTargetTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsByTargetTableId` exist. */
+  relationProvisionsByTargetTableIdExist?: boolean;
 }
 export interface CheckConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
-  fieldIds?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `expr` field. */
   expr?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: CheckConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: CheckConstraintFilter[];
+  /** Negates the expression. */
   not?: CheckConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface FieldFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `label` field. */
   label?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
+  /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
+  apiRequired?: BooleanFilter;
+  /** Filter by the object’s `defaultValue` field. */
   defaultValue?: StringFilter;
+  /** Filter by the object’s `defaultValueAst` field. */
   defaultValueAst?: JSONFilter;
+  /** Filter by the object’s `isHidden` field. */
   isHidden?: BooleanFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
+  /** Filter by the object’s `fieldOrder` field. */
   fieldOrder?: IntFilter;
+  /** Filter by the object’s `regexp` field. */
   regexp?: StringFilter;
+  /** Filter by the object’s `chk` field. */
   chk?: JSONFilter;
+  /** Filter by the object’s `chkExpr` field. */
   chkExpr?: JSONFilter;
+  /** Filter by the object’s `min` field. */
   min?: FloatFilter;
+  /** Filter by the object’s `max` field. */
   max?: FloatFilter;
-  tags?: StringFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  labelTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  defaultValueTrgmSimilarity?: FloatFilter;
-  regexpTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: FieldFilter[];
+  /** Checks for any expressions in this list. */
   or?: FieldFilter[];
+  /** Negates the expression. */
   not?: FieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface ForeignKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
-  fieldIds?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
   refTableId?: UUIDFilter;
-  refFieldIds?: UUIDFilter;
+  /** Filter by the object’s `refFieldIds` field. */
+  refFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `updateAction` field. */
   updateAction?: StringFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  deleteActionTrgmSimilarity?: FloatFilter;
-  updateActionTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: ForeignKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: ForeignKeyConstraintFilter[];
+  /** Negates the expression. */
   not?: ForeignKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface FullTextSearchFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
   fieldId?: UUIDFilter;
-  fieldIds?: UUIDFilter;
-  weights?: StringFilter;
-  langs?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `weights` field. */
+  weights?: StringListFilter;
+  /** Filter by the object’s `langs` field. */
+  langs?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: FullTextSearchFilter[];
+  /** Checks for any expressions in this list. */
   or?: FullTextSearchFilter[];
+  /** Negates the expression. */
   not?: FullTextSearchFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface IndexFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  fieldIds?: UUIDFilter;
-  includeFieldIds?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `includeFieldIds` field. */
+  includeFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `accessMethod` field. */
   accessMethod?: StringFilter;
+  /** Filter by the object’s `indexParams` field. */
   indexParams?: JSONFilter;
+  /** Filter by the object’s `whereClause` field. */
   whereClause?: JSONFilter;
+  /** Filter by the object’s `isUnique` field. */
   isUnique?: BooleanFilter;
+  /** Filter by the object’s `options` field. */
   options?: JSONFilter;
-  opClasses?: StringFilter;
+  /** Filter by the object’s `opClasses` field. */
+  opClasses?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  accessMethodTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: IndexFilter[];
+  /** Checks for any expressions in this list. */
   or?: IndexFilter[];
+  /** Negates the expression. */
   not?: IndexFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface PolicyFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `permissive` field. */
   permissive?: BooleanFilter;
+  /** Filter by the object’s `disabled` field. */
   disabled?: BooleanFilter;
+  /** Filter by the object’s `policyType` field. */
   policyType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  policyTypeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: PolicyFilter[];
+  /** Checks for any expressions in this list. */
   or?: PolicyFilter[];
+  /** Negates the expression. */
   not?: PolicyFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface PrimaryKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
-  fieldIds?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: PrimaryKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: PrimaryKeyConstraintFilter[];
+  /** Negates the expression. */
   not?: PrimaryKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface TableGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
-  fieldIds?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: TableGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: TableGrantFilter[];
+  /** Negates the expression. */
   not?: TableGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface TriggerFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `functionName` field. */
   functionName?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  eventTrgmSimilarity?: FloatFilter;
-  functionNameTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: TriggerFilter[];
+  /** Checks for any expressions in this list. */
   or?: TriggerFilter[];
+  /** Negates the expression. */
   not?: TriggerFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface UniqueConstraintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
   type?: StringFilter;
-  fieldIds?: UUIDFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  typeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: UniqueConstraintFilter[];
+  /** Checks for any expressions in this list. */
   or?: UniqueConstraintFilter[];
+  /** Negates the expression. */
   not?: UniqueConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface ViewFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `viewType` field. */
   viewType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `filterType` field. */
   filterType?: StringFilter;
+  /** Filter by the object’s `filterData` field. */
   filterData?: JSONFilter;
+  /** Filter by the object’s `securityInvoker` field. */
   securityInvoker?: BooleanFilter;
+  /** Filter by the object’s `isReadOnly` field. */
   isReadOnly?: BooleanFilter;
+  /** Filter by the object’s `smartTags` field. */
   smartTags?: JSONFilter;
-  category?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
   module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
   scope?: IntFilter;
-  tags?: StringFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  viewTypeTrgmSimilarity?: FloatFilter;
-  filterTypeTrgmSimilarity?: FloatFilter;
-  moduleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewFilter[];
+  /** Negates the expression. */
   not?: ViewFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** A related `table` exists. */
+  tableExists?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: ViewToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: ViewToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: ViewToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
 }
 export interface ViewTableFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `joinOrder` field. */
   joinOrder?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewTableFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewTableFilter[];
+  /** Negates the expression. */
   not?: ViewTableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
 }
 export interface ViewGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `withGrantOption` field. */
   withGrantOption?: BooleanFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewGrantFilter[];
+  /** Negates the expression. */
   not?: ViewGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
 }
 export interface ViewRuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
   viewId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `event` field. */
   event?: StringFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  eventTrgmSimilarity?: FloatFilter;
-  actionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: ViewRuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ViewRuleFilter[];
+  /** Negates the expression. */
   not?: ViewRuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
+}
+export interface EmbeddingChunkFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `embeddingFieldId` field. */
+  embeddingFieldId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableId` field. */
+  chunksTableId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableName` field. */
+  chunksTableName?: StringFilter;
+  /** Filter by the object’s `contentFieldName` field. */
+  contentFieldName?: StringFilter;
+  /** Filter by the object’s `dimensions` field. */
+  dimensions?: IntFilter;
+  /** Filter by the object’s `metric` field. */
+  metric?: StringFilter;
+  /** Filter by the object’s `chunkSize` field. */
+  chunkSize?: IntFilter;
+  /** Filter by the object’s `chunkOverlap` field. */
+  chunkOverlap?: IntFilter;
+  /** Filter by the object’s `chunkStrategy` field. */
+  chunkStrategy?: StringFilter;
+  /** Filter by the object’s `metadataFields` field. */
+  metadataFields?: JSONFilter;
+  /** Filter by the object’s `enqueueChunkingJob` field. */
+  enqueueChunkingJob?: BooleanFilter;
+  /** Filter by the object’s `chunkingTaskName` field. */
+  chunkingTaskName?: StringFilter;
+  /** Filter by the object’s `parentFkFieldId` field. */
+  parentFkFieldId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmbeddingChunkFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmbeddingChunkFilter[];
+  /** Negates the expression. */
+  not?: EmbeddingChunkFilter;
+  /** Filter by the object’s `chunksTable` relation. */
+  chunksTable?: TableFilter;
+  /** A related `chunksTable` exists. */
+  chunksTableExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `embeddingField` relation. */
+  embeddingField?: FieldFilter;
+  /** A related `embeddingField` exists. */
+  embeddingFieldExists?: boolean;
+  /** Filter by the object’s `parentFkField` relation. */
+  parentFkField?: FieldFilter;
+  /** A related `parentFkField` exists. */
+  parentFkFieldExists?: boolean;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface TableTemplateModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: TableTemplateModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: TableTemplateModuleFilter[];
+  /** Negates the expression. */
   not?: TableTemplateModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface SecureTableProvisionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
+  /** Filter by the object’s `nodeData` field. */
   nodeData?: JSONFilter;
-  fields?: JSONFilter;
-  grantRoles?: StringFilter;
-  grantPrivileges?: JSONFilter;
+  /** Filter by the object’s `fields` field. */
+  fields?: JSONListFilter;
+  /** Filter by the object’s `grantRoles` field. */
+  grantRoles?: StringListFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
   policyType?: StringFilter;
-  policyPrivileges?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
+  policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
   policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
   policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
   policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
   policyData?: JSONFilter;
-  outFields?: UUIDFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  policyTypeTrgmSimilarity?: FloatFilter;
-  policyRoleTrgmSimilarity?: FloatFilter;
-  policyNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Filter by the object’s `outFields` field. */
+  outFields?: UUIDListFilter;
+  /** Checks for all expressions in this list. */
   and?: SecureTableProvisionFilter[];
+  /** Checks for any expressions in this list. */
   or?: SecureTableProvisionFilter[];
+  /** Negates the expression. */
   not?: SecureTableProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface RelationProvisionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `relationType` field. */
   relationType?: StringFilter;
+  /** Filter by the object’s `sourceTableId` field. */
   sourceTableId?: UUIDFilter;
+  /** Filter by the object’s `targetTableId` field. */
   targetTableId?: UUIDFilter;
+  /** Filter by the object’s `fieldName` field. */
   fieldName?: StringFilter;
+  /** Filter by the object’s `deleteAction` field. */
   deleteAction?: StringFilter;
+  /** Filter by the object’s `isRequired` field. */
   isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
+  apiRequired?: BooleanFilter;
+  /** Filter by the object’s `junctionTableId` field. */
   junctionTableId?: UUIDFilter;
+  /** Filter by the object’s `junctionTableName` field. */
   junctionTableName?: StringFilter;
+  /** Filter by the object’s `junctionSchemaId` field. */
   junctionSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sourceFieldName` field. */
   sourceFieldName?: StringFilter;
+  /** Filter by the object’s `targetFieldName` field. */
   targetFieldName?: StringFilter;
+  /** Filter by the object’s `useCompositeKey` field. */
   useCompositeKey?: BooleanFilter;
+  /** Filter by the object’s `createIndex` field. */
+  createIndex?: BooleanFilter;
+  /** Filter by the object’s `exposeInApi` field. */
+  exposeInApi?: BooleanFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `nodeData` field. */
   nodeData?: JSONFilter;
-  grantRoles?: StringFilter;
-  grantPrivileges?: JSONFilter;
+  /** Filter by the object’s `grantRoles` field. */
+  grantRoles?: StringListFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
   policyType?: StringFilter;
-  policyPrivileges?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
+  policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
   policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
   policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
   policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
   policyData?: JSONFilter;
+  /** Filter by the object’s `outFieldId` field. */
   outFieldId?: UUIDFilter;
+  /** Filter by the object’s `outJunctionTableId` field. */
   outJunctionTableId?: UUIDFilter;
+  /** Filter by the object’s `outSourceFieldId` field. */
   outSourceFieldId?: UUIDFilter;
+  /** Filter by the object’s `outTargetFieldId` field. */
   outTargetFieldId?: UUIDFilter;
-  relationTypeTrgmSimilarity?: FloatFilter;
-  fieldNameTrgmSimilarity?: FloatFilter;
-  deleteActionTrgmSimilarity?: FloatFilter;
-  junctionTableNameTrgmSimilarity?: FloatFilter;
-  sourceFieldNameTrgmSimilarity?: FloatFilter;
-  targetFieldNameTrgmSimilarity?: FloatFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  policyTypeTrgmSimilarity?: FloatFilter;
-  policyRoleTrgmSimilarity?: FloatFilter;
-  policyNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: RelationProvisionFilter[];
+  /** Checks for any expressions in this list. */
   or?: RelationProvisionFilter[];
+  /** Negates the expression. */
   not?: RelationProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `sourceTable` relation. */
+  sourceTable?: TableFilter;
+  /** Filter by the object’s `targetTable` relation. */
+  targetTable?: TableFilter;
 }
 export interface SchemaGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: SchemaGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: SchemaGrantFilter[];
+  /** Negates the expression. */
   not?: SchemaGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface DefaultPrivilegeFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `objectType` field. */
   objectType?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
   privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
   granteeName?: StringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
-  objectTypeTrgmSimilarity?: FloatFilter;
-  privilegeTrgmSimilarity?: FloatFilter;
-  granteeNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: DefaultPrivilegeFilter[];
+  /** Checks for any expressions in this list. */
   or?: DefaultPrivilegeFilter[];
+  /** Negates the expression. */
   not?: DefaultPrivilegeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+export interface EnumFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `values` field. */
+  values?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: EnumFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EnumFilter[];
+  /** Negates the expression. */
+  not?: EnumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface ApiSchemaFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: ApiSchemaFilter[];
+  /** Checks for any expressions in this list. */
   or?: ApiSchemaFilter[];
+  /** Negates the expression. */
   not?: ApiSchemaFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface ApiModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  data?: JSONFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: ApiModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ApiModuleFilter[];
+  /** Negates the expression. */
   not?: ApiModuleFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface DomainFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
   apiId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
-  subdomain?: StringFilter;
-  domain?: StringFilter;
+  /** Filter by the object’s `subdomain` field. */
+  subdomain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Checks for all expressions in this list. */
   and?: DomainFilter[];
+  /** Checks for any expressions in this list. */
   or?: DomainFilter[];
+  /** Negates the expression. */
   not?: DomainFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** A related `api` exists. */
+  apiExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** A related `site` exists. */
+  siteExists?: boolean;
 }
 export interface SiteMetadatumFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
   title?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  ogImage?: StringFilter;
-  titleTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteMetadatumFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteMetadatumFilter[];
+  /** Negates the expression. */
   not?: SiteMetadatumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
 }
 export interface SiteModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  data?: JSONFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteModuleFilter[];
+  /** Negates the expression. */
   not?: SiteModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
 }
 export interface SiteThemeFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `theme` field. */
   theme?: JSONFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteThemeFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteThemeFilter[];
+  /** Negates the expression. */
   not?: SiteThemeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
 }
 export interface TriggerFunctionFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `code` field. */
   code?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  codeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: TriggerFunctionFilter[];
+  /** Checks for any expressions in this list. */
   or?: TriggerFunctionFilter[];
+  /** Negates the expression. */
   not?: TriggerFunctionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+export interface DatabaseTransferFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `targetOwnerId` field. */
+  targetOwnerId?: UUIDFilter;
+  /** Filter by the object’s `sourceApproved` field. */
+  sourceApproved?: BooleanFilter;
+  /** Filter by the object’s `targetApproved` field. */
+  targetApproved?: BooleanFilter;
+  /** Filter by the object’s `sourceApprovedAt` field. */
+  sourceApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `targetApprovedAt` field. */
+  targetApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `initiatedBy` field. */
+  initiatedBy?: UUIDFilter;
+  /** Filter by the object’s `notes` field. */
+  notes?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseTransferFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseTransferFilter[];
+  /** Negates the expression. */
+  not?: DatabaseTransferFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface ApiFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
+  /** Filter by the object’s `roleName` field. */
   roleName?: StringFilter;
+  /** Filter by the object’s `anonRole` field. */
   anonRole?: StringFilter;
+  /** Filter by the object’s `isPublic` field. */
   isPublic?: BooleanFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  dbnameTrgmSimilarity?: FloatFilter;
-  roleNameTrgmSimilarity?: FloatFilter;
-  anonRoleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: ApiFilter[];
+  /** Checks for any expressions in this list. */
   or?: ApiFilter[];
+  /** Negates the expression. */
   not?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: ApiToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: ApiToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
 }
 export interface SiteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
   title?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
-  ogImage?: StringFilter;
-  favicon?: StringFilter;
-  appleTouchIcon?: StringFilter;
-  logo?: StringFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `favicon` field. */
+  favicon?: ConstructiveInternalTypeAttachmentFilter;
+  /** Filter by the object’s `appleTouchIcon` field. */
+  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `logo` field. */
+  logo?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `dbname` field. */
   dbname?: StringFilter;
-  titleTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  dbnameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: SiteFilter[];
+  /** Checks for any expressions in this list. */
   or?: SiteFilter[];
+  /** Negates the expression. */
   not?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `app` relation. */
+  app?: AppFilter;
+  /** A related `app` exists. */
+  appExists?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: SiteToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: SiteToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: SiteToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: SiteToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
 }
 export interface AppFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
   siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  appImage?: StringFilter;
-  appStoreLink?: StringFilter;
+  /** Filter by the object’s `appImage` field. */
+  appImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `appStoreLink` field. */
+  appStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Filter by the object’s `appStoreId` field. */
   appStoreId?: StringFilter;
+  /** Filter by the object’s `appIdPrefix` field. */
   appIdPrefix?: StringFilter;
-  playStoreLink?: StringFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  appStoreIdTrgmSimilarity?: FloatFilter;
-  appIdPrefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Filter by the object’s `playStoreLink` field. */
+  playStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Checks for all expressions in this list. */
   and?: AppFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppFilter[];
+  /** Negates the expression. */
   not?: AppFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface ConnectedAccountsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: ConnectedAccountsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ConnectedAccountsModuleFilter[];
+  /** Negates the expression. */
   not?: ConnectedAccountsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface CryptoAddressesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
   cryptoNetwork?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  cryptoNetworkTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: CryptoAddressesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: CryptoAddressesModuleFilter[];
+  /** Negates the expression. */
   not?: CryptoAddressesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface CryptoAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
   secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `addressesTableId` field. */
   addressesTableId?: UUIDFilter;
+  /** Filter by the object’s `userField` field. */
   userField?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
   cryptoNetwork?: StringFilter;
+  /** Filter by the object’s `signInRequestChallenge` field. */
   signInRequestChallenge?: StringFilter;
+  /** Filter by the object’s `signInRecordFailure` field. */
   signInRecordFailure?: StringFilter;
+  /** Filter by the object’s `signUpWithKey` field. */
   signUpWithKey?: StringFilter;
+  /** Filter by the object’s `signInWithChallenge` field. */
   signInWithChallenge?: StringFilter;
-  userFieldTrgmSimilarity?: FloatFilter;
-  cryptoNetworkTrgmSimilarity?: FloatFilter;
-  signInRequestChallengeTrgmSimilarity?: FloatFilter;
-  signInRecordFailureTrgmSimilarity?: FloatFilter;
-  signUpWithKeyTrgmSimilarity?: FloatFilter;
-  signInWithChallengeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: CryptoAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: CryptoAuthModuleFilter[];
+  /** Negates the expression. */
   not?: CryptoAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface DefaultIdsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: DefaultIdsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: DefaultIdsModuleFilter[];
+  /** Negates the expression. */
   not?: DefaultIdsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
 }
 export interface DenormalizedTableFieldFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
   fieldId?: UUIDFilter;
-  setIds?: UUIDFilter;
+  /** Filter by the object’s `setIds` field. */
+  setIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
   refTableId?: UUIDFilter;
+  /** Filter by the object’s `refFieldId` field. */
   refFieldId?: UUIDFilter;
-  refIds?: UUIDFilter;
+  /** Filter by the object’s `refIds` field. */
+  refIds?: UUIDListFilter;
+  /** Filter by the object’s `useUpdates` field. */
   useUpdates?: BooleanFilter;
+  /** Filter by the object’s `updateDefaults` field. */
   updateDefaults?: BooleanFilter;
+  /** Filter by the object’s `funcName` field. */
   funcName?: StringFilter;
+  /** Filter by the object’s `funcOrder` field. */
   funcOrder?: IntFilter;
-  funcNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: DenormalizedTableFieldFilter[];
+  /** Checks for any expressions in this list. */
   or?: DenormalizedTableFieldFilter[];
+  /** Negates the expression. */
   not?: DenormalizedTableFieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `refField` relation. */
+  refField?: FieldFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface EmailsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: EmailsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: EmailsModuleFilter[];
+  /** Negates the expression. */
   not?: EmailsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface EncryptedSecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: EncryptedSecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: EncryptedSecretsModuleFilter[];
+  /** Negates the expression. */
   not?: EncryptedSecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface FieldModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
   fieldId?: UUIDFilter;
+  /** Filter by the object’s `nodeType` field. */
   nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
-  triggers?: StringFilter;
-  functions?: StringFilter;
-  nodeTypeTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Filter by the object’s `triggers` field. */
+  triggers?: StringListFilter;
+  /** Filter by the object’s `functions` field. */
+  functions?: StringListFilter;
+  /** Checks for all expressions in this list. */
   and?: FieldModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: FieldModuleFilter[];
+  /** Negates the expression. */
   not?: FieldModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface InvitesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
   emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableId` field. */
   invitesTableId?: UUIDFilter;
+  /** Filter by the object’s `claimedInvitesTableId` field. */
   claimedInvitesTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableName` field. */
   invitesTableName?: StringFilter;
+  /** Filter by the object’s `claimedInvitesTableName` field. */
   claimedInvitesTableName?: StringFilter;
+  /** Filter by the object’s `submitInviteCodeFunction` field. */
   submitInviteCodeFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
-  invitesTableNameTrgmSimilarity?: FloatFilter;
-  claimedInvitesTableNameTrgmSimilarity?: FloatFilter;
-  submitInviteCodeFunctionTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: InvitesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: InvitesModuleFilter[];
+  /** Negates the expression. */
   not?: InvitesModuleFilter;
+  /** Filter by the object’s `claimedInvitesTable` relation. */
+  claimedInvitesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `invitesTable` relation. */
+  invitesTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface LevelsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableId` field. */
   stepsTableId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableName` field. */
   stepsTableName?: StringFilter;
+  /** Filter by the object’s `achievementsTableId` field. */
   achievementsTableId?: UUIDFilter;
+  /** Filter by the object’s `achievementsTableName` field. */
   achievementsTableName?: StringFilter;
+  /** Filter by the object’s `levelsTableId` field. */
   levelsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelsTableName` field. */
   levelsTableName?: StringFilter;
+  /** Filter by the object’s `levelRequirementsTableId` field. */
   levelRequirementsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelRequirementsTableName` field. */
   levelRequirementsTableName?: StringFilter;
+  /** Filter by the object’s `completedStep` field. */
   completedStep?: StringFilter;
+  /** Filter by the object’s `incompletedStep` field. */
   incompletedStep?: StringFilter;
+  /** Filter by the object’s `tgAchievement` field. */
   tgAchievement?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggle` field. */
   tgAchievementToggle?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggleBoolean` field. */
   tgAchievementToggleBoolean?: StringFilter;
+  /** Filter by the object’s `tgAchievementBoolean` field. */
   tgAchievementBoolean?: StringFilter;
+  /** Filter by the object’s `upsertAchievement` field. */
   upsertAchievement?: StringFilter;
+  /** Filter by the object’s `tgUpdateAchievements` field. */
   tgUpdateAchievements?: StringFilter;
+  /** Filter by the object’s `stepsRequired` field. */
   stepsRequired?: StringFilter;
+  /** Filter by the object’s `levelAchieved` field. */
   levelAchieved?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
-  stepsTableNameTrgmSimilarity?: FloatFilter;
-  achievementsTableNameTrgmSimilarity?: FloatFilter;
-  levelsTableNameTrgmSimilarity?: FloatFilter;
-  levelRequirementsTableNameTrgmSimilarity?: FloatFilter;
-  completedStepTrgmSimilarity?: FloatFilter;
-  incompletedStepTrgmSimilarity?: FloatFilter;
-  tgAchievementTrgmSimilarity?: FloatFilter;
-  tgAchievementToggleTrgmSimilarity?: FloatFilter;
-  tgAchievementToggleBooleanTrgmSimilarity?: FloatFilter;
-  tgAchievementBooleanTrgmSimilarity?: FloatFilter;
-  upsertAchievementTrgmSimilarity?: FloatFilter;
-  tgUpdateAchievementsTrgmSimilarity?: FloatFilter;
-  stepsRequiredTrgmSimilarity?: FloatFilter;
-  levelAchievedTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: LevelsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: LevelsModuleFilter[];
+  /** Negates the expression. */
   not?: LevelsModuleFilter;
+  /** Filter by the object’s `achievementsTable` relation. */
+  achievementsTable?: TableFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `levelRequirementsTable` relation. */
+  levelRequirementsTable?: TableFilter;
+  /** Filter by the object’s `levelsTable` relation. */
+  levelsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `stepsTable` relation. */
+  stepsTable?: TableFilter;
 }
 export interface LimitsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
   defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
   defaultTableName?: StringFilter;
+  /** Filter by the object’s `limitIncrementFunction` field. */
   limitIncrementFunction?: StringFilter;
+  /** Filter by the object’s `limitDecrementFunction` field. */
   limitDecrementFunction?: StringFilter;
+  /** Filter by the object’s `limitIncrementTrigger` field. */
   limitIncrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitDecrementTrigger` field. */
   limitDecrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitUpdateTrigger` field. */
   limitUpdateTrigger?: StringFilter;
+  /** Filter by the object’s `limitCheckFunction` field. */
   limitCheckFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  defaultTableNameTrgmSimilarity?: FloatFilter;
-  limitIncrementFunctionTrgmSimilarity?: FloatFilter;
-  limitDecrementFunctionTrgmSimilarity?: FloatFilter;
-  limitIncrementTriggerTrgmSimilarity?: FloatFilter;
-  limitDecrementTriggerTrgmSimilarity?: FloatFilter;
-  limitUpdateTriggerTrgmSimilarity?: FloatFilter;
-  limitCheckFunctionTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: LimitsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: LimitsModuleFilter[];
+  /** Negates the expression. */
   not?: LimitsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface MembershipTypesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: MembershipTypesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: MembershipTypesModuleFilter[];
+  /** Negates the expression. */
   not?: MembershipTypesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface MembershipsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
   membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableName` field. */
   membershipsTableName?: StringFilter;
+  /** Filter by the object’s `membersTableId` field. */
   membersTableId?: UUIDFilter;
+  /** Filter by the object’s `membersTableName` field. */
   membersTableName?: StringFilter;
+  /** Filter by the object’s `membershipDefaultsTableId` field. */
   membershipDefaultsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipDefaultsTableName` field. */
   membershipDefaultsTableName?: StringFilter;
+  /** Filter by the object’s `grantsTableId` field. */
   grantsTableId?: UUIDFilter;
+  /** Filter by the object’s `grantsTableName` field. */
   grantsTableName?: StringFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Filter by the object’s `limitsTableId` field. */
   limitsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultLimitsTableId` field. */
   defaultLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
   permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissionsTableId` field. */
   defaultPermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sprtTableId` field. */
   sprtTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableId` field. */
   adminGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableName` field. */
   adminGrantsTableName?: StringFilter;
+  /** Filter by the object’s `ownerGrantsTableId` field. */
   ownerGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `ownerGrantsTableName` field. */
   ownerGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `entityTableOwnerId` field. */
   entityTableOwnerId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `actorMaskCheck` field. */
   actorMaskCheck?: StringFilter;
+  /** Filter by the object’s `actorPermCheck` field. */
   actorPermCheck?: StringFilter;
+  /** Filter by the object’s `entityIdsByMask` field. */
   entityIdsByMask?: StringFilter;
+  /** Filter by the object’s `entityIdsByPerm` field. */
   entityIdsByPerm?: StringFilter;
+  /** Filter by the object’s `entityIdsFunction` field. */
   entityIdsFunction?: StringFilter;
-  membershipsTableNameTrgmSimilarity?: FloatFilter;
-  membersTableNameTrgmSimilarity?: FloatFilter;
-  membershipDefaultsTableNameTrgmSimilarity?: FloatFilter;
-  grantsTableNameTrgmSimilarity?: FloatFilter;
-  adminGrantsTableNameTrgmSimilarity?: FloatFilter;
-  ownerGrantsTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  actorMaskCheckTrgmSimilarity?: FloatFilter;
-  actorPermCheckTrgmSimilarity?: FloatFilter;
-  entityIdsByMaskTrgmSimilarity?: FloatFilter;
-  entityIdsByPermTrgmSimilarity?: FloatFilter;
-  entityIdsFunctionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: MembershipsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: MembershipsModuleFilter[];
+  /** Negates the expression. */
   not?: MembershipsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultLimitsTable` relation. */
+  defaultLimitsTable?: TableFilter;
+  /** Filter by the object’s `defaultPermissionsTable` relation. */
+  defaultPermissionsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `entityTableOwner` relation. */
+  entityTableOwner?: FieldFilter;
+  /** A related `entityTableOwner` exists. */
+  entityTableOwnerExists?: boolean;
+  /** Filter by the object’s `grantsTable` relation. */
+  grantsTable?: TableFilter;
+  /** Filter by the object’s `limitsTable` relation. */
+  limitsTable?: TableFilter;
+  /** Filter by the object’s `membersTable` relation. */
+  membersTable?: TableFilter;
+  /** Filter by the object’s `membershipDefaultsTable` relation. */
+  membershipDefaultsTable?: TableFilter;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sprtTable` relation. */
+  sprtTable?: TableFilter;
 }
 export interface PermissionsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
   defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
   defaultTableName?: StringFilter;
+  /** Filter by the object’s `bitlen` field. */
   bitlen?: IntFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `getPaddedMask` field. */
   getPaddedMask?: StringFilter;
+  /** Filter by the object’s `getMask` field. */
   getMask?: StringFilter;
+  /** Filter by the object’s `getByMask` field. */
   getByMask?: StringFilter;
+  /** Filter by the object’s `getMaskByName` field. */
   getMaskByName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  defaultTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  getPaddedMaskTrgmSimilarity?: FloatFilter;
-  getMaskTrgmSimilarity?: FloatFilter;
-  getByMaskTrgmSimilarity?: FloatFilter;
-  getMaskByNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: PermissionsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: PermissionsModuleFilter[];
+  /** Negates the expression. */
   not?: PermissionsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface PhoneNumbersModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
   ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: PhoneNumbersModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: PhoneNumbersModuleFilter[];
+  /** Negates the expression. */
   not?: PhoneNumbersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface ProfilesModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `profilePermissionsTableId` field. */
   profilePermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `profilePermissionsTableName` field. */
   profilePermissionsTableName?: StringFilter;
+  /** Filter by the object’s `profileGrantsTableId` field. */
   profileGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileGrantsTableName` field. */
   profileGrantsTableName?: StringFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableId` field. */
   profileDefinitionGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableName` field. */
   profileDefinitionGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
   actorTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
   permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
   membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  profilePermissionsTableNameTrgmSimilarity?: FloatFilter;
-  profileGrantsTableNameTrgmSimilarity?: FloatFilter;
-  profileDefinitionGrantsTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: ProfilesModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: ProfilesModuleFilter[];
+  /** Negates the expression. */
   not?: ProfilesModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTable` relation. */
+  profileDefinitionGrantsTable?: TableFilter;
+  /** Filter by the object’s `profileGrantsTable` relation. */
+  profileGrantsTable?: TableFilter;
+  /** Filter by the object’s `profilePermissionsTable` relation. */
+  profilePermissionsTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface SecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: SecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: SecretsModuleFilter[];
+  /** Negates the expression. */
   not?: SecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
 }
 export interface SessionsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `authSettingsTableId` field. */
   authSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
-  sessionsDefaultExpiration?: StringFilter;
+  /** Filter by the object’s `sessionsDefaultExpiration` field. */
+  sessionsDefaultExpiration?: IntervalFilter;
+  /** Filter by the object’s `sessionsTable` field. */
   sessionsTable?: StringFilter;
+  /** Filter by the object’s `sessionCredentialsTable` field. */
   sessionCredentialsTable?: StringFilter;
+  /** Filter by the object’s `authSettingsTable` field. */
   authSettingsTable?: StringFilter;
-  sessionsTableTrgmSimilarity?: FloatFilter;
-  sessionCredentialsTableTrgmSimilarity?: FloatFilter;
-  authSettingsTableTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: SessionsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: SessionsModuleFilter[];
+  /** Negates the expression. */
   not?: SessionsModuleFilter;
+  /** Filter by the object’s `authSettingsTableByAuthSettingsTableId` relation. */
+  authSettingsTableByAuthSettingsTableId?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTableBySessionCredentialsTableId` relation. */
+  sessionCredentialsTableBySessionCredentialsTableId?: TableFilter;
+  /** Filter by the object’s `sessionsTableBySessionsTableId` relation. */
+  sessionsTableBySessionsTableId?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface UserAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
   emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
   secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `encryptedTableId` field. */
   encryptedTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableId` field. */
   auditsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableName` field. */
   auditsTableName?: StringFilter;
+  /** Filter by the object’s `signInFunction` field. */
   signInFunction?: StringFilter;
+  /** Filter by the object’s `signUpFunction` field. */
   signUpFunction?: StringFilter;
+  /** Filter by the object’s `signOutFunction` field. */
   signOutFunction?: StringFilter;
+  /** Filter by the object’s `setPasswordFunction` field. */
   setPasswordFunction?: StringFilter;
+  /** Filter by the object’s `resetPasswordFunction` field. */
   resetPasswordFunction?: StringFilter;
+  /** Filter by the object’s `forgotPasswordFunction` field. */
   forgotPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendVerificationEmailFunction` field. */
   sendVerificationEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyEmailFunction` field. */
   verifyEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyPasswordFunction` field. */
   verifyPasswordFunction?: StringFilter;
+  /** Filter by the object’s `checkPasswordFunction` field. */
   checkPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendAccountDeletionEmailFunction` field. */
   sendAccountDeletionEmailFunction?: StringFilter;
+  /** Filter by the object’s `deleteAccountFunction` field. */
   deleteAccountFunction?: StringFilter;
+  /** Filter by the object’s `signInOneTimeTokenFunction` field. */
   signInOneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `oneTimeTokenFunction` field. */
   oneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `extendTokenExpires` field. */
   extendTokenExpires?: StringFilter;
-  auditsTableNameTrgmSimilarity?: FloatFilter;
-  signInFunctionTrgmSimilarity?: FloatFilter;
-  signUpFunctionTrgmSimilarity?: FloatFilter;
-  signOutFunctionTrgmSimilarity?: FloatFilter;
-  setPasswordFunctionTrgmSimilarity?: FloatFilter;
-  resetPasswordFunctionTrgmSimilarity?: FloatFilter;
-  forgotPasswordFunctionTrgmSimilarity?: FloatFilter;
-  sendVerificationEmailFunctionTrgmSimilarity?: FloatFilter;
-  verifyEmailFunctionTrgmSimilarity?: FloatFilter;
-  verifyPasswordFunctionTrgmSimilarity?: FloatFilter;
-  checkPasswordFunctionTrgmSimilarity?: FloatFilter;
-  sendAccountDeletionEmailFunctionTrgmSimilarity?: FloatFilter;
-  deleteAccountFunctionTrgmSimilarity?: FloatFilter;
-  signInOneTimeTokenFunctionTrgmSimilarity?: FloatFilter;
-  oneTimeTokenFunctionTrgmSimilarity?: FloatFilter;
-  extendTokenExpiresTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: UserAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: UserAuthModuleFilter[];
+  /** Negates the expression. */
   not?: UserAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `encryptedTable` relation. */
+  encryptedTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface UsersModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
   tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
+  /** Filter by the object’s `typeTableId` field. */
   typeTableId?: UUIDFilter;
+  /** Filter by the object’s `typeTableName` field. */
   typeTableName?: StringFilter;
-  tableNameTrgmSimilarity?: FloatFilter;
-  typeTableNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: UsersModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: UsersModuleFilter[];
+  /** Negates the expression. */
   not?: UsersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `typeTable` relation. */
+  typeTable?: TableFilter;
 }
-export interface UuidModuleFilter {
+export interface BlueprintFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  schemaId?: UUIDFilter;
-  uuidFunction?: StringFilter;
-  uuidSeed?: StringFilter;
-  uuidFunctionTrgmSimilarity?: FloatFilter;
-  uuidSeedTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: UuidModuleFilter[];
-  or?: UuidModuleFilter[];
-  not?: UuidModuleFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `templateId` field. */
+  templateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `constructedAt` field. */
+  constructedAt?: DatetimeFilter;
+  /** Filter by the object’s `errorDetails` field. */
+  errorDetails?: StringFilter;
+  /** Filter by the object’s `refMap` field. */
+  refMap?: JSONFilter;
+  /** Filter by the object’s `constructedDefinition` field. */
+  constructedDefinition?: JSONFilter;
+  /** Filter by the object’s `definitionHash` field. */
+  definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
+  tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintFilter[];
+  /** Negates the expression. */
+  not?: BlueprintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `template` relation. */
+  template?: BlueprintTemplateFilter;
+  /** A related `template` exists. */
+  templateExists?: boolean;
+}
+export interface BlueprintTemplateFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `version` field. */
+  version?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+  /** Filter by the object’s `categories` field. */
+  categories?: StringListFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `definitionSchemaVersion` field. */
+  definitionSchemaVersion?: StringFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `complexity` field. */
+  complexity?: StringFilter;
+  /** Filter by the object’s `copyCount` field. */
+  copyCount?: IntFilter;
+  /** Filter by the object’s `forkCount` field. */
+  forkCount?: IntFilter;
+  /** Filter by the object’s `forkedFromId` field. */
+  forkedFromId?: UUIDFilter;
+  /** Filter by the object’s `definitionHash` field. */
+  definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
+  tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintTemplateFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintTemplateFilter[];
+  /** Negates the expression. */
+  not?: BlueprintTemplateFilter;
+  /** Filter by the object’s `forkedFrom` relation. */
+  forkedFrom?: BlueprintTemplateFilter;
+  /** A related `forkedFrom` exists. */
+  forkedFromExists?: boolean;
+  /** Filter by the object’s `blueprintTemplatesByForkedFromId` relation. */
+  blueprintTemplatesByForkedFromId?: BlueprintTemplateToManyBlueprintTemplateFilter;
+  /** `blueprintTemplatesByForkedFromId` exist. */
+  blueprintTemplatesByForkedFromIdExist?: boolean;
+  /** Filter by the object’s `blueprintsByTemplateId` relation. */
+  blueprintsByTemplateId?: BlueprintTemplateToManyBlueprintFilter;
+  /** `blueprintsByTemplateId` exist. */
+  blueprintsByTemplateIdExist?: boolean;
 }
 export interface DatabaseProvisionModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseName` field. */
   databaseName?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
+  /** Filter by the object’s `subdomain` field. */
   subdomain?: StringFilter;
+  /** Filter by the object’s `domain` field. */
   domain?: StringFilter;
-  modules?: StringFilter;
+  /** Filter by the object’s `modules` field. */
+  modules?: StringListFilter;
+  /** Filter by the object’s `options` field. */
   options?: JSONFilter;
+  /** Filter by the object’s `bootstrapUser` field. */
   bootstrapUser?: BooleanFilter;
+  /** Filter by the object’s `status` field. */
   status?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
   errorMessage?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
   completedAt?: DatetimeFilter;
-  databaseNameTrgmSimilarity?: FloatFilter;
-  subdomainTrgmSimilarity?: FloatFilter;
-  domainTrgmSimilarity?: FloatFilter;
-  statusTrgmSimilarity?: FloatFilter;
-  errorMessageTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: DatabaseProvisionModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: DatabaseProvisionModuleFilter[];
+  /** Negates the expression. */
   not?: DatabaseProvisionModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** A related `database` exists. */
+  databaseExists?: boolean;
 }
 export interface AppAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppAdminGrantFilter[];
+  /** Negates the expression. */
   not?: AppAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface AppOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppOwnerGrantFilter[];
+  /** Negates the expression. */
   not?: AppOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface AppGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppGrantFilter[];
+  /** Negates the expression. */
   not?: AppGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgMembershipFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
   isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
   isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
   granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
   profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMembershipFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMembershipFilter[];
+  /** Negates the expression. */
   not?: OrgMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface OrgMemberFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMemberFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMemberFilter[];
+  /** Negates the expression. */
   not?: OrgMemberFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface OrgAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgAdminGrantFilter[];
+  /** Negates the expression. */
   not?: OrgAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgOwnerGrantFilter[];
+  /** Negates the expression. */
   not?: OrgOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgGrantFilter[];
+  /** Negates the expression. */
   not?: OrgGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
 }
 export interface OrgChartEdgeFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
   childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
   parentId?: UUIDFilter;
+  /** Filter by the object’s `positionTitle` field. */
   positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
   positionLevel?: IntFilter;
-  positionTitleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgChartEdgeFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgChartEdgeFilter[];
+  /** Negates the expression. */
   not?: OrgChartEdgeFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
 }
 export interface OrgChartEdgeGrantFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
   childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
   parentId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
   grantorId?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
   isGrant?: BooleanFilter;
+  /** Filter by the object’s `positionTitle` field. */
   positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
   positionLevel?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  positionTitleTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgChartEdgeGrantFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgChartEdgeGrantFilter[];
+  /** Negates the expression. */
   not?: OrgChartEdgeGrantFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+}
+export interface OrgPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgPermissionDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgPermissionDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface AppLimitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
   num?: IntFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLimitFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLimitFilter[];
+  /** Negates the expression. */
   not?: AppLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
 }
 export interface OrgLimitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
   num?: IntFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgLimitFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgLimitFilter[];
+  /** Negates the expression. */
   not?: OrgLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface AppStepFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `count` field. */
   count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppStepFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppStepFilter[];
+  /** Negates the expression. */
   not?: AppStepFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
 }
 export interface AppAchievementFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `count` field. */
   count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: AppAchievementFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppAchievementFilter[];
+  /** Negates the expression. */
   not?: AppAchievementFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+export interface AppLevelFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `image` field. */
+  image?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLevelFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLevelFilter[];
+  /** Negates the expression. */
+  not?: AppLevelFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
+}
+export interface EmailFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmailFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmailFilter[];
+  /** Negates the expression. */
+  not?: EmailFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+export interface PhoneNumberFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `cc` field. */
+  cc?: StringFilter;
+  /** Filter by the object’s `number` field. */
+  number?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PhoneNumberFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PhoneNumberFilter[];
+  /** Negates the expression. */
+  not?: PhoneNumberFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+export interface CryptoAddressFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `address` field. */
+  address?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAddressFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAddressFilter[];
+  /** Negates the expression. */
+  not?: CryptoAddressFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+export interface ConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
+  service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
+  identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
+  details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ConnectedAccountFilter[];
+  /** Negates the expression. */
+  not?: ConnectedAccountFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
 }
 export interface InviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
   inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
   inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
   inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
   inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  inviteTokenTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: InviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: InviteFilter[];
+  /** Negates the expression. */
   not?: InviteFilter;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
 }
 export interface ClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: ClaimedInviteFilter[];
+  /** Negates the expression. */
   not?: ClaimedInviteFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
 }
 export interface OrgInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  email?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
   inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
   inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
   inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
   inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
   multiple?: BooleanFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `expiresAt` field. */
   expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
-  inviteTokenTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgInviteFilter[];
+  /** Negates the expression. */
   not?: OrgInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
 }
 export interface OrgClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  data?: JSONFilter;
+  /** Filter by the object’s `senderId` field. */
   senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
   receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgClaimedInviteFilter[];
+  /** Negates the expression. */
   not?: OrgClaimedInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
+}
+export interface AuditLogFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `origin` field. */
+  origin?: ConstructiveInternalTypeOriginFilter;
+  /** Filter by the object’s `userAgent` field. */
+  userAgent?: StringFilter;
+  /** Filter by the object’s `ipAddress` field. */
+  ipAddress?: InternetAddressFilter;
+  /** Filter by the object’s `success` field. */
+  success?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AuditLogFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AuditLogFilter[];
+  /** Negates the expression. */
+  not?: AuditLogFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
 }
 export interface RefFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
+  /** Filter by the object’s `commitId` field. */
   commitId?: UUIDFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: RefFilter[];
+  /** Checks for any expressions in this list. */
   or?: RefFilter[];
+  /** Negates the expression. */
   not?: RefFilter;
 }
 export interface StoreFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: StoreFilter[];
+  /** Checks for any expressions in this list. */
   or?: StoreFilter[];
+  /** Negates the expression. */
   not?: StoreFilter;
 }
 export interface AppPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Checks for all expressions in this list. */
   and?: AppPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppPermissionDefaultFilter[];
+  /** Negates the expression. */
   not?: AppPermissionDefaultFilter;
 }
-export interface CryptoAddressFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  address?: StringFilter;
-  isVerified?: BooleanFilter;
-  isPrimary?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  addressTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: CryptoAddressFilter[];
-  or?: CryptoAddressFilter[];
-  not?: CryptoAddressFilter;
-}
 export interface RoleTypeFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Checks for all expressions in this list. */
   and?: RoleTypeFilter[];
+  /** Checks for any expressions in this list. */
   or?: RoleTypeFilter[];
+  /** Negates the expression. */
   not?: RoleTypeFilter;
 }
-export interface OrgPermissionDefaultFilter {
-  id?: UUIDFilter;
-  permissions?: BitStringFilter;
-  entityId?: UUIDFilter;
-  and?: OrgPermissionDefaultFilter[];
-  or?: OrgPermissionDefaultFilter[];
-  not?: OrgPermissionDefaultFilter;
-}
-export interface PhoneNumberFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  cc?: StringFilter;
-  number?: StringFilter;
-  isVerified?: BooleanFilter;
-  isPrimary?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  ccTrgmSimilarity?: FloatFilter;
-  numberTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: PhoneNumberFilter[];
-  or?: PhoneNumberFilter[];
-  not?: PhoneNumberFilter;
-}
 export interface AppLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: AppLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppLimitDefaultFilter[];
+  /** Negates the expression. */
   not?: AppLimitDefaultFilter;
 }
 export interface OrgLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `max` field. */
   max?: IntFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgLimitDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
-export interface ConnectedAccountFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  service?: StringFilter;
-  identifier?: StringFilter;
-  details?: JSONFilter;
-  isVerified?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  serviceTrgmSimilarity?: FloatFilter;
-  identifierTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: ConnectedAccountFilter[];
-  or?: ConnectedAccountFilter[];
-  not?: ConnectedAccountFilter;
-}
 export interface NodeTypeRegistryFilter {
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
   slug?: StringFilter;
+  /** Filter by the object’s `category` field. */
   category?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
   displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `parameterSchema` field. */
   parameterSchema?: JSONFilter;
-  tags?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  slugTrgmSimilarity?: FloatFilter;
-  categoryTrgmSimilarity?: FloatFilter;
-  displayNameTrgmSimilarity?: FloatFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: NodeTypeRegistryFilter[];
+  /** Checks for any expressions in this list. */
   or?: NodeTypeRegistryFilter[];
+  /** Negates the expression. */
   not?: NodeTypeRegistryFilter;
 }
 export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `description` field. */
   description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
   or?: MembershipTypeFilter[];
+  /** Negates the expression. */
   not?: MembershipTypeFilter;
 }
 export interface CommitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
   message?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
-  parentIds?: UUIDFilter;
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `authorId` field. */
   authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
   committerId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
   treeId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
   date?: DatetimeFilter;
-  messageTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: CommitFilter[];
+  /** Checks for any expressions in this list. */
   or?: CommitFilter[];
+  /** Negates the expression. */
   not?: CommitFilter;
 }
 export interface AppMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: AppMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppMembershipDefaultFilter[];
+  /** Negates the expression. */
   not?: AppMembershipDefaultFilter;
 }
 export interface RlsModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
   sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
   sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `authenticate` field. */
   authenticate?: StringFilter;
+  /** Filter by the object’s `authenticateStrict` field. */
   authenticateStrict?: StringFilter;
+  /** Filter by the object’s `currentRole` field. */
   currentRole?: StringFilter;
+  /** Filter by the object’s `currentRoleId` field. */
   currentRoleId?: StringFilter;
-  authenticateTrgmSimilarity?: FloatFilter;
-  authenticateStrictTrgmSimilarity?: FloatFilter;
-  currentRoleTrgmSimilarity?: FloatFilter;
-  currentRoleIdTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: RlsModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: RlsModuleFilter[];
+  /** Negates the expression. */
   not?: RlsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 export interface OrgMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
   deleteMemberCascadeGroups?: BooleanFilter;
+  /** Filter by the object’s `createGroupsCascadeMembers` field. */
   createGroupsCascadeMembers?: BooleanFilter;
+  /** Checks for all expressions in this list. */
   and?: OrgMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
   or?: OrgMembershipDefaultFilter[];
+  /** Negates the expression. */
   not?: OrgMembershipDefaultFilter;
-}
-export interface AuditLogFilter {
-  id?: UUIDFilter;
-  event?: StringFilter;
-  actorId?: UUIDFilter;
-  origin?: StringFilter;
-  userAgent?: StringFilter;
-  ipAddress?: InternetAddressFilter;
-  success?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  userAgentTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: AuditLogFilter[];
-  or?: AuditLogFilter[];
-  not?: AuditLogFilter;
-}
-export interface AppLevelFilter {
-  id?: UUIDFilter;
-  name?: StringFilter;
-  description?: StringFilter;
-  image?: StringFilter;
-  ownerId?: UUIDFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  descriptionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
-  and?: AppLevelFilter[];
-  or?: AppLevelFilter[];
-  not?: AppLevelFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface SqlMigrationFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploy` field. */
   deploy?: StringFilter;
-  deps?: StringFilter;
-  payload?: JSONFilter;
+  /** Filter by the object’s `deps` field. */
+  deps?: StringListFilter;
+  /** Filter by the object’s `content` field. */
   content?: StringFilter;
+  /** Filter by the object’s `revert` field. */
   revert?: StringFilter;
+  /** Filter by the object’s `verify` field. */
   verify?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
+  /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  deployTrgmSimilarity?: FloatFilter;
-  contentTrgmSimilarity?: FloatFilter;
-  revertTrgmSimilarity?: FloatFilter;
-  verifyTrgmSimilarity?: FloatFilter;
-  actionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: SqlMigrationFilter[];
+  /** Checks for any expressions in this list. */
   or?: SqlMigrationFilter[];
+  /** Negates the expression. */
   not?: SqlMigrationFilter;
 }
-export interface EmailFilter {
-  id?: UUIDFilter;
-  ownerId?: UUIDFilter;
-  email?: StringFilter;
-  isVerified?: BooleanFilter;
-  isPrimary?: BooleanFilter;
-  createdAt?: DatetimeFilter;
-  updatedAt?: DatetimeFilter;
-  and?: EmailFilter[];
-  or?: EmailFilter[];
-  not?: EmailFilter;
-}
 export interface UserFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
-  username?: StringFilter;
-  displayName?: StringFilter;
-  profilePicture?: StringFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
   searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
   type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  searchTsvRank?: FloatFilter;
-  displayNameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: UserFilter[];
+  /** Checks for any expressions in this list. */
   or?: UserFilter[];
+  /** Negates the expression. */
   not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedDatabases` relation. */
+  ownedDatabases?: UserToManyDatabaseFilter;
+  /** `ownedDatabases` exist. */
+  ownedDatabasesExist?: boolean;
+  /** Filter by the object’s `appMembershipByActorId` relation. */
+  appMembershipByActorId?: AppMembershipFilter;
+  /** A related `appMembershipByActorId` exists. */
+  appMembershipByActorIdExists?: boolean;
+  /** Filter by the object’s `appAdminGrantsByActorId` relation. */
+  appAdminGrantsByActorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByActorId` exist. */
+  appAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAdminGrantsByGrantorId` relation. */
+  appAdminGrantsByGrantorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByGrantorId` exist. */
+  appAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByActorId` relation. */
+  appOwnerGrantsByActorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByActorId` exist. */
+  appOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByGrantorId` relation. */
+  appOwnerGrantsByGrantorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByGrantorId` exist. */
+  appOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByActorId` relation. */
+  appGrantsByActorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByActorId` exist. */
+  appGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByGrantorId` relation. */
+  appGrantsByGrantorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByGrantorId` exist. */
+  appGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByActorId` relation. */
+  orgMembershipsByActorId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByActorId` exist. */
+  orgMembershipsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByEntityId` relation. */
+  orgMembershipsByEntityId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByEntityId` exist. */
+  orgMembershipsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipDefaultByEntityId` relation. */
+  orgMembershipDefaultByEntityId?: OrgMembershipDefaultFilter;
+  /** A related `orgMembershipDefaultByEntityId` exists. */
+  orgMembershipDefaultByEntityIdExists?: boolean;
+  /** Filter by the object’s `orgMembersByActorId` relation. */
+  orgMembersByActorId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByActorId` exist. */
+  orgMembersByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembersByEntityId` relation. */
+  orgMembersByEntityId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByEntityId` exist. */
+  orgMembersByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByActorId` relation. */
+  orgAdminGrantsByActorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByActorId` exist. */
+  orgAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByEntityId` relation. */
+  orgAdminGrantsByEntityId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByEntityId` exist. */
+  orgAdminGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByGrantorId` relation. */
+  orgAdminGrantsByGrantorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByGrantorId` exist. */
+  orgAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByActorId` relation. */
+  orgOwnerGrantsByActorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByActorId` exist. */
+  orgOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByEntityId` relation. */
+  orgOwnerGrantsByEntityId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByEntityId` exist. */
+  orgOwnerGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByGrantorId` relation. */
+  orgOwnerGrantsByGrantorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByGrantorId` exist. */
+  orgOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByActorId` relation. */
+  orgGrantsByActorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByActorId` exist. */
+  orgGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByEntityId` relation. */
+  orgGrantsByEntityId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByEntityId` exist. */
+  orgGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByGrantorId` relation. */
+  orgGrantsByGrantorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByGrantorId` exist. */
+  orgGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdges` relation. */
+  parentOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `parentOrgChartEdges` exist. */
+  parentOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `orgChartEdgesByEntityId` relation. */
+  orgChartEdgesByEntityId?: UserToManyOrgChartEdgeFilter;
+  /** `orgChartEdgesByEntityId` exist. */
+  orgChartEdgesByEntityIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdges` relation. */
+  childOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `childOrgChartEdges` exist. */
+  childOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdgeGrants` relation. */
+  parentOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `parentOrgChartEdgeGrants` exist. */
+  parentOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByEntityId` relation. */
+  orgChartEdgeGrantsByEntityId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByEntityId` exist. */
+  orgChartEdgeGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByGrantorId` relation. */
+  orgChartEdgeGrantsByGrantorId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByGrantorId` exist. */
+  orgChartEdgeGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdgeGrants` relation. */
+  childOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `childOrgChartEdgeGrants` exist. */
+  childOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgPermissionDefaultsByEntityId` relation. */
+  orgPermissionDefaultsByEntityId?: UserToManyOrgPermissionDefaultFilter;
+  /** `orgPermissionDefaultsByEntityId` exist. */
+  orgPermissionDefaultsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appLimitsByActorId` relation. */
+  appLimitsByActorId?: UserToManyAppLimitFilter;
+  /** `appLimitsByActorId` exist. */
+  appLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByActorId` relation. */
+  orgLimitsByActorId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByActorId` exist. */
+  orgLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByEntityId` relation. */
+  orgLimitsByEntityId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByEntityId` exist. */
+  orgLimitsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appStepsByActorId` relation. */
+  appStepsByActorId?: UserToManyAppStepFilter;
+  /** `appStepsByActorId` exist. */
+  appStepsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAchievementsByActorId` relation. */
+  appAchievementsByActorId?: UserToManyAppAchievementFilter;
+  /** `appAchievementsByActorId` exist. */
+  appAchievementsByActorIdExist?: boolean;
+  /** Filter by the object’s `ownedAppLevels` relation. */
+  ownedAppLevels?: UserToManyAppLevelFilter;
+  /** `ownedAppLevels` exist. */
+  ownedAppLevelsExist?: boolean;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedConnectedAccounts` relation. */
+  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
+  /** `ownedConnectedAccounts` exist. */
+  ownedConnectedAccountsExist?: boolean;
+  /** Filter by the object’s `invitesBySenderId` relation. */
+  invitesBySenderId?: UserToManyInviteFilter;
+  /** `invitesBySenderId` exist. */
+  invitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesByReceiverId` relation. */
+  claimedInvitesByReceiverId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesByReceiverId` exist. */
+  claimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesBySenderId` relation. */
+  claimedInvitesBySenderId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesBySenderId` exist. */
+  claimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByEntityId` relation. */
+  orgInvitesByEntityId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByEntityId` exist. */
+  orgInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByReceiverId` relation. */
+  orgInvitesByReceiverId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByReceiverId` exist. */
+  orgInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesBySenderId` relation. */
+  orgInvitesBySenderId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesBySenderId` exist. */
+  orgInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByEntityId` relation. */
+  orgClaimedInvitesByEntityId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByEntityId` exist. */
+  orgClaimedInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByReceiverId` relation. */
+  orgClaimedInvitesByReceiverId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByReceiverId` exist. */
+  orgClaimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesBySenderId` relation. */
+  orgClaimedInvitesBySenderId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesBySenderId` exist. */
+  orgClaimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `auditLogsByActorId` relation. */
+  auditLogsByActorId?: UserToManyAuditLogFilter;
+  /** `auditLogsByActorId` exist. */
+  auditLogsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
 }
 export interface AstMigrationFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
-  requires?: StringFilter;
+  /** Filter by the object’s `requires` field. */
+  requires?: StringListFilter;
+  /** Filter by the object’s `payload` field. */
   payload?: JSONFilter;
+  /** Filter by the object’s `deploys` field. */
   deploys?: StringFilter;
+  /** Filter by the object’s `deploy` field. */
   deploy?: JSONFilter;
+  /** Filter by the object’s `revert` field. */
   revert?: JSONFilter;
+  /** Filter by the object’s `verify` field. */
   verify?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
+  /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
-  actionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: AstMigrationFilter[];
+  /** Checks for any expressions in this list. */
   or?: AstMigrationFilter[];
+  /** Negates the expression. */
   not?: AstMigrationFilter;
 }
 export interface AppMembershipFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
   createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
   updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
   isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
   isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
   isVerified?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
   isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
   permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
   granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
   profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: AppMembershipFilter[];
+  /** Checks for any expressions in this list. */
   or?: AppMembershipFilter[];
+  /** Negates the expression. */
   not?: AppMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
 }
 export interface HierarchyModuleFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
   schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
   privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableId` field. */
   chartEdgesTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableName` field. */
   chartEdgesTableName?: StringFilter;
+  /** Filter by the object’s `hierarchySprtTableId` field. */
   hierarchySprtTableId?: UUIDFilter;
+  /** Filter by the object’s `hierarchySprtTableName` field. */
   hierarchySprtTableName?: StringFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableId` field. */
   chartEdgeGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableName` field. */
   chartEdgeGrantsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
   usersTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
   privateSchemaName?: StringFilter;
+  /** Filter by the object’s `sprtTableName` field. */
   sprtTableName?: StringFilter;
+  /** Filter by the object’s `rebuildHierarchyFunction` field. */
   rebuildHierarchyFunction?: StringFilter;
+  /** Filter by the object’s `getSubordinatesFunction` field. */
   getSubordinatesFunction?: StringFilter;
+  /** Filter by the object’s `getManagersFunction` field. */
   getManagersFunction?: StringFilter;
+  /** Filter by the object’s `isManagerOfFunction` field. */
   isManagerOfFunction?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  chartEdgesTableNameTrgmSimilarity?: FloatFilter;
-  hierarchySprtTableNameTrgmSimilarity?: FloatFilter;
-  chartEdgeGrantsTableNameTrgmSimilarity?: FloatFilter;
-  prefixTrgmSimilarity?: FloatFilter;
-  privateSchemaNameTrgmSimilarity?: FloatFilter;
-  sprtTableNameTrgmSimilarity?: FloatFilter;
-  rebuildHierarchyFunctionTrgmSimilarity?: FloatFilter;
-  getSubordinatesFunctionTrgmSimilarity?: FloatFilter;
-  getManagersFunctionTrgmSimilarity?: FloatFilter;
-  isManagerOfFunctionTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: HierarchyModuleFilter[];
+  /** Checks for any expressions in this list. */
   or?: HierarchyModuleFilter[];
+  /** Negates the expression. */
   not?: HierarchyModuleFilter;
+  /** Filter by the object’s `chartEdgeGrantsTable` relation. */
+  chartEdgeGrantsTable?: TableFilter;
+  /** Filter by the object’s `chartEdgesTable` relation. */
+  chartEdgesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** Filter by the object’s `hierarchySprtTable` relation. */
+  hierarchySprtTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
 }
 // ============ OrderBy Types ============
+export type GetAllRecordsOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC';
 export type OrgGetManagersRecordsOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -7964,126 +9840,70 @@ export type OrgGetSubordinatesRecordsOrderBy =
   | 'USER_ID_DESC'
   | 'DEPTH_ASC'
   | 'DEPTH_DESC';
-export type GetAllRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC';
 export type ObjectOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'HASH_UUID_ASC'
-  | 'HASH_UUID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'FRZN_ASC'
-  | 'FRZN_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
+  | 'FRZN_DESC';
 export type AppPermissionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 export type OrgPermissionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC'
-  | 'BITSTR_ASC'
-  | 'BITSTR_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'BITNUM_DESC';
 export type AppLevelRequirementOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'LEVEL_ASC'
   | 'LEVEL_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'REQUIRED_COUNT_ASC'
-  | 'REQUIRED_COUNT_DESC'
   | 'PRIORITY_ASC'
   | 'PRIORITY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type DatabaseOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
   | 'SCHEMA_HASH_ASC'
   | 'SCHEMA_HASH_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'SCHEMA_HASH_TRGM_SIMILARITY_ASC'
-  | 'SCHEMA_HASH_TRGM_SIMILARITY_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type SchemaOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8092,42 +9912,14 @@ export type SchemaOrderBy =
   | 'NAME_DESC'
   | 'SCHEMA_NAME_ASC'
   | 'SCHEMA_NAME_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'IS_PUBLIC_ASC'
-  | 'IS_PUBLIC_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SCHEMA_NAME_TRGM_SIMILARITY_ASC'
-  | 'SCHEMA_NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type TableOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8136,54 +9928,14 @@ export type TableOrderBy =
   | 'SCHEMA_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'USE_RLS_ASC'
-  | 'USE_RLS_DESC'
-  | 'TIMESTAMPS_ASC'
-  | 'TIMESTAMPS_DESC'
-  | 'PEOPLESTAMPS_ASC'
-  | 'PEOPLESTAMPS_DESC'
-  | 'PLURAL_NAME_ASC'
-  | 'PLURAL_NAME_DESC'
-  | 'SINGULAR_NAME_ASC'
-  | 'SINGULAR_NAME_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'INHERITS_ID_ASC'
-  | 'INHERITS_ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'PLURAL_NAME_TRGM_SIMILARITY_ASC'
-  | 'PLURAL_NAME_TRGM_SIMILARITY_DESC'
-  | 'SINGULAR_NAME_TRGM_SIMILARITY_ASC'
-  | 'SINGULAR_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type CheckConstraintOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8192,38 +9944,14 @@ export type CheckConstraintOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'EXPR_ASC'
-  | 'EXPR_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type FieldOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8232,64 +9960,14 @@ export type FieldOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'LABEL_ASC'
-  | 'LABEL_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'IS_REQUIRED_ASC'
-  | 'IS_REQUIRED_DESC'
-  | 'DEFAULT_VALUE_ASC'
-  | 'DEFAULT_VALUE_DESC'
-  | 'DEFAULT_VALUE_AST_ASC'
-  | 'DEFAULT_VALUE_AST_DESC'
-  | 'IS_HIDDEN_ASC'
-  | 'IS_HIDDEN_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'FIELD_ORDER_ASC'
-  | 'FIELD_ORDER_DESC'
-  | 'REGEXP_ASC'
-  | 'REGEXP_DESC'
-  | 'CHK_ASC'
-  | 'CHK_DESC'
-  | 'CHK_EXPR_ASC'
-  | 'CHK_EXPR_DESC'
-  | 'MIN_ASC'
-  | 'MIN_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'LABEL_TRGM_SIMILARITY_ASC'
-  | 'LABEL_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'DEFAULT_VALUE_TRGM_SIMILARITY_ASC'
-  | 'DEFAULT_VALUE_TRGM_SIMILARITY_DESC'
-  | 'REGEXP_TRGM_SIMILARITY_ASC'
-  | 'REGEXP_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type ForeignKeyConstraintOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8298,74 +9976,28 @@ export type ForeignKeyConstraintOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'REF_TABLE_ID_ASC'
-  | 'REF_TABLE_ID_DESC'
-  | 'REF_FIELD_IDS_ASC'
-  | 'REF_FIELD_IDS_DESC'
-  | 'DELETE_ACTION_ASC'
-  | 'DELETE_ACTION_DESC'
-  | 'UPDATE_ACTION_ASC'
-  | 'UPDATE_ACTION_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_ASC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_DESC'
-  | 'UPDATE_ACTION_TRGM_SIMILARITY_ASC'
-  | 'UPDATE_ACTION_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type FullTextSearchOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'TABLE_ID_ASC'
   | 'TABLE_ID_DESC'
-  | 'FIELD_ID_ASC'
-  | 'FIELD_ID_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'WEIGHTS_ASC'
-  | 'WEIGHTS_DESC'
-  | 'LANGS_ASC'
-  | 'LANGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type IndexOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8374,48 +10006,14 @@ export type IndexOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'INCLUDE_FIELD_IDS_ASC'
-  | 'INCLUDE_FIELD_IDS_DESC'
-  | 'ACCESS_METHOD_ASC'
-  | 'ACCESS_METHOD_DESC'
-  | 'INDEX_PARAMS_ASC'
-  | 'INDEX_PARAMS_DESC'
-  | 'WHERE_CLAUSE_ASC'
-  | 'WHERE_CLAUSE_DESC'
-  | 'IS_UNIQUE_ASC'
-  | 'IS_UNIQUE_DESC'
-  | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC'
-  | 'OP_CLASSES_ASC'
-  | 'OP_CLASSES_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'ACCESS_METHOD_TRGM_SIMILARITY_ASC'
-  | 'ACCESS_METHOD_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type PolicyOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8424,48 +10022,14 @@ export type PolicyOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
-  | 'PRIVILEGE_ASC'
-  | 'PRIVILEGE_DESC'
-  | 'PERMISSIVE_ASC'
-  | 'PERMISSIVE_DESC'
-  | 'DISABLED_ASC'
-  | 'DISABLED_DESC'
-  | 'POLICY_TYPE_ASC'
-  | 'POLICY_TYPE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type PrimaryKeyConstraintOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8474,64 +10038,28 @@ export type PrimaryKeyConstraintOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type TableGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'TABLE_ID_ASC'
   | 'TABLE_ID_DESC'
-  | 'PRIVILEGE_ASC'
-  | 'PRIVILEGE_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type TriggerOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8540,38 +10068,14 @@ export type TriggerOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'EVENT_ASC'
-  | 'EVENT_DESC'
-  | 'FUNCTION_NAME_ASC'
-  | 'FUNCTION_NAME_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'EVENT_TRGM_SIMILARITY_ASC'
-  | 'EVENT_TRGM_SIMILARITY_DESC'
-  | 'FUNCTION_NAME_TRGM_SIMILARITY_ASC'
-  | 'FUNCTION_NAME_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type UniqueConstraintOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8580,40 +10084,14 @@ export type UniqueConstraintOrderBy =
   | 'TABLE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
-  | 'FIELD_IDS_ASC'
-  | 'FIELD_IDS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type ViewOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8623,55 +10101,21 @@ export type ViewOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'VIEW_TYPE_ASC'
-  | 'VIEW_TYPE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'FILTER_TYPE_ASC'
-  | 'FILTER_TYPE_DESC'
-  | 'FILTER_DATA_ASC'
-  | 'FILTER_DATA_DESC'
-  | 'SECURITY_INVOKER_ASC'
-  | 'SECURITY_INVOKER_DESC'
-  | 'IS_READ_ONLY_ASC'
-  | 'IS_READ_ONLY_DESC'
-  | 'SMART_TAGS_ASC'
-  | 'SMART_TAGS_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'MODULE_ASC'
-  | 'MODULE_DESC'
-  | 'SCOPE_ASC'
-  | 'SCOPE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'VIEW_TYPE_TRGM_SIMILARITY_ASC'
-  | 'VIEW_TYPE_TRGM_SIMILARITY_DESC'
-  | 'FILTER_TYPE_TRGM_SIMILARITY_ASC'
-  | 'FILTER_TYPE_TRGM_SIMILARITY_DESC'
-  | 'MODULE_TRGM_SIMILARITY_ASC'
-  | 'MODULE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'TABLE_ID_DESC';
 export type ViewTableOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'VIEW_ID_ASC'
   | 'VIEW_ID_DESC'
   | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'JOIN_ORDER_ASC'
-  | 'JOIN_ORDER_DESC';
+  | 'TABLE_ID_DESC';
 export type ViewGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8682,20 +10126,12 @@ export type ViewGrantOrderBy =
   | 'GRANTEE_NAME_DESC'
   | 'PRIVILEGE_ASC'
   | 'PRIVILEGE_DESC'
-  | 'WITH_GRANT_OPTION_ASC'
-  | 'WITH_GRANT_OPTION_DESC'
   | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'IS_GRANT_DESC';
 export type ViewRuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8703,23 +10139,27 @@ export type ViewRuleOrderBy =
   | 'VIEW_ID_ASC'
   | 'VIEW_ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'EVENT_ASC'
-  | 'EVENT_DESC'
-  | 'ACTION_ASC'
-  | 'ACTION_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'EVENT_TRGM_SIMILARITY_ASC'
-  | 'EVENT_TRGM_SIMILARITY_DESC'
-  | 'ACTION_TRGM_SIMILARITY_ASC'
-  | 'ACTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type TableTemplateModuleOrderBy =
+  | 'NAME_DESC';
+export type EmbeddingChunkOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'TABLE_ID_ASC'
+  | 'TABLE_ID_DESC'
+  | 'CHUNKS_TABLE_ID_ASC'
+  | 'CHUNKS_TABLE_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type TableTemplateModuleOrderBy =
   | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8732,74 +10172,24 @@ export type TableTemplateModuleOrderBy =
   | 'TABLE_ID_DESC'
   | 'OWNER_TABLE_ID_ASC'
   | 'OWNER_TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
   | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NODE_TYPE_DESC';
 export type SecureTableProvisionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
   | 'TABLE_ID_ASC'
   | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
   | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'USE_RLS_ASC'
-  | 'USE_RLS_DESC'
-  | 'NODE_DATA_ASC'
-  | 'NODE_DATA_DESC'
-  | 'FIELDS_ASC'
-  | 'FIELDS_DESC'
-  | 'GRANT_ROLES_ASC'
-  | 'GRANT_ROLES_DESC'
-  | 'GRANT_PRIVILEGES_ASC'
-  | 'GRANT_PRIVILEGES_DESC'
-  | 'POLICY_TYPE_ASC'
-  | 'POLICY_TYPE_DESC'
-  | 'POLICY_PRIVILEGES_ASC'
-  | 'POLICY_PRIVILEGES_DESC'
-  | 'POLICY_ROLE_ASC'
-  | 'POLICY_ROLE_DESC'
-  | 'POLICY_PERMISSIVE_ASC'
-  | 'POLICY_PERMISSIVE_DESC'
-  | 'POLICY_NAME_ASC'
-  | 'POLICY_NAME_DESC'
-  | 'POLICY_DATA_ASC'
-  | 'POLICY_DATA_DESC'
-  | 'OUT_FIELDS_ASC'
-  | 'OUT_FIELDS_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_ASC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NODE_TYPE_DESC';
 export type RelationProvisionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8809,99 +10199,25 @@ export type RelationProvisionOrderBy =
   | 'SOURCE_TABLE_ID_ASC'
   | 'SOURCE_TABLE_ID_DESC'
   | 'TARGET_TABLE_ID_ASC'
-  | 'TARGET_TABLE_ID_DESC'
-  | 'FIELD_NAME_ASC'
-  | 'FIELD_NAME_DESC'
-  | 'DELETE_ACTION_ASC'
-  | 'DELETE_ACTION_DESC'
-  | 'IS_REQUIRED_ASC'
-  | 'IS_REQUIRED_DESC'
-  | 'JUNCTION_TABLE_ID_ASC'
-  | 'JUNCTION_TABLE_ID_DESC'
-  | 'JUNCTION_TABLE_NAME_ASC'
-  | 'JUNCTION_TABLE_NAME_DESC'
-  | 'JUNCTION_SCHEMA_ID_ASC'
-  | 'JUNCTION_SCHEMA_ID_DESC'
-  | 'SOURCE_FIELD_NAME_ASC'
-  | 'SOURCE_FIELD_NAME_DESC'
-  | 'TARGET_FIELD_NAME_ASC'
-  | 'TARGET_FIELD_NAME_DESC'
-  | 'USE_COMPOSITE_KEY_ASC'
-  | 'USE_COMPOSITE_KEY_DESC'
-  | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'NODE_DATA_ASC'
-  | 'NODE_DATA_DESC'
-  | 'GRANT_ROLES_ASC'
-  | 'GRANT_ROLES_DESC'
-  | 'GRANT_PRIVILEGES_ASC'
-  | 'GRANT_PRIVILEGES_DESC'
-  | 'POLICY_TYPE_ASC'
-  | 'POLICY_TYPE_DESC'
-  | 'POLICY_PRIVILEGES_ASC'
-  | 'POLICY_PRIVILEGES_DESC'
-  | 'POLICY_ROLE_ASC'
-  | 'POLICY_ROLE_DESC'
-  | 'POLICY_PERMISSIVE_ASC'
-  | 'POLICY_PERMISSIVE_DESC'
-  | 'POLICY_NAME_ASC'
-  | 'POLICY_NAME_DESC'
-  | 'POLICY_DATA_ASC'
-  | 'POLICY_DATA_DESC'
-  | 'OUT_FIELD_ID_ASC'
-  | 'OUT_FIELD_ID_DESC'
-  | 'OUT_JUNCTION_TABLE_ID_ASC'
-  | 'OUT_JUNCTION_TABLE_ID_DESC'
-  | 'OUT_SOURCE_FIELD_ID_ASC'
-  | 'OUT_SOURCE_FIELD_ID_DESC'
-  | 'OUT_TARGET_FIELD_ID_ASC'
-  | 'OUT_TARGET_FIELD_ID_DESC'
-  | 'RELATION_TYPE_TRGM_SIMILARITY_ASC'
-  | 'RELATION_TYPE_TRGM_SIMILARITY_DESC'
-  | 'FIELD_NAME_TRGM_SIMILARITY_ASC'
-  | 'FIELD_NAME_TRGM_SIMILARITY_DESC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_ASC'
-  | 'DELETE_ACTION_TRGM_SIMILARITY_DESC'
-  | 'JUNCTION_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'JUNCTION_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SOURCE_FIELD_NAME_TRGM_SIMILARITY_ASC'
-  | 'SOURCE_FIELD_NAME_TRGM_SIMILARITY_DESC'
-  | 'TARGET_FIELD_NAME_TRGM_SIMILARITY_ASC'
-  | 'TARGET_FIELD_NAME_TRGM_SIMILARITY_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_TYPE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_ASC'
-  | 'POLICY_ROLE_TRGM_SIMILARITY_DESC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_ASC'
-  | 'POLICY_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'TARGET_TABLE_ID_DESC';
 export type SchemaGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SCHEMA_ID_ASC'
   | 'SCHEMA_ID_DESC'
-  | 'GRANTEE_NAME_ASC'
-  | 'GRANTEE_NAME_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type DefaultPrivilegeOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8915,19 +10231,23 @@ export type DefaultPrivilegeOrderBy =
   | 'GRANTEE_NAME_ASC'
   | 'GRANTEE_NAME_DESC'
   | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'OBJECT_TYPE_TRGM_SIMILARITY_ASC'
-  | 'OBJECT_TYPE_TRGM_SIMILARITY_DESC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_ASC'
-  | 'PRIVILEGE_TRGM_SIMILARITY_DESC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTEE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type ApiSchemaOrderBy =
+  | 'IS_GRANT_DESC';
+export type EnumOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
+export type ApiSchemaOrderBy =
   | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8937,9 +10257,9 @@ export type ApiSchemaOrderBy =
   | 'API_ID_ASC'
   | 'API_ID_DESC';
 export type ApiModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8947,17 +10267,11 @@ export type ApiModuleOrderBy =
   | 'API_ID_ASC'
   | 'API_ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
 export type DomainOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
@@ -8971,1033 +10285,307 @@ export type DomainOrderBy =
   | 'DOMAIN_ASC'
   | 'DOMAIN_DESC';
 export type SiteMetadatumOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'OG_IMAGE_ASC'
-  | 'OG_IMAGE_DESC'
-  | 'TITLE_TRGM_SIMILARITY_ASC'
-  | 'TITLE_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'SITE_ID_DESC';
 export type SiteModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'SITE_ID_DESC';
 export type SiteThemeOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'THEME_ASC'
-  | 'THEME_DESC';
+  | 'SITE_ID_DESC';
 export type TriggerFunctionOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'CODE_ASC'
-  | 'CODE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'CODE_TRGM_SIMILARITY_ASC'
-  | 'CODE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type ApiOrderBy =
+  | 'UPDATED_AT_DESC';
+export type DatabaseTransferOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'TARGET_OWNER_ID_ASC'
+  | 'TARGET_OWNER_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC';
+export type ApiOrderBy =
   | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'ROLE_NAME_ASC'
-  | 'ROLE_NAME_DESC'
-  | 'ANON_ROLE_ASC'
-  | 'ANON_ROLE_DESC'
-  | 'IS_PUBLIC_ASC'
-  | 'IS_PUBLIC_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DBNAME_TRGM_SIMILARITY_ASC'
-  | 'DBNAME_TRGM_SIMILARITY_DESC'
-  | 'ROLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'ROLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'ANON_ROLE_TRGM_SIMILARITY_ASC'
-  | 'ANON_ROLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NAME_DESC';
 export type SiteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TITLE_ASC'
-  | 'TITLE_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'OG_IMAGE_ASC'
-  | 'OG_IMAGE_DESC'
-  | 'FAVICON_ASC'
-  | 'FAVICON_DESC'
-  | 'APPLE_TOUCH_ICON_ASC'
-  | 'APPLE_TOUCH_ICON_DESC'
-  | 'LOGO_ASC'
-  | 'LOGO_DESC'
-  | 'DBNAME_ASC'
-  | 'DBNAME_DESC'
-  | 'TITLE_TRGM_SIMILARITY_ASC'
-  | 'TITLE_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'DBNAME_TRGM_SIMILARITY_ASC'
-  | 'DBNAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type AppOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'SITE_ID_ASC'
-  | 'SITE_ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'APP_IMAGE_ASC'
-  | 'APP_IMAGE_DESC'
-  | 'APP_STORE_LINK_ASC'
-  | 'APP_STORE_LINK_DESC'
-  | 'APP_STORE_ID_ASC'
-  | 'APP_STORE_ID_DESC'
-  | 'APP_ID_PREFIX_ASC'
-  | 'APP_ID_PREFIX_DESC'
-  | 'PLAY_STORE_LINK_ASC'
-  | 'PLAY_STORE_LINK_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'APP_STORE_ID_TRGM_SIMILARITY_ASC'
-  | 'APP_STORE_ID_TRGM_SIMILARITY_DESC'
-  | 'APP_ID_PREFIX_TRGM_SIMILARITY_ASC'
-  | 'APP_ID_PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'SITE_ID_DESC';
 export type ConnectedAccountsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type CryptoAddressesModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'CRYPTO_NETWORK_ASC'
-  | 'CRYPTO_NETWORK_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_ASC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type CryptoAuthModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'SECRETS_TABLE_ID_ASC'
-  | 'SECRETS_TABLE_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'ADDRESSES_TABLE_ID_ASC'
-  | 'ADDRESSES_TABLE_ID_DESC'
-  | 'USER_FIELD_ASC'
-  | 'USER_FIELD_DESC'
-  | 'CRYPTO_NETWORK_ASC'
-  | 'CRYPTO_NETWORK_DESC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_ASC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_DESC'
-  | 'SIGN_IN_RECORD_FAILURE_ASC'
-  | 'SIGN_IN_RECORD_FAILURE_DESC'
-  | 'SIGN_UP_WITH_KEY_ASC'
-  | 'SIGN_UP_WITH_KEY_DESC'
-  | 'SIGN_IN_WITH_CHALLENGE_ASC'
-  | 'SIGN_IN_WITH_CHALLENGE_DESC'
-  | 'USER_FIELD_TRGM_SIMILARITY_ASC'
-  | 'USER_FIELD_TRGM_SIMILARITY_DESC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_ASC'
-  | 'CRYPTO_NETWORK_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_REQUEST_CHALLENGE_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_RECORD_FAILURE_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_RECORD_FAILURE_TRGM_SIMILARITY_DESC'
-  | 'SIGN_UP_WITH_KEY_TRGM_SIMILARITY_ASC'
-  | 'SIGN_UP_WITH_KEY_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_WITH_CHALLENGE_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_WITH_CHALLENGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type DefaultIdsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC';
 export type DenormalizedTableFieldOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'FIELD_ID_ASC'
-  | 'FIELD_ID_DESC'
-  | 'SET_IDS_ASC'
-  | 'SET_IDS_DESC'
-  | 'REF_TABLE_ID_ASC'
-  | 'REF_TABLE_ID_DESC'
-  | 'REF_FIELD_ID_ASC'
-  | 'REF_FIELD_ID_DESC'
-  | 'REF_IDS_ASC'
-  | 'REF_IDS_DESC'
-  | 'USE_UPDATES_ASC'
-  | 'USE_UPDATES_DESC'
-  | 'UPDATE_DEFAULTS_ASC'
-  | 'UPDATE_DEFAULTS_DESC'
-  | 'FUNC_NAME_ASC'
-  | 'FUNC_NAME_DESC'
-  | 'FUNC_ORDER_ASC'
-  | 'FUNC_ORDER_DESC'
-  | 'FUNC_NAME_TRGM_SIMILARITY_ASC'
-  | 'FUNC_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type EmailsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type EncryptedSecretsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type FieldModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'FIELD_ID_ASC'
-  | 'FIELD_ID_DESC'
   | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'TRIGGERS_ASC'
-  | 'TRIGGERS_DESC'
-  | 'FUNCTIONS_ASC'
-  | 'FUNCTIONS_DESC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_ASC'
-  | 'NODE_TYPE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'NODE_TYPE_DESC';
 export type InvitesModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'EMAILS_TABLE_ID_ASC'
-  | 'EMAILS_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'INVITES_TABLE_ID_ASC'
-  | 'INVITES_TABLE_ID_DESC'
-  | 'CLAIMED_INVITES_TABLE_ID_ASC'
-  | 'CLAIMED_INVITES_TABLE_ID_DESC'
-  | 'INVITES_TABLE_NAME_ASC'
-  | 'INVITES_TABLE_NAME_DESC'
-  | 'CLAIMED_INVITES_TABLE_NAME_ASC'
-  | 'CLAIMED_INVITES_TABLE_NAME_DESC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_ASC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'MEMBERSHIP_TYPE_ASC'
-  | 'MEMBERSHIP_TYPE_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'INVITES_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'INVITES_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'CLAIMED_INVITES_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'CLAIMED_INVITES_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SUBMIT_INVITE_CODE_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type LevelsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'STEPS_TABLE_ID_ASC'
-  | 'STEPS_TABLE_ID_DESC'
-  | 'STEPS_TABLE_NAME_ASC'
-  | 'STEPS_TABLE_NAME_DESC'
-  | 'ACHIEVEMENTS_TABLE_ID_ASC'
-  | 'ACHIEVEMENTS_TABLE_ID_DESC'
-  | 'ACHIEVEMENTS_TABLE_NAME_ASC'
-  | 'ACHIEVEMENTS_TABLE_NAME_DESC'
-  | 'LEVELS_TABLE_ID_ASC'
-  | 'LEVELS_TABLE_ID_DESC'
-  | 'LEVELS_TABLE_NAME_ASC'
-  | 'LEVELS_TABLE_NAME_DESC'
-  | 'LEVEL_REQUIREMENTS_TABLE_ID_ASC'
-  | 'LEVEL_REQUIREMENTS_TABLE_ID_DESC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_ASC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_DESC'
-  | 'COMPLETED_STEP_ASC'
-  | 'COMPLETED_STEP_DESC'
-  | 'INCOMPLETED_STEP_ASC'
-  | 'INCOMPLETED_STEP_DESC'
-  | 'TG_ACHIEVEMENT_ASC'
-  | 'TG_ACHIEVEMENT_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_DESC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_ASC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_DESC'
-  | 'UPSERT_ACHIEVEMENT_ASC'
-  | 'UPSERT_ACHIEVEMENT_DESC'
-  | 'TG_UPDATE_ACHIEVEMENTS_ASC'
-  | 'TG_UPDATE_ACHIEVEMENTS_DESC'
-  | 'STEPS_REQUIRED_ASC'
-  | 'STEPS_REQUIRED_DESC'
-  | 'LEVEL_ACHIEVED_ASC'
-  | 'LEVEL_ACHIEVED_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'MEMBERSHIP_TYPE_ASC'
-  | 'MEMBERSHIP_TYPE_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'STEPS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'STEPS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'ACHIEVEMENTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'ACHIEVEMENTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'LEVELS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'LEVELS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'LEVEL_REQUIREMENTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'COMPLETED_STEP_TRGM_SIMILARITY_ASC'
-  | 'COMPLETED_STEP_TRGM_SIMILARITY_DESC'
-  | 'INCOMPLETED_STEP_TRGM_SIMILARITY_ASC'
-  | 'INCOMPLETED_STEP_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_TOGGLE_BOOLEAN_TRGM_SIMILARITY_DESC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_TRGM_SIMILARITY_ASC'
-  | 'TG_ACHIEVEMENT_BOOLEAN_TRGM_SIMILARITY_DESC'
-  | 'UPSERT_ACHIEVEMENT_TRGM_SIMILARITY_ASC'
-  | 'UPSERT_ACHIEVEMENT_TRGM_SIMILARITY_DESC'
-  | 'TG_UPDATE_ACHIEVEMENTS_TRGM_SIMILARITY_ASC'
-  | 'TG_UPDATE_ACHIEVEMENTS_TRGM_SIMILARITY_DESC'
-  | 'STEPS_REQUIRED_TRGM_SIMILARITY_ASC'
-  | 'STEPS_REQUIRED_TRGM_SIMILARITY_DESC'
-  | 'LEVEL_ACHIEVED_TRGM_SIMILARITY_ASC'
-  | 'LEVEL_ACHIEVED_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type LimitsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'DEFAULT_TABLE_ID_ASC'
-  | 'DEFAULT_TABLE_ID_DESC'
-  | 'DEFAULT_TABLE_NAME_ASC'
-  | 'DEFAULT_TABLE_NAME_DESC'
-  | 'LIMIT_INCREMENT_FUNCTION_ASC'
-  | 'LIMIT_INCREMENT_FUNCTION_DESC'
-  | 'LIMIT_DECREMENT_FUNCTION_ASC'
-  | 'LIMIT_DECREMENT_FUNCTION_DESC'
-  | 'LIMIT_INCREMENT_TRIGGER_ASC'
-  | 'LIMIT_INCREMENT_TRIGGER_DESC'
-  | 'LIMIT_DECREMENT_TRIGGER_ASC'
-  | 'LIMIT_DECREMENT_TRIGGER_DESC'
-  | 'LIMIT_UPDATE_TRIGGER_ASC'
-  | 'LIMIT_UPDATE_TRIGGER_DESC'
-  | 'LIMIT_CHECK_FUNCTION_ASC'
-  | 'LIMIT_CHECK_FUNCTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'MEMBERSHIP_TYPE_ASC'
-  | 'MEMBERSHIP_TYPE_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_INCREMENT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_INCREMENT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_DECREMENT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_DECREMENT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_INCREMENT_TRIGGER_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_INCREMENT_TRIGGER_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_DECREMENT_TRIGGER_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_DECREMENT_TRIGGER_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_UPDATE_TRIGGER_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_UPDATE_TRIGGER_TRGM_SIMILARITY_DESC'
-  | 'LIMIT_CHECK_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'LIMIT_CHECK_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type MembershipTypesModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type MembershipsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'MEMBERSHIPS_TABLE_ID_ASC'
-  | 'MEMBERSHIPS_TABLE_ID_DESC'
-  | 'MEMBERSHIPS_TABLE_NAME_ASC'
-  | 'MEMBERSHIPS_TABLE_NAME_DESC'
-  | 'MEMBERS_TABLE_ID_ASC'
-  | 'MEMBERS_TABLE_ID_DESC'
-  | 'MEMBERS_TABLE_NAME_ASC'
-  | 'MEMBERS_TABLE_NAME_DESC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_ID_ASC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_ID_DESC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_ASC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_DESC'
-  | 'GRANTS_TABLE_ID_ASC'
-  | 'GRANTS_TABLE_ID_DESC'
-  | 'GRANTS_TABLE_NAME_ASC'
-  | 'GRANTS_TABLE_NAME_DESC'
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'LIMITS_TABLE_ID_ASC'
-  | 'LIMITS_TABLE_ID_DESC'
-  | 'DEFAULT_LIMITS_TABLE_ID_ASC'
-  | 'DEFAULT_LIMITS_TABLE_ID_DESC'
-  | 'PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSIONS_TABLE_ID_DESC'
-  | 'DEFAULT_PERMISSIONS_TABLE_ID_ASC'
-  | 'DEFAULT_PERMISSIONS_TABLE_ID_DESC'
-  | 'SPRT_TABLE_ID_ASC'
-  | 'SPRT_TABLE_ID_DESC'
-  | 'ADMIN_GRANTS_TABLE_ID_ASC'
-  | 'ADMIN_GRANTS_TABLE_ID_DESC'
-  | 'ADMIN_GRANTS_TABLE_NAME_ASC'
-  | 'ADMIN_GRANTS_TABLE_NAME_DESC'
-  | 'OWNER_GRANTS_TABLE_ID_ASC'
-  | 'OWNER_GRANTS_TABLE_ID_DESC'
-  | 'OWNER_GRANTS_TABLE_NAME_ASC'
-  | 'OWNER_GRANTS_TABLE_NAME_DESC'
-  | 'MEMBERSHIP_TYPE_ASC'
-  | 'MEMBERSHIP_TYPE_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ENTITY_TABLE_OWNER_ID_ASC'
-  | 'ENTITY_TABLE_OWNER_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'ACTOR_MASK_CHECK_ASC'
-  | 'ACTOR_MASK_CHECK_DESC'
-  | 'ACTOR_PERM_CHECK_ASC'
-  | 'ACTOR_PERM_CHECK_DESC'
-  | 'ENTITY_IDS_BY_MASK_ASC'
-  | 'ENTITY_IDS_BY_MASK_DESC'
-  | 'ENTITY_IDS_BY_PERM_ASC'
-  | 'ENTITY_IDS_BY_PERM_DESC'
-  | 'ENTITY_IDS_FUNCTION_ASC'
-  | 'ENTITY_IDS_FUNCTION_DESC'
-  | 'MEMBERSHIPS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'MEMBERSHIPS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'MEMBERS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'MEMBERS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'MEMBERSHIP_DEFAULTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'ADMIN_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'ADMIN_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'OWNER_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'OWNER_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'ACTOR_MASK_CHECK_TRGM_SIMILARITY_ASC'
-  | 'ACTOR_MASK_CHECK_TRGM_SIMILARITY_DESC'
-  | 'ACTOR_PERM_CHECK_TRGM_SIMILARITY_ASC'
-  | 'ACTOR_PERM_CHECK_TRGM_SIMILARITY_DESC'
-  | 'ENTITY_IDS_BY_MASK_TRGM_SIMILARITY_ASC'
-  | 'ENTITY_IDS_BY_MASK_TRGM_SIMILARITY_DESC'
-  | 'ENTITY_IDS_BY_PERM_TRGM_SIMILARITY_ASC'
-  | 'ENTITY_IDS_BY_PERM_TRGM_SIMILARITY_DESC'
-  | 'ENTITY_IDS_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'ENTITY_IDS_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type PermissionsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'DEFAULT_TABLE_ID_ASC'
-  | 'DEFAULT_TABLE_ID_DESC'
-  | 'DEFAULT_TABLE_NAME_ASC'
-  | 'DEFAULT_TABLE_NAME_DESC'
-  | 'BITLEN_ASC'
-  | 'BITLEN_DESC'
-  | 'MEMBERSHIP_TYPE_ASC'
-  | 'MEMBERSHIP_TYPE_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'GET_PADDED_MASK_ASC'
-  | 'GET_PADDED_MASK_DESC'
-  | 'GET_MASK_ASC'
-  | 'GET_MASK_DESC'
-  | 'GET_BY_MASK_ASC'
-  | 'GET_BY_MASK_DESC'
-  | 'GET_MASK_BY_NAME_ASC'
-  | 'GET_MASK_BY_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'DEFAULT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'GET_PADDED_MASK_TRGM_SIMILARITY_ASC'
-  | 'GET_PADDED_MASK_TRGM_SIMILARITY_DESC'
-  | 'GET_MASK_TRGM_SIMILARITY_ASC'
-  | 'GET_MASK_TRGM_SIMILARITY_DESC'
-  | 'GET_BY_MASK_TRGM_SIMILARITY_ASC'
-  | 'GET_BY_MASK_TRGM_SIMILARITY_DESC'
-  | 'GET_MASK_BY_NAME_TRGM_SIMILARITY_ASC'
-  | 'GET_MASK_BY_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type PhoneNumbersModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'OWNER_TABLE_ID_ASC'
-  | 'OWNER_TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type ProfilesModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_ID_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_ID_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_DESC'
-  | 'PROFILE_GRANTS_TABLE_ID_ASC'
-  | 'PROFILE_GRANTS_TABLE_ID_DESC'
-  | 'PROFILE_GRANTS_TABLE_NAME_ASC'
-  | 'PROFILE_GRANTS_TABLE_NAME_DESC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_ID_ASC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_ID_DESC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_ASC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_DESC'
   | 'MEMBERSHIP_TYPE_ASC'
-  | 'MEMBERSHIP_TYPE_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'ACTOR_TABLE_ID_ASC'
-  | 'ACTOR_TABLE_ID_DESC'
-  | 'PERMISSIONS_TABLE_ID_ASC'
-  | 'PERMISSIONS_TABLE_ID_DESC'
-  | 'MEMBERSHIPS_TABLE_ID_ASC'
-  | 'MEMBERSHIPS_TABLE_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'PROFILE_PERMISSIONS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PROFILE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'PROFILE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'PROFILE_DEFINITION_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'MEMBERSHIP_TYPE_DESC';
 export type SecretsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type SessionsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'AUTH_SETTINGS_TABLE_ID_ASC'
-  | 'AUTH_SETTINGS_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'SESSIONS_DEFAULT_EXPIRATION_ASC'
-  | 'SESSIONS_DEFAULT_EXPIRATION_DESC'
-  | 'SESSIONS_TABLE_ASC'
-  | 'SESSIONS_TABLE_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_DESC'
-  | 'AUTH_SETTINGS_TABLE_ASC'
-  | 'AUTH_SETTINGS_TABLE_DESC'
-  | 'SESSIONS_TABLE_TRGM_SIMILARITY_ASC'
-  | 'SESSIONS_TABLE_TRGM_SIMILARITY_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_TRGM_SIMILARITY_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_TRGM_SIMILARITY_DESC'
-  | 'AUTH_SETTINGS_TABLE_TRGM_SIMILARITY_ASC'
-  | 'AUTH_SETTINGS_TABLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type UserAuthModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'EMAILS_TABLE_ID_ASC'
-  | 'EMAILS_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'SECRETS_TABLE_ID_ASC'
-  | 'SECRETS_TABLE_ID_DESC'
-  | 'ENCRYPTED_TABLE_ID_ASC'
-  | 'ENCRYPTED_TABLE_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'AUDITS_TABLE_ID_ASC'
-  | 'AUDITS_TABLE_ID_DESC'
-  | 'AUDITS_TABLE_NAME_ASC'
-  | 'AUDITS_TABLE_NAME_DESC'
-  | 'SIGN_IN_FUNCTION_ASC'
-  | 'SIGN_IN_FUNCTION_DESC'
-  | 'SIGN_UP_FUNCTION_ASC'
-  | 'SIGN_UP_FUNCTION_DESC'
-  | 'SIGN_OUT_FUNCTION_ASC'
-  | 'SIGN_OUT_FUNCTION_DESC'
-  | 'SET_PASSWORD_FUNCTION_ASC'
-  | 'SET_PASSWORD_FUNCTION_DESC'
-  | 'RESET_PASSWORD_FUNCTION_ASC'
-  | 'RESET_PASSWORD_FUNCTION_DESC'
-  | 'FORGOT_PASSWORD_FUNCTION_ASC'
-  | 'FORGOT_PASSWORD_FUNCTION_DESC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_ASC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_DESC'
-  | 'VERIFY_EMAIL_FUNCTION_ASC'
-  | 'VERIFY_EMAIL_FUNCTION_DESC'
-  | 'VERIFY_PASSWORD_FUNCTION_ASC'
-  | 'VERIFY_PASSWORD_FUNCTION_DESC'
-  | 'CHECK_PASSWORD_FUNCTION_ASC'
-  | 'CHECK_PASSWORD_FUNCTION_DESC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_ASC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_DESC'
-  | 'DELETE_ACCOUNT_FUNCTION_ASC'
-  | 'DELETE_ACCOUNT_FUNCTION_DESC'
-  | 'SIGN_IN_ONE_TIME_TOKEN_FUNCTION_ASC'
-  | 'SIGN_IN_ONE_TIME_TOKEN_FUNCTION_DESC'
-  | 'ONE_TIME_TOKEN_FUNCTION_ASC'
-  | 'ONE_TIME_TOKEN_FUNCTION_DESC'
-  | 'EXTEND_TOKEN_EXPIRES_ASC'
-  | 'EXTEND_TOKEN_EXPIRES_DESC'
-  | 'AUDITS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'AUDITS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SIGN_UP_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_UP_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SIGN_OUT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_OUT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SET_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SET_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'RESET_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'RESET_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'FORGOT_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'FORGOT_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SEND_VERIFICATION_EMAIL_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'VERIFY_EMAIL_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'VERIFY_EMAIL_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'VERIFY_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'VERIFY_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'CHECK_PASSWORD_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'CHECK_PASSWORD_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SEND_ACCOUNT_DELETION_EMAIL_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'DELETE_ACCOUNT_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'DELETE_ACCOUNT_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SIGN_IN_ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'SIGN_IN_ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'ONE_TIME_TOKEN_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'EXTEND_TOKEN_EXPIRES_TRGM_SIMILARITY_ASC'
-  | 'EXTEND_TOKEN_EXPIRES_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type UsersModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'TABLE_ID_ASC'
-  | 'TABLE_ID_DESC'
-  | 'TABLE_NAME_ASC'
-  | 'TABLE_NAME_DESC'
-  | 'TYPE_TABLE_ID_ASC'
-  | 'TYPE_TABLE_ID_DESC'
-  | 'TYPE_TABLE_NAME_ASC'
-  | 'TYPE_TABLE_NAME_DESC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'TYPE_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'TYPE_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type UuidModuleOrderBy =
+  | 'DATABASE_ID_DESC';
+export type BlueprintOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'UUID_FUNCTION_ASC'
-  | 'UUID_FUNCTION_DESC'
-  | 'UUID_SEED_ASC'
-  | 'UUID_SEED_DESC'
-  | 'UUID_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'UUID_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'UUID_SEED_TRGM_SIMILARITY_ASC'
-  | 'UUID_SEED_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type DatabaseProvisionModuleOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_NAME_ASC'
-  | 'DATABASE_NAME_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
-  | 'SUBDOMAIN_ASC'
-  | 'SUBDOMAIN_DESC'
-  | 'DOMAIN_ASC'
-  | 'DOMAIN_DESC'
-  | 'MODULES_ASC'
-  | 'MODULES_DESC'
-  | 'OPTIONS_ASC'
-  | 'OPTIONS_DESC'
-  | 'BOOTSTRAP_USER_ASC'
-  | 'BOOTSTRAP_USER_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'ERROR_MESSAGE_ASC'
-  | 'ERROR_MESSAGE_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'COMPLETED_AT_ASC'
-  | 'COMPLETED_AT_DESC'
-  | 'DATABASE_NAME_TRGM_SIMILARITY_ASC'
-  | 'DATABASE_NAME_TRGM_SIMILARITY_DESC'
-  | 'SUBDOMAIN_TRGM_SIMILARITY_ASC'
-  | 'SUBDOMAIN_TRGM_SIMILARITY_DESC'
-  | 'DOMAIN_TRGM_SIMILARITY_ASC'
-  | 'DOMAIN_TRGM_SIMILARITY_DESC'
-  | 'STATUS_TRGM_SIMILARITY_ASC'
-  | 'STATUS_TRGM_SIMILARITY_DESC'
-  | 'ERROR_MESSAGE_TRGM_SIMILARITY_ASC'
-  | 'ERROR_MESSAGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type AppAdminGrantOrderBy =
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'TEMPLATE_ID_ASC'
+  | 'TEMPLATE_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'DEFINITION_HASH_ASC'
+  | 'DEFINITION_HASH_DESC';
+export type BlueprintTemplateOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'VERSION_ASC'
+  | 'VERSION_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'VISIBILITY_ASC'
+  | 'VISIBILITY_DESC'
+  | 'FORKED_FROM_ID_ASC'
+  | 'FORKED_FROM_ID_DESC'
+  | 'DEFINITION_HASH_ASC'
+  | 'DEFINITION_HASH_DESC';
+export type DatabaseProvisionModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
+export type AppAdminGrantOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -10007,13 +10595,11 @@ export type AppAdminGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppOwnerGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -10023,15 +10609,11 @@ export type AppOwnerGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -10041,9 +10623,9 @@ export type AppGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgMembershipOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -10054,22 +10636,10 @@ export type OrgMembershipOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
   | 'IS_ADMIN_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -10077,9 +10647,9 @@ export type OrgMembershipOrderBy =
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
 export type OrgMemberOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'IS_ADMIN_ASC'
@@ -10089,13 +10659,11 @@ export type OrgMemberOrderBy =
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
 export type OrgAdminGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -10107,13 +10675,11 @@ export type OrgAdminGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgOwnerGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -10125,15 +10691,11 @@ export type OrgOwnerGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -10145,9 +10707,9 @@ export type OrgGrantOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgChartEdgeOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -10159,19 +10721,11 @@ export type OrgChartEdgeOrderBy =
   | 'CHILD_ID_ASC'
   | 'CHILD_ID_DESC'
   | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'PARENT_ID_DESC';
 export type OrgChartEdgeGrantOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -10181,85 +10735,141 @@ export type OrgChartEdgeGrantOrderBy =
   | 'PARENT_ID_ASC'
   | 'PARENT_ID_DESC'
   | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC'
-  | 'IS_GRANT_ASC'
-  | 'IS_GRANT_DESC'
-  | 'POSITION_TITLE_ASC'
-  | 'POSITION_TITLE_DESC'
-  | 'POSITION_LEVEL_ASC'
-  | 'POSITION_LEVEL_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_ASC'
-  | 'POSITION_TITLE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'GRANTOR_ID_DESC';
+export type OrgPermissionDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 export type AppLimitOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
+  | 'ACTOR_ID_DESC';
 export type OrgLimitOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
-  | 'NUM_ASC'
-  | 'NUM_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
 export type AppStepOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'COUNT_ASC'
-  | 'COUNT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type AppAchievementOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'COUNT_ASC'
-  | 'COUNT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type AppLevelOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type EmailOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type PhoneNumberOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'NUMBER_ASC'
+  | 'NUMBER_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type CryptoAddressOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'ADDRESS_ASC'
+  | 'ADDRESS_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type ConnectedAccountOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'SERVICE_ASC'
+  | 'SERVICE_DESC'
+  | 'IDENTIFIER_ASC'
+  | 'IDENTIFIER_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type InviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EMAIL_ASC'
@@ -10270,32 +10880,18 @@ export type InviteOrderBy =
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
   | 'INVITE_VALID_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'UPDATED_AT_DESC';
 export type ClaimedInviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
   | 'RECEIVER_ID_ASC'
@@ -10305,9 +10901,9 @@ export type ClaimedInviteOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
 export type OrgInviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EMAIL_ASC'
@@ -10320,14 +10916,6 @@ export type OrgInviteOrderBy =
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
   | 'INVITE_VALID_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
@@ -10335,19 +10923,13 @@ export type OrgInviteOrderBy =
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
   | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_ASC'
-  | 'INVITE_TOKEN_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'ENTITY_ID_DESC';
 export type OrgClaimedInviteOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
   | 'RECEIVER_ID_ASC'
@@ -10358,365 +10940,129 @@ export type OrgClaimedInviteOrderBy =
   | 'UPDATED_AT_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
-export type RefOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type StoreOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type AppPermissionDefaultOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC';
-export type CryptoAddressOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'ADDRESS_ASC'
-  | 'ADDRESS_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_PRIMARY_ASC'
-  | 'IS_PRIMARY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ADDRESS_TRGM_SIMILARITY_ASC'
-  | 'ADDRESS_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type RoleTypeOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC';
-export type OrgPermissionDefaultOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
-export type PhoneNumberOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'CC_ASC'
-  | 'CC_DESC'
-  | 'NUMBER_ASC'
-  | 'NUMBER_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_PRIMARY_ASC'
-  | 'IS_PRIMARY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CC_TRGM_SIMILARITY_ASC'
-  | 'CC_TRGM_SIMILARITY_DESC'
-  | 'NUMBER_TRGM_SIMILARITY_ASC'
-  | 'NUMBER_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type AppLimitDefaultOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
-export type OrgLimitDefaultOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'MAX_ASC'
-  | 'MAX_DESC';
-export type ConnectedAccountOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'SERVICE_ASC'
-  | 'SERVICE_DESC'
-  | 'IDENTIFIER_ASC'
-  | 'IDENTIFIER_DESC'
-  | 'DETAILS_ASC'
-  | 'DETAILS_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'SERVICE_TRGM_SIMILARITY_ASC'
-  | 'SERVICE_TRGM_SIMILARITY_DESC'
-  | 'IDENTIFIER_TRGM_SIMILARITY_ASC'
-  | 'IDENTIFIER_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type NodeTypeRegistryOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'PARAMETER_SCHEMA_ASC'
-  | 'PARAMETER_SCHEMA_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SLUG_TRGM_SIMILARITY_ASC'
-  | 'SLUG_TRGM_SIMILARITY_DESC'
-  | 'CATEGORY_TRGM_SIMILARITY_ASC'
-  | 'CATEGORY_TRGM_SIMILARITY_DESC'
-  | 'DISPLAY_NAME_TRGM_SIMILARITY_ASC'
-  | 'DISPLAY_NAME_TRGM_SIMILARITY_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type MembershipTypeOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type CommitOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'MESSAGE_TRGM_SIMILARITY_ASC'
-  | 'MESSAGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type AppMembershipDefaultOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC';
-export type RlsModuleOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_ASC'
-  | 'SESSION_CREDENTIALS_TABLE_ID_DESC'
-  | 'SESSIONS_TABLE_ID_ASC'
-  | 'SESSIONS_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'AUTHENTICATE_ASC'
-  | 'AUTHENTICATE_DESC'
-  | 'AUTHENTICATE_STRICT_ASC'
-  | 'AUTHENTICATE_STRICT_DESC'
-  | 'CURRENT_ROLE_ASC'
-  | 'CURRENT_ROLE_DESC'
-  | 'CURRENT_ROLE_ID_ASC'
-  | 'CURRENT_ROLE_ID_DESC'
-  | 'AUTHENTICATE_TRGM_SIMILARITY_ASC'
-  | 'AUTHENTICATE_TRGM_SIMILARITY_DESC'
-  | 'AUTHENTICATE_STRICT_TRGM_SIMILARITY_ASC'
-  | 'AUTHENTICATE_STRICT_TRGM_SIMILARITY_DESC'
-  | 'CURRENT_ROLE_TRGM_SIMILARITY_ASC'
-  | 'CURRENT_ROLE_TRGM_SIMILARITY_DESC'
-  | 'CURRENT_ROLE_ID_TRGM_SIMILARITY_ASC'
-  | 'CURRENT_ROLE_ID_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type OrgMembershipDefaultOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_ASC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
 export type AuditLogOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'EVENT_ASC'
   | 'EVENT_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ORIGIN_ASC'
-  | 'ORIGIN_DESC'
-  | 'USER_AGENT_ASC'
-  | 'USER_AGENT_DESC'
-  | 'IP_ADDRESS_ASC'
-  | 'IP_ADDRESS_DESC'
-  | 'SUCCESS_ASC'
-  | 'SUCCESS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'USER_AGENT_TRGM_SIMILARITY_ASC'
-  | 'USER_AGENT_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type AppLevelOrderBy =
+  | 'ACTOR_ID_DESC';
+export type RefOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC';
+export type StoreOrderBy =
   | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
+export type AppPermissionDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC';
+export type RoleTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
+  | 'NAME_DESC';
+export type AppLimitDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
+export type OrgLimitDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
+export type NodeTypeRegistryOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'IMAGE_ASC'
-  | 'IMAGE_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC';
+export type MembershipTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC';
+export type CommitOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
+export type AppMembershipDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_ASC'
-  | 'DESCRIPTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type SqlMigrationOrderBy =
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC';
+export type RlsModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
+export type OrgMembershipDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
+export type SqlMigrationOrderBy =
   | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
@@ -10726,10 +11072,6 @@ export type SqlMigrationOrderBy =
   | 'DATABASE_ID_DESC'
   | 'DEPLOY_ASC'
   | 'DEPLOY_DESC'
-  | 'DEPS_ASC'
-  | 'DEPS_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
   | 'CONTENT_ASC'
   | 'CONTENT_DESC'
   | 'REVERT_ASC'
@@ -10743,55 +11085,15 @@ export type SqlMigrationOrderBy =
   | 'ACTION_ID_ASC'
   | 'ACTION_ID_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'DEPLOY_TRGM_SIMILARITY_ASC'
-  | 'DEPLOY_TRGM_SIMILARITY_DESC'
-  | 'CONTENT_TRGM_SIMILARITY_ASC'
-  | 'CONTENT_TRGM_SIMILARITY_DESC'
-  | 'REVERT_TRGM_SIMILARITY_ASC'
-  | 'REVERT_TRGM_SIMILARITY_DESC'
-  | 'VERIFY_TRGM_SIMILARITY_ASC'
-  | 'VERIFY_TRGM_SIMILARITY_DESC'
-  | 'ACTION_TRGM_SIMILARITY_ASC'
-  | 'ACTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
-export type EmailOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_PRIMARY_ASC'
-  | 'IS_PRIMARY_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
+  | 'ACTOR_ID_DESC';
 export type UserOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'USERNAME_ASC'
   | 'USERNAME_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'PROFILE_PICTURE_ASC'
-  | 'PROFILE_PICTURE_DESC'
-  | 'SEARCH_TSV_ASC'
-  | 'SEARCH_TSV_DESC'
-  | 'TYPE_ASC'
-  | 'TYPE_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -10803,8 +11105,6 @@ export type UserOrderBy =
   | 'SEARCH_SCORE_ASC'
   | 'SEARCH_SCORE_DESC';
 export type AstMigrationOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
   | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
@@ -10812,18 +11112,8 @@ export type AstMigrationOrderBy =
   | 'DATABASE_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
-  | 'REQUIRES_ASC'
-  | 'REQUIRES_DESC'
-  | 'PAYLOAD_ASC'
-  | 'PAYLOAD_DESC'
   | 'DEPLOYS_ASC'
   | 'DEPLOYS_DESC'
-  | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC'
-  | 'REVERT_ASC'
-  | 'REVERT_DESC'
-  | 'VERIFY_ASC'
-  | 'VERIFY_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'ACTION_ASC'
@@ -10831,15 +11121,11 @@ export type AstMigrationOrderBy =
   | 'ACTION_ID_ASC'
   | 'ACTION_ID_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC'
-  | 'ACTION_TRGM_SIMILARITY_ASC'
-  | 'ACTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'ACTOR_ID_DESC';
 export type AppMembershipOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'CREATED_AT_ASC'
@@ -10850,95 +11136,43 @@ export type AppMembershipOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'IS_BANNED_ASC'
-  | 'IS_BANNED_DESC'
-  | 'IS_DISABLED_ASC'
-  | 'IS_DISABLED_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'IS_ACTIVE_ASC'
-  | 'IS_ACTIVE_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
   | 'IS_ADMIN_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC'
-  | 'GRANTED_ASC'
-  | 'GRANTED_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
 export type HierarchyModuleOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'SCHEMA_ID_ASC'
-  | 'SCHEMA_ID_DESC'
-  | 'PRIVATE_SCHEMA_ID_ASC'
-  | 'PRIVATE_SCHEMA_ID_DESC'
-  | 'CHART_EDGES_TABLE_ID_ASC'
-  | 'CHART_EDGES_TABLE_ID_DESC'
-  | 'CHART_EDGES_TABLE_NAME_ASC'
-  | 'CHART_EDGES_TABLE_NAME_DESC'
-  | 'HIERARCHY_SPRT_TABLE_ID_ASC'
-  | 'HIERARCHY_SPRT_TABLE_ID_DESC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_ASC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_DESC'
-  | 'CHART_EDGE_GRANTS_TABLE_ID_ASC'
-  | 'CHART_EDGE_GRANTS_TABLE_ID_DESC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_ASC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_DESC'
-  | 'ENTITY_TABLE_ID_ASC'
-  | 'ENTITY_TABLE_ID_DESC'
-  | 'USERS_TABLE_ID_ASC'
-  | 'USERS_TABLE_ID_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC'
-  | 'PRIVATE_SCHEMA_NAME_ASC'
-  | 'PRIVATE_SCHEMA_NAME_DESC'
-  | 'SPRT_TABLE_NAME_ASC'
-  | 'SPRT_TABLE_NAME_DESC'
-  | 'REBUILD_HIERARCHY_FUNCTION_ASC'
-  | 'REBUILD_HIERARCHY_FUNCTION_DESC'
-  | 'GET_SUBORDINATES_FUNCTION_ASC'
-  | 'GET_SUBORDINATES_FUNCTION_DESC'
-  | 'GET_MANAGERS_FUNCTION_ASC'
-  | 'GET_MANAGERS_FUNCTION_DESC'
-  | 'IS_MANAGER_OF_FUNCTION_ASC'
-  | 'IS_MANAGER_OF_FUNCTION_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'CHART_EDGES_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'CHART_EDGES_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'HIERARCHY_SPRT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'CHART_EDGE_GRANTS_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'PREFIX_TRGM_SIMILARITY_ASC'
-  | 'PREFIX_TRGM_SIMILARITY_DESC'
-  | 'PRIVATE_SCHEMA_NAME_TRGM_SIMILARITY_ASC'
-  | 'PRIVATE_SCHEMA_NAME_TRGM_SIMILARITY_DESC'
-  | 'SPRT_TABLE_NAME_TRGM_SIMILARITY_ASC'
-  | 'SPRT_TABLE_NAME_TRGM_SIMILARITY_DESC'
-  | 'REBUILD_HIERARCHY_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'REBUILD_HIERARCHY_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'GET_SUBORDINATES_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'GET_SUBORDINATES_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'GET_MANAGERS_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'GET_MANAGERS_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'IS_MANAGER_OF_FUNCTION_TRGM_SIMILARITY_ASC'
-  | 'IS_MANAGER_OF_FUNCTION_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 // ============ CRUD Input Types ============
+export interface CreateGetAllRecordInput {
+  clientMutationId?: string;
+  getAllRecord: {
+    path?: string[];
+    data?: Record<string, unknown>;
+  };
+}
+export interface GetAllRecordPatch {
+  path?: string[] | null;
+  data?: Record<string, unknown> | null;
+}
+export interface UpdateGetAllRecordInput {
+  clientMutationId?: string;
+  id: string;
+  getAllRecordPatch: GetAllRecordPatch;
+}
+export interface DeleteGetAllRecordInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateOrgGetManagersRecordInput {
   clientMutationId?: string;
   orgGetManagersRecord: {
@@ -10979,26 +11213,6 @@ export interface DeleteOrgGetSubordinatesRecordInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateGetAllRecordInput {
-  clientMutationId?: string;
-  getAllRecord: {
-    path?: string;
-    data?: Record<string, unknown>;
-  };
-}
-export interface GetAllRecordPatch {
-  path?: string | null;
-  data?: Record<string, unknown> | null;
-}
-export interface UpdateGetAllRecordInput {
-  clientMutationId?: string;
-  id: string;
-  getAllRecordPatch: GetAllRecordPatch;
-}
-export interface DeleteGetAllRecordInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateObjectInput {
   clientMutationId?: string;
   object: {
@@ -11010,10 +11224,9 @@ export interface CreateObjectInput {
   };
 }
 export interface ObjectPatch {
-  hashUuid?: string | null;
   databaseId?: string | null;
-  kids?: string | null;
-  ktree?: string | null;
+  kids?: string[] | null;
+  ktree?: string[] | null;
   data?: Record<string, unknown> | null;
   frzn?: boolean | null;
 }
@@ -11040,8 +11253,6 @@ export interface AppPermissionPatch {
   bitnum?: number | null;
   bitstr?: string | null;
   description?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateAppPermissionInput {
   clientMutationId?: string;
@@ -11066,8 +11277,6 @@ export interface OrgPermissionPatch {
   bitnum?: number | null;
   bitstr?: string | null;
   description?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgPermissionInput {
   clientMutationId?: string;
@@ -11094,8 +11303,6 @@ export interface AppLevelRequirementPatch {
   description?: string | null;
   requiredCount?: number | null;
   priority?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateAppLevelRequirementInput {
   clientMutationId?: string;
@@ -11122,10 +11329,6 @@ export interface DatabasePatch {
   name?: string | null;
   label?: string | null;
   hash?: string | null;
-  schemaHashTrgmSimilarity?: number | null;
-  nameTrgmSimilarity?: number | null;
-  labelTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateDatabaseInput {
   clientMutationId?: string;
@@ -11162,14 +11365,8 @@ export interface SchemaPatch {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   isPublic?: boolean | null;
-  nameTrgmSimilarity?: number | null;
-  schemaNameTrgmSimilarity?: number | null;
-  labelTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSchemaInput {
   clientMutationId?: string;
@@ -11216,15 +11413,8 @@ export interface TablePatch {
   peoplestamps?: boolean | null;
   pluralName?: string | null;
   singularName?: string | null;
-  tags?: string | null;
+  tags?: string[] | null;
   inheritsId?: string | null;
-  nameTrgmSimilarity?: number | null;
-  labelTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  pluralNameTrgmSimilarity?: number | null;
-  singularNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateTableInput {
   clientMutationId?: string;
@@ -11256,17 +11446,13 @@ export interface CheckConstraintPatch {
   tableId?: string | null;
   name?: string | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   expr?: Record<string, unknown> | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  typeTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdateCheckConstraintInput {
   clientMutationId?: string;
@@ -11287,6 +11473,7 @@ export interface CreateFieldInput {
     description?: string;
     smartTags?: Record<string, unknown>;
     isRequired?: boolean;
+    apiRequired?: boolean;
     defaultValue?: string;
     defaultValueAst?: Record<string, unknown>;
     isHidden?: boolean;
@@ -11311,6 +11498,7 @@ export interface FieldPatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   isRequired?: boolean | null;
+  apiRequired?: boolean | null;
   defaultValue?: string | null;
   defaultValueAst?: Record<string, unknown> | null;
   isHidden?: boolean | null;
@@ -11321,17 +11509,10 @@ export interface FieldPatch {
   chkExpr?: Record<string, unknown> | null;
   min?: number | null;
   max?: number | null;
-  tags?: string | null;
+  tags?: string[] | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  nameTrgmSimilarity?: number | null;
-  labelTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  defaultValueTrgmSimilarity?: number | null;
-  regexpTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateFieldInput {
   clientMutationId?: string;
@@ -11369,22 +11550,15 @@ export interface ForeignKeyConstraintPatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   refTableId?: string | null;
-  refFieldIds?: string | null;
+  refFieldIds?: string[] | null;
   deleteAction?: string | null;
   updateAction?: string | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  typeTrgmSimilarity?: number | null;
-  deleteActionTrgmSimilarity?: number | null;
-  updateActionTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdateForeignKeyConstraintInput {
   clientMutationId?: string;
@@ -11410,9 +11584,9 @@ export interface FullTextSearchPatch {
   databaseId?: string | null;
   tableId?: string | null;
   fieldId?: string | null;
-  fieldIds?: string | null;
-  weights?: string | null;
-  langs?: string | null;
+  fieldIds?: string[] | null;
+  weights?: string[] | null;
+  langs?: string[] | null;
 }
 export interface UpdateFullTextSearchInput {
   clientMutationId?: string;
@@ -11448,23 +11622,19 @@ export interface IndexPatch {
   databaseId?: string | null;
   tableId?: string | null;
   name?: string | null;
-  fieldIds?: string | null;
-  includeFieldIds?: string | null;
+  fieldIds?: string[] | null;
+  includeFieldIds?: string[] | null;
   accessMethod?: string | null;
   indexParams?: Record<string, unknown> | null;
   whereClause?: Record<string, unknown> | null;
   isUnique?: boolean | null;
   options?: Record<string, unknown> | null;
-  opClasses?: string | null;
+  opClasses?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  accessMethodTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdateIndexInput {
   clientMutationId?: string;
@@ -11508,13 +11678,7 @@ export interface PolicyPatch {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  granteeNameTrgmSimilarity?: number | null;
-  privilegeTrgmSimilarity?: number | null;
-  policyTypeTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdatePolicyInput {
   clientMutationId?: string;
@@ -11545,16 +11709,12 @@ export interface PrimaryKeyConstraintPatch {
   tableId?: string | null;
   name?: string | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   smartTags?: Record<string, unknown> | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  typeTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdatePrimaryKeyConstraintInput {
   clientMutationId?: string;
@@ -11581,11 +11741,8 @@ export interface TableGrantPatch {
   tableId?: string | null;
   privilege?: string | null;
   granteeName?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   isGrant?: boolean | null;
-  privilegeTrgmSimilarity?: number | null;
-  granteeNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateTableGrantInput {
   clientMutationId?: string;
@@ -11621,12 +11778,7 @@ export interface TriggerPatch {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  eventTrgmSimilarity?: number | null;
-  functionNameTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdateTriggerInput {
   clientMutationId?: string;
@@ -11660,16 +11812,11 @@ export interface UniqueConstraintPatch {
   description?: string | null;
   smartTags?: Record<string, unknown> | null;
   type?: string | null;
-  fieldIds?: string | null;
+  fieldIds?: string[] | null;
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  typeTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdateUniqueConstraintInput {
   clientMutationId?: string;
@@ -11715,12 +11862,7 @@ export interface ViewPatch {
   category?: ObjectCategory | null;
   module?: string | null;
   scope?: number | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  viewTypeTrgmSimilarity?: number | null;
-  filterTypeTrgmSimilarity?: number | null;
-  moduleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdateViewInput {
   clientMutationId?: string;
@@ -11771,9 +11913,6 @@ export interface ViewGrantPatch {
   privilege?: string | null;
   withGrantOption?: boolean | null;
   isGrant?: boolean | null;
-  granteeNameTrgmSimilarity?: number | null;
-  privilegeTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateViewGrantInput {
   clientMutationId?: string;
@@ -11800,10 +11939,6 @@ export interface ViewRulePatch {
   name?: string | null;
   event?: string | null;
   action?: string | null;
-  nameTrgmSimilarity?: number | null;
-  eventTrgmSimilarity?: number | null;
-  actionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateViewRuleInput {
   clientMutationId?: string;
@@ -11811,6 +11946,52 @@ export interface UpdateViewRuleInput {
   viewRulePatch: ViewRulePatch;
 }
 export interface DeleteViewRuleInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmbeddingChunkInput {
+  clientMutationId?: string;
+  embeddingChunk: {
+    databaseId?: string;
+    tableId: string;
+    embeddingFieldId?: string;
+    chunksTableId?: string;
+    chunksTableName?: string;
+    contentFieldName?: string;
+    dimensions?: number;
+    metric?: string;
+    chunkSize?: number;
+    chunkOverlap?: number;
+    chunkStrategy?: string;
+    metadataFields?: Record<string, unknown>;
+    enqueueChunkingJob?: boolean;
+    chunkingTaskName?: string;
+    parentFkFieldId?: string;
+  };
+}
+export interface EmbeddingChunkPatch {
+  databaseId?: string | null;
+  tableId?: string | null;
+  embeddingFieldId?: string | null;
+  chunksTableId?: string | null;
+  chunksTableName?: string | null;
+  contentFieldName?: string | null;
+  dimensions?: number | null;
+  metric?: string | null;
+  chunkSize?: number | null;
+  chunkOverlap?: number | null;
+  chunkStrategy?: string | null;
+  metadataFields?: Record<string, unknown> | null;
+  enqueueChunkingJob?: boolean | null;
+  chunkingTaskName?: string | null;
+  parentFkFieldId?: string | null;
+}
+export interface UpdateEmbeddingChunkInput {
+  clientMutationId?: string;
+  id: string;
+  embeddingChunkPatch: EmbeddingChunkPatch;
+}
+export interface DeleteEmbeddingChunkInput {
   clientMutationId?: string;
   id: string;
 }
@@ -11836,9 +12017,6 @@ export interface TableTemplateModulePatch {
   tableName?: string | null;
   nodeType?: string | null;
   data?: Record<string, unknown> | null;
-  tableNameTrgmSimilarity?: number | null;
-  nodeTypeTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateTableTemplateModuleInput {
   clientMutationId?: string;
@@ -11859,9 +12037,9 @@ export interface CreateSecureTableProvisionInput {
     nodeType?: string;
     useRls?: boolean;
     nodeData?: Record<string, unknown>;
-    fields?: Record<string, unknown>;
+    fields?: Record<string, unknown>[];
     grantRoles?: string[];
-    grantPrivileges?: Record<string, unknown>;
+    grantPrivileges?: Record<string, unknown>[];
     policyType?: string;
     policyPrivileges?: string[];
     policyRole?: string;
@@ -11879,22 +12057,16 @@ export interface SecureTableProvisionPatch {
   nodeType?: string | null;
   useRls?: boolean | null;
   nodeData?: Record<string, unknown> | null;
-  fields?: Record<string, unknown> | null;
-  grantRoles?: string | null;
-  grantPrivileges?: Record<string, unknown> | null;
+  fields?: Record<string, unknown>[] | null;
+  grantRoles?: string[] | null;
+  grantPrivileges?: Record<string, unknown>[] | null;
   policyType?: string | null;
-  policyPrivileges?: string | null;
+  policyPrivileges?: string[] | null;
   policyRole?: string | null;
   policyPermissive?: boolean | null;
   policyName?: string | null;
   policyData?: Record<string, unknown> | null;
-  outFields?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  nodeTypeTrgmSimilarity?: number | null;
-  policyTypeTrgmSimilarity?: number | null;
-  policyRoleTrgmSimilarity?: number | null;
-  policyNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  outFields?: string[] | null;
 }
 export interface UpdateSecureTableProvisionInput {
   clientMutationId?: string;
@@ -11915,16 +12087,19 @@ export interface CreateRelationProvisionInput {
     fieldName?: string;
     deleteAction?: string;
     isRequired?: boolean;
+    apiRequired?: boolean;
     junctionTableId?: string;
     junctionTableName?: string;
     junctionSchemaId?: string;
     sourceFieldName?: string;
     targetFieldName?: string;
     useCompositeKey?: boolean;
+    createIndex?: boolean;
+    exposeInApi?: boolean;
     nodeType?: string;
     nodeData?: Record<string, unknown>;
     grantRoles?: string[];
-    grantPrivileges?: Record<string, unknown>;
+    grantPrivileges?: Record<string, unknown>[];
     policyType?: string;
     policyPrivileges?: string[];
     policyRole?: string;
@@ -11945,18 +12120,21 @@ export interface RelationProvisionPatch {
   fieldName?: string | null;
   deleteAction?: string | null;
   isRequired?: boolean | null;
+  apiRequired?: boolean | null;
   junctionTableId?: string | null;
   junctionTableName?: string | null;
   junctionSchemaId?: string | null;
   sourceFieldName?: string | null;
   targetFieldName?: string | null;
   useCompositeKey?: boolean | null;
+  createIndex?: boolean | null;
+  exposeInApi?: boolean | null;
   nodeType?: string | null;
   nodeData?: Record<string, unknown> | null;
-  grantRoles?: string | null;
-  grantPrivileges?: Record<string, unknown> | null;
+  grantRoles?: string[] | null;
+  grantPrivileges?: Record<string, unknown>[] | null;
   policyType?: string | null;
-  policyPrivileges?: string | null;
+  policyPrivileges?: string[] | null;
   policyRole?: string | null;
   policyPermissive?: boolean | null;
   policyName?: string | null;
@@ -11965,17 +12143,6 @@ export interface RelationProvisionPatch {
   outJunctionTableId?: string | null;
   outSourceFieldId?: string | null;
   outTargetFieldId?: string | null;
-  relationTypeTrgmSimilarity?: number | null;
-  fieldNameTrgmSimilarity?: number | null;
-  deleteActionTrgmSimilarity?: number | null;
-  junctionTableNameTrgmSimilarity?: number | null;
-  sourceFieldNameTrgmSimilarity?: number | null;
-  targetFieldNameTrgmSimilarity?: number | null;
-  nodeTypeTrgmSimilarity?: number | null;
-  policyTypeTrgmSimilarity?: number | null;
-  policyRoleTrgmSimilarity?: number | null;
-  policyNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateRelationProvisionInput {
   clientMutationId?: string;
@@ -11998,8 +12165,6 @@ export interface SchemaGrantPatch {
   databaseId?: string | null;
   schemaId?: string | null;
   granteeName?: string | null;
-  granteeNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSchemaGrantInput {
   clientMutationId?: string;
@@ -12028,10 +12193,6 @@ export interface DefaultPrivilegePatch {
   privilege?: string | null;
   granteeName?: string | null;
   isGrant?: boolean | null;
-  objectTypeTrgmSimilarity?: number | null;
-  privilegeTrgmSimilarity?: number | null;
-  granteeNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateDefaultPrivilegeInput {
   clientMutationId?: string;
@@ -12039,6 +12200,44 @@ export interface UpdateDefaultPrivilegeInput {
   defaultPrivilegePatch: DefaultPrivilegePatch;
 }
 export interface DeleteDefaultPrivilegeInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEnumInput {
+  clientMutationId?: string;
+  enum: {
+    databaseId: string;
+    schemaId: string;
+    name: string;
+    label?: string;
+    description?: string;
+    values?: string[];
+    smartTags?: Record<string, unknown>;
+    category?: ObjectCategory;
+    module?: string;
+    scope?: number;
+    tags?: string[];
+  };
+}
+export interface EnumPatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  name?: string | null;
+  label?: string | null;
+  description?: string | null;
+  values?: string[] | null;
+  smartTags?: Record<string, unknown> | null;
+  category?: ObjectCategory | null;
+  module?: string | null;
+  scope?: number | null;
+  tags?: string[] | null;
+}
+export interface UpdateEnumInput {
+  clientMutationId?: string;
+  id: string;
+  enumPatch: EnumPatch;
+}
+export interface DeleteEnumInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12078,8 +12277,6 @@ export interface ApiModulePatch {
   apiId?: string | null;
   name?: string | null;
   data?: Record<string, unknown> | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateApiModuleInput {
   clientMutationId?: string;
@@ -12132,9 +12329,7 @@ export interface SiteMetadatumPatch {
   title?: string | null;
   description?: string | null;
   ogImage?: ConstructiveInternalTypeImage | null;
-  titleTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  ogImageUpload?: File | null;
 }
 export interface UpdateSiteMetadatumInput {
   clientMutationId?: string;
@@ -12159,8 +12354,6 @@ export interface SiteModulePatch {
   siteId?: string | null;
   name?: string | null;
   data?: Record<string, unknown> | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSiteModuleInput {
   clientMutationId?: string;
@@ -12205,9 +12398,6 @@ export interface TriggerFunctionPatch {
   databaseId?: string | null;
   name?: string | null;
   code?: string | null;
-  nameTrgmSimilarity?: number | null;
-  codeTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateTriggerFunctionInput {
   clientMutationId?: string;
@@ -12215,6 +12405,44 @@ export interface UpdateTriggerFunctionInput {
   triggerFunctionPatch: TriggerFunctionPatch;
 }
 export interface DeleteTriggerFunctionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateDatabaseTransferInput {
+  clientMutationId?: string;
+  databaseTransfer: {
+    databaseId: string;
+    targetOwnerId: string;
+    sourceApproved?: boolean;
+    targetApproved?: boolean;
+    sourceApprovedAt?: string;
+    targetApprovedAt?: string;
+    status?: string;
+    initiatedBy: string;
+    notes?: string;
+    expiresAt?: string;
+    completedAt?: string;
+  };
+}
+export interface DatabaseTransferPatch {
+  databaseId?: string | null;
+  targetOwnerId?: string | null;
+  sourceApproved?: boolean | null;
+  targetApproved?: boolean | null;
+  sourceApprovedAt?: string | null;
+  targetApprovedAt?: string | null;
+  status?: string | null;
+  initiatedBy?: string | null;
+  notes?: string | null;
+  expiresAt?: string | null;
+  completedAt?: string | null;
+}
+export interface UpdateDatabaseTransferInput {
+  clientMutationId?: string;
+  id: string;
+  databaseTransferPatch: DatabaseTransferPatch;
+}
+export interface DeleteDatabaseTransferInput {
   clientMutationId?: string;
   id: string;
 }
@@ -12236,11 +12464,6 @@ export interface ApiPatch {
   roleName?: string | null;
   anonRole?: string | null;
   isPublic?: boolean | null;
-  nameTrgmSimilarity?: number | null;
-  dbnameTrgmSimilarity?: number | null;
-  roleNameTrgmSimilarity?: number | null;
-  anonRoleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateApiInput {
   clientMutationId?: string;
@@ -12273,10 +12496,10 @@ export interface SitePatch {
   appleTouchIcon?: ConstructiveInternalTypeImage | null;
   logo?: ConstructiveInternalTypeImage | null;
   dbname?: string | null;
-  titleTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  dbnameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  ogImageUpload?: File | null;
+  faviconUpload?: File | null;
+  appleTouchIconUpload?: File | null;
+  logoUpload?: File | null;
 }
 export interface UpdateSiteInput {
   clientMutationId?: string;
@@ -12309,10 +12532,7 @@ export interface AppPatch {
   appStoreId?: string | null;
   appIdPrefix?: string | null;
   playStoreLink?: ConstructiveInternalTypeUrl | null;
-  nameTrgmSimilarity?: number | null;
-  appStoreIdTrgmSimilarity?: number | null;
-  appIdPrefixTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  appImageUpload?: File | null;
 }
 export interface UpdateAppInput {
   clientMutationId?: string;
@@ -12341,8 +12561,6 @@ export interface ConnectedAccountsModulePatch {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateConnectedAccountsModuleInput {
   clientMutationId?: string;
@@ -12373,9 +12591,6 @@ export interface CryptoAddressesModulePatch {
   ownerTableId?: string | null;
   tableName?: string | null;
   cryptoNetwork?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  cryptoNetworkTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateCryptoAddressesModuleInput {
   clientMutationId?: string;
@@ -12418,13 +12633,6 @@ export interface CryptoAuthModulePatch {
   signInRecordFailure?: string | null;
   signUpWithKey?: string | null;
   signInWithChallenge?: string | null;
-  userFieldTrgmSimilarity?: number | null;
-  cryptoNetworkTrgmSimilarity?: number | null;
-  signInRequestChallengeTrgmSimilarity?: number | null;
-  signInRecordFailureTrgmSimilarity?: number | null;
-  signUpWithKeyTrgmSimilarity?: number | null;
-  signInWithChallengeTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateCryptoAuthModuleInput {
   clientMutationId?: string;
@@ -12473,16 +12681,14 @@ export interface DenormalizedTableFieldPatch {
   databaseId?: string | null;
   tableId?: string | null;
   fieldId?: string | null;
-  setIds?: string | null;
+  setIds?: string[] | null;
   refTableId?: string | null;
   refFieldId?: string | null;
-  refIds?: string | null;
+  refIds?: string[] | null;
   useUpdates?: boolean | null;
   updateDefaults?: boolean | null;
   funcName?: string | null;
   funcOrder?: number | null;
-  funcNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateDenormalizedTableFieldInput {
   clientMutationId?: string;
@@ -12511,8 +12717,6 @@ export interface EmailsModulePatch {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateEmailsModuleInput {
   clientMutationId?: string;
@@ -12537,8 +12741,6 @@ export interface EncryptedSecretsModulePatch {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateEncryptedSecretsModuleInput {
   clientMutationId?: string;
@@ -12569,10 +12771,8 @@ export interface FieldModulePatch {
   fieldId?: string | null;
   nodeType?: string | null;
   data?: Record<string, unknown> | null;
-  triggers?: string | null;
-  functions?: string | null;
-  nodeTypeTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  triggers?: string[] | null;
+  functions?: string[] | null;
 }
 export interface UpdateFieldModuleInput {
   clientMutationId?: string;
@@ -12615,11 +12815,6 @@ export interface InvitesModulePatch {
   prefix?: string | null;
   membershipType?: number | null;
   entityTableId?: string | null;
-  invitesTableNameTrgmSimilarity?: number | null;
-  claimedInvitesTableNameTrgmSimilarity?: number | null;
-  submitInviteCodeFunctionTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateInvitesModuleInput {
   clientMutationId?: string;
@@ -12686,22 +12881,6 @@ export interface LevelsModulePatch {
   membershipType?: number | null;
   entityTableId?: string | null;
   actorTableId?: string | null;
-  stepsTableNameTrgmSimilarity?: number | null;
-  achievementsTableNameTrgmSimilarity?: number | null;
-  levelsTableNameTrgmSimilarity?: number | null;
-  levelRequirementsTableNameTrgmSimilarity?: number | null;
-  completedStepTrgmSimilarity?: number | null;
-  incompletedStepTrgmSimilarity?: number | null;
-  tgAchievementTrgmSimilarity?: number | null;
-  tgAchievementToggleTrgmSimilarity?: number | null;
-  tgAchievementToggleBooleanTrgmSimilarity?: number | null;
-  tgAchievementBooleanTrgmSimilarity?: number | null;
-  upsertAchievementTrgmSimilarity?: number | null;
-  tgUpdateAchievementsTrgmSimilarity?: number | null;
-  stepsRequiredTrgmSimilarity?: number | null;
-  levelAchievedTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateLevelsModuleInput {
   clientMutationId?: string;
@@ -12752,16 +12931,6 @@ export interface LimitsModulePatch {
   membershipType?: number | null;
   entityTableId?: string | null;
   actorTableId?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  defaultTableNameTrgmSimilarity?: number | null;
-  limitIncrementFunctionTrgmSimilarity?: number | null;
-  limitDecrementFunctionTrgmSimilarity?: number | null;
-  limitIncrementTriggerTrgmSimilarity?: number | null;
-  limitDecrementTriggerTrgmSimilarity?: number | null;
-  limitUpdateTriggerTrgmSimilarity?: number | null;
-  limitCheckFunctionTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateLimitsModuleInput {
   clientMutationId?: string;
@@ -12786,8 +12955,6 @@ export interface MembershipTypesModulePatch {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateMembershipTypesModuleInput {
   clientMutationId?: string;
@@ -12864,19 +13031,6 @@ export interface MembershipsModulePatch {
   entityIdsByMask?: string | null;
   entityIdsByPerm?: string | null;
   entityIdsFunction?: string | null;
-  membershipsTableNameTrgmSimilarity?: number | null;
-  membersTableNameTrgmSimilarity?: number | null;
-  membershipDefaultsTableNameTrgmSimilarity?: number | null;
-  grantsTableNameTrgmSimilarity?: number | null;
-  adminGrantsTableNameTrgmSimilarity?: number | null;
-  ownerGrantsTableNameTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  actorMaskCheckTrgmSimilarity?: number | null;
-  actorPermCheckTrgmSimilarity?: number | null;
-  entityIdsByMaskTrgmSimilarity?: number | null;
-  entityIdsByPermTrgmSimilarity?: number | null;
-  entityIdsFunctionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateMembershipsModuleInput {
   clientMutationId?: string;
@@ -12925,14 +13079,6 @@ export interface PermissionsModulePatch {
   getMask?: string | null;
   getByMask?: string | null;
   getMaskByName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  defaultTableNameTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  getPaddedMaskTrgmSimilarity?: number | null;
-  getMaskTrgmSimilarity?: number | null;
-  getByMaskTrgmSimilarity?: number | null;
-  getMaskByNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdatePermissionsModuleInput {
   clientMutationId?: string;
@@ -12961,8 +13107,6 @@ export interface PhoneNumbersModulePatch {
   tableId?: string | null;
   ownerTableId?: string | null;
   tableName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdatePhoneNumbersModuleInput {
   clientMutationId?: string;
@@ -13013,12 +13157,6 @@ export interface ProfilesModulePatch {
   permissionsTableId?: string | null;
   membershipsTableId?: string | null;
   prefix?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  profilePermissionsTableNameTrgmSimilarity?: number | null;
-  profileGrantsTableNameTrgmSimilarity?: number | null;
-  profileDefinitionGrantsTableNameTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateProfilesModuleInput {
   clientMutationId?: string;
@@ -13043,8 +13181,6 @@ export interface SecretsModulePatch {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSecretsModuleInput {
   clientMutationId?: string;
@@ -13077,14 +13213,10 @@ export interface SessionsModulePatch {
   sessionCredentialsTableId?: string | null;
   authSettingsTableId?: string | null;
   usersTableId?: string | null;
-  sessionsDefaultExpiration?: string | null;
+  sessionsDefaultExpiration?: IntervalInput | null;
   sessionsTable?: string | null;
   sessionCredentialsTable?: string | null;
   authSettingsTable?: string | null;
-  sessionsTableTrgmSimilarity?: number | null;
-  sessionCredentialsTableTrgmSimilarity?: number | null;
-  authSettingsTableTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSessionsModuleInput {
   clientMutationId?: string;
@@ -13151,23 +13283,6 @@ export interface UserAuthModulePatch {
   signInOneTimeTokenFunction?: string | null;
   oneTimeTokenFunction?: string | null;
   extendTokenExpires?: string | null;
-  auditsTableNameTrgmSimilarity?: number | null;
-  signInFunctionTrgmSimilarity?: number | null;
-  signUpFunctionTrgmSimilarity?: number | null;
-  signOutFunctionTrgmSimilarity?: number | null;
-  setPasswordFunctionTrgmSimilarity?: number | null;
-  resetPasswordFunctionTrgmSimilarity?: number | null;
-  forgotPasswordFunctionTrgmSimilarity?: number | null;
-  sendVerificationEmailFunctionTrgmSimilarity?: number | null;
-  verifyEmailFunctionTrgmSimilarity?: number | null;
-  verifyPasswordFunctionTrgmSimilarity?: number | null;
-  checkPasswordFunctionTrgmSimilarity?: number | null;
-  sendAccountDeletionEmailFunctionTrgmSimilarity?: number | null;
-  deleteAccountFunctionTrgmSimilarity?: number | null;
-  signInOneTimeTokenFunctionTrgmSimilarity?: number | null;
-  oneTimeTokenFunctionTrgmSimilarity?: number | null;
-  extendTokenExpiresTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateUserAuthModuleInput {
   clientMutationId?: string;
@@ -13196,9 +13311,6 @@ export interface UsersModulePatch {
   tableName?: string | null;
   typeTableId?: string | null;
   typeTableName?: string | null;
-  tableNameTrgmSimilarity?: number | null;
-  typeTableNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateUsersModuleInput {
   clientMutationId?: string;
@@ -13209,30 +13321,97 @@ export interface DeleteUsersModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateUuidModuleInput {
+export interface CreateBlueprintInput {
   clientMutationId?: string;
-  uuidModule: {
+  blueprint: {
+    ownerId: string;
     databaseId: string;
-    schemaId?: string;
-    uuidFunction?: string;
-    uuidSeed: string;
+    name: string;
+    displayName: string;
+    description?: string;
+    definition: Record<string, unknown>;
+    templateId?: string;
+    status?: string;
+    constructedAt?: string;
+    errorDetails?: string;
+    refMap?: Record<string, unknown>;
+    constructedDefinition?: Record<string, unknown>;
+    definitionHash?: string;
+    tableHashes?: Record<string, unknown>;
   };
 }
-export interface UuidModulePatch {
+export interface BlueprintPatch {
+  ownerId?: string | null;
   databaseId?: string | null;
-  schemaId?: string | null;
-  uuidFunction?: string | null;
-  uuidSeed?: string | null;
-  uuidFunctionTrgmSimilarity?: number | null;
-  uuidSeedTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  name?: string | null;
+  displayName?: string | null;
+  description?: string | null;
+  definition?: Record<string, unknown> | null;
+  templateId?: string | null;
+  status?: string | null;
+  constructedAt?: string | null;
+  errorDetails?: string | null;
+  refMap?: Record<string, unknown> | null;
+  constructedDefinition?: Record<string, unknown> | null;
+  definitionHash?: string | null;
+  tableHashes?: Record<string, unknown> | null;
 }
-export interface UpdateUuidModuleInput {
+export interface UpdateBlueprintInput {
   clientMutationId?: string;
   id: string;
-  uuidModulePatch: UuidModulePatch;
+  blueprintPatch: BlueprintPatch;
 }
-export interface DeleteUuidModuleInput {
+export interface DeleteBlueprintInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateBlueprintTemplateInput {
+  clientMutationId?: string;
+  blueprintTemplate: {
+    name: string;
+    version?: string;
+    displayName: string;
+    description?: string;
+    ownerId: string;
+    visibility?: string;
+    categories?: string[];
+    tags?: string[];
+    definition: Record<string, unknown>;
+    definitionSchemaVersion?: string;
+    source?: string;
+    complexity?: string;
+    copyCount?: number;
+    forkCount?: number;
+    forkedFromId?: string;
+    definitionHash?: string;
+    tableHashes?: Record<string, unknown>;
+  };
+}
+export interface BlueprintTemplatePatch {
+  name?: string | null;
+  version?: string | null;
+  displayName?: string | null;
+  description?: string | null;
+  ownerId?: string | null;
+  visibility?: string | null;
+  categories?: string[] | null;
+  tags?: string[] | null;
+  definition?: Record<string, unknown> | null;
+  definitionSchemaVersion?: string | null;
+  source?: string | null;
+  complexity?: string | null;
+  copyCount?: number | null;
+  forkCount?: number | null;
+  forkedFromId?: string | null;
+  definitionHash?: string | null;
+  tableHashes?: Record<string, unknown> | null;
+}
+export interface UpdateBlueprintTemplateInput {
+  clientMutationId?: string;
+  id: string;
+  blueprintTemplatePatch: BlueprintTemplatePatch;
+}
+export interface DeleteBlueprintTemplateInput {
   clientMutationId?: string;
   id: string;
 }
@@ -13257,19 +13436,13 @@ export interface DatabaseProvisionModulePatch {
   ownerId?: string | null;
   subdomain?: string | null;
   domain?: string | null;
-  modules?: string | null;
+  modules?: string[] | null;
   options?: Record<string, unknown> | null;
   bootstrapUser?: boolean | null;
   status?: string | null;
   errorMessage?: string | null;
   databaseId?: string | null;
   completedAt?: string | null;
-  databaseNameTrgmSimilarity?: number | null;
-  subdomainTrgmSimilarity?: number | null;
-  domainTrgmSimilarity?: number | null;
-  statusTrgmSimilarity?: number | null;
-  errorMessageTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateDatabaseProvisionModuleInput {
   clientMutationId?: string;
@@ -13502,8 +13675,6 @@ export interface OrgChartEdgePatch {
   parentId?: string | null;
   positionTitle?: string | null;
   positionLevel?: number | null;
-  positionTitleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgChartEdgeInput {
   clientMutationId?: string;
@@ -13520,7 +13691,7 @@ export interface CreateOrgChartEdgeGrantInput {
     entityId: string;
     childId: string;
     parentId?: string;
-    grantorId: string;
+    grantorId?: string;
     isGrant?: boolean;
     positionTitle?: string;
     positionLevel?: number;
@@ -13534,8 +13705,6 @@ export interface OrgChartEdgeGrantPatch {
   isGrant?: boolean | null;
   positionTitle?: string | null;
   positionLevel?: number | null;
-  positionTitleTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgChartEdgeGrantInput {
   clientMutationId?: string;
@@ -13543,6 +13712,26 @@ export interface UpdateOrgChartEdgeGrantInput {
   orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch;
 }
 export interface DeleteOrgChartEdgeGrantInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateOrgPermissionDefaultInput {
+  clientMutationId?: string;
+  orgPermissionDefault: {
+    permissions?: string;
+    entityId: string;
+  };
+}
+export interface OrgPermissionDefaultPatch {
+  permissions?: string | null;
+  entityId?: string | null;
+}
+export interface UpdateOrgPermissionDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  orgPermissionDefaultPatch: OrgPermissionDefaultPatch;
+}
+export interface DeleteOrgPermissionDefaultInput {
   clientMutationId?: string;
   id: string;
 }
@@ -13640,6 +13829,131 @@ export interface DeleteAppAchievementInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateAppLevelInput {
+  clientMutationId?: string;
+  appLevel: {
+    name: string;
+    description?: string;
+    image?: ConstructiveInternalTypeImage;
+    ownerId?: string;
+  };
+}
+export interface AppLevelPatch {
+  name?: string | null;
+  description?: string | null;
+  image?: ConstructiveInternalTypeImage | null;
+  ownerId?: string | null;
+  imageUpload?: File | null;
+}
+export interface UpdateAppLevelInput {
+  clientMutationId?: string;
+  id: string;
+  appLevelPatch: AppLevelPatch;
+}
+export interface DeleteAppLevelInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateEmailInput {
+  clientMutationId?: string;
+  email: {
+    ownerId?: string;
+    email: ConstructiveInternalTypeEmail;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface EmailPatch {
+  ownerId?: string | null;
+  email?: ConstructiveInternalTypeEmail | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+}
+export interface UpdateEmailInput {
+  clientMutationId?: string;
+  id: string;
+  emailPatch: EmailPatch;
+}
+export interface DeleteEmailInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreatePhoneNumberInput {
+  clientMutationId?: string;
+  phoneNumber: {
+    ownerId?: string;
+    cc: string;
+    number: string;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface PhoneNumberPatch {
+  ownerId?: string | null;
+  cc?: string | null;
+  number?: string | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+}
+export interface UpdatePhoneNumberInput {
+  clientMutationId?: string;
+  id: string;
+  phoneNumberPatch: PhoneNumberPatch;
+}
+export interface DeletePhoneNumberInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateCryptoAddressInput {
+  clientMutationId?: string;
+  cryptoAddress: {
+    ownerId?: string;
+    address: string;
+    isVerified?: boolean;
+    isPrimary?: boolean;
+  };
+}
+export interface CryptoAddressPatch {
+  ownerId?: string | null;
+  address?: string | null;
+  isVerified?: boolean | null;
+  isPrimary?: boolean | null;
+}
+export interface UpdateCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+  cryptoAddressPatch: CryptoAddressPatch;
+}
+export interface DeleteCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateConnectedAccountInput {
+  clientMutationId?: string;
+  connectedAccount: {
+    ownerId?: string;
+    service: string;
+    identifier: string;
+    details: Record<string, unknown>;
+    isVerified?: boolean;
+  };
+}
+export interface ConnectedAccountPatch {
+  ownerId?: string | null;
+  service?: string | null;
+  identifier?: string | null;
+  details?: Record<string, unknown> | null;
+  isVerified?: boolean | null;
+}
+export interface UpdateConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
+  connectedAccountPatch: ConnectedAccountPatch;
+}
+export interface DeleteConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateInviteInput {
   clientMutationId?: string;
   invite: {
@@ -13664,8 +13978,6 @@ export interface InvitePatch {
   multiple?: boolean | null;
   data?: Record<string, unknown> | null;
   expiresAt?: string | null;
-  inviteTokenTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateInviteInput {
   clientMutationId?: string;
@@ -13726,8 +14038,6 @@ export interface OrgInvitePatch {
   data?: Record<string, unknown> | null;
   expiresAt?: string | null;
   entityId?: string | null;
-  inviteTokenTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateOrgInviteInput {
   clientMutationId?: string;
@@ -13762,6 +14072,34 @@ export interface DeleteOrgClaimedInviteInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateAuditLogInput {
+  clientMutationId?: string;
+  auditLog: {
+    event: string;
+    actorId?: string;
+    origin?: ConstructiveInternalTypeOrigin;
+    userAgent?: string;
+    ipAddress?: string;
+    success: boolean;
+  };
+}
+export interface AuditLogPatch {
+  event?: string | null;
+  actorId?: string | null;
+  origin?: ConstructiveInternalTypeOrigin | null;
+  userAgent?: string | null;
+  ipAddress?: string | null;
+  success?: boolean | null;
+}
+export interface UpdateAuditLogInput {
+  clientMutationId?: string;
+  id: string;
+  auditLogPatch: AuditLogPatch;
+}
+export interface DeleteAuditLogInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateRefInput {
   clientMutationId?: string;
   ref: {
@@ -13776,8 +14114,6 @@ export interface RefPatch {
   databaseId?: string | null;
   storeId?: string | null;
   commitId?: string | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateRefInput {
   clientMutationId?: string;
@@ -13800,8 +14136,6 @@ export interface StorePatch {
   name?: string | null;
   databaseId?: string | null;
   hash?: string | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateStoreInput {
   clientMutationId?: string;
@@ -13830,32 +14164,6 @@ export interface DeleteAppPermissionDefaultInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateCryptoAddressInput {
-  clientMutationId?: string;
-  cryptoAddress: {
-    ownerId?: string;
-    address: string;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface CryptoAddressPatch {
-  ownerId?: string | null;
-  address?: string | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-  addressTrgmSimilarity?: number | null;
-  searchScore?: number | null;
-}
-export interface UpdateCryptoAddressInput {
-  clientMutationId?: string;
-  id: string;
-  cryptoAddressPatch: CryptoAddressPatch;
-}
-export interface DeleteCryptoAddressInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateRoleTypeInput {
   clientMutationId?: string;
   roleType: {
@@ -13873,55 +14181,6 @@ export interface UpdateRoleTypeInput {
 export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
-}
-export interface CreateOrgPermissionDefaultInput {
-  clientMutationId?: string;
-  orgPermissionDefault: {
-    permissions?: string;
-    entityId: string;
-  };
-}
-export interface OrgPermissionDefaultPatch {
-  permissions?: string | null;
-  entityId?: string | null;
-}
-export interface UpdateOrgPermissionDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  orgPermissionDefaultPatch: OrgPermissionDefaultPatch;
-}
-export interface DeleteOrgPermissionDefaultInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreatePhoneNumberInput {
-  clientMutationId?: string;
-  phoneNumber: {
-    ownerId?: string;
-    cc: string;
-    number: string;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface PhoneNumberPatch {
-  ownerId?: string | null;
-  cc?: string | null;
-  number?: string | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-  ccTrgmSimilarity?: number | null;
-  numberTrgmSimilarity?: number | null;
-  searchScore?: number | null;
-}
-export interface UpdatePhoneNumberInput {
-  clientMutationId?: string;
-  id: string;
-  phoneNumberPatch: PhoneNumberPatch;
-}
-export interface DeletePhoneNumberInput {
-  clientMutationId?: string;
-  id: string;
 }
 export interface CreateAppLimitDefaultInput {
   clientMutationId?: string;
@@ -13963,35 +14222,6 @@ export interface DeleteOrgLimitDefaultInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateConnectedAccountInput {
-  clientMutationId?: string;
-  connectedAccount: {
-    ownerId?: string;
-    service: string;
-    identifier: string;
-    details: Record<string, unknown>;
-    isVerified?: boolean;
-  };
-}
-export interface ConnectedAccountPatch {
-  ownerId?: string | null;
-  service?: string | null;
-  identifier?: string | null;
-  details?: Record<string, unknown> | null;
-  isVerified?: boolean | null;
-  serviceTrgmSimilarity?: number | null;
-  identifierTrgmSimilarity?: number | null;
-  searchScore?: number | null;
-}
-export interface UpdateConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-  connectedAccountPatch: ConnectedAccountPatch;
-}
-export interface DeleteConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateNodeTypeRegistryInput {
   clientMutationId?: string;
   nodeTypeRegistry: {
@@ -14011,13 +14241,7 @@ export interface NodeTypeRegistryPatch {
   displayName?: string | null;
   description?: string | null;
   parameterSchema?: Record<string, unknown> | null;
-  tags?: string | null;
-  nameTrgmSimilarity?: number | null;
-  slugTrgmSimilarity?: number | null;
-  categoryTrgmSimilarity?: number | null;
-  displayNameTrgmSimilarity?: number | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  tags?: string[] | null;
 }
 export interface UpdateNodeTypeRegistryInput {
   clientMutationId?: string;
@@ -14040,9 +14264,6 @@ export interface MembershipTypePatch {
   name?: string | null;
   description?: string | null;
   prefix?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateMembershipTypeInput {
   clientMutationId?: string;
@@ -14070,13 +14291,11 @@ export interface CommitPatch {
   message?: string | null;
   databaseId?: string | null;
   storeId?: string | null;
-  parentIds?: string | null;
+  parentIds?: string[] | null;
   authorId?: string | null;
   committerId?: string | null;
   treeId?: string | null;
   date?: string | null;
-  messageTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateCommitInput {
   clientMutationId?: string;
@@ -14137,11 +14356,6 @@ export interface RlsModulePatch {
   authenticateStrict?: string | null;
   currentRole?: string | null;
   currentRoleId?: string | null;
-  authenticateTrgmSimilarity?: number | null;
-  authenticateStrictTrgmSimilarity?: number | null;
-  currentRoleTrgmSimilarity?: number | null;
-  currentRoleIdTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateRlsModuleInput {
   clientMutationId?: string;
@@ -14180,62 +14394,6 @@ export interface DeleteOrgMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAuditLogInput {
-  clientMutationId?: string;
-  auditLog: {
-    event: string;
-    actorId?: string;
-    origin?: ConstructiveInternalTypeOrigin;
-    userAgent?: string;
-    ipAddress?: string;
-    success: boolean;
-  };
-}
-export interface AuditLogPatch {
-  event?: string | null;
-  actorId?: string | null;
-  origin?: ConstructiveInternalTypeOrigin | null;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-  success?: boolean | null;
-  userAgentTrgmSimilarity?: number | null;
-  searchScore?: number | null;
-}
-export interface UpdateAuditLogInput {
-  clientMutationId?: string;
-  id: string;
-  auditLogPatch: AuditLogPatch;
-}
-export interface DeleteAuditLogInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateAppLevelInput {
-  clientMutationId?: string;
-  appLevel: {
-    name: string;
-    description?: string;
-    image?: ConstructiveInternalTypeImage;
-    ownerId?: string;
-  };
-}
-export interface AppLevelPatch {
-  name?: string | null;
-  description?: string | null;
-  image?: ConstructiveInternalTypeImage | null;
-  ownerId?: string | null;
-  descriptionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
-}
-export interface UpdateAppLevelInput {
-  clientMutationId?: string;
-  id: string;
-  appLevelPatch: AppLevelPatch;
-}
-export interface DeleteAppLevelInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateSqlMigrationInput {
   clientMutationId?: string;
   sqlMigration: {
@@ -14256,7 +14414,7 @@ export interface SqlMigrationPatch {
   name?: string | null;
   databaseId?: string | null;
   deploy?: string | null;
-  deps?: string | null;
+  deps?: string[] | null;
   payload?: Record<string, unknown> | null;
   content?: string | null;
   revert?: string | null;
@@ -14264,13 +14422,6 @@ export interface SqlMigrationPatch {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  nameTrgmSimilarity?: number | null;
-  deployTrgmSimilarity?: number | null;
-  contentTrgmSimilarity?: number | null;
-  revertTrgmSimilarity?: number | null;
-  verifyTrgmSimilarity?: number | null;
-  actionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateSqlMigrationInput {
   clientMutationId?: string;
@@ -14280,30 +14431,6 @@ export interface UpdateSqlMigrationInput {
 export interface DeleteSqlMigrationInput {
   clientMutationId?: string;
   id: number;
-}
-export interface CreateEmailInput {
-  clientMutationId?: string;
-  email: {
-    ownerId?: string;
-    email: ConstructiveInternalTypeEmail;
-    isVerified?: boolean;
-    isPrimary?: boolean;
-  };
-}
-export interface EmailPatch {
-  ownerId?: string | null;
-  email?: ConstructiveInternalTypeEmail | null;
-  isVerified?: boolean | null;
-  isPrimary?: boolean | null;
-}
-export interface UpdateEmailInput {
-  clientMutationId?: string;
-  id: string;
-  emailPatch: EmailPatch;
-}
-export interface DeleteEmailInput {
-  clientMutationId?: string;
-  id: string;
 }
 export interface CreateUserInput {
   clientMutationId?: string;
@@ -14318,11 +14445,8 @@ export interface UserPatch {
   username?: string | null;
   displayName?: string | null;
   profilePicture?: ConstructiveInternalTypeImage | null;
-  searchTsv?: string | null;
   type?: number | null;
-  searchTsvRank?: number | null;
-  displayNameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
+  profilePictureUpload?: File | null;
 }
 export interface UpdateUserInput {
   clientMutationId?: string;
@@ -14352,7 +14476,7 @@ export interface CreateAstMigrationInput {
 export interface AstMigrationPatch {
   databaseId?: string | null;
   name?: string | null;
-  requires?: string | null;
+  requires?: string[] | null;
   payload?: Record<string, unknown> | null;
   deploys?: string | null;
   deploy?: Record<string, unknown> | null;
@@ -14361,8 +14485,6 @@ export interface AstMigrationPatch {
   action?: string | null;
   actionId?: string | null;
   actorId?: string | null;
-  actionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateAstMigrationInput {
   clientMutationId?: string;
@@ -14457,17 +14579,6 @@ export interface HierarchyModulePatch {
   getSubordinatesFunction?: string | null;
   getManagersFunction?: string | null;
   isManagerOfFunction?: string | null;
-  chartEdgesTableNameTrgmSimilarity?: number | null;
-  hierarchySprtTableNameTrgmSimilarity?: number | null;
-  chartEdgeGrantsTableNameTrgmSimilarity?: number | null;
-  prefixTrgmSimilarity?: number | null;
-  privateSchemaNameTrgmSimilarity?: number | null;
-  sprtTableNameTrgmSimilarity?: number | null;
-  rebuildHierarchyFunctionTrgmSimilarity?: number | null;
-  getSubordinatesFunctionTrgmSimilarity?: number | null;
-  getManagersFunctionTrgmSimilarity?: number | null;
-  isManagerOfFunctionTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateHierarchyModuleInput {
   clientMutationId?: string;
@@ -14499,6 +14610,9 @@ export const connectionFieldsMap = {
     viewGrants: 'ViewGrant',
     viewRules: 'ViewRule',
     defaultPrivileges: 'DefaultPrivilege',
+    enums: 'Enum',
+    embeddingChunks: 'EmbeddingChunk',
+    databaseTransfers: 'DatabaseTransfer',
     apis: 'Api',
     apiModules: 'ApiModule',
     apiSchemas: 'ApiSchema',
@@ -14528,10 +14642,10 @@ export const connectionFieldsMap = {
     sessionsModules: 'SessionsModule',
     userAuthModules: 'UserAuthModule',
     usersModules: 'UsersModule',
-    uuidModules: 'UuidModule',
     tableTemplateModules: 'TableTemplateModule',
     secureTableProvisions: 'SecureTableProvision',
     relationProvisions: 'RelationProvision',
+    blueprints: 'Blueprint',
     databaseProvisionModules: 'DatabaseProvisionModule',
   },
   Schema: {
@@ -14539,6 +14653,7 @@ export const connectionFieldsMap = {
     schemaGrants: 'SchemaGrant',
     views: 'View',
     defaultPrivileges: 'DefaultPrivilege',
+    enums: 'Enum',
     apiSchemas: 'ApiSchema',
     tableTemplateModulesByPrivateSchemaId: 'TableTemplateModule',
     tableTemplateModules: 'TableTemplateModule',
@@ -14556,6 +14671,8 @@ export const connectionFieldsMap = {
     uniqueConstraints: 'UniqueConstraint',
     views: 'View',
     viewTables: 'ViewTable',
+    embeddingChunksByChunksTableId: 'EmbeddingChunk',
+    embeddingChunks: 'EmbeddingChunk',
     tableTemplateModulesByOwnerTableId: 'TableTemplateModule',
     tableTemplateModules: 'TableTemplateModule',
     secureTableProvisions: 'SecureTableProvision',
@@ -14578,19 +14695,29 @@ export const connectionFieldsMap = {
     siteModules: 'SiteModule',
     siteThemes: 'SiteTheme',
   },
+  BlueprintTemplate: {
+    blueprintTemplatesByForkedFromId: 'BlueprintTemplate',
+    blueprintsByTemplateId: 'Blueprint',
+  },
   User: {
     ownedDatabases: 'Database',
+    appAdminGrantsByActorId: 'AppAdminGrant',
     appAdminGrantsByGrantorId: 'AppAdminGrant',
+    appOwnerGrantsByActorId: 'AppOwnerGrant',
     appOwnerGrantsByGrantorId: 'AppOwnerGrant',
+    appGrantsByActorId: 'AppGrant',
     appGrantsByGrantorId: 'AppGrant',
     orgMembershipsByActorId: 'OrgMembership',
     orgMembershipsByEntityId: 'OrgMembership',
     orgMembersByActorId: 'OrgMember',
     orgMembersByEntityId: 'OrgMember',
+    orgAdminGrantsByActorId: 'OrgAdminGrant',
     orgAdminGrantsByEntityId: 'OrgAdminGrant',
     orgAdminGrantsByGrantorId: 'OrgAdminGrant',
+    orgOwnerGrantsByActorId: 'OrgOwnerGrant',
     orgOwnerGrantsByEntityId: 'OrgOwnerGrant',
     orgOwnerGrantsByGrantorId: 'OrgOwnerGrant',
+    orgGrantsByActorId: 'OrgGrant',
     orgGrantsByEntityId: 'OrgGrant',
     orgGrantsByGrantorId: 'OrgGrant',
     parentOrgChartEdges: 'OrgChartEdge',
@@ -14600,30 +14727,47 @@ export const connectionFieldsMap = {
     orgChartEdgeGrantsByEntityId: 'OrgChartEdgeGrant',
     orgChartEdgeGrantsByGrantorId: 'OrgChartEdgeGrant',
     childOrgChartEdgeGrants: 'OrgChartEdgeGrant',
+    orgPermissionDefaultsByEntityId: 'OrgPermissionDefault',
     appLimitsByActorId: 'AppLimit',
     orgLimitsByActorId: 'OrgLimit',
     orgLimitsByEntityId: 'OrgLimit',
     appStepsByActorId: 'AppStep',
     appAchievementsByActorId: 'AppAchievement',
+    ownedAppLevels: 'AppLevel',
+    ownedEmails: 'Email',
+    ownedPhoneNumbers: 'PhoneNumber',
+    ownedCryptoAddresses: 'CryptoAddress',
+    ownedConnectedAccounts: 'ConnectedAccount',
     invitesBySenderId: 'Invite',
     claimedInvitesByReceiverId: 'ClaimedInvite',
     claimedInvitesBySenderId: 'ClaimedInvite',
     orgInvitesByEntityId: 'OrgInvite',
+    orgInvitesByReceiverId: 'OrgInvite',
     orgInvitesBySenderId: 'OrgInvite',
+    orgClaimedInvitesByEntityId: 'OrgClaimedInvite',
     orgClaimedInvitesByReceiverId: 'OrgClaimedInvite',
     orgClaimedInvitesBySenderId: 'OrgClaimedInvite',
+    auditLogsByActorId: 'AuditLog',
   },
 } as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
-export interface SignOutInput {
-  clientMutationId?: string;
-}
 export interface SendAccountDeletionEmailInput {
   clientMutationId?: string;
 }
-export interface CheckPasswordInput {
+export interface SignOutInput {
   clientMutationId?: string;
-  password?: string;
+}
+export interface AcceptDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
+}
+export interface CancelDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
+}
+export interface RejectDatabaseTransferInput {
+  clientMutationId?: string;
+  transferId?: string;
 }
 export interface SubmitInviteCodeInput {
   clientMutationId?: string;
@@ -14633,15 +14777,9 @@ export interface SubmitOrgInviteCodeInput {
   clientMutationId?: string;
   token?: string;
 }
-export interface FreezeObjectsInput {
+export interface CheckPasswordInput {
   clientMutationId?: string;
-  databaseId?: string;
-  id?: string;
-}
-export interface InitEmptyRepoInput {
-  clientMutationId?: string;
-  dbId?: string;
-  storeId?: string;
+  password?: string;
 }
 export interface ConfirmDeleteAccountInput {
   clientMutationId?: string;
@@ -14658,11 +14796,20 @@ export interface VerifyEmailInput {
   emailId?: string;
   token?: string;
 }
-export interface RemoveNodeAtPathInput {
+export interface FreezeObjectsInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  id?: string;
+}
+export interface InitEmptyRepoInput {
   clientMutationId?: string;
   dbId?: string;
-  root?: string;
-  path?: string[];
+  storeId?: string;
+}
+export interface ConstructBlueprintInput {
+  clientMutationId?: string;
+  blueprintId?: string;
+  schemaId?: string;
 }
 export interface ResetPasswordInput {
   clientMutationId?: string;
@@ -14670,19 +14817,11 @@ export interface ResetPasswordInput {
   resetToken?: string;
   newPassword?: string;
 }
-export interface BootstrapUserInput {
+export interface RemoveNodeAtPathInput {
   clientMutationId?: string;
-  targetDatabaseId?: string;
-  password?: string;
-  isAdmin?: boolean;
-  isOwner?: boolean;
-  username?: string;
-  displayName?: string;
-  returnApiKey?: boolean;
-}
-export interface SetFieldOrderInput {
-  clientMutationId?: string;
-  fieldIds?: string[];
+  dbId?: string;
+  root?: string;
+  path?: string[];
 }
 export interface SetDataAtPathInput {
   clientMutationId?: string;
@@ -14699,6 +14838,14 @@ export interface SetPropsAndCommitInput {
   path?: string[];
   data?: Record<string, unknown>;
 }
+export interface CopyTemplateToBlueprintInput {
+  clientMutationId?: string;
+  templateId?: string;
+  databaseId?: string;
+  ownerId?: string;
+  nameOverride?: string;
+  displayNameOverride?: string;
+}
 export interface ProvisionDatabaseWithUserInput {
   clientMutationId?: string;
   pDatabaseName?: string;
@@ -14706,6 +14853,20 @@ export interface ProvisionDatabaseWithUserInput {
   pSubdomain?: string;
   pModules?: string[];
   pOptions?: Record<string, unknown>;
+}
+export interface BootstrapUserInput {
+  clientMutationId?: string;
+  targetDatabaseId?: string;
+  password?: string;
+  isAdmin?: boolean;
+  isOwner?: boolean;
+  username?: string;
+  displayName?: string;
+  returnApiKey?: boolean;
+}
+export interface SetFieldOrderInput {
+  clientMutationId?: string;
+  fieldIds?: string[];
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
@@ -14787,11 +14948,11 @@ export interface OneTimeTokenInput {
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
 }
-export interface ForgotPasswordInput {
+export interface SendVerificationEmailInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
 }
-export interface SendVerificationEmailInput {
+export interface ForgotPasswordInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
 }
@@ -14802,6 +14963,1647 @@ export interface VerifyPasswordInput {
 export interface VerifyTotpInput {
   clientMutationId?: string;
   totpValue: string;
+}
+/** A filter to be used against many `Schema` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SchemaFilter;
+}
+/** A filter to be used against many `Table` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableFilter;
+}
+/** A filter to be used against many `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCheckConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CheckConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CheckConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CheckConstraintFilter;
+}
+/** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyFieldFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FieldFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FieldFilter;
+}
+/** A filter to be used against many `ForeignKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyForeignKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ForeignKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ForeignKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ForeignKeyConstraintFilter;
+}
+/** A filter to be used against many `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyFullTextSearchFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FullTextSearchFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FullTextSearchFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FullTextSearchFilter;
+}
+/** A filter to be used against many `Index` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyIndexFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: IndexFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: IndexFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: IndexFilter;
+}
+/** A filter to be used against many `Policy` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPolicyFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PolicyFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PolicyFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PolicyFilter;
+}
+/** A filter to be used against many `PrimaryKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPrimaryKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrimaryKeyConstraintFilter;
+}
+/** A filter to be used against many `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySchemaGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SchemaGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SchemaGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SchemaGrantFilter;
+}
+/** A filter to be used against many `TableGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTableGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableGrantFilter;
+}
+/** A filter to be used against many `TriggerFunction` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTriggerFunctionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TriggerFunctionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TriggerFunctionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TriggerFunctionFilter;
+}
+/** A filter to be used against many `Trigger` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTriggerFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TriggerFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TriggerFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TriggerFilter;
+}
+/** A filter to be used against many `UniqueConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyUniqueConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UniqueConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UniqueConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UniqueConstraintFilter;
+}
+/** A filter to be used against many `View` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyViewFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewFilter;
+}
+/** A filter to be used against many `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyViewGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewGrantFilter;
+}
+/** A filter to be used against many `ViewRule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyViewRuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewRuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewRuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewRuleFilter;
+}
+/** A filter to be used against many `DefaultPrivilege` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDefaultPrivilegeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DefaultPrivilegeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DefaultPrivilegeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DefaultPrivilegeFilter;
+}
+/** A filter to be used against many `Enum` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEnumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EnumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EnumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EnumFilter;
+}
+/** A filter to be used against many `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEmbeddingChunkFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmbeddingChunkFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmbeddingChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmbeddingChunkFilter;
+}
+/** A filter to be used against many `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDatabaseTransferFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DatabaseTransferFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DatabaseTransferFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DatabaseTransferFilter;
+}
+/** A filter to be used against many `Api` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyApiFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiFilter;
+}
+/** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyApiModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiModuleFilter;
+}
+/** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyApiSchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSchemaFilter;
+}
+/** A filter to be used against many `Site` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteFilter;
+}
+/** A filter to be used against many `App` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyAppFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppFilter;
+}
+/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDomainFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DomainFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainFilter;
+}
+/** A filter to be used against many `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteMetadatumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteMetadatumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteMetadatumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteMetadatumFilter;
+}
+/** A filter to be used against many `SiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteModuleFilter;
+}
+/** A filter to be used against many `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySiteThemeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteThemeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteThemeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteThemeFilter;
+}
+/** A filter to be used against many `ConnectedAccountsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyConnectedAccountsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ConnectedAccountsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ConnectedAccountsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ConnectedAccountsModuleFilter;
+}
+/** A filter to be used against many `CryptoAddressesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCryptoAddressesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAddressesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAddressesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAddressesModuleFilter;
+}
+/** A filter to be used against many `CryptoAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyCryptoAuthModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAuthModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAuthModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAuthModuleFilter;
+}
+/** A filter to be used against many `DefaultIdsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDefaultIdsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DefaultIdsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DefaultIdsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DefaultIdsModuleFilter;
+}
+/** A filter to be used against many `DenormalizedTableField` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDenormalizedTableFieldFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DenormalizedTableFieldFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DenormalizedTableFieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DenormalizedTableFieldFilter;
+}
+/** A filter to be used against many `EmailsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEmailsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmailsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailsModuleFilter;
+}
+/** A filter to be used against many `EncryptedSecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyEncryptedSecretsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EncryptedSecretsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EncryptedSecretsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EncryptedSecretsModuleFilter;
+}
+/** A filter to be used against many `FieldModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyFieldModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FieldModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FieldModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FieldModuleFilter;
+}
+/** A filter to be used against many `InvitesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyInvitesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: InvitesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: InvitesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: InvitesModuleFilter;
+}
+/** A filter to be used against many `LevelsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyLevelsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: LevelsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: LevelsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: LevelsModuleFilter;
+}
+/** A filter to be used against many `LimitsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyLimitsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: LimitsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: LimitsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: LimitsModuleFilter;
+}
+/** A filter to be used against many `MembershipTypesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyMembershipTypesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: MembershipTypesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: MembershipTypesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: MembershipTypesModuleFilter;
+}
+/** A filter to be used against many `MembershipsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyMembershipsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: MembershipsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: MembershipsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: MembershipsModuleFilter;
+}
+/** A filter to be used against many `PermissionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPermissionsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PermissionsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PermissionsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PermissionsModuleFilter;
+}
+/** A filter to be used against many `PhoneNumbersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyPhoneNumbersModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PhoneNumbersModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PhoneNumbersModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PhoneNumbersModuleFilter;
+}
+/** A filter to be used against many `ProfilesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyProfilesModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ProfilesModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ProfilesModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ProfilesModuleFilter;
+}
+/** A filter to be used against many `SecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySecretsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SecretsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SecretsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SecretsModuleFilter;
+}
+/** A filter to be used against many `SessionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySessionsModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SessionsModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SessionsModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SessionsModuleFilter;
+}
+/** A filter to be used against many `UserAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyUserAuthModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UserAuthModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UserAuthModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UserAuthModuleFilter;
+}
+/** A filter to be used against many `UsersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyUsersModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UsersModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UsersModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UsersModuleFilter;
+}
+/** A filter to be used against many `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyTableTemplateModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableTemplateModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableTemplateModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableTemplateModuleFilter;
+}
+/** A filter to be used against many `SecureTableProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManySecureTableProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SecureTableProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SecureTableProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SecureTableProvisionFilter;
+}
+/** A filter to be used against many `RelationProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyRelationProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: RelationProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: RelationProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RelationProvisionFilter;
+}
+/** A filter to be used against many `Blueprint` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyBlueprintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintFilter;
+}
+/** A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyDatabaseProvisionModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DatabaseProvisionModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DatabaseProvisionModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DatabaseProvisionModuleFilter;
+}
+/** A filter to be used against ObjectCategory fields. All fields are combined with a logical ‘and.’ */
+export interface ObjectCategoryFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ObjectCategory;
+  /** Not equal to the specified value. */
+  notEqualTo?: ObjectCategory;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ObjectCategory;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ObjectCategory;
+  /** Included in the specified list. */
+  in?: ObjectCategory[];
+  /** Not included in the specified list. */
+  notIn?: ObjectCategory[];
+  /** Less than the specified value. */
+  lessThan?: ObjectCategory;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ObjectCategory;
+  /** Greater than the specified value. */
+  greaterThan?: ObjectCategory;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ObjectCategory;
+}
+/** A filter to be used against many `Table` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableFilter;
+}
+/** A filter to be used against many `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManySchemaGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SchemaGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SchemaGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SchemaGrantFilter;
+}
+/** A filter to be used against many `View` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyViewFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewFilter;
+}
+/** A filter to be used against many `DefaultPrivilege` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyDefaultPrivilegeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DefaultPrivilegeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DefaultPrivilegeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DefaultPrivilegeFilter;
+}
+/** A filter to be used against many `Enum` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyEnumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EnumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EnumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EnumFilter;
+}
+/** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyApiSchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSchemaFilter;
+}
+/** A filter to be used against many `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaToManyTableTemplateModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableTemplateModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableTemplateModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableTemplateModuleFilter;
+}
+/** A filter to be used against many `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyCheckConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CheckConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CheckConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CheckConstraintFilter;
+}
+/** A filter to be used against many `Field` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyFieldFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FieldFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FieldFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FieldFilter;
+}
+/** A filter to be used against many `ForeignKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyForeignKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ForeignKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ForeignKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ForeignKeyConstraintFilter;
+}
+/** A filter to be used against many `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyFullTextSearchFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: FullTextSearchFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: FullTextSearchFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: FullTextSearchFilter;
+}
+/** A filter to be used against many `Index` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyIndexFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: IndexFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: IndexFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: IndexFilter;
+}
+/** A filter to be used against many `Policy` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyPolicyFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PolicyFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PolicyFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PolicyFilter;
+}
+/** A filter to be used against many `PrimaryKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyPrimaryKeyConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PrimaryKeyConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PrimaryKeyConstraintFilter;
+}
+/** A filter to be used against many `TableGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyTableGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableGrantFilter;
+}
+/** A filter to be used against many `Trigger` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyTriggerFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TriggerFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TriggerFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TriggerFilter;
+}
+/** A filter to be used against many `UniqueConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyUniqueConstraintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: UniqueConstraintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: UniqueConstraintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: UniqueConstraintFilter;
+}
+/** A filter to be used against many `View` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyViewFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewFilter;
+}
+/** A filter to be used against many `ViewTable` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyViewTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewTableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewTableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewTableFilter;
+}
+/** A filter to be used against many `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyEmbeddingChunkFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmbeddingChunkFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmbeddingChunkFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmbeddingChunkFilter;
+}
+/** A filter to be used against many `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyTableTemplateModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: TableTemplateModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: TableTemplateModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: TableTemplateModuleFilter;
+}
+/** A filter to be used against many `SecureTableProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManySecureTableProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SecureTableProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SecureTableProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SecureTableProvisionFilter;
+}
+/** A filter to be used against many `RelationProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface TableToManyRelationProvisionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: RelationProvisionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: RelationProvisionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: RelationProvisionFilter;
+}
+/** A filter to be used against many `ViewTable` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewToManyViewTableFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewTableFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewTableFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewTableFilter;
+}
+/** A filter to be used against many `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewToManyViewGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewGrantFilter;
+}
+/** A filter to be used against many `ViewRule` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewToManyViewRuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ViewRuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ViewRuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ViewRuleFilter;
+}
+/** A filter to be used against JSON List fields. All fields are combined with a logical ‘and.’ */
+export interface JSONListFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: Record<string, unknown>[];
+  /** Not equal to the specified value. */
+  notEqualTo?: Record<string, unknown>[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Record<string, unknown>[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Record<string, unknown>[];
+  /** Less than the specified value. */
+  lessThan?: Record<string, unknown>[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: Record<string, unknown>[];
+  /** Greater than the specified value. */
+  greaterThan?: Record<string, unknown>[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: Record<string, unknown>[];
+  /** Contains the specified list of values. */
+  contains?: Record<string, unknown>[];
+  /** Contained by the specified list of values. */
+  containedBy?: Record<string, unknown>[];
+  /** Overlaps the specified list of values. */
+  overlaps?: Record<string, unknown>[];
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: Record<string, unknown>;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: Record<string, unknown>;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: Record<string, unknown>;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: Record<string, unknown>;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: Record<string, unknown>;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: Record<string, unknown>;
+}
+/** A filter to be used against ConstructiveInternalTypeHostname fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeHostnameFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeHostname;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeHostname;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeHostname;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeHostname;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeHostname[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeHostname[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeHostname;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeHostname;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeHostname;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeHostname;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeHostname;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeHostname;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeHostname;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeHostname;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeHostname;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeHostname;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeHostname;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeHostname;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeHostname;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeHostname;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeHostname;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeHostname;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeImageFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeImage;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeImage;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeImage;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeImage[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeImage[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeImage;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeImage;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeImage;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeImage;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeImage;
+}
+/** A filter to be used against many `ApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiToManyApiModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiModuleFilter;
+}
+/** A filter to be used against many `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiToManyApiSchemaFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ApiSchemaFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ApiSchemaFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ApiSchemaFilter;
+}
+/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiToManyDomainFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DomainFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainFilter;
+}
+/** A filter to be used against ConstructiveInternalTypeAttachment fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeAttachmentFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeAttachment;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeAttachment;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeAttachment;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeAttachment;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeAttachment[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeAttachment[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeAttachment;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeAttachment;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeAttachment;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeAttachment;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeAttachment;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeAttachment;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeAttachment;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeAttachment;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeAttachment;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeAttachment;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeAttachment;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeAttachment;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeAttachment;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against many `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManyDomainFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DomainFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DomainFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DomainFilter;
+}
+/** A filter to be used against many `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManySiteMetadatumFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteMetadatumFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteMetadatumFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteMetadatumFilter;
+}
+/** A filter to be used against many `SiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManySiteModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteModuleFilter;
+}
+/** A filter to be used against many `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteToManySiteThemeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: SiteThemeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: SiteThemeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: SiteThemeFilter;
+}
+/** A filter to be used against ConstructiveInternalTypeUrl fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeUrlFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeUrl;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeUrl;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeUrl;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeUrl;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeUrl[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeUrl[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeUrl;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeUrl;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeUrl;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeUrl;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeUrl;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeUrl;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeUrl;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeUrl;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeUrl;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeUrl;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeUrl;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeUrl;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeUrl;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeUrl;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeUrl;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeUrl;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against Interval fields. All fields are combined with a logical ‘and.’ */
+export interface IntervalFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: IntervalInput;
+  /** Not equal to the specified value. */
+  notEqualTo?: IntervalInput;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: IntervalInput;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: IntervalInput;
+  /** Included in the specified list. */
+  in?: IntervalInput[];
+  /** Not included in the specified list. */
+  notIn?: IntervalInput[];
+  /** Less than the specified value. */
+  lessThan?: IntervalInput;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: IntervalInput;
+  /** Greater than the specified value. */
+  greaterThan?: IntervalInput;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: IntervalInput;
+}
+/** A filter to be used against many `BlueprintTemplate` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintTemplateToManyBlueprintTemplateFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintTemplateFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintTemplateFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintTemplateFilter;
+}
+/** A filter to be used against many `Blueprint` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintTemplateToManyBlueprintFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintFilter;
+}
+/** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeEmailFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeEmail;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeEmail;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: ConstructiveInternalTypeEmail;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: ConstructiveInternalTypeEmail[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: ConstructiveInternalTypeEmail;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+}
+/** A filter to be used against ConstructiveInternalTypeOrigin fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeOriginFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeOrigin;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeOrigin;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeOrigin;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeOrigin[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeOrigin[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeOrigin;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeOrigin;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeOrigin;
+  /** Contains the specified string (case-sensitive). */
+  includes?: ConstructiveInternalTypeOrigin;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: ConstructiveInternalTypeOrigin;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: ConstructiveInternalTypeOrigin;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: ConstructiveInternalTypeOrigin;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: ConstructiveInternalTypeOrigin;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: ConstructiveInternalTypeOrigin;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: ConstructiveInternalTypeOrigin;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: ConstructiveInternalTypeOrigin;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: ConstructiveInternalTypeOrigin;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against String fields with pg_trgm support. All fields are combined with a logical ‘and.’ */
+export interface StringTrgmFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+  /** Fuzzy matches using pg_trgm trigram similarity. Tolerates typos and misspellings. */
+  similarTo?: TrgmSearchInput;
+  /** Fuzzy matches using pg_trgm word_similarity. Finds the best matching substring within the column value. */
+  wordSimilarTo?: TrgmSearchInput;
+}
+/** A filter to be used against many `Database` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyDatabaseFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: DatabaseFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: DatabaseFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: DatabaseFilter;
+}
+/** A filter to be used against many `AppAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppAdminGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppAdminGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppAdminGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppAdminGrantFilter;
+}
+/** A filter to be used against many `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppOwnerGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppOwnerGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppOwnerGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppOwnerGrantFilter;
+}
+/** A filter to be used against many `AppGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppGrantFilter;
+}
+/** A filter to be used against many `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgMembershipFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgMembershipFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgMembershipFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgMembershipFilter;
+}
+/** A filter to be used against many `OrgMember` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgMemberFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgMemberFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgMemberFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgMemberFilter;
+}
+/** A filter to be used against many `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgAdminGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgAdminGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgAdminGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgAdminGrantFilter;
+}
+/** A filter to be used against many `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgOwnerGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgOwnerGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgOwnerGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgOwnerGrantFilter;
+}
+/** A filter to be used against many `OrgGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgGrantFilter;
+}
+/** A filter to be used against many `OrgChartEdge` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgChartEdgeFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgChartEdgeFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgChartEdgeFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgChartEdgeFilter;
+}
+/** A filter to be used against many `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgChartEdgeGrantFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgChartEdgeGrantFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgChartEdgeGrantFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgChartEdgeGrantFilter;
+}
+/** A filter to be used against many `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgPermissionDefaultFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgPermissionDefaultFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgPermissionDefaultFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgPermissionDefaultFilter;
+}
+/** A filter to be used against many `AppLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppLimitFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLimitFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLimitFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLimitFilter;
+}
+/** A filter to be used against many `OrgLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgLimitFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgLimitFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgLimitFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgLimitFilter;
+}
+/** A filter to be used against many `AppStep` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppStepFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppStepFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppStepFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppStepFilter;
+}
+/** A filter to be used against many `AppAchievement` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppAchievementFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppAchievementFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppAchievementFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppAchievementFilter;
+}
+/** A filter to be used against many `AppLevel` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppLevelFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AppLevelFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AppLevelFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AppLevelFilter;
+}
+/** A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyEmailFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: EmailFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: EmailFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: EmailFilter;
+}
+/** A filter to be used against many `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyPhoneNumberFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: PhoneNumberFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: PhoneNumberFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: PhoneNumberFilter;
+}
+/** A filter to be used against many `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyCryptoAddressFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: CryptoAddressFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: CryptoAddressFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: CryptoAddressFilter;
+}
+/** A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyConnectedAccountFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ConnectedAccountFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ConnectedAccountFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ConnectedAccountFilter;
+}
+/** A filter to be used against many `Invite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: InviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: InviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: InviteFilter;
+}
+/** A filter to be used against many `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyClaimedInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: ClaimedInviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: ClaimedInviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: ClaimedInviteFilter;
+}
+/** A filter to be used against many `OrgInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgInviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgInviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgInviteFilter;
+}
+/** A filter to be used against many `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyOrgClaimedInviteFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: OrgClaimedInviteFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: OrgClaimedInviteFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: OrgClaimedInviteFilter;
+}
+/** A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAuditLogFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: AuditLogFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: AuditLogFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: AuditLogFilter;
+}
+/** Input for pg_trgm fuzzy text matching. Provide a search value and optional similarity threshold. */
+export interface TrgmSearchInput {
+  /** The text to fuzzy-match against. Typos and misspellings are tolerated. */
+  value: string;
+  /** Minimum similarity threshold (0.0 to 1.0). Higher = stricter matching. Default is 0.3. */
+  threshold?: number;
 }
 /** An interval of time that has passed where the smallest distinct unit is a second. */
 export interface IntervalInput {
@@ -14821,6 +16623,4296 @@ export interface IntervalInput {
   months?: number;
   /** A quantity of years. */
   years?: number;
+}
+/** A filter to be used against `Schema` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `schemaName` field. */
+  schemaName?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `isPublic` field. */
+  isPublic?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: SchemaFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SchemaFilter[];
+  /** Negates the expression. */
+  not?: SchemaFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `tables` relation. */
+  tables?: SchemaToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: SchemaToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: SchemaToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: SchemaToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: SchemaToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: SchemaToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByPrivateSchemaId` relation. */
+  tableTemplateModulesByPrivateSchemaId?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByPrivateSchemaId` exist. */
+  tableTemplateModulesByPrivateSchemaIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: SchemaToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+}
+/** A filter to be used against `Table` object types. All fields are combined with a logical ‘and.’ */
+export interface TableFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `useRls` field. */
+  useRls?: BooleanFilter;
+  /** Filter by the object’s `timestamps` field. */
+  timestamps?: BooleanFilter;
+  /** Filter by the object’s `peoplestamps` field. */
+  peoplestamps?: BooleanFilter;
+  /** Filter by the object’s `pluralName` field. */
+  pluralName?: StringFilter;
+  /** Filter by the object’s `singularName` field. */
+  singularName?: StringFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `inheritsId` field. */
+  inheritsId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TableFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TableFilter[];
+  /** Negates the expression. */
+  not?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `inherits` relation. */
+  inherits?: TableFilter;
+  /** A related `inherits` exists. */
+  inheritsExists?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: TableToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: TableToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: TableToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: TableToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: TableToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: TableToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: TableToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: TableToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: TableToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: TableToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: TableToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: TableToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `embeddingChunksByChunksTableId` relation. */
+  embeddingChunksByChunksTableId?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunksByChunksTableId` exist. */
+  embeddingChunksByChunksTableIdExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: TableToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `tableTemplateModulesByOwnerTableId` relation. */
+  tableTemplateModulesByOwnerTableId?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModulesByOwnerTableId` exist. */
+  tableTemplateModulesByOwnerTableIdExist?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: TableToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: TableToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisionsBySourceTableId` relation. */
+  relationProvisionsBySourceTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsBySourceTableId` exist. */
+  relationProvisionsBySourceTableIdExist?: boolean;
+  /** Filter by the object’s `relationProvisionsByTargetTableId` relation. */
+  relationProvisionsByTargetTableId?: TableToManyRelationProvisionFilter;
+  /** `relationProvisionsByTargetTableId` exist. */
+  relationProvisionsByTargetTableIdExist?: boolean;
+}
+/** A filter to be used against `CheckConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface CheckConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `expr` field. */
+  expr?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: CheckConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CheckConstraintFilter[];
+  /** Negates the expression. */
+  not?: CheckConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `Field` object types. All fields are combined with a logical ‘and.’ */
+export interface FieldFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `isRequired` field. */
+  isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
+  apiRequired?: BooleanFilter;
+  /** Filter by the object’s `defaultValue` field. */
+  defaultValue?: StringFilter;
+  /** Filter by the object’s `defaultValueAst` field. */
+  defaultValueAst?: JSONFilter;
+  /** Filter by the object’s `isHidden` field. */
+  isHidden?: BooleanFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldOrder` field. */
+  fieldOrder?: IntFilter;
+  /** Filter by the object’s `regexp` field. */
+  regexp?: StringFilter;
+  /** Filter by the object’s `chk` field. */
+  chk?: JSONFilter;
+  /** Filter by the object’s `chkExpr` field. */
+  chkExpr?: JSONFilter;
+  /** Filter by the object’s `min` field. */
+  min?: FloatFilter;
+  /** Filter by the object’s `max` field. */
+  max?: FloatFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: FieldFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FieldFilter[];
+  /** Negates the expression. */
+  not?: FieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `ForeignKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface ForeignKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
+  refTableId?: UUIDFilter;
+  /** Filter by the object’s `refFieldIds` field. */
+  refFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `deleteAction` field. */
+  deleteAction?: StringFilter;
+  /** Filter by the object’s `updateAction` field. */
+  updateAction?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ForeignKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ForeignKeyConstraintFilter[];
+  /** Negates the expression. */
+  not?: ForeignKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `FullTextSearch` object types. All fields are combined with a logical ‘and.’ */
+export interface FullTextSearchFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `weights` field. */
+  weights?: StringListFilter;
+  /** Filter by the object’s `langs` field. */
+  langs?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: FullTextSearchFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FullTextSearchFilter[];
+  /** Negates the expression. */
+  not?: FullTextSearchFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `Index` object types. All fields are combined with a logical ‘and.’ */
+export interface IndexFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `includeFieldIds` field. */
+  includeFieldIds?: UUIDListFilter;
+  /** Filter by the object’s `accessMethod` field. */
+  accessMethod?: StringFilter;
+  /** Filter by the object’s `indexParams` field. */
+  indexParams?: JSONFilter;
+  /** Filter by the object’s `whereClause` field. */
+  whereClause?: JSONFilter;
+  /** Filter by the object’s `isUnique` field. */
+  isUnique?: BooleanFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Filter by the object’s `opClasses` field. */
+  opClasses?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: IndexFilter[];
+  /** Checks for any expressions in this list. */
+  or?: IndexFilter[];
+  /** Negates the expression. */
+  not?: IndexFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `Policy` object types. All fields are combined with a logical ‘and.’ */
+export interface PolicyFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `permissive` field. */
+  permissive?: BooleanFilter;
+  /** Filter by the object’s `disabled` field. */
+  disabled?: BooleanFilter;
+  /** Filter by the object’s `policyType` field. */
+  policyType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PolicyFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PolicyFilter[];
+  /** Negates the expression. */
+  not?: PolicyFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `PrimaryKeyConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface PrimaryKeyConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PrimaryKeyConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PrimaryKeyConstraintFilter[];
+  /** Negates the expression. */
+  not?: PrimaryKeyConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SchemaGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface SchemaGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: SchemaGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SchemaGrantFilter[];
+  /** Negates the expression. */
+  not?: SchemaGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `TableGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface TableGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TableGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TableGrantFilter[];
+  /** Negates the expression. */
+  not?: TableGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `TriggerFunction` object types. All fields are combined with a logical ‘and.’ */
+export interface TriggerFunctionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `code` field. */
+  code?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TriggerFunctionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TriggerFunctionFilter[];
+  /** Negates the expression. */
+  not?: TriggerFunctionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `Trigger` object types. All fields are combined with a logical ‘and.’ */
+export interface TriggerFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `functionName` field. */
+  functionName?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: TriggerFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TriggerFilter[];
+  /** Negates the expression. */
+  not?: TriggerFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `UniqueConstraint` object types. All fields are combined with a logical ‘and.’ */
+export interface UniqueConstraintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `type` field. */
+  type?: StringFilter;
+  /** Filter by the object’s `fieldIds` field. */
+  fieldIds?: UUIDListFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UniqueConstraintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UniqueConstraintFilter[];
+  /** Negates the expression. */
+  not?: UniqueConstraintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `View` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `viewType` field. */
+  viewType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `filterType` field. */
+  filterType?: StringFilter;
+  /** Filter by the object’s `filterData` field. */
+  filterData?: JSONFilter;
+  /** Filter by the object’s `securityInvoker` field. */
+  securityInvoker?: BooleanFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewFilter[];
+  /** Negates the expression. */
+  not?: ViewFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** A related `table` exists. */
+  tableExists?: boolean;
+  /** Filter by the object’s `viewTables` relation. */
+  viewTables?: ViewToManyViewTableFilter;
+  /** `viewTables` exist. */
+  viewTablesExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: ViewToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: ViewToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
+}
+/** A filter to be used against `ViewGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
+  viewId?: UUIDFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `withGrantOption` field. */
+  withGrantOption?: BooleanFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewGrantFilter[];
+  /** Negates the expression. */
+  not?: ViewGrantFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
+}
+/** A filter to be used against `ViewRule` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewRuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
+  viewId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `action` field. */
+  action?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewRuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewRuleFilter[];
+  /** Negates the expression. */
+  not?: ViewRuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
+}
+/** A filter to be used against `DefaultPrivilege` object types. All fields are combined with a logical ‘and.’ */
+export interface DefaultPrivilegeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `objectType` field. */
+  objectType?: StringFilter;
+  /** Filter by the object’s `privilege` field. */
+  privilege?: StringFilter;
+  /** Filter by the object’s `granteeName` field. */
+  granteeName?: StringFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: DefaultPrivilegeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DefaultPrivilegeFilter[];
+  /** Negates the expression. */
+  not?: DefaultPrivilegeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `Enum` object types. All fields are combined with a logical ‘and.’ */
+export interface EnumFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `values` field. */
+  values?: StringListFilter;
+  /** Filter by the object’s `smartTags` field. */
+  smartTags?: JSONFilter;
+  /** Filter by the object’s `category` field. */
+  category?: ObjectCategoryFilter;
+  /** Filter by the object’s `module` field. */
+  module?: StringFilter;
+  /** Filter by the object’s `scope` field. */
+  scope?: IntFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: EnumFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EnumFilter[];
+  /** Negates the expression. */
+  not?: EnumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `EmbeddingChunk` object types. All fields are combined with a logical ‘and.’ */
+export interface EmbeddingChunkFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `embeddingFieldId` field. */
+  embeddingFieldId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableId` field. */
+  chunksTableId?: UUIDFilter;
+  /** Filter by the object’s `chunksTableName` field. */
+  chunksTableName?: StringFilter;
+  /** Filter by the object’s `contentFieldName` field. */
+  contentFieldName?: StringFilter;
+  /** Filter by the object’s `dimensions` field. */
+  dimensions?: IntFilter;
+  /** Filter by the object’s `metric` field. */
+  metric?: StringFilter;
+  /** Filter by the object’s `chunkSize` field. */
+  chunkSize?: IntFilter;
+  /** Filter by the object’s `chunkOverlap` field. */
+  chunkOverlap?: IntFilter;
+  /** Filter by the object’s `chunkStrategy` field. */
+  chunkStrategy?: StringFilter;
+  /** Filter by the object’s `metadataFields` field. */
+  metadataFields?: JSONFilter;
+  /** Filter by the object’s `enqueueChunkingJob` field. */
+  enqueueChunkingJob?: BooleanFilter;
+  /** Filter by the object’s `chunkingTaskName` field. */
+  chunkingTaskName?: StringFilter;
+  /** Filter by the object’s `parentFkFieldId` field. */
+  parentFkFieldId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmbeddingChunkFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmbeddingChunkFilter[];
+  /** Negates the expression. */
+  not?: EmbeddingChunkFilter;
+  /** Filter by the object’s `chunksTable` relation. */
+  chunksTable?: TableFilter;
+  /** A related `chunksTable` exists. */
+  chunksTableExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `embeddingField` relation. */
+  embeddingField?: FieldFilter;
+  /** A related `embeddingField` exists. */
+  embeddingFieldExists?: boolean;
+  /** Filter by the object’s `parentFkField` relation. */
+  parentFkField?: FieldFilter;
+  /** A related `parentFkField` exists. */
+  parentFkFieldExists?: boolean;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `DatabaseTransfer` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseTransferFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `targetOwnerId` field. */
+  targetOwnerId?: UUIDFilter;
+  /** Filter by the object’s `sourceApproved` field. */
+  sourceApproved?: BooleanFilter;
+  /** Filter by the object’s `targetApproved` field. */
+  targetApproved?: BooleanFilter;
+  /** Filter by the object’s `sourceApprovedAt` field. */
+  sourceApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `targetApprovedAt` field. */
+  targetApprovedAt?: DatetimeFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `initiatedBy` field. */
+  initiatedBy?: UUIDFilter;
+  /** Filter by the object’s `notes` field. */
+  notes?: StringFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseTransferFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseTransferFilter[];
+  /** Negates the expression. */
+  not?: DatabaseTransferFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `Api` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Filter by the object’s `roleName` field. */
+  roleName?: StringFilter;
+  /** Filter by the object’s `anonRole` field. */
+  anonRole?: StringFilter;
+  /** Filter by the object’s `isPublic` field. */
+  isPublic?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: ApiFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ApiFilter[];
+  /** Negates the expression. */
+  not?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: ApiToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: ApiToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: ApiToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+}
+/** A filter to be used against `ApiModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ApiModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ApiModuleFilter[];
+  /** Negates the expression. */
+  not?: ApiModuleFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `ApiSchema` object types. All fields are combined with a logical ‘and.’ */
+export interface ApiSchemaFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: ApiSchemaFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ApiSchemaFilter[];
+  /** Negates the expression. */
+  not?: ApiSchemaFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+}
+/** A filter to be used against `Site` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `favicon` field. */
+  favicon?: ConstructiveInternalTypeAttachmentFilter;
+  /** Filter by the object’s `appleTouchIcon` field. */
+  appleTouchIcon?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `logo` field. */
+  logo?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `dbname` field. */
+  dbname?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteFilter[];
+  /** Negates the expression. */
+  not?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `app` relation. */
+  app?: AppFilter;
+  /** A related `app` exists. */
+  appExists?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: SiteToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: SiteToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: SiteToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: SiteToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+}
+/** A filter to be used against `App` object types. All fields are combined with a logical ‘and.’ */
+export interface AppFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `appImage` field. */
+  appImage?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `appStoreLink` field. */
+  appStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Filter by the object’s `appStoreId` field. */
+  appStoreId?: StringFilter;
+  /** Filter by the object’s `appIdPrefix` field. */
+  appIdPrefix?: StringFilter;
+  /** Filter by the object’s `playStoreLink` field. */
+  playStoreLink?: ConstructiveInternalTypeUrlFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppFilter[];
+  /** Negates the expression. */
+  not?: AppFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `Domain` object types. All fields are combined with a logical ‘and.’ */
+export interface DomainFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `apiId` field. */
+  apiId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `subdomain` field. */
+  subdomain?: ConstructiveInternalTypeHostnameFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: ConstructiveInternalTypeHostnameFilter;
+  /** Checks for all expressions in this list. */
+  and?: DomainFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DomainFilter[];
+  /** Negates the expression. */
+  not?: DomainFilter;
+  /** Filter by the object’s `api` relation. */
+  api?: ApiFilter;
+  /** A related `api` exists. */
+  apiExists?: boolean;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+  /** A related `site` exists. */
+  siteExists?: boolean;
+}
+/** A filter to be used against `SiteMetadatum` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteMetadatumFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `ogImage` field. */
+  ogImage?: ConstructiveInternalTypeImageFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteMetadatumFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteMetadatumFilter[];
+  /** Negates the expression. */
+  not?: SiteMetadatumFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+}
+/** A filter to be used against `SiteModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteModuleFilter[];
+  /** Negates the expression. */
+  not?: SiteModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+}
+/** A filter to be used against `SiteTheme` object types. All fields are combined with a logical ‘and.’ */
+export interface SiteThemeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `siteId` field. */
+  siteId?: UUIDFilter;
+  /** Filter by the object’s `theme` field. */
+  theme?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: SiteThemeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SiteThemeFilter[];
+  /** Negates the expression. */
+  not?: SiteThemeFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `site` relation. */
+  site?: SiteFilter;
+}
+/** A filter to be used against `ConnectedAccountsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ConnectedAccountsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ConnectedAccountsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ConnectedAccountsModuleFilter[];
+  /** Negates the expression. */
+  not?: ConnectedAccountsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `CryptoAddressesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CryptoAddressesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
+  cryptoNetwork?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAddressesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAddressesModuleFilter[];
+  /** Negates the expression. */
+  not?: CryptoAddressesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `CryptoAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface CryptoAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
+  secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `addressesTableId` field. */
+  addressesTableId?: UUIDFilter;
+  /** Filter by the object’s `userField` field. */
+  userField?: StringFilter;
+  /** Filter by the object’s `cryptoNetwork` field. */
+  cryptoNetwork?: StringFilter;
+  /** Filter by the object’s `signInRequestChallenge` field. */
+  signInRequestChallenge?: StringFilter;
+  /** Filter by the object’s `signInRecordFailure` field. */
+  signInRecordFailure?: StringFilter;
+  /** Filter by the object’s `signUpWithKey` field. */
+  signUpWithKey?: StringFilter;
+  /** Filter by the object’s `signInWithChallenge` field. */
+  signInWithChallenge?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAuthModuleFilter[];
+  /** Negates the expression. */
+  not?: CryptoAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `DefaultIdsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DefaultIdsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: DefaultIdsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DefaultIdsModuleFilter[];
+  /** Negates the expression. */
+  not?: DefaultIdsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `DenormalizedTableField` object types. All fields are combined with a logical ‘and.’ */
+export interface DenormalizedTableFieldFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `setIds` field. */
+  setIds?: UUIDListFilter;
+  /** Filter by the object’s `refTableId` field. */
+  refTableId?: UUIDFilter;
+  /** Filter by the object’s `refFieldId` field. */
+  refFieldId?: UUIDFilter;
+  /** Filter by the object’s `refIds` field. */
+  refIds?: UUIDListFilter;
+  /** Filter by the object’s `useUpdates` field. */
+  useUpdates?: BooleanFilter;
+  /** Filter by the object’s `updateDefaults` field. */
+  updateDefaults?: BooleanFilter;
+  /** Filter by the object’s `funcName` field. */
+  funcName?: StringFilter;
+  /** Filter by the object’s `funcOrder` field. */
+  funcOrder?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: DenormalizedTableFieldFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DenormalizedTableFieldFilter[];
+  /** Negates the expression. */
+  not?: DenormalizedTableFieldFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `refField` relation. */
+  refField?: FieldFilter;
+  /** Filter by the object’s `refTable` relation. */
+  refTable?: TableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `EmailsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmailsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmailsModuleFilter[];
+  /** Negates the expression. */
+  not?: EmailsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `EncryptedSecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface EncryptedSecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: EncryptedSecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EncryptedSecretsModuleFilter[];
+  /** Negates the expression. */
+  not?: EncryptedSecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `FieldModule` object types. All fields are combined with a logical ‘and.’ */
+export interface FieldModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `fieldId` field. */
+  fieldId?: UUIDFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Filter by the object’s `triggers` field. */
+  triggers?: StringListFilter;
+  /** Filter by the object’s `functions` field. */
+  functions?: StringListFilter;
+  /** Checks for all expressions in this list. */
+  and?: FieldModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: FieldModuleFilter[];
+  /** Negates the expression. */
+  not?: FieldModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `field` relation. */
+  field?: FieldFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `InvitesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface InvitesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
+  emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableId` field. */
+  invitesTableId?: UUIDFilter;
+  /** Filter by the object’s `claimedInvitesTableId` field. */
+  claimedInvitesTableId?: UUIDFilter;
+  /** Filter by the object’s `invitesTableName` field. */
+  invitesTableName?: StringFilter;
+  /** Filter by the object’s `claimedInvitesTableName` field. */
+  claimedInvitesTableName?: StringFilter;
+  /** Filter by the object’s `submitInviteCodeFunction` field. */
+  submitInviteCodeFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: InvitesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: InvitesModuleFilter[];
+  /** Negates the expression. */
+  not?: InvitesModuleFilter;
+  /** Filter by the object’s `claimedInvitesTable` relation. */
+  claimedInvitesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `invitesTable` relation. */
+  invitesTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `LevelsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface LevelsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableId` field. */
+  stepsTableId?: UUIDFilter;
+  /** Filter by the object’s `stepsTableName` field. */
+  stepsTableName?: StringFilter;
+  /** Filter by the object’s `achievementsTableId` field. */
+  achievementsTableId?: UUIDFilter;
+  /** Filter by the object’s `achievementsTableName` field. */
+  achievementsTableName?: StringFilter;
+  /** Filter by the object’s `levelsTableId` field. */
+  levelsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelsTableName` field. */
+  levelsTableName?: StringFilter;
+  /** Filter by the object’s `levelRequirementsTableId` field. */
+  levelRequirementsTableId?: UUIDFilter;
+  /** Filter by the object’s `levelRequirementsTableName` field. */
+  levelRequirementsTableName?: StringFilter;
+  /** Filter by the object’s `completedStep` field. */
+  completedStep?: StringFilter;
+  /** Filter by the object’s `incompletedStep` field. */
+  incompletedStep?: StringFilter;
+  /** Filter by the object’s `tgAchievement` field. */
+  tgAchievement?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggle` field. */
+  tgAchievementToggle?: StringFilter;
+  /** Filter by the object’s `tgAchievementToggleBoolean` field. */
+  tgAchievementToggleBoolean?: StringFilter;
+  /** Filter by the object’s `tgAchievementBoolean` field. */
+  tgAchievementBoolean?: StringFilter;
+  /** Filter by the object’s `upsertAchievement` field. */
+  upsertAchievement?: StringFilter;
+  /** Filter by the object’s `tgUpdateAchievements` field. */
+  tgUpdateAchievements?: StringFilter;
+  /** Filter by the object’s `stepsRequired` field. */
+  stepsRequired?: StringFilter;
+  /** Filter by the object’s `levelAchieved` field. */
+  levelAchieved?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: LevelsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: LevelsModuleFilter[];
+  /** Negates the expression. */
+  not?: LevelsModuleFilter;
+  /** Filter by the object’s `achievementsTable` relation. */
+  achievementsTable?: TableFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `levelRequirementsTable` relation. */
+  levelRequirementsTable?: TableFilter;
+  /** Filter by the object’s `levelsTable` relation. */
+  levelsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `stepsTable` relation. */
+  stepsTable?: TableFilter;
+}
+/** A filter to be used against `LimitsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface LimitsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
+  defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
+  defaultTableName?: StringFilter;
+  /** Filter by the object’s `limitIncrementFunction` field. */
+  limitIncrementFunction?: StringFilter;
+  /** Filter by the object’s `limitDecrementFunction` field. */
+  limitDecrementFunction?: StringFilter;
+  /** Filter by the object’s `limitIncrementTrigger` field. */
+  limitIncrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitDecrementTrigger` field. */
+  limitDecrementTrigger?: StringFilter;
+  /** Filter by the object’s `limitUpdateTrigger` field. */
+  limitUpdateTrigger?: StringFilter;
+  /** Filter by the object’s `limitCheckFunction` field. */
+  limitCheckFunction?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: LimitsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: LimitsModuleFilter[];
+  /** Negates the expression. */
+  not?: LimitsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `MembershipTypesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface MembershipTypesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipTypesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipTypesModuleFilter[];
+  /** Negates the expression. */
+  not?: MembershipTypesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `MembershipsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface MembershipsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
+  membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableName` field. */
+  membershipsTableName?: StringFilter;
+  /** Filter by the object’s `membersTableId` field. */
+  membersTableId?: UUIDFilter;
+  /** Filter by the object’s `membersTableName` field. */
+  membersTableName?: StringFilter;
+  /** Filter by the object’s `membershipDefaultsTableId` field. */
+  membershipDefaultsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipDefaultsTableName` field. */
+  membershipDefaultsTableName?: StringFilter;
+  /** Filter by the object’s `grantsTableId` field. */
+  grantsTableId?: UUIDFilter;
+  /** Filter by the object’s `grantsTableName` field. */
+  grantsTableName?: StringFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Filter by the object’s `limitsTableId` field. */
+  limitsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultLimitsTableId` field. */
+  defaultLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
+  permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultPermissionsTableId` field. */
+  defaultPermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sprtTableId` field. */
+  sprtTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableId` field. */
+  adminGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `adminGrantsTableName` field. */
+  adminGrantsTableName?: StringFilter;
+  /** Filter by the object’s `ownerGrantsTableId` field. */
+  ownerGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `ownerGrantsTableName` field. */
+  ownerGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `entityTableOwnerId` field. */
+  entityTableOwnerId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `actorMaskCheck` field. */
+  actorMaskCheck?: StringFilter;
+  /** Filter by the object’s `actorPermCheck` field. */
+  actorPermCheck?: StringFilter;
+  /** Filter by the object’s `entityIdsByMask` field. */
+  entityIdsByMask?: StringFilter;
+  /** Filter by the object’s `entityIdsByPerm` field. */
+  entityIdsByPerm?: StringFilter;
+  /** Filter by the object’s `entityIdsFunction` field. */
+  entityIdsFunction?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipsModuleFilter[];
+  /** Negates the expression. */
+  not?: MembershipsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultLimitsTable` relation. */
+  defaultLimitsTable?: TableFilter;
+  /** Filter by the object’s `defaultPermissionsTable` relation. */
+  defaultPermissionsTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `entityTableOwner` relation. */
+  entityTableOwner?: FieldFilter;
+  /** A related `entityTableOwner` exists. */
+  entityTableOwnerExists?: boolean;
+  /** Filter by the object’s `grantsTable` relation. */
+  grantsTable?: TableFilter;
+  /** Filter by the object’s `limitsTable` relation. */
+  limitsTable?: TableFilter;
+  /** Filter by the object’s `membersTable` relation. */
+  membersTable?: TableFilter;
+  /** Filter by the object’s `membershipDefaultsTable` relation. */
+  membershipDefaultsTable?: TableFilter;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sprtTable` relation. */
+  sprtTable?: TableFilter;
+}
+/** A filter to be used against `PermissionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PermissionsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `defaultTableId` field. */
+  defaultTableId?: UUIDFilter;
+  /** Filter by the object’s `defaultTableName` field. */
+  defaultTableName?: StringFilter;
+  /** Filter by the object’s `bitlen` field. */
+  bitlen?: IntFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `getPaddedMask` field. */
+  getPaddedMask?: StringFilter;
+  /** Filter by the object’s `getMask` field. */
+  getMask?: StringFilter;
+  /** Filter by the object’s `getByMask` field. */
+  getByMask?: StringFilter;
+  /** Filter by the object’s `getMaskByName` field. */
+  getMaskByName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: PermissionsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PermissionsModuleFilter[];
+  /** Negates the expression. */
+  not?: PermissionsModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `defaultTable` relation. */
+  defaultTable?: TableFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `PhoneNumbersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface PhoneNumbersModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: PhoneNumbersModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PhoneNumbersModuleFilter[];
+  /** Negates the expression. */
+  not?: PhoneNumbersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `ProfilesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface ProfilesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `profilePermissionsTableId` field. */
+  profilePermissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `profilePermissionsTableName` field. */
+  profilePermissionsTableName?: StringFilter;
+  /** Filter by the object’s `profileGrantsTableId` field. */
+  profileGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileGrantsTableName` field. */
+  profileGrantsTableName?: StringFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableId` field. */
+  profileDefinitionGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTableName` field. */
+  profileDefinitionGrantsTableName?: StringFilter;
+  /** Filter by the object’s `membershipType` field. */
+  membershipType?: IntFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `actorTableId` field. */
+  actorTableId?: UUIDFilter;
+  /** Filter by the object’s `permissionsTableId` field. */
+  permissionsTableId?: UUIDFilter;
+  /** Filter by the object’s `membershipsTableId` field. */
+  membershipsTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: ProfilesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ProfilesModuleFilter[];
+  /** Negates the expression. */
+  not?: ProfilesModuleFilter;
+  /** Filter by the object’s `actorTable` relation. */
+  actorTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `membershipsTable` relation. */
+  membershipsTable?: TableFilter;
+  /** Filter by the object’s `permissionsTable` relation. */
+  permissionsTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `profileDefinitionGrantsTable` relation. */
+  profileDefinitionGrantsTable?: TableFilter;
+  /** Filter by the object’s `profileGrantsTable` relation. */
+  profileGrantsTable?: TableFilter;
+  /** Filter by the object’s `profilePermissionsTable` relation. */
+  profilePermissionsTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SecretsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SecretsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SecretsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SecretsModuleFilter[];
+  /** Negates the expression. */
+  not?: SecretsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SessionsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface SessionsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `authSettingsTableId` field. */
+  authSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsDefaultExpiration` field. */
+  sessionsDefaultExpiration?: IntervalFilter;
+  /** Filter by the object’s `sessionsTable` field. */
+  sessionsTable?: StringFilter;
+  /** Filter by the object’s `sessionCredentialsTable` field. */
+  sessionCredentialsTable?: StringFilter;
+  /** Filter by the object’s `authSettingsTable` field. */
+  authSettingsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: SessionsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SessionsModuleFilter[];
+  /** Negates the expression. */
+  not?: SessionsModuleFilter;
+  /** Filter by the object’s `authSettingsTableByAuthSettingsTableId` relation. */
+  authSettingsTableByAuthSettingsTableId?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTableBySessionCredentialsTableId` relation. */
+  sessionCredentialsTableBySessionCredentialsTableId?: TableFilter;
+  /** Filter by the object’s `sessionsTableBySessionsTableId` relation. */
+  sessionsTableBySessionsTableId?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `UserAuthModule` object types. All fields are combined with a logical ‘and.’ */
+export interface UserAuthModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `emailsTableId` field. */
+  emailsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `secretsTableId` field. */
+  secretsTableId?: UUIDFilter;
+  /** Filter by the object’s `encryptedTableId` field. */
+  encryptedTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableId` field. */
+  auditsTableId?: UUIDFilter;
+  /** Filter by the object’s `auditsTableName` field. */
+  auditsTableName?: StringFilter;
+  /** Filter by the object’s `signInFunction` field. */
+  signInFunction?: StringFilter;
+  /** Filter by the object’s `signUpFunction` field. */
+  signUpFunction?: StringFilter;
+  /** Filter by the object’s `signOutFunction` field. */
+  signOutFunction?: StringFilter;
+  /** Filter by the object’s `setPasswordFunction` field. */
+  setPasswordFunction?: StringFilter;
+  /** Filter by the object’s `resetPasswordFunction` field. */
+  resetPasswordFunction?: StringFilter;
+  /** Filter by the object’s `forgotPasswordFunction` field. */
+  forgotPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendVerificationEmailFunction` field. */
+  sendVerificationEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyEmailFunction` field. */
+  verifyEmailFunction?: StringFilter;
+  /** Filter by the object’s `verifyPasswordFunction` field. */
+  verifyPasswordFunction?: StringFilter;
+  /** Filter by the object’s `checkPasswordFunction` field. */
+  checkPasswordFunction?: StringFilter;
+  /** Filter by the object’s `sendAccountDeletionEmailFunction` field. */
+  sendAccountDeletionEmailFunction?: StringFilter;
+  /** Filter by the object’s `deleteAccountFunction` field. */
+  deleteAccountFunction?: StringFilter;
+  /** Filter by the object’s `signInOneTimeTokenFunction` field. */
+  signInOneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `oneTimeTokenFunction` field. */
+  oneTimeTokenFunction?: StringFilter;
+  /** Filter by the object’s `extendTokenExpires` field. */
+  extendTokenExpires?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserAuthModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserAuthModuleFilter[];
+  /** Negates the expression. */
+  not?: UserAuthModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `emailsTable` relation. */
+  emailsTable?: TableFilter;
+  /** Filter by the object’s `encryptedTable` relation. */
+  encryptedTable?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `secretsTable` relation. */
+  secretsTable?: TableFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `UsersModule` object types. All fields are combined with a logical ‘and.’ */
+export interface UsersModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `typeTableId` field. */
+  typeTableId?: UUIDFilter;
+  /** Filter by the object’s `typeTableName` field. */
+  typeTableName?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: UsersModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UsersModuleFilter[];
+  /** Negates the expression. */
+  not?: UsersModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `typeTable` relation. */
+  typeTable?: TableFilter;
+}
+/** A filter to be used against `TableTemplateModule` object types. All fields are combined with a logical ‘and.’ */
+export interface TableTemplateModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `ownerTableId` field. */
+  ownerTableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `data` field. */
+  data?: JSONFilter;
+  /** Checks for all expressions in this list. */
+  and?: TableTemplateModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: TableTemplateModuleFilter[];
+  /** Negates the expression. */
+  not?: TableTemplateModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ownerTable` relation. */
+  ownerTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `SecureTableProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface SecureTableProvisionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `tableName` field. */
+  tableName?: StringFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `useRls` field. */
+  useRls?: BooleanFilter;
+  /** Filter by the object’s `nodeData` field. */
+  nodeData?: JSONFilter;
+  /** Filter by the object’s `fields` field. */
+  fields?: JSONListFilter;
+  /** Filter by the object’s `grantRoles` field. */
+  grantRoles?: StringListFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
+  policyType?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
+  policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
+  policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
+  policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
+  policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
+  policyData?: JSONFilter;
+  /** Filter by the object’s `outFields` field. */
+  outFields?: UUIDListFilter;
+  /** Checks for all expressions in this list. */
+  and?: SecureTableProvisionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: SecureTableProvisionFilter[];
+  /** Negates the expression. */
+  not?: SecureTableProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+}
+/** A filter to be used against `RelationProvision` object types. All fields are combined with a logical ‘and.’ */
+export interface RelationProvisionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `relationType` field. */
+  relationType?: StringFilter;
+  /** Filter by the object’s `sourceTableId` field. */
+  sourceTableId?: UUIDFilter;
+  /** Filter by the object’s `targetTableId` field. */
+  targetTableId?: UUIDFilter;
+  /** Filter by the object’s `fieldName` field. */
+  fieldName?: StringFilter;
+  /** Filter by the object’s `deleteAction` field. */
+  deleteAction?: StringFilter;
+  /** Filter by the object’s `isRequired` field. */
+  isRequired?: BooleanFilter;
+  /** Filter by the object’s `apiRequired` field. */
+  apiRequired?: BooleanFilter;
+  /** Filter by the object’s `junctionTableId` field. */
+  junctionTableId?: UUIDFilter;
+  /** Filter by the object’s `junctionTableName` field. */
+  junctionTableName?: StringFilter;
+  /** Filter by the object’s `junctionSchemaId` field. */
+  junctionSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sourceFieldName` field. */
+  sourceFieldName?: StringFilter;
+  /** Filter by the object’s `targetFieldName` field. */
+  targetFieldName?: StringFilter;
+  /** Filter by the object’s `useCompositeKey` field. */
+  useCompositeKey?: BooleanFilter;
+  /** Filter by the object’s `createIndex` field. */
+  createIndex?: BooleanFilter;
+  /** Filter by the object’s `exposeInApi` field. */
+  exposeInApi?: BooleanFilter;
+  /** Filter by the object’s `nodeType` field. */
+  nodeType?: StringFilter;
+  /** Filter by the object’s `nodeData` field. */
+  nodeData?: JSONFilter;
+  /** Filter by the object’s `grantRoles` field. */
+  grantRoles?: StringListFilter;
+  /** Filter by the object’s `grantPrivileges` field. */
+  grantPrivileges?: JSONListFilter;
+  /** Filter by the object’s `policyType` field. */
+  policyType?: StringFilter;
+  /** Filter by the object’s `policyPrivileges` field. */
+  policyPrivileges?: StringListFilter;
+  /** Filter by the object’s `policyRole` field. */
+  policyRole?: StringFilter;
+  /** Filter by the object’s `policyPermissive` field. */
+  policyPermissive?: BooleanFilter;
+  /** Filter by the object’s `policyName` field. */
+  policyName?: StringFilter;
+  /** Filter by the object’s `policyData` field. */
+  policyData?: JSONFilter;
+  /** Filter by the object’s `outFieldId` field. */
+  outFieldId?: UUIDFilter;
+  /** Filter by the object’s `outJunctionTableId` field. */
+  outJunctionTableId?: UUIDFilter;
+  /** Filter by the object’s `outSourceFieldId` field. */
+  outSourceFieldId?: UUIDFilter;
+  /** Filter by the object’s `outTargetFieldId` field. */
+  outTargetFieldId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: RelationProvisionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RelationProvisionFilter[];
+  /** Negates the expression. */
+  not?: RelationProvisionFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `sourceTable` relation. */
+  sourceTable?: TableFilter;
+  /** Filter by the object’s `targetTable` relation. */
+  targetTable?: TableFilter;
+}
+/** A filter to be used against `Blueprint` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `templateId` field. */
+  templateId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `constructedAt` field. */
+  constructedAt?: DatetimeFilter;
+  /** Filter by the object’s `errorDetails` field. */
+  errorDetails?: StringFilter;
+  /** Filter by the object’s `refMap` field. */
+  refMap?: JSONFilter;
+  /** Filter by the object’s `constructedDefinition` field. */
+  constructedDefinition?: JSONFilter;
+  /** Filter by the object’s `definitionHash` field. */
+  definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
+  tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintFilter[];
+  /** Negates the expression. */
+  not?: BlueprintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `template` relation. */
+  template?: BlueprintTemplateFilter;
+  /** A related `template` exists. */
+  templateExists?: boolean;
+}
+/** A filter to be used against `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseProvisionModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseName` field. */
+  databaseName?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `subdomain` field. */
+  subdomain?: StringFilter;
+  /** Filter by the object’s `domain` field. */
+  domain?: StringFilter;
+  /** Filter by the object’s `modules` field. */
+  modules?: StringListFilter;
+  /** Filter by the object’s `options` field. */
+  options?: JSONFilter;
+  /** Filter by the object’s `bootstrapUser` field. */
+  bootstrapUser?: BooleanFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `errorMessage` field. */
+  errorMessage?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `completedAt` field. */
+  completedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseProvisionModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseProvisionModuleFilter[];
+  /** Negates the expression. */
+  not?: DatabaseProvisionModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** A related `database` exists. */
+  databaseExists?: boolean;
+}
+/** A filter to be used against `ViewTable` object types. All fields are combined with a logical ‘and.’ */
+export interface ViewTableFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `viewId` field. */
+  viewId?: UUIDFilter;
+  /** Filter by the object’s `tableId` field. */
+  tableId?: UUIDFilter;
+  /** Filter by the object’s `joinOrder` field. */
+  joinOrder?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: ViewTableFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ViewTableFilter[];
+  /** Negates the expression. */
+  not?: ViewTableFilter;
+  /** Filter by the object’s `table` relation. */
+  table?: TableFilter;
+  /** Filter by the object’s `view` relation. */
+  view?: ViewFilter;
+}
+/** A filter to be used against `BlueprintTemplate` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintTemplateFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `version` field. */
+  version?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `visibility` field. */
+  visibility?: StringFilter;
+  /** Filter by the object’s `categories` field. */
+  categories?: StringListFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `definition` field. */
+  definition?: JSONFilter;
+  /** Filter by the object’s `definitionSchemaVersion` field. */
+  definitionSchemaVersion?: StringFilter;
+  /** Filter by the object’s `source` field. */
+  source?: StringFilter;
+  /** Filter by the object’s `complexity` field. */
+  complexity?: StringFilter;
+  /** Filter by the object’s `copyCount` field. */
+  copyCount?: IntFilter;
+  /** Filter by the object’s `forkCount` field. */
+  forkCount?: IntFilter;
+  /** Filter by the object’s `forkedFromId` field. */
+  forkedFromId?: UUIDFilter;
+  /** Filter by the object’s `definitionHash` field. */
+  definitionHash?: UUIDFilter;
+  /** Filter by the object’s `tableHashes` field. */
+  tableHashes?: JSONFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintTemplateFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintTemplateFilter[];
+  /** Negates the expression. */
+  not?: BlueprintTemplateFilter;
+  /** Filter by the object’s `forkedFrom` relation. */
+  forkedFrom?: BlueprintTemplateFilter;
+  /** A related `forkedFrom` exists. */
+  forkedFromExists?: boolean;
+  /** Filter by the object’s `blueprintTemplatesByForkedFromId` relation. */
+  blueprintTemplatesByForkedFromId?: BlueprintTemplateToManyBlueprintTemplateFilter;
+  /** `blueprintTemplatesByForkedFromId` exist. */
+  blueprintTemplatesByForkedFromIdExist?: boolean;
+  /** Filter by the object’s `blueprintsByTemplateId` relation. */
+  blueprintsByTemplateId?: BlueprintTemplateToManyBlueprintFilter;
+  /** `blueprintsByTemplateId` exist. */
+  blueprintsByTemplateIdExist?: boolean;
+}
+/** A filter to be used against `Database` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `schemaHash` field. */
+  schemaHash?: StringFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `label` field. */
+  label?: StringFilter;
+  /** Filter by the object’s `hash` field. */
+  hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: DatabaseFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DatabaseFilter[];
+  /** Negates the expression. */
+  not?: DatabaseFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
+  /** Filter by the object’s `schemas` relation. */
+  schemas?: DatabaseToManySchemaFilter;
+  /** `schemas` exist. */
+  schemasExist?: boolean;
+  /** Filter by the object’s `tables` relation. */
+  tables?: DatabaseToManyTableFilter;
+  /** `tables` exist. */
+  tablesExist?: boolean;
+  /** Filter by the object’s `checkConstraints` relation. */
+  checkConstraints?: DatabaseToManyCheckConstraintFilter;
+  /** `checkConstraints` exist. */
+  checkConstraintsExist?: boolean;
+  /** Filter by the object’s `fields` relation. */
+  fields?: DatabaseToManyFieldFilter;
+  /** `fields` exist. */
+  fieldsExist?: boolean;
+  /** Filter by the object’s `foreignKeyConstraints` relation. */
+  foreignKeyConstraints?: DatabaseToManyForeignKeyConstraintFilter;
+  /** `foreignKeyConstraints` exist. */
+  foreignKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `fullTextSearches` relation. */
+  fullTextSearches?: DatabaseToManyFullTextSearchFilter;
+  /** `fullTextSearches` exist. */
+  fullTextSearchesExist?: boolean;
+  /** Filter by the object’s `indices` relation. */
+  indices?: DatabaseToManyIndexFilter;
+  /** `indices` exist. */
+  indicesExist?: boolean;
+  /** Filter by the object’s `policies` relation. */
+  policies?: DatabaseToManyPolicyFilter;
+  /** `policies` exist. */
+  policiesExist?: boolean;
+  /** Filter by the object’s `primaryKeyConstraints` relation. */
+  primaryKeyConstraints?: DatabaseToManyPrimaryKeyConstraintFilter;
+  /** `primaryKeyConstraints` exist. */
+  primaryKeyConstraintsExist?: boolean;
+  /** Filter by the object’s `schemaGrants` relation. */
+  schemaGrants?: DatabaseToManySchemaGrantFilter;
+  /** `schemaGrants` exist. */
+  schemaGrantsExist?: boolean;
+  /** Filter by the object’s `tableGrants` relation. */
+  tableGrants?: DatabaseToManyTableGrantFilter;
+  /** `tableGrants` exist. */
+  tableGrantsExist?: boolean;
+  /** Filter by the object’s `triggerFunctions` relation. */
+  triggerFunctions?: DatabaseToManyTriggerFunctionFilter;
+  /** `triggerFunctions` exist. */
+  triggerFunctionsExist?: boolean;
+  /** Filter by the object’s `triggers` relation. */
+  triggers?: DatabaseToManyTriggerFilter;
+  /** `triggers` exist. */
+  triggersExist?: boolean;
+  /** Filter by the object’s `uniqueConstraints` relation. */
+  uniqueConstraints?: DatabaseToManyUniqueConstraintFilter;
+  /** `uniqueConstraints` exist. */
+  uniqueConstraintsExist?: boolean;
+  /** Filter by the object’s `views` relation. */
+  views?: DatabaseToManyViewFilter;
+  /** `views` exist. */
+  viewsExist?: boolean;
+  /** Filter by the object’s `viewGrants` relation. */
+  viewGrants?: DatabaseToManyViewGrantFilter;
+  /** `viewGrants` exist. */
+  viewGrantsExist?: boolean;
+  /** Filter by the object’s `viewRules` relation. */
+  viewRules?: DatabaseToManyViewRuleFilter;
+  /** `viewRules` exist. */
+  viewRulesExist?: boolean;
+  /** Filter by the object’s `defaultPrivileges` relation. */
+  defaultPrivileges?: DatabaseToManyDefaultPrivilegeFilter;
+  /** `defaultPrivileges` exist. */
+  defaultPrivilegesExist?: boolean;
+  /** Filter by the object’s `enums` relation. */
+  enums?: DatabaseToManyEnumFilter;
+  /** `enums` exist. */
+  enumsExist?: boolean;
+  /** Filter by the object’s `embeddingChunks` relation. */
+  embeddingChunks?: DatabaseToManyEmbeddingChunkFilter;
+  /** `embeddingChunks` exist. */
+  embeddingChunksExist?: boolean;
+  /** Filter by the object’s `databaseTransfers` relation. */
+  databaseTransfers?: DatabaseToManyDatabaseTransferFilter;
+  /** `databaseTransfers` exist. */
+  databaseTransfersExist?: boolean;
+  /** Filter by the object’s `apis` relation. */
+  apis?: DatabaseToManyApiFilter;
+  /** `apis` exist. */
+  apisExist?: boolean;
+  /** Filter by the object’s `apiModules` relation. */
+  apiModules?: DatabaseToManyApiModuleFilter;
+  /** `apiModules` exist. */
+  apiModulesExist?: boolean;
+  /** Filter by the object’s `apiSchemas` relation. */
+  apiSchemas?: DatabaseToManyApiSchemaFilter;
+  /** `apiSchemas` exist. */
+  apiSchemasExist?: boolean;
+  /** Filter by the object’s `sites` relation. */
+  sites?: DatabaseToManySiteFilter;
+  /** `sites` exist. */
+  sitesExist?: boolean;
+  /** Filter by the object’s `apps` relation. */
+  apps?: DatabaseToManyAppFilter;
+  /** `apps` exist. */
+  appsExist?: boolean;
+  /** Filter by the object’s `domains` relation. */
+  domains?: DatabaseToManyDomainFilter;
+  /** `domains` exist. */
+  domainsExist?: boolean;
+  /** Filter by the object’s `siteMetadata` relation. */
+  siteMetadata?: DatabaseToManySiteMetadatumFilter;
+  /** `siteMetadata` exist. */
+  siteMetadataExist?: boolean;
+  /** Filter by the object’s `siteModules` relation. */
+  siteModules?: DatabaseToManySiteModuleFilter;
+  /** `siteModules` exist. */
+  siteModulesExist?: boolean;
+  /** Filter by the object’s `siteThemes` relation. */
+  siteThemes?: DatabaseToManySiteThemeFilter;
+  /** `siteThemes` exist. */
+  siteThemesExist?: boolean;
+  /** Filter by the object’s `connectedAccountsModules` relation. */
+  connectedAccountsModules?: DatabaseToManyConnectedAccountsModuleFilter;
+  /** `connectedAccountsModules` exist. */
+  connectedAccountsModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAddressesModules` relation. */
+  cryptoAddressesModules?: DatabaseToManyCryptoAddressesModuleFilter;
+  /** `cryptoAddressesModules` exist. */
+  cryptoAddressesModulesExist?: boolean;
+  /** Filter by the object’s `cryptoAuthModules` relation. */
+  cryptoAuthModules?: DatabaseToManyCryptoAuthModuleFilter;
+  /** `cryptoAuthModules` exist. */
+  cryptoAuthModulesExist?: boolean;
+  /** Filter by the object’s `defaultIdsModules` relation. */
+  defaultIdsModules?: DatabaseToManyDefaultIdsModuleFilter;
+  /** `defaultIdsModules` exist. */
+  defaultIdsModulesExist?: boolean;
+  /** Filter by the object’s `denormalizedTableFields` relation. */
+  denormalizedTableFields?: DatabaseToManyDenormalizedTableFieldFilter;
+  /** `denormalizedTableFields` exist. */
+  denormalizedTableFieldsExist?: boolean;
+  /** Filter by the object’s `emailsModules` relation. */
+  emailsModules?: DatabaseToManyEmailsModuleFilter;
+  /** `emailsModules` exist. */
+  emailsModulesExist?: boolean;
+  /** Filter by the object’s `encryptedSecretsModules` relation. */
+  encryptedSecretsModules?: DatabaseToManyEncryptedSecretsModuleFilter;
+  /** `encryptedSecretsModules` exist. */
+  encryptedSecretsModulesExist?: boolean;
+  /** Filter by the object’s `fieldModules` relation. */
+  fieldModules?: DatabaseToManyFieldModuleFilter;
+  /** `fieldModules` exist. */
+  fieldModulesExist?: boolean;
+  /** Filter by the object’s `invitesModules` relation. */
+  invitesModules?: DatabaseToManyInvitesModuleFilter;
+  /** `invitesModules` exist. */
+  invitesModulesExist?: boolean;
+  /** Filter by the object’s `levelsModules` relation. */
+  levelsModules?: DatabaseToManyLevelsModuleFilter;
+  /** `levelsModules` exist. */
+  levelsModulesExist?: boolean;
+  /** Filter by the object’s `limitsModules` relation. */
+  limitsModules?: DatabaseToManyLimitsModuleFilter;
+  /** `limitsModules` exist. */
+  limitsModulesExist?: boolean;
+  /** Filter by the object’s `membershipTypesModules` relation. */
+  membershipTypesModules?: DatabaseToManyMembershipTypesModuleFilter;
+  /** `membershipTypesModules` exist. */
+  membershipTypesModulesExist?: boolean;
+  /** Filter by the object’s `membershipsModules` relation. */
+  membershipsModules?: DatabaseToManyMembershipsModuleFilter;
+  /** `membershipsModules` exist. */
+  membershipsModulesExist?: boolean;
+  /** Filter by the object’s `permissionsModules` relation. */
+  permissionsModules?: DatabaseToManyPermissionsModuleFilter;
+  /** `permissionsModules` exist. */
+  permissionsModulesExist?: boolean;
+  /** Filter by the object’s `phoneNumbersModules` relation. */
+  phoneNumbersModules?: DatabaseToManyPhoneNumbersModuleFilter;
+  /** `phoneNumbersModules` exist. */
+  phoneNumbersModulesExist?: boolean;
+  /** Filter by the object’s `profilesModules` relation. */
+  profilesModules?: DatabaseToManyProfilesModuleFilter;
+  /** `profilesModules` exist. */
+  profilesModulesExist?: boolean;
+  /** Filter by the object’s `rlsModule` relation. */
+  rlsModule?: RlsModuleFilter;
+  /** A related `rlsModule` exists. */
+  rlsModuleExists?: boolean;
+  /** Filter by the object’s `secretsModules` relation. */
+  secretsModules?: DatabaseToManySecretsModuleFilter;
+  /** `secretsModules` exist. */
+  secretsModulesExist?: boolean;
+  /** Filter by the object’s `sessionsModules` relation. */
+  sessionsModules?: DatabaseToManySessionsModuleFilter;
+  /** `sessionsModules` exist. */
+  sessionsModulesExist?: boolean;
+  /** Filter by the object’s `userAuthModules` relation. */
+  userAuthModules?: DatabaseToManyUserAuthModuleFilter;
+  /** `userAuthModules` exist. */
+  userAuthModulesExist?: boolean;
+  /** Filter by the object’s `usersModules` relation. */
+  usersModules?: DatabaseToManyUsersModuleFilter;
+  /** `usersModules` exist. */
+  usersModulesExist?: boolean;
+  /** Filter by the object’s `hierarchyModule` relation. */
+  hierarchyModule?: HierarchyModuleFilter;
+  /** A related `hierarchyModule` exists. */
+  hierarchyModuleExists?: boolean;
+  /** Filter by the object’s `tableTemplateModules` relation. */
+  tableTemplateModules?: DatabaseToManyTableTemplateModuleFilter;
+  /** `tableTemplateModules` exist. */
+  tableTemplateModulesExist?: boolean;
+  /** Filter by the object’s `secureTableProvisions` relation. */
+  secureTableProvisions?: DatabaseToManySecureTableProvisionFilter;
+  /** `secureTableProvisions` exist. */
+  secureTableProvisionsExist?: boolean;
+  /** Filter by the object’s `relationProvisions` relation. */
+  relationProvisions?: DatabaseToManyRelationProvisionFilter;
+  /** `relationProvisions` exist. */
+  relationProvisionsExist?: boolean;
+  /** Filter by the object’s `blueprints` relation. */
+  blueprints?: DatabaseToManyBlueprintFilter;
+  /** `blueprints` exist. */
+  blueprintsExist?: boolean;
+  /** Filter by the object’s `databaseProvisionModules` relation. */
+  databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
+  /** `databaseProvisionModules` exist. */
+  databaseProvisionModulesExist?: boolean;
+}
+/** A filter to be used against `AppAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface AppAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppAdminGrantFilter[];
+  /** Negates the expression. */
+  not?: AppAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `AppOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface AppOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppOwnerGrantFilter[];
+  /** Negates the expression. */
+  not?: AppOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `AppGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface AppGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppGrantFilter[];
+  /** Negates the expression. */
+  not?: AppGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `OrgMember` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMemberFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMemberFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMemberFilter[];
+  /** Negates the expression. */
+  not?: OrgMemberFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgAdminGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgAdminGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgAdminGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgAdminGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgOwnerGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgOwnerGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgOwnerGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgOwnerGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgGrantFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+}
+/** A filter to be used against `OrgChartEdge` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgChartEdgeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
+  childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `positionTitle` field. */
+  positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
+  positionLevel?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgChartEdgeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgChartEdgeFilter[];
+  /** Negates the expression. */
+  not?: OrgChartEdgeFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+}
+/** A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgChartEdgeGrantFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `childId` field. */
+  childId?: UUIDFilter;
+  /** Filter by the object’s `parentId` field. */
+  parentId?: UUIDFilter;
+  /** Filter by the object’s `grantorId` field. */
+  grantorId?: UUIDFilter;
+  /** Filter by the object’s `isGrant` field. */
+  isGrant?: BooleanFilter;
+  /** Filter by the object’s `positionTitle` field. */
+  positionTitle?: StringFilter;
+  /** Filter by the object’s `positionLevel` field. */
+  positionLevel?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgChartEdgeGrantFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgChartEdgeGrantFilter[];
+  /** Negates the expression. */
+  not?: OrgChartEdgeGrantFilter;
+  /** Filter by the object’s `child` relation. */
+  child?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `grantor` relation. */
+  grantor?: UserFilter;
+  /** A related `grantor` exists. */
+  grantorExists?: boolean;
+  /** Filter by the object’s `parent` relation. */
+  parent?: UserFilter;
+  /** A related `parent` exists. */
+  parentExists?: boolean;
+}
+/** A filter to be used against `OrgPermissionDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgPermissionDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgPermissionDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `AppLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
+  num?: IntFilter;
+  /** Filter by the object’s `max` field. */
+  max?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitFilter[];
+  /** Negates the expression. */
+  not?: AppLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `num` field. */
+  num?: IntFilter;
+  /** Filter by the object’s `max` field. */
+  max?: IntFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitFilter[];
+  /** Negates the expression. */
+  not?: OrgLimitFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+}
+/** A filter to be used against `AppStep` object types. All fields are combined with a logical ‘and.’ */
+export interface AppStepFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `count` field. */
+  count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppStepFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppStepFilter[];
+  /** Negates the expression. */
+  not?: AppStepFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `AppAchievement` object types. All fields are combined with a logical ‘and.’ */
+export interface AppAchievementFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `count` field. */
+  count?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppAchievementFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppAchievementFilter[];
+  /** Negates the expression. */
+  not?: AppAchievementFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLevelFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `image` field. */
+  image?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLevelFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLevelFilter[];
+  /** Negates the expression. */
+  not?: AppLevelFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+  /** A related `owner` exists. */
+  ownerExists?: boolean;
+}
+/** A filter to be used against `Email` object types. All fields are combined with a logical ‘and.’ */
+export interface EmailFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: EmailFilter[];
+  /** Checks for any expressions in this list. */
+  or?: EmailFilter[];
+  /** Negates the expression. */
+  not?: EmailFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `PhoneNumber` object types. All fields are combined with a logical ‘and.’ */
+export interface PhoneNumberFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `cc` field. */
+  cc?: StringFilter;
+  /** Filter by the object’s `number` field. */
+  number?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: PhoneNumberFilter[];
+  /** Checks for any expressions in this list. */
+  or?: PhoneNumberFilter[];
+  /** Negates the expression. */
+  not?: PhoneNumberFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `CryptoAddress` object types. All fields are combined with a logical ‘and.’ */
+export interface CryptoAddressFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `address` field. */
+  address?: StringFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isPrimary` field. */
+  isPrimary?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: CryptoAddressFilter[];
+  /** Checks for any expressions in this list. */
+  or?: CryptoAddressFilter[];
+  /** Negates the expression. */
+  not?: CryptoAddressFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface ConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
+  service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
+  identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
+  details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ConnectedAccountFilter[];
+  /** Negates the expression. */
+  not?: ConnectedAccountFilter;
+  /** Filter by the object’s `owner` relation. */
+  owner?: UserFilter;
+}
+/** A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’ */
+export interface InviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
+  inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
+  inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
+  inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
+  inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
+  multiple?: BooleanFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: InviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: InviteFilter[];
+  /** Negates the expression. */
+  not?: InviteFilter;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+}
+/** A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface ClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
+  receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: ClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: ClaimedInviteFilter[];
+  /** Negates the expression. */
+  not?: ClaimedInviteFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
+}
+/** A filter to be used against `OrgInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgInviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
+  receiverId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
+  inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
+  inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
+  inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
+  inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
+  multiple?: BooleanFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgInviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgInviteFilter[];
+  /** Negates the expression. */
+  not?: OrgInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+}
+/** A filter to be used against `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgClaimedInviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
+  receiverId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgClaimedInviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgClaimedInviteFilter[];
+  /** Negates the expression. */
+  not?: OrgClaimedInviteFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
+  /** Filter by the object’s `receiver` relation. */
+  receiver?: UserFilter;
+  /** A related `receiver` exists. */
+  receiverExists?: boolean;
+  /** Filter by the object’s `sender` relation. */
+  sender?: UserFilter;
+  /** A related `sender` exists. */
+  senderExists?: boolean;
+}
+/** A filter to be used against `AuditLog` object types. All fields are combined with a logical ‘and.’ */
+export interface AuditLogFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `event` field. */
+  event?: StringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `origin` field. */
+  origin?: ConstructiveInternalTypeOriginFilter;
+  /** Filter by the object’s `userAgent` field. */
+  userAgent?: StringFilter;
+  /** Filter by the object’s `ipAddress` field. */
+  ipAddress?: InternetAddressFilter;
+  /** Filter by the object’s `success` field. */
+  success?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AuditLogFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AuditLogFilter[];
+  /** Negates the expression. */
+  not?: AuditLogFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+  /** A related `actor` exists. */
+  actorExists?: boolean;
+}
+/** A filter to be used against UUID fields. All fields are combined with a logical ‘and.’ */
+export interface UUIDFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
+export interface StringFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified string (case-sensitive). */
+  includes?: string;
+  /** Does not contain the specified string (case-sensitive). */
+  notIncludes?: string;
+  /** Contains the specified string (case-insensitive). */
+  includesInsensitive?: string;
+  /** Does not contain the specified string (case-insensitive). */
+  notIncludesInsensitive?: string;
+  /** Starts with the specified string (case-sensitive). */
+  startsWith?: string;
+  /** Does not start with the specified string (case-sensitive). */
+  notStartsWith?: string;
+  /** Starts with the specified string (case-insensitive). */
+  startsWithInsensitive?: string;
+  /** Does not start with the specified string (case-insensitive). */
+  notStartsWithInsensitive?: string;
+  /** Ends with the specified string (case-sensitive). */
+  endsWith?: string;
+  /** Does not end with the specified string (case-sensitive). */
+  notEndsWith?: string;
+  /** Ends with the specified string (case-insensitive). */
+  endsWithInsensitive?: string;
+  /** Does not end with the specified string (case-insensitive). */
+  notEndsWithInsensitive?: string;
+  /** Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  like?: string;
+  /** Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLike?: string;
+  /** Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  likeInsensitive?: string;
+  /** Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters. */
+  notLikeInsensitive?: string;
+  /** Equal to the specified value (case-insensitive). */
+  equalToInsensitive?: string;
+  /** Not equal to the specified value (case-insensitive). */
+  notEqualToInsensitive?: string;
+  /** Not equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  distinctFromInsensitive?: string;
+  /** Equal to the specified value, treating null like an ordinary value (case-insensitive). */
+  notDistinctFromInsensitive?: string;
+  /** Included in the specified list (case-insensitive). */
+  inInsensitive?: string[];
+  /** Not included in the specified list (case-insensitive). */
+  notInInsensitive?: string[];
+  /** Less than the specified value (case-insensitive). */
+  lessThanInsensitive?: string;
+  /** Less than or equal to the specified value (case-insensitive). */
+  lessThanOrEqualToInsensitive?: string;
+  /** Greater than the specified value (case-insensitive). */
+  greaterThanInsensitive?: string;
+  /** Greater than or equal to the specified value (case-insensitive). */
+  greaterThanOrEqualToInsensitive?: string;
+}
+/** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
+export interface JSONFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: Record<string, unknown>;
+  /** Not equal to the specified value. */
+  notEqualTo?: Record<string, unknown>;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Record<string, unknown>;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Record<string, unknown>;
+  /** Included in the specified list. */
+  in?: Record<string, unknown>[];
+  /** Not included in the specified list. */
+  notIn?: Record<string, unknown>[];
+  /** Less than the specified value. */
+  lessThan?: Record<string, unknown>;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: Record<string, unknown>;
+  /** Greater than the specified value. */
+  greaterThan?: Record<string, unknown>;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: Record<string, unknown>;
+  /** Contains the specified JSON. */
+  contains?: Record<string, unknown>;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: Record<string, unknown>;
+}
+/** A filter to be used against Int fields. All fields are combined with a logical ‘and.’ */
+export interface IntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+}
+/** A filter to be used against String List fields. All fields are combined with a logical ‘and.’ */
+export interface StringListFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string[];
+  /** Not equal to the specified value. */
+  notEqualTo?: string[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string[];
+  /** Less than the specified value. */
+  lessThan?: string[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string[];
+  /** Greater than the specified value. */
+  greaterThan?: string[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string[];
+  /** Contains the specified list of values. */
+  contains?: string[];
+  /** Contained by the specified list of values. */
+  containedBy?: string[];
+  /** Overlaps the specified list of values. */
+  overlaps?: string[];
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: string;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: string;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: string;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: string;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: string;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: string;
+}
+/** A filter to be used against Boolean fields. All fields are combined with a logical ‘and.’ */
+export interface BooleanFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: boolean;
+  /** Not equal to the specified value. */
+  notEqualTo?: boolean;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: boolean;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: boolean;
+  /** Included in the specified list. */
+  in?: boolean[];
+  /** Not included in the specified list. */
+  notIn?: boolean[];
+  /** Less than the specified value. */
+  lessThan?: boolean;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: boolean;
+  /** Greater than the specified value. */
+  greaterThan?: boolean;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: boolean;
+}
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against UUID List fields. All fields are combined with a logical ‘and.’ */
+export interface UUIDListFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string[];
+  /** Not equal to the specified value. */
+  notEqualTo?: string[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string[];
+  /** Less than the specified value. */
+  lessThan?: string[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string[];
+  /** Greater than the specified value. */
+  greaterThan?: string[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string[];
+  /** Contains the specified list of values. */
+  contains?: string[];
+  /** Contained by the specified list of values. */
+  containedBy?: string[];
+  /** Overlaps the specified list of values. */
+  overlaps?: string[];
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: string;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: string;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: string;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: string;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: string;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: string;
+}
+/** A filter to be used against Float fields. All fields are combined with a logical ‘and.’ */
+export interface FloatFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: number;
+  /** Not equal to the specified value. */
+  notEqualTo?: number;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: number;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: number;
+  /** Included in the specified list. */
+  in?: number[];
+  /** Not included in the specified list. */
+  notIn?: number[];
+  /** Less than the specified value. */
+  lessThan?: number;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: number;
+  /** Greater than the specified value. */
+  greaterThan?: number;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: number;
+}
+/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
+export interface UserFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
+  searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
+  type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserFilter[];
+  /** Negates the expression. */
+  not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedDatabases` relation. */
+  ownedDatabases?: UserToManyDatabaseFilter;
+  /** `ownedDatabases` exist. */
+  ownedDatabasesExist?: boolean;
+  /** Filter by the object’s `appMembershipByActorId` relation. */
+  appMembershipByActorId?: AppMembershipFilter;
+  /** A related `appMembershipByActorId` exists. */
+  appMembershipByActorIdExists?: boolean;
+  /** Filter by the object’s `appAdminGrantsByActorId` relation. */
+  appAdminGrantsByActorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByActorId` exist. */
+  appAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAdminGrantsByGrantorId` relation. */
+  appAdminGrantsByGrantorId?: UserToManyAppAdminGrantFilter;
+  /** `appAdminGrantsByGrantorId` exist. */
+  appAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByActorId` relation. */
+  appOwnerGrantsByActorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByActorId` exist. */
+  appOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appOwnerGrantsByGrantorId` relation. */
+  appOwnerGrantsByGrantorId?: UserToManyAppOwnerGrantFilter;
+  /** `appOwnerGrantsByGrantorId` exist. */
+  appOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByActorId` relation. */
+  appGrantsByActorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByActorId` exist. */
+  appGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `appGrantsByGrantorId` relation. */
+  appGrantsByGrantorId?: UserToManyAppGrantFilter;
+  /** `appGrantsByGrantorId` exist. */
+  appGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByActorId` relation. */
+  orgMembershipsByActorId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByActorId` exist. */
+  orgMembershipsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipsByEntityId` relation. */
+  orgMembershipsByEntityId?: UserToManyOrgMembershipFilter;
+  /** `orgMembershipsByEntityId` exist. */
+  orgMembershipsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgMembershipDefaultByEntityId` relation. */
+  orgMembershipDefaultByEntityId?: OrgMembershipDefaultFilter;
+  /** A related `orgMembershipDefaultByEntityId` exists. */
+  orgMembershipDefaultByEntityIdExists?: boolean;
+  /** Filter by the object’s `orgMembersByActorId` relation. */
+  orgMembersByActorId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByActorId` exist. */
+  orgMembersByActorIdExist?: boolean;
+  /** Filter by the object’s `orgMembersByEntityId` relation. */
+  orgMembersByEntityId?: UserToManyOrgMemberFilter;
+  /** `orgMembersByEntityId` exist. */
+  orgMembersByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByActorId` relation. */
+  orgAdminGrantsByActorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByActorId` exist. */
+  orgAdminGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByEntityId` relation. */
+  orgAdminGrantsByEntityId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByEntityId` exist. */
+  orgAdminGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgAdminGrantsByGrantorId` relation. */
+  orgAdminGrantsByGrantorId?: UserToManyOrgAdminGrantFilter;
+  /** `orgAdminGrantsByGrantorId` exist. */
+  orgAdminGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByActorId` relation. */
+  orgOwnerGrantsByActorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByActorId` exist. */
+  orgOwnerGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByEntityId` relation. */
+  orgOwnerGrantsByEntityId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByEntityId` exist. */
+  orgOwnerGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgOwnerGrantsByGrantorId` relation. */
+  orgOwnerGrantsByGrantorId?: UserToManyOrgOwnerGrantFilter;
+  /** `orgOwnerGrantsByGrantorId` exist. */
+  orgOwnerGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByActorId` relation. */
+  orgGrantsByActorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByActorId` exist. */
+  orgGrantsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByEntityId` relation. */
+  orgGrantsByEntityId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByEntityId` exist. */
+  orgGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgGrantsByGrantorId` relation. */
+  orgGrantsByGrantorId?: UserToManyOrgGrantFilter;
+  /** `orgGrantsByGrantorId` exist. */
+  orgGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdges` relation. */
+  parentOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `parentOrgChartEdges` exist. */
+  parentOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `orgChartEdgesByEntityId` relation. */
+  orgChartEdgesByEntityId?: UserToManyOrgChartEdgeFilter;
+  /** `orgChartEdgesByEntityId` exist. */
+  orgChartEdgesByEntityIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdges` relation. */
+  childOrgChartEdges?: UserToManyOrgChartEdgeFilter;
+  /** `childOrgChartEdges` exist. */
+  childOrgChartEdgesExist?: boolean;
+  /** Filter by the object’s `parentOrgChartEdgeGrants` relation. */
+  parentOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `parentOrgChartEdgeGrants` exist. */
+  parentOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByEntityId` relation. */
+  orgChartEdgeGrantsByEntityId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByEntityId` exist. */
+  orgChartEdgeGrantsByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgChartEdgeGrantsByGrantorId` relation. */
+  orgChartEdgeGrantsByGrantorId?: UserToManyOrgChartEdgeGrantFilter;
+  /** `orgChartEdgeGrantsByGrantorId` exist. */
+  orgChartEdgeGrantsByGrantorIdExist?: boolean;
+  /** Filter by the object’s `childOrgChartEdgeGrants` relation. */
+  childOrgChartEdgeGrants?: UserToManyOrgChartEdgeGrantFilter;
+  /** `childOrgChartEdgeGrants` exist. */
+  childOrgChartEdgeGrantsExist?: boolean;
+  /** Filter by the object’s `orgPermissionDefaultsByEntityId` relation. */
+  orgPermissionDefaultsByEntityId?: UserToManyOrgPermissionDefaultFilter;
+  /** `orgPermissionDefaultsByEntityId` exist. */
+  orgPermissionDefaultsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appLimitsByActorId` relation. */
+  appLimitsByActorId?: UserToManyAppLimitFilter;
+  /** `appLimitsByActorId` exist. */
+  appLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByActorId` relation. */
+  orgLimitsByActorId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByActorId` exist. */
+  orgLimitsByActorIdExist?: boolean;
+  /** Filter by the object’s `orgLimitsByEntityId` relation. */
+  orgLimitsByEntityId?: UserToManyOrgLimitFilter;
+  /** `orgLimitsByEntityId` exist. */
+  orgLimitsByEntityIdExist?: boolean;
+  /** Filter by the object’s `appStepsByActorId` relation. */
+  appStepsByActorId?: UserToManyAppStepFilter;
+  /** `appStepsByActorId` exist. */
+  appStepsByActorIdExist?: boolean;
+  /** Filter by the object’s `appAchievementsByActorId` relation. */
+  appAchievementsByActorId?: UserToManyAppAchievementFilter;
+  /** `appAchievementsByActorId` exist. */
+  appAchievementsByActorIdExist?: boolean;
+  /** Filter by the object’s `ownedAppLevels` relation. */
+  ownedAppLevels?: UserToManyAppLevelFilter;
+  /** `ownedAppLevels` exist. */
+  ownedAppLevelsExist?: boolean;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedConnectedAccounts` relation. */
+  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
+  /** `ownedConnectedAccounts` exist. */
+  ownedConnectedAccountsExist?: boolean;
+  /** Filter by the object’s `invitesBySenderId` relation. */
+  invitesBySenderId?: UserToManyInviteFilter;
+  /** `invitesBySenderId` exist. */
+  invitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesByReceiverId` relation. */
+  claimedInvitesByReceiverId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesByReceiverId` exist. */
+  claimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `claimedInvitesBySenderId` relation. */
+  claimedInvitesBySenderId?: UserToManyClaimedInviteFilter;
+  /** `claimedInvitesBySenderId` exist. */
+  claimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByEntityId` relation. */
+  orgInvitesByEntityId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByEntityId` exist. */
+  orgInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesByReceiverId` relation. */
+  orgInvitesByReceiverId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesByReceiverId` exist. */
+  orgInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgInvitesBySenderId` relation. */
+  orgInvitesBySenderId?: UserToManyOrgInviteFilter;
+  /** `orgInvitesBySenderId` exist. */
+  orgInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByEntityId` relation. */
+  orgClaimedInvitesByEntityId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByEntityId` exist. */
+  orgClaimedInvitesByEntityIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesByReceiverId` relation. */
+  orgClaimedInvitesByReceiverId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesByReceiverId` exist. */
+  orgClaimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `orgClaimedInvitesBySenderId` relation. */
+  orgClaimedInvitesBySenderId?: UserToManyOrgClaimedInviteFilter;
+  /** `orgClaimedInvitesBySenderId` exist. */
+  orgClaimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `auditLogsByActorId` relation. */
+  auditLogsByActorId?: UserToManyAuditLogFilter;
+  /** `auditLogsByActorId` exist. */
+  auditLogsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite full-text search. Provide a search string and it will be dispatched
+   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  fullTextSearch?: string;
+}
+/** A filter to be used against `RlsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface RlsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `sessionCredentialsTableId` field. */
+  sessionCredentialsTableId?: UUIDFilter;
+  /** Filter by the object’s `sessionsTableId` field. */
+  sessionsTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `authenticate` field. */
+  authenticate?: StringFilter;
+  /** Filter by the object’s `authenticateStrict` field. */
+  authenticateStrict?: StringFilter;
+  /** Filter by the object’s `currentRole` field. */
+  currentRole?: StringFilter;
+  /** Filter by the object’s `currentRoleId` field. */
+  currentRoleId?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RlsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RlsModuleFilter[];
+  /** Negates the expression. */
+  not?: RlsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `sessionCredentialsTable` relation. */
+  sessionCredentialsTable?: TableFilter;
+  /** Filter by the object’s `sessionsTable` relation. */
+  sessionsTable?: TableFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against `HierarchyModule` object types. All fields are combined with a logical ‘and.’ */
+export interface HierarchyModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableId` field. */
+  chartEdgesTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgesTableName` field. */
+  chartEdgesTableName?: StringFilter;
+  /** Filter by the object’s `hierarchySprtTableId` field. */
+  hierarchySprtTableId?: UUIDFilter;
+  /** Filter by the object’s `hierarchySprtTableName` field. */
+  hierarchySprtTableName?: StringFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableId` field. */
+  chartEdgeGrantsTableId?: UUIDFilter;
+  /** Filter by the object’s `chartEdgeGrantsTableName` field. */
+  chartEdgeGrantsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `usersTableId` field. */
+  usersTableId?: UUIDFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `privateSchemaName` field. */
+  privateSchemaName?: StringFilter;
+  /** Filter by the object’s `sprtTableName` field. */
+  sprtTableName?: StringFilter;
+  /** Filter by the object’s `rebuildHierarchyFunction` field. */
+  rebuildHierarchyFunction?: StringFilter;
+  /** Filter by the object’s `getSubordinatesFunction` field. */
+  getSubordinatesFunction?: StringFilter;
+  /** Filter by the object’s `getManagersFunction` field. */
+  getManagersFunction?: StringFilter;
+  /** Filter by the object’s `isManagerOfFunction` field. */
+  isManagerOfFunction?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: HierarchyModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: HierarchyModuleFilter[];
+  /** Negates the expression. */
+  not?: HierarchyModuleFilter;
+  /** Filter by the object’s `chartEdgeGrantsTable` relation. */
+  chartEdgeGrantsTable?: TableFilter;
+  /** Filter by the object’s `chartEdgesTable` relation. */
+  chartEdgesTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** Filter by the object’s `hierarchySprtTable` relation. */
+  hierarchySprtTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `usersTable` relation. */
+  usersTable?: TableFilter;
+}
+/** A filter to be used against BitString fields. All fields are combined with a logical ‘and.’ */
+export interface BitStringFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against InternetAddress fields. All fields are combined with a logical ‘and.’ */
+export interface InternetAddressFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+  /** Contains the specified internet address. */
+  contains?: string;
+  /** Contains or equal to the specified internet address. */
+  containsOrEqualTo?: string;
+  /** Contained by the specified internet address. */
+  containedBy?: string;
+  /** Contained by or equal to the specified internet address. */
+  containedByOrEqualTo?: string;
+  /** Contains or contained by the specified internet address. */
+  containsOrContainedBy?: string;
+}
+/** A filter to be used against FullText fields. All fields are combined with a logical ‘and.’ */
+export interface FullTextFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Performs a full text search on the field. */
+  matches?: string;
+}
+/** A filter to be used against `RoleType` object types. All fields are combined with a logical ‘and.’ */
+export interface RoleTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RoleTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RoleTypeFilter[];
+  /** Negates the expression. */
+  not?: RoleTypeFilter;
+}
+/** A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface AppMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppMembershipFilter[];
+  /** Negates the expression. */
+  not?: AppMembershipFilter;
+  /** Filter by the object’s `actor` relation. */
+  actor?: UserFilter;
+}
+/** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
+  deleteMemberCascadeGroups?: BooleanFilter;
+  /** Filter by the object’s `createGroupsCascadeMembers` field. */
+  createGroupsCascadeMembers?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 /** A connection to a list of `Object` values. */
 // ============ Payload/Return Types (for custom operations) ============
@@ -14899,12 +20991,6 @@ export type AppLevelRequirementConnectionSelect = {
   };
   totalCount?: boolean;
 };
-export interface SignOutPayload {
-  clientMutationId?: string | null;
-}
-export type SignOutPayloadSelect = {
-  clientMutationId?: boolean;
-};
 export interface SendAccountDeletionEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -14913,11 +20999,35 @@ export type SendAccountDeletionEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface CheckPasswordPayload {
+export interface SignOutPayload {
   clientMutationId?: string | null;
 }
-export type CheckPasswordPayloadSelect = {
+export type SignOutPayloadSelect = {
   clientMutationId?: boolean;
+};
+export interface AcceptDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type AcceptDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface CancelDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type CancelDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RejectDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RejectDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface SubmitInviteCodePayload {
   clientMutationId?: string | null;
@@ -14935,16 +21045,10 @@ export type SubmitOrgInviteCodePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface FreezeObjectsPayload {
+export interface CheckPasswordPayload {
   clientMutationId?: string | null;
 }
-export type FreezeObjectsPayloadSelect = {
-  clientMutationId?: boolean;
-};
-export interface InitEmptyRepoPayload {
-  clientMutationId?: string | null;
-}
-export type InitEmptyRepoPayloadSelect = {
+export type CheckPasswordPayloadSelect = {
   clientMutationId?: boolean;
 };
 export interface ConfirmDeleteAccountPayload {
@@ -14971,11 +21075,23 @@ export type VerifyEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface RemoveNodeAtPathPayload {
+export interface FreezeObjectsPayload {
   clientMutationId?: string | null;
-  result?: string | null;
 }
-export type RemoveNodeAtPathPayloadSelect = {
+export type FreezeObjectsPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface InitEmptyRepoPayload {
+  clientMutationId?: string | null;
+}
+export type InitEmptyRepoPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface ConstructBlueprintPayload {
+  clientMutationId?: string | null;
+  result?: Record<string, unknown> | null;
+}
+export type ConstructBlueprintPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -14987,21 +21103,13 @@ export type ResetPasswordPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface BootstrapUserPayload {
+export interface RemoveNodeAtPathPayload {
   clientMutationId?: string | null;
-  result?: BootstrapUserRecord[] | null;
+  result?: string | null;
 }
-export type BootstrapUserPayloadSelect = {
+export type RemoveNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
-  result?: {
-    select: BootstrapUserRecordSelect;
-  };
-};
-export interface SetFieldOrderPayload {
-  clientMutationId?: string | null;
-}
-export type SetFieldOrderPayloadSelect = {
-  clientMutationId?: boolean;
+  result?: boolean;
 };
 export interface SetDataAtPathPayload {
   clientMutationId?: string | null;
@@ -15019,6 +21127,14 @@ export type SetPropsAndCommitPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface CopyTemplateToBlueprintPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type CopyTemplateToBlueprintPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ProvisionDatabaseWithUserPayload {
   clientMutationId?: string | null;
   result?: ProvisionDatabaseWithUserRecord[] | null;
@@ -15028,6 +21144,22 @@ export type ProvisionDatabaseWithUserPayloadSelect = {
   result?: {
     select: ProvisionDatabaseWithUserRecordSelect;
   };
+};
+export interface BootstrapUserPayload {
+  clientMutationId?: string | null;
+  result?: BootstrapUserRecord[] | null;
+}
+export type BootstrapUserPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: BootstrapUserRecordSelect;
+  };
+};
+export interface SetFieldOrderPayload {
+  clientMutationId?: string | null;
+}
+export type SetFieldOrderPayloadSelect = {
+  clientMutationId?: boolean;
 };
 export interface InsertNodeAtPathPayload {
   clientMutationId?: string | null;
@@ -15115,12 +21247,6 @@ export type OneTimeTokenPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface ForgotPasswordPayload {
-  clientMutationId?: string | null;
-}
-export type ForgotPasswordPayloadSelect = {
-  clientMutationId?: boolean;
-};
 export interface SendVerificationEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -15128,6 +21254,12 @@ export interface SendVerificationEmailPayload {
 export type SendVerificationEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface ForgotPasswordPayload {
+  clientMutationId?: string | null;
+}
+export type ForgotPasswordPayloadSelect = {
+  clientMutationId?: boolean;
 };
 export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
@@ -16094,6 +22226,51 @@ export type DeleteViewRulePayloadSelect = {
     select: ViewRuleEdgeSelect;
   };
 };
+export interface CreateEmbeddingChunkPayload {
+  clientMutationId?: string | null;
+  /** The `EmbeddingChunk` that was created by this mutation. */
+  embeddingChunk?: EmbeddingChunk | null;
+  embeddingChunkEdge?: EmbeddingChunkEdge | null;
+}
+export type CreateEmbeddingChunkPayloadSelect = {
+  clientMutationId?: boolean;
+  embeddingChunk?: {
+    select: EmbeddingChunkSelect;
+  };
+  embeddingChunkEdge?: {
+    select: EmbeddingChunkEdgeSelect;
+  };
+};
+export interface UpdateEmbeddingChunkPayload {
+  clientMutationId?: string | null;
+  /** The `EmbeddingChunk` that was updated by this mutation. */
+  embeddingChunk?: EmbeddingChunk | null;
+  embeddingChunkEdge?: EmbeddingChunkEdge | null;
+}
+export type UpdateEmbeddingChunkPayloadSelect = {
+  clientMutationId?: boolean;
+  embeddingChunk?: {
+    select: EmbeddingChunkSelect;
+  };
+  embeddingChunkEdge?: {
+    select: EmbeddingChunkEdgeSelect;
+  };
+};
+export interface DeleteEmbeddingChunkPayload {
+  clientMutationId?: string | null;
+  /** The `EmbeddingChunk` that was deleted by this mutation. */
+  embeddingChunk?: EmbeddingChunk | null;
+  embeddingChunkEdge?: EmbeddingChunkEdge | null;
+}
+export type DeleteEmbeddingChunkPayloadSelect = {
+  clientMutationId?: boolean;
+  embeddingChunk?: {
+    select: EmbeddingChunkSelect;
+  };
+  embeddingChunkEdge?: {
+    select: EmbeddingChunkEdgeSelect;
+  };
+};
 export interface CreateTableTemplateModulePayload {
   clientMutationId?: string | null;
   /** The `TableTemplateModule` that was created by this mutation. */
@@ -16317,6 +22494,51 @@ export type DeleteDefaultPrivilegePayloadSelect = {
   };
   defaultPrivilegeEdge?: {
     select: DefaultPrivilegeEdgeSelect;
+  };
+};
+export interface CreateEnumPayload {
+  clientMutationId?: string | null;
+  /** The `Enum` that was created by this mutation. */
+  enum?: Enum | null;
+  enumEdge?: EnumEdge | null;
+}
+export type CreateEnumPayloadSelect = {
+  clientMutationId?: boolean;
+  enum?: {
+    select: EnumSelect;
+  };
+  enumEdge?: {
+    select: EnumEdgeSelect;
+  };
+};
+export interface UpdateEnumPayload {
+  clientMutationId?: string | null;
+  /** The `Enum` that was updated by this mutation. */
+  enum?: Enum | null;
+  enumEdge?: EnumEdge | null;
+}
+export type UpdateEnumPayloadSelect = {
+  clientMutationId?: boolean;
+  enum?: {
+    select: EnumSelect;
+  };
+  enumEdge?: {
+    select: EnumEdgeSelect;
+  };
+};
+export interface DeleteEnumPayload {
+  clientMutationId?: string | null;
+  /** The `Enum` that was deleted by this mutation. */
+  enum?: Enum | null;
+  enumEdge?: EnumEdge | null;
+}
+export type DeleteEnumPayloadSelect = {
+  clientMutationId?: boolean;
+  enum?: {
+    select: EnumSelect;
+  };
+  enumEdge?: {
+    select: EnumEdgeSelect;
   };
 };
 export interface CreateApiSchemaPayload {
@@ -16632,6 +22854,51 @@ export type DeleteTriggerFunctionPayloadSelect = {
   };
   triggerFunctionEdge?: {
     select: TriggerFunctionEdgeSelect;
+  };
+};
+export interface CreateDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseTransfer` that was created by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
+}
+export type CreateDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseTransfer?: {
+    select: DatabaseTransferSelect;
+  };
+  databaseTransferEdge?: {
+    select: DatabaseTransferEdgeSelect;
+  };
+};
+export interface UpdateDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseTransfer` that was updated by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
+}
+export type UpdateDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseTransfer?: {
+    select: DatabaseTransferSelect;
+  };
+  databaseTransferEdge?: {
+    select: DatabaseTransferEdgeSelect;
+  };
+};
+export interface DeleteDatabaseTransferPayload {
+  clientMutationId?: string | null;
+  /** The `DatabaseTransfer` that was deleted by this mutation. */
+  databaseTransfer?: DatabaseTransfer | null;
+  databaseTransferEdge?: DatabaseTransferEdge | null;
+}
+export type DeleteDatabaseTransferPayloadSelect = {
+  clientMutationId?: boolean;
+  databaseTransfer?: {
+    select: DatabaseTransferSelect;
+  };
+  databaseTransferEdge?: {
+    select: DatabaseTransferEdgeSelect;
   };
 };
 export interface CreateApiPayload {
@@ -17669,49 +23936,94 @@ export type DeleteUsersModulePayloadSelect = {
     select: UsersModuleEdgeSelect;
   };
 };
-export interface CreateUuidModulePayload {
+export interface CreateBlueprintPayload {
   clientMutationId?: string | null;
-  /** The `UuidModule` that was created by this mutation. */
-  uuidModule?: UuidModule | null;
-  uuidModuleEdge?: UuidModuleEdge | null;
+  /** The `Blueprint` that was created by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
-export type CreateUuidModulePayloadSelect = {
+export type CreateBlueprintPayloadSelect = {
   clientMutationId?: boolean;
-  uuidModule?: {
-    select: UuidModuleSelect;
+  blueprint?: {
+    select: BlueprintSelect;
   };
-  uuidModuleEdge?: {
-    select: UuidModuleEdgeSelect;
+  blueprintEdge?: {
+    select: BlueprintEdgeSelect;
   };
 };
-export interface UpdateUuidModulePayload {
+export interface UpdateBlueprintPayload {
   clientMutationId?: string | null;
-  /** The `UuidModule` that was updated by this mutation. */
-  uuidModule?: UuidModule | null;
-  uuidModuleEdge?: UuidModuleEdge | null;
+  /** The `Blueprint` that was updated by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
-export type UpdateUuidModulePayloadSelect = {
+export type UpdateBlueprintPayloadSelect = {
   clientMutationId?: boolean;
-  uuidModule?: {
-    select: UuidModuleSelect;
+  blueprint?: {
+    select: BlueprintSelect;
   };
-  uuidModuleEdge?: {
-    select: UuidModuleEdgeSelect;
+  blueprintEdge?: {
+    select: BlueprintEdgeSelect;
   };
 };
-export interface DeleteUuidModulePayload {
+export interface DeleteBlueprintPayload {
   clientMutationId?: string | null;
-  /** The `UuidModule` that was deleted by this mutation. */
-  uuidModule?: UuidModule | null;
-  uuidModuleEdge?: UuidModuleEdge | null;
+  /** The `Blueprint` that was deleted by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
-export type DeleteUuidModulePayloadSelect = {
+export type DeleteBlueprintPayloadSelect = {
   clientMutationId?: boolean;
-  uuidModule?: {
-    select: UuidModuleSelect;
+  blueprint?: {
+    select: BlueprintSelect;
   };
-  uuidModuleEdge?: {
-    select: UuidModuleEdgeSelect;
+  blueprintEdge?: {
+    select: BlueprintEdgeSelect;
+  };
+};
+export interface CreateBlueprintTemplatePayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintTemplate` that was created by this mutation. */
+  blueprintTemplate?: BlueprintTemplate | null;
+  blueprintTemplateEdge?: BlueprintTemplateEdge | null;
+}
+export type CreateBlueprintTemplatePayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintTemplate?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplateEdge?: {
+    select: BlueprintTemplateEdgeSelect;
+  };
+};
+export interface UpdateBlueprintTemplatePayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintTemplate` that was updated by this mutation. */
+  blueprintTemplate?: BlueprintTemplate | null;
+  blueprintTemplateEdge?: BlueprintTemplateEdge | null;
+}
+export type UpdateBlueprintTemplatePayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintTemplate?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplateEdge?: {
+    select: BlueprintTemplateEdgeSelect;
+  };
+};
+export interface DeleteBlueprintTemplatePayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintTemplate` that was deleted by this mutation. */
+  blueprintTemplate?: BlueprintTemplate | null;
+  blueprintTemplateEdge?: BlueprintTemplateEdge | null;
+}
+export type DeleteBlueprintTemplatePayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintTemplate?: {
+    select: BlueprintTemplateSelect;
+  };
+  blueprintTemplateEdge?: {
+    select: BlueprintTemplateEdgeSelect;
   };
 };
 export interface CreateDatabaseProvisionModulePayload {
@@ -18209,6 +24521,51 @@ export type DeleteOrgChartEdgeGrantPayloadSelect = {
     select: OrgChartEdgeGrantEdgeSelect;
   };
 };
+export interface CreateOrgPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgPermissionDefault` that was created by this mutation. */
+  orgPermissionDefault?: OrgPermissionDefault | null;
+  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
+}
+export type CreateOrgPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  orgPermissionDefault?: {
+    select: OrgPermissionDefaultSelect;
+  };
+  orgPermissionDefaultEdge?: {
+    select: OrgPermissionDefaultEdgeSelect;
+  };
+};
+export interface UpdateOrgPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgPermissionDefault` that was updated by this mutation. */
+  orgPermissionDefault?: OrgPermissionDefault | null;
+  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
+}
+export type UpdateOrgPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  orgPermissionDefault?: {
+    select: OrgPermissionDefaultSelect;
+  };
+  orgPermissionDefaultEdge?: {
+    select: OrgPermissionDefaultEdgeSelect;
+  };
+};
+export interface DeleteOrgPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgPermissionDefault` that was deleted by this mutation. */
+  orgPermissionDefault?: OrgPermissionDefault | null;
+  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
+}
+export type DeleteOrgPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  orgPermissionDefault?: {
+    select: OrgPermissionDefaultSelect;
+  };
+  orgPermissionDefaultEdge?: {
+    select: OrgPermissionDefaultEdgeSelect;
+  };
+};
 export interface CreateAppLimitPayload {
   clientMutationId?: string | null;
   /** The `AppLimit` that was created by this mutation. */
@@ -18387,6 +24744,231 @@ export type DeleteAppAchievementPayloadSelect = {
   };
   appAchievementEdge?: {
     select: AppAchievementEdgeSelect;
+  };
+};
+export interface CreateAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was created by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+}
+export type CreateAppLevelPayloadSelect = {
+  clientMutationId?: boolean;
+  appLevel?: {
+    select: AppLevelSelect;
+  };
+  appLevelEdge?: {
+    select: AppLevelEdgeSelect;
+  };
+};
+export interface UpdateAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was updated by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+}
+export type UpdateAppLevelPayloadSelect = {
+  clientMutationId?: boolean;
+  appLevel?: {
+    select: AppLevelSelect;
+  };
+  appLevelEdge?: {
+    select: AppLevelEdgeSelect;
+  };
+};
+export interface DeleteAppLevelPayload {
+  clientMutationId?: string | null;
+  /** The `AppLevel` that was deleted by this mutation. */
+  appLevel?: AppLevel | null;
+  appLevelEdge?: AppLevelEdge | null;
+}
+export type DeleteAppLevelPayloadSelect = {
+  clientMutationId?: boolean;
+  appLevel?: {
+    select: AppLevelSelect;
+  };
+  appLevelEdge?: {
+    select: AppLevelEdgeSelect;
+  };
+};
+export interface CreateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was created by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type CreateEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface UpdateEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was updated by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type UpdateEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface DeleteEmailPayload {
+  clientMutationId?: string | null;
+  /** The `Email` that was deleted by this mutation. */
+  email?: Email | null;
+  emailEdge?: EmailEdge | null;
+}
+export type DeleteEmailPayloadSelect = {
+  clientMutationId?: boolean;
+  email?: {
+    select: EmailSelect;
+  };
+  emailEdge?: {
+    select: EmailEdgeSelect;
+  };
+};
+export interface CreatePhoneNumberPayload {
+  clientMutationId?: string | null;
+  /** The `PhoneNumber` that was created by this mutation. */
+  phoneNumber?: PhoneNumber | null;
+  phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export type CreatePhoneNumberPayloadSelect = {
+  clientMutationId?: boolean;
+  phoneNumber?: {
+    select: PhoneNumberSelect;
+  };
+  phoneNumberEdge?: {
+    select: PhoneNumberEdgeSelect;
+  };
+};
+export interface UpdatePhoneNumberPayload {
+  clientMutationId?: string | null;
+  /** The `PhoneNumber` that was updated by this mutation. */
+  phoneNumber?: PhoneNumber | null;
+  phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export type UpdatePhoneNumberPayloadSelect = {
+  clientMutationId?: boolean;
+  phoneNumber?: {
+    select: PhoneNumberSelect;
+  };
+  phoneNumberEdge?: {
+    select: PhoneNumberEdgeSelect;
+  };
+};
+export interface DeletePhoneNumberPayload {
+  clientMutationId?: string | null;
+  /** The `PhoneNumber` that was deleted by this mutation. */
+  phoneNumber?: PhoneNumber | null;
+  phoneNumberEdge?: PhoneNumberEdge | null;
+}
+export type DeletePhoneNumberPayloadSelect = {
+  clientMutationId?: boolean;
+  phoneNumber?: {
+    select: PhoneNumberSelect;
+  };
+  phoneNumberEdge?: {
+    select: PhoneNumberEdgeSelect;
+  };
+};
+export interface CreateCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was created by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export type CreateCryptoAddressPayloadSelect = {
+  clientMutationId?: boolean;
+  cryptoAddress?: {
+    select: CryptoAddressSelect;
+  };
+  cryptoAddressEdge?: {
+    select: CryptoAddressEdgeSelect;
+  };
+};
+export interface UpdateCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was updated by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export type UpdateCryptoAddressPayloadSelect = {
+  clientMutationId?: boolean;
+  cryptoAddress?: {
+    select: CryptoAddressSelect;
+  };
+  cryptoAddressEdge?: {
+    select: CryptoAddressEdgeSelect;
+  };
+};
+export interface DeleteCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was deleted by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
+}
+export type DeleteCryptoAddressPayloadSelect = {
+  clientMutationId?: boolean;
+  cryptoAddress?: {
+    select: CryptoAddressSelect;
+  };
+  cryptoAddressEdge?: {
+    select: CryptoAddressEdgeSelect;
+  };
+};
+export interface CreateConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was created by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
+}
+export type CreateConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  connectedAccount?: {
+    select: ConnectedAccountSelect;
+  };
+  connectedAccountEdge?: {
+    select: ConnectedAccountEdgeSelect;
+  };
+};
+export interface UpdateConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was updated by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
+}
+export type UpdateConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  connectedAccount?: {
+    select: ConnectedAccountSelect;
+  };
+  connectedAccountEdge?: {
+    select: ConnectedAccountEdgeSelect;
+  };
+};
+export interface DeleteConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was deleted by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
+}
+export type DeleteConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  connectedAccount?: {
+    select: ConnectedAccountSelect;
+  };
+  connectedAccountEdge?: {
+    select: ConnectedAccountEdgeSelect;
   };
 };
 export interface CreateInvitePayload {
@@ -18569,6 +25151,51 @@ export type DeleteOrgClaimedInvitePayloadSelect = {
     select: OrgClaimedInviteEdgeSelect;
   };
 };
+export interface CreateAuditLogPayload {
+  clientMutationId?: string | null;
+  /** The `AuditLog` that was created by this mutation. */
+  auditLog?: AuditLog | null;
+  auditLogEdge?: AuditLogEdge | null;
+}
+export type CreateAuditLogPayloadSelect = {
+  clientMutationId?: boolean;
+  auditLog?: {
+    select: AuditLogSelect;
+  };
+  auditLogEdge?: {
+    select: AuditLogEdgeSelect;
+  };
+};
+export interface UpdateAuditLogPayload {
+  clientMutationId?: string | null;
+  /** The `AuditLog` that was updated by this mutation. */
+  auditLog?: AuditLog | null;
+  auditLogEdge?: AuditLogEdge | null;
+}
+export type UpdateAuditLogPayloadSelect = {
+  clientMutationId?: boolean;
+  auditLog?: {
+    select: AuditLogSelect;
+  };
+  auditLogEdge?: {
+    select: AuditLogEdgeSelect;
+  };
+};
+export interface DeleteAuditLogPayload {
+  clientMutationId?: string | null;
+  /** The `AuditLog` that was deleted by this mutation. */
+  auditLog?: AuditLog | null;
+  auditLogEdge?: AuditLogEdge | null;
+}
+export type DeleteAuditLogPayloadSelect = {
+  clientMutationId?: boolean;
+  auditLog?: {
+    select: AuditLogSelect;
+  };
+  auditLogEdge?: {
+    select: AuditLogEdgeSelect;
+  };
+};
 export interface CreateRefPayload {
   clientMutationId?: string | null;
   /** The `Ref` that was created by this mutation. */
@@ -18704,51 +25331,6 @@ export type DeleteAppPermissionDefaultPayloadSelect = {
     select: AppPermissionDefaultEdgeSelect;
   };
 };
-export interface CreateCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was created by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export type CreateCryptoAddressPayloadSelect = {
-  clientMutationId?: boolean;
-  cryptoAddress?: {
-    select: CryptoAddressSelect;
-  };
-  cryptoAddressEdge?: {
-    select: CryptoAddressEdgeSelect;
-  };
-};
-export interface UpdateCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was updated by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export type UpdateCryptoAddressPayloadSelect = {
-  clientMutationId?: boolean;
-  cryptoAddress?: {
-    select: CryptoAddressSelect;
-  };
-  cryptoAddressEdge?: {
-    select: CryptoAddressEdgeSelect;
-  };
-};
-export interface DeleteCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was deleted by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export type DeleteCryptoAddressPayloadSelect = {
-  clientMutationId?: boolean;
-  cryptoAddress?: {
-    select: CryptoAddressSelect;
-  };
-  cryptoAddressEdge?: {
-    select: CryptoAddressEdgeSelect;
-  };
-};
 export interface CreateRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was created by this mutation. */
@@ -18792,96 +25374,6 @@ export type DeleteRoleTypePayloadSelect = {
   };
   roleTypeEdge?: {
     select: RoleTypeEdgeSelect;
-  };
-};
-export interface CreateOrgPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgPermissionDefault` that was created by this mutation. */
-  orgPermissionDefault?: OrgPermissionDefault | null;
-  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
-}
-export type CreateOrgPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  orgPermissionDefault?: {
-    select: OrgPermissionDefaultSelect;
-  };
-  orgPermissionDefaultEdge?: {
-    select: OrgPermissionDefaultEdgeSelect;
-  };
-};
-export interface UpdateOrgPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgPermissionDefault` that was updated by this mutation. */
-  orgPermissionDefault?: OrgPermissionDefault | null;
-  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
-}
-export type UpdateOrgPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  orgPermissionDefault?: {
-    select: OrgPermissionDefaultSelect;
-  };
-  orgPermissionDefaultEdge?: {
-    select: OrgPermissionDefaultEdgeSelect;
-  };
-};
-export interface DeleteOrgPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgPermissionDefault` that was deleted by this mutation. */
-  orgPermissionDefault?: OrgPermissionDefault | null;
-  orgPermissionDefaultEdge?: OrgPermissionDefaultEdge | null;
-}
-export type DeleteOrgPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  orgPermissionDefault?: {
-    select: OrgPermissionDefaultSelect;
-  };
-  orgPermissionDefaultEdge?: {
-    select: OrgPermissionDefaultEdgeSelect;
-  };
-};
-export interface CreatePhoneNumberPayload {
-  clientMutationId?: string | null;
-  /** The `PhoneNumber` that was created by this mutation. */
-  phoneNumber?: PhoneNumber | null;
-  phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export type CreatePhoneNumberPayloadSelect = {
-  clientMutationId?: boolean;
-  phoneNumber?: {
-    select: PhoneNumberSelect;
-  };
-  phoneNumberEdge?: {
-    select: PhoneNumberEdgeSelect;
-  };
-};
-export interface UpdatePhoneNumberPayload {
-  clientMutationId?: string | null;
-  /** The `PhoneNumber` that was updated by this mutation. */
-  phoneNumber?: PhoneNumber | null;
-  phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export type UpdatePhoneNumberPayloadSelect = {
-  clientMutationId?: boolean;
-  phoneNumber?: {
-    select: PhoneNumberSelect;
-  };
-  phoneNumberEdge?: {
-    select: PhoneNumberEdgeSelect;
-  };
-};
-export interface DeletePhoneNumberPayload {
-  clientMutationId?: string | null;
-  /** The `PhoneNumber` that was deleted by this mutation. */
-  phoneNumber?: PhoneNumber | null;
-  phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export type DeletePhoneNumberPayloadSelect = {
-  clientMutationId?: boolean;
-  phoneNumber?: {
-    select: PhoneNumberSelect;
-  };
-  phoneNumberEdge?: {
-    select: PhoneNumberEdgeSelect;
   };
 };
 export interface CreateAppLimitDefaultPayload {
@@ -18972,51 +25464,6 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
   };
   orgLimitDefaultEdge?: {
     select: OrgLimitDefaultEdgeSelect;
-  };
-};
-export interface CreateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was created by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type CreateConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
-  };
-};
-export interface UpdateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was updated by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type UpdateConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
-  };
-};
-export interface DeleteConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was deleted by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type DeleteConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
   };
 };
 export interface CreateNodeTypeRegistryPayload {
@@ -19289,96 +25736,6 @@ export type DeleteOrgMembershipDefaultPayloadSelect = {
     select: OrgMembershipDefaultEdgeSelect;
   };
 };
-export interface CreateAuditLogPayload {
-  clientMutationId?: string | null;
-  /** The `AuditLog` that was created by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
-}
-export type CreateAuditLogPayloadSelect = {
-  clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
-  };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
-  };
-};
-export interface UpdateAuditLogPayload {
-  clientMutationId?: string | null;
-  /** The `AuditLog` that was updated by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
-}
-export type UpdateAuditLogPayloadSelect = {
-  clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
-  };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
-  };
-};
-export interface DeleteAuditLogPayload {
-  clientMutationId?: string | null;
-  /** The `AuditLog` that was deleted by this mutation. */
-  auditLog?: AuditLog | null;
-  auditLogEdge?: AuditLogEdge | null;
-}
-export type DeleteAuditLogPayloadSelect = {
-  clientMutationId?: boolean;
-  auditLog?: {
-    select: AuditLogSelect;
-  };
-  auditLogEdge?: {
-    select: AuditLogEdgeSelect;
-  };
-};
-export interface CreateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was created by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type CreateAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
-export interface UpdateAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was updated by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type UpdateAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
-export interface DeleteAppLevelPayload {
-  clientMutationId?: string | null;
-  /** The `AppLevel` that was deleted by this mutation. */
-  appLevel?: AppLevel | null;
-  appLevelEdge?: AppLevelEdge | null;
-}
-export type DeleteAppLevelPayloadSelect = {
-  clientMutationId?: boolean;
-  appLevel?: {
-    select: AppLevelSelect;
-  };
-  appLevelEdge?: {
-    select: AppLevelEdgeSelect;
-  };
-};
 export interface CreateSqlMigrationPayload {
   clientMutationId?: string | null;
   /** The `SqlMigration` that was created by this mutation. */
@@ -19388,51 +25745,6 @@ export type CreateSqlMigrationPayloadSelect = {
   clientMutationId?: boolean;
   sqlMigration?: {
     select: SqlMigrationSelect;
-  };
-};
-export interface CreateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was created by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type CreateEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
-  };
-};
-export interface UpdateEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was updated by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type UpdateEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
-  };
-};
-export interface DeleteEmailPayload {
-  clientMutationId?: string | null;
-  /** The `Email` that was deleted by this mutation. */
-  email?: Email | null;
-  emailEdge?: EmailEdge | null;
-}
-export type DeleteEmailPayloadSelect = {
-  clientMutationId?: boolean;
-  email?: {
-    select: EmailSelect;
-  };
-  emailEdge?: {
-    select: EmailEdgeSelect;
   };
 };
 export interface CreateUserPayload {
@@ -19646,6 +25958,14 @@ export type AppLevelRequirementEdgeSelect = {
     select: AppLevelRequirementSelect;
   };
 };
+export interface ProvisionDatabaseWithUserRecord {
+  outDatabaseId?: string | null;
+  outApiKey?: string | null;
+}
+export type ProvisionDatabaseWithUserRecordSelect = {
+  outDatabaseId?: boolean;
+  outApiKey?: boolean;
+};
 export interface BootstrapUserRecord {
   outUserId?: string | null;
   outEmail?: string | null;
@@ -19655,16 +25975,6 @@ export interface BootstrapUserRecord {
   outIsOwner?: boolean | null;
   outIsSudo?: boolean | null;
   outApiKey?: string | null;
-  /** TRGM similarity when searching `outEmail`. Returns null when no trgm search filter is active. */
-  outEmailTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `outUsername`. Returns null when no trgm search filter is active. */
-  outUsernameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `outDisplayName`. Returns null when no trgm search filter is active. */
-  outDisplayNameTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `outApiKey`. Returns null when no trgm search filter is active. */
-  outApiKeyTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type BootstrapUserRecordSelect = {
   outUserId?: boolean;
@@ -19675,25 +25985,6 @@ export type BootstrapUserRecordSelect = {
   outIsOwner?: boolean;
   outIsSudo?: boolean;
   outApiKey?: boolean;
-  outEmailTrgmSimilarity?: boolean;
-  outUsernameTrgmSimilarity?: boolean;
-  outDisplayNameTrgmSimilarity?: boolean;
-  outApiKeyTrgmSimilarity?: boolean;
-  searchScore?: boolean;
-};
-export interface ProvisionDatabaseWithUserRecord {
-  outDatabaseId?: string | null;
-  outApiKey?: string | null;
-  /** TRGM similarity when searching `outApiKey`. Returns null when no trgm search filter is active. */
-  outApiKeyTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
-}
-export type ProvisionDatabaseWithUserRecordSelect = {
-  outDatabaseId?: boolean;
-  outApiKey?: boolean;
-  outApiKeyTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export interface SignInOneTimeTokenRecord {
   id?: string | null;
@@ -19702,10 +25993,6 @@ export interface SignInOneTimeTokenRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
-  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
-  accessTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SignInOneTimeTokenRecordSelect = {
   id?: boolean;
@@ -19714,8 +26001,6 @@ export type SignInOneTimeTokenRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
-  accessTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export interface ExtendTokenExpiresRecord {
   id?: string | null;
@@ -19734,10 +26019,6 @@ export interface SignInRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
-  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
-  accessTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SignInRecordSelect = {
   id?: boolean;
@@ -19746,8 +26027,6 @@ export type SignInRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
-  accessTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export interface SignUpRecord {
   id?: string | null;
@@ -19756,10 +26035,6 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
-  /** TRGM similarity when searching `accessToken`. Returns null when no trgm search filter is active. */
-  accessTokenTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SignUpRecordSelect = {
   id?: boolean;
@@ -19768,8 +26043,6 @@ export type SignUpRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
-  accessTokenTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 /** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
 export interface Session {
@@ -19798,14 +26071,6 @@ export interface Session {
   csrfSecret?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  /** TRGM similarity when searching `uagent`. Returns null when no trgm search filter is active. */
-  uagentTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `fingerprintMode`. Returns null when no trgm search filter is active. */
-  fingerprintModeTrgmSimilarity?: number | null;
-  /** TRGM similarity when searching `csrfSecret`. Returns null when no trgm search filter is active. */
-  csrfSecretTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 export type SessionSelect = {
   id?: boolean;
@@ -19822,10 +26087,6 @@ export type SessionSelect = {
   csrfSecret?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
-  uagentTrgmSimilarity?: boolean;
-  fingerprintModeTrgmSimilarity?: boolean;
-  csrfSecretTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 /** A `Database` edge in the connection. */
 export interface DatabaseEdge {
@@ -20031,6 +26292,18 @@ export type ViewRuleEdgeSelect = {
     select: ViewRuleSelect;
   };
 };
+/** A `EmbeddingChunk` edge in the connection. */
+export interface EmbeddingChunkEdge {
+  cursor?: string | null;
+  /** The `EmbeddingChunk` at the end of the edge. */
+  node?: EmbeddingChunk | null;
+}
+export type EmbeddingChunkEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmbeddingChunkSelect;
+  };
+};
 /** A `TableTemplateModule` edge in the connection. */
 export interface TableTemplateModuleEdge {
   cursor?: string | null;
@@ -20089,6 +26362,18 @@ export type DefaultPrivilegeEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: DefaultPrivilegeSelect;
+  };
+};
+/** A `Enum` edge in the connection. */
+export interface EnumEdge {
+  cursor?: string | null;
+  /** The `Enum` at the end of the edge. */
+  node?: Enum | null;
+}
+export type EnumEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EnumSelect;
   };
 };
 /** A `ApiSchema` edge in the connection. */
@@ -20173,6 +26458,18 @@ export type TriggerFunctionEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: TriggerFunctionSelect;
+  };
+};
+/** A `DatabaseTransfer` edge in the connection. */
+export interface DatabaseTransferEdge {
+  cursor?: string | null;
+  /** The `DatabaseTransfer` at the end of the edge. */
+  node?: DatabaseTransfer | null;
+}
+export type DatabaseTransferEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DatabaseTransferSelect;
   };
 };
 /** A `Api` edge in the connection. */
@@ -20451,16 +26748,28 @@ export type UsersModuleEdgeSelect = {
     select: UsersModuleSelect;
   };
 };
-/** A `UuidModule` edge in the connection. */
-export interface UuidModuleEdge {
+/** A `Blueprint` edge in the connection. */
+export interface BlueprintEdge {
   cursor?: string | null;
-  /** The `UuidModule` at the end of the edge. */
-  node?: UuidModule | null;
+  /** The `Blueprint` at the end of the edge. */
+  node?: Blueprint | null;
 }
-export type UuidModuleEdgeSelect = {
+export type BlueprintEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: UuidModuleSelect;
+    select: BlueprintSelect;
+  };
+};
+/** A `BlueprintTemplate` edge in the connection. */
+export interface BlueprintTemplateEdge {
+  cursor?: string | null;
+  /** The `BlueprintTemplate` at the end of the edge. */
+  node?: BlueprintTemplate | null;
+}
+export type BlueprintTemplateEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: BlueprintTemplateSelect;
   };
 };
 /** A `DatabaseProvisionModule` edge in the connection. */
@@ -20595,6 +26904,18 @@ export type OrgChartEdgeGrantEdgeSelect = {
     select: OrgChartEdgeGrantSelect;
   };
 };
+/** A `OrgPermissionDefault` edge in the connection. */
+export interface OrgPermissionDefaultEdge {
+  cursor?: string | null;
+  /** The `OrgPermissionDefault` at the end of the edge. */
+  node?: OrgPermissionDefault | null;
+}
+export type OrgPermissionDefaultEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: OrgPermissionDefaultSelect;
+  };
+};
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
   cursor?: string | null;
@@ -20641,6 +26962,66 @@ export type AppAchievementEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: AppAchievementSelect;
+  };
+};
+/** A `AppLevel` edge in the connection. */
+export interface AppLevelEdge {
+  cursor?: string | null;
+  /** The `AppLevel` at the end of the edge. */
+  node?: AppLevel | null;
+}
+export type AppLevelEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AppLevelSelect;
+  };
+};
+/** A `Email` edge in the connection. */
+export interface EmailEdge {
+  cursor?: string | null;
+  /** The `Email` at the end of the edge. */
+  node?: Email | null;
+}
+export type EmailEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: EmailSelect;
+  };
+};
+/** A `PhoneNumber` edge in the connection. */
+export interface PhoneNumberEdge {
+  cursor?: string | null;
+  /** The `PhoneNumber` at the end of the edge. */
+  node?: PhoneNumber | null;
+}
+export type PhoneNumberEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: PhoneNumberSelect;
+  };
+};
+/** A `CryptoAddress` edge in the connection. */
+export interface CryptoAddressEdge {
+  cursor?: string | null;
+  /** The `CryptoAddress` at the end of the edge. */
+  node?: CryptoAddress | null;
+}
+export type CryptoAddressEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: CryptoAddressSelect;
+  };
+};
+/** A `ConnectedAccount` edge in the connection. */
+export interface ConnectedAccountEdge {
+  cursor?: string | null;
+  /** The `ConnectedAccount` at the end of the edge. */
+  node?: ConnectedAccount | null;
+}
+export type ConnectedAccountEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: ConnectedAccountSelect;
   };
 };
 /** A `Invite` edge in the connection. */
@@ -20691,6 +27072,18 @@ export type OrgClaimedInviteEdgeSelect = {
     select: OrgClaimedInviteSelect;
   };
 };
+/** A `AuditLog` edge in the connection. */
+export interface AuditLogEdge {
+  cursor?: string | null;
+  /** The `AuditLog` at the end of the edge. */
+  node?: AuditLog | null;
+}
+export type AuditLogEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AuditLogSelect;
+  };
+};
 /** A `Ref` edge in the connection. */
 export interface RefEdge {
   cursor?: string | null;
@@ -20727,18 +27120,6 @@ export type AppPermissionDefaultEdgeSelect = {
     select: AppPermissionDefaultSelect;
   };
 };
-/** A `CryptoAddress` edge in the connection. */
-export interface CryptoAddressEdge {
-  cursor?: string | null;
-  /** The `CryptoAddress` at the end of the edge. */
-  node?: CryptoAddress | null;
-}
-export type CryptoAddressEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: CryptoAddressSelect;
-  };
-};
 /** A `RoleType` edge in the connection. */
 export interface RoleTypeEdge {
   cursor?: string | null;
@@ -20749,30 +27130,6 @@ export type RoleTypeEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: RoleTypeSelect;
-  };
-};
-/** A `OrgPermissionDefault` edge in the connection. */
-export interface OrgPermissionDefaultEdge {
-  cursor?: string | null;
-  /** The `OrgPermissionDefault` at the end of the edge. */
-  node?: OrgPermissionDefault | null;
-}
-export type OrgPermissionDefaultEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: OrgPermissionDefaultSelect;
-  };
-};
-/** A `PhoneNumber` edge in the connection. */
-export interface PhoneNumberEdge {
-  cursor?: string | null;
-  /** The `PhoneNumber` at the end of the edge. */
-  node?: PhoneNumber | null;
-}
-export type PhoneNumberEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: PhoneNumberSelect;
   };
 };
 /** A `AppLimitDefault` edge in the connection. */
@@ -20797,18 +27154,6 @@ export type OrgLimitDefaultEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgLimitDefaultSelect;
-  };
-};
-/** A `ConnectedAccount` edge in the connection. */
-export interface ConnectedAccountEdge {
-  cursor?: string | null;
-  /** The `ConnectedAccount` at the end of the edge. */
-  node?: ConnectedAccount | null;
-}
-export type ConnectedAccountEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: ConnectedAccountSelect;
   };
 };
 /** A `NodeTypeRegistry` edge in the connection. */
@@ -20881,42 +27226,6 @@ export type OrgMembershipDefaultEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgMembershipDefaultSelect;
-  };
-};
-/** A `AuditLog` edge in the connection. */
-export interface AuditLogEdge {
-  cursor?: string | null;
-  /** The `AuditLog` at the end of the edge. */
-  node?: AuditLog | null;
-}
-export type AuditLogEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AuditLogSelect;
-  };
-};
-/** A `AppLevel` edge in the connection. */
-export interface AppLevelEdge {
-  cursor?: string | null;
-  /** The `AppLevel` at the end of the edge. */
-  node?: AppLevel | null;
-}
-export type AppLevelEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AppLevelSelect;
-  };
-};
-/** A `Email` edge in the connection. */
-export interface EmailEdge {
-  cursor?: string | null;
-  /** The `Email` at the end of the edge. */
-  node?: Email | null;
-}
-export type EmailEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: EmailSelect;
   };
 };
 /** A `User` edge in the connection. */

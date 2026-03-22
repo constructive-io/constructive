@@ -218,9 +218,10 @@ export class AppLimitModel {
       'AppLimit',
       'deleteAppLimit',
       'appLimit',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppLimitInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -23,8 +23,6 @@ export interface Ref {
   databaseId: string | null;
   storeId: string | null;
   commitId: string | null;
-  nameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Store {
   id: string | null;
@@ -32,8 +30,6 @@ export interface Store {
   databaseId: string | null;
   hash: string | null;
   createdAt: string | null;
-  nameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Commit {
   id: string | null;
@@ -45,8 +41,6 @@ export interface Commit {
   committerId: string | null;
   treeId: string | null;
   date: string | null;
-  messageTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface StringFilter {
   isNull?: boolean;

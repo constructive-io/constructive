@@ -294,29 +294,49 @@ export type SqlActionSelect = {
 };
 // ============ Table Filter Types ============
 export interface MigrateFileFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  upload?: StringFilter;
+  /** Filter by the object’s `upload` field. */
+  upload?: ConstructiveInternalTypeUploadFilter;
+  /** Checks for all expressions in this list. */
   and?: MigrateFileFilter[];
+  /** Checks for any expressions in this list. */
   or?: MigrateFileFilter[];
+  /** Negates the expression. */
   not?: MigrateFileFilter;
 }
 export interface SqlActionFilter {
+  /** Filter by the object’s `id` field. */
   id?: IntFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `deploy` field. */
   deploy?: StringFilter;
+  /** Filter by the object’s `deps` field. */
   deps?: StringListFilter;
-  payload?: JSONFilter;
+  /** Filter by the object’s `content` field. */
   content?: StringFilter;
+  /** Filter by the object’s `revert` field. */
   revert?: StringFilter;
+  /** Filter by the object’s `verify` field. */
   verify?: StringFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Filter by the object’s `action` field. */
   action?: StringFilter;
+  /** Filter by the object’s `actionId` field. */
   actionId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
   and?: SqlActionFilter[];
+  /** Checks for any expressions in this list. */
   or?: SqlActionFilter[];
+  /** Negates the expression. */
   not?: SqlActionFilter;
 }
 // ============ OrderBy Types ============
@@ -408,6 +428,41 @@ export interface RunMigrationInput {
   databaseId?: string;
   migration?: number;
   kind?: string;
+}
+/** A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeUploadFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeUpload;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeUpload;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeUpload;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeUpload;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeUpload[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeUpload[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeUpload;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeUpload;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeUpload;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeUpload;
 }
 // ============ Payload/Return Types (for custom operations) ============
 export interface ExecuteSqlPayload {

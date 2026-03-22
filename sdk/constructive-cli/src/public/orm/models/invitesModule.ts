@@ -218,9 +218,10 @@ export class InvitesModuleModel {
       'InvitesModule',
       'deleteInvitesModule',
       'invitesModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteInvitesModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

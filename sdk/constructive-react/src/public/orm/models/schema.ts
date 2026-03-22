@@ -218,9 +218,10 @@ export class SchemaModel {
       'Schema',
       'deleteSchema',
       'schema',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSchemaInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

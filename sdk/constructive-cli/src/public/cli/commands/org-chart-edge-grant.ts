@@ -18,8 +18,6 @@ const fieldSchema: FieldSchema = {
   positionTitle: 'string',
   positionLevel: 'int',
   createdAt: 'string',
-  positionTitleTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\norg-chart-edge-grant <command>\n\nCommands:\n  list                  List all orgChartEdgeGrant records\n  get                   Get a orgChartEdgeGrant by ID\n  create                Create a new orgChartEdgeGrant\n  update                Update an existing orgChartEdgeGrant\n  delete                Delete a orgChartEdgeGrant\n\n  --help, -h            Show this help message\n';
@@ -156,7 +154,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'grantorId',
         message: 'grantorId',
-        required: true,
+        required: false,
+        skipPrompt: true,
       },
       {
         type: 'boolean',
@@ -252,6 +251,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         name: 'grantorId',
         message: 'grantorId',
         required: false,
+        skipPrompt: true,
       },
       {
         type: 'boolean',

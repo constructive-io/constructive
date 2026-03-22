@@ -35,22 +35,6 @@ const fieldSchema: FieldSchema = {
   membershipType: 'int',
   entityTableId: 'uuid',
   actorTableId: 'uuid',
-  stepsTableNameTrgmSimilarity: 'float',
-  achievementsTableNameTrgmSimilarity: 'float',
-  levelsTableNameTrgmSimilarity: 'float',
-  levelRequirementsTableNameTrgmSimilarity: 'float',
-  completedStepTrgmSimilarity: 'float',
-  incompletedStepTrgmSimilarity: 'float',
-  tgAchievementTrgmSimilarity: 'float',
-  tgAchievementToggleTrgmSimilarity: 'float',
-  tgAchievementToggleBooleanTrgmSimilarity: 'float',
-  tgAchievementBooleanTrgmSimilarity: 'float',
-  upsertAchievementTrgmSimilarity: 'float',
-  tgUpdateAchievementsTrgmSimilarity: 'float',
-  stepsRequiredTrgmSimilarity: 'float',
-  levelAchievedTrgmSimilarity: 'float',
-  prefixTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nlevels-module <command>\n\nCommands:\n  list                  List all levelsModule records\n  get                   Get a levelsModule by ID\n  create                Create a new levelsModule\n  update                Update an existing levelsModule\n  delete                Delete a levelsModule\n\n  --help, -h            Show this help message\n';

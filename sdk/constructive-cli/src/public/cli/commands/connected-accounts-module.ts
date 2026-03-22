@@ -19,8 +19,6 @@ const fieldSchema: FieldSchema = {
   tableId: 'uuid',
   ownerTableId: 'uuid',
   tableName: 'string',
-  tableNameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nconnected-accounts-module <command>\n\nCommands:\n  list                  List all connectedAccountsModule records\n  get                   Get a connectedAccountsModule by ID\n  create                Create a new connectedAccountsModule\n  update                Update an existing connectedAccountsModule\n  delete                Delete a connectedAccountsModule\n\n  --help, -h            Show this help message\n';

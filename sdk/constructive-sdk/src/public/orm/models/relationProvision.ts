@@ -218,9 +218,10 @@ export class RelationProvisionModel {
       'RelationProvision',
       'deleteRelationProvision',
       'relationProvision',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteRelationProvisionInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

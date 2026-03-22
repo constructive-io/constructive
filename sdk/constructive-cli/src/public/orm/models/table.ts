@@ -218,9 +218,10 @@ export class TableModel {
       'Table',
       'deleteTable',
       'table',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteTableInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

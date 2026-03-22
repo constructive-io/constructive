@@ -572,9 +572,8 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
   operationName: string,
   mutationField: string,
   entityField: string,
-  id: string | number,
+  keys: Record<string, unknown>,
   inputTypeName: string,
-  idFieldName: string,
   select?: TSelect,
   connectionFieldsMap?: Record<string, Record<string, string>>
 ): { document: string; variables: Record<string, unknown> } {
@@ -595,9 +594,26 @@ export function buildDeleteByPkDocument<TSelect = undefined>(
       ],
     }),
     variables: {
-      input: {
-        [idFieldName]: id,
-      },
+      input: keys,
+    },
+  };
+}
+
+export function buildJunctionRemoveDocument(
+  operationName: string,
+  mutationField: string,
+  keys: Record<string, unknown>,
+  inputTypeName: string
+): { document: string; variables: Record<string, unknown> } {
+  return {
+    document: buildInputMutationDocument({
+      operationName,
+      mutationField,
+      inputTypeName,
+      resultSelections: [t.field({ name: 'clientMutationId' })],
+    }),
+    variables: {
+      input: keys,
     },
   };
 }

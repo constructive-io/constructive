@@ -218,9 +218,10 @@ export class StoreModel {
       'Store',
       'deleteStore',
       'store',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteStoreInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

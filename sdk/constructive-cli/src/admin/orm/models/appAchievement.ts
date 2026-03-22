@@ -218,9 +218,10 @@ export class AppAchievementModel {
       'AppAchievement',
       'deleteAppAchievement',
       'appAchievement',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppAchievementInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

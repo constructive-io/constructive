@@ -220,9 +220,10 @@ export class DenormalizedTableFieldModel {
       'DenormalizedTableField',
       'deleteDenormalizedTableField',
       'denormalizedTableField',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteDenormalizedTableFieldInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

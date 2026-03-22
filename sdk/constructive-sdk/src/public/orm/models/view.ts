@@ -218,9 +218,10 @@ export class ViewModel {
       'View',
       'deleteView',
       'view',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteViewInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

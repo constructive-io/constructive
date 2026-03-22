@@ -28,10 +28,6 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
-  nameTrgmSimilarity: 'float',
-  accessMethodTrgmSimilarity: 'float',
-  moduleTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nindex <command>\n\nCommands:\n  list                  List all index records\n  get                   Get a index by ID\n  create                Create a new index\n  update                Update an existing index\n  delete                Delete a index\n\n  --help, -h            Show this help message\n';

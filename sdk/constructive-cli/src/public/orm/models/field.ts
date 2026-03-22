@@ -218,9 +218,10 @@ export class FieldModel {
       'Field',
       'deleteField',
       'field',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteFieldInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

@@ -218,9 +218,10 @@ export class OrgGrantModel {
       'OrgGrant',
       'deleteOrgGrant',
       'orgGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

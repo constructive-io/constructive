@@ -218,9 +218,10 @@ export class LevelsModuleModel {
       'LevelsModule',
       'deleteLevelsModule',
       'levelsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteLevelsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

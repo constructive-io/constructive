@@ -23,8 +23,6 @@ const fieldSchema: FieldSchema = {
   createdAt: 'string',
   updatedAt: 'string',
   entityId: 'uuid',
-  inviteTokenTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\norg-invite <command>\n\nCommands:\n  list                  List all orgInvite records\n  get                   Get a orgInvite by ID\n  create                Create a new orgInvite\n  update                Update an existing orgInvite\n  delete                Delete a orgInvite\n\n  --help, -h            Show this help message\n';
