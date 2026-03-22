@@ -3691,8 +3691,6 @@ export interface FieldFilter {
   defaultValue?: StringFilter;
   /** Filter by the object’s `defaultValueAst` field. */
   defaultValueAst?: JSONFilter;
-  /** Filter by the object’s `isHidden` field. */
-  isHidden?: BooleanFilter;
   /** Filter by the object’s `type` field. */
   type?: StringFilter;
   /** Filter by the object’s `fieldOrder` field. */
@@ -9728,7 +9726,6 @@ export interface FieldInput {
   apiRequired?: boolean;
   defaultValue?: string;
   defaultValueAst?: unknown;
-  isHidden?: boolean;
   type: string;
   fieldOrder?: number;
   regexp?: string;
@@ -12112,7 +12109,6 @@ export interface FieldPatch {
   apiRequired?: boolean;
   defaultValue?: string;
   defaultValueAst?: unknown;
-  isHidden?: boolean;
   type?: string;
   fieldOrder?: number;
   regexp?: string;

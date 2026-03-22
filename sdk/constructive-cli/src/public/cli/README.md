@@ -574,7 +574,6 @@ CRUD operations for Field records.
 | `apiRequired` | Boolean |
 | `defaultValue` | String |
 | `defaultValueAst` | JSON |
-| `isHidden` | Boolean |
 | `type` | String |
 | `fieldOrder` | Int |
 | `regexp` | String |
@@ -590,7 +589,7 @@ CRUD operations for Field records.
 | `updatedAt` | Datetime |
 
 **Required create fields:** `tableId`, `name`, `type`
-**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `apiRequired`, `defaultValue`, `defaultValueAst`, `isHidden`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`, `module`, `scope`
+**Optional create fields (backend defaults):** `databaseId`, `label`, `description`, `smartTags`, `isRequired`, `apiRequired`, `defaultValue`, `defaultValueAst`, `fieldOrder`, `regexp`, `chk`, `chkExpr`, `min`, `max`, `tags`, `category`, `module`, `scope`
 
 ### `foreign-key-constraint`
 

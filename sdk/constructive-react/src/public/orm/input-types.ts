@@ -377,7 +377,6 @@ export interface Field {
   apiRequired?: boolean | null;
   defaultValue?: string | null;
   defaultValueAst?: Record<string, unknown> | null;
-  isHidden?: boolean | null;
   type?: string | null;
   fieldOrder?: number | null;
   regexp?: string | null;
@@ -3373,7 +3372,6 @@ export type FieldSelect = {
   apiRequired?: boolean;
   defaultValue?: boolean;
   defaultValueAst?: boolean;
-  isHidden?: boolean;
   type?: boolean;
   fieldOrder?: boolean;
   regexp?: boolean;
@@ -6295,8 +6293,6 @@ export interface FieldFilter {
   defaultValue?: StringFilter;
   /** Filter by the object’s `defaultValueAst` field. */
   defaultValueAst?: JSONFilter;
-  /** Filter by the object’s `isHidden` field. */
-  isHidden?: BooleanFilter;
   /** Filter by the object’s `type` field. */
   type?: StringFilter;
   /** Filter by the object’s `fieldOrder` field. */
@@ -11476,7 +11472,6 @@ export interface CreateFieldInput {
     apiRequired?: boolean;
     defaultValue?: string;
     defaultValueAst?: Record<string, unknown>;
-    isHidden?: boolean;
     type: string;
     fieldOrder?: number;
     regexp?: string;
@@ -11501,7 +11496,6 @@ export interface FieldPatch {
   apiRequired?: boolean | null;
   defaultValue?: string | null;
   defaultValueAst?: Record<string, unknown> | null;
-  isHidden?: boolean | null;
   type?: string | null;
   fieldOrder?: number | null;
   regexp?: string | null;
@@ -16891,8 +16885,6 @@ export interface FieldFilter {
   defaultValue?: StringFilter;
   /** Filter by the object’s `defaultValueAst` field. */
   defaultValueAst?: JSONFilter;
-  /** Filter by the object’s `isHidden` field. */
-  isHidden?: BooleanFilter;
   /** Filter by the object’s `type` field. */
   type?: StringFilter;
   /** Filter by the object’s `fieldOrder` field. */
