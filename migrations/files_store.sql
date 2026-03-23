@@ -78,7 +78,7 @@ CREATE TABLE files_store_public.files (
   CONSTRAINT files_key_max_length CHECK (length(key) <= 1024),
   CONSTRAINT files_bucket_key_format CHECK (bucket_key ~ '^[a-z][a-z0-9_-]*$'),
   CONSTRAINT files_source_table_format CHECK (
-    source_table IS NULL OR source_table ~ '^[a-z_]+\.[a-z_]+$'
+    source_table IS NULL OR source_table ~ '^[a-z0-9_-]+\.[a-z0-9_-]+$'
   ),
   CONSTRAINT files_source_complete CHECK (
     (source_table IS NULL AND source_column IS NULL AND source_id IS NULL)
