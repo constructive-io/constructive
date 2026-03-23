@@ -1,0 +1,34 @@
+# encryptedSecretsModule
+
+<!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
+
+React Query hooks for EncryptedSecretsModule data operations
+
+## Usage
+
+```typescript
+useEncryptedSecretsModulesQuery({ selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
+useEncryptedSecretsModuleQuery({ id: '<UUID>', selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } } })
+useCreateEncryptedSecretsModuleMutation({ selection: { fields: { id: true } } })
+useUpdateEncryptedSecretsModuleMutation({ selection: { fields: { id: true } } })
+useDeleteEncryptedSecretsModuleMutation({})
+```
+
+## Examples
+
+### List all encryptedSecretsModules
+
+```typescript
+const { data, isLoading } = useEncryptedSecretsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true } },
+});
+```
+
+### Create a encryptedSecretsModule
+
+```typescript
+const { mutate } = useCreateEncryptedSecretsModuleMutation({
+  selection: { fields: { id: true } },
+});
+mutate({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
+```
