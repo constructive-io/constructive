@@ -397,6 +397,13 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
         .toEqual({ path: relPath, content: gqlFiltered[relPath] });
     }
 
+    // Verify the ORM was called with PostGraphile-style filter syntax
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { databaseId: { equalTo: DATABASE_ID } }
+      })
+    );
+
     // Sanity checks
     expect(sqlPaths.some(p => p.includes(EXTENSION_NAME) && p.endsWith('pgpm.plan'))).toBe(true);
     expect(sqlPaths.some(p => p.includes(META_EXTENSION_NAME) && p.endsWith('pgpm.plan'))).toBe(true);
@@ -460,5 +467,218 @@ describe('export parity — SQL vs GraphQL (integration)', () => {
     expect(fs.existsSync(path.join(pkgsDir, META_EXTENSION_NAME, 'deploy'))).toBe(true);
     // Database module should NOT exist (no sql_actions, no migrateEndpoint)
     expect(fs.existsSync(path.join(pkgsDir, EXTENSION_NAME, 'deploy'))).toBe(false);
+  });
+
+  // =========================================================================
+  // Cursor-based pagination with >100 rows (multi-page + output parity)
+  // =========================================================================
+
+  it('should paginate through >100 sql_actions and produce output identical to single-page', async () => {
+    mockFindMany.mockReset();
+
+    // Generate 105 unique sql_actions — enough to exceed PAGE_SIZE (100)
+    const PAGINATION_DATABASE_ID = 'a1b2c3d4-e5f6-4708-b250-000000000099';
+    const TOTAL_ACTIONS = 105;
+
+    // Seed >100 sql_actions into the real test DB
+    const insertValues: string[] = [];
+    for (let i = 0; i < TOTAL_ACTIONS; i++) {
+      const padded = String(i).padStart(3, '0');
+      const schemaPrefix = i < 50 ? 'pets_public' : 'pets_private';
+      const prevSchemaPrefix = (i - 1) < 50 ? 'pets_public' : 'pets_private';
+      const depClause = i === 0
+        ? `ARRAY[]::text[]`
+        : `ARRAY['schemas/${prevSchemaPrefix}/tables/tbl_${String(i - 1).padStart(3, '0')}/table']::text[]`;
+      insertValues.push(
+        `('Create table tbl_${padded}', '${PAGINATION_DATABASE_ID}', 'schemas/${schemaPrefix}/tables/tbl_${padded}/table', ` +
+        `${depClause}, ` +
+        `'CREATE TABLE ${schemaPrefix}.tbl_${padded} (id uuid PRIMARY KEY);', ` +
+        `'DROP TABLE ${schemaPrefix}.tbl_${padded};', ` +
+        `$$SELECT 1 FROM information_schema.tables WHERE table_schema = ''${schemaPrefix}'' AND table_name = ''tbl_${padded}'';$$)`
+      );
+    }
+
+    // Use a separate pgsql-test connection for the large-dataset pagination test
+    const { teardown: pagTeardown } = await getConnections({}, [
+      seed.fn(async ({ pg: pgClient, config }: any) => {
+        const migrate = new PgpmMigrate(config);
+        await migrate.initialize();
+
+        await pgClient.query(SCHEMA_SHIMS_SQL);
+
+        // Seed the database row + schemas (required by exportMigrations)
+        await pgClient.query(`
+          INSERT INTO metaschema_public.database (id, owner_id, name, hash) VALUES
+            ('${PAGINATION_DATABASE_ID}', '00000000-0000-0000-0000-000000000001', '${DATABASE_NAME}', 'f1e2d3c4-b5a6-5c2e-9a07-000000000099');
+          INSERT INTO metaschema_public.schema (id, database_id, name, schema_name, description) VALUES
+            ('aaaa0001-0000-0000-0000-000000000099', '${PAGINATION_DATABASE_ID}', 'public', 'pets_public', 'Public-facing tables'),
+            ('aaaa0002-0000-0000-0000-000000000099', '${PAGINATION_DATABASE_ID}', 'private', 'pets_private', 'Internal tables');
+        `);
+
+        // Seed >100 sql_actions
+        await pgClient.query(
+          `INSERT INTO db_migrate.sql_actions (name, database_id, deploy, deps, content, revert, verify) VALUES\n` +
+          insertValues.join(',\n')
+        );
+
+        // Fetch the camelCase rows for the mock
+        const sqlActionsResult = await pgClient.query(
+          'SELECT * FROM db_migrate.sql_actions WHERE database_id = $1 ORDER BY id',
+          [PAGINATION_DATABASE_ID]
+        );
+        const pagCamelActions = sqlActionsResult.rows.map(pgRowToCamel);
+        expect(pagCamelActions.length).toBe(TOTAL_ACTIONS);
+
+        const pagSchemas = [
+          { name: 'public', schema_name: 'pets_public' },
+          { name: 'private', schema_name: 'pets_private' }
+        ];
+        const pagSchemaNames = pagSchemas.map(s => s.schema_name);
+
+        // Fetch meta result from real DB
+        const pagMetaResult = await exportMeta({ opts: { pg: config }, dbname: config.database, database_id: PAGINATION_DATABASE_ID });
+
+        // ---- Create two workspaces: SQL baseline and paginated GraphQL ----
+        const pagTempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'pgpm-pagination-'));
+        const createWorkspace = (label: string) => {
+          const wsDir = path.join(pagTempDir, label);
+          const pkgsDir = path.join(wsDir, 'packages');
+          fs.mkdirSync(path.join(wsDir, 'extensions'), { recursive: true });
+          fs.mkdirSync(pkgsDir, { recursive: true });
+          fs.writeFileSync(path.join(wsDir, 'pgpm.json'), JSON.stringify({ packages: ['packages/*', 'extensions/*'] }));
+          fs.writeFileSync(path.join(wsDir, 'package.json'), JSON.stringify({ name: label, version: '1.0.0', private: true }));
+
+          for (const mod of [EXTENSION_NAME, META_EXTENSION_NAME]) {
+            const modDir = path.join(pkgsDir, mod);
+            fs.mkdirSync(modDir, { recursive: true });
+            fs.writeFileSync(path.join(modDir, 'package.json'), JSON.stringify({ name: mod, version: '1.0.0' }));
+            fs.writeFileSync(path.join(modDir, `${mod}.control`), `comment='test'\ndefault_version='1.0.0'\n`);
+            fs.writeFileSync(path.join(modDir, 'pgpm.plan'), `%syntax-version=1.0.0\n%project=${mod}\n%uri=${mod}\n`);
+          }
+          return wsDir;
+        };
+
+        const sqlWs = createWorkspace('sql-baseline');
+        const gqlWs = createWorkspace('gql-paginated');
+
+        // ---- SQL flow (single query, no pagination) ----
+        const sqlProject = new PgpmPackage(sqlWs);
+        await exportMigrations({
+          project: sqlProject,
+          options: { pg: config },
+          dbInfo: {
+            dbname: config.database,
+            databaseName: DATABASE_NAME,
+            database_ids: [PAGINATION_DATABASE_ID]
+          },
+          schema_names: pagSchemaNames,
+          author: 'test <test@test.local>',
+          outdir: path.join(sqlWs, 'packages'),
+          extensionName: EXTENSION_NAME,
+          metaExtensionName: META_EXTENSION_NAME
+        });
+
+        // ---- GraphQL flow (paginated mock returning pages of 100) ----
+        const PAGE_SIZE = 100;
+        const pages: Record<string, unknown>[][] = [];
+        for (let offset = 0; offset < pagCamelActions.length; offset += PAGE_SIZE) {
+          pages.push(pagCamelActions.slice(offset, offset + PAGE_SIZE));
+        }
+        // Should be 2 pages: [100, 5]
+        expect(pages.length).toBe(2);
+        expect(pages[0].length).toBe(PAGE_SIZE);
+        expect(pages[1].length).toBe(TOTAL_ACTIONS - PAGE_SIZE);
+
+        // Wire up mockFindMany to return each page with proper cursor info
+        for (let i = 0; i < pages.length; i++) {
+          const isLast = i === pages.length - 1;
+          mockFindMany.mockReturnValueOnce({
+            unwrap: jest.fn().mockResolvedValue({
+              sqlActions: {
+                nodes: pages[i],
+                totalCount: pagCamelActions.length,
+                pageInfo: {
+                  hasNextPage: !isLast,
+                  hasPreviousPage: i > 0,
+                  endCursor: isLast ? null : `cursor-after-page-${i + 1}`
+                }
+              }
+            })
+          });
+        }
+
+        (exportGraphQLMeta as any).mockImplementation(async () => pagMetaResult);
+
+        const gqlProject = new PgpmPackage(gqlWs);
+        await exportGraphQL({
+          project: gqlProject,
+          metaEndpoint: 'http://localhost:3002/graphql',
+          migrateEndpoint: 'http://db_migrate.localhost:3000/graphql',
+          token: undefined,
+          headers: { 'X-Meta-Schema': 'true' },
+          databaseId: PAGINATION_DATABASE_ID,
+          databaseName: DATABASE_NAME,
+          schema_names: pagSchemaNames,
+          schemas: pagSchemas,
+          author: 'test <test@test.local>',
+          outdir: path.join(gqlWs, 'packages'),
+          extensionName: EXTENSION_NAME,
+          metaExtensionName: META_EXTENSION_NAME
+        });
+
+        // ---- Assertions ----
+
+        // findMany must have been called exactly twice (page 1 + page 2)
+        expect(mockFindMany).toHaveBeenCalledTimes(2);
+
+        // First call: no cursor
+        expect(mockFindMany.mock.calls[0][0]).not.toHaveProperty('after');
+
+        // Second call: cursor from page 1
+        expect(mockFindMany.mock.calls[1][0]).toHaveProperty('after', 'cursor-after-page-1');
+
+        // Both calls use the correct filter
+        for (const call of mockFindMany.mock.calls) {
+          expect(call[0]).toMatchObject({
+            where: { databaseId: { equalTo: PAGINATION_DATABASE_ID } }
+          });
+        }
+
+        // ---- Output parity: paginated GraphQL must match SQL baseline ----
+        const isScaffold = (p: string) =>
+          p.endsWith('package.json') || p.endsWith('.control');
+        const filterScaffold = (files: Record<string, string>) => {
+          const out: Record<string, string> = {};
+          for (const [k, v] of Object.entries(files)) {
+            if (!isScaffold(k)) out[k] = v;
+          }
+          return out;
+        };
+
+        const sqlFiles = filterScaffold(collectFiles(path.join(sqlWs, 'packages')));
+        const gqlFiles = filterScaffold(collectFiles(path.join(gqlWs, 'packages')));
+
+        const sqlPaths = Object.keys(sqlFiles).sort();
+        const gqlPaths = Object.keys(gqlFiles).sort();
+
+        // Same set of files
+        expect(gqlPaths).toEqual(sqlPaths);
+
+        // Identical content for every file
+        for (const relPath of sqlPaths) {
+          expect({ path: relPath, content: gqlFiles[relPath] })
+            .toEqual({ path: relPath, content: sqlFiles[relPath] });
+        }
+
+        // Sanity: at least 105 deploy files were produced (one per sql_action)
+        const deployFiles = sqlPaths.filter(p => p.includes(EXTENSION_NAME) && p.includes('/deploy/'));
+        expect(deployFiles.length).toBe(TOTAL_ACTIONS);
+
+        // Cleanup
+        fs.rmSync(pagTempDir, { recursive: true, force: true });
+      })
+    ]);
+
+    await pagTeardown();
   });
 });
