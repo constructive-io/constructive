@@ -1,16 +1,42 @@
-import { PgpmOptions } from '@pgpmjs/types';
-import { Parser } from 'csv-to-pg';
-import { getPgPool } from 'pg-cache';
-import type { Pool } from 'pg';
+import { mkdirSync, rmSync } from 'fs';
+import { sync as glob } from 'glob';
+import { Inquirerer } from 'inquirerer';
+import { toSnakeCase } from 'komoji';
+import path from 'path';
 
-type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'jsonb[]' | 'int' | 'interval' | 'timestamptz';
+import { PgpmPackage, getMissingInstallableModules, parseAuthor } from '@pgpmjs/core';
 
-interface TableConfig {
-  schema: string;
-  table: string;
-  conflictDoNothing?: boolean;
-  fields: Record<string, FieldType>;
-}
+// =============================================================================
+// Shared constants
+// =============================================================================
+
+/**
+ * Required extensions for database schema exports.
+ * Includes native PostgreSQL extensions and pgpm modules.
+ */
+export const DB_REQUIRED_EXTENSIONS = [
+  'plpgsql',
+  'uuid-ossp',
+  'citext',
+  'pgcrypto',
+  'btree_gin',
+  'btree_gist',
+  'pg_textsearch',
+  'pg_trgm',
+  'postgis',
+  'hstore',
+  'vector',
+  'metaschema-schema',
+  'pgpm-inflection',
+  'pgpm-uuid',
+  'pgpm-utils',
+  'pgpm-database-jobs',
+  'pgpm-jwt-claims',
+  'pgpm-stamps',
+  'pgpm-base32',
+  'pgpm-totp',
+  'pgpm-types'
+] as const;
 
 /**
  * Map PostgreSQL data types to FieldType values.
@@ -53,56 +79,127 @@ const mapPgTypeToFieldType = (udtName: string): FieldType => {
 };
 
 /**
- * Query actual columns from information_schema for a given table.
- * Returns a map of column_name -> udt_name (PostgreSQL type).
+ * Required extensions for service/meta exports.
+ * Includes native PostgreSQL extensions and pgpm modules for metadata management.
  */
-const getTableColumns = async (pool: Pool, schemaName: string, tableName: string): Promise<Map<string, string>> => {
-  const result = await pool.query(`
-    SELECT column_name, udt_name
-    FROM information_schema.columns
-    WHERE table_schema = $1 AND table_name = $2
-    ORDER BY ordinal_position
-  `, [schemaName, tableName]);
-  
-  const columns = new Map<string, string>();
-  for (const row of result.rows) {
-    columns.set(row.column_name, row.udt_name);
-  }
-  return columns;
-};
+export const SERVICE_REQUIRED_EXTENSIONS = [
+  'plpgsql',
+  'metaschema-schema',
+  'metaschema-modules',
+  'services'
+] as const;
 
 /**
- * Build dynamic fields config by intersecting the hardcoded config with actual database columns.
- * - Only includes columns that exist in the database
- * - Preserves special type hints from config (image, upload, url) for columns that exist
- * - Infers types from PostgreSQL for columns not in config
+ * Common SQL header for meta export files.
+ * Sets session_replication_role and grants necessary permissions.
  */
-const buildDynamicFields = async (
-  pool: Pool,
-  tableConfig: TableConfig
-): Promise<Record<string, FieldType>> => {
-  const actualColumns = await getTableColumns(pool, tableConfig.schema, tableConfig.table);
-  
-  if (actualColumns.size === 0) {
-    // Table doesn't exist, return empty fields
-    return {};
-  }
-  
-  const dynamicFields: Record<string, FieldType> = {};
-  
-  // For each column in the hardcoded config, check if it exists in the database
-  for (const [fieldName, fieldType] of Object.entries(tableConfig.fields)) {
-    if (actualColumns.has(fieldName)) {
-      // Column exists - use the config's type hint (preserves special types like 'image', 'upload', 'url')
-      dynamicFields[fieldName] = fieldType;
-    }
-    // If column doesn't exist in database, skip it (this fixes the bug)
-  }
-  
-  return dynamicFields;
-};
+export const META_COMMON_HEADER = `SET session_replication_role TO replica;
+-- using replica in case we are deploying triggers to metaschema_public
 
-const config: Record<string, TableConfig> = {
+-- unaccent, postgis affected and require grants
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to public;
+
+DO $LQLMIGRATION$
+  DECLARE
+  BEGIN
+
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_user');
+    EXECUTE format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), 'app_admin');
+
+  END;
+$LQLMIGRATION$;`;
+
+/**
+ * Common SQL footer for meta export files.
+ */
+export const META_COMMON_FOOTER = `
+SET session_replication_role TO DEFAULT;`;
+
+/**
+ * Ordered list of meta tables for export.
+ * Tables are processed in this order to satisfy foreign key dependencies.
+ */
+export const META_TABLE_ORDER = [
+  'database',
+  'schema',
+  'table',
+  'field',
+  'policy',
+  'index',
+  'trigger',
+  'trigger_function',
+  'rls_function',
+  'foreign_key_constraint',
+  'primary_key_constraint',
+  'unique_constraint',
+  'check_constraint',
+  'full_text_search',
+  'schema_grant',
+  'table_grant',
+  'default_privilege',
+  'domains',
+  'sites',
+  'apis',
+  'apps',
+  'site_modules',
+  'site_themes',
+  'site_metadata',
+  'api_modules',
+  'api_extensions',
+  'api_schemas',
+  'rls_module',
+  'user_auth_module',
+  'memberships_module',
+  'permissions_module',
+  'limits_module',
+  'levels_module',
+  'users_module',
+  'hierarchy_module',
+  'membership_types_module',
+  'invites_module',
+  'emails_module',
+  'sessions_module',
+  'secrets_module',
+  'profiles_module',
+  'encrypted_secrets_module',
+  'connected_accounts_module',
+  'phone_numbers_module',
+  'crypto_addresses_module',
+  'crypto_auth_module',
+  'field_module',
+  'table_module',
+  'secure_table_provision',
+  'uuid_module',
+  'default_ids_module',
+  'denormalized_table_field',
+  'table_template_module'
+] as const;
+
+// =============================================================================
+// Shared types for table config
+// =============================================================================
+
+export type FieldType = 'uuid' | 'uuid[]' | 'text' | 'text[]' | 'boolean' | 'image' | 'upload' | 'url' | 'jsonb' | 'jsonb[]' | 'int' | 'interval' | 'timestamptz';
+
+export interface TableConfig {
+  schema: string;
+  table: string;
+  conflictDoNothing?: boolean;
+  fields: Record<string, FieldType>;
+}
+
+/**
+ * Shared metadata table configuration.
+ * 
+ * This is the **superset** of fields needed by both the SQL export flow
+ * (export-meta.ts) and the GraphQL export flow (export-graphql-meta.ts).
+ * Each flow dynamically filters to only the fields that actually exist:
+ * - SQL flow: uses buildDynamicFields() to intersect with information_schema
+ * - GraphQL flow: filters to fields present in the returned data
+ * 
+ * Adding a field here that doesn't exist in a particular environment is safe.
+ */
+export const META_TABLE_CONFIG: Record<string, TableConfig> = {
   // =============================================================================
   // metaschema_public tables
   // =============================================================================
@@ -114,6 +211,16 @@ const config: Record<string, TableConfig> = {
       owner_id: 'uuid',
       name: 'text',
       hash: 'uuid'
+    }
+  },
+  database_extension: {
+    schema: 'metaschema_public',
+    table: 'database_extension',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      name: 'text',
+      schema_id: 'uuid'
     }
   },
   schema: {
@@ -430,6 +537,16 @@ const config: Record<string, TableConfig> = {
       data: 'jsonb'
     }
   },
+  api_extensions: {
+    schema: 'services_public',
+    table: 'api_extensions',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      api_id: 'uuid',
+      name: 'text'
+    }
+  },
   api_schemas: {
     schema: 'services_public',
     table: 'api_schemas',
@@ -440,7 +557,6 @@ const config: Record<string, TableConfig> = {
       api_id: 'uuid'
     }
   },
-
   // =============================================================================
   // metaschema_modules_public tables
   // =============================================================================
@@ -450,7 +566,6 @@ const config: Record<string, TableConfig> = {
     fields: {
       id: 'uuid',
       database_id: 'uuid',
-      api_id: 'uuid',
       schema_id: 'uuid',
       private_schema_id: 'uuid',
       session_credentials_table_id: 'uuid',
@@ -531,7 +646,7 @@ const config: Record<string, TableConfig> = {
       entity_ids_function: 'text'
     }
   },
-  permissions_module:{
+  permissions_module: {
     schema: 'metaschema_modules_public',
     table: 'permissions_module',
     fields: {
@@ -736,7 +851,6 @@ const config: Record<string, TableConfig> = {
       profile_grants_table_name: 'text',
       profile_definition_grants_table_id: 'uuid',
       profile_definition_grants_table_name: 'text',
-      bitlen: 'int',
       membership_type: 'int',
       entity_table_id: 'uuid',
       actor_table_id: 'uuid',
@@ -844,6 +958,21 @@ const config: Record<string, TableConfig> = {
       fields: 'uuid[]'
     }
   },
+  table_template_module: {
+    schema: 'metaschema_modules_public',
+    table: 'table_template_module',
+    fields: {
+      id: 'uuid',
+      database_id: 'uuid',
+      schema_id: 'uuid',
+      private_schema_id: 'uuid',
+      table_id: 'uuid',
+      owner_table_id: 'uuid',
+      table_name: 'text',
+      node_type: 'text',
+      data: 'jsonb'
+    }
+  },
   secure_table_provision: {
     schema: 'metaschema_modules_public',
     table: 'secure_table_provision',
@@ -865,21 +994,6 @@ const config: Record<string, TableConfig> = {
       policy_permissive: 'boolean',
       policy_data: 'jsonb',
       out_fields: 'uuid[]'
-    }
-  },
-  table_template_module: {
-    schema: 'metaschema_modules_public',
-    table: 'table_template_module',
-    fields: {
-      id: 'uuid',
-      database_id: 'uuid',
-      schema_id: 'uuid',
-      private_schema_id: 'uuid',
-      table_id: 'uuid',
-      owner_table_id: 'uuid',
-      table_name: 'text',
-      node_type: 'text',
-      data: 'jsonb'
     }
   },
   uuid_module: {
@@ -921,141 +1035,235 @@ const config: Record<string, TableConfig> = {
   }
 };
 
-interface ExportMetaParams {
-  opts: PgpmOptions,
-  dbname: string;
-  database_id: string;
+// =============================================================================
+// Shared interfaces
+// =============================================================================
+
+export interface Schema {
+  name: string;
+  schema_name: string;
 }
 
-export type ExportMetaResult = Record<string, string>;
+export interface MakeReplacerOptions {
+  schemas: Schema[];
+  name: string;
+  /**
+   * Optional prefix for schema name replacement.
+   * When provided, schema names are replaced using this prefix instead of `name`.
+   * This is needed for the services/meta package where `name` is the services
+   * extension name (e.g. "agent-db-services") but schemas should use the
+   * application extension prefix (e.g. "agent-db" → "agent_db_auth_public").
+   */
+  schemaPrefix?: string;
+}
 
-export const exportMeta = async ({ opts, dbname, database_id }: ExportMetaParams): Promise<ExportMetaResult> => {
-  const pool = getPgPool({
-    ...opts.pg,
-    database: dbname
-  });
-  const sql: Record<string, string> = {};
-  
-  // Cache for dynamically built parsers
-  const parsers: Record<string, Parser> = {};
-  
-  // Build parser dynamically by querying actual columns from the database
-  const getParser = async (key: string): Promise<Parser | null> => {
-    if (parsers[key]) {
-      return parsers[key];
+export interface ReplacerResult {
+  replacer: (str: string, n?: number) => string;
+  replace: [RegExp, string][];
+}
+
+export interface PreparePackageOptions {
+  project: PgpmPackage;
+  author: string;
+  outdir: string;
+  name: string;
+  description: string;
+  extensions: string[];
+  prompter?: Inquirerer;
+  /** Repository name for module scaffolding. Defaults to module name if not provided. */
+  repoName?: string;
+  /** GitHub username/org for module scaffolding. Required for non-interactive use. */
+  username?: string;
+}
+
+/**
+ * Result of checking for missing modules at workspace level.
+ */
+export interface MissingModulesResult {
+  missingModules: { controlName: string; npmName: string }[];
+  shouldInstall: boolean;
+}
+
+// =============================================================================
+// Shared functions
+// =============================================================================
+
+/**
+ * Checks which pgpm modules from the extensions list are missing from the workspace
+ * and prompts the user if they want to install them.
+ *
+ * This function only does detection and prompting - it does NOT install.
+ * Use installMissingModules() after the module is created to do the actual installation.
+ *
+ * @param project - The PgpmPackage instance (only needs workspace context)
+ * @param extensions - List of extension names (control file names)
+ * @param prompter - Optional prompter for interactive confirmation
+ * @returns Object with missing modules and whether user wants to install them
+ */
+export const detectMissingModules = async (
+  project: PgpmPackage,
+  extensions: string[],
+  prompter?: Inquirerer,
+  argv?: Record<string, any>
+): Promise<MissingModulesResult> => {
+  // Use workspace-level check - doesn't require being inside a module
+  const installed = project.getWorkspaceInstalledModules();
+  const missingModules = getMissingInstallableModules(extensions, installed);
+
+  if (missingModules.length === 0) {
+    return { missingModules: [], shouldInstall: false };
+  }
+
+  const missingNames = missingModules.map(m => m.npmName);
+  console.log(`\nMissing pgpm modules detected: ${missingNames.join(', ')}`);
+
+  if (prompter) {
+    const { install } = await prompter.prompt(argv || {}, [
+      {
+        type: 'confirm',
+        name: 'install',
+        message: `Install missing modules (${missingNames.join(', ')})?`,
+        default: true
+      }
+    ]);
+
+    return { missingModules, shouldInstall: install };
+  }
+
+  return { missingModules, shouldInstall: false };
+};
+
+/**
+ * Installs missing modules into a specific module directory.
+ * Must be called after the module has been created.
+ *
+ * @param moduleDir - The directory of the module to install into
+ * @param missingModules - Array of missing modules to install
+ */
+export const installMissingModules = async (
+  moduleDir: string,
+  missingModules: { controlName: string; npmName: string }[]
+): Promise<void> => {
+  if (missingModules.length === 0) {
+    return;
+  }
+
+  const missingNames = missingModules.map(m => m.npmName);
+  console.log('Installing missing modules...');
+
+  // Create a new PgpmPackage instance pointing to the module directory
+  const moduleProject = new PgpmPackage(moduleDir);
+  await moduleProject.installModules(...missingNames);
+
+  console.log('Modules installed successfully.');
+};
+
+/**
+ * Generates a function for replacing schema names and extension names in strings.
+ */
+export const makeReplacer = ({ schemas, name, schemaPrefix }: MakeReplacerOptions): ReplacerResult => {
+  const replacements: [string, string] = ['constructive-extension-name', name];
+  const prefix = schemaPrefix || name;
+  const schemaReplacers: [string, string][] = schemas.map((schema) => [
+    schema.schema_name,
+    toSnakeCase(`${prefix}_${schema.name}`)
+  ]);
+
+  const replace: [RegExp, string][] = [...schemaReplacers, replacements].map(
+    ([from, to]) => [new RegExp(from, 'g'), to]
+  );
+
+  const replacer = (str: string, n = 0): string => {
+    if (!str) return '';
+    if (replace[n] && replace[n].length === 2) {
+      return replacer(str.replace(replace[n][0], replace[n][1]), n + 1);
     }
-    
-    const tableConfig = config[key];
-    if (!tableConfig) {
-      return null;
-    }
-    
-    // Build fields dynamically based on actual database columns
-    const dynamicFields = await buildDynamicFields(pool, tableConfig);
-    
-    if (Object.keys(dynamicFields).length === 0) {
-      // No columns found (table doesn't exist or no matching columns)
-      return null;
-    }
-    
-    const parser = new Parser({
-      schema: tableConfig.schema,
-      table: tableConfig.table,
-      conflictDoNothing: tableConfig.conflictDoNothing,
-      fields: dynamicFields
-    });
-    
-    parsers[key] = parser;
-    return parser;
+    return str;
   };
 
-  const queryAndParse = async (key: string, query: string) => {
-    try {
-      const parser = await getParser(key);
-      if (!parser) {
-        return;
-      }
-      
-      const result = await pool.query(query, [database_id]);
-      if (result.rows.length) {
-        const parsed = await parser.parse(result.rows);
-        if (parsed) {
-          sql[key] = parsed;
+  return { replacer, replace };
+};
+
+/**
+ * Creates a PGPM package directory or resets the deploy/revert/verify directories if it exists.
+ * If the module already exists and a prompter is provided, prompts the user for confirmation.
+ *
+ * @returns The absolute path to the created/prepared module directory
+ */
+export const preparePackage = async ({
+  project,
+  author,
+  outdir,
+  name,
+  description,
+  extensions,
+  prompter,
+  repoName,
+  username
+}: PreparePackageOptions): Promise<string> => {
+  const curDir = process.cwd();
+  const pgpmDir = path.resolve(path.join(outdir, name));
+  mkdirSync(pgpmDir, { recursive: true });
+  process.chdir(pgpmDir);
+
+  try {
+    const plan = glob(path.join(pgpmDir, 'pgpm.plan'));
+    if (!plan.length) {
+      const { fullName, email } = parseAuthor(author);
+
+      // Always run non-interactively — all answers are pre-filled
+      const effectiveUsername = username || fullName || 'export';
+
+      await project.initModule({
+        name,
+        description,
+        author,
+        extensions,
+        // Use outputDir to create module directly in the specified location
+        outputDir: outdir,
+        noTty: true,
+        prompter,
+        answers: {
+          moduleName: name,
+          moduleDesc: description,
+          access: 'restricted',
+          license: 'CLOSED',
+          fullName,
+          ...(email && { email }),
+          // Use provided values or sensible defaults
+          repoName: repoName || name,
+          username: effectiveUsername
+        }
+      });
+    } else {
+      if (prompter) {
+        const { overwrite } = await prompter.prompt({} as Record<string, any>, [
+          {
+            type: 'confirm',
+            name: 'overwrite',
+            message: `Module "${name}" already exists at ${pgpmDir}. Overwrite deploy/revert/verify directories?`,
+            default: true,
+            useDefault: true
+          }
+        ]);
+        if (!overwrite) {
+          throw new Error(`Export cancelled: Module "${name}" already exists.`);
         }
       }
-    } catch (err: unknown) {
-      const pgError = err as { code?: string };
-      if (pgError.code === '42P01') {
-        return;
-      }
-      throw err;
+      rmSync(path.resolve(pgpmDir, 'deploy'), { recursive: true, force: true });
+      rmSync(path.resolve(pgpmDir, 'revert'), { recursive: true, force: true });
+      rmSync(path.resolve(pgpmDir, 'verify'), { recursive: true, force: true });
     }
-  };
+  } finally {
+    process.chdir(curDir);
+  }
 
-  // =============================================================================
-  // metaschema_public tables
-  // =============================================================================
-  await queryAndParse('database', `SELECT * FROM metaschema_public.database WHERE id = $1`);
-  await queryAndParse('database_extension', `SELECT * FROM metaschema_public.database_extension WHERE database_id = $1`);
-  await queryAndParse('schema', `SELECT * FROM metaschema_public.schema WHERE database_id = $1`);
-  await queryAndParse('table', `SELECT * FROM metaschema_public.table WHERE database_id = $1`);
-  await queryAndParse('field', `SELECT * FROM metaschema_public.field WHERE database_id = $1`);
-  await queryAndParse('policy', `SELECT * FROM metaschema_public.policy WHERE database_id = $1`);
-  await queryAndParse('index', `SELECT * FROM metaschema_public.index WHERE database_id = $1`);
-  await queryAndParse('trigger', `SELECT * FROM metaschema_public.trigger WHERE database_id = $1`);
-  await queryAndParse('trigger_function', `SELECT * FROM metaschema_public.trigger_function WHERE database_id = $1`);
-  await queryAndParse('rls_function', `SELECT * FROM metaschema_public.rls_function WHERE database_id = $1`);
-  await queryAndParse('foreign_key_constraint', `SELECT * FROM metaschema_public.foreign_key_constraint WHERE database_id = $1`);
-  await queryAndParse('primary_key_constraint', `SELECT * FROM metaschema_public.primary_key_constraint WHERE database_id = $1`);
-  await queryAndParse('unique_constraint', `SELECT * FROM metaschema_public.unique_constraint WHERE database_id = $1`);
-  await queryAndParse('check_constraint', `SELECT * FROM metaschema_public.check_constraint WHERE database_id = $1`);
-  await queryAndParse('full_text_search', `SELECT * FROM metaschema_public.full_text_search WHERE database_id = $1`);
-  await queryAndParse('schema_grant', `SELECT * FROM metaschema_public.schema_grant WHERE database_id = $1`);
-  await queryAndParse('table_grant', `SELECT * FROM metaschema_public.table_grant WHERE database_id = $1`);
-  await queryAndParse('default_privilege', `SELECT * FROM metaschema_public.default_privilege WHERE database_id = $1`);
+  return pgpmDir;
+};
 
-  // =============================================================================
-  // services_public tables
-  // =============================================================================
-  await queryAndParse('domains', `SELECT * FROM services_public.domains WHERE database_id = $1`);
-  await queryAndParse('sites', `SELECT * FROM services_public.sites WHERE database_id = $1`);
-  await queryAndParse('apis', `SELECT * FROM services_public.apis WHERE database_id = $1`);
-  await queryAndParse('apps', `SELECT * FROM services_public.apps WHERE database_id = $1`);
-  await queryAndParse('site_modules', `SELECT * FROM services_public.site_modules WHERE database_id = $1`);
-  await queryAndParse('site_themes', `SELECT * FROM services_public.site_themes WHERE database_id = $1`);
-  await queryAndParse('site_metadata', `SELECT * FROM services_public.site_metadata WHERE database_id = $1`);
-  await queryAndParse('api_modules', `SELECT * FROM services_public.api_modules WHERE database_id = $1`);
-  await queryAndParse('api_extensions', `SELECT * FROM services_public.api_extensions WHERE database_id = $1`);
-  await queryAndParse('api_schemas', `SELECT * FROM services_public.api_schemas WHERE database_id = $1`);
-
-  // =============================================================================
-  // metaschema_modules_public tables
-  // =============================================================================
-  await queryAndParse('rls_module', `SELECT * FROM metaschema_modules_public.rls_module WHERE database_id = $1`);
-  await queryAndParse('user_auth_module', `SELECT * FROM metaschema_modules_public.user_auth_module WHERE database_id = $1`);
-  await queryAndParse('memberships_module', `SELECT * FROM metaschema_modules_public.memberships_module WHERE database_id = $1`);
-  await queryAndParse('permissions_module', `SELECT * FROM metaschema_modules_public.permissions_module WHERE database_id = $1`);
-  await queryAndParse('limits_module', `SELECT * FROM metaschema_modules_public.limits_module WHERE database_id = $1`);
-  await queryAndParse('levels_module', `SELECT * FROM metaschema_modules_public.levels_module WHERE database_id = $1`);
-  await queryAndParse('users_module', `SELECT * FROM metaschema_modules_public.users_module WHERE database_id = $1`);
-  await queryAndParse('hierarchy_module', `SELECT * FROM metaschema_modules_public.hierarchy_module WHERE database_id = $1`);
-  await queryAndParse('membership_types_module', `SELECT * FROM metaschema_modules_public.membership_types_module WHERE database_id = $1`);
-  await queryAndParse('invites_module', `SELECT * FROM metaschema_modules_public.invites_module WHERE database_id = $1`);
-  await queryAndParse('emails_module', `SELECT * FROM metaschema_modules_public.emails_module WHERE database_id = $1`);
-  await queryAndParse('sessions_module', `SELECT * FROM metaschema_modules_public.sessions_module WHERE database_id = $1`);
-  await queryAndParse('secrets_module', `SELECT * FROM metaschema_modules_public.secrets_module WHERE database_id = $1`);
-  await queryAndParse('profiles_module', `SELECT * FROM metaschema_modules_public.profiles_module WHERE database_id = $1`);
-  await queryAndParse('encrypted_secrets_module', `SELECT * FROM metaschema_modules_public.encrypted_secrets_module WHERE database_id = $1`);
-  await queryAndParse('connected_accounts_module', `SELECT * FROM metaschema_modules_public.connected_accounts_module WHERE database_id = $1`);
-  await queryAndParse('phone_numbers_module', `SELECT * FROM metaschema_modules_public.phone_numbers_module WHERE database_id = $1`);
-  await queryAndParse('crypto_addresses_module', `SELECT * FROM metaschema_modules_public.crypto_addresses_module WHERE database_id = $1`);
-  await queryAndParse('crypto_auth_module', `SELECT * FROM metaschema_modules_public.crypto_auth_module WHERE database_id = $1`);
-  await queryAndParse('field_module', `SELECT * FROM metaschema_modules_public.field_module WHERE database_id = $1`);
-  await queryAndParse('table_template_module', `SELECT * FROM metaschema_modules_public.table_template_module WHERE database_id = $1`);
-  await queryAndParse('secure_table_provision', `SELECT * FROM metaschema_modules_public.secure_table_provision WHERE database_id = $1`);
-  await queryAndParse('uuid_module', `SELECT * FROM metaschema_modules_public.uuid_module WHERE database_id = $1`);
-  await queryAndParse('default_ids_module', `SELECT * FROM metaschema_modules_public.default_ids_module WHERE database_id = $1`);
-  await queryAndParse('denormalized_table_field', `SELECT * FROM metaschema_modules_public.denormalized_table_field WHERE database_id = $1`);
-
-  return sql;
+/**
+ * Normalizes an output directory path to ensure it ends with a path separator.
+ */
+export const normalizeOutdir = (outdir: string): string => {
+  return outdir.endsWith(path.sep) ? outdir : outdir + path.sep;
 };

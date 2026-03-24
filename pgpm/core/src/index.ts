@@ -1,6 +1,4 @@
 export * from './core/class/pgpm';
-export * from './export/export-meta';
-export * from './export/export-migrations';
 export * from './slice';
 export * from './extensions/extensions';
 export * from './modules/modules';
@@ -20,6 +18,7 @@ export { cleanSql } from './migrate/clean';
 export { PgpmMigrate } from './migrate/client';
 export { PgpmInit } from './init/client';
 export * from './roles';
+export { parseAuthor } from './utils/author';
 export {
   DeployOptions, 
   DeployResult, 
