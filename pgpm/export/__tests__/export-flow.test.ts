@@ -10,20 +10,18 @@
  * 4. Runs the export flow and verifies the output
  * 
  * PREREQUISITES:
- * - The @pgpm/metaschema-schema, @pgpm/metaschema-modules, and @pgpm/db-migrate modules must be available
- *   in the workspace's extensions/ directory or installable via pgpm install
+ * - A running PostgreSQL instance accessible via standard PG* env vars
  */
 
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync, readdirSync, statSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, relative } from 'path';
-import { Pool } from 'pg';
-import { getPgPool, teardownPgPools } from 'pg-cache';
-import { getPgEnvOptions, PgConfig } from 'pg-env';
+import { getConnections, seed } from 'pgsql-test';
+import type { PgTestClient } from 'pgsql-test';
+import type { PgConfig } from 'pg-env';
 
-import { PgpmPackage } from '../../src/core/class/pgpm';
-import { PgpmMigrate } from '../../src/migrate/client';
-import { exportMigrations } from '../../src/export/export-migrations';
+import { PgpmPackage, PgpmMigrate } from '@pgpmjs/core';
+import { exportMigrations } from '../src/export-migrations';
 
 // Increase timeout for this test as it involves workspace setup and deployment
 jest.setTimeout(120000);
@@ -57,16 +55,185 @@ function getDirectoryStructure(dir: string, baseDir?: string): string[] {
   return results.sort();
 }
 
+// ---------------------------------------------------------------------------
+// Schema shim SQL — creates the minimal tables needed by the export flow
+// ---------------------------------------------------------------------------
+
+const SCHEMA_SHIMS_SQL = `
+  CREATE SCHEMA IF NOT EXISTS metaschema_public;
+  CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
+  CREATE SCHEMA IF NOT EXISTS services_public;
+  CREATE SCHEMA IF NOT EXISTS db_migrate;
+
+  -- metaschema_public tables
+  CREATE TABLE IF NOT EXISTS metaschema_public.database (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_id uuid,
+    name text,
+    hash uuid
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_public.schema (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid REFERENCES metaschema_public.database(id),
+    name text,
+    schema_name text,
+    description text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_public.table (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid REFERENCES metaschema_public.database(id),
+    schema_id uuid REFERENCES metaschema_public.schema(id),
+    name text,
+    description text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_public.field (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid REFERENCES metaschema_public.database(id),
+    table_id uuid REFERENCES metaschema_public.table(id),
+    name text,
+    type text,
+    description text
+  );
+
+  -- services_public tables
+  CREATE TABLE IF NOT EXISTS services_public.domains (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    site_id uuid,
+    api_id uuid,
+    domain text,
+    subdomain text
+  );
+
+  CREATE TABLE IF NOT EXISTS services_public.apis (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    name text,
+    dbname text,
+    is_public boolean,
+    role_name text,
+    anon_role text
+  );
+
+  CREATE TABLE IF NOT EXISTS services_public.sites (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    title text,
+    description text,
+    og_image text,
+    favicon text,
+    apple_touch_icon text,
+    logo text,
+    dbname text
+  );
+
+  CREATE TABLE IF NOT EXISTS services_public.api_schemas (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    api_id uuid
+  );
+
+  -- Additional services_public tables required by exportMeta
+  CREATE TABLE IF NOT EXISTS services_public.apps (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    site_id uuid,
+    name text,
+    app_image text,
+    app_store_link text,
+    app_store_id text,
+    app_id_prefix text,
+    play_store_link text
+  );
+
+  CREATE TABLE IF NOT EXISTS services_public.site_modules (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    site_id uuid,
+    name text,
+    data jsonb
+  );
+
+  CREATE TABLE IF NOT EXISTS services_public.site_themes (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    site_id uuid,
+    theme jsonb
+  );
+
+  CREATE TABLE IF NOT EXISTS services_public.api_modules (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    api_id uuid,
+    name text,
+    data jsonb
+  );
+
+  CREATE TABLE IF NOT EXISTS services_public.api_extensions (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    api_id uuid,
+    schema_name text
+  );
+
+  -- metaschema_modules_public tables (module configuration)
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.rls_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    private_schema_id uuid,
+    tokens_table_id uuid,
+    users_table_id uuid,
+    authenticate text,
+    authenticate_strict text,
+    "current_role" text,
+    current_role_id text
+  );
+
+  CREATE TABLE IF NOT EXISTS metaschema_modules_public.user_auth_module (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    schema_id uuid,
+    emails_table_id uuid,
+    users_table_id uuid,
+    secrets_table_id uuid,
+    encrypted_table_id uuid,
+    tokens_table_id uuid,
+    sign_in_function text,
+    sign_up_function text,
+    sign_out_function text,
+    sign_in_one_time_token_function text,
+    one_time_token_function text,
+    extend_token_expires text,
+    send_account_deletion_email_function text,
+    delete_account_function text,
+    set_password_function text,
+    reset_password_function text,
+    forgot_password_function text,
+    send_verification_email_function text,
+    verify_email_function text
+  );
+
+  -- Additional metaschema_public table required by exportMeta
+  CREATE TABLE IF NOT EXISTS metaschema_public.database_extension (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    database_id uuid,
+    name text
+  );
+`;
+
 describe('Export Flow E2E', () => {
   let tempDir: string;
   let workspaceDir: string;
   let testModuleDir: string;
   let exportWorkspaceDir: string;
-  let db: {
-    name: string;
-    config: PgConfig;
-    pool: Pool;
-  };
+  let pg: PgTestClient;
+  let dbConfig: PgConfig;
+  let teardown: () => Promise<void>;
 
   beforeAll(async () => {
     // Create temporary workspace directory
@@ -80,11 +247,23 @@ describe('Export Flow E2E', () => {
     // Create test module with seed migrations
     await setupTestModule();
 
-    // Setup test database
-    db = await setupTestDatabase();
+    // Setup test database via pgsql-test
+    ({ pg, teardown } = await getConnections({}, [
+      seed.fn(async ({ pg, config }) => {
+        dbConfig = config;
 
-    // Deploy the workspace to the test database
-    await deployWorkspace();
+        // Initialize migrate schema
+        const migrate = new PgpmMigrate(config);
+        await migrate.initialize();
+
+        // Create shim schemas + tables
+        await pg.query(SCHEMA_SHIMS_SQL);
+
+        // Deploy the test module
+        const deployer = new PgpmMigrate(config);
+        await deployer.deploy({ modulePath: testModuleDir });
+      })
+    ]));
 
     // Setup export workspace directory
     exportWorkspaceDir = join(tempDir, 'export-workspace');
@@ -106,27 +285,8 @@ describe('Export Flow E2E', () => {
   });
 
   afterAll(async () => {
-    // Cleanup
-    try {
-      await teardownPgPools();
-    } catch (e) {
-      // Ignore cleanup errors
-    }
-
-    try {
-      // Drop test database
-      const adminConfig = getPgEnvOptions({ database: 'postgres' });
-      const adminPool = getPgPool(adminConfig);
-      await adminPool.query(`DROP DATABASE IF EXISTS "${db.name}"`);
-    } catch (e) {
-      // Ignore cleanup errors
-    }
-
-    try {
-      rmSync(tempDir, { recursive: true, force: true });
-    } catch (e) {
-      // Ignore cleanup errors
-    }
+    await teardown();
+    rmSync(tempDir, { recursive: true, force: true });
   });
 
   async function setupWorkspace(): Promise<void> {
@@ -200,216 +360,6 @@ insert_meta_schema [insert_sql_actions] 2017-08-11T08:11:53Z constructive <const
     writeFileSync(join(testModuleDir, 'verify', 'create_sql_actions.sql'), 'SELECT 1 FROM db_migrate.sql_actions LIMIT 0;');
     writeFileSync(join(testModuleDir, 'verify', 'insert_sql_actions.sql'), 'SELECT 1 FROM db_migrate.sql_actions WHERE database_id IS NOT NULL LIMIT 1;');
     writeFileSync(join(testModuleDir, 'verify', 'insert_meta_schema.sql'), 'SELECT 1 FROM metaschema_public.database WHERE name = \'pets\' LIMIT 1;');
-  }
-
-  async function setupTestDatabase(): Promise<{ name: string; config: PgConfig; pool: Pool }> {
-    const dbName = `test_export_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-
-    // Get base config from environment
-    const baseConfig = getPgEnvOptions({ database: 'postgres' });
-
-    // Create database using admin pool
-    const adminPool = getPgPool(baseConfig);
-    await adminPool.query(`CREATE DATABASE "${dbName}"`);
-
-    // Get config for the new test database
-    const pgConfig = getPgEnvOptions({ database: dbName });
-
-    const config: PgConfig = {
-      host: pgConfig.host,
-      port: pgConfig.port,
-      user: pgConfig.user,
-      password: pgConfig.password,
-      database: pgConfig.database
-    };
-
-    // Initialize migrate schema
-    const migrate = new PgpmMigrate(config);
-    await migrate.initialize();
-
-    // Get pool for test database operations
-    const pool = getPgPool(pgConfig);
-
-    // Create the required schemas that would normally come from pgpm modules
-    // For this test, we create minimal shims since we're testing the export flow, not the modules
-    await pool.query(`
-      CREATE SCHEMA IF NOT EXISTS metaschema_public;
-      CREATE SCHEMA IF NOT EXISTS metaschema_modules_public;
-      CREATE SCHEMA IF NOT EXISTS services_public;
-      CREATE SCHEMA IF NOT EXISTS db_migrate;
-
-      -- metaschema_public tables
-      CREATE TABLE IF NOT EXISTS metaschema_public.database (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        owner_id uuid,
-        name text,
-        hash uuid
-      );
-
-      CREATE TABLE IF NOT EXISTS metaschema_public.schema (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid REFERENCES metaschema_public.database(id),
-        name text,
-        schema_name text,
-        description text
-      );
-
-      CREATE TABLE IF NOT EXISTS metaschema_public.table (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid REFERENCES metaschema_public.database(id),
-        schema_id uuid REFERENCES metaschema_public.schema(id),
-        name text,
-        description text
-      );
-
-      CREATE TABLE IF NOT EXISTS metaschema_public.field (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid REFERENCES metaschema_public.database(id),
-        table_id uuid REFERENCES metaschema_public.table(id),
-        name text,
-        type text,
-        description text
-      );
-
-      -- services_public tables
-      CREATE TABLE IF NOT EXISTS services_public.domains (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        site_id uuid,
-        api_id uuid,
-        domain text,
-        subdomain text
-      );
-
-      CREATE TABLE IF NOT EXISTS services_public.apis (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        name text,
-        dbname text,
-        is_public boolean,
-        role_name text,
-        anon_role text
-      );
-
-      CREATE TABLE IF NOT EXISTS services_public.sites (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        title text,
-        description text,
-        og_image text,
-        favicon text,
-        apple_touch_icon text,
-        logo text,
-        dbname text
-      );
-
-      CREATE TABLE IF NOT EXISTS services_public.api_schemas (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        schema_id uuid,
-        api_id uuid
-      );
-
-      -- Additional services_public tables required by exportMeta
-      CREATE TABLE IF NOT EXISTS services_public.apps (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        site_id uuid,
-        name text,
-        app_image text,
-        app_store_link text,
-        app_store_id text,
-        app_id_prefix text,
-        play_store_link text
-      );
-
-      CREATE TABLE IF NOT EXISTS services_public.site_modules (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        site_id uuid,
-        name text,
-        data jsonb
-      );
-
-      CREATE TABLE IF NOT EXISTS services_public.site_themes (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        site_id uuid,
-        theme jsonb
-      );
-
-      CREATE TABLE IF NOT EXISTS services_public.api_modules (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        api_id uuid,
-        name text,
-        data jsonb
-      );
-
-      CREATE TABLE IF NOT EXISTS services_public.api_extensions (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        api_id uuid,
-        schema_name text
-      );
-
-      -- metaschema_modules_public tables (module configuration)
-      CREATE TABLE IF NOT EXISTS metaschema_modules_public.rls_module (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        api_id uuid,
-        schema_id uuid,
-        private_schema_id uuid,
-        tokens_table_id uuid,
-        users_table_id uuid,
-        authenticate text,
-        authenticate_strict text,
-        "current_role" text,
-        current_role_id text
-      );
-
-      CREATE TABLE IF NOT EXISTS metaschema_modules_public.user_auth_module (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        schema_id uuid,
-        emails_table_id uuid,
-        users_table_id uuid,
-        secrets_table_id uuid,
-        encrypted_table_id uuid,
-        tokens_table_id uuid,
-        sign_in_function text,
-        sign_up_function text,
-        sign_out_function text,
-        sign_in_one_time_token_function text,
-        one_time_token_function text,
-        extend_token_expires text,
-        send_account_deletion_email_function text,
-        delete_account_function text,
-        set_password_function text,
-        reset_password_function text,
-        forgot_password_function text,
-        send_verification_email_function text,
-        verify_email_function text
-      );
-
-      -- Additional metaschema_public table required by exportMeta
-      CREATE TABLE IF NOT EXISTS metaschema_public.database_extension (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        database_id uuid,
-        name text
-      );
-    `);
-
-    return { name: dbName, config, pool };
-  }
-
-  async function deployWorkspace(): Promise<void> {
-    const migrate = new PgpmMigrate(db.config);
-
-    // Deploy the test module
-    await migrate.deploy({
-      modulePath: testModuleDir
-    });
   }
 
   // SQL script generators
@@ -537,38 +487,38 @@ INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id) VAL
 
   // Tests
   it('should have seeded the database with sql_actions records', async () => {
-    const result = await db.pool.query('SELECT COUNT(*) as count FROM db_migrate.sql_actions');
+    const result = await pg.query('SELECT COUNT(*) as count FROM db_migrate.sql_actions');
     expect(parseInt(result.rows[0].count)).toBeGreaterThan(0);
   });
 
   it('should have seeded the database with metaschema_public data', async () => {
-    const dbResult = await db.pool.query('SELECT * FROM metaschema_public.database WHERE name = $1', ['pets']);
+    const dbResult = await pg.query('SELECT * FROM metaschema_public.database WHERE name = $1', ['pets']);
     expect(dbResult.rows).toHaveLength(1);
     expect(dbResult.rows[0].name).toBe('pets');
 
-    const schemaResult = await db.pool.query('SELECT COUNT(*) as count FROM metaschema_public.schema');
+    const schemaResult = await pg.query('SELECT COUNT(*) as count FROM metaschema_public.schema');
     expect(parseInt(schemaResult.rows[0].count)).toBeGreaterThan(0);
 
-    const tableResult = await db.pool.query('SELECT COUNT(*) as count FROM metaschema_public.table');
+    const tableResult = await pg.query('SELECT COUNT(*) as count FROM metaschema_public.table');
     expect(parseInt(tableResult.rows[0].count)).toBeGreaterThan(0);
 
-    const fieldResult = await db.pool.query('SELECT COUNT(*) as count FROM metaschema_public.field');
+    const fieldResult = await pg.query('SELECT COUNT(*) as count FROM metaschema_public.field');
     expect(parseInt(fieldResult.rows[0].count)).toBeGreaterThan(0);
   });
 
   it('should have seeded the database with services_public data', async () => {
-    const apiResult = await db.pool.query('SELECT COUNT(*) as count FROM services_public.apis');
+    const apiResult = await pg.query('SELECT COUNT(*) as count FROM services_public.apis');
     expect(parseInt(apiResult.rows[0].count)).toBeGreaterThan(0);
 
-    const siteResult = await db.pool.query('SELECT COUNT(*) as count FROM services_public.sites');
+    const siteResult = await pg.query('SELECT COUNT(*) as count FROM services_public.sites');
     expect(parseInt(siteResult.rows[0].count)).toBeGreaterThan(0);
 
-    const domainResult = await db.pool.query('SELECT COUNT(*) as count FROM services_public.domains');
+    const domainResult = await pg.query('SELECT COUNT(*) as count FROM services_public.domains');
     expect(parseInt(domainResult.rows[0].count)).toBeGreaterThan(0);
   });
 
   it('should have sql_actions records with proper structure', async () => {
-    const result = await db.pool.query(`
+    const result = await pg.query(`
       SELECT deploy, deps, content, revert, verify 
       FROM db_migrate.sql_actions 
       WHERE database_id = 'a1b2c3d4-e5f6-4708-b250-000000000001'
@@ -587,7 +537,7 @@ INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id) VAL
 
   it('should be able to query sql_actions like export-migrations does', async () => {
     // This mimics the query in export-migrations.ts line 217-219
-    const result = await db.pool.query('SELECT * FROM db_migrate.sql_actions ORDER BY id');
+    const result = await pg.query('SELECT * FROM db_migrate.sql_actions ORDER BY id');
 
     expect(result.rows.length).toBeGreaterThan(0);
 
@@ -609,7 +559,7 @@ INSERT INTO services_public.api_schemas (id, database_id, schema_id, api_id) VAL
 
     beforeAll(async () => {
       // Get schema names from the seeded data
-      const schemaResult = await db.pool.query(
+      const schemaResult = await pg.query(
         'SELECT schema_name FROM metaschema_public.schema WHERE database_id = $1',
         [DATABASE_ID]
       );
@@ -665,10 +615,10 @@ relocatable = false
         await exportMigrations({
           project,
           options: {
-            pg: db.config
+            pg: dbConfig
           },
           dbInfo: {
-            dbname: db.name,
+            dbname: dbConfig.database,
             databaseName: 'pets',
             database_ids: [DATABASE_ID]
           },

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.5.10...pgsql-seed@2.6.0) (2026-03-24)
+
+**Note:** Version bump only for package pgsql-seed
+
 ## [2.5.10](https://github.com/constructive-io/constructive/compare/pgsql-seed@2.5.9...pgsql-seed@2.5.10) (2026-03-21)
 
 **Note:** Version bump only for package pgsql-seed

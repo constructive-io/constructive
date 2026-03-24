@@ -1872,6 +1872,9 @@ importers:
       '@pgpmjs/env':
         specifier: workspace:^
         version: link:../env/dist
+      '@pgpmjs/export':
+        specifier: workspace:^
+        version: link:../export/dist
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../logger/dist
@@ -2030,6 +2033,56 @@ importers:
       makage:
         specifier: ^0.1.12
         version: 0.1.12
+    publishDirectory: dist
+
+  pgpm/export:
+    dependencies:
+      '@pgpmjs/core':
+        specifier: workspace:^
+        version: link:../core/dist
+      '@pgpmjs/migrate-client':
+        specifier: workspace:^
+        version: link:../../sdk/migrate-client/dist
+      '@pgpmjs/types':
+        specifier: workspace:^
+        version: link:../types/dist
+      csv-to-pg:
+        specifier: workspace:^
+        version: link:../../packages/csv-to-pg/dist
+      glob:
+        specifier: ^13.0.6
+        version: 13.0.6
+      inflekt:
+        specifier: ^0.3.3
+        version: 0.3.3
+      inquirerer:
+        specifier: ^4.7.0
+        version: 4.7.0
+      komoji:
+        specifier: ^0.8.1
+        version: 0.8.1
+      pg:
+        specifier: ^8.20.0
+        version: 8.20.0
+      pg-cache:
+        specifier: workspace:^
+        version: link:../../postgres/pg-cache/dist
+      pg-env:
+        specifier: workspace:^
+        version: link:../../postgres/pg-env/dist
+    devDependencies:
+      '@pgsql/types':
+        specifier: ^17.6.2
+        version: 17.6.2
+      '@types/pg':
+        specifier: ^8.18.0
+        version: 8.18.0
+      makage:
+        specifier: ^0.1.12
+        version: 0.1.12
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
   pgpm/logger:
