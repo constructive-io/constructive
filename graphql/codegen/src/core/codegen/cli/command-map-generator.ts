@@ -3,7 +3,7 @@ import { toKebabCase } from 'komoji';
 
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader, getTableNames } from '../utils';
-import type { CleanTable, CleanOperation } from '../../../types/schema';
+import type { Table, Operation } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
 
 function createImportDeclaration(
@@ -74,8 +74,8 @@ function buildCommandHandlerType(): t.TSFunctionType {
 }
 
 export function generateCommandMap(
-  tables: CleanTable[],
-  customOperations: CleanOperation[],
+  tables: Table[],
+  customOperations: Operation[],
   toolName: string,
 ): GeneratedFile {
   const statements: t.Statement[] = [];
@@ -423,8 +423,8 @@ export interface MultiTargetCommandMapInput {
   builtinNames: { auth: string; context: string; config: string };
   targets: Array<{
     name: string;
-    tables: CleanTable[];
-    customOperations: CleanOperation[];
+    tables: Table[];
+    customOperations: Operation[];
   }>;
 }
 

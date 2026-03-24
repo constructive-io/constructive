@@ -218,9 +218,10 @@ export class ClaimedInviteModel {
       'ClaimedInvite',
       'deleteClaimedInvite',
       'claimedInvite',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteClaimedInviteInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

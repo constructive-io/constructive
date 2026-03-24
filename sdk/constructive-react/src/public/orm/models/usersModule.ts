@@ -218,9 +218,10 @@ export class UsersModuleModel {
       'UsersModule',
       'deleteUsersModule',
       'usersModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteUsersModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

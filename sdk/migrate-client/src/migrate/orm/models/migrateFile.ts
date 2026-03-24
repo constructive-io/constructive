@@ -218,9 +218,10 @@ export class MigrateFileModel {
       'MigrateFile',
       'deleteMigrateFile',
       'migrateFile',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteMigrateFileInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

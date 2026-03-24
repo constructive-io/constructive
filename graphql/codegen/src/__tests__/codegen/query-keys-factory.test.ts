@@ -11,21 +11,21 @@ import { generateMutationKeysFile } from '../../core/codegen/mutation-keys';
 import { generateQueryKeysFile } from '../../core/codegen/query-keys';
 import type { EntityRelationship, QueryKeyConfig } from '../../types/config';
 import type {
-  CleanFieldType,
-  CleanOperation,
-  CleanRelations,
-  CleanTable,
-  CleanTypeRef,
+  FieldType,
+  Operation,
+  Relations,
+  Table,
+  TypeRef,
 } from '../../types/schema';
 
 const fieldTypes = {
-  uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
-  string: { gqlType: 'String', isArray: false } as CleanFieldType,
-  int: { gqlType: 'Int', isArray: false } as CleanFieldType,
-  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType,
+  uuid: { gqlType: 'UUID', isArray: false } as FieldType,
+  string: { gqlType: 'String', isArray: false } as FieldType,
+  int: { gqlType: 'Int', isArray: false } as FieldType,
+  datetime: { gqlType: 'Datetime', isArray: false } as FieldType,
 };
 
-const emptyRelations: CleanRelations = {
+const emptyRelations: Relations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
@@ -33,8 +33,8 @@ const emptyRelations: CleanRelations = {
 };
 
 function createTable(
-  partial: Partial<CleanTable> & { name: string },
-): CleanTable {
+  partial: Partial<Table> & { name: string },
+): Table {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -46,10 +46,10 @@ function createTable(
 }
 
 function createTypeRef(
-  kind: CleanTypeRef['kind'],
+  kind: TypeRef['kind'],
   name: string | null,
-  ofType?: CleanTypeRef,
-): CleanTypeRef {
+  ofType?: TypeRef,
+): TypeRef {
   return { kind, name, ofType };
 }
 
@@ -179,7 +179,7 @@ const hierarchicalRelationships: Record<string, EntityRelationship> = {
   },
 };
 
-const sampleCustomQueries: CleanOperation[] = [
+const sampleCustomQueries: Operation[] = [
   {
     name: 'currentUser',
     kind: 'query',
@@ -206,7 +206,7 @@ const sampleCustomQueries: CleanOperation[] = [
   },
 ];
 
-const sampleCustomMutations: CleanOperation[] = [
+const sampleCustomMutations: Operation[] = [
   {
     name: 'login',
     kind: 'mutation',

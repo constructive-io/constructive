@@ -1,7 +1,7 @@
 /**
  * Transform GraphQL introspection data to clean operation types
  *
- * This module converts raw introspection responses into the CleanOperation
+ * This module converts raw introspection responses into the Operation
  * format used by code generators.
  */
 import type {
@@ -17,10 +17,10 @@ import {
   unwrapType,
 } from '../types/introspection';
 import type {
-  CleanArgument,
-  CleanObjectField,
-  CleanOperation,
-  CleanTypeRef,
+  Argument,
+  ObjectField,
+  Operation,
+  TypeRef,
   ResolvedType,
   TypeRegistry,
 } from '../types/schema';
@@ -83,6 +83,10 @@ export function buildTypeRegistry(types: IntrospectionType[]): TypeRegistry {
       resolvedType.inputFields = type.inputFields.map((field) =>
         transformInputValueToCleanArgumentShallow(field),
       );
+      // Detect @oneOf directive (GraphQL 16+ discriminated union inputs)
+      if (type.isOneOf) {
+        resolvedType.isOneOf = true;
+      }
     }
   }
 
@@ -90,12 +94,12 @@ export function buildTypeRegistry(types: IntrospectionType[]): TypeRegistry {
 }
 
 /**
- * Transform field to CleanObjectField without resolving nested types
+ * Transform field to ObjectField without resolving nested types
  * (shallow transformation to avoid circular refs)
  */
 function transformFieldToCleanObjectFieldShallow(
   field: IntrospectionField,
-): CleanObjectField {
+): ObjectField {
   return {
     name: field.name,
     type: transformTypeRefShallow(field.type),
@@ -104,11 +108,11 @@ function transformFieldToCleanObjectFieldShallow(
 }
 
 /**
- * Transform input value to CleanArgument without resolving nested types
+ * Transform input value to Argument without resolving nested types
  */
 function transformInputValueToCleanArgumentShallow(
   inputValue: IntrospectionInputValue,
-): CleanArgument {
+): Argument {
   return {
     name: inputValue.name,
     type: transformTypeRefShallow(inputValue.type),
@@ -121,9 +125,9 @@ function transformInputValueToCleanArgumentShallow(
  * Transform TypeRef without resolving nested types
  * Only handles wrappers (LIST, NON_NULL) and stores the type name
  */
-function transformTypeRefShallow(typeRef: IntrospectionTypeRef): CleanTypeRef {
-  const cleanRef: CleanTypeRef = {
-    kind: typeRef.kind as CleanTypeRef['kind'],
+function transformTypeRefShallow(typeRef: IntrospectionTypeRef): TypeRef {
+  const cleanRef: TypeRef = {
+    kind: typeRef.kind as TypeRef['kind'],
     name: typeRef.name,
   };
 
@@ -139,8 +143,8 @@ function transformTypeRefShallow(typeRef: IntrospectionTypeRef): CleanTypeRef {
 // ============================================================================
 
 export interface TransformSchemaResult {
-  queries: CleanOperation[];
-  mutations: CleanOperation[];
+  queries: Operation[];
+  mutations: Operation[];
   typeRegistry: TypeRegistry;
 }
 
@@ -163,14 +167,14 @@ export function transformSchemaToOperations(
     : null;
 
   // Transform queries
-  const queries: CleanOperation[] = queryTypeDef?.fields
+  const queries: Operation[] = queryTypeDef?.fields
     ? queryTypeDef.fields.map((field) =>
         transformFieldToCleanOperation(field, 'query', types),
       )
     : [];
 
   // Transform mutations
-  const mutations: CleanOperation[] = mutationTypeDef?.fields
+  const mutations: Operation[] = mutationTypeDef?.fields
     ? mutationTypeDef.fields.map((field) =>
         transformFieldToCleanOperation(field, 'mutation', types),
       )
@@ -184,13 +188,13 @@ export function transformSchemaToOperations(
 // ============================================================================
 
 /**
- * Transform an introspection field to a CleanOperation
+ * Transform an introspection field to a Operation
  */
 function transformFieldToCleanOperation(
   field: IntrospectionField,
   kind: 'query' | 'mutation',
   types: IntrospectionType[],
-): CleanOperation {
+): Operation {
   return {
     name: field.name,
     kind,
@@ -205,12 +209,12 @@ function transformFieldToCleanOperation(
 }
 
 /**
- * Transform an input value to CleanArgument
+ * Transform an input value to Argument
  */
 function transformInputValueToCleanArgument(
   inputValue: IntrospectionInputValue,
   types: IntrospectionType[],
-): CleanArgument {
+): Argument {
   return {
     name: inputValue.name,
     type: transformTypeRefToCleanTypeRef(inputValue.type, types),
@@ -224,7 +228,7 @@ function transformInputValueToCleanArgument(
 // ============================================================================
 
 /**
- * Transform an introspection TypeRef to CleanTypeRef
+ * Transform an introspection TypeRef to TypeRef
  * Recursively handles wrapper types (LIST, NON_NULL)
  *
  * NOTE: We intentionally do NOT resolve nested fields here to avoid
@@ -234,9 +238,9 @@ function transformInputValueToCleanArgument(
 function transformTypeRefToCleanTypeRef(
   typeRef: IntrospectionTypeRef,
   types: IntrospectionType[],
-): CleanTypeRef {
-  const cleanRef: CleanTypeRef = {
-    kind: typeRef.kind as CleanTypeRef['kind'],
+): TypeRef {
+  const cleanRef: TypeRef = {
+    kind: typeRef.kind as TypeRef['kind'],
     name: typeRef.name,
   };
 
@@ -271,10 +275,10 @@ function transformTypeRefToCleanTypeRef(
  * Uses glob-like patterns (supports * wildcard)
  */
 export function filterOperations(
-  operations: CleanOperation[],
+  operations: Operation[],
   include?: string[],
   exclude?: string[],
-): CleanOperation[] {
+): Operation[] {
   let result = operations;
 
   if (include && include.length > 0) {
@@ -376,7 +380,7 @@ export function getTableOperationNames(
  * 3. 100% schema coverage is guaranteed
  */
 export function isTableOperation(
-  operation: CleanOperation,
+  operation: Operation,
   tableOperationNames: TableOperationNames,
 ): boolean {
   if (operation.kind === 'query') {
@@ -395,9 +399,9 @@ export function isTableOperation(
  * - True custom operations (login, register, bootstrapUser, etc.)
  */
 export function getCustomOperations(
-  operations: CleanOperation[],
+  operations: Operation[],
   tableOperationNames: TableOperationNames,
-): CleanOperation[] {
+): Operation[] {
   return operations.filter((op) => !isTableOperation(op, tableOperationNames));
 }
 

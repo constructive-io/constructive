@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.0...@constructive-io/graphql-codegen@4.22.1) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.21.2...@constructive-io/graphql-codegen@4.22.0) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.21.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.21.1...@constructive-io/graphql-codegen@4.21.2) (2026-03-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.21.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.21.0...@constructive-io/graphql-codegen@4.21.1) (2026-03-21)
+
+### Bug Fixes
+
+- collect custom scalar filter types (ConstructiveInternalTypeEmailFilter etc.) from all filter fields, not just plugin-injected ones ([bedad3b](https://github.com/constructive-io/constructive/commit/bedad3b97392d73f5e566d3af4560a9a68ce6063))
+
+# [4.21.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.20.0...@constructive-io/graphql-codegen@4.21.0) (2026-03-21)
+
+### Bug Fixes
+
+- composite PK detection + filter type-safety from schema source of truth ([0bda790](https://github.com/constructive-io/constructive/commit/0bda790694a009578014eebfdbabd5aac13084d1))
+- remove dead toPascalCase import, drop async on add/remove methods to match CRUD pattern ([e8277db](https://github.com/constructive-io/constructive/commit/e8277dbf347e8d05866d248fa3e0e05b42487d75))
+- use existing utils for junction naming + resolve actual PK types for M:N methods ([b7eaca5](https://github.com/constructive-io/constructive/commit/b7eaca5df5a5e7861f52aaeeacf95a9da02d15f2))
+- use inflekt singularize for M:N method names (handles irregular plurals) ([de47501](https://github.com/constructive-io/constructive/commit/de47501bea6bfbe8c3c15297407f189e52ddac5b))
+
+### Features
+
+- composite PK delete support — junction tables use (post_id, tag_id) PK, ORM delete with composite keys, derive input types from actual mutation names ([01f22e3](https://github.com/constructive-io/constructive/commit/01f22e3b770b1604611211cbaaae156f1770dfba))
+- wire tablesMeta through pipeline, enrich M:N relations, add ORM add/remove junction methods ([23a31e5](https://github.com/constructive-io/constructive/commit/23a31e53590c27d2ea8ff5f3eb29bb18e5626400))
+
+# [4.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.19.1...@constructive-io/graphql-codegen@4.20.0) (2026-03-21)
+
+### Bug Fixes
+
+- generate root barrel file in multi-target codegen ([3e62d31](https://github.com/constructive-io/constructive/commit/3e62d31c757d91b8ac68cef4ddc5bbf4ad9ae43d))
+
+## [4.19.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.19.0...@constructive-io/graphql-codegen@4.19.1) (2026-03-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.18.0...@constructive-io/graphql-codegen@4.19.0) (2026-03-21)
+
+### Features
+
+- add .agents/skills/ directory + fix codegen output path ([e1d7dfd](https://github.com/constructive-io/constructive/commit/e1d7dfd9d6717a2e306c104f329c2224d371fba5))
+
+# [4.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.17.1...@constructive-io/graphql-codegen@4.18.0) (2026-03-20)
+
+### Features
+
+- \_meta plumbing + CleanManyToManyRelation junction key fields ([db5c4e4](https://github.com/constructive-io/constructive/commit/db5c4e4b0c518911845f72d6dd9ab1f5248b2140))
+
+## [4.17.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.17.0...@constructive-io/graphql-codegen@4.17.1) (2026-03-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.16.1...@constructive-io/graphql-codegen@4.17.0) (2026-03-20)
+
+### Features
+
+- [@one](https://github.com/one)Of typed blueprint definitions with SuperCase node type keys ([3d040b1](https://github.com/constructive-io/constructive/commit/3d040b1506a1f831ca7c9c9de7b872a49e42c9f3))
+- **codegen:** replace generic <value> placeholders with type-aware placeholders ([2af7bad](https://github.com/constructive-io/constructive/commit/2af7bade1d89e22b72da789a26cf0e4612165a2f))
+
+## [4.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.16.0...@constructive-io/graphql-codegen@4.16.1) (2026-03-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.4...@constructive-io/graphql-codegen@4.16.0) (2026-03-19)
+
+### Features
+
+- schema-time validation, integration tests, chunk-aware codegen docs (Phases I+J+H) ([49f0e33](https://github.com/constructive-io/constructive/commit/49f0e333bff3f6805f3a0321efd68431246f8272))
+
+## [4.15.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.3...@constructive-io/graphql-codegen@4.15.4) (2026-03-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
 ## [4.15.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.15.2...@constructive-io/graphql-codegen@4.15.3) (2026-03-17)
 
 ### Bug Fixes

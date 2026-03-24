@@ -12,11 +12,11 @@ import {
   generateInputTypesFile,
 } from '../../core/codegen/orm/input-types-generator';
 import type {
-  CleanArgument,
-  CleanFieldType,
-  CleanRelations,
-  CleanTable,
-  CleanTypeRef,
+  Argument,
+  FieldType,
+  Relations,
+  Table,
+  TypeRef,
   ResolvedType,
   TypeRegistry,
 } from '../../types/schema';
@@ -26,24 +26,24 @@ import type {
 // ============================================================================
 
 const fieldTypes = {
-  uuid: { gqlType: 'UUID', isArray: false } as CleanFieldType,
-  string: { gqlType: 'String', isArray: false } as CleanFieldType,
-  int: { gqlType: 'Int', isArray: false } as CleanFieldType,
-  float: { gqlType: 'Float', isArray: false } as CleanFieldType,
-  boolean: { gqlType: 'Boolean', isArray: false } as CleanFieldType,
-  datetime: { gqlType: 'Datetime', isArray: false } as CleanFieldType,
-  date: { gqlType: 'Date', isArray: false } as CleanFieldType,
-  json: { gqlType: 'JSON', isArray: false } as CleanFieldType,
-  bigint: { gqlType: 'BigInt', isArray: false } as CleanFieldType,
-  stringArray: { gqlType: 'String', isArray: true } as CleanFieldType,
-  intArray: { gqlType: 'Int', isArray: true } as CleanFieldType,
+  uuid: { gqlType: 'UUID', isArray: false } as FieldType,
+  string: { gqlType: 'String', isArray: false } as FieldType,
+  int: { gqlType: 'Int', isArray: false } as FieldType,
+  float: { gqlType: 'Float', isArray: false } as FieldType,
+  boolean: { gqlType: 'Boolean', isArray: false } as FieldType,
+  datetime: { gqlType: 'Datetime', isArray: false } as FieldType,
+  date: { gqlType: 'Date', isArray: false } as FieldType,
+  json: { gqlType: 'JSON', isArray: false } as FieldType,
+  bigint: { gqlType: 'BigInt', isArray: false } as FieldType,
+  stringArray: { gqlType: 'String', isArray: true } as FieldType,
+  intArray: { gqlType: 'Int', isArray: true } as FieldType,
 };
 
 // ============================================================================
 // Test Fixtures - Helper Functions
 // ============================================================================
 
-const emptyRelations: CleanRelations = {
+const emptyRelations: Relations = {
   belongsTo: [],
   hasOne: [],
   hasMany: [],
@@ -51,8 +51,8 @@ const emptyRelations: CleanRelations = {
 };
 
 function createTable(
-  partial: Partial<CleanTable> & { name: string },
-): CleanTable {
+  partial: Partial<Table> & { name: string },
+): Table {
   return {
     name: partial.name,
     fields: partial.fields ?? [],
@@ -68,18 +68,18 @@ function createTypeRegistry(types: Record<string, ResolvedType>): TypeRegistry {
 }
 
 function createTypeRef(
-  kind: CleanTypeRef['kind'],
+  kind: TypeRef['kind'],
   name: string | null,
-  ofType?: CleanTypeRef,
-): CleanTypeRef {
+  ofType?: TypeRef,
+): TypeRef {
   return { kind, name, ofType };
 }
 
-function createNonNull(inner: CleanTypeRef): CleanTypeRef {
+function createNonNull(inner: TypeRef): TypeRef {
   return { kind: 'NON_NULL', name: null, ofType: inner };
 }
 
-function createList(inner: CleanTypeRef): CleanTypeRef {
+function createList(inner: TypeRef): TypeRef {
   return { kind: 'LIST', name: null, ofType: inner };
 }
 
@@ -736,7 +736,7 @@ describe('custom input types', () => {
         { name: 'id', type: fieldTypes.uuid },
         {
           name: 'thumbnail',
-          type: { gqlType: 'ImageAsset', isArray: false } as CleanFieldType,
+          type: { gqlType: 'ImageAsset', isArray: false } as FieldType,
         },
       ],
     });
@@ -770,7 +770,7 @@ describe('custom input types', () => {
         { name: 'id', type: fieldTypes.uuid },
         {
           name: 'author',
-          type: { gqlType: 'User', isArray: false } as CleanFieldType,
+          type: { gqlType: 'User', isArray: false } as FieldType,
         },
       ],
     });
@@ -832,7 +832,7 @@ describe('collectInputTypeNames', () => {
             name: 'input',
             type: createNonNull(createTypeRef('INPUT_OBJECT', 'LoginInput')),
           },
-        ] as CleanArgument[],
+        ] as Argument[],
       },
       {
         args: [
@@ -840,7 +840,7 @@ describe('collectInputTypeNames', () => {
             name: 'data',
             type: createTypeRef('INPUT_OBJECT', 'RegisterInput'),
           },
-        ] as CleanArgument[],
+        ] as Argument[],
       },
     ];
 
@@ -855,7 +855,7 @@ describe('collectInputTypeNames', () => {
       {
         args: [
           { name: 'filter', type: createTypeRef('INPUT_OBJECT', 'UserFilter') },
-        ] as CleanArgument[],
+        ] as Argument[],
       },
     ];
 
@@ -908,7 +908,7 @@ describe('plugin-injected condition fields', () => {
       { name: 'email', type: fieldTypes.string },
       {
         name: 'embedding',
-        type: { gqlType: 'Vector', isArray: false } as CleanFieldType,
+        type: { gqlType: 'Vector', isArray: false } as FieldType,
       },
     ],
     query: {

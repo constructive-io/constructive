@@ -218,9 +218,10 @@ export class OrgChartEdgeModel {
       'OrgChartEdge',
       'deleteOrgChartEdge',
       'orgChartEdge',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgChartEdgeInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

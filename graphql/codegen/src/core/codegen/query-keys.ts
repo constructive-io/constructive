@@ -11,7 +11,7 @@
 import * as t from '@babel/types';
 
 import type { EntityRelationship, QueryKeyConfig } from '../../types/config';
-import type { CleanOperation, CleanTable } from '../../types/schema';
+import type { Operation, Table } from '../../types/schema';
 import {
   addJSDocComment,
   asConst,
@@ -28,8 +28,8 @@ import {
 } from './utils';
 
 export interface QueryKeyGeneratorOptions {
-  tables: CleanTable[];
-  customQueries: CleanOperation[];
+  tables: Table[];
+  customQueries: Operation[];
   config: QueryKeyConfig;
 }
 
@@ -482,7 +482,7 @@ function buildSimpleDetailProperty(keysName: string): t.ObjectProperty {
  * Generate query keys declaration for a single table entity
  */
 function generateEntityKeysDeclaration(
-  table: CleanTable,
+  table: Table,
   relationships: Record<string, EntityRelationship>,
   generateScopedKeys: boolean,
 ): t.ExportNamedDeclaration {
@@ -541,7 +541,7 @@ function generateEntityKeysDeclaration(
  * Generate query keys declaration for custom operations
  */
 function generateCustomQueryKeysDeclaration(
-  operations: CleanOperation[],
+  operations: Operation[],
 ): t.ExportNamedDeclaration | null {
   if (operations.length === 0) return null;
 
@@ -593,7 +593,7 @@ function generateCustomQueryKeysDeclaration(
  * Generate the unified query keys store declaration
  */
 function generateUnifiedStoreDeclaration(
-  tables: CleanTable[],
+  tables: Table[],
   hasCustomQueries: boolean,
 ): t.ExportNamedDeclaration {
   const properties: t.ObjectProperty[] = [];

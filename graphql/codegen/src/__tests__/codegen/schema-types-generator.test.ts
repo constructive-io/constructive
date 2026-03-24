@@ -174,6 +174,80 @@ describe('schema-types-generator', () => {
     expect(result.generatedEnums).toEqual(['CustomEnum']);
   });
 
+  it('generates @oneOf input types as discriminated unions', () => {
+    const registry = createTypeRegistry([
+      [
+        'DataIdParams',
+        {
+          kind: 'INPUT_OBJECT',
+          name: 'DataIdParams',
+          inputFields: [
+            {
+              name: '_',
+              type: { kind: 'SCALAR', name: 'Boolean' },
+            },
+          ],
+        },
+      ],
+      [
+        'DataTimestampsParams',
+        {
+          kind: 'INPUT_OBJECT',
+          name: 'DataTimestampsParams',
+          inputFields: [
+            {
+              name: 'createdAtColumn',
+              type: { kind: 'SCALAR', name: 'String' },
+            },
+            {
+              name: 'updatedAtColumn',
+              type: { kind: 'SCALAR', name: 'String' },
+            },
+          ],
+        },
+      ],
+      [
+        'BlueprintNodeInput',
+        {
+          kind: 'INPUT_OBJECT',
+          name: 'BlueprintNodeInput',
+          isOneOf: true,
+          inputFields: [
+            {
+              name: 'shorthand',
+              type: { kind: 'SCALAR', name: 'String' },
+            },
+            {
+              name: 'DataId',
+              type: { kind: 'INPUT_OBJECT', name: 'DataIdParams' },
+            },
+            {
+              name: 'DataTimestamps',
+              type: { kind: 'INPUT_OBJECT', name: 'DataTimestampsParams' },
+            },
+          ],
+        },
+      ],
+    ]);
+
+    const result = generateSchemaTypesFile({
+      typeRegistry: registry,
+      tableTypeNames: new Set(),
+    });
+
+    // @oneOf types should become discriminated union type aliases, not interfaces
+    expect(result.content).toContain('export type BlueprintNodeInput =');
+    expect(result.content).toContain('shorthand: string');
+    expect(result.content).toContain('DataId: DataIdParams');
+    expect(result.content).toContain('DataTimestamps: DataTimestampsParams');
+    // Should NOT be an interface
+    expect(result.content).not.toContain('export interface BlueprintNodeInput');
+    // Nested types should still be generated as interfaces
+    expect(result.content).toContain('export interface DataIdParams');
+    expect(result.content).toContain('export interface DataTimestampsParams');
+    expect(result.content).toMatchSnapshot();
+  });
+
   it('emits unknown aliases for custom scalars', () => {
     const registry = createTypeRegistry([
       ['ImageAsset', { kind: 'SCALAR', name: 'ImageAsset' }],

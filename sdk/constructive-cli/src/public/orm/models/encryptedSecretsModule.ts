@@ -220,9 +220,10 @@ export class EncryptedSecretsModuleModel {
       'EncryptedSecretsModule',
       'deleteEncryptedSecretsModule',
       'encryptedSecretsModule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteEncryptedSecretsModuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

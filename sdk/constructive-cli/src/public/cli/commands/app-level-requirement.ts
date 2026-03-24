@@ -20,8 +20,6 @@ const fieldSchema: FieldSchema = {
   priority: 'int',
   createdAt: 'string',
   updatedAt: 'string',
-  descriptionTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\napp-level-requirement <command>\n\nCommands:\n  list                  List all appLevelRequirement records\n  get                   Get a appLevelRequirement by ID\n  create                Create a new appLevelRequirement\n  update                Update an existing appLevelRequirement\n  delete                Delete a appLevelRequirement\n\n  --help, -h            Show this help message\n';

@@ -14,11 +14,11 @@ import { pgCache } from 'pg-cache';
 import { createEphemeralDb, type EphemeralDbResult } from 'pgsql-client';
 import { deployPgpm } from 'pgsql-seed';
 
-import type { CliConfig, DbConfig, GraphQLSDKConfigTarget, PgpmConfig } from '../types/config';
+import type { CliConfig, DbConfig, GraphQLSDKConfigTarget, PgpmConfig, SchemaConfig } from '../types/config';
 import { getConfigOptions } from '../types/config';
-import type { CleanOperation, CleanTable, TypeRegistry } from '../types/schema';
+import type { Operation, Table, TypeRegistry } from '../types/schema';
 import { generate as generateReactQueryFiles } from './codegen';
-import { generateRootBarrel } from './codegen/barrel';
+import { generateRootBarrel, generateMultiTargetBarrel } from './codegen/barrel';
 import { generateCli as generateCliFiles, generateMultiTargetCli } from './codegen/cli';
 import type { MultiTargetCliTarget } from './codegen/cli';
 import {
@@ -64,9 +64,6 @@ export interface GenerateOptions extends GraphQLSDKConfigTarget {
   verbose?: boolean;
   dryRun?: boolean;
   skipCustomOperations?: boolean;
-  schemaOnly?: boolean;
-  schemaOnlyOutput?: string;
-  schemaOnlyFilename?: string;
 }
 
 export interface GenerateResult {
@@ -77,10 +74,10 @@ export interface GenerateResult {
   filesWritten?: string[];
   errors?: string[];
   pipelineData?: {
-    tables: CleanTable[];
+    tables: Table[];
     customOperations: {
-      queries: CleanOperation[];
-      mutations: CleanOperation[];
+      queries: Operation[];
+      mutations: Operation[];
       typeRegistry?: TypeRegistry;
     };
   };
@@ -116,7 +113,7 @@ function resolveSkillsOutputDir(
       : path.resolve(workspaceRoot, config.skillsPath);
   }
 
-  return path.resolve(workspaceRoot, 'skills');
+  return path.resolve(workspaceRoot, '.agents/skills');
 }
 
 export async function generate(
@@ -140,7 +137,9 @@ export async function generate(
     options.nodeHttpAdapter === true ||
     (runCli && options.nodeHttpAdapter !== false);
 
-  if (!options.schemaOnly && !runReactQuery && !runOrm && !runCli) {
+  const schemaEnabled = !!options.schema?.enabled;
+
+  if (!schemaEnabled && !runReactQuery && !runOrm && !runCli) {
     return {
       success: false,
       message:
@@ -171,7 +170,7 @@ export async function generate(
     headers: config.headers,
   });
 
-  if (options.schemaOnly) {
+  if (schemaEnabled && !runReactQuery && !runOrm && !runCli) {
     try {
       console.log(`Fetching schema from ${source.describe()}...`);
       const { introspection } = await source.fetch();
@@ -186,9 +185,9 @@ export async function generate(
         };
       }
 
-      const outDir = path.resolve(options.schemaOnlyOutput || outputRoot || '.');
+      const outDir = path.resolve(options.schema?.output || outputRoot || '.');
       await fs.promises.mkdir(outDir, { recursive: true });
-      const filename = options.schemaOnlyFilename || 'schema.graphql';
+      const filename = options.schema?.filename || 'schema.graphql';
       const filePath = path.join(outDir, filename);
       await fs.promises.writeFile(filePath, sdl, 'utf-8');
 
@@ -339,7 +338,7 @@ export async function generate(
 
   // Generate docs for each enabled generator
   const docsConfig = resolveDocsConfig(config.docs);
-  const allCustomOps: CleanOperation[] = [
+  const allCustomOps: Operation[] = [
     ...(customOperations.queries ?? []),
     ...(customOperations.mutations ?? []),
   ];
@@ -349,7 +348,7 @@ export async function generate(
 
   if (runOrm) {
     if (docsConfig.readme) {
-      const readme = generateOrmReadme(tables, allCustomOps);
+      const readme = generateOrmReadme(tables, allCustomOps, customOperations.typeRegistry);
       filesToWrite.push({ path: path.posix.join('orm', readme.fileName), content: readme.content });
     }
     if (docsConfig.agents) {
@@ -360,7 +359,7 @@ export async function generate(
       allMcpTools.push(...getOrmMcpTools(tables, allCustomOps));
     }
     if (docsConfig.skills) {
-      for (const skill of generateOrmSkills(tables, allCustomOps, targetName)) {
+      for (const skill of generateOrmSkills(tables, allCustomOps, targetName, customOperations.typeRegistry)) {
         skillsToWrite.push({ path: skill.fileName, content: skill.content });
       }
     }
@@ -368,7 +367,7 @@ export async function generate(
 
   if (runReactQuery) {
     if (docsConfig.readme) {
-      const readme = generateHooksReadme(tables, allCustomOps);
+      const readme = generateHooksReadme(tables, allCustomOps, customOperations.typeRegistry);
       filesToWrite.push({ path: path.posix.join('hooks', readme.fileName), content: readme.content });
     }
     if (docsConfig.agents) {
@@ -379,7 +378,7 @@ export async function generate(
       allMcpTools.push(...getHooksMcpTools(tables, allCustomOps));
     }
     if (docsConfig.skills) {
-      for (const skill of generateHooksSkills(tables, allCustomOps, targetName)) {
+      for (const skill of generateHooksSkills(tables, allCustomOps, targetName, customOperations.typeRegistry)) {
         skillsToWrite.push({ path: skill.fileName, content: skill.content });
       }
     }
@@ -550,7 +549,7 @@ export interface GenerateMultiOptions {
   cliOverrides?: Partial<GraphQLSDKConfigTarget>;
   verbose?: boolean;
   dryRun?: boolean;
-  schemaOnly?: boolean;
+  schema?: SchemaConfig;
   unifiedCli?: CliConfig | boolean;
 }
 
@@ -669,13 +668,14 @@ function applySharedPgpmDb(
 export async function generateMulti(
   options: GenerateMultiOptions,
 ): Promise<GenerateMultiResult> {
-  const { configs, cliOverrides, verbose, dryRun, schemaOnly, unifiedCli } = options;
+  const { configs, cliOverrides, verbose, dryRun, schema, unifiedCli } = options;
   const names = Object.keys(configs);
   const results: Array<{ name: string; result: GenerateResult }> = [];
   let hasError = false;
 
+  const schemaEnabled = !!schema?.enabled;
   const targetInfos: RootRootReadmeTarget[] = [];
-  const useUnifiedCli = !schemaOnly && !!unifiedCli && names.length > 1;
+  const useUnifiedCli = !schemaEnabled && !!unifiedCli && names.length > 1;
 
   const cliTargets: MultiTargetCliTarget[] = [];
 
@@ -693,8 +693,9 @@ export async function generateMulti(
         ...targetConfig,
         verbose,
         dryRun,
-        schemaOnly,
-        schemaOnlyFilename: schemaOnly ? `${name}.graphql` : undefined,
+        schema: schemaEnabled
+          ? { ...schema, filename: schema?.filename ?? `${name}.graphql` }
+          : targetConfig.schema,
       },
       useUnifiedCli ? { skipCli: true, targetName: name } : { targetName: name },
     );
@@ -826,16 +827,35 @@ export async function generateMulti(
     }
   }
 
-  // Generate root-root README if multi-target
+  // Generate root-root README and barrel if multi-target
   if (names.length > 1 && targetInfos.length > 0 && !dryRun) {
-    const rootReadme = generateRootRootReadme(targetInfos);
     const { writeGeneratedFiles: writeFiles } = await import('./output');
+
+    const rootReadme = generateRootRootReadme(targetInfos);
     await writeFiles(
       [{ path: rootReadme.fileName, content: rootReadme.content }],
       '.',
       [],
       { pruneStaleFiles: false },
     );
+
+    // Write a root barrel (index.ts) that re-exports each target as a
+    // namespace so the package has a single entry-point.  Derive the
+    // common output root from the first target's output path.
+    const successfulNames = results
+      .filter((r) => r.result.success)
+      .map((r) => r.name);
+    if (successfulNames.length > 0) {
+      const firstOutput = getConfigOptions(configs[successfulNames[0]]).output;
+      const outputRoot = path.dirname(firstOutput);
+      const barrelContent = generateMultiTargetBarrel(successfulNames);
+      await writeFiles(
+        [{ path: 'index.ts', content: barrelContent }],
+        outputRoot,
+        [],
+        { pruneStaleFiles: false },
+      );
+    }
   }
 
   } finally {

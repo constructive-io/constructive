@@ -220,9 +220,10 @@ export class OrgMembershipDefaultModel {
       'OrgMembershipDefault',
       'deleteOrgMembershipDefault',
       'orgMembershipDefault',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteOrgMembershipDefaultInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

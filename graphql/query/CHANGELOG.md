@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.10.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.10.0...@constructive-io/graphql-query@3.10.1) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
+# [3.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.9.1...@constructive-io/graphql-query@3.10.0) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
+## [3.9.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.9.0...@constructive-io/graphql-query@3.9.1) (2026-03-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
+# [3.9.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.8.1...@constructive-io/graphql-query@3.9.0) (2026-03-21)
+
+### Bug Fixes
+
+- composite PK detection + filter type-safety from schema source of truth ([0bda790](https://github.com/constructive-io/constructive/commit/0bda790694a009578014eebfdbabd5aac13084d1))
+
+### Features
+
+- composite PK delete support — junction tables use (post_id, tag_id) PK, ORM delete with composite keys, derive input types from actual mutation names ([01f22e3](https://github.com/constructive-io/constructive/commit/01f22e3b770b1604611211cbaaae156f1770dfba))
+
+## [3.8.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.8.0...@constructive-io/graphql-query@3.8.1) (2026-03-21)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
+# [3.8.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.7.0...@constructive-io/graphql-query@3.8.0) (2026-03-20)
+
+### Features
+
+- \_meta plumbing + CleanManyToManyRelation junction key fields ([db5c4e4](https://github.com/constructive-io/constructive/commit/db5c4e4b0c518911845f72d6dd9ab1f5248b2140))
+
+# [3.7.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.6.7...@constructive-io/graphql-query@3.7.0) (2026-03-20)
+
+### Features
+
+- [@one](https://github.com/one)Of typed blueprint definitions with SuperCase node type keys ([3d040b1](https://github.com/constructive-io/constructive/commit/3d040b1506a1f831ca7c9c9de7b872a49e42c9f3))
+- wire BlueprintTypesPlugin into production schema build ([7addba2](https://github.com/constructive-io/constructive/commit/7addba2168ff3b75ae54492f5c011aa3ca146d40)), closes [#857](https://github.com/constructive-io/constructive/issues/857)
+
+## [3.6.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.6.6...@constructive-io/graphql-query@3.6.7) (2026-03-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
+## [3.6.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.6.5...@constructive-io/graphql-query@3.6.6) (2026-03-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-query
+
 ## [3.6.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.6.4...@constructive-io/graphql-query@3.6.5) (2026-03-17)
 
 **Note:** Version bump only for package @constructive-io/graphql-query

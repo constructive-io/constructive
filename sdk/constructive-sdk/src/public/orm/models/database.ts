@@ -218,9 +218,10 @@ export class DatabaseModel {
       'Database',
       'deleteDatabase',
       'database',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteDatabaseInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

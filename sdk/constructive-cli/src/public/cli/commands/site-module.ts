@@ -14,8 +14,6 @@ const fieldSchema: FieldSchema = {
   siteId: 'uuid',
   name: 'string',
   data: 'json',
-  nameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nsite-module <command>\n\nCommands:\n  list                  List all siteModule records\n  get                   Get a siteModule by ID\n  create                Create a new siteModule\n  update                Update an existing siteModule\n  delete                Delete a siteModule\n\n  --help, -h            Show this help message\n';

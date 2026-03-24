@@ -20,11 +20,6 @@ const fieldSchema: FieldSchema = {
   authenticateStrict: 'string',
   currentRole: 'string',
   currentRoleId: 'string',
-  authenticateTrgmSimilarity: 'float',
-  authenticateStrictTrgmSimilarity: 'float',
-  currentRoleTrgmSimilarity: 'float',
-  currentRoleIdTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\nrls-module <command>\n\nCommands:\n  list                  List all rlsModule records\n  get                   Get a rlsModule by ID\n  create                Create a new rlsModule\n  update                Update an existing rlsModule\n  delete                Delete a rlsModule\n\n  --help, -h            Show this help message\n';

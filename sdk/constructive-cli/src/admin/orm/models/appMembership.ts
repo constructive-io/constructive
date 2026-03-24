@@ -218,9 +218,10 @@ export class AppMembershipModel {
       'AppMembership',
       'deleteAppMembership',
       'appMembership',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppMembershipInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

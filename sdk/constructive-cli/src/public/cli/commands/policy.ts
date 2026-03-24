@@ -26,12 +26,6 @@ const fieldSchema: FieldSchema = {
   tags: 'string',
   createdAt: 'string',
   updatedAt: 'string',
-  nameTrgmSimilarity: 'float',
-  granteeNameTrgmSimilarity: 'float',
-  privilegeTrgmSimilarity: 'float',
-  policyTypeTrgmSimilarity: 'float',
-  moduleTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\npolicy <command>\n\nCommands:\n  list                  List all policy records\n  get                   Get a policy by ID\n  create                Create a new policy\n  update                Update an existing policy\n  delete                Delete a policy\n\n  --help, -h            Show this help message\n';

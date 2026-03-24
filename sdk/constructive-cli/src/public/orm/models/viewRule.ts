@@ -218,9 +218,10 @@ export class ViewRuleModel {
       'ViewRule',
       'deleteViewRule',
       'viewRule',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteViewRuleInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

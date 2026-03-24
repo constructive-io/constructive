@@ -6,7 +6,7 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import { createGraphileInstance, graphileCache, GraphileCacheEntry } from 'graphile-cache';
 import { makePgService } from 'graphile-settings';
 import type { GraphileConfig } from 'graphile-config';
-import { buildConnectionString, getPgPool } from 'pg-cache';
+import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 
 import { printDatabases, printSchemas } from './render';
@@ -32,19 +32,16 @@ export const GraphQLExplorer = (rawOpts: ConstructiveOptions = {}): Express => {
       ...pg,
       database: dbname,
     });
-    const connectionString = buildConnectionString(
-      pgConfig.user,
-      pgConfig.password,
-      pgConfig.host,
-      pgConfig.port,
-      pgConfig.database
-    );
+
+    // Route through pg-cache so the pool is tracked and can be cleaned up
+    // properly, preventing leaked connections during database teardown.
+    const pool = getPgPool(pgConfig);
 
     const basePreset = getGraphilePreset(opts);
     const preset: GraphileConfig.Preset = {
       ...basePreset,
       pgServices: [
-        makePgService({ connectionString, schemas: [schemaname] }),
+        makePgService({ pool, schemas: [schemaname] }),
       ],
       grafserv: {
         graphqlPath: '/graphql',

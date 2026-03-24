@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.8.1](https://github.com/constructive-io/constructive/compare/pgpm@4.8.0...pgpm@4.8.1) (2026-03-24)
+
+**Note:** Version bump only for package pgpm
+
+# [4.8.0](https://github.com/constructive-io/constructive/compare/pgpm@4.7.9...pgpm@4.8.0) (2026-03-24)
+
+### Bug Fixes
+
+- **test:** resolve migrate-client mock by absolute path for CI compatibility ([5c878ae](https://github.com/constructive-io/constructive/commit/5c878ae269deaf72399e64c9f6c01571e9b102be))
+
+## [4.7.9](https://github.com/constructive-io/constructive/compare/pgpm@4.7.8...pgpm@4.7.9) (2026-03-21)
+
+**Note:** Version bump only for package pgpm
+
+## [4.7.8](https://github.com/constructive-io/constructive/compare/pgpm@4.7.7...pgpm@4.7.8) (2026-03-21)
+
+**Note:** Version bump only for package pgpm
+
+## [4.7.7](https://github.com/constructive-io/constructive/compare/pgpm@4.7.6...pgpm@4.7.7) (2026-03-20)
+
+**Note:** Version bump only for package pgpm
+
 ## [4.7.6](https://github.com/constructive-io/constructive/compare/pgpm@4.7.5...pgpm@4.7.6) (2026-03-17)
 
 **Note:** Version bump only for package pgpm

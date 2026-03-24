@@ -7,7 +7,7 @@ import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
 import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { ConstructivePreset, makePgService } from 'graphile-settings';
-import { buildConnectionString } from 'pg-cache';
+import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
 import './types'; // for Request type
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
@@ -124,18 +124,19 @@ const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
 
 /**
- * Build a PostGraphile v5 preset for a tenant
+ * Build a PostGraphile v5 preset for a tenant.
  */
 const buildPreset = (
-  connectionString: string,
+  pool: import('pg').Pool,
   schemas: string[],
   anonRole: string,
   roleName: string,
-): GraphileConfig.Preset => ({
+): GraphileConfig.Preset => {
+  return {
   extends: [ConstructivePreset],
   pgServices: [
     makePgService({
-      connectionString,
+      pool,
       schemas,
     }),
   ],
@@ -187,7 +188,8 @@ const buildPreset = (
       };
     },
   },
-});
+};
+};
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
@@ -261,16 +263,13 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
         ...opts.pg,
         database: dbname,
       });
-      const connectionString = buildConnectionString(
-        pgConfig.user,
-        pgConfig.password,
-        pgConfig.host,
-        pgConfig.port,
-        pgConfig.database,
-      );
+
+      // Route through pg-cache so the pool is tracked and can be cleaned up
+      // properly, preventing leaked connections during database teardown.
+      const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(connectionString, schema || [], anonRole, roleName);
+      const preset = buildPreset(pool, schema || [], anonRole, roleName);
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,

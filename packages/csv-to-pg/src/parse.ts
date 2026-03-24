@@ -104,9 +104,13 @@ const escapeArrayElement = (value: unknown): string => {
 
 /**
  * Convert an array to PostgreSQL array literal format with proper escaping.
+ * Returns '{}' for empty arrays instead of undefined.
  */
 const psqlArray = (value: unknown): string | undefined => {
-  if (Array.isArray(value) && value.length) {
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return '{}';
+    }
     return `{${value.map(escapeArrayElement).join(',')}}`;
   }
   return undefined;
@@ -213,11 +217,22 @@ export class ValidationError extends Error {
 type CoercionFunc = (record: Record<string, unknown>) => Node;
 
 /**
- * Helper to create a NULL node or throw if field is required
+ * Check if a type is an array type (e.g. 'text[]', 'uuid[]', 'jsonb[]')
+ */
+const isArrayType = (type: string): boolean => type.endsWith('[]');
+
+/**
+ * Helper to create a NULL node or throw if field is required.
+ * For array types, emits an empty array literal '{}' instead of NULL.
  */
 const makeNullOrThrow = (fieldName: string, rawValue: unknown, type: string, required: boolean, reason: string): Node => {
   if (required) {
     throw new ValidationError(fieldName, rawValue, type, reason);
+  }
+  if (isArrayType(type)) {
+    return nodes.aConst({
+      sval: ast.string({ sval: '{}' })
+    });
   }
   return nodes.aConst({ isnull: true });
 };
@@ -457,6 +472,39 @@ const getCoercionFunc = (type: string, from: string[], opts: FieldOptions, field
           sval: ast.string({ sval: String(value) })
         });
         return wrapValue(val, opts);
+      };
+    case 'jsonb[]':
+      return (record: Record<string, unknown>): Node => {
+        const rawValue = record[from[0]];
+        if (isNullToken(rawValue)) {
+          return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+        }
+        if (Array.isArray(rawValue)) {
+          if (rawValue.length === 0) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'array is empty');
+          }
+          const elements = rawValue.map(el => JSON.stringify(el));
+          const arrayLiteral = psqlArray(elements);
+          if (isEmpty(arrayLiteral)) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'failed to format array');
+          }
+          const val = nodes.aConst({
+            sval: ast.string({ sval: String(arrayLiteral) })
+          });
+          return wrapValue(val, opts);
+        }
+        // If it's a string, try to parse as JSON array
+        if (typeof rawValue === 'string') {
+          const parsed = parseJson(cleanseEmptyStrings(rawValue));
+          if (isEmpty(parsed)) {
+            return makeNullOrThrow(fieldName, rawValue, type, required, 'value is empty or null');
+          }
+          const val = nodes.aConst({
+            sval: ast.string({ sval: String(parsed) })
+          });
+          return wrapValue(val, opts);
+        }
+        return makeNullOrThrow(fieldName, rawValue, type, required, 'value is not an array');
       };
     default:
       return (record: Record<string, unknown>): Node => {

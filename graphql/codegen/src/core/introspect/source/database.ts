@@ -3,10 +3,11 @@
  *
  * Loads GraphQL schema directly from a PostgreSQL database using PostGraphile
  * introspection and converts it to introspection format.
+ * Also returns _meta table metadata when available (via MetaSchemaPlugin cache).
  */
 import { buildSchema, introspectionFromSchema } from 'graphql';
 
-import { buildSchemaSDL } from 'graphile-schema';
+import { buildSchemaSDL, _cachedTablesMeta } from 'graphile-schema';
 
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 import {
@@ -14,7 +15,7 @@ import {
   resolveApiSchemas,
   validateServicesSchemas,
 } from './api-schemas';
-import type { SchemaSource, SchemaSourceResult } from './types';
+import type { MetaTableInfo, SchemaSource, SchemaSourceResult } from './types';
 import { SchemaSourceError } from './types';
 
 export interface DatabaseSchemaSourceOptions {
@@ -78,7 +79,7 @@ export class DatabaseSchemaSource implements SchemaSource {
       schemas = this.options.schemas ?? ['public'];
     }
 
-    // Build SDL from database
+    // Build SDL from database (MetaSchemaPlugin populates _cachedTablesMeta as a side-effect)
     let sdl: string;
     try {
       sdl = await buildSchemaSDL({
@@ -130,7 +131,10 @@ export class DatabaseSchemaSource implements SchemaSource {
       JSON.stringify(introspectionResult),
     ) as IntrospectionQueryResponse;
 
-    return { introspection };
+    return {
+      introspection,
+      tablesMeta: [..._cachedTablesMeta] as MetaTableInfo[],
+    };
   }
 
   describe(): string {

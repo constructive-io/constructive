@@ -36,9 +36,11 @@ Generator Options:
   -v, --verbose                 Show detailed output
 
 Schema Export:
-  --schema-only                 Export GraphQL SDL instead of running full codegen.
+  --schema-enabled              Export GraphQL SDL instead of running full codegen.
                                 Works with any source (endpoint, file, database, PGPM).
                                 With multiple apiNames, writes one .graphql per API.
+  --schema-output <dir>         Output directory for the exported schema file
+  --schema-filename <name>      Filename for the exported schema (default: schema.graphql)
 
   -h, --help                    Show this help message
   --version                     Show version number
@@ -77,12 +79,14 @@ export const options: Partial<CLIOptions> = {
       a: 'authorization',
       v: 'verbose',
     },
-    boolean: ['schema-only'],
+    boolean: ['schema-enabled'],
     string: [
       'config',
       'endpoint',
       'schema-file',
       'schema-dir',
+      'schema-output',
+      'schema-filename',
       'output',
       'target',
       'authorization',

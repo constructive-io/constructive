@@ -26,12 +26,12 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
-| `crypto-address` | cryptoAddress CRUD operations |
-| `role-type` | roleType CRUD operations |
+| `email` | email CRUD operations |
 | `phone-number` | phoneNumber CRUD operations |
+| `crypto-address` | cryptoAddress CRUD operations |
 | `connected-account` | connectedAccount CRUD operations |
 | `audit-log` | auditLog CRUD operations |
-| `email` | email CRUD operations |
+| `role-type` | roleType CRUD operations |
 | `user` | user CRUD operations |
 | `current-ip-address` | currentIpAddress |
 | `current-user-agent` | currentUserAgent |
@@ -95,148 +95,6 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
-### `crypto-address`
-
-CRUD operations for CryptoAddress records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all cryptoAddress records |
-| `get` | Get a cryptoAddress by id |
-| `create` | Create a new cryptoAddress |
-| `update` | Update an existing cryptoAddress |
-| `delete` | Delete a cryptoAddress |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `ownerId` | UUID |
-| `address` | String |
-| `isVerified` | Boolean |
-| `isPrimary` | Boolean |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `addressTrgmSimilarity` | Float |
-| `searchScore` | Float |
-
-**Required create fields:** `address`, `addressTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
-
-### `role-type`
-
-CRUD operations for RoleType records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all roleType records |
-| `get` | Get a roleType by id |
-| `create` | Create a new roleType |
-| `update` | Update an existing roleType |
-| `delete` | Delete a roleType |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-
-**Required create fields:** `name`
-
-### `phone-number`
-
-CRUD operations for PhoneNumber records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all phoneNumber records |
-| `get` | Get a phoneNumber by id |
-| `create` | Create a new phoneNumber |
-| `update` | Update an existing phoneNumber |
-| `delete` | Delete a phoneNumber |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `ownerId` | UUID |
-| `cc` | String |
-| `number` | String |
-| `isVerified` | Boolean |
-| `isPrimary` | Boolean |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `ccTrgmSimilarity` | Float |
-| `numberTrgmSimilarity` | Float |
-| `searchScore` | Float |
-
-**Required create fields:** `cc`, `number`, `ccTrgmSimilarity`, `numberTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
-
-### `connected-account`
-
-CRUD operations for ConnectedAccount records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all connectedAccount records |
-| `get` | Get a connectedAccount by id |
-| `create` | Create a new connectedAccount |
-| `update` | Update an existing connectedAccount |
-| `delete` | Delete a connectedAccount |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `ownerId` | UUID |
-| `service` | String |
-| `identifier` | String |
-| `details` | JSON |
-| `isVerified` | Boolean |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `serviceTrgmSimilarity` | Float |
-| `identifierTrgmSimilarity` | Float |
-| `searchScore` | Float |
-
-**Required create fields:** `service`, `identifier`, `details`, `serviceTrgmSimilarity`, `identifierTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`
-
-### `audit-log`
-
-CRUD operations for AuditLog records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all auditLog records |
-| `get` | Get a auditLog by id |
-| `create` | Create a new auditLog |
-| `update` | Update an existing auditLog |
-| `delete` | Delete a auditLog |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `event` | String |
-| `actorId` | UUID |
-| `origin` | Origin |
-| `userAgent` | String |
-| `ipAddress` | InternetAddress |
-| `success` | Boolean |
-| `createdAt` | Datetime |
-| `userAgentTrgmSimilarity` | Float |
-| `searchScore` | Float |
-
-**Required create fields:** `event`, `success`, `userAgentTrgmSimilarity`, `searchScore`
-**Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
-
 ### `email`
 
 CRUD operations for Email records.
@@ -263,6 +121,138 @@ CRUD operations for Email records.
 
 **Required create fields:** `email`
 **Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+
+### `phone-number`
+
+CRUD operations for PhoneNumber records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all phoneNumber records |
+| `get` | Get a phoneNumber by id |
+| `create` | Create a new phoneNumber |
+| `update` | Update an existing phoneNumber |
+| `delete` | Delete a phoneNumber |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `ownerId` | UUID |
+| `cc` | String |
+| `number` | String |
+| `isVerified` | Boolean |
+| `isPrimary` | Boolean |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `cc`, `number`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+
+### `crypto-address`
+
+CRUD operations for CryptoAddress records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all cryptoAddress records |
+| `get` | Get a cryptoAddress by id |
+| `create` | Create a new cryptoAddress |
+| `update` | Update an existing cryptoAddress |
+| `delete` | Delete a cryptoAddress |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `ownerId` | UUID |
+| `address` | String |
+| `isVerified` | Boolean |
+| `isPrimary` | Boolean |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `address`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+
+### `connected-account`
+
+CRUD operations for ConnectedAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all connectedAccount records |
+| `get` | Get a connectedAccount by id |
+| `create` | Create a new connectedAccount |
+| `update` | Update an existing connectedAccount |
+| `delete` | Delete a connectedAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `ownerId` | UUID |
+| `service` | String |
+| `identifier` | String |
+| `details` | JSON |
+| `isVerified` | Boolean |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `service`, `identifier`, `details`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`
+
+### `audit-log`
+
+CRUD operations for AuditLog records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all auditLog records |
+| `get` | Get a auditLog by id |
+| `create` | Create a new auditLog |
+| `update` | Update an existing auditLog |
+| `delete` | Delete a auditLog |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `event` | String |
+| `actorId` | UUID |
+| `origin` | Origin |
+| `userAgent` | String |
+| `ipAddress` | InternetAddress |
+| `success` | Boolean |
+| `createdAt` | Datetime |
+
+**Required create fields:** `event`, `success`
+**Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
+
+### `role-type`
+
+CRUD operations for RoleType records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all roleType records |
+| `get` | Get a roleType by id |
+| `create` | Create a new roleType |
+| `update` | Update an existing roleType |
+| `delete` | Delete a roleType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | Int |
+| `name` | String |
+
+**Required create fields:** `name`
 
 ### `user`
 
@@ -292,8 +282,10 @@ CRUD operations for User records.
 | `displayNameTrgmSimilarity` | Float |
 | `searchScore` | Float |
 
-**Required create fields:** `searchTsv`, `searchTsvRank`, `displayNameTrgmSimilarity`, `searchScore`
 **Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `type`
+> **Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
 
 ## Custom Operations
 

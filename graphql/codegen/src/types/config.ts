@@ -165,12 +165,38 @@ export interface DocsConfig {
   mcp?: boolean;
 
   /**
-   * Generate skills/ directory — per-entity SKILL.md files with YAML frontmatter.
-   * Skills are written to the workspace root skills/ directory (not nested in output).
+   * Generate .agents/skills/ directory — per-entity SKILL.md files with YAML frontmatter.
+   * Skills are written to {workspaceRoot}/.agents/skills/ (not nested in output).
    * Uses composable naming: orm-{target}-{entity}, hooks-{target}-{entity}, cli-{target}-{entity}.
    * @default false
    */
   skills?: boolean;
+}
+
+/**
+ * Schema export configuration
+ * Controls SDL schema export behavior.
+ */
+export interface SchemaConfig {
+  /**
+   * Enable schema SDL export
+   * When true, fetches the schema and writes it as a .graphql SDL file.
+   * If no generators are enabled (orm, reactQuery, cli), only the schema is exported.
+   * @default false
+   */
+  enabled?: boolean;
+
+  /**
+   * Output directory for the exported schema file
+   * @default same as the target's output directory
+   */
+  output?: string;
+
+  /**
+   * Filename for the exported schema file
+   * @default 'schema.graphql'
+   */
+  filename?: string;
 }
 
 /**
@@ -391,9 +417,16 @@ export interface GraphQLSDKConfigTarget {
   docs?: DocsConfig | boolean;
 
   /**
+   * Schema export configuration
+   * When enabled, exports the GraphQL SDL to a file.
+   * If no generators are also enabled, this acts as a schema-only export.
+   */
+  schema?: SchemaConfig;
+
+  /**
    * Custom path for generated skill files.
    * When set, skills are written to this directory.
-   * When undefined (default), skills are written to {workspaceRoot}/skills/
+   * When undefined (default), skills are written to {workspaceRoot}/.agents/skills/
    * where workspaceRoot is auto-detected by walking up from the output directory
    * looking for pnpm-workspace.yaml, lerna.json, or package.json with workspaces.
    */

@@ -6,7 +6,7 @@
  */
 import * as t from '@babel/types';
 
-import type { CleanArgument, CleanOperation } from '../../../types/schema';
+import type { Argument, Operation } from '../../../types/schema';
 import { addJSDocComment, generateCode } from '../babel-ast';
 import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
@@ -26,7 +26,7 @@ export interface GeneratedCustomOpsFile {
  * Collect all input type names used by operations
  * Includes Input, Filter, OrderBy, and Condition types
  */
-function collectInputTypeNamesFromOps(operations: CleanOperation[]): string[] {
+function collectInputTypeNamesFromOps(operations: Operation[]): string[] {
   const inputTypes = new Set<string>();
 
   for (const op of operations) {
@@ -52,7 +52,7 @@ function collectInputTypeNamesFromOps(operations: CleanOperation[]): string[] {
  * Filters out scalar types
  */
 function collectPayloadTypeNamesFromOps(
-  operations: CleanOperation[],
+  operations: Operation[],
 ): string[] {
   const payloadTypes = new Set<string>();
 
@@ -74,7 +74,7 @@ function collectPayloadTypeNamesFromOps(
  * Collect Connection and other non-scalar return type names that need importing
  * (for typing QueryBuilder results on scalar/Connection operations)
  */
-function collectRawReturnTypeNames(operations: CleanOperation[]): string[] {
+function collectRawReturnTypeNames(operations: Operation[]): string[] {
   const types = new Set<string>();
 
   for (const op of operations) {
@@ -108,7 +108,7 @@ function createImportDeclaration(
 }
 
 function createVariablesInterface(
-  op: CleanOperation,
+  op: Operation,
   comments: boolean = true,
 ): t.ExportNamedDeclaration | null {
   if (op.args.length === 0) return null;
@@ -165,7 +165,7 @@ function parseTypeAnnotation(typeStr: string): t.TSType {
 }
 
 function buildSelectedResultTsType(
-  typeRef: CleanArgument['type'],
+  typeRef: Argument['type'],
   payloadTypeName: string,
 ): t.TSType {
   const nonNullable = buildSelectedResultTsTypeNonNullable(
@@ -181,12 +181,12 @@ function buildSelectedResultTsType(
 }
 
 function buildSelectedResultTsTypeNonNullable(
-  typeRef: CleanArgument['type'],
+  typeRef: Argument['type'],
   payloadTypeName: string,
 ): t.TSType {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
     return buildSelectedResultTsTypeNonNullable(
-      typeRef.ofType as CleanArgument['type'],
+      typeRef.ofType as Argument['type'],
       payloadTypeName,
     );
   }
@@ -194,7 +194,7 @@ function buildSelectedResultTsTypeNonNullable(
   if (typeRef.kind === 'LIST' && typeRef.ofType) {
     return t.tsArrayType(
       buildSelectedResultTsType(
-        typeRef.ofType as CleanArgument['type'],
+        typeRef.ofType as Argument['type'],
         payloadTypeName,
       ),
     );
@@ -216,7 +216,7 @@ function scalarTsTypeToAst(typeName: string): t.TSType {
   return t.tsUnknownKeyword();
 }
 
-function buildRawResultTsType(typeRef: CleanArgument['type']): t.TSType {
+function buildRawResultTsType(typeRef: Argument['type']): t.TSType {
   const nonNullable = buildRawResultTsTypeNonNullable(typeRef);
 
   if (typeRef.kind === 'NON_NULL') {
@@ -227,14 +227,14 @@ function buildRawResultTsType(typeRef: CleanArgument['type']): t.TSType {
 }
 
 function buildRawResultTsTypeNonNullable(
-  typeRef: CleanArgument['type'],
+  typeRef: Argument['type'],
 ): t.TSType {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
-    return buildRawResultTsTypeNonNullable(typeRef.ofType as CleanArgument['type']);
+    return buildRawResultTsTypeNonNullable(typeRef.ofType as Argument['type']);
   }
 
   if (typeRef.kind === 'LIST' && typeRef.ofType) {
-    return t.tsArrayType(buildRawResultTsType(typeRef.ofType as CleanArgument['type']));
+    return t.tsArrayType(buildRawResultTsType(typeRef.ofType as Argument['type']));
   }
 
   if (typeRef.kind === 'SCALAR') {
@@ -245,7 +245,7 @@ function buildRawResultTsTypeNonNullable(
 }
 
 function buildOperationMethod(
-  op: CleanOperation,
+  op: Operation,
   operationType: 'query' | 'mutation',
 ): t.ObjectProperty {
   const hasArgs = op.args.length > 0;
@@ -409,7 +409,7 @@ function buildOperationMethod(
  * Generate the query/index.ts file for custom query operations
  */
 export function generateCustomQueryOpsFile(
-  operations: CleanOperation[],
+  operations: Operation[],
   comments: boolean = true,
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
@@ -492,7 +492,7 @@ export function generateCustomQueryOpsFile(
  * Generate the mutation/index.ts file for custom mutation operations
  */
 export function generateCustomMutationOpsFile(
-  operations: CleanOperation[],
+  operations: Operation[],
   comments: boolean = true,
 ): GeneratedCustomOpsFile {
   const statements: t.Statement[] = [];
@@ -572,20 +572,20 @@ export function generateCustomMutationOpsFile(
 }
 
 /**
- * Format a CleanTypeRef to GraphQL type string
+ * Format a TypeRef to GraphQL type string
  */
-function formatGraphQLType(typeRef: CleanArgument['type']): string {
+function formatGraphQLType(typeRef: Argument['type']): string {
   let result = '';
 
   if (typeRef.kind === 'NON_NULL') {
     if (typeRef.ofType) {
-      result = formatGraphQLType(typeRef.ofType as CleanArgument['type']) + '!';
+      result = formatGraphQLType(typeRef.ofType as Argument['type']) + '!';
     } else {
       result = (typeRef.name ?? 'String') + '!';
     }
   } else if (typeRef.kind === 'LIST') {
     if (typeRef.ofType) {
-      result = `[${formatGraphQLType(typeRef.ofType as CleanArgument['type'])}]`;
+      result = `[${formatGraphQLType(typeRef.ofType as Argument['type'])}]`;
     } else {
       result = '[String]';
     }

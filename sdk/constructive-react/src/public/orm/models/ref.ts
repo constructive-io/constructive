@@ -218,9 +218,10 @@ export class RefModel {
       'Ref',
       'deleteRef',
       'ref',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteRefInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

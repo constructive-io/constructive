@@ -218,9 +218,10 @@ export class ViewTableModel {
       'ViewTable',
       'deleteViewTable',
       'viewTable',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteViewTableInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

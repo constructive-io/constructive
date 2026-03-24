@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.10.6](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.10.5...csv-to-pg@3.10.6) (2026-03-24)
+
+### Bug Fixes
+
+- **csv-to-pg:** emit empty array '{}' instead of NULL for array types ([2155d29](https://github.com/constructive-io/constructive/commit/2155d2916e09b6488a8c8e92c442f07c4bad03b2))
+
+## [3.10.5](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.10.4...csv-to-pg@3.10.5) (2026-03-20)
+
+### Bug Fixes
+
+- add jsonb[] coercion handler in csv-to-pg parser to prevent corrupted SQL output ([aec7dac](https://github.com/constructive-io/constructive/commit/aec7dac954747e254ff06a55f2eeb5763b22fcf4))
+
 ## [3.10.4](https://github.com/constructive-io/constructive/compare/csv-to-pg@3.10.3...csv-to-pg@3.10.4) (2026-03-15)
 
 **Note:** Version bump only for package csv-to-pg

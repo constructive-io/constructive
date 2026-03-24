@@ -10,6 +10,10 @@ export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
+export interface GetAllRecord {
+  path: string[] | null;
+  data: unknown | null;
+}
 export interface OrgGetManagersRecord {
   userId: string | null;
   depth: number | null;
@@ -17,10 +21,6 @@ export interface OrgGetManagersRecord {
 export interface OrgGetSubordinatesRecord {
   userId: string | null;
   depth: number | null;
-}
-export interface GetAllRecord {
-  path: string[] | null;
-  data: unknown | null;
 }
 export interface Object {
   hashUuid: string | null;
@@ -38,8 +38,6 @@ export interface AppPermission {
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgPermission {
   id: string | null;
@@ -47,8 +45,6 @@ export interface OrgPermission {
   bitnum: number | null;
   bitstr: string | null;
   description: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppLevelRequirement {
   id: string | null;
@@ -59,8 +55,6 @@ export interface AppLevelRequirement {
   priority: number | null;
   createdAt: string | null;
   updatedAt: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Database {
   id: string | null;
@@ -71,10 +65,6 @@ export interface Database {
   hash: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  schemaHashTrgmSimilarity: number | null;
-  nameTrgmSimilarity: number | null;
-  labelTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Schema {
   id: string | null;
@@ -91,12 +81,6 @@ export interface Schema {
   isPublic: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  schemaNameTrgmSimilarity: number | null;
-  labelTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Table {
   id: string | null;
@@ -118,13 +102,6 @@ export interface Table {
   inheritsId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  labelTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  pluralNameTrgmSimilarity: number | null;
-  singularNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface CheckConstraint {
   id: string | null;
@@ -141,10 +118,6 @@ export interface CheckConstraint {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  typeTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Field {
   id: string | null;
@@ -155,9 +128,9 @@ export interface Field {
   description: string | null;
   smartTags: unknown | null;
   isRequired: boolean | null;
+  apiRequired: boolean | null;
   defaultValue: string | null;
   defaultValueAst: unknown | null;
-  isHidden: boolean | null;
   type: string | null;
   fieldOrder: number | null;
   regexp: string | null;
@@ -171,13 +144,6 @@ export interface Field {
   scope: number | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  labelTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  defaultValueTrgmSimilarity: number | null;
-  regexpTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface ForeignKeyConstraint {
   id: string | null;
@@ -198,13 +164,6 @@ export interface ForeignKeyConstraint {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  typeTrgmSimilarity: number | null;
-  deleteActionTrgmSimilarity: number | null;
-  updateActionTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface FullTextSearch {
   id: string | null;
@@ -237,10 +196,6 @@ export interface Index {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  accessMethodTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Policy {
   id: string | null;
@@ -260,12 +215,6 @@ export interface Policy {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  granteeNameTrgmSimilarity: number | null;
-  privilegeTrgmSimilarity: number | null;
-  policyTypeTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface PrimaryKeyConstraint {
   id: string | null;
@@ -281,10 +230,6 @@ export interface PrimaryKeyConstraint {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  typeTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface TableGrant {
   id: string | null;
@@ -296,9 +241,6 @@ export interface TableGrant {
   isGrant: boolean | null;
   createdAt: string | null;
   updatedAt: string | null;
-  privilegeTrgmSimilarity: number | null;
-  granteeNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Trigger {
   id: string | null;
@@ -314,11 +256,6 @@ export interface Trigger {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  eventTrgmSimilarity: number | null;
-  functionNameTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface UniqueConstraint {
   id: string | null;
@@ -335,11 +272,6 @@ export interface UniqueConstraint {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  typeTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface View {
   id: string | null;
@@ -358,11 +290,6 @@ export interface View {
   module: string | null;
   scope: number | null;
   tags: string[] | null;
-  nameTrgmSimilarity: number | null;
-  viewTypeTrgmSimilarity: number | null;
-  filterTypeTrgmSimilarity: number | null;
-  moduleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface ViewTable {
   id: string | null;
@@ -378,9 +305,6 @@ export interface ViewGrant {
   privilege: string | null;
   withGrantOption: boolean | null;
   isGrant: boolean | null;
-  granteeNameTrgmSimilarity: number | null;
-  privilegeTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface ViewRule {
   id: string | null;
@@ -389,10 +313,26 @@ export interface ViewRule {
   name: string | null;
   event: string | null;
   action: string | null;
-  nameTrgmSimilarity: number | null;
-  eventTrgmSimilarity: number | null;
-  actionTrgmSimilarity: number | null;
-  searchScore: number | null;
+}
+export interface EmbeddingChunk {
+  id: string | null;
+  databaseId: string | null;
+  tableId: string | null;
+  embeddingFieldId: string | null;
+  chunksTableId: string | null;
+  chunksTableName: string | null;
+  contentFieldName: string | null;
+  dimensions: number | null;
+  metric: string | null;
+  chunkSize: number | null;
+  chunkOverlap: number | null;
+  chunkStrategy: string | null;
+  metadataFields: unknown | null;
+  enqueueChunkingJob: boolean | null;
+  chunkingTaskName: string | null;
+  parentFkFieldId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface TableTemplateModule {
   id: string | null;
@@ -404,9 +344,6 @@ export interface TableTemplateModule {
   tableName: string | null;
   nodeType: string | null;
   data: unknown | null;
-  tableNameTrgmSimilarity: number | null;
-  nodeTypeTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface SecureTableProvision {
   id: string | null;
@@ -417,9 +354,9 @@ export interface SecureTableProvision {
   nodeType: string | null;
   useRls: boolean | null;
   nodeData: unknown | null;
-  fields: unknown | null;
+  fields: unknown[] | null;
   grantRoles: string[] | null;
-  grantPrivileges: unknown | null;
+  grantPrivileges: unknown[] | null;
   policyType: string | null;
   policyPrivileges: string[] | null;
   policyRole: string | null;
@@ -427,12 +364,6 @@ export interface SecureTableProvision {
   policyName: string | null;
   policyData: unknown | null;
   outFields: string[] | null;
-  tableNameTrgmSimilarity: number | null;
-  nodeTypeTrgmSimilarity: number | null;
-  policyTypeTrgmSimilarity: number | null;
-  policyRoleTrgmSimilarity: number | null;
-  policyNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface RelationProvision {
   id: string | null;
@@ -443,16 +374,19 @@ export interface RelationProvision {
   fieldName: string | null;
   deleteAction: string | null;
   isRequired: boolean | null;
+  apiRequired: boolean | null;
   junctionTableId: string | null;
   junctionTableName: string | null;
   junctionSchemaId: string | null;
   sourceFieldName: string | null;
   targetFieldName: string | null;
   useCompositeKey: boolean | null;
+  createIndex: boolean | null;
+  exposeInApi: boolean | null;
   nodeType: string | null;
   nodeData: unknown | null;
   grantRoles: string[] | null;
-  grantPrivileges: unknown | null;
+  grantPrivileges: unknown[] | null;
   policyType: string | null;
   policyPrivileges: string[] | null;
   policyRole: string | null;
@@ -463,17 +397,6 @@ export interface RelationProvision {
   outJunctionTableId: string | null;
   outSourceFieldId: string | null;
   outTargetFieldId: string | null;
-  relationTypeTrgmSimilarity: number | null;
-  fieldNameTrgmSimilarity: number | null;
-  deleteActionTrgmSimilarity: number | null;
-  junctionTableNameTrgmSimilarity: number | null;
-  sourceFieldNameTrgmSimilarity: number | null;
-  targetFieldNameTrgmSimilarity: number | null;
-  nodeTypeTrgmSimilarity: number | null;
-  policyTypeTrgmSimilarity: number | null;
-  policyRoleTrgmSimilarity: number | null;
-  policyNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface SchemaGrant {
   id: string | null;
@@ -482,8 +405,6 @@ export interface SchemaGrant {
   granteeName: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  granteeNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface DefaultPrivilege {
   id: string | null;
@@ -493,10 +414,20 @@ export interface DefaultPrivilege {
   privilege: string | null;
   granteeName: string | null;
   isGrant: boolean | null;
-  objectTypeTrgmSimilarity: number | null;
-  privilegeTrgmSimilarity: number | null;
-  granteeNameTrgmSimilarity: number | null;
-  searchScore: number | null;
+}
+export interface Enum {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  name: string | null;
+  label: string | null;
+  description: string | null;
+  values: string[] | null;
+  smartTags: unknown | null;
+  category: ObjectCategory | null;
+  module: string | null;
+  scope: number | null;
+  tags: string[] | null;
 }
 export interface ApiSchema {
   id: string | null;
@@ -510,8 +441,6 @@ export interface ApiModule {
   apiId: string | null;
   name: string | null;
   data: unknown | null;
-  nameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Domain {
   id: string | null;
@@ -528,9 +457,6 @@ export interface SiteMetadatum {
   title: string | null;
   description: string | null;
   ogImage: ConstructiveInternalTypeImage | null;
-  titleTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface SiteModule {
   id: string | null;
@@ -538,8 +464,6 @@ export interface SiteModule {
   siteId: string | null;
   name: string | null;
   data: unknown | null;
-  nameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface SiteTheme {
   id: string | null;
@@ -554,9 +478,22 @@ export interface TriggerFunction {
   code: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  codeTrgmSimilarity: number | null;
-  searchScore: number | null;
+}
+export interface DatabaseTransfer {
+  id: string | null;
+  databaseId: string | null;
+  targetOwnerId: string | null;
+  sourceApproved: boolean | null;
+  targetApproved: boolean | null;
+  sourceApprovedAt: string | null;
+  targetApprovedAt: string | null;
+  status: string | null;
+  initiatedBy: string | null;
+  notes: string | null;
+  expiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  completedAt: string | null;
 }
 export interface Api {
   id: string | null;
@@ -566,11 +503,6 @@ export interface Api {
   roleName: string | null;
   anonRole: string | null;
   isPublic: boolean | null;
-  nameTrgmSimilarity: number | null;
-  dbnameTrgmSimilarity: number | null;
-  roleNameTrgmSimilarity: number | null;
-  anonRoleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Site {
   id: string | null;
@@ -582,10 +514,6 @@ export interface Site {
   appleTouchIcon: ConstructiveInternalTypeImage | null;
   logo: ConstructiveInternalTypeImage | null;
   dbname: string | null;
-  titleTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  dbnameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface App {
   id: string | null;
@@ -597,10 +525,6 @@ export interface App {
   appStoreId: string | null;
   appIdPrefix: string | null;
   playStoreLink: ConstructiveInternalTypeUrl | null;
-  nameTrgmSimilarity: number | null;
-  appStoreIdTrgmSimilarity: number | null;
-  appIdPrefixTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface ConnectedAccountsModule {
   id: string | null;
@@ -610,8 +534,6 @@ export interface ConnectedAccountsModule {
   tableId: string | null;
   ownerTableId: string | null;
   tableName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface CryptoAddressesModule {
   id: string | null;
@@ -622,9 +544,6 @@ export interface CryptoAddressesModule {
   ownerTableId: string | null;
   tableName: string | null;
   cryptoNetwork: string | null;
-  tableNameTrgmSimilarity: number | null;
-  cryptoNetworkTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface CryptoAuthModule {
   id: string | null;
@@ -641,13 +560,6 @@ export interface CryptoAuthModule {
   signInRecordFailure: string | null;
   signUpWithKey: string | null;
   signInWithChallenge: string | null;
-  userFieldTrgmSimilarity: number | null;
-  cryptoNetworkTrgmSimilarity: number | null;
-  signInRequestChallengeTrgmSimilarity: number | null;
-  signInRecordFailureTrgmSimilarity: number | null;
-  signUpWithKeyTrgmSimilarity: number | null;
-  signInWithChallengeTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface DefaultIdsModule {
   id: string | null;
@@ -666,8 +578,6 @@ export interface DenormalizedTableField {
   updateDefaults: boolean | null;
   funcName: string | null;
   funcOrder: number | null;
-  funcNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface EmailsModule {
   id: string | null;
@@ -677,8 +587,6 @@ export interface EmailsModule {
   tableId: string | null;
   ownerTableId: string | null;
   tableName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface EncryptedSecretsModule {
   id: string | null;
@@ -686,8 +594,6 @@ export interface EncryptedSecretsModule {
   schemaId: string | null;
   tableId: string | null;
   tableName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface FieldModule {
   id: string | null;
@@ -699,8 +605,6 @@ export interface FieldModule {
   data: unknown | null;
   triggers: string[] | null;
   functions: string[] | null;
-  nodeTypeTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface InvitesModule {
   id: string | null;
@@ -717,11 +621,6 @@ export interface InvitesModule {
   prefix: string | null;
   membershipType: number | null;
   entityTableId: string | null;
-  invitesTableNameTrgmSimilarity: number | null;
-  claimedInvitesTableNameTrgmSimilarity: number | null;
-  submitInviteCodeFunctionTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface LevelsModule {
   id: string | null;
@@ -750,22 +649,6 @@ export interface LevelsModule {
   membershipType: number | null;
   entityTableId: string | null;
   actorTableId: string | null;
-  stepsTableNameTrgmSimilarity: number | null;
-  achievementsTableNameTrgmSimilarity: number | null;
-  levelsTableNameTrgmSimilarity: number | null;
-  levelRequirementsTableNameTrgmSimilarity: number | null;
-  completedStepTrgmSimilarity: number | null;
-  incompletedStepTrgmSimilarity: number | null;
-  tgAchievementTrgmSimilarity: number | null;
-  tgAchievementToggleTrgmSimilarity: number | null;
-  tgAchievementToggleBooleanTrgmSimilarity: number | null;
-  tgAchievementBooleanTrgmSimilarity: number | null;
-  upsertAchievementTrgmSimilarity: number | null;
-  tgUpdateAchievementsTrgmSimilarity: number | null;
-  stepsRequiredTrgmSimilarity: number | null;
-  levelAchievedTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface LimitsModule {
   id: string | null;
@@ -786,16 +669,6 @@ export interface LimitsModule {
   membershipType: number | null;
   entityTableId: string | null;
   actorTableId: string | null;
-  tableNameTrgmSimilarity: number | null;
-  defaultTableNameTrgmSimilarity: number | null;
-  limitIncrementFunctionTrgmSimilarity: number | null;
-  limitDecrementFunctionTrgmSimilarity: number | null;
-  limitIncrementTriggerTrgmSimilarity: number | null;
-  limitDecrementTriggerTrgmSimilarity: number | null;
-  limitUpdateTriggerTrgmSimilarity: number | null;
-  limitCheckFunctionTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface MembershipTypesModule {
   id: string | null;
@@ -803,8 +676,6 @@ export interface MembershipTypesModule {
   schemaId: string | null;
   tableId: string | null;
   tableName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface MembershipsModule {
   id: string | null;
@@ -838,19 +709,6 @@ export interface MembershipsModule {
   entityIdsByMask: string | null;
   entityIdsByPerm: string | null;
   entityIdsFunction: string | null;
-  membershipsTableNameTrgmSimilarity: number | null;
-  membersTableNameTrgmSimilarity: number | null;
-  membershipDefaultsTableNameTrgmSimilarity: number | null;
-  grantsTableNameTrgmSimilarity: number | null;
-  adminGrantsTableNameTrgmSimilarity: number | null;
-  ownerGrantsTableNameTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  actorMaskCheckTrgmSimilarity: number | null;
-  actorPermCheckTrgmSimilarity: number | null;
-  entityIdsByMaskTrgmSimilarity: number | null;
-  entityIdsByPermTrgmSimilarity: number | null;
-  entityIdsFunctionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface PermissionsModule {
   id: string | null;
@@ -870,14 +728,6 @@ export interface PermissionsModule {
   getMask: string | null;
   getByMask: string | null;
   getMaskByName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  defaultTableNameTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  getPaddedMaskTrgmSimilarity: number | null;
-  getMaskTrgmSimilarity: number | null;
-  getByMaskTrgmSimilarity: number | null;
-  getMaskByNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface PhoneNumbersModule {
   id: string | null;
@@ -887,8 +737,6 @@ export interface PhoneNumbersModule {
   tableId: string | null;
   ownerTableId: string | null;
   tableName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface ProfilesModule {
   id: string | null;
@@ -909,12 +757,6 @@ export interface ProfilesModule {
   permissionsTableId: string | null;
   membershipsTableId: string | null;
   prefix: string | null;
-  tableNameTrgmSimilarity: number | null;
-  profilePermissionsTableNameTrgmSimilarity: number | null;
-  profileGrantsTableNameTrgmSimilarity: number | null;
-  profileDefinitionGrantsTableNameTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface SecretsModule {
   id: string | null;
@@ -922,8 +764,6 @@ export interface SecretsModule {
   schemaId: string | null;
   tableId: string | null;
   tableName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface SessionsModule {
   id: string | null;
@@ -937,10 +777,6 @@ export interface SessionsModule {
   sessionsTable: string | null;
   sessionCredentialsTable: string | null;
   authSettingsTable: string | null;
-  sessionsTableTrgmSimilarity: number | null;
-  sessionCredentialsTableTrgmSimilarity: number | null;
-  authSettingsTableTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface UserAuthModule {
   id: string | null;
@@ -969,23 +805,6 @@ export interface UserAuthModule {
   signInOneTimeTokenFunction: string | null;
   oneTimeTokenFunction: string | null;
   extendTokenExpires: string | null;
-  auditsTableNameTrgmSimilarity: number | null;
-  signInFunctionTrgmSimilarity: number | null;
-  signUpFunctionTrgmSimilarity: number | null;
-  signOutFunctionTrgmSimilarity: number | null;
-  setPasswordFunctionTrgmSimilarity: number | null;
-  resetPasswordFunctionTrgmSimilarity: number | null;
-  forgotPasswordFunctionTrgmSimilarity: number | null;
-  sendVerificationEmailFunctionTrgmSimilarity: number | null;
-  verifyEmailFunctionTrgmSimilarity: number | null;
-  verifyPasswordFunctionTrgmSimilarity: number | null;
-  checkPasswordFunctionTrgmSimilarity: number | null;
-  sendAccountDeletionEmailFunctionTrgmSimilarity: number | null;
-  deleteAccountFunctionTrgmSimilarity: number | null;
-  signInOneTimeTokenFunctionTrgmSimilarity: number | null;
-  oneTimeTokenFunctionTrgmSimilarity: number | null;
-  extendTokenExpiresTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface UsersModule {
   id: string | null;
@@ -995,19 +814,47 @@ export interface UsersModule {
   tableName: string | null;
   typeTableId: string | null;
   typeTableName: string | null;
-  tableNameTrgmSimilarity: number | null;
-  typeTableNameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
-export interface UuidModule {
+export interface Blueprint {
   id: string | null;
+  ownerId: string | null;
   databaseId: string | null;
-  schemaId: string | null;
-  uuidFunction: string | null;
-  uuidSeed: string | null;
-  uuidFunctionTrgmSimilarity: number | null;
-  uuidSeedTrgmSimilarity: number | null;
-  searchScore: number | null;
+  name: string | null;
+  displayName: string | null;
+  description: string | null;
+  definition: unknown | null;
+  templateId: string | null;
+  status: string | null;
+  constructedAt: string | null;
+  errorDetails: string | null;
+  refMap: unknown | null;
+  constructedDefinition: unknown | null;
+  definitionHash: string | null;
+  tableHashes: unknown | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface BlueprintTemplate {
+  id: string | null;
+  name: string | null;
+  version: string | null;
+  displayName: string | null;
+  description: string | null;
+  ownerId: string | null;
+  visibility: string | null;
+  categories: string[] | null;
+  tags: string[] | null;
+  definition: unknown | null;
+  definitionSchemaVersion: string | null;
+  source: string | null;
+  complexity: string | null;
+  copyCount: number | null;
+  forkCount: number | null;
+  forkedFromId: string | null;
+  definitionHash: string | null;
+  tableHashes: unknown | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface DatabaseProvisionModule {
   id: string | null;
@@ -1024,12 +871,6 @@ export interface DatabaseProvisionModule {
   createdAt: string | null;
   updatedAt: string | null;
   completedAt: string | null;
-  databaseNameTrgmSimilarity: number | null;
-  subdomainTrgmSimilarity: number | null;
-  domainTrgmSimilarity: number | null;
-  statusTrgmSimilarity: number | null;
-  errorMessageTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppAdminGrant {
   id: string | null;
@@ -1117,8 +958,6 @@ export interface OrgChartEdge {
   parentId: string | null;
   positionTitle: string | null;
   positionLevel: number | null;
-  positionTitleTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgChartEdgeGrant {
   id: string | null;
@@ -1130,8 +969,11 @@ export interface OrgChartEdgeGrant {
   positionTitle: string | null;
   positionLevel: number | null;
   createdAt: string | null;
-  positionTitleTrgmSimilarity: number | null;
-  searchScore: number | null;
+}
+export interface OrgPermissionDefault {
+  id: string | null;
+  permissions: string | null;
+  entityId: string | null;
 }
 export interface AppLimit {
   id: string | null;
@@ -1164,6 +1006,53 @@ export interface AppAchievement {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface AppLevel {
+  id: string | null;
+  name: string | null;
+  description: string | null;
+  image: ConstructiveInternalTypeImage | null;
+  ownerId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface Email {
+  id: string | null;
+  ownerId: string | null;
+  email: ConstructiveInternalTypeEmail | null;
+  isVerified: boolean | null;
+  isPrimary: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface PhoneNumber {
+  id: string | null;
+  ownerId: string | null;
+  cc: string | null;
+  number: string | null;
+  isVerified: boolean | null;
+  isPrimary: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface CryptoAddress {
+  id: string | null;
+  ownerId: string | null;
+  address: string | null;
+  isVerified: boolean | null;
+  isPrimary: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface ConnectedAccount {
+  id: string | null;
+  ownerId: string | null;
+  service: string | null;
+  identifier: string | null;
+  details: unknown | null;
+  isVerified: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface Invite {
   id: string | null;
   email: ConstructiveInternalTypeEmail | null;
@@ -1177,8 +1066,6 @@ export interface Invite {
   expiresAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
-  inviteTokenTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface ClaimedInvite {
   id: string | null;
@@ -1203,8 +1090,6 @@ export interface OrgInvite {
   createdAt: string | null;
   updatedAt: string | null;
   entityId: string | null;
-  inviteTokenTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgClaimedInvite {
   id: string | null;
@@ -1215,14 +1100,22 @@ export interface OrgClaimedInvite {
   updatedAt: string | null;
   entityId: string | null;
 }
+export interface AuditLog {
+  id: string | null;
+  event: string | null;
+  actorId: string | null;
+  origin: ConstructiveInternalTypeOrigin | null;
+  userAgent: string | null;
+  ipAddress: string | null;
+  success: boolean | null;
+  createdAt: string | null;
+}
 export interface Ref {
   id: string | null;
   name: string | null;
   databaseId: string | null;
   storeId: string | null;
   commitId: string | null;
-  nameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Store {
   id: string | null;
@@ -1230,45 +1123,14 @@ export interface Store {
   databaseId: string | null;
   hash: string | null;
   createdAt: string | null;
-  nameTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppPermissionDefault {
   id: string | null;
   permissions: string | null;
 }
-export interface CryptoAddress {
-  id: string | null;
-  ownerId: string | null;
-  address: string | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  addressTrgmSimilarity: number | null;
-  searchScore: number | null;
-}
 export interface RoleType {
   id: number | null;
   name: string | null;
-}
-export interface OrgPermissionDefault {
-  id: string | null;
-  permissions: string | null;
-  entityId: string | null;
-}
-export interface PhoneNumber {
-  id: string | null;
-  ownerId: string | null;
-  cc: string | null;
-  number: string | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  ccTrgmSimilarity: number | null;
-  numberTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppLimitDefault {
   id: string | null;
@@ -1280,19 +1142,6 @@ export interface OrgLimitDefault {
   name: string | null;
   max: number | null;
 }
-export interface ConnectedAccount {
-  id: string | null;
-  ownerId: string | null;
-  service: string | null;
-  identifier: string | null;
-  details: unknown | null;
-  isVerified: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  serviceTrgmSimilarity: number | null;
-  identifierTrgmSimilarity: number | null;
-  searchScore: number | null;
-}
 export interface NodeTypeRegistry {
   name: string | null;
   slug: string | null;
@@ -1303,21 +1152,12 @@ export interface NodeTypeRegistry {
   tags: string[] | null;
   createdAt: string | null;
   updatedAt: string | null;
-  nameTrgmSimilarity: number | null;
-  slugTrgmSimilarity: number | null;
-  categoryTrgmSimilarity: number | null;
-  displayNameTrgmSimilarity: number | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface MembershipType {
   id: number | null;
   name: string | null;
   description: string | null;
   prefix: string | null;
-  descriptionTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface Commit {
   id: string | null;
@@ -1329,8 +1169,6 @@ export interface Commit {
   committerId: string | null;
   treeId: string | null;
   date: string | null;
-  messageTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppMembershipDefault {
   id: string | null;
@@ -1353,11 +1191,6 @@ export interface RlsModule {
   authenticateStrict: string | null;
   currentRole: string | null;
   currentRoleId: string | null;
-  authenticateTrgmSimilarity: number | null;
-  authenticateStrictTrgmSimilarity: number | null;
-  currentRoleTrgmSimilarity: number | null;
-  currentRoleIdTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface OrgMembershipDefault {
   id: string | null;
@@ -1369,29 +1202,6 @@ export interface OrgMembershipDefault {
   entityId: string | null;
   deleteMemberCascadeGroups: boolean | null;
   createGroupsCascadeMembers: boolean | null;
-}
-export interface AuditLog {
-  id: string | null;
-  event: string | null;
-  actorId: string | null;
-  origin: ConstructiveInternalTypeOrigin | null;
-  userAgent: string | null;
-  ipAddress: string | null;
-  success: boolean | null;
-  createdAt: string | null;
-  userAgentTrgmSimilarity: number | null;
-  searchScore: number | null;
-}
-export interface AppLevel {
-  id: string | null;
-  name: string | null;
-  description: string | null;
-  image: ConstructiveInternalTypeImage | null;
-  ownerId: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  descriptionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface SqlMigration {
   id: number | null;
@@ -1407,22 +1217,6 @@ export interface SqlMigration {
   action: string | null;
   actionId: string | null;
   actorId: string | null;
-  nameTrgmSimilarity: number | null;
-  deployTrgmSimilarity: number | null;
-  contentTrgmSimilarity: number | null;
-  revertTrgmSimilarity: number | null;
-  verifyTrgmSimilarity: number | null;
-  actionTrgmSimilarity: number | null;
-  searchScore: number | null;
-}
-export interface Email {
-  id: string | null;
-  ownerId: string | null;
-  email: ConstructiveInternalTypeEmail | null;
-  isVerified: boolean | null;
-  isPrimary: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
 }
 export interface User {
   id: string | null;
@@ -1451,8 +1245,6 @@ export interface AstMigration {
   action: string | null;
   actionId: string | null;
   actorId: string | null;
-  actionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface AppMembership {
   id: string | null;
@@ -1493,17 +1285,6 @@ export interface HierarchyModule {
   getManagersFunction: string | null;
   isManagerOfFunction: string | null;
   createdAt: string | null;
-  chartEdgesTableNameTrgmSimilarity: number | null;
-  hierarchySprtTableNameTrgmSimilarity: number | null;
-  chartEdgeGrantsTableNameTrgmSimilarity: number | null;
-  prefixTrgmSimilarity: number | null;
-  privateSchemaNameTrgmSimilarity: number | null;
-  sprtTableNameTrgmSimilarity: number | null;
-  rebuildHierarchyFunctionTrgmSimilarity: number | null;
-  getSubordinatesFunctionTrgmSimilarity: number | null;
-  getManagersFunctionTrgmSimilarity: number | null;
-  isManagerOfFunctionTrgmSimilarity: number | null;
-  searchScore: number | null;
 }
 export interface StringFilter {
   isNull?: boolean;

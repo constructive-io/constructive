@@ -1,16 +1,16 @@
 /**
- * Table utility functions for CleanTable[]
+ * Table utility functions for Table[]
  *
  * Note: The _meta transform functions have been removed.
  * Tables are now inferred from standard GraphQL introspection
  * using inferTablesFromIntrospection() in ./infer-tables.ts
  */
-import type { CleanTable } from '../types/schema';
+import type { Table } from '../types/schema';
 
 /**
- * Get table names from CleanTable array
+ * Get table names from Table array
  */
-export function getTableNames(tables: CleanTable[]): string[] {
+export function getTableNames(tables: Table[]): string[] {
   return tables.map((t) => t.name);
 }
 
@@ -18,9 +18,9 @@ export function getTableNames(tables: CleanTable[]): string[] {
  * Find a table by name
  */
 export function findTable(
-  tables: CleanTable[],
+  tables: Table[],
   name: string,
-): CleanTable | undefined {
+): Table | undefined {
   return tables.find((t) => t.name === name);
 }
 
@@ -28,10 +28,10 @@ export function findTable(
  * Filter tables by name pattern (glob-like)
  */
 export function filterTables(
-  tables: CleanTable[],
+  tables: Table[],
   include?: string[],
   exclude?: string[],
-): CleanTable[] {
+): Table[] {
   let result = tables;
 
   if (include && include.length > 0) {

@@ -1,5 +1,5 @@
 import type { DocsConfig } from '../../types/config';
-import type { CleanArgument, CleanField, CleanOperation, CleanTable, CleanTypeRef, TypeRegistry } from '../../types/schema';
+import type { Argument, Field, Operation, Table, TypeRef, TypeRegistry } from '../../types/schema';
 import { getScalarFields, getPrimaryKeyInfo, getWritableFieldNames } from './utils';
 
 export interface GeneratedDocFile {
@@ -83,7 +83,7 @@ export function resolveDocsConfig(
   };
 }
 
-export function formatArgType(arg: CleanOperation['args'][number]): string {
+export function formatArgType(arg: Operation['args'][number]): string {
   const t = arg.type;
   if (t.kind === 'NON_NULL' && t.ofType) {
     return `${formatTypeRef(t.ofType)} (required)`;
@@ -92,7 +92,7 @@ export function formatArgType(arg: CleanOperation['args'][number]): string {
 }
 
 export function formatTypeRef(
-  t: CleanOperation['args'][number]['type'],
+  t: Operation['args'][number]['type'],
 ): string {
   if (t.kind === 'LIST' && t.ofType) {
     return `[${formatTypeRef(t.ofType)}]`;
@@ -103,7 +103,7 @@ export function formatTypeRef(
   return t.name ?? 'unknown';
 }
 
-export function getEditableFields(table: CleanTable, typeRegistry?: TypeRegistry): CleanField[] {
+export function getEditableFields(table: Table, typeRegistry?: TypeRegistry): Field[] {
   const pk = getPrimaryKeyInfo(table)[0];
   const writableFields = getWritableFieldNames(table, typeRegistry);
   return getScalarFields(table).filter(
@@ -123,7 +123,7 @@ export function getEditableFields(table: CleanTable, typeRegistry?: TypeRegistry
  * type but NOT in the create input type. These are plugin-added fields like
  * trgm similarity scores, tsvector ranks, searchScore, etc.
  */
-export function getSearchFields(table: CleanTable, typeRegistry?: TypeRegistry): CleanField[] {
+export function getSearchFields(table: Table, typeRegistry?: TypeRegistry): Field[] {
   const writableFields = getWritableFieldNames(table, typeRegistry);
   if (writableFields === null) return [];
   const pk = getPrimaryKeyInfo(table)[0];
@@ -149,10 +149,10 @@ export interface SpecialFieldGroup {
   /** One-line description of this category */
   description: string;
   /** Fields belonging to this category */
-  fields: CleanField[];
+  fields: Field[];
 }
 
-function isPostGISField(f: CleanField): boolean {
+function isPostGISField(f: Field): boolean {
   const pgType = f.type.pgType?.toLowerCase();
   if (pgType === 'geometry' || pgType === 'geography') return true;
   const gql = f.type.gqlType;
@@ -160,24 +160,36 @@ function isPostGISField(f: CleanField): boolean {
   return false;
 }
 
-function isEmbeddingField(f: CleanField): boolean {
+function isEmbeddingField(f: Field): boolean {
   const pgType = f.type.pgType?.toLowerCase();
   if (pgType === 'vector') return true;
   if (/embedding$/i.test(f.name) && f.type.isArray && f.type.gqlType === 'Float') return true;
   return false;
 }
 
-function isTsvectorField(f: CleanField): boolean {
+function isTsvectorField(f: Field): boolean {
   const pgType = f.type.pgType?.toLowerCase();
   return pgType === 'tsvector';
 }
 
-function isSearchComputedField(f: CleanField): boolean {
+function isSearchComputedField(f: Field): boolean {
   if (f.name === 'searchScore') return true;
   if (/TrgmSimilarity$/.test(f.name)) return true;
   if (/TsvectorRank$/.test(f.name)) return true;
   if (/Bm25Score$/.test(f.name)) return true;
   return false;
+}
+
+/**
+ * Check whether the schema's VectorNearbyInput type includes an
+ * `includeChunks` field.  When present, tables with embedding columns
+ * support transparent chunk-aware vector search.
+ */
+function hasIncludeChunksCapability(registry?: TypeRegistry): boolean {
+  if (!registry) return false;
+  const vectorInput = registry.get('VectorNearbyInput');
+  if (!vectorInput || vectorInput.kind !== 'INPUT_OBJECT') return false;
+  return !!vectorInput.inputFields?.some((f) => f.name === 'includeChunks');
 }
 
 /**
@@ -189,16 +201,16 @@ function isSearchComputedField(f: CleanField): boolean {
  * descriptive context in generated docs.
  */
 export function categorizeSpecialFields(
-  table: CleanTable,
+  table: Table,
   typeRegistry?: TypeRegistry,
 ): SpecialFieldGroup[] {
   const allFields = getScalarFields(table);
   const computedFields = getSearchFields(table, typeRegistry);
   const computedSet = new Set(computedFields.map((f) => f.name));
 
-  const geospatial: CleanField[] = [];
-  const embedding: CleanField[] = [];
-  const search: CleanField[] = [];
+  const geospatial: Field[] = [];
+  const embedding: Field[] = [];
+  const search: Field[] = [];
 
   for (const f of allFields) {
     if (isPostGISField(f)) {
@@ -225,11 +237,17 @@ export function categorizeSpecialFields(
   }
 
   if (embedding.length > 0) {
+    const chunkAware = hasIncludeChunksCapability(typeRegistry);
+    const baseDesc =
+      'High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.';
+    const chunkDesc = chunkAware
+      ? baseDesc +
+        ' Supports chunk-aware search: set `includeChunks: true` in VectorNearbyInput to transparently query across parent and chunk embeddings, returning the minimum distance.'
+      : baseDesc;
     groups.push({
       category: 'embedding',
       label: 'pgvector embedding fields',
-      description:
-        'High-dimensional vector columns for semantic similarity search. Query via the Unified Search API pgvector adapter using cosine, L2, or inner-product distance.',
+      description: chunkDesc,
       fields: embedding,
     });
   }
@@ -296,14 +314,14 @@ export interface FlattenedArg {
   description?: string;
 }
 
-function unwrapNonNull(typeRef: CleanTypeRef): { inner: CleanTypeRef; required: boolean } {
+function unwrapNonNull(typeRef: TypeRef): { inner: TypeRef; required: boolean } {
   if (typeRef.kind === 'NON_NULL' && typeRef.ofType) {
     return { inner: typeRef.ofType, required: true };
   }
   return { inner: typeRef, required: false };
 }
 
-function resolveBaseType(typeRef: CleanTypeRef): CleanTypeRef {
+function resolveBaseType(typeRef: TypeRef): TypeRef {
   if ((typeRef.kind === 'NON_NULL' || typeRef.kind === 'LIST') && typeRef.ofType) {
     return resolveBaseType(typeRef.ofType);
   }
@@ -321,7 +339,7 @@ export function cleanTypeName(name: string): string {
   return name;
 }
 
-function getScalarTypeName(typeRef: CleanTypeRef): string {
+function getScalarTypeName(typeRef: TypeRef): string {
   const base = resolveBaseType(typeRef);
   return cleanTypeName(base.name ?? 'String');
 }
@@ -333,12 +351,12 @@ function getScalarTypeName(typeRef: CleanTypeRef): string {
  */
 /**
  * Resolve inputFields for an INPUT_OBJECT type.
- * Checks the CleanTypeRef first, then falls back to the TypeRegistry.
+ * Checks the TypeRef first, then falls back to the TypeRegistry.
  */
 function resolveInputFields(
-  typeRef: CleanTypeRef,
+  typeRef: TypeRef,
   registry?: TypeRegistry,
-): CleanArgument[] | undefined {
+): Argument[] | undefined {
   if (typeRef.inputFields && typeRef.inputFields.length > 0) {
     return typeRef.inputFields;
   }
@@ -351,7 +369,7 @@ function resolveInputFields(
   return undefined;
 }
 
-export function flattenArgs(args: CleanArgument[], registry?: TypeRegistry): FlattenedArg[] {
+export function flattenArgs(args: Argument[], registry?: TypeRegistry): FlattenedArg[] {
   const result: FlattenedArg[] = [];
   for (const arg of args) {
     const { inner, required } = unwrapNonNull(arg.type);
@@ -403,10 +421,63 @@ export function flattenArgs(args: CleanArgument[], registry?: TypeRegistry): Fla
 
 /**
  * Build CLI flags string from flattened args.
- * e.g. '--input.email <value> --input.password <value>'
+ * e.g. '--input.email <String> --input.password <String>'
  */
 export function flattenedArgsToFlags(flatArgs: FlattenedArg[]): string {
-  return flatArgs.map((a) => `--${a.flag} <value>`).join(' ');
+  return flatArgs.map((a) => `--${a.flag} <${a.type}>`).join(' ');
+}
+
+// ---------------------------------------------------------------------------
+// Type-aware placeholder helpers for code examples
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a type-aware placeholder for a table field value in code examples.
+ * Returns a quoted placeholder string, e.g. `'<UUID>'`, `'<String>'`, `'<Int>'`.
+ */
+export function fieldPlaceholder(field: Field): string {
+  return `'<${cleanTypeName(field.type.gqlType)}>'`;
+}
+
+/**
+ * Generate a type-aware placeholder for a primary key value in code examples.
+ * PrimaryKeyField has `gqlType` directly (not nested under `.type`).
+ */
+export function pkPlaceholder(pk: { gqlType: string }): string {
+  return `'<${cleanTypeName(pk.gqlType)}>'`;
+}
+
+/**
+ * Generate a type-aware placeholder for an operation argument value.
+ *
+ * - Scalar args: `'<String>'`
+ * - INPUT_OBJECT with resolvable fields (up to a limit): `{ email: '<String>', password: '<String>' }`
+ * - INPUT_OBJECT without resolvable fields: `'<TypeName>'`
+ *
+ * The result is a ready-to-embed JS expression (quotes included for scalars).
+ */
+export function argPlaceholder(arg: Argument, registry?: TypeRegistry): string {
+  const { inner } = unwrapNonNull(arg.type);
+
+  if (inner.kind === 'INPUT_OBJECT') {
+    const fields = resolveInputFields(inner, registry);
+    if (fields && fields.length > 0) {
+      const meaningful = fields.filter((f) => f.name !== 'clientMutationId');
+      if (meaningful.length > 0 && meaningful.length <= 5) {
+        const parts = meaningful.map((f) => {
+          const typeName = cleanTypeName(getScalarTypeName(f.type));
+          return `${f.name}: '<${typeName}>'`;
+        });
+        return '{ ' + parts.join(', ') + ' }';
+      }
+    }
+    if (inner.name) {
+      return `'<${cleanTypeName(inner.name)}>'`;
+    }
+  }
+
+  const typeName = cleanTypeName(getScalarTypeName(arg.type));
+  return `'<${typeName}>'`;
 }
 
 export function gqlTypeToJsonSchemaType(gqlType: string): string {

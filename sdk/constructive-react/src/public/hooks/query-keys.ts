@@ -19,6 +19,15 @@
 // Entity Query Keys
 // ============================================================================
 
+export const getAllRecordKeys = {
+  /** All getAllRecord queries */ all: ['getallrecord'] as const,
+  /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...getAllRecordKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...getAllRecordKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...getAllRecordKeys.details(), id] as const,
+} as const;
 export const orgGetManagersRecordKeys = {
   /** All orgGetManagersRecord queries */ all: ['orggetmanagersrecord'] as const,
   /** List query keys */ lists: () => [...orgGetManagersRecordKeys.all, 'list'] as const,
@@ -36,15 +45,6 @@ export const orgGetSubordinatesRecordKeys = {
   /** Detail query keys */ details: () => [...orgGetSubordinatesRecordKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgGetSubordinatesRecordKeys.details(), id] as const,
-} as const;
-export const getAllRecordKeys = {
-  /** All getAllRecord queries */ all: ['getallrecord'] as const,
-  /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...getAllRecordKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...getAllRecordKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...getAllRecordKeys.details(), id] as const,
 } as const;
 export const objectKeys = {
   /** All object queries */ all: ['object'] as const,
@@ -235,6 +235,15 @@ export const viewRuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...viewRuleKeys.details(), id] as const,
 } as const;
+export const embeddingChunkKeys = {
+  /** All embeddingChunk queries */ all: ['embeddingchunk'] as const,
+  /** List query keys */ lists: () => [...embeddingChunkKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...embeddingChunkKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...embeddingChunkKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...embeddingChunkKeys.details(), id] as const,
+} as const;
 export const tableTemplateModuleKeys = {
   /** All tableTemplateModule queries */ all: ['tabletemplatemodule'] as const,
   /** List query keys */ lists: () => [...tableTemplateModuleKeys.all, 'list'] as const,
@@ -279,6 +288,15 @@ export const defaultPrivilegeKeys = {
   /** Detail query keys */ details: () => [...defaultPrivilegeKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...defaultPrivilegeKeys.details(), id] as const,
+} as const;
+export const enumKeys = {
+  /** All enum queries */ all: ['enum'] as const,
+  /** List query keys */ lists: () => [...enumKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...enumKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...enumKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...enumKeys.details(), id] as const,
 } as const;
 export const apiSchemaKeys = {
   /** All apiSchema queries */ all: ['apischema'] as const,
@@ -342,6 +360,15 @@ export const triggerFunctionKeys = {
   /** Detail query keys */ details: () => [...triggerFunctionKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...triggerFunctionKeys.details(), id] as const,
+} as const;
+export const databaseTransferKeys = {
+  /** All databaseTransfer queries */ all: ['databasetransfer'] as const,
+  /** List query keys */ lists: () => [...databaseTransferKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...databaseTransferKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...databaseTransferKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...databaseTransferKeys.details(), id] as const,
 } as const;
 export const apiKeys = {
   /** All api queries */ all: ['api'] as const,
@@ -550,14 +577,23 @@ export const usersModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...usersModuleKeys.details(), id] as const,
 } as const;
-export const uuidModuleKeys = {
-  /** All uuidModule queries */ all: ['uuidmodule'] as const,
-  /** List query keys */ lists: () => [...uuidModuleKeys.all, 'list'] as const,
+export const blueprintKeys = {
+  /** All blueprint queries */ all: ['blueprint'] as const,
+  /** List query keys */ lists: () => [...blueprintKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...uuidModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...uuidModuleKeys.all, 'detail'] as const,
+    [...blueprintKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...blueprintKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...uuidModuleKeys.details(), id] as const,
+    [...blueprintKeys.details(), id] as const,
+} as const;
+export const blueprintTemplateKeys = {
+  /** All blueprintTemplate queries */ all: ['blueprinttemplate'] as const,
+  /** List query keys */ lists: () => [...blueprintTemplateKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...blueprintTemplateKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...blueprintTemplateKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...blueprintTemplateKeys.details(), id] as const,
 } as const;
 export const databaseProvisionModuleKeys = {
   /** All databaseProvisionModule queries */ all: ['databaseprovisionmodule'] as const,
@@ -658,6 +694,15 @@ export const orgChartEdgeGrantKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgChartEdgeGrantKeys.details(), id] as const,
 } as const;
+export const orgPermissionDefaultKeys = {
+  /** All orgPermissionDefault queries */ all: ['orgpermissiondefault'] as const,
+  /** List query keys */ lists: () => [...orgPermissionDefaultKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...orgPermissionDefaultKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...orgPermissionDefaultKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...orgPermissionDefaultKeys.details(), id] as const,
+} as const;
 export const appLimitKeys = {
   /** All appLimit queries */ all: ['applimit'] as const,
   /** List query keys */ lists: () => [...appLimitKeys.all, 'list'] as const,
@@ -693,6 +738,51 @@ export const appAchievementKeys = {
   /** Detail query keys */ details: () => [...appAchievementKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...appAchievementKeys.details(), id] as const,
+} as const;
+export const appLevelKeys = {
+  /** All appLevel queries */ all: ['applevel'] as const,
+  /** List query keys */ lists: () => [...appLevelKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...appLevelKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...appLevelKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...appLevelKeys.details(), id] as const,
+} as const;
+export const emailKeys = {
+  /** All email queries */ all: ['email'] as const,
+  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...emailKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...emailKeys.details(), id] as const,
+} as const;
+export const phoneNumberKeys = {
+  /** All phoneNumber queries */ all: ['phonenumber'] as const,
+  /** List query keys */ lists: () => [...phoneNumberKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...phoneNumberKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...phoneNumberKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...phoneNumberKeys.details(), id] as const,
+} as const;
+export const cryptoAddressKeys = {
+  /** All cryptoAddress queries */ all: ['cryptoaddress'] as const,
+  /** List query keys */ lists: () => [...cryptoAddressKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...cryptoAddressKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...cryptoAddressKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...cryptoAddressKeys.details(), id] as const,
+} as const;
+export const connectedAccountKeys = {
+  /** All connectedAccount queries */ all: ['connectedaccount'] as const,
+  /** List query keys */ lists: () => [...connectedAccountKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...connectedAccountKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...connectedAccountKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...connectedAccountKeys.details(), id] as const,
 } as const;
 export const inviteKeys = {
   /** All invite queries */ all: ['invite'] as const,
@@ -730,6 +820,15 @@ export const orgClaimedInviteKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgClaimedInviteKeys.details(), id] as const,
 } as const;
+export const auditLogKeys = {
+  /** All auditLog queries */ all: ['auditlog'] as const,
+  /** List query keys */ lists: () => [...auditLogKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...auditLogKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...auditLogKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...auditLogKeys.details(), id] as const,
+} as const;
 export const refKeys = {
   /** All ref queries */ all: ['ref'] as const,
   /** List query keys */ lists: () => [...refKeys.all, 'list'] as const,
@@ -757,15 +856,6 @@ export const appPermissionDefaultKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...appPermissionDefaultKeys.details(), id] as const,
 } as const;
-export const cryptoAddressKeys = {
-  /** All cryptoAddress queries */ all: ['cryptoaddress'] as const,
-  /** List query keys */ lists: () => [...cryptoAddressKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...cryptoAddressKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...cryptoAddressKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...cryptoAddressKeys.details(), id] as const,
-} as const;
 export const roleTypeKeys = {
   /** All roleType queries */ all: ['roletype'] as const,
   /** List query keys */ lists: () => [...roleTypeKeys.all, 'list'] as const,
@@ -774,24 +864,6 @@ export const roleTypeKeys = {
   /** Detail query keys */ details: () => [...roleTypeKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...roleTypeKeys.details(), id] as const,
-} as const;
-export const orgPermissionDefaultKeys = {
-  /** All orgPermissionDefault queries */ all: ['orgpermissiondefault'] as const,
-  /** List query keys */ lists: () => [...orgPermissionDefaultKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...orgPermissionDefaultKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...orgPermissionDefaultKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...orgPermissionDefaultKeys.details(), id] as const,
-} as const;
-export const phoneNumberKeys = {
-  /** All phoneNumber queries */ all: ['phonenumber'] as const,
-  /** List query keys */ lists: () => [...phoneNumberKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...phoneNumberKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...phoneNumberKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...phoneNumberKeys.details(), id] as const,
 } as const;
 export const appLimitDefaultKeys = {
   /** All appLimitDefault queries */ all: ['applimitdefault'] as const,
@@ -810,15 +882,6 @@ export const orgLimitDefaultKeys = {
   /** Detail query keys */ details: () => [...orgLimitDefaultKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitDefaultKeys.details(), id] as const,
-} as const;
-export const connectedAccountKeys = {
-  /** All connectedAccount queries */ all: ['connectedaccount'] as const,
-  /** List query keys */ lists: () => [...connectedAccountKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...connectedAccountKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...connectedAccountKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...connectedAccountKeys.details(), id] as const,
 } as const;
 export const nodeTypeRegistryKeys = {
   /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
@@ -874,24 +937,6 @@ export const orgMembershipDefaultKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgMembershipDefaultKeys.details(), id] as const,
 } as const;
-export const auditLogKeys = {
-  /** All auditLog queries */ all: ['auditlog'] as const,
-  /** List query keys */ lists: () => [...auditLogKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...auditLogKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...auditLogKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...auditLogKeys.details(), id] as const,
-} as const;
-export const appLevelKeys = {
-  /** All appLevel queries */ all: ['applevel'] as const,
-  /** List query keys */ lists: () => [...appLevelKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appLevelKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appLevelKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appLevelKeys.details(), id] as const,
-} as const;
 export const sqlMigrationKeys = {
   /** All sqlMigration queries */ all: ['sqlmigration'] as const,
   /** List query keys */ lists: () => [...sqlMigrationKeys.all, 'list'] as const,
@@ -900,15 +945,6 @@ export const sqlMigrationKeys = {
   /** Detail query keys */ details: () => [...sqlMigrationKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...sqlMigrationKeys.details(), id] as const,
-} as const;
-export const emailKeys = {
-  /** All email queries */ all: ['email'] as const,
-  /** List query keys */ lists: () => [...emailKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...emailKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...emailKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...emailKeys.details(), id] as const,
 } as const;
 export const userKeys = {
   /** All user queries */ all: ['user'] as const,
@@ -1013,9 +1049,9 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
+  getAllRecord: getAllRecordKeys,
   orgGetManagersRecord: orgGetManagersRecordKeys,
   orgGetSubordinatesRecord: orgGetSubordinatesRecordKeys,
-  getAllRecord: getAllRecordKeys,
   object: objectKeys,
   appPermission: appPermissionKeys,
   orgPermission: orgPermissionKeys,
@@ -1037,11 +1073,13 @@ export const queryKeys = {
   viewTable: viewTableKeys,
   viewGrant: viewGrantKeys,
   viewRule: viewRuleKeys,
+  embeddingChunk: embeddingChunkKeys,
   tableTemplateModule: tableTemplateModuleKeys,
   secureTableProvision: secureTableProvisionKeys,
   relationProvision: relationProvisionKeys,
   schemaGrant: schemaGrantKeys,
   defaultPrivilege: defaultPrivilegeKeys,
+  enum: enumKeys,
   apiSchema: apiSchemaKeys,
   apiModule: apiModuleKeys,
   domain: domainKeys,
@@ -1049,6 +1087,7 @@ export const queryKeys = {
   siteModule: siteModuleKeys,
   siteTheme: siteThemeKeys,
   triggerFunction: triggerFunctionKeys,
+  databaseTransfer: databaseTransferKeys,
   api: apiKeys,
   site: siteKeys,
   app: appKeys,
@@ -1072,7 +1111,8 @@ export const queryKeys = {
   sessionsModule: sessionsModuleKeys,
   userAuthModule: userAuthModuleKeys,
   usersModule: usersModuleKeys,
-  uuidModule: uuidModuleKeys,
+  blueprint: blueprintKeys,
+  blueprintTemplate: blueprintTemplateKeys,
   databaseProvisionModule: databaseProvisionModuleKeys,
   appAdminGrant: appAdminGrantKeys,
   appOwnerGrant: appOwnerGrantKeys,
@@ -1084,34 +1124,34 @@ export const queryKeys = {
   orgGrant: orgGrantKeys,
   orgChartEdge: orgChartEdgeKeys,
   orgChartEdgeGrant: orgChartEdgeGrantKeys,
+  orgPermissionDefault: orgPermissionDefaultKeys,
   appLimit: appLimitKeys,
   orgLimit: orgLimitKeys,
   appStep: appStepKeys,
   appAchievement: appAchievementKeys,
+  appLevel: appLevelKeys,
+  email: emailKeys,
+  phoneNumber: phoneNumberKeys,
+  cryptoAddress: cryptoAddressKeys,
+  connectedAccount: connectedAccountKeys,
   invite: inviteKeys,
   claimedInvite: claimedInviteKeys,
   orgInvite: orgInviteKeys,
   orgClaimedInvite: orgClaimedInviteKeys,
+  auditLog: auditLogKeys,
   ref: refKeys,
   store: storeKeys,
   appPermissionDefault: appPermissionDefaultKeys,
-  cryptoAddress: cryptoAddressKeys,
   roleType: roleTypeKeys,
-  orgPermissionDefault: orgPermissionDefaultKeys,
-  phoneNumber: phoneNumberKeys,
   appLimitDefault: appLimitDefaultKeys,
   orgLimitDefault: orgLimitDefaultKeys,
-  connectedAccount: connectedAccountKeys,
   nodeTypeRegistry: nodeTypeRegistryKeys,
   membershipType: membershipTypeKeys,
   commit: commitKeys,
   appMembershipDefault: appMembershipDefaultKeys,
   rlsModule: rlsModuleKeys,
   orgMembershipDefault: orgMembershipDefaultKeys,
-  auditLog: auditLogKeys,
-  appLevel: appLevelKeys,
   sqlMigration: sqlMigrationKeys,
-  email: emailKeys,
   user: userKeys,
   astMigration: astMigrationKeys,
   appMembership: appMembershipKeys,

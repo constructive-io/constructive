@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.13.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.13.0...graphile-settings@4.13.1) (2026-03-24)
+
+**Note:** Version bump only for package graphile-settings
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.12.2...graphile-settings@4.13.0) (2026-03-24)
+
+**Note:** Version bump only for package graphile-settings
+
+## [4.12.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.12.1...graphile-settings@4.12.2) (2026-03-21)
+
+**Note:** Version bump only for package graphile-settings
+
+## [4.12.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.12.0...graphile-settings@4.12.1) (2026-03-21)
+
+**Note:** Version bump only for package graphile-settings
+
+# [4.12.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.11.0...graphile-settings@4.12.0) (2026-03-20)
+
+**Note:** Version bump only for package graphile-settings
+
+# [4.11.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.10.3...graphile-settings@4.11.0) (2026-03-20)
+
+### Bug Fixes
+
+- keep legacy BlueprintTypesPlugin name for backward compatibility tests ([9fccba5](https://github.com/constructive-io/constructive/commit/9fccba5e3b96dca475d903de4e8725160e08e927))
+
+### Features
+
+- [@one](https://github.com/one)Of typed blueprint definitions with SuperCase node type keys ([3d040b1](https://github.com/constructive-io/constructive/commit/3d040b1506a1f831ca7c9c9de7b872a49e42c9f3))
+- wire BlueprintTypesPlugin into production schema build ([7addba2](https://github.com/constructive-io/constructive/commit/7addba2168ff3b75ae54492f5c011aa3ca146d40)), closes [#857](https://github.com/constructive-io/constructive/issues/857)
+
+## [4.10.3](https://github.com/constructive-io/constructive/compare/graphile-settings@4.10.2...graphile-settings@4.10.3) (2026-03-20)
+
+**Note:** Version bump only for package graphile-settings
+
+## [4.10.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.10.1...graphile-settings@4.10.2) (2026-03-19)
+
+**Note:** Version bump only for package graphile-settings
+
 ## [4.10.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.10.0...graphile-settings@4.10.1) (2026-03-17)
 
 **Note:** Version bump only for package graphile-settings

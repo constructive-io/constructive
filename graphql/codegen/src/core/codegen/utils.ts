@@ -4,9 +4,9 @@
 import { pluralize } from 'inflekt';
 
 import type {
-  CleanField,
-  CleanFieldType,
-  CleanTable,
+  Field,
+  FieldType,
+  Table,
   TypeRegistry,
 } from '../../types/schema';
 import { scalarToFilterType, scalarToTsType } from './scalars';
@@ -66,7 +66,7 @@ export interface TableNames {
 /**
  * Derive all naming variants from a table
  */
-export function getTableNames(table: CleanTable): TableNames {
+export function getTableNames(table: Table): TableNames {
   const typeName = table.name;
   const singularName = table.inflection?.tableFieldName || lcFirst(typeName);
   const pluralName =
@@ -87,7 +87,7 @@ export function getTableNames(table: CleanTable): TableNames {
  * Generate hook function name for list query
  * e.g., "useCarsQuery"
  */
-export function getListQueryHookName(table: CleanTable): string {
+export function getListQueryHookName(table: Table): string {
   const { pluralName } = getTableNames(table);
   return `use${ucFirst(pluralName)}Query`;
 }
@@ -96,7 +96,7 @@ export function getListQueryHookName(table: CleanTable): string {
  * Generate hook function name for single item query
  * e.g., "useCarQuery"
  */
-export function getSingleQueryHookName(table: CleanTable): string {
+export function getSingleQueryHookName(table: Table): string {
   const { singularName } = getTableNames(table);
   return `use${ucFirst(singularName)}Query`;
 }
@@ -105,7 +105,7 @@ export function getSingleQueryHookName(table: CleanTable): string {
  * Generate hook function name for create mutation
  * e.g., "useCreateCarMutation"
  */
-export function getCreateMutationHookName(table: CleanTable): string {
+export function getCreateMutationHookName(table: Table): string {
   const { typeName } = getTableNames(table);
   return `useCreate${typeName}Mutation`;
 }
@@ -114,7 +114,7 @@ export function getCreateMutationHookName(table: CleanTable): string {
  * Generate hook function name for update mutation
  * e.g., "useUpdateCarMutation"
  */
-export function getUpdateMutationHookName(table: CleanTable): string {
+export function getUpdateMutationHookName(table: Table): string {
   const { typeName } = getTableNames(table);
   return `useUpdate${typeName}Mutation`;
 }
@@ -123,7 +123,7 @@ export function getUpdateMutationHookName(table: CleanTable): string {
  * Generate hook function name for delete mutation
  * e.g., "useDeleteCarMutation"
  */
-export function getDeleteMutationHookName(table: CleanTable): string {
+export function getDeleteMutationHookName(table: Table): string {
   const { typeName } = getTableNames(table);
   return `useDelete${typeName}Mutation`;
 }
@@ -132,7 +132,7 @@ export function getDeleteMutationHookName(table: CleanTable): string {
  * Generate file name for list query hook
  * e.g., "useCarsQuery.ts"
  */
-export function getListQueryFileName(table: CleanTable): string {
+export function getListQueryFileName(table: Table): string {
   return `${getListQueryHookName(table)}.ts`;
 }
 
@@ -140,28 +140,28 @@ export function getListQueryFileName(table: CleanTable): string {
  * Generate file name for single query hook
  * e.g., "useCarQuery.ts"
  */
-export function getSingleQueryFileName(table: CleanTable): string {
+export function getSingleQueryFileName(table: Table): string {
   return `${getSingleQueryHookName(table)}.ts`;
 }
 
 /**
  * Generate file name for create mutation hook
  */
-export function getCreateMutationFileName(table: CleanTable): string {
+export function getCreateMutationFileName(table: Table): string {
   return `${getCreateMutationHookName(table)}.ts`;
 }
 
 /**
  * Generate file name for update mutation hook
  */
-export function getUpdateMutationFileName(table: CleanTable): string {
+export function getUpdateMutationFileName(table: Table): string {
   return `${getUpdateMutationHookName(table)}.ts`;
 }
 
 /**
  * Generate file name for delete mutation hook
  */
-export function getDeleteMutationFileName(table: CleanTable): string {
+export function getDeleteMutationFileName(table: Table): string {
   return `${getDeleteMutationHookName(table)}.ts`;
 }
 
@@ -173,7 +173,7 @@ export function getDeleteMutationFileName(table: CleanTable): string {
  * Get the GraphQL query name for fetching all rows
  * Uses inflection from introspection, falls back to convention
  */
-export function getAllRowsQueryName(table: CleanTable): string {
+export function getAllRowsQueryName(table: Table): string {
   return (
     table.query?.all ||
     table.inflection?.allRows ||
@@ -184,7 +184,7 @@ export function getAllRowsQueryName(table: CleanTable): string {
 /**
  * Get the GraphQL query name for fetching single row
  */
-export function getSingleRowQueryName(table: CleanTable): string {
+export function getSingleRowQueryName(table: Table): string {
   return (
     table.query?.one || table.inflection?.tableFieldName || lcFirst(table.name)
   );
@@ -193,21 +193,21 @@ export function getSingleRowQueryName(table: CleanTable): string {
 /**
  * Get the GraphQL mutation name for creating
  */
-export function getCreateMutationName(table: CleanTable): string {
+export function getCreateMutationName(table: Table): string {
   return table.query?.create || `create${table.name}`;
 }
 
 /**
  * Get the GraphQL mutation name for updating
  */
-export function getUpdateMutationName(table: CleanTable): string {
+export function getUpdateMutationName(table: Table): string {
   return table.query?.update || `update${table.name}`;
 }
 
 /**
  * Get the GraphQL mutation name for deleting
  */
-export function getDeleteMutationName(table: CleanTable): string {
+export function getDeleteMutationName(table: Table): string {
   return table.query?.delete || `delete${table.name}`;
 }
 
@@ -219,7 +219,7 @@ export function getDeleteMutationName(table: CleanTable): string {
  * Get PostGraphile filter type name
  * e.g., "CarFilter"
  */
-export function getFilterTypeName(table: CleanTable): string {
+export function getFilterTypeName(table: Table): string {
   return table.inflection?.filterType || `${table.name}Filter`;
 }
 
@@ -227,7 +227,7 @@ export function getFilterTypeName(table: CleanTable): string {
  * Get PostGraphile OrderBy enum type name
  * e.g., "CarsOrderBy", "AddressesOrderBy"
  */
-export function getOrderByTypeName(table: CleanTable): string {
+export function getOrderByTypeName(table: Table): string {
   return table.inflection?.orderByType || `${pluralize(table.name)}OrderBy`;
 }
 
@@ -235,7 +235,7 @@ export function getOrderByTypeName(table: CleanTable): string {
  * Get PostGraphile Condition type name (simple equality filter)
  * e.g., "CarCondition", "AddressCondition"
  */
-export function getConditionTypeName(table: CleanTable): string {
+export function getConditionTypeName(table: Table): string {
   return table.inflection?.conditionType || `${table.name}Condition`;
 }
 
@@ -243,7 +243,7 @@ export function getConditionTypeName(table: CleanTable): string {
  * Get PostGraphile create input type name
  * e.g., "CreateCarInput"
  */
-export function getCreateInputTypeName(table: CleanTable): string {
+export function getCreateInputTypeName(table: Table): string {
   return table.inflection?.createInputType || `Create${table.name}Input`;
 }
 
@@ -251,24 +251,28 @@ export function getCreateInputTypeName(table: CleanTable): string {
  * Get PostGraphile patch type name for updates
  * e.g., "CarPatch"
  */
-export function getPatchTypeName(table: CleanTable): string {
+export function getPatchTypeName(table: Table): string {
   return table.inflection?.patchType || `${table.name}Patch`;
 }
 
 /**
  * Get PostGraphile update input type name
- * e.g., "UpdateCarInput"
+ * Derives from actual mutation name when available (handles composite PK naming
+ * like UpdatePostTagByPostIdAndTagIdInput), falls back to Update${Entity}Input.
  */
-export function getUpdateInputTypeName(table: CleanTable): string {
-  return `Update${table.name}Input`;
+export function getUpdateInputTypeName(table: Table): string {
+  const mutationName = table.query?.update;
+  return mutationName ? ucFirst(mutationName) + 'Input' : `Update${table.name}Input`;
 }
 
 /**
  * Get PostGraphile delete input type name
- * e.g., "DeleteCarInput"
+ * Derives from actual mutation name when available (handles composite PK naming
+ * like DeletePostTagByPostIdAndTagIdInput), falls back to Delete${Entity}Input.
  */
-export function getDeleteInputTypeName(table: CleanTable): string {
-  return `Delete${table.name}Input`;
+export function getDeleteInputTypeName(table: Table): string {
+  const mutationName = table.query?.delete;
+  return mutationName ? ucFirst(mutationName) + 'Input' : `Delete${table.name}Input`;
 }
 
 // ============================================================================
@@ -289,9 +293,9 @@ export function gqlTypeToTs(gqlType: string, isArray: boolean = false): string {
 }
 
 /**
- * Convert CleanFieldType to TypeScript type string
+ * Convert FieldType to TypeScript type string
  */
-export function fieldTypeToTs(fieldType: CleanFieldType): string {
+export function fieldTypeToTs(fieldType: FieldType): string {
   return gqlTypeToTs(fieldType.gqlType, fieldType.isArray);
 }
 
@@ -319,7 +323,7 @@ export function getScalarFilterType(
 /**
  * Check if a field is a relation field (not a scalar)
  */
-export function isRelationField(fieldName: string, table: CleanTable): boolean {
+export function isRelationField(fieldName: string, table: Table): boolean {
   const { belongsTo, hasOne, hasMany, manyToMany } = table.relations;
   return (
     belongsTo.some((r) => r.fieldName === fieldName) ||
@@ -332,7 +336,7 @@ export function isRelationField(fieldName: string, table: CleanTable): boolean {
 /**
  * Get only scalar fields (non-relation fields)
  */
-export function getScalarFields(table: CleanTable): CleanField[] {
+export function getScalarFields(table: Table): Field[] {
   return table.fields.filter((f) => !isRelationField(f.name, table));
 }
 
@@ -371,7 +375,7 @@ export function resolveInnerInputType(
  * Returns null when no typeRegistry is provided (caller should treat as "no filtering").
  */
 export function getWritableFieldNames(
-  table: CleanTable,
+  table: Table,
   typeRegistry?: TypeRegistry,
 ): Set<string> | null {
   if (!typeRegistry) return null;
@@ -389,9 +393,9 @@ export function getWritableFieldNames(
  * Without a TypeRegistry, falls back to all scalar fields.
  */
 export function getSelectableScalarFields(
-  table: CleanTable,
+  table: Table,
   typeRegistry?: TypeRegistry,
-): CleanField[] {
+): Field[] {
   const writableFields = getWritableFieldNames(table, typeRegistry);
   return getScalarFields(table).filter(
     (f) => writableFields === null || writableFields.has(f.name),
@@ -414,7 +418,7 @@ export interface PrimaryKeyField {
  * Get primary key field information from table constraints
  * Returns array to support composite primary keys
  */
-export function getPrimaryKeyInfo(table: CleanTable): PrimaryKeyField[] {
+export function getPrimaryKeyInfo(table: Table): PrimaryKeyField[] {
   const pk = table.constraints?.primaryKey?.[0];
   if (!pk || pk.fields.length === 0) {
     // Fallback: try to find 'id' field in table fields
@@ -441,7 +445,7 @@ export function getPrimaryKeyInfo(table: CleanTable): PrimaryKeyField[] {
 /**
  * Get primary key field names (convenience wrapper)
  */
-export function getPrimaryKeyFields(table: CleanTable): string[] {
+export function getPrimaryKeyFields(table: Table): string[] {
   return getPrimaryKeyInfo(table).map((pk) => pk.name);
 }
 
@@ -450,7 +454,7 @@ export function getPrimaryKeyFields(table: CleanTable): string[] {
  * Used to determine if a single query hook can be generated
  * Tables with composite keys return false (handled as custom queries)
  */
-export function hasValidPrimaryKey(table: CleanTable): boolean {
+export function hasValidPrimaryKey(table: Table): boolean {
   // Check for explicit primary key constraint with single field
   const pk = table.constraints?.primaryKey?.[0];
   if (pk && pk.fields.length === 1) {
@@ -472,7 +476,7 @@ export function hasValidPrimaryKey(table: CleanTable): boolean {
  * Generate query key prefix for a table
  * e.g., "cars" for list queries, "car" for detail queries
  */
-export function getQueryKeyPrefix(table: CleanTable): string {
+export function getQueryKeyPrefix(table: Table): string {
   return lcFirst(table.name);
 }
 

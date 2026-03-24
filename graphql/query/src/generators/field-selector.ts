@@ -3,16 +3,16 @@
  * Converts user-friendly selection options to internal SelectionOptions format
  */
 import type { QuerySelectionOptions } from '../types';
-import type { CleanTable } from '../types/schema';
+import type { Table } from '../types/schema';
 import type {
   FieldSelection,
   FieldSelectionPreset,
   SimpleFieldSelection,
 } from '../types/selection';
 
-const relationalFieldSetCache = new WeakMap<CleanTable, Set<string>>();
+const relationalFieldSetCache = new WeakMap<Table, Set<string>>();
 
-function getRelationalFieldSet(table: CleanTable): Set<string> {
+function getRelationalFieldSet(table: Table): Set<string> {
   const cached = relationalFieldSetCache.get(table);
   if (cached) return cached;
 
@@ -39,8 +39,8 @@ function getRelationalFieldSet(table: CleanTable): Set<string> {
  * Convert simplified field selection to QueryBuilder SelectionOptions
  */
 export function convertToSelectionOptions(
-  table: CleanTable,
-  allTables: CleanTable[],
+  table: Table,
+  allTables: Table[],
   selection?: FieldSelection,
 ): QuerySelectionOptions | null {
   if (!selection) {
@@ -58,7 +58,7 @@ export function convertToSelectionOptions(
  * Convert preset to selection options
  */
 function convertPresetToSelection(
-  table: CleanTable,
+  table: Table,
   preset: FieldSelectionPreset,
 ): QuerySelectionOptions {
   const options: QuerySelectionOptions = {};
@@ -114,8 +114,8 @@ function convertPresetToSelection(
  * Convert custom selection to options
  */
 function convertCustomSelectionToOptions(
-  table: CleanTable,
-  allTables: CleanTable[],
+  table: Table,
+  allTables: Table[],
   selection: SimpleFieldSelection,
 ): QuerySelectionOptions {
   const options: QuerySelectionOptions = {};
@@ -193,7 +193,7 @@ function convertCustomSelectionToOptions(
 /**
  * Get minimal fields - completely schema-driven, no hardcoded assumptions
  */
-function getMinimalFields(table: CleanTable): string[] {
+function getMinimalFields(table: Table): string[] {
   // Get all non-relational fields from the actual schema
   const nonRelationalFields = getNonRelationalFields(table);
 
@@ -205,7 +205,7 @@ function getMinimalFields(table: CleanTable): string[] {
 /**
  * Get display fields - completely schema-driven, no hardcoded field names
  */
-function getDisplayFields(table: CleanTable): string[] {
+function getDisplayFields(table: Table): string[] {
   // Get all non-relational fields from the actual schema
   const nonRelationalFields = getNonRelationalFields(table);
 
@@ -222,7 +222,7 @@ function getDisplayFields(table: CleanTable): string[] {
  * Get all non-relational fields (includes both scalar and complex fields)
  * Complex fields like JSON, geometry, images should be included by default
  */
-function getNonRelationalFields(table: CleanTable): string[] {
+function getNonRelationalFields(table: Table): string[] {
   return table.fields
     .filter((field) => !isRelationalField(field.name, table))
     .map((field) => field.name);
@@ -233,7 +233,7 @@ function getNonRelationalFields(table: CleanTable): string[] {
  */
 export function isRelationalField(
   fieldName: string,
-  table: CleanTable,
+  table: Table,
 ): boolean {
   return getRelationalFieldSet(table).has(fieldName);
 }
@@ -244,8 +244,8 @@ export function isRelationalField(
  */
 function getRelatedTableScalarFields(
   relationField: string,
-  table: CleanTable,
-  allTables: CleanTable[],
+  table: Table,
+  allTables: Table[],
 ): Record<string, boolean> {
   // Find the related table name
   let referencedTableName: string | undefined;
@@ -357,7 +357,7 @@ function getRelatedTableScalarFields(
 /**
  * Get all available relation fields from a table
  */
-export function getAvailableRelations(table: CleanTable): Array<{
+export function getAvailableRelations(table: Table): Array<{
   fieldName: string;
   type: 'belongsTo' | 'hasOne' | 'hasMany' | 'manyToMany';
   referencedTable?: string;
@@ -420,7 +420,7 @@ export function getAvailableRelations(table: CleanTable): Array<{
  */
 export function validateFieldSelection(
   selection: FieldSelection,
-  table: CleanTable,
+  table: Table,
 ): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 

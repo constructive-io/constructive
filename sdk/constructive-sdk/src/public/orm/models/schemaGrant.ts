@@ -218,9 +218,10 @@ export class SchemaGrantModel {
       'SchemaGrant',
       'deleteSchemaGrant',
       'schemaGrant',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSchemaGrantInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

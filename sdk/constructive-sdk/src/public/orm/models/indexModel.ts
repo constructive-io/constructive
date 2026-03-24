@@ -218,9 +218,10 @@ export class IndexModel {
       'Index',
       'deleteIndex',
       'index',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteIndexInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

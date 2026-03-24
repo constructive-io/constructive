@@ -218,9 +218,10 @@ export class AppLevelRequirementModel {
       'AppLevelRequirement',
       'deleteAppLevelRequirement',
       'appLevelRequirement',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteAppLevelRequirementInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

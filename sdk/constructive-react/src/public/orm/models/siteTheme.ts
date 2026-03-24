@@ -218,9 +218,10 @@ export class SiteThemeModel {
       'SiteTheme',
       'deleteSiteTheme',
       'siteTheme',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSiteThemeInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

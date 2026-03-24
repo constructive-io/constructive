@@ -86,10 +86,12 @@ function runFactory(options: {
 describe('PostGIS operator factory (createPostgisOperatorFactory)', () => {
   describe('preset', () => {
     it('declares the factory in connectionFilterOperatorFactories', () => {
-      const factories = GraphilePostgisPreset.schema?.connectionFilterOperatorFactories;
+      const schema = GraphilePostgisPreset.schema as Record<string, unknown> | undefined;
+      const factories = schema?.connectionFilterOperatorFactories as unknown[] | undefined;
       expect(factories).toBeDefined();
-      expect(factories).toHaveLength(1);
+      expect(factories).toHaveLength(2);
       expect(typeof factories![0]).toBe('function');
+      expect(typeof factories![1]).toBe('function');
     });
   });
 

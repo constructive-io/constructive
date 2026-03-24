@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.9.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.9.0...@pgpmjs/core@6.9.1) (2026-03-24)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.9.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.8.2...@pgpmjs/core@6.9.0) (2026-03-24)
+
+### Bug Fixes
+
+- **export:** use extensionName for schema prefix in meta replacer (parity with SQL flow) ([681d3b9](https://github.com/constructive-io/constructive/commit/681d3b9a89cabfb2a3771f306477828232f0ddf6))
+
+## [6.8.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.8.1...@pgpmjs/core@6.8.2) (2026-03-21)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+## [6.8.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.8.0...@pgpmjs/core@6.8.1) (2026-03-21)
+
+**Note:** Version bump only for package @pgpmjs/core
+
+# [6.8.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.7.1...@pgpmjs/core@6.8.0) (2026-03-20)
+
+### Features
+
+- add jsonb[] type support for secure_table_provision export ([1ba8a0e](https://github.com/constructive-io/constructive/commit/1ba8a0ed827d62f2d3c52956a68c827e80709abb))
+
 ## [6.7.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.7.0...@pgpmjs/core@6.7.1) (2026-03-17)
 
 **Note:** Version bump only for package @pgpmjs/core

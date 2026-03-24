@@ -232,15 +232,15 @@ export interface UUIDListFilter {
 }
 // ============ Entity Types ============
 export interface GetAllRecord {
-  path?: string | null;
+  path?: string[] | null;
   data?: Record<string, unknown> | null;
 }
 export interface Object {
   hashUuid?: string | null;
   id: string;
   databaseId?: string | null;
-  kids?: string | null;
-  ktree?: string | null;
+  kids?: string[] | null;
+  ktree?: string[] | null;
   data?: Record<string, unknown> | null;
   frzn?: boolean | null;
   createdAt?: string | null;
@@ -254,10 +254,6 @@ export interface Ref {
   databaseId?: string | null;
   storeId?: string | null;
   commitId?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A store represents an isolated object repository within a database. */
 export interface Store {
@@ -270,10 +266,6 @@ export interface Store {
   /** The current head tree_id for this store. */
   hash?: string | null;
   createdAt?: string | null;
-  /** TRGM similarity when searching `name`. Returns null when no trgm search filter is active. */
-  nameTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 /** A commit records changes to the repository. */
 export interface Commit {
@@ -285,7 +277,7 @@ export interface Commit {
   databaseId?: string | null;
   storeId?: string | null;
   /** Parent commits */
-  parentIds?: string | null;
+  parentIds?: string[] | null;
   /** The author of the commit */
   authorId?: string | null;
   /** The committer of the commit */
@@ -293,10 +285,6 @@ export interface Commit {
   /** The root of the tree */
   treeId?: string | null;
   date?: string | null;
-  /** TRGM similarity when searching `message`. Returns null when no trgm search filter is active. */
-  messageTrgmSimilarity?: number | null;
-  /** Composite search relevance score (0..1, higher = more relevant). Computed by normalizing and averaging all active search signals. Returns null when no search filters are active. */
-  searchScore?: number | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -343,8 +331,6 @@ export type RefSelect = {
   databaseId?: boolean;
   storeId?: boolean;
   commitId?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type StoreSelect = {
   id?: boolean;
@@ -352,8 +338,6 @@ export type StoreSelect = {
   databaseId?: boolean;
   hash?: boolean;
   createdAt?: boolean;
-  nameTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 export type CommitSelect = {
   id?: boolean;
@@ -365,68 +349,97 @@ export type CommitSelect = {
   committerId?: boolean;
   treeId?: boolean;
   date?: boolean;
-  messageTrgmSimilarity?: boolean;
-  searchScore?: boolean;
 };
 // ============ Table Filter Types ============
 export interface GetAllRecordFilter {
-  path?: StringFilter;
+  path?: StringListFilter;
   data?: JSONFilter;
   and?: GetAllRecordFilter[];
   or?: GetAllRecordFilter[];
   not?: GetAllRecordFilter;
 }
 export interface ObjectFilter {
-  hashUuid?: UUIDFilter;
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
-  kids?: UUIDFilter;
-  ktree?: StringFilter;
+  /** Filter by the object’s `kids` field. */
+  kids?: UUIDListFilter;
+  /** Filter by the object’s `ktree` field. */
+  ktree?: StringListFilter;
+  /** Filter by the object’s `data` field. */
   data?: JSONFilter;
+  /** Filter by the object’s `frzn` field. */
   frzn?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
   and?: ObjectFilter[];
+  /** Checks for any expressions in this list. */
   or?: ObjectFilter[];
+  /** Negates the expression. */
   not?: ObjectFilter;
 }
 export interface RefFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
+  /** Filter by the object’s `commitId` field. */
   commitId?: UUIDFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: RefFilter[];
+  /** Checks for any expressions in this list. */
   or?: RefFilter[];
+  /** Negates the expression. */
   not?: RefFilter;
 }
 export interface StoreFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
   name?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `hash` field. */
   hash?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
-  nameTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: StoreFilter[];
+  /** Checks for any expressions in this list. */
   or?: StoreFilter[];
+  /** Negates the expression. */
   not?: StoreFilter;
 }
 export interface CommitFilter {
+  /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
+  /** Filter by the object’s `message` field. */
   message?: StringFilter;
+  /** Filter by the object’s `databaseId` field. */
   databaseId?: UUIDFilter;
+  /** Filter by the object’s `storeId` field. */
   storeId?: UUIDFilter;
-  parentIds?: UUIDFilter;
+  /** Filter by the object’s `parentIds` field. */
+  parentIds?: UUIDListFilter;
+  /** Filter by the object’s `authorId` field. */
   authorId?: UUIDFilter;
+  /** Filter by the object’s `committerId` field. */
   committerId?: UUIDFilter;
+  /** Filter by the object’s `treeId` field. */
   treeId?: UUIDFilter;
+  /** Filter by the object’s `date` field. */
   date?: DatetimeFilter;
-  messageTrgmSimilarity?: FloatFilter;
-  searchScore?: FloatFilter;
+  /** Checks for all expressions in this list. */
   and?: CommitFilter[];
+  /** Checks for any expressions in this list. */
   or?: CommitFilter[];
+  /** Negates the expression. */
   not?: CommitFilter;
 }
 // ============ OrderBy Types ============
@@ -439,97 +452,51 @@ export type GetAllRecordsOrderBy =
   | 'DATA_ASC'
   | 'DATA_DESC';
 export type ObjectOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'HASH_UUID_ASC'
-  | 'HASH_UUID_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
-  | 'KIDS_ASC'
-  | 'KIDS_DESC'
-  | 'KTREE_ASC'
-  | 'KTREE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
   | 'FRZN_ASC'
-  | 'FRZN_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC';
+  | 'FRZN_DESC';
 export type RefOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'COMMIT_ID_ASC'
-  | 'COMMIT_ID_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'STORE_ID_DESC';
 export type StoreOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'HASH_ASC'
-  | 'HASH_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'NAME_TRGM_SIMILARITY_ASC'
-  | 'NAME_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 export type CommitOrderBy =
+  | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'MESSAGE_ASC'
-  | 'MESSAGE_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC'
-  | 'PARENT_IDS_ASC'
-  | 'PARENT_IDS_DESC'
-  | 'AUTHOR_ID_ASC'
-  | 'AUTHOR_ID_DESC'
-  | 'COMMITTER_ID_ASC'
-  | 'COMMITTER_ID_DESC'
-  | 'TREE_ID_ASC'
-  | 'TREE_ID_DESC'
-  | 'DATE_ASC'
-  | 'DATE_DESC'
-  | 'MESSAGE_TRGM_SIMILARITY_ASC'
-  | 'MESSAGE_TRGM_SIMILARITY_DESC'
-  | 'SEARCH_SCORE_ASC'
-  | 'SEARCH_SCORE_DESC';
+  | 'DATABASE_ID_DESC';
 // ============ CRUD Input Types ============
 export interface CreateGetAllRecordInput {
   clientMutationId?: string;
   getAllRecord: {
-    path?: string;
+    path?: string[];
     data?: Record<string, unknown>;
   };
 }
 export interface GetAllRecordPatch {
-  path?: string | null;
+  path?: string[] | null;
   data?: Record<string, unknown> | null;
 }
 export interface UpdateGetAllRecordInput {
@@ -552,10 +519,9 @@ export interface CreateObjectInput {
   };
 }
 export interface ObjectPatch {
-  hashUuid?: string | null;
   databaseId?: string | null;
-  kids?: string | null;
-  ktree?: string | null;
+  kids?: string[] | null;
+  ktree?: string[] | null;
   data?: Record<string, unknown> | null;
   frzn?: boolean | null;
 }
@@ -582,8 +548,6 @@ export interface RefPatch {
   databaseId?: string | null;
   storeId?: string | null;
   commitId?: string | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateRefInput {
   clientMutationId?: string;
@@ -606,8 +570,6 @@ export interface StorePatch {
   name?: string | null;
   databaseId?: string | null;
   hash?: string | null;
-  nameTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateStoreInput {
   clientMutationId?: string;
@@ -635,13 +597,11 @@ export interface CommitPatch {
   message?: string | null;
   databaseId?: string | null;
   storeId?: string | null;
-  parentIds?: string | null;
+  parentIds?: string[] | null;
   authorId?: string | null;
   committerId?: string | null;
   treeId?: string | null;
   date?: string | null;
-  messageTrgmSimilarity?: number | null;
-  searchScore?: number | null;
 }
 export interface UpdateCommitInput {
   clientMutationId?: string;

@@ -6,12 +6,12 @@
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import contextCmd from './commands/context';
 import authCmd from './commands/auth';
-import cryptoAddressCmd from './commands/crypto-address';
-import roleTypeCmd from './commands/role-type';
+import emailCmd from './commands/email';
 import phoneNumberCmd from './commands/phone-number';
+import cryptoAddressCmd from './commands/crypto-address';
 import connectedAccountCmd from './commands/connected-account';
 import auditLogCmd from './commands/audit-log';
-import emailCmd from './commands/email';
+import roleTypeCmd from './commands/role-type';
 import userCmd from './commands/user';
 import currentIpAddressCmd from './commands/current-ip-address';
 import currentUserAgentCmd from './commands/current-user-agent';
@@ -43,12 +43,12 @@ const createCommandMap: () => Record<
 > = () => ({
   context: contextCmd,
   auth: authCmd,
-  'crypto-address': cryptoAddressCmd,
-  'role-type': roleTypeCmd,
+  email: emailCmd,
   'phone-number': phoneNumberCmd,
+  'crypto-address': cryptoAddressCmd,
   'connected-account': connectedAccountCmd,
   'audit-log': auditLogCmd,
-  email: emailCmd,
+  'role-type': roleTypeCmd,
   user: userCmd,
   'current-ip-address': currentIpAddressCmd,
   'current-user-agent': currentUserAgentCmd,
@@ -72,7 +72,7 @@ const createCommandMap: () => Record<
   'verify-totp': verifyTotpCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  crypto-address       cryptoAddress CRUD operations\n  role-type            roleType CRUD operations\n  phone-number         phoneNumber CRUD operations\n  connected-account    connectedAccount CRUD operations\n  audit-log            auditLog CRUD operations\n  email                email CRUD operations\n  user                 user CRUD operations\n  current-ip-address   currentIpAddress\n  current-user-agent   currentUserAgent\n  current-user-id      currentUserId\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  reset-password       resetPassword\n  sign-in-one-time-token signInOneTimeToken\n  sign-in              signIn\n  sign-up              signUp\n  one-time-token       oneTimeToken\n  extend-token-expires extendTokenExpires\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  connected-account    connectedAccount CRUD operations\n  audit-log            auditLog CRUD operations\n  role-type            roleType CRUD operations\n  user                 user CRUD operations\n  current-ip-address   currentIpAddress\n  current-user-agent   currentUserAgent\n  current-user-id      currentUserId\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  reset-password       resetPassword\n  sign-in-one-time-token signInOneTimeToken\n  sign-in              signIn\n  sign-up              signUp\n  one-time-token       oneTimeToken\n  extend-token-expires extendTokenExpires\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

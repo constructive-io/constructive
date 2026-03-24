@@ -218,9 +218,10 @@ export class EmailModel {
       'Email',
       'deleteEmail',
       'email',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteEmailInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

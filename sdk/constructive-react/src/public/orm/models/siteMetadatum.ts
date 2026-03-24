@@ -218,9 +218,10 @@ export class SiteMetadatumModel {
       'SiteMetadatum',
       'deleteSiteMetadatum',
       'siteMetadatum',
-      args.where.id,
+      {
+        id: args.where.id,
+      },
       'DeleteSiteMetadatumInput',
-      'id',
       args.select,
       connectionFieldsMap
     );

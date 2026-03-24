@@ -10,10 +10,11 @@
  */
 import type { GraphQLSDKConfigTarget } from '../../types/config';
 import type {
-  CleanOperation,
-  CleanTable,
+  Operation,
+  Table,
   TypeRegistry,
 } from '../../types/schema';
+import { enrichManyToManyRelations } from '../introspect/enrich-relations';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
 import type { SchemaSource } from '../introspect/source';
 import { filterTables } from '../introspect/transform';
@@ -61,14 +62,14 @@ export interface CodegenPipelineResult {
   /**
    * Inferred table metadata
    */
-  tables: CleanTable[];
+  tables: Table[];
 
   /**
    * Custom operations (queries and mutations not covered by tables)
    */
   customOperations: {
-    queries: CleanOperation[];
-    mutations: CleanOperation[];
+    queries: Operation[];
+    mutations: Operation[];
     typeRegistry: TypeRegistry;
   };
 
@@ -112,7 +113,7 @@ export async function runCodegenPipeline(
 
   // 1. Fetch introspection from source
   log(`Fetching schema from ${source.describe()}...`);
-  const { introspection } = await source.fetch();
+  const { introspection, tablesMeta } = await source.fetch();
 
   // 2. Infer tables from introspection (replaces _meta)
   log('Inferring table metadata from schema...');
@@ -120,6 +121,12 @@ export async function runCodegenPipeline(
   let tables = inferTablesFromIntrospection(introspection, { comments: commentsEnabled });
   const totalTables = tables.length;
   log(`  Found ${totalTables} tables`);
+
+  // 2a. Enrich M:N relations with junction key metadata from _meta
+  if (tablesMeta?.length) {
+    enrichManyToManyRelations(tables, tablesMeta);
+    log(`  Enriched M:N relations from _meta (${tablesMeta.length} tables)`);
+  }
 
   // 3. Filter tables by config (combine exclude and systemExclude)
   tables = filterTables(tables, config.tables.include, [
@@ -145,8 +152,8 @@ export async function runCodegenPipeline(
   const tableOperationNames = getTableOperationNames(tables);
 
   // 6. Filter and separate custom operations
-  let customQueries: CleanOperation[] = [];
-  let customMutations: CleanOperation[] = [];
+  let customQueries: Operation[] = [];
+  let customMutations: Operation[] = [];
 
   if (!skipCustomOperations) {
     // Filter by config include/exclude (combine exclude and systemExclude)
@@ -202,7 +209,7 @@ export async function runCodegenPipeline(
 /**
  * Validate that tables were found
  */
-export function validateTablesFound(tables: CleanTable[]): {
+export function validateTablesFound(tables: Table[]): {
   valid: boolean;
   error?: string;
 } {

@@ -220,6 +220,64 @@ it('interval type', async () => {
   expect(sql).toMatchSnapshot();
 });
 
+it('null array fields emit empty array literal instead of NULL', async () => {
+  const parser = new Parser({
+    schema: 'metaschema_modules_public',
+    singleStmts: true,
+    table: 'secure_table_provision',
+    fields: {
+      id: 'uuid',
+      node_type: 'text',
+      fields: 'jsonb[]',
+      grant_privileges: 'jsonb[]',
+      out_fields: 'uuid[]'
+    }
+  });
+
+  const sql = await parser.parse([
+    {
+      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+      node_type: 'DataTimestamps',
+      fields: null,
+      grant_privileges: null,
+      out_fields: null
+    }
+  ]);
+
+  // Should emit '{}' for array columns instead of NULL
+  expect(sql).toContain("'{}'");
+  expect(sql).not.toContain('NULL');
+  expect(sql).toMatchSnapshot();
+});
+
+it('empty array fields emit empty array literal', async () => {
+  const parser = new Parser({
+    schema: 'metaschema_modules_public',
+    singleStmts: true,
+    table: 'secure_table_provision',
+    fields: {
+      id: 'uuid',
+      node_type: 'text',
+      fields: 'jsonb[]',
+      grant_roles: 'text[]'
+    }
+  });
+
+  const sql = await parser.parse([
+    {
+      id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
+      node_type: 'DataTimestamps',
+      fields: [],
+      grant_roles: []
+    }
+  ]);
+
+  // Empty arrays should also emit '{}' not NULL
+  expect(sql).toContain("'{}'");
+  expect(sql).not.toContain('NULL');
+  expect(sql).toMatchSnapshot();
+});
+
 it('interval type with string value', async () => {
   const parser = new Parser({
     schema: 'metaschema_modules_public',

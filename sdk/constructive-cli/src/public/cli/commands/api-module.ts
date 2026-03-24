@@ -14,8 +14,6 @@ const fieldSchema: FieldSchema = {
   apiId: 'uuid',
   name: 'string',
   data: 'json',
-  nameTrgmSimilarity: 'float',
-  searchScore: 'float',
 };
 const usage =
   '\napi-module <command>\n\nCommands:\n  list                  List all apiModule records\n  get                   Get a apiModule by ID\n  create                Create a new apiModule\n  update                Update an existing apiModule\n  delete                Delete a apiModule\n\n  --help, -h            Show this help message\n';
