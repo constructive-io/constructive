@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/export",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "PGPM export tools for SQL and GraphQL database migration extraction",
   "main": "index.js",
