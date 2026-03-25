@@ -1,0 +1,123 @@
+# Local Email Services for Development
+# 
+# Usage:
+#   docker-compose -f docker-compose.local-email.yml up -d
+#
+# Services:
+#   - mailpit (SMTP: 1025, Web UI: 8025)
+#   - constructive-admin-server (3002)
+#   - send-email-link (8082)
+#   - knative-job-service (8080)
+#
+# Prerequisites:
+#   - PostgreSQL running with constructive database
+#   - Network: constructive-net (created by docker-compose.yml)
+#   - Build image first: docker build -t constructive:dev .
+
+services:
+  # Mailpit - Local email testing (replaces Mailgun)
+  mailpit:
+    container_name: mailpit
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - constructive-net
+
+  # Admin GraphQL Server (internal, header-based routing)
+  constructive-admin-server:
+    container_name: constructive-admin-server
+    image: constructive:dev
+    entrypoint: ["constructive", "server", "--host", "0.0.0.0", "--port", "3000", "--origin", "*"]
+    environment:
+      NODE_ENV: development
+      PORT: "3000"
+      SERVER_HOST: "0.0.0.0"
+      SERVER_TRUST_PROXY: "true"
+      SERVER_ORIGIN: "*"
+      SERVER_STRICT_AUTH: "false"
+      # Postgres - use host.docker.internal to connect to local postgres
+      PGHOST: host.docker.internal
+      PGPORT: "5432"
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-password}
+      PGDATABASE: constructive
+      # API configuration
+      API_ENABLE_SERVICES: "true"
+      API_IS_PUBLIC: "false"
+      API_EXPOSED_SCHEMAS: "metaschema_public,services_public,constructive_auth_public"
+      API_META_SCHEMAS: "metaschema_public,services_public,metaschema_modules_public,constructive_auth_public"
+      API_ANON_ROLE: "administrator"
+      API_ROLE_NAME: "administrator"
+    ports:
+      - "3002:3000"
+    networks:
+      - constructive-net
+
+  # Send email link function (uses SMTP to Mailpit)
+  send-email-link:
+    container_name: send-email-link
+    image: constructive:dev
+    entrypoint: ["node", "functions/send-email-link/dist/index.js"]
+    depends_on:
+      - mailpit
+      - constructive-admin-server
+    environment:
+      NODE_ENV: development
+      PORT: "8080"
+      LOG_LEVEL: info
+      # GraphQL endpoints
+      GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
+      META_GRAPHQL_URL: "http://constructive-admin-server:3000/graphql"
+      GRAPHQL_API_NAME: "private"
+      # SMTP configuration (Mailpit)
+      EMAIL_SEND_USE_SMTP: "true"
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_FROM: "noreply@localhost"
+      # Local app port for email links
+      LOCAL_APP_PORT: "3011"
+      ALLOW_LOCALHOST: "true"
+      SEND_EMAIL_LINK_DRY_RUN: "false"
+    ports:
+      - "8082:8080"
+    networks:
+      - constructive-net
+
+  # Job service (polls app_jobs, triggers send-email-link)
+  knative-job-service:
+    container_name: knative-job-service
+    image: constructive:dev
+    entrypoint: ["node", "jobs/knative-job-service/dist/run.js"]
+    depends_on:
+      - send-email-link
+    environment:
+      NODE_ENV: development
+      # Postgres - use host.docker.internal to connect to local postgres
+      PGHOST: host.docker.internal
+      PGPORT: "5432"
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-password}
+      PGDATABASE: constructive
+      JOBS_SCHEMA: app_jobs
+      # Worker config
+      JOBS_SUPPORT_ANY: "true"
+      JOBS_SUPPORTED: "send-email-link"
+      HOSTNAME: "local-worker"
+      # Callback server
+      INTERNAL_JOBS_CALLBACK_PORT: "8080"
+      INTERNAL_JOBS_CALLBACK_URL: "http://knative-job-service:8080/callback"
+      JOBS_CALLBACK_HOST: "knative-job-service"
+      # Function gateway
+      INTERNAL_GATEWAY_URL: "http://send-email-link:8080"
+      INTERNAL_GATEWAY_DEVELOPMENT_MAP: '{"send-email-link":"http://send-email-link:8080"}'
+    ports:
+      - "8080:8080"
+    networks:
+      - constructive-net
+
+networks:
+  constructive-net:
+    external: true
+    name: constructive-net
