@@ -5,8 +5,12 @@
  * For public files, returns the public URL prefix + key.
  * For private files, generates a presigned GET URL.
  *
- * This plugin uses the GraphQLObjectType_fields hook to detect file tables
- * (by checking for the storage module's files table) and add the computed field.
+ * Detection: Uses the `@storageFiles` smart tag on the codec (table).
+ * The storage module generator in constructive-db sets this tag on the
+ * generated files table via a smart comment:
+ *   COMMENT ON TABLE files IS E'@storageFiles\nStorage files table';
+ *
+ * This is explicit and reliable — no duck-typing on column names.
  */
 
 import type { GraphileConfig } from 'graphile-config';
@@ -23,7 +27,8 @@ const log = new Logger('graphile-presigned-url:download-url');
  * This is a separate plugin from the main presigned URL plugin because it
  * uses the GraphQLObjectType_fields hook (low-level) rather than extendSchema.
  * The downloadUrl field needs to be added dynamically to whatever table is
- * the storage module's files table, which we discover at schema-build time.
+ * the storage module's files table, which we discover at schema-build time
+ * via the `@storageFiles` smart tag.
  */
 export function createDownloadUrlPlugin(
   options: PresignedUrlPluginOptions,
@@ -34,7 +39,7 @@ export function createDownloadUrlPlugin(
   return {
     name: 'PresignedUrlDownloadPlugin',
     version: '0.1.0',
-    description: 'Adds downloadUrl computed field to File types',
+    description: 'Adds downloadUrl computed field to File types tagged with @storageFiles',
 
     schema: {
       hooks: {
@@ -48,22 +53,13 @@ export function createDownloadUrlPlugin(
             return fields;
           }
 
-          const attrs = pgCodec.attributes as Record<string, any>;
-
-          // Detect if this is a files table by checking for characteristic columns:
-          // key, content_type, content_hash, status, bucket_id, is_public
-          const hasKey = 'key' in attrs;
-          const hasContentType = 'content_type' in attrs;
-          const hasContentHash = 'content_hash' in attrs;
-          const hasStatus = 'status' in attrs;
-          const hasBucketId = 'bucket_id' in attrs;
-          const hasIsPublic = 'is_public' in attrs;
-
-          if (!hasKey || !hasContentType || !hasContentHash || !hasStatus || !hasBucketId || !hasIsPublic) {
+          // Check for @storageFiles smart tag — set by the storage module generator
+          const tags = (pgCodec.extensions as any)?.tags;
+          if (!tags?.storageFiles) {
             return fields;
           }
 
-          log.debug(`Adding downloadUrl field to type: ${pgCodec.name}`);
+          log.debug(`Adding downloadUrl field to type: ${pgCodec.name} (has @storageFiles tag)`);
 
           const {
             graphql: { GraphQLString },
