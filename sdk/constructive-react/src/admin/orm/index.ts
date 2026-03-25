@@ -44,8 +44,6 @@ export { GraphQLRequestError } from './client';
 export { QueryBuilder } from './query-builder';
 export * from './select-types';
 export * from './models';
-export * from './types';
-export type { ConnectionResult, PageInfo } from './select-types';
 export { createQueryOperations } from './query';
 export { createMutationOperations } from './mutation';
 /**
