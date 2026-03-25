@@ -25,6 +25,7 @@ import type { QueryOptions } from '../types/query';
 import type { Table } from '../types/schema';
 import type { FieldSelection } from '../types/selection';
 import { convertToSelectionOptions, isRelationalField } from './field-selector';
+import { fuzzyFindByName } from './name-matching';
 import {
   normalizeInflectionValue,
   toCamelCasePlural,
@@ -787,19 +788,10 @@ function findRelatedTable(
     return null;
   }
 
-  // Find the related table in allTables
-  const exactMatch = allTables.find((tbl) => tbl.name === referencedTableName);
-  if (exactMatch) return exactMatch;
-
-  // Fuzzy match: case-insensitive, strip underscores, optional trailing 's'.
-  // Needed because relation target names from _meta use snake_case codec names
-  // (e.g. "routes", "delivery_zone") while allTables[].name is PascalCase (e.g. "Route", "DeliveryZone").
-  const nameLower = referencedTableName.toLowerCase().replace(/_/g, '');
-  const nameBase = nameLower.endsWith('s') ? nameLower.slice(0, -1) : nameLower;
-  return allTables.find((tbl) => {
-    const tLower = tbl.name.toLowerCase().replace(/_/g, '');
-    return tLower === nameLower || tLower === nameBase;
-  }) || null;
+  // Find the related table using shared fuzzy matching.
+  // Handles PascalCase table names vs snake_case/camelCase/plural codec names.
+  // TODO: replace with fuzzyFindByName from inflekt once 0.4.0 is published
+  return fuzzyFindByName(allTables, referencedTableName, (tbl) => tbl.name) ?? null;
 }
 
 /**

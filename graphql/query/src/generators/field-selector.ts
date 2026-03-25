@@ -9,6 +9,7 @@ import type {
   FieldSelectionPreset,
   SimpleFieldSelection,
 } from '../types/selection';
+import { fuzzyFindByName } from './name-matching';
 
 const relationalFieldSetCache = new WeakMap<Table, Set<string>>();
 
@@ -293,19 +294,14 @@ function getRelatedTableScalarFields(
     return {};
   }
 
-  // Find the related table in allTables.
-  // PostGraphile v5 uses different inflections in different contexts:
-  // - table.name: PascalCase tableType (e.g., "Shipment", "DriverVehicleAssignment")
-  // - relation referencedBy.name: raw codec name (e.g., "shipments", "driverVehicleAssignments")
-  // Try exact match first, then case-insensitive match with optional trailing 's' for plural.
-  const nameLower = referencedTableName.toLowerCase().replace(/_/g, '');
-  const nameBase = nameLower.endsWith('s') ? nameLower.slice(0, -1) : nameLower;
-  const relatedTable =
-    allTables.find((t) => t.name === referencedTableName) ??
-    allTables.find((t) => {
-      const tLower = t.name.toLowerCase().replace(/_/g, '');
-      return tLower === nameLower || tLower === nameBase;
-    });
+  // Find the related table in allTables using shared fuzzy matching.
+  // Handles PascalCase table names vs snake_case/camelCase/plural codec names.
+  // TODO: replace with fuzzyFindByName from inflekt once 0.4.0 is published
+  const relatedTable = fuzzyFindByName(
+    allTables,
+    referencedTableName,
+    (t) => t.name,
+  );
   if (!relatedTable) {
     // Related table not found in schema — return fallback { __typename: true }
     // so the query remains valid (nodes need at least one subfield).

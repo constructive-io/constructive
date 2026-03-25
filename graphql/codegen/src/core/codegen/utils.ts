@@ -13,6 +13,9 @@ import { scalarToFilterType, scalarToTsType } from './scalars';
 
 // ============================================================================
 // String manipulation
+// NOTE: lcFirst, ucFirst already exist in inflekt; toCamelCase, toPascalCase,
+// toScreamingSnake are available in inflekt >=0.4.0.  Once that version is
+// published these can be replaced with re-exports from inflekt.
 // ============================================================================
 
 /** Lowercase first character */
