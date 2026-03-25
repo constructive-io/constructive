@@ -1560,8 +1560,8 @@ describe('MetaSchemaPlugin', () => {
       expect(post.relations.manyToMany).toHaveLength(1);
       expect(post.relations.manyToMany[0]).toMatchObject({
         fieldName: 'tags',
-        type: 'tag',
-        junctionTable: { name: 'post_tag' },
+        type: 'Tag',
+        junctionTable: { name: 'PostTag' },
         junctionLeftConstraint: {
           name: 'post_post_tags',
           referencedTable: 'post',
@@ -1572,7 +1572,7 @@ describe('MetaSchemaPlugin', () => {
           referencedTable: 'tag',
           referencedFields: ['id'],
         },
-        rightTable: { name: 'tag' },
+        rightTable: { name: 'Tag' },
       });
       expect(post.relations.manyToMany[0].junctionLeftKeyAttributes.map((f: any) => f.name)).toEqual([
         'postId',
