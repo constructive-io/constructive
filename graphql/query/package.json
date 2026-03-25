@@ -6,6 +6,158 @@
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./ast": {
+      "import": "./esm/ast.js",
+      "require": "./ast.js",
+      "types": "./ast.d.ts"
+    },
+    "./custom-ast": {
+      "import": "./esm/custom-ast.js",
+      "require": "./custom-ast.js",
+      "types": "./custom-ast.d.ts"
+    },
+    "./executor": {
+      "import": "./esm/executor.js",
+      "require": "./executor.js",
+      "types": "./executor.d.ts"
+    },
+    "./query-builder": {
+      "import": "./esm/query-builder.js",
+      "require": "./query-builder.js",
+      "types": "./query-builder.d.ts"
+    },
+    "./utils": {
+      "import": "./esm/utils.js",
+      "require": "./utils.js",
+      "types": "./utils.d.ts"
+    },
+    "./client": {
+      "import": "./esm/client/index.js",
+      "require": "./client/index.js",
+      "types": "./client/index.d.ts"
+    },
+    "./client/error": {
+      "import": "./esm/client/error.js",
+      "require": "./client/error.js",
+      "types": "./client/error.d.ts"
+    },
+    "./client/execute": {
+      "import": "./esm/client/execute.js",
+      "require": "./client/execute.js",
+      "types": "./client/execute.d.ts"
+    },
+    "./client/typed-document": {
+      "import": "./esm/client/typed-document.js",
+      "require": "./client/typed-document.js",
+      "types": "./client/typed-document.d.ts"
+    },
+    "./generators": {
+      "import": "./esm/generators/index.js",
+      "require": "./generators/index.js",
+      "types": "./generators/index.d.ts"
+    },
+    "./generators/field-selector": {
+      "import": "./esm/generators/field-selector.js",
+      "require": "./generators/field-selector.js",
+      "types": "./generators/field-selector.d.ts"
+    },
+    "./generators/mutations": {
+      "import": "./esm/generators/mutations.js",
+      "require": "./generators/mutations.js",
+      "types": "./generators/mutations.d.ts"
+    },
+    "./generators/naming-helpers": {
+      "import": "./esm/generators/naming-helpers.js",
+      "require": "./generators/naming-helpers.js",
+      "types": "./generators/naming-helpers.d.ts"
+    },
+    "./generators/select": {
+      "import": "./esm/generators/select.js",
+      "require": "./generators/select.js",
+      "types": "./generators/select.d.ts"
+    },
+    "./introspect": {
+      "import": "./esm/introspect/index.js",
+      "require": "./introspect/index.js",
+      "types": "./introspect/index.d.ts"
+    },
+    "./introspect/infer-tables": {
+      "import": "./esm/introspect/infer-tables.js",
+      "require": "./introspect/infer-tables.js",
+      "types": "./introspect/infer-tables.d.ts"
+    },
+    "./introspect/schema-query": {
+      "import": "./esm/introspect/schema-query.js",
+      "require": "./introspect/schema-query.js",
+      "types": "./introspect/schema-query.d.ts"
+    },
+    "./introspect/transform-schema": {
+      "import": "./esm/introspect/transform-schema.js",
+      "require": "./introspect/transform-schema.js",
+      "types": "./introspect/transform-schema.d.ts"
+    },
+    "./introspect/transform": {
+      "import": "./esm/introspect/transform.js",
+      "require": "./introspect/transform.js",
+      "types": "./introspect/transform.d.ts"
+    },
+    "./meta-object": {
+      "import": "./esm/meta-object/index.js",
+      "require": "./meta-object/index.js",
+      "types": "./meta-object/index.d.ts"
+    },
+    "./meta-object/convert": {
+      "import": "./esm/meta-object/convert.js",
+      "require": "./meta-object/convert.js",
+      "types": "./meta-object/convert.d.ts"
+    },
+    "./meta-object/validate": {
+      "import": "./esm/meta-object/validate.js",
+      "require": "./meta-object/validate.js",
+      "types": "./meta-object/validate.d.ts"
+    },
+    "./types": {
+      "import": "./esm/types/index.js",
+      "require": "./types/index.js",
+      "types": "./types/index.d.ts"
+    },
+    "./types/core": {
+      "import": "./esm/types/core.js",
+      "require": "./types/core.js",
+      "types": "./types/core.d.ts"
+    },
+    "./types/introspection": {
+      "import": "./esm/types/introspection.js",
+      "require": "./types/introspection.js",
+      "types": "./types/introspection.d.ts"
+    },
+    "./types/mutation": {
+      "import": "./esm/types/mutation.js",
+      "require": "./types/mutation.js",
+      "types": "./types/mutation.d.ts"
+    },
+    "./types/query": {
+      "import": "./esm/types/query.js",
+      "require": "./types/query.js",
+      "types": "./types/query.d.ts"
+    },
+    "./types/schema": {
+      "import": "./esm/types/schema.js",
+      "require": "./types/schema.js",
+      "types": "./types/schema.d.ts"
+    },
+    "./types/selection": {
+      "import": "./esm/types/selection.js",
+      "require": "./types/selection.js",
+      "types": "./types/selection.d.ts"
+    }
+  },
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
   "publishConfig": {
