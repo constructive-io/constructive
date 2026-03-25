@@ -293,11 +293,23 @@ function getRelatedTableScalarFields(
     return {};
   }
 
-  // Find the related table in allTables
-  const relatedTable = allTables.find((t) => t.name === referencedTableName);
+  // Find the related table in allTables.
+  // PostGraphile v5 uses different inflections in different contexts:
+  // - table.name: PascalCase tableType (e.g., "Shipment", "DriverVehicleAssignment")
+  // - relation referencedBy.name: raw codec name (e.g., "shipments", "driverVehicleAssignments")
+  // Try exact match first, then case-insensitive match with optional trailing 's' for plural.
+  const nameLower = referencedTableName.toLowerCase();
+  const nameBase = nameLower.endsWith('s') ? nameLower.slice(0, -1) : nameLower;
+  const relatedTable =
+    allTables.find((t) => t.name === referencedTableName) ??
+    allTables.find((t) => {
+      const tLower = t.name.toLowerCase();
+      return tLower === nameLower || tLower === nameBase;
+    });
   if (!relatedTable) {
-    // Related table not found in schema - return empty selection
-    return {};
+    // Related table not found in schema — return fallback { __typename: true }
+    // so the query remains valid (nodes need at least one subfield).
+    return { __typename: true };
   }
 
   // Get ALL scalar fields from the related table (non-relational fields)
