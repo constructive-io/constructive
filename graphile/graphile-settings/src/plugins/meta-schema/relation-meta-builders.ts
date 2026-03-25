@@ -2,6 +2,7 @@ import { safeInflection } from './inflection-utils';
 import {
   buildForeignKeyConstraint,
 } from './constraint-meta-builders';
+import { resolveTableType } from './name-meta-builders';
 import { buildFieldList, type BuildContext } from './table-meta-context';
 import {
   getRelation,
@@ -43,12 +44,15 @@ export function buildBelongsToRelations(
       sameAttributes(unique.attributes, localAttributes),
     );
 
+    const remoteCodec = relation.remoteResource?.codec;
+    const remoteTableType = remoteCodec ? resolveTableType(context.build, remoteCodec) : null;
+
     belongsTo.push({
       fieldName: relationName,
       isUnique,
-      type: relation.remoteResource?.codec?.name || null,
+      type: remoteTableType || remoteCodec?.name || null,
       keys: buildFieldList(localAttributes, codec, attributes, context),
-      references: { name: relation.remoteResource?.codec?.name || 'unknown' },
+      references: { name: remoteTableType || remoteCodec?.name || 'unknown' },
     });
   }
 
@@ -73,12 +77,15 @@ export function buildReverseRelations(
       sameAttributes(unique.attributes, remoteAttributes),
     );
 
+    const remoteCodec = relation.remoteResource?.codec;
+    const remoteTableType = remoteCodec ? resolveTableType(context.build, remoteCodec) : null;
+
     const meta: HasRelation = {
       fieldName: relationName,
       isUnique,
-      type: relation.remoteResource?.codec?.name || null,
+      type: remoteTableType || remoteCodec?.name || null,
       keys: buildFieldList(relation.localAttributes || [], codec, attributes, context),
-      referencedBy: { name: relation.remoteResource?.codec?.name || 'unknown' },
+      referencedBy: { name: remoteTableType || remoteCodec?.name || 'unknown' },
     };
 
     if (isUnique) {
@@ -174,10 +181,13 @@ function buildManyToManyRelation(
     context,
   );
 
+  const rightTableType = resolveTableType(context.build, rightCodec);
+  const junctionTableType = resolveTableType(context.build, junctionCodec);
+
   return {
     fieldName: relationFieldName,
-    type: rightCodec.name || null,
-    junctionTable: { name: junctionCodec.name || 'unknown' },
+    type: rightTableType || rightCodec.name || null,
+    junctionTable: { name: junctionTableType || junctionCodec.name || 'unknown' },
     junctionLeftConstraint,
     junctionLeftKeyAttributes: buildFieldList(
       leftJunctionAttributes,
@@ -204,7 +214,7 @@ function buildManyToManyRelation(
       rightCodec.attributes,
       context,
     ),
-    rightTable: { name: rightCodec.name || 'unknown' },
+    rightTable: { name: rightTableType || rightCodec.name || 'unknown' },
   };
 }
 
