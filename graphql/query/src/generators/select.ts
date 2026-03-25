@@ -788,7 +788,18 @@ function findRelatedTable(
   }
 
   // Find the related table in allTables
-  return allTables.find((tbl) => tbl.name === referencedTableName) || null;
+  const exactMatch = allTables.find((tbl) => tbl.name === referencedTableName);
+  if (exactMatch) return exactMatch;
+
+  // Fuzzy match: case-insensitive, strip underscores, optional trailing 's'.
+  // Needed because relation target names from _meta use snake_case codec names
+  // (e.g. "routes", "delivery_zone") while allTables[].name is PascalCase (e.g. "Route", "DeliveryZone").
+  const nameLower = referencedTableName.toLowerCase().replace(/_/g, '');
+  const nameBase = nameLower.endsWith('s') ? nameLower.slice(0, -1) : nameLower;
+  return allTables.find((tbl) => {
+    const tLower = tbl.name.toLowerCase().replace(/_/g, '');
+    return tLower === nameLower || tLower === nameBase;
+  }) || null;
 }
 
 /**
