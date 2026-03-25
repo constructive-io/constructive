@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.5](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.4...@constructive-sdk/cli@0.11.5) (2026-03-25)
+
+### Bug Fixes
+
+- revert type re-exports from ORM indexes, restore migrate-client entry point ([67895ab](https://github.com/constructive-io/constructive/commit/67895ab13a1c815e00b0c8d6fc9440a324d62467))
+
 ## [0.11.4](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.3...@constructive-sdk/cli@0.11.4) (2026-03-25)
 
 **Note:** Version bump only for package @constructive-sdk/cli
