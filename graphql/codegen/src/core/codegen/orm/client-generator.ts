@@ -219,6 +219,25 @@ export function generateCreateClientFile(
   // Re-export all input types (SecureTableProvision, RelationProvision, Blueprint, etc.)
   statements.push(t.exportAllDeclaration(t.stringLiteral('./types')));
 
+  // Explicitly resolve ambiguity for types exported by both select-types and types/input-types
+  // (ConnectionResult, PageInfo are defined in both — prefer the select-types versions)
+  const ambiguousTypeExport = t.exportNamedDeclaration(
+    null,
+    [
+      t.exportSpecifier(
+        t.identifier('ConnectionResult'),
+        t.identifier('ConnectionResult'),
+      ),
+      t.exportSpecifier(
+        t.identifier('PageInfo'),
+        t.identifier('PageInfo'),
+      ),
+    ],
+    t.stringLiteral('./select-types'),
+  );
+  ambiguousTypeExport.exportKind = 'type';
+  statements.push(ambiguousTypeExport);
+
   // Re-export NodeHttpAdapter when enabled (for use in any Node.js application)
   if (options?.nodeHttpAdapter) {
     statements.push(
