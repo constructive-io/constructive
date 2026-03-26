@@ -2243,6 +2243,9 @@ importers:
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
+      inflekt:
+        specifier: ^0.5.0
+        version: 0.5.0
       pg:
         specifier: ^8.20.0
         version: 8.20.0

@@ -150,14 +150,7 @@ const skipNonTopLevel = (key: string, path: string[]) =>
   !isTopLevel(key, path) || key === '_' || key.startsWith('_');
 
 export const camelizeArgv = (argv: Record<string, any>): Record<string, any> =>
-  inflektTree(
-    argv,
-    (key) => {
-      const underscored = key.replace(/-/g, '_');
-      return toCamelCase(underscored);
-    },
-    { skip: skipNonTopLevel },
-  );
+  inflektTree(argv, toCamelCase, { skip: skipNonTopLevel });
 
 export const hyphenateKeys = (obj: Record<string, any>): Record<string, any> =>
   inflektTree(

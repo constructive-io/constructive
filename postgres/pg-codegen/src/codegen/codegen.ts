@@ -1,5 +1,6 @@
 import generate from '@babel/generator';
 import * as t from '@babel/types';
+import { toPascalCase } from 'inflekt';
 
 import { DatabaseObject } from '../types';
 
@@ -161,11 +162,6 @@ export const generateCodeTree = (
   fileTree['index.ts'] = generate(t.program(indexFileStatements)).code;
   return fileTree;
 };
-
-const toPascalCase = (str: string): string =>
-  str
-    .replace(/[_-](\w)/g, (_, c) => c.toUpperCase())
-    .replace(/^\w/, (c) => c.toUpperCase());
 
 const mapPostgresTypeToTSType = (typeId: string, isNotNull: boolean): t.TSType => {
   const optionalType = (type: t.TSType): t.TSType =>

@@ -7,7 +7,7 @@
  *
  * Back-ported from Dashboard's `packages/data/src/query-generator.ts`.
  */
-import { toCamelCase, pluralize } from 'inflekt';
+import { toCamelCase, toScreamingSnake, pluralize } from 'inflekt';
 
 import type { Table } from '../types/schema';
 
@@ -206,9 +206,7 @@ export function toOrderByEnumValue(
   fieldName: string,
   direction: 'asc' | 'desc',
 ): string {
-  const screaming = fieldName
-    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
-    .toUpperCase();
+  const screaming = toScreamingSnake(fieldName);
   return `${screaming}_${direction.toUpperCase()}`;
 }
 
