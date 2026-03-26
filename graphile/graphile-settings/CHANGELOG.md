@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.15.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.14.0...graphile-settings@4.15.0) (2026-03-26)
+
+### Bug Fixes
+
+- emit inflected PascalCase names for all relation targets in \_meta ([194cb57](https://github.com/constructive-io/constructive/commit/194cb57813ccb37347436466673e652aa0aa6f8c))
+
+### Features
+
+- use inflekt@0.5.0 for shared name-matching and case helpers ([c394518](https://github.com/constructive-io/constructive/commit/c394518fbe45c2a95f45cbed83dc9babcd48f5ab))
+
 # [4.14.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.13.3...graphile-settings@4.14.0) (2026-03-25)
 
 ### Features

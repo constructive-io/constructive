@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.23.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.6...@constructive-io/graphql-codegen@4.23.0) (2026-03-26)
+
+### Features
+
+- use inflekt@0.5.0 for shared name-matching and case helpers ([c394518](https://github.com/constructive-io/constructive/commit/c394518fbe45c2a95f45cbed83dc9babcd48f5ab))
+
 ## [4.22.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.5...@constructive-io/graphql-codegen@4.22.6) (2026-03-25)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

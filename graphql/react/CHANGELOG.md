@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.8.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@4.8.4...@constructive-io/graphql-react@4.8.5) (2026-03-26)
+
+**Note:** Version bump only for package @constructive-io/graphql-react
+
 ## [4.8.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-react@4.8.3...@constructive-io/graphql-react@4.8.4) (2026-03-25)
 
 **Note:** Version bump only for package @constructive-io/graphql-react

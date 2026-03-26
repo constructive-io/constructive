@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.10.4...@constructive-io/graphql-query@3.11.0) (2026-03-26)
+
+### Bug Fixes
+
+- add case-insensitive fallback for relation table name matching ([662824d](https://github.com/constructive-io/constructive/commit/662824dd747a3a66a02ba0e30ad9e43a5a267dcf))
+- add fuzzy table name matching for v5 camelCase codec relation targets ([57c2d5b](https://github.com/constructive-io/constructive/commit/57c2d5b1c5c154a1b8cd895c350a7f7a60388943))
+
+### Features
+
+- use inflekt@0.5.0 for shared name-matching and case helpers ([c394518](https://github.com/constructive-io/constructive/commit/c394518fbe45c2a95f45cbed83dc9babcd48f5ab))
+
+### Reverts
+
+- Revert "chore: add explicit exports to graphql-query for Turbopack sub-path resolution" ([6c9175e](https://github.com/constructive-io/constructive/commit/6c9175e772ae26ffa80baca24208b2b5624a18e0))
+
 ## [3.10.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.10.3...@constructive-io/graphql-query@3.10.4) (2026-03-25)
 
 **Note:** Version bump only for package @constructive-io/graphql-query
