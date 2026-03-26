@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.2](https://github.com/constructive-io/constructive/compare/graphile-schema@1.10.1...graphile-schema@1.10.2) (2026-03-26)
+
+### Bug Fixes
+
+- **graphile-schema:** hybrid deepmerge — pluck extends/pgServices, deepmerge the rest ([2dad48d](https://github.com/constructive-io/constructive/commit/2dad48d3bffb07b13e5a70419f781ec4a239ac67))
+
 ## [1.10.1](https://github.com/constructive-io/constructive/compare/graphile-schema@1.10.0...graphile-schema@1.10.1) (2026-03-26)
 
 ### Bug Fixes
