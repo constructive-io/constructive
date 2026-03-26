@@ -12,22 +12,34 @@
  *    uses withPgClientFromPgService like PgIntrospectionPlugin)
  * 2. `init` hook: registers all input type shells from gathered entries
  * 3. `GraphQLInputObjectType_fields` hook: populates fields on those types
+ * 4. `GraphQLSchema_types` hook: force-includes all blueprint types so
+ *    they survive GraphQL's unreferenced-type pruning
+ *
+ * All field names use snake_case to match the JSONB format consumed by
+ * construct_blueprint() and validated by tg_validate_blueprint_definition().
  *
  * Generated type hierarchy:
  *
  *   BlueprintDefinitionInput
- *   +-- tables: [BlueprintTableInput!]
+ *   +-- tables: [BlueprintTableInput!]!
  *   |   +-- ref: String!
- *   |   +-- tableName: String!
- *   |   +-- nodes: [BlueprintNodeInput!]!    <-- @oneOf
- *   |       +-- shorthand: String
- *   |       +-- DataId: DataIdParams
- *   |       +-- DataTimestamps: DataTimestampsParams
- *   |       +-- AuthzEntityMembership: AuthzEntityMembershipParams
- *   |       +-- ...
- *   +-- relations: [BlueprintRelationInput!]  <-- @oneOf
- *       +-- RelationBelongsTo: RelationBelongsToParams
- *       +-- ...
+ *   |   +-- table_name: String!
+ *   |   +-- nodes: [BlueprintNodeInput!]!       <-- @oneOf
+ *   |   |   +-- shorthand: String
+ *   |   |   +-- DataId: DataIdParams
+ *   |   |   +-- DataTimestamps: DataTimestampsParams
+ *   |   |   +-- AuthzEntityMembership: AuthzEntityMembershipParams
+ *   |   |   +-- ...
+ *   |   +-- fields: [BlueprintFieldInput!]
+ *   |   +-- policies: [BlueprintPolicyInput!]
+ *   |   +-- grant_roles: [String!]
+ *   |   +-- grants: [JSON!]
+ *   |   +-- use_rls: Boolean
+ *   +-- relations: [BlueprintRelationInput!]     <-- @oneOf
+ *   |   +-- RelationBelongsTo: RelationBelongsToParams
+ *   |   +-- ...
+ *   +-- indexes: [BlueprintIndexInput!]
+ *   +-- full_text_searches: [BlueprintFullTextSearchInput!]
  *
  * When codegen runs, @oneOf types become discriminated union types:
  *
@@ -37,7 +49,7 @@
  *     | { AuthzEntityMembership: AuthzEntityMembershipParams }
  */
 import type { GraphileConfig } from 'graphile-config';
-import type { GraphQLInputType } from 'graphql';
+import type { GraphQLInputType, GraphQLNamedType } from 'graphql';
 import { withPgClientFromPgService } from 'graphile-build-pg';
 import { jsonSchemaToGraphQLFieldSpecs } from './json-schema-to-graphql';
 
@@ -67,6 +79,11 @@ declare global {
       isBlueprintTable?: boolean;
       isBlueprintDefinition?: boolean;
       isBlueprintRelation?: boolean;
+      isBlueprintField?: boolean;
+      isBlueprintPolicy?: boolean;
+      isBlueprintIndex?: boolean;
+      isBlueprintFullTextSearch?: boolean;
+      isBlueprintFtsSource?: boolean;
       blueprintNodeTypeName?: string;
     }
 
@@ -84,6 +101,24 @@ const BLUEPRINT_NODE_INPUT = 'BlueprintNodeInput';
 const BLUEPRINT_TABLE_INPUT = 'BlueprintTableInput';
 const BLUEPRINT_RELATION_INPUT = 'BlueprintRelationInput';
 const BLUEPRINT_DEFINITION_INPUT = 'BlueprintDefinitionInput';
+const BLUEPRINT_FIELD_INPUT = 'BlueprintFieldInput';
+const BLUEPRINT_POLICY_INPUT = 'BlueprintPolicyInput';
+const BLUEPRINT_INDEX_INPUT = 'BlueprintIndexInput';
+const BLUEPRINT_FULL_TEXT_SEARCH_INPUT = 'BlueprintFullTextSearchInput';
+const BLUEPRINT_FTS_SOURCE_INPUT = 'BlueprintFtsSourceInput';
+
+/** All blueprint type names — used by GraphQLSchema_types to force-include */
+const ALL_BLUEPRINT_TYPE_NAMES = [
+  BLUEPRINT_DEFINITION_INPUT,
+  BLUEPRINT_TABLE_INPUT,
+  BLUEPRINT_NODE_INPUT,
+  BLUEPRINT_RELATION_INPUT,
+  BLUEPRINT_FIELD_INPUT,
+  BLUEPRINT_POLICY_INPUT,
+  BLUEPRINT_INDEX_INPUT,
+  BLUEPRINT_FULL_TEXT_SEARCH_INPUT,
+  BLUEPRINT_FTS_SOURCE_INPUT,
+];
 
 const NODE_TYPE_REGISTRY_QUERY = `
   SELECT
@@ -168,9 +203,59 @@ function buildSchemaHooks(
           { isBlueprintDefinition: true },
           () => ({
             description:
-              'The complete blueprint definition. Contains tables with typed nodes and relations.',
+              'The complete blueprint definition. Contains tables with typed nodes, relations, indexes, and full-text searches.',
           }),
           'NodeTypeRegistryPlugin: BlueprintDefinitionInput',
+        );
+
+        build.registerInputObjectType(
+          BLUEPRINT_FIELD_INPUT,
+          { isBlueprintField: true },
+          () => ({
+            description:
+              'A custom field (column) to add to a blueprint table. Passed as raw JSONB to metaschema field provisioning.',
+          }),
+          'NodeTypeRegistryPlugin: BlueprintFieldInput',
+        );
+
+        build.registerInputObjectType(
+          BLUEPRINT_POLICY_INPUT,
+          { isBlueprintPolicy: true },
+          () => ({
+            description:
+              'An RLS policy entry for a blueprint table. The _type field maps to $type in the JSONB and selects the Authz* policy type.',
+          }),
+          'NodeTypeRegistryPlugin: BlueprintPolicyInput',
+        );
+
+        build.registerInputObjectType(
+          BLUEPRINT_INDEX_INPUT,
+          { isBlueprintIndex: true },
+          () => ({
+            description:
+              'An index definition within a blueprint. Indexes are defined at the definition level and reference tables by ref.',
+          }),
+          'NodeTypeRegistryPlugin: BlueprintIndexInput',
+        );
+
+        build.registerInputObjectType(
+          BLUEPRINT_FULL_TEXT_SEARCH_INPUT,
+          { isBlueprintFullTextSearch: true },
+          () => ({
+            description:
+              'A full-text search configuration for a blueprint table. References a tsvector field and its source fields.',
+          }),
+          'NodeTypeRegistryPlugin: BlueprintFullTextSearchInput',
+        );
+
+        build.registerInputObjectType(
+          BLUEPRINT_FTS_SOURCE_INPUT,
+          { isBlueprintFtsSource: true },
+          () => ({
+            description:
+              'A source field contributing to a full-text search tsvector column.',
+          }),
+          'NodeTypeRegistryPlugin: BlueprintFtsSourceInput',
         );
 
         return _;
@@ -205,6 +290,11 @@ function buildSchemaHooks(
             isBlueprintTable,
             isBlueprintDefinition,
             isBlueprintRelation,
+            isBlueprintField,
+            isBlueprintPolicy,
+            isBlueprintIndex,
+            isBlueprintFullTextSearch,
+            isBlueprintFtsSource,
             blueprintNodeTypeName,
           },
         } = context;
@@ -328,10 +418,227 @@ function buildSchemaHooks(
           return result;
         }
 
+        // --- BlueprintFieldInput ---
+        if (isBlueprintField) {
+          return extend(
+            fields,
+            {
+              name: fieldWithHooks(
+                { fieldName: 'name' },
+                () => ({
+                  type: new GraphQLNonNull(GraphQLString),
+                  description: 'The column name for this field.',
+                }),
+              ),
+              type: fieldWithHooks(
+                { fieldName: 'type' },
+                () => ({
+                  type: new GraphQLNonNull(GraphQLString),
+                  description: 'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").',
+                }),
+              ),
+              is_not_null: fieldWithHooks(
+                { fieldName: 'is_not_null' },
+                () => ({
+                  type: build.graphql.GraphQLBoolean,
+                  description: 'Whether the column has a NOT NULL constraint. Defaults to false.',
+                }),
+              ),
+              default_value: fieldWithHooks(
+                { fieldName: 'default_value' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'SQL default value expression (e.g., "true", "now()").',
+                }),
+              ),
+              description: fieldWithHooks(
+                { fieldName: 'description' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'Comment/description for this field.',
+                }),
+              ),
+            },
+            'NodeTypeRegistryPlugin: BlueprintFieldInput fields',
+          );
+        }
+
+        // --- BlueprintPolicyInput ---
+        if (isBlueprintPolicy) {
+          return extend(
+            fields,
+            {
+              _type: fieldWithHooks(
+                { fieldName: '_type' },
+                () => ({
+                  type: new GraphQLNonNull(GraphQLString),
+                  description: 'Authz* policy type name (e.g., "AuthzEntityMembership", "AuthzDirectOwner", "AuthzAllowAll"). Maps to $type in the JSONB.',
+                }),
+              ),
+              policy_role: fieldWithHooks(
+                { fieldName: 'policy_role' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'Role for this policy (e.g., "authenticated"). Defaults to "authenticated".',
+                }),
+              ),
+              permissive: fieldWithHooks(
+                { fieldName: 'permissive' },
+                () => ({
+                  type: build.graphql.GraphQLBoolean,
+                  description: 'Whether this policy is permissive (true) or restrictive (false). Defaults to true.',
+                }),
+              ),
+              policy_name: fieldWithHooks(
+                { fieldName: 'policy_name' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'Optional custom name for this policy.',
+                }),
+              ),
+            },
+            'NodeTypeRegistryPlugin: BlueprintPolicyInput fields',
+          );
+        }
+
+        // --- BlueprintIndexInput ---
+        if (isBlueprintIndex) {
+          return extend(
+            fields,
+            {
+              table_ref: fieldWithHooks(
+                { fieldName: 'table_ref' },
+                () => ({
+                  type: new GraphQLNonNull(GraphQLString),
+                  description: 'Reference key of the table this index belongs to.',
+                }),
+              ),
+              columns: fieldWithHooks(
+                { fieldName: 'columns' },
+                () => ({
+                  type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+                  description: 'Array of column names for a multi-column index. Mutually exclusive with "column".',
+                }),
+              ),
+              column: fieldWithHooks(
+                { fieldName: 'column' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'Single column name for the index. Mutually exclusive with "columns".',
+                }),
+              ),
+              access_method: fieldWithHooks(
+                { fieldName: 'access_method' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'Index access method (e.g., "BTREE", "GIN", "GIST"). Defaults to BTREE.',
+                }),
+              ),
+              is_unique: fieldWithHooks(
+                { fieldName: 'is_unique' },
+                () => ({
+                  type: build.graphql.GraphQLBoolean,
+                  description: 'Whether this is a unique index. Defaults to false.',
+                }),
+              ),
+              name: fieldWithHooks(
+                { fieldName: 'name' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'Optional custom name for the index. Auto-generated if omitted.',
+                }),
+              ),
+            },
+            'NodeTypeRegistryPlugin: BlueprintIndexInput fields',
+          );
+        }
+
+        // --- BlueprintFullTextSearchInput ---
+        if (isBlueprintFullTextSearch) {
+          const BlueprintFtsSourceInputType = build.getTypeByName(
+            BLUEPRINT_FTS_SOURCE_INPUT,
+          ) as GraphQLInputType | undefined;
+
+          return extend(
+            fields,
+            {
+              table_ref: fieldWithHooks(
+                { fieldName: 'table_ref' },
+                () => ({
+                  type: new GraphQLNonNull(GraphQLString),
+                  description: 'Reference key of the table this full-text search belongs to.',
+                }),
+              ),
+              field: fieldWithHooks(
+                { fieldName: 'field' },
+                () => ({
+                  type: new GraphQLNonNull(GraphQLString),
+                  description: 'Name of the tsvector field on the table.',
+                }),
+              ),
+              sources: fieldWithHooks(
+                { fieldName: 'sources' },
+                () => ({
+                  type: BlueprintFtsSourceInputType
+                    ? new GraphQLNonNull(
+                        new GraphQLList(
+                          new GraphQLNonNull(BlueprintFtsSourceInputType),
+                        ),
+                      )
+                    : new GraphQLNonNull(
+                        new GraphQLList(
+                          new GraphQLNonNull(GraphQLString),
+                        ),
+                      ),
+                  description: 'Array of source fields that feed into this tsvector.',
+                }),
+              ),
+            },
+            'NodeTypeRegistryPlugin: BlueprintFullTextSearchInput fields',
+          );
+        }
+
+        // --- BlueprintFtsSourceInput ---
+        if (isBlueprintFtsSource) {
+          return extend(
+            fields,
+            {
+              field: fieldWithHooks(
+                { fieldName: 'field' },
+                () => ({
+                  type: new GraphQLNonNull(GraphQLString),
+                  description: 'Name of the source column.',
+                }),
+              ),
+              weight: fieldWithHooks(
+                { fieldName: 'weight' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'tsvector weight: A, B, C, or D. Defaults to D.',
+                }),
+              ),
+              lang: fieldWithHooks(
+                { fieldName: 'lang' },
+                () => ({
+                  type: GraphQLString,
+                  description: 'Text search configuration (e.g., "pg_catalog.simple", "pg_catalog.english"). Defaults to pg_catalog.simple.',
+                }),
+              ),
+            },
+            'NodeTypeRegistryPlugin: BlueprintFtsSourceInput fields',
+          );
+        }
+
         // --- BlueprintTableInput ---
         if (isBlueprintTable) {
           const BlueprintNodeInputType = build.getTypeByName(
             BLUEPRINT_NODE_INPUT,
+          ) as GraphQLInputType | undefined;
+          const BlueprintFieldInputType = build.getTypeByName(
+            BLUEPRINT_FIELD_INPUT,
+          ) as GraphQLInputType | undefined;
+          const BlueprintPolicyInputType = build.getTypeByName(
+            BLUEPRINT_POLICY_INPUT,
           ) as GraphQLInputType | undefined;
 
           return extend(
@@ -345,8 +652,8 @@ function buildSchemaHooks(
                     'Unique reference key for this table within the blueprint (used for cross-references in relations).',
                 }),
               ),
-              tableName: fieldWithHooks(
-                { fieldName: 'tableName' },
+              table_name: fieldWithHooks(
+                { fieldName: 'table_name' },
                 () => ({
                   type: new GraphQLNonNull(GraphQLString),
                   description: 'The PostgreSQL table name to create.',
@@ -370,6 +677,52 @@ function buildSchemaHooks(
                     'Array of node type entries (data, authz, field behaviors) to apply to this table.',
                 }),
               ),
+              fields: fieldWithHooks(
+                { fieldName: 'fields' },
+                () => ({
+                  type: BlueprintFieldInputType
+                    ? new GraphQLList(
+                        new GraphQLNonNull(BlueprintFieldInputType),
+                      )
+                    : new GraphQLList(GraphQLString),
+                  description: 'Custom fields (columns) to add to this table.',
+                }),
+              ),
+              policies: fieldWithHooks(
+                { fieldName: 'policies' },
+                () => ({
+                  type: BlueprintPolicyInputType
+                    ? new GraphQLList(
+                        new GraphQLNonNull(BlueprintPolicyInputType),
+                      )
+                    : new GraphQLList(GraphQLString),
+                  description: 'RLS policies for this table.',
+                }),
+              ),
+              grant_roles: fieldWithHooks(
+                { fieldName: 'grant_roles' },
+                () => ({
+                  type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+                  description: 'Roles to grant access to (e.g., ["authenticated"]).',
+                }),
+              ),
+              grants: fieldWithHooks(
+                { fieldName: 'grants' },
+                () => {
+                  const JSONType = build.getTypeByName('JSON') as GraphQLInputType | undefined;
+                  return {
+                    type: new GraphQLList(JSONType ?? GraphQLString),
+                    description: 'Grant privilege specifications as JSON arrays (e.g., [["select", "*"], ["insert", "*"]]).',
+                  };
+                },
+              ),
+              use_rls: fieldWithHooks(
+                { fieldName: 'use_rls' },
+                () => ({
+                  type: build.graphql.GraphQLBoolean,
+                  description: 'Whether to enable RLS on this table. Defaults to true.',
+                }),
+              ),
             },
             'NodeTypeRegistryPlugin: BlueprintTableInput fields',
           );
@@ -383,6 +736,12 @@ function buildSchemaHooks(
           const BlueprintRelationInputType = build.getTypeByName(
             BLUEPRINT_RELATION_INPUT,
           ) as GraphQLInputType | undefined;
+          const BlueprintIndexInputType = build.getTypeByName(
+            BLUEPRINT_INDEX_INPUT,
+          ) as GraphQLInputType | undefined;
+          const BlueprintFullTextSearchInputType = build.getTypeByName(
+            BLUEPRINT_FULL_TEXT_SEARCH_INPUT,
+          ) as GraphQLInputType | undefined;
 
           return extend(
             fields,
@@ -391,10 +750,14 @@ function buildSchemaHooks(
                 { fieldName: 'tables' },
                 () => ({
                   type: BlueprintTableInputType
-                    ? new GraphQLList(
-                        new GraphQLNonNull(BlueprintTableInputType),
+                    ? new GraphQLNonNull(
+                        new GraphQLList(
+                          new GraphQLNonNull(BlueprintTableInputType),
+                        ),
                       )
-                    : new GraphQLList(GraphQLString),
+                    : new GraphQLNonNull(
+                        new GraphQLList(GraphQLString),
+                      ),
                   description: 'Array of table definitions.',
                 }),
               ),
@@ -409,12 +772,59 @@ function buildSchemaHooks(
                   description: 'Array of relation definitions.',
                 }),
               ),
+              indexes: fieldWithHooks(
+                { fieldName: 'indexes' },
+                () => ({
+                  type: BlueprintIndexInputType
+                    ? new GraphQLList(
+                        new GraphQLNonNull(BlueprintIndexInputType),
+                      )
+                    : new GraphQLList(GraphQLString),
+                  description: 'Array of index definitions. Each index references a table by ref.',
+                }),
+              ),
+              full_text_searches: fieldWithHooks(
+                { fieldName: 'full_text_searches' },
+                () => ({
+                  type: BlueprintFullTextSearchInputType
+                    ? new GraphQLList(
+                        new GraphQLNonNull(BlueprintFullTextSearchInputType),
+                      )
+                    : new GraphQLList(GraphQLString),
+                  description: 'Array of full-text search configurations. Each references a table by ref.',
+                }),
+              ),
             },
             'NodeTypeRegistryPlugin: BlueprintDefinitionInput fields',
           );
         }
 
         return fields;
+      },
+
+      // Force-include all blueprint types so they survive GraphQL's
+      // unreferenced-type pruning (printSchema only emits reachable types)
+      GraphQLSchema_types(types: GraphQLNamedType[], build) {
+        const nodeTypes = getNodeTypes(build);
+        if (nodeTypes.length === 0) return types;
+
+        for (const typeName of ALL_BLUEPRINT_TYPE_NAMES) {
+          const type = build.getTypeByName(typeName) as GraphQLNamedType | undefined;
+          if (type && !types.includes(type)) {
+            types.push(type);
+          }
+        }
+
+        // Also include all per-node-type Params types
+        for (const nt of nodeTypes) {
+          const paramsTypeName = nt.name + 'Params';
+          const type = build.getTypeByName(paramsTypeName) as GraphQLNamedType | undefined;
+          if (type && !types.includes(type)) {
+            types.push(type);
+          }
+        }
+
+        return types;
       },
     },
   };

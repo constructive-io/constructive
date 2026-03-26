@@ -101,6 +101,7 @@ describe('createBlueprintTypesPlugin', () => {
     expect(plugin.schema!.hooks).toBeDefined();
     expect(plugin.schema!.hooks!.init).toBeDefined();
     expect(plugin.schema!.hooks!.GraphQLInputObjectType_fields).toBeDefined();
+    expect(plugin.schema!.hooks!.GraphQLSchema_types).toBeDefined();
   });
 
   it('works with an empty node types array', () => {
@@ -246,6 +247,24 @@ describe('jsonSchemaToGraphQLFieldSpecs', () => {
     const specs = jsonSchemaToGraphQLFieldSpecs(schema, 'TestParams', mockBuild);
 
     expect(Object.keys(specs)).toHaveLength(0);
+  });
+
+  it('uses snake_case field names (matching JSONB format)', () => {
+    const schema = {
+      type: 'object' as const,
+      properties: {
+        table_name: { type: 'string', description: 'The table name' },
+        grant_roles: { type: 'array', items: { type: 'string' } },
+        use_rls: { type: 'boolean' },
+      },
+    };
+
+    const specs = jsonSchemaToGraphQLFieldSpecs(schema, 'TestParams', mockBuild);
+
+    // Field names should be preserved as-is (snake_case)
+    expect(specs.table_name).toBeDefined();
+    expect(specs.grant_roles).toBeDefined();
+    expect(specs.use_rls).toBeDefined();
   });
 
   it('falls back to String for unknown types', () => {
