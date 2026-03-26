@@ -654,7 +654,7 @@ export interface BlueprintField {
   /** The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid"). */
   type: string;
   /** Whether the column has a NOT NULL constraint. */
-  is_not_null?: boolean;
+  is_required?: boolean;
   /** SQL default value expression (e.g., "true", "now()"). */
   default_value?: string;
   /** Comment/description for this field. */
