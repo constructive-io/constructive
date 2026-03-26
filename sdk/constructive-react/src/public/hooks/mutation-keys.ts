@@ -452,15 +452,6 @@ export const encryptedSecretsModuleMutationKeys = {
   /** Delete encryptedSecretsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'encryptedsecretsmodule', 'delete', id] as const,
 } as const;
-export const fieldModuleMutationKeys = {
-  /** All fieldModule mutation keys */ all: ['mutation', 'fieldmodule'] as const,
-  /** Create fieldModule mutation key */ create: () =>
-    ['mutation', 'fieldmodule', 'create'] as const,
-  /** Update fieldModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'fieldmodule', 'update', id] as const,
-  /** Delete fieldModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'fieldmodule', 'delete', id] as const,
-} as const;
 export const invitesModuleMutationKeys = {
   /** All invitesModule mutation keys */ all: ['mutation', 'invitesmodule'] as const,
   /** Create invitesModule mutation key */ create: () =>
@@ -848,6 +839,15 @@ export const roleTypeMutationKeys = {
   /** Delete roleType mutation key */ delete: (id: string | number) =>
     ['mutation', 'roletype', 'delete', id] as const,
 } as const;
+export const migrateFileMutationKeys = {
+  /** All migrateFile mutation keys */ all: ['mutation', 'migratefile'] as const,
+  /** Create migrateFile mutation key */ create: () =>
+    ['mutation', 'migratefile', 'create'] as const,
+  /** Update migrateFile mutation key */ update: (id: string | number) =>
+    ['mutation', 'migratefile', 'update', id] as const,
+  /** Delete migrateFile mutation key */ delete: (id: string | number) =>
+    ['mutation', 'migratefile', 'delete', id] as const,
+} as const;
 export const appLimitDefaultMutationKeys = {
   /** All appLimitDefault mutation keys */ all: ['mutation', 'applimitdefault'] as const,
   /** Create appLimitDefault mutation key */ create: () =>
@@ -918,14 +918,13 @@ export const orgMembershipDefaultMutationKeys = {
   /** Delete orgMembershipDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgmembershipdefault', 'delete', id] as const,
 } as const;
-export const sqlMigrationMutationKeys = {
-  /** All sqlMigration mutation keys */ all: ['mutation', 'sqlmigration'] as const,
-  /** Create sqlMigration mutation key */ create: () =>
-    ['mutation', 'sqlmigration', 'create'] as const,
-  /** Update sqlMigration mutation key */ update: (id: string | number) =>
-    ['mutation', 'sqlmigration', 'update', id] as const,
-  /** Delete sqlMigration mutation key */ delete: (id: string | number) =>
-    ['mutation', 'sqlmigration', 'delete', id] as const,
+export const sqlActionMutationKeys = {
+  /** All sqlAction mutation keys */ all: ['mutation', 'sqlaction'] as const,
+  /** Create sqlAction mutation key */ create: () => ['mutation', 'sqlaction', 'create'] as const,
+  /** Update sqlAction mutation key */ update: (id: string | number) =>
+    ['mutation', 'sqlaction', 'update', id] as const,
+  /** Delete sqlAction mutation key */ delete: (id: string | number) =>
+    ['mutation', 'sqlaction', 'delete', id] as const,
 } as const;
 export const userMutationKeys = {
   /** All user mutation keys */ all: ['mutation', 'user'] as const,
@@ -1185,7 +1184,6 @@ export const mutationKeys = {
   denormalizedTableField: denormalizedTableFieldMutationKeys,
   emailsModule: emailsModuleMutationKeys,
   encryptedSecretsModule: encryptedSecretsModuleMutationKeys,
-  fieldModule: fieldModuleMutationKeys,
   invitesModule: invitesModuleMutationKeys,
   levelsModule: levelsModuleMutationKeys,
   limitsModule: limitsModuleMutationKeys,
@@ -1230,6 +1228,7 @@ export const mutationKeys = {
   store: storeMutationKeys,
   appPermissionDefault: appPermissionDefaultMutationKeys,
   roleType: roleTypeMutationKeys,
+  migrateFile: migrateFileMutationKeys,
   appLimitDefault: appLimitDefaultMutationKeys,
   orgLimitDefault: orgLimitDefaultMutationKeys,
   nodeTypeRegistry: nodeTypeRegistryMutationKeys,
@@ -1238,7 +1237,7 @@ export const mutationKeys = {
   appMembershipDefault: appMembershipDefaultMutationKeys,
   rlsModule: rlsModuleMutationKeys,
   orgMembershipDefault: orgMembershipDefaultMutationKeys,
-  sqlMigration: sqlMigrationMutationKeys,
+  sqlAction: sqlActionMutationKeys,
   user: userMutationKeys,
   astMigration: astMigrationMutationKeys,
   appMembership: appMembershipMutationKeys,

@@ -303,11 +303,6 @@ function App() {
 | `useCreateEncryptedSecretsModuleMutation` | Mutation | Create a encryptedSecretsModule |
 | `useUpdateEncryptedSecretsModuleMutation` | Mutation | Update a encryptedSecretsModule |
 | `useDeleteEncryptedSecretsModuleMutation` | Mutation | Delete a encryptedSecretsModule |
-| `useFieldModulesQuery` | Query | List all fieldModules |
-| `useFieldModuleQuery` | Query | Get one fieldModule |
-| `useCreateFieldModuleMutation` | Mutation | Create a fieldModule |
-| `useUpdateFieldModuleMutation` | Mutation | Update a fieldModule |
-| `useDeleteFieldModuleMutation` | Mutation | Delete a fieldModule |
 | `useInvitesModulesQuery` | Query | List all invitesModules |
 | `useInvitesModuleQuery` | Query | Get one invitesModule |
 | `useCreateInvitesModuleMutation` | Mutation | Create a invitesModule |
@@ -528,6 +523,11 @@ function App() {
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
 | `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
 | `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
+| `useMigrateFilesQuery` | Query | List all migrateFiles |
+| `useMigrateFileQuery` | Query | Get one migrateFile |
+| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
+| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
+| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
 | `useAppLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useAppLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useCreateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
@@ -568,11 +568,11 @@ function App() {
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useSqlMigrationsQuery` | Query | List all sqlMigrations |
-| `useSqlMigrationQuery` | Query | Get one sqlMigration |
-| `useCreateSqlMigrationMutation` | Mutation | Create a sqlMigration |
-| `useUpdateSqlMigrationMutation` | Mutation | Update a sqlMigration |
-| `useDeleteSqlMigrationMutation` | Mutation | Delete a sqlMigration |
+| `useSqlActionsQuery` | Query | List all sqlActions |
+| `useSqlActionQuery` | Query | Get one sqlAction |
+| `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
+| `useUpdateSqlActionMutation` | Mutation | Update a sqlAction |
+| `useDeleteSqlActionMutation` | Mutation | Delete a sqlAction |
 | `useUsersQuery` | Query | List all users |
 | `useUserQuery` | Query | Get one user |
 | `useCreateUserMutation` | Mutation | Create a user |
@@ -1678,27 +1678,6 @@ const { mutate: create } = useCreateEncryptedSecretsModuleMutation({
 create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```
 
-### FieldModule
-
-```typescript
-// List all fieldModules
-const { data, isLoading } = useFieldModulesQuery({
-  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } },
-});
-
-// Get one fieldModule
-const { data: item } = useFieldModuleQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } },
-});
-
-// Create a fieldModule
-const { mutate: create } = useCreateFieldModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', nodeType: '<String>', data: '<JSON>', triggers: '<String>', functions: '<String>' });
-```
-
 ### InvitesModule
 
 ```typescript
@@ -2623,6 +2602,27 @@ const { mutate: create } = useCreateRoleTypeMutation({
 create({ name: '<String>' });
 ```
 
+### MigrateFile
+
+```typescript
+// List all migrateFiles
+const { data, isLoading } = useMigrateFilesQuery({
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Get one migrateFile
+const { data: item } = useMigrateFileQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Create a migrateFile
+const { mutate: create } = useCreateMigrateFileMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', upload: '<Upload>' });
+```
+
 ### AppLimitDefault
 
 ```typescript
@@ -2791,22 +2791,22 @@ const { mutate: create } = useCreateOrgMembershipDefaultMutation({
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' });
 ```
 
-### SqlMigration
+### SqlAction
 
 ```typescript
-// List all sqlMigrations
-const { data, isLoading } = useSqlMigrationsQuery({
+// List all sqlActions
+const { data, isLoading } = useSqlActionsQuery({
   selection: { fields: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
 });
 
-// Get one sqlMigration
-const { data: item } = useSqlMigrationQuery({
+// Get one sqlAction
+const { data: item } = useSqlActionQuery({
   id: '<Int>',
   selection: { fields: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } },
 });
 
-// Create a sqlMigration
-const { mutate: create } = useCreateSqlMigrationMutation({
+// Create a sqlAction
+const { mutate: create } = useCreateSqlActionMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' });
