@@ -7,7 +7,7 @@
  *
  * Back-ported from Dashboard's `packages/data/src/query-generator.ts`.
  */
-import { camelize, pluralize } from 'inflekt';
+import { toCamelCase, pluralize } from 'inflekt';
 
 import type { Table } from '../types/schema';
 
@@ -43,7 +43,7 @@ export function toCamelCasePlural(
   tableName: string,
   table?: Table | null,
 ): string {
-  const singular = camelize(tableName, true);
+  const singular = toCamelCase(tableName);
   const inflectedPlural = pluralize(singular);
   const serverPluralCandidates = [
     table?.query?.all,
@@ -78,7 +78,7 @@ export function toCamelCaseSingular(
   tableName: string,
   table?: Table | null,
 ): string {
-  const localSingular = camelize(tableName, true);
+  const localSingular = toCamelCase(tableName);
 
   for (const candidateRaw of [
     table?.query?.one,

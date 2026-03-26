@@ -13,17 +13,17 @@
  *   db_migrate.sql_actions -> sqlActions
  *   column database_id -> databaseId
  */
-import { camelize, distinctPluralize, singularizeLast, underscore } from 'inflekt';
+import { toCamelCase, toPascalCase, distinctPluralize, singularizeLast, underscore } from 'inflekt';
 
 /**
  * Get the GraphQL query field name for a given Postgres table name.
  * Mirrors the PostGraphile InflektPlugin's allRowsConnection inflector:
- *   camelize(distinctPluralize(singularizeLast(camelize(pgTableName))), true)
+ *   toCamelCase(distinctPluralize(singularizeLast(toPascalCase(pgTableName))))
  */
 export const getGraphQLQueryName = (pgTableName: string): string => {
-  const pascal = camelize(pgTableName);
+  const pascal = toPascalCase(pgTableName);
   const singularized = singularizeLast(pascal);
-  return camelize(distinctPluralize(singularized), true);
+  return toCamelCase(distinctPluralize(singularized));
 };
 
 /**
@@ -68,7 +68,7 @@ export const buildFieldsFragment = (
   fieldTypes?: Record<string, string>
 ): string => {
   return pgFieldNames.map(name => {
-    const camel = camelize(name, true);
+    const camel = toCamelCase(name);
     const fieldType = fieldTypes?.[name];
     if (fieldType === 'interval') {
       return `${camel} { seconds minutes hours days months years }`;

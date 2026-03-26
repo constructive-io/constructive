@@ -4,7 +4,7 @@
  * These are exported so that packages/cli can use the same questions,
  * types, and transform utilities, ensuring consistency between the two CLIs.
  */
-import { camelize } from 'inflekt';
+import { toCamelCase } from 'inflekt';
 import { inflektTree } from 'inflekt/transform-keys';
 import type { Question } from 'inquirerer';
 
@@ -154,7 +154,7 @@ export const camelizeArgv = (argv: Record<string, any>): Record<string, any> =>
     argv,
     (key) => {
       const underscored = key.replace(/-/g, '_');
-      return camelize(underscored, true);
+      return toCamelCase(underscored);
     },
     { skip: skipNonTopLevel },
   );

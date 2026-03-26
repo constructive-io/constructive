@@ -8,7 +8,7 @@ import type {
   ValueNode,
   VariableDefinitionNode,
 } from 'graphql';
-import { camelize, singularize } from 'inflekt';
+import { toCamelCase, toPascalCase, singularize } from 'inflekt';
 
 import { getCustomAst } from './custom-ast';
 import type {
@@ -376,7 +376,7 @@ export const createOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = camelize([singularize(mutation.model)].join('_'), true);
+  const modelName = toCamelCase(singularize(mutation.model));
 
   const inputProperties = mutation.properties.input
     .properties as NestedProperties;
@@ -442,7 +442,7 @@ export const patchOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = camelize([singularize(mutation.model)].join('_'), true);
+  const modelName = toCamelCase(singularize(mutation.model));
 
   const inputProperties = mutation.properties.input
     .properties as NestedProperties;
@@ -516,7 +516,7 @@ export const deleteOne = ({
     throw new Error(`No input field for mutation: ${mutationName}`);
   }
 
-  const modelName = camelize([singularize(mutation.model)].join('_'), true);
+  const modelName = toCamelCase(singularize(mutation.model));
 
   const inputProperties = mutation.properties.input
     .properties as NestedProperties;

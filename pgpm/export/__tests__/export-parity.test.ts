@@ -49,7 +49,7 @@ import { exportMigrations } from '../src/export-migrations';
 import { exportMeta } from '../src/export-meta';
 import { GraphQLClient } from '../src/graphql-client';
 import { exportGraphQLMeta } from '../src/export-graphql-meta';
-import { camelize } from 'inflekt';
+import { toCamelCase } from 'inflekt';
 import { getConnections, seed } from 'pgsql-test';
 
 import type { PgpmPackage as PgpmPackageType } from '@pgpmjs/core';
@@ -88,7 +88,7 @@ const collectFiles = (dir: string, base = dir): Record<string, string> => {
 const pgRowToCamel = (row: Record<string, unknown>): Record<string, unknown> => {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(row)) {
-    out[camelize(k, true)] = v;
+    out[toCamelCase(k)] = v;
   }
   return out;
 };
