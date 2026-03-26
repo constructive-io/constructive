@@ -1,0 +1,109 @@
+import { Logger } from '@pgpmjs/logger';
+import { LRUCache } from 'lru-cache';
+import type { StorageModuleConfig } from './types';
+
+const log = new Logger('graphile-presigned-url:cache');
+
+const FIVE_MINUTES_MS = 1000 * 60 * 5;
+const ONE_HOUR_MS = 1000 * 60 * 60;
+
+/**
+ * LRU cache for per-database StorageModuleConfig.
+ *
+ * Each PostGraphile instance serves a single database, but the presigned URL
+ * plugin needs to know the generated table names (buckets, files,
+ * upload_requests) and their schemas. This cache avoids re-querying metaschema
+ * on every request.
+ *
+ * Pattern: same as graphile-cache's LRU with TTL-based eviction.
+ */
+const storageModuleCache = new LRUCache<string, StorageModuleConfig>({
+  max: 50,
+  ttl: process.env.NODE_ENV === 'development' ? FIVE_MINUTES_MS : ONE_HOUR_MS,
+  updateAgeOnGet: true,
+});
+
+/**
+ * SQL query to resolve storage module config for a database.
+ *
+ * Joins storage_module → table → schema to get fully-qualified table names.
+ */
+const STORAGE_MODULE_QUERY = `
+  SELECT
+    sm.id,
+    bs.schema_name AS buckets_schema,
+    bt.name AS buckets_table,
+    fs.schema_name AS files_schema,
+    ft.name AS files_table,
+    urs.schema_name AS upload_requests_schema,
+    urt.name AS upload_requests_table
+  FROM metaschema_modules_public.storage_module sm
+  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
+  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
+  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
+  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
+  JOIN metaschema_public.table urt ON urt.id = sm.upload_requests_table_id
+  JOIN metaschema_public.schema urs ON urs.id = urt.schema_id
+  WHERE sm.database_id = $1
+  LIMIT 1
+`;
+
+interface StorageModuleRow {
+  id: string;
+  buckets_schema: string;
+  buckets_table: string;
+  files_schema: string;
+  files_table: string;
+  upload_requests_schema: string;
+  upload_requests_table: string;
+}
+
+/**
+ * Resolve the storage module config for a database, using the LRU cache.
+ *
+ * @param pgClient - A pg client from the Graphile context (withPgClient or pgClient)
+ * @param databaseId - The metaschema database UUID
+ * @returns StorageModuleConfig or null if no storage module is provisioned
+ */
+export async function getStorageModuleConfig(
+  pgClient: { query: (sql: string, params: unknown[]) => Promise<{ rows: unknown[] }> },
+  databaseId: string,
+): Promise<StorageModuleConfig | null> {
+  const cacheKey = `storage:${databaseId}`;
+  const cached = storageModuleCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  log.debug(`Cache miss for database ${databaseId}, querying metaschema...`);
+
+  const result = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
+  if (result.rows.length === 0) {
+    log.warn(`No storage module found for database ${databaseId}`);
+    return null;
+  }
+
+  const row = result.rows[0] as StorageModuleRow;
+  const config: StorageModuleConfig = {
+    id: row.id,
+    bucketsQualifiedName: `"${row.buckets_schema}"."${row.buckets_table}"`,
+    filesQualifiedName: `"${row.files_schema}"."${row.files_table}"`,
+    uploadRequestsQualifiedName: `"${row.upload_requests_schema}"."${row.upload_requests_table}"`,
+    schemaName: row.buckets_schema,
+    bucketsTableName: row.buckets_table,
+    filesTableName: row.files_table,
+    uploadRequestsTableName: row.upload_requests_table,
+  };
+
+  storageModuleCache.set(cacheKey, config);
+  log.debug(`Cached storage config for database ${databaseId}: ${config.bucketsQualifiedName}`);
+
+  return config;
+}
+
+/**
+ * Clear the storage module cache (useful for testing or schema changes).
+ */
+export function clearStorageModuleCache(): void {
+  storageModuleCache.clear();
+}
