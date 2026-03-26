@@ -26,7 +26,8 @@
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "generate:seed": "ts-node src/codegen/generate-seed.ts"
   },
   "dependencies": {
     "@pgsql/types": "^17.6.2",
