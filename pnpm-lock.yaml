@@ -642,6 +642,12 @@ importers:
 
   graphile/node-type-registry:
     dependencies:
+      '@babel/generator':
+        specifier: ^7.29.0
+        version: 7.29.1
+      '@babel/types':
+        specifier: ^7.29.0
+        version: 7.29.0
       '@pgsql/types':
         specifier: ^17.6.2
         version: 17.6.2
@@ -651,6 +657,9 @@ importers:
       pgsql-deparser:
         specifier: ^17.18.1
         version: 17.18.1
+      schema-typescript:
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       makage:
         specifier: ^0.1.10
@@ -2975,11 +2984,6 @@ packages:
   '@babel/helpers@7.28.6':
     resolution: {integrity: sha512-xOBvwq86HHdB7WUDTfKfT/Vuxh7gElQ+Sfti2Cy6yIWNW05P8iUslOVcZ4/sKbE+/jQaukQAdz/gf3724kYdqw==}
     engines: {node: '>=6.9.0'}
-
-  '@babel/parser@7.28.6':
-    resolution: {integrity: sha512-TeR9zWR18BvbfPmGbLampPMW+uW1NZnJlRuuHso8i87QZNq2JRF9i6RgxRqtEq+wQGsS19NNTWr2duhnE49mfQ==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
 
   '@babel/parser@7.29.0':
     resolution: {integrity: sha512-IyDgFV5GeDUVX4YdF/3CPULtVGSXXMLh1xVIgdCgxApktqnQV0r7/8Nqthg+8YLGaAtdyIlo2qIdZrbCv4+7ww==}
@@ -8978,6 +8982,9 @@ packages:
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
 
+  schema-typescript@0.14.1:
+    resolution: {integrity: sha512-BM9DO5LKrmCsXHfBKd8x6FzdMjj1ZN01KGCEQVgkOWM3X9GbNvEWR0MlXQDCPli9ZDr8EvQLYgO/v3FYss6oxg==}
+
   semver@5.7.2:
     resolution: {integrity: sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==}
     hasBin: true
@@ -10281,7 +10288,7 @@ snapshots:
       '@babel/helper-compilation-targets': 7.28.6
       '@babel/helper-module-transforms': 7.28.6(@babel/core@7.28.6)
       '@babel/helpers': 7.28.6
-      '@babel/parser': 7.28.6
+      '@babel/parser': 7.29.0
       '@babel/template': 7.28.6
       '@babel/traverse': 7.28.6(supports-color@5.5.0)
       '@babel/types': 7.29.0
@@ -10381,10 +10388,6 @@ snapshots:
   '@babel/helpers@7.28.6':
     dependencies:
       '@babel/template': 7.28.6
-      '@babel/types': 7.29.0
-
-  '@babel/parser@7.28.6':
-    dependencies:
       '@babel/types': 7.29.0
 
   '@babel/parser@7.29.0':
@@ -10500,7 +10503,7 @@ snapshots:
   '@babel/template@7.28.6':
     dependencies:
       '@babel/code-frame': 7.28.6
-      '@babel/parser': 7.28.6
+      '@babel/parser': 7.29.0
       '@babel/types': 7.29.0
 
   '@babel/traverse@7.28.5':
@@ -10510,7 +10513,7 @@ snapshots:
       '@babel/helper-globals': 7.28.0
       '@babel/parser': 7.29.0
       '@babel/template': 7.28.6
-      '@babel/types': 7.28.5
+      '@babel/types': 7.29.0
       debug: 4.4.3(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
@@ -10520,7 +10523,7 @@ snapshots:
       '@babel/code-frame': 7.28.6
       '@babel/generator': 7.29.1
       '@babel/helper-globals': 7.28.0
-      '@babel/parser': 7.28.6
+      '@babel/parser': 7.29.0
       '@babel/template': 7.28.6
       '@babel/types': 7.29.0
       debug: 4.4.3(supports-color@5.5.0)
@@ -12784,7 +12787,7 @@ snapshots:
 
   '@types/babel__core@7.20.5':
     dependencies:
-      '@babel/parser': 7.28.6
+      '@babel/parser': 7.29.0
       '@babel/types': 7.29.0
       '@types/babel__generator': 7.27.0
       '@types/babel__template': 7.4.4
@@ -12796,7 +12799,7 @@ snapshots:
 
   '@types/babel__template@7.4.4':
     dependencies:
-      '@babel/parser': 7.28.6
+      '@babel/parser': 7.29.0
       '@babel/types': 7.29.0
 
   '@types/babel__traverse@7.28.0':
@@ -17522,6 +17525,14 @@ snapshots:
   safer-buffer@2.1.2: {}
 
   scheduler@0.27.0: {}
+
+  schema-typescript@0.14.1:
+    dependencies:
+      '@babel/generator': 7.29.1
+      '@babel/types': 7.29.0
+      deepmerge: 4.3.1
+      komoji: 0.8.1
+      minimatch: 10.2.4
 
   semver@5.7.2: {}
 
