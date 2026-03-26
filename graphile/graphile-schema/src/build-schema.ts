@@ -1,3 +1,4 @@
+import deepmerge from 'deepmerge'
 import { printSchema } from 'graphql'
 import { ConstructivePreset, makePgService } from 'graphile-settings'
 import { makeSchema } from 'graphile-build'
@@ -23,16 +24,22 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
   // causing "database has active sessions" errors during ephemeral DB teardown.
   const pool = getPgPool(config)
 
-  // Compose presets using Graphile's native `extends` mechanism instead of
-  // deepmerge.  deepmerge recursively clones every nested object — including
-  // the pg Pool (EventEmitter internals) and the entire PostGraphile preset
-  // tree — which overflows the call stack.
+  // Hybrid preset composition: use deepmerge for safe scalar/object keys
+  // (plugins, disablePlugins, schema, gather, etc.) but pluck out `extends`
+  // and `pgServices` to compose them via Graphile's native mechanism.
+  // deepmerge cannot deep-clone `extends` (contains the entire PostGraphile
+  // preset tree) or `pgServices` (contains pg Pool / EventEmitter internals)
+  // without overflowing the call stack.
+  const { extends: callerExtends, pgServices: _pgServices, ...callerRest } = opts.graphile ?? {}
+
+  const baseRest: GraphileConfig.Preset = {}
+
   const preset: GraphileConfig.Preset = {
+    ...deepmerge(baseRest, callerRest),
     extends: [
       ConstructivePreset,
-      ...(opts.graphile?.extends ?? []),
+      ...(callerExtends ?? []),
     ],
-    plugins: opts.graphile?.plugins ?? [],
     pgServices: [
       makePgService({
         pool,
