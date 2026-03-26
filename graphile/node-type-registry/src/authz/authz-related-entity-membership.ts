@@ -1,70 +1,73 @@
 import type { NodeTypeDefinition } from '../types';
 
 export const AuthzRelatedEntityMembership: NodeTypeDefinition = {
-  name: 'AuthzRelatedEntityMembership',
-  slug: 'authz_related_entity_membership',
-  category: 'authz',
-  display_name: 'Related Entity Membership',
-  description: 'JOIN-based membership verification through related tables. Joins SPRT table with another table to verify membership.',
-  parameter_schema: {
-      "type": "object",
-      "properties": {
-        "entity_field": {
-          "type": "string",
-          "description": "Column name on protected table referencing the join table"
-        },
-        "membership_type": {
-          "type": [
-            "integer",
-            "string"
-          ],
-          "description": "Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module)"
-        },
-        "obj_table_id": {
-          "type": "string",
-          "format": "uuid",
-          "description": "UUID of the join table (alternative to obj_schema/obj_table)"
-        },
-        "obj_schema": {
-          "type": "string",
-          "description": "Schema of the join table (or use obj_table_id)"
-        },
-        "obj_table": {
-          "type": "string",
-          "description": "Name of the join table (or use obj_table_id)"
-        },
-        "obj_field_id": {
-          "type": "string",
-          "format": "uuid",
-          "description": "UUID of field on join table (alternative to obj_field)"
-        },
-        "obj_field": {
-          "type": "string",
-          "description": "Field name on join table to match against SPRT entity_id"
-        },
-        "permission": {
-          "type": "string",
-          "description": "Single permission name to check (resolved to bitstring mask)"
-        },
-        "permissions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Multiple permission names to check (ORed together into mask)"
-        },
-        "is_admin": {
-          "type": "boolean",
-          "description": "If true, require is_admin flag"
-        },
-        "is_owner": {
-          "type": "boolean",
-          "description": "If true, require is_owner flag"
-        }
+  "name": "AuthzRelatedEntityMembership",
+  "slug": "authz_related_entity_membership",
+  "category": "authz",
+  "display_name": "Related Entity Membership",
+  "description": "JOIN-based membership verification through related tables. Joins SPRT table with another table to verify membership.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "entity_field": {
+        "type": "string",
+        "description": "Column name on protected table referencing the join table"
       },
-      "required": [
-        "entity_field"
-      ]
+      "membership_type": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "description": "Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module)"
+      },
+      "obj_table_id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "UUID of the join table (alternative to obj_schema/obj_table)"
+      },
+      "obj_schema": {
+        "type": "string",
+        "description": "Schema of the join table (or use obj_table_id)"
+      },
+      "obj_table": {
+        "type": "string",
+        "description": "Name of the join table (or use obj_table_id)"
+      },
+      "obj_field_id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "UUID of field on join table (alternative to obj_field)"
+      },
+      "obj_field": {
+        "type": "string",
+        "description": "Field name on join table to match against SPRT entity_id"
+      },
+      "permission": {
+        "type": "string",
+        "description": "Single permission name to check (resolved to bitstring mask)"
+      },
+      "permissions": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Multiple permission names to check (ORed together into mask)"
+      },
+      "is_admin": {
+        "type": "boolean",
+        "description": "If true, require is_admin flag"
+      },
+      "is_owner": {
+        "type": "boolean",
+        "description": "If true, require is_owner flag"
+      }
     },
-  tags: ['membership', 'authz'],
+    "required": [
+      "entity_field"
+    ]
+  },
+  "tags": [
+    "membership",
+    "authz"
+  ]
 };
