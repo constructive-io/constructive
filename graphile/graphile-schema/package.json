@@ -29,7 +29,6 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "deepmerge": "^4.3.1",
     "graphile-build": "5.0.0-rc.6",
     "graphile-config": "1.0.0-rc.6",
     "graphile-settings": "workspace:^",
