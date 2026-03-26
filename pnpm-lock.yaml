@@ -7120,6 +7120,9 @@ packages:
     resolution: {integrity: sha512-+Bg3+kg+J6JUWn8J6bzFmOWkTQ6L/NHfDRSYU+EVvuKHDxUDHAXgqixHfVlzuBQaPOTac8hn43aPhMNk6rMe3g==}
     engines: {node: '>=18.0.0'}
 
+  inflekt@0.3.3:
+    resolution: {integrity: sha512-Jw3XIpEwkvgxb0yoQfS4vIpL2dW4gFyn0kHjRWTSpuWbJWyn5/3PvsUy9QSWSSxoiAbeyXXdz4Gzk7HIOTnS4Q==}
+
   inflekt@0.5.0:
     resolution: {integrity: sha512-4cDyXHcmXyU924YNrjHdwVsGZJlLQJ645jQdsti59gys8wArpHm+AZ47j03KKXQMMNo7zDl0sz9gSXT9vY5m6A==}
 
@@ -15000,6 +15003,10 @@ snapshots:
   indent-string@4.0.0: {}
 
   inflection@3.0.2: {}
+
+  inflekt@0.3.3:
+    dependencies:
+      inflection: 3.0.2
 
   inflekt@0.5.0:
     dependencies:
