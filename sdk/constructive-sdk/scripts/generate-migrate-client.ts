@@ -6,6 +6,8 @@
  * so that migrate-client itself has zero codegen dependency — avoiding
  * circular deps when pgpm/core imports @pgpmjs/migrate-client.
  */
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {
   generateMulti,
   expandSchemaDirToMultiTarget,
@@ -63,6 +65,19 @@ async function main() {
   if (realError) {
     console.error('\nGeneration failed');
     process.exit(1);
+  }
+
+  // generateMulti only writes a root barrel when there are multiple targets.
+  // migrate-client has a single target ("migrate"), so we must write
+  // src/index.ts ourselves to keep the package entry-point intact.
+  const successfulNames = results.filter((r) => r.result.success).map((r) => r.name);
+  if (successfulNames.length > 0) {
+    const indexPath = path.resolve(OUTPUT_DIR, 'index.ts');
+    const barrel = successfulNames
+      .map((name) => `export * from './${name}';`)
+      .join('\n');
+    fs.writeFileSync(indexPath, barrel + '\n', 'utf-8');
+    console.log(`Wrote root barrel: ${indexPath}`);
   }
 
   console.log('\nMigrate-client ORM generation completed successfully!');
