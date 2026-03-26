@@ -139,20 +139,28 @@ function buildInsertStmt(nt: NodeTypeDefinition): Node {
 // pgpm file generators
 // ---------------------------------------------------------------------------
 
+const GENERATED_HEADER = [
+  '-- GENERATED FILE — DO NOT EDIT',
+  '--',
+  '-- Regenerate with:',
+  '--   cd graphile/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema',
+  '--',
+  '',
+].join('\n');
+
 async function buildDeploySql(): Promise<string> {
   const header = [
     `-- Deploy ${MIGRATION_PATH} to pg`,
     '',
+    GENERATED_HEADER,
     '-- requires: schemas/metaschema_public/tables/node_type_registry/table',
-    '',
-    'BEGIN;',
     '',
   ].join('\n');
 
   const stmts = allNodeTypes.map(buildInsertStmt);
   const body = await deparse(stmts);
 
-  return header + body + '\n\nCOMMIT;\n';
+  return header + body + '\n';
 }
 
 function buildRevertSql(): string {
@@ -167,14 +175,11 @@ function buildRevertSql(): string {
   return [
     `-- Revert ${MIGRATION_PATH} from pg`,
     '',
-    'BEGIN;',
-    '',
+    GENERATED_HEADER,
     'DELETE FROM metaschema_public.node_type_registry',
     'WHERE name IN (',
     chunks.join(',\n'),
     ');',
-    '',
-    'COMMIT;',
     '',
   ].join('\n');
 }
@@ -196,11 +201,8 @@ function buildVerifySql(): string {
   return [
     `-- Verify ${MIGRATION_PATH} on pg`,
     '',
-    'BEGIN;',
-    '',
+    GENERATED_HEADER,
     ...checks,
-    '',
-    'ROLLBACK;',
     '',
   ].join('\n');
 }
