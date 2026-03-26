@@ -5,10 +5,16 @@
  * suitable for use as separate pgpm migration files.
  *
  * Usage:
- *   npx ts-node src/codegen/generate-seed.ts [--outdir <dir>] [--single]
+ *   npx ts-node src/codegen/generate-seed.ts [--outdir <dir>] [--single] [--pgpm <dir>]
  *
  *   --outdir <dir>   Directory to write individual SQL files (default: stdout)
  *   --single         Emit a single combined seed.sql instead of per-node files
+ *   --pgpm <dir>     Generate deploy/revert/verify files in pgpm package layout.
+ *                     <dir> is the pgpm package root (e.g. packages/metaschema).
+ *                     Files are written relative to this root at:
+ *                       deploy/schemas/metaschema_public/tables/node_type_registry/data/seed.sql
+ *                       revert/schemas/metaschema_public/tables/node_type_registry/data/seed.sql
+ *                       verify/schemas/metaschema_public/tables/node_type_registry/data/seed.sql
  *
  * Examples:
  *   # Print all INSERT statements to stdout
@@ -19,6 +25,9 @@
  *
  *   # Generate a single combined seed file
  *   npx ts-node src/codegen/generate-seed.ts --single --outdir ./deploy
+ *
+ *   # Generate pgpm deploy/revert/verify files
+ *   npx ts-node src/codegen/generate-seed.ts --pgpm ../../constructive-db/packages/metaschema
  */
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
@@ -28,6 +37,13 @@ import { ast, nodes } from '@pgsql/utils';
 import type { Node } from '@pgsql/types';
 import { allNodeTypes } from '../index';
 import type { NodeTypeDefinition } from '../types';
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const MIGRATION_PATH =
+  'schemas/metaschema_public/tables/node_type_registry/data/seed';
 
 // ---------------------------------------------------------------------------
 // AST helpers
@@ -120,19 +136,120 @@ function buildInsertStmt(nt: NodeTypeDefinition): Node {
 }
 
 // ---------------------------------------------------------------------------
+// pgpm file generators
+// ---------------------------------------------------------------------------
+
+async function buildDeploySql(): Promise<string> {
+  const header = [
+    `-- Deploy ${MIGRATION_PATH} to pg`,
+    '',
+    '-- requires: schemas/metaschema_public/tables/node_type_registry/table',
+    '',
+    'BEGIN;',
+    '',
+  ].join('\n');
+
+  const stmts = allNodeTypes.map(buildInsertStmt);
+  const body = await deparse(stmts);
+
+  return header + body + '\n\nCOMMIT;\n';
+}
+
+function buildRevertSql(): string {
+  const names = allNodeTypes.map((nt) => `    '${nt.name}'`);
+
+  // Wrap names at ~4 per line for readability
+  const chunks: string[] = [];
+  for (let i = 0; i < names.length; i += 4) {
+    chunks.push(names.slice(i, i + 4).join(', '));
+  }
+
+  return [
+    `-- Revert ${MIGRATION_PATH} from pg`,
+    '',
+    'BEGIN;',
+    '',
+    'DELETE FROM metaschema_public.node_type_registry',
+    'WHERE name IN (',
+    chunks.join(',\n'),
+    ');',
+    '',
+    'COMMIT;',
+    '',
+  ].join('\n');
+}
+
+function buildVerifySql(): string {
+  // Pick one representative from each category
+  const categories = new Map<string, NodeTypeDefinition>();
+  for (const nt of allNodeTypes) {
+    if (!categories.has(nt.category)) {
+      categories.set(nt.category, nt);
+    }
+  }
+
+  const checks = Array.from(categories.values()).map(
+    (nt) =>
+      `SELECT 1 FROM metaschema_public.node_type_registry WHERE name = '${nt.name}';`
+  );
+
+  return [
+    `-- Verify ${MIGRATION_PATH} on pg`,
+    '',
+    'BEGIN;',
+    '',
+    ...checks,
+    '',
+    'ROLLBACK;',
+    '',
+  ].join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// File writer helper
+// ---------------------------------------------------------------------------
+
+function writeFile(filePath: string, content: string): void {
+  const dir = join(filePath, '..');
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  writeFileSync(filePath, content);
+}
+
+// ---------------------------------------------------------------------------
 // CLI
 // ---------------------------------------------------------------------------
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const outdirIdx = args.indexOf('--outdir');
   const outdir = outdirIdx !== -1 ? args[outdirIdx + 1] : undefined;
   const single = args.includes('--single');
+  const pgpmIdx = args.indexOf('--pgpm');
+  const pgpmRoot = pgpmIdx !== -1 ? args[pgpmIdx + 1] : undefined;
+
+  // --pgpm mode: generate deploy/revert/verify in pgpm package layout
+  if (pgpmRoot) {
+    const relPath = 'schemas/metaschema_public/tables/node_type_registry/data/seed.sql';
+
+    const deployPath = join(pgpmRoot, 'deploy', relPath);
+    const revertPath = join(pgpmRoot, 'revert', relPath);
+    const verifyPath = join(pgpmRoot, 'verify', relPath);
+
+    writeFile(deployPath, await buildDeploySql());
+    writeFile(revertPath, buildRevertSql());
+    writeFile(verifyPath, buildVerifySql());
+
+    console.log(`Wrote ${allNodeTypes.length} node types to pgpm layout:`);
+    console.log(`  deploy: ${deployPath}`);
+    console.log(`  revert: ${revertPath}`);
+    console.log(`  verify: ${verifyPath}`);
+    return;
+  }
 
   if (single) {
     // Emit all INSERT statements as a single SQL string
     const stmts = allNodeTypes.map(buildInsertStmt);
-    const sql = deparse(stmts);
+    const sql = await deparse(stmts);
     if (outdir) {
       if (!existsSync(outdir)) mkdirSync(outdir, { recursive: true });
       writeFileSync(join(outdir, 'seed.sql'), sql + '\n');
@@ -144,10 +261,12 @@ function main() {
   }
 
   // Emit individual SQL files per node type
-  const stmts = allNodeTypes.map((nt) => ({
-    nt,
-    sql: deparse([buildInsertStmt(nt)]),
-  }));
+  const stmts = await Promise.all(
+    allNodeTypes.map(async (nt) => ({
+      nt,
+      sql: await deparse([buildInsertStmt(nt)]),
+    }))
+  );
 
   if (outdir) {
     if (!existsSync(outdir)) mkdirSync(outdir, { recursive: true });
