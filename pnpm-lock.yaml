@@ -479,8 +479,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inflekt:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
       lru-cache:
         specifier: ^11.2.7
         version: 11.2.7
@@ -705,8 +705,8 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inflekt:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
       inquirerer:
         specifier: ^4.7.0
         version: 4.7.0
@@ -964,8 +964,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.2
       inflekt:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
       lru-cache:
         specifier: ^11.2.7
         version: 11.2.7
@@ -2077,8 +2077,8 @@ importers:
         specifier: ^13.0.6
         version: 13.0.6
       inflekt:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
       inquirerer:
         specifier: ^4.7.0
         version: 4.7.0
@@ -2244,8 +2244,8 @@ importers:
         specifier: workspace:^
         version: link:../../pgpm/types/dist
       inflekt:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.1
+        version: 0.5.1
       pg:
         specifier: ^8.20.0
         version: 8.20.0
@@ -7123,8 +7123,8 @@ packages:
     resolution: {integrity: sha512-+Bg3+kg+J6JUWn8J6bzFmOWkTQ6L/NHfDRSYU+EVvuKHDxUDHAXgqixHfVlzuBQaPOTac8hn43aPhMNk6rMe3g==}
     engines: {node: '>=18.0.0'}
 
-  inflekt@0.5.0:
-    resolution: {integrity: sha512-4cDyXHcmXyU924YNrjHdwVsGZJlLQJ645jQdsti59gys8wArpHm+AZ47j03KKXQMMNo7zDl0sz9gSXT9vY5m6A==}
+  inflekt@0.5.1:
+    resolution: {integrity: sha512-dEKA3BN8FcXAIhr6LZUe+9CoyaumShaFnDXbMTGB7Lo3srsTdixHR7E+onY0EIfan3wwhf2jQEyHdCnjm4sHAw==}
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
@@ -15004,7 +15004,7 @@ snapshots:
 
   inflection@3.0.2: {}
 
-  inflekt@0.5.0:
+  inflekt@0.5.1:
     dependencies:
       inflection: 3.0.2
 
