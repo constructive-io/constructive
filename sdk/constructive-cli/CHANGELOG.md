@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.6](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.5...@constructive-sdk/cli@0.11.6) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [0.11.5](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.4...@constructive-sdk/cli@0.11.5) (2026-03-25)
+
+### Bug Fixes
+
+- revert type re-exports from ORM indexes, restore migrate-client entry point ([67895ab](https://github.com/constructive-io/constructive/commit/67895ab13a1c815e00b0c8d6fc9440a324d62467))
+
+## [0.11.4](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.3...@constructive-sdk/cli@0.11.4) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [0.11.3](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.2...@constructive-sdk/cli@0.11.3) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [0.11.2](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.1...@constructive-sdk/cli@0.11.2) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+## [0.11.1](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.11.0...@constructive-sdk/cli@0.11.1) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
+# [0.11.0](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.10.5...@constructive-sdk/cli@0.11.0) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-sdk/cli
+
 ## [0.10.5](https://github.com/constructive-io/constructive/compare/@constructive-sdk/cli@0.10.4...@constructive-sdk/cli@0.10.5) (2026-03-22)
 
 **Note:** Version bump only for package @constructive-sdk/cli

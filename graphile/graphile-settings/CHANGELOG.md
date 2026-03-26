@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.14.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.13.3...graphile-settings@4.14.0) (2026-03-25)
+
+### Features
+
+- add node-type-registry package — single source of truth for all 50 blueprint node types ([3fd4aa2](https://github.com/constructive-io/constructive/commit/3fd4aa28b3406eab3b7c810a4a7493ea45e269cb))
+
+## [4.13.3](https://github.com/constructive-io/constructive/compare/graphile-settings@4.13.2...graphile-settings@4.13.3) (2026-03-25)
+
+**Note:** Version bump only for package graphile-settings
+
+## [4.13.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.13.1...graphile-settings@4.13.2) (2026-03-25)
+
+**Note:** Version bump only for package graphile-settings
+
+## [4.13.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.13.0...graphile-settings@4.13.1) (2026-03-24)
+
+**Note:** Version bump only for package graphile-settings
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.12.2...graphile-settings@4.13.0) (2026-03-24)
+
+**Note:** Version bump only for package graphile-settings
+
 ## [4.12.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.12.1...graphile-settings@4.12.2) (2026-03-21)
 
 **Note:** Version bump only for package graphile-settings

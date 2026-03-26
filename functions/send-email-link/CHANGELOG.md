@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.2](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.5.1...@constructive-io/send-email-link-fn@2.5.2) (2026-03-25)
+
+### Bug Fixes
+
+- **send-email-link:** use X-Meta-Schema for platform data queries ([b29614c](https://github.com/constructive-io/constructive/commit/b29614ca540ceb43469d2e1d6b95edae4c5e87c8))
+
 ## [2.5.1](https://github.com/constructive-io/constructive/compare/@constructive-io/send-email-link-fn@2.5.0...@constructive-io/send-email-link-fn@2.5.1) (2026-03-15)
 
 **Note:** Version bump only for package @constructive-io/send-email-link-fn

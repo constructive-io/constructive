@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.22.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.5...@constructive-io/graphql-codegen@4.22.6) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.22.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.4...@constructive-io/graphql-codegen@4.22.5) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.22.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.3...@constructive-io/graphql-codegen@4.22.4) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.22.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.2...@constructive-io/graphql-codegen@4.22.3) (2026-03-25)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.22.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.1...@constructive-io/graphql-codegen@4.22.2) (2026-03-25)
+
+### Bug Fixes
+
+- **graphql-codegen:** re-export input types from generated ORM index ([259c1ad](https://github.com/constructive-io/constructive/commit/259c1ad805a3b85a2bd4feb09ff2b30629e12c49))
+- **graphql-codegen:** resolve ConnectionResult/PageInfo ambiguity between select-types and input-types ([410760a](https://github.com/constructive-io/constructive/commit/410760acfcaac86843927bb5808ca2438fbb1bd2))
+
+## [4.22.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.22.0...@constructive-io/graphql-codegen@4.22.1) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.22.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.21.2...@constructive-io/graphql-codegen@4.22.0) (2026-03-24)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
 ## [4.21.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.21.1...@constructive-io/graphql-codegen@4.21.2) (2026-03-21)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
