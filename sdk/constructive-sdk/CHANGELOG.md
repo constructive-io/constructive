@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.4](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.12.3...@constructive-io/sdk@0.12.4) (2026-03-26)
+
+### Bug Fixes
+
+- **codegen:** preserve migrate-client src/index.ts during regeneration ([7c176fe](https://github.com/constructive-io/constructive/commit/7c176feacadc21e85940ec95aa4ef9d3982ba3f6))
+
 ## [0.12.3](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.12.2...@constructive-io/sdk@0.12.3) (2026-03-26)
 
 **Note:** Version bump only for package @constructive-io/sdk

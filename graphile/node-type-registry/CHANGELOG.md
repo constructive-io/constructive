@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.4.0...node-type-registry@0.5.0) (2026-03-26)
+
+### Bug Fixes
+
+- delete preset.ts and remove unused graphile-settings/graphile-config deps from node-type-registry ([88d507d](https://github.com/constructive-io/constructive/commit/88d507d8084c992443d7afd46d478dd627f108e5))
+
+### Features
+
+- **node-type-registry:** add blueprint type codegen — generates TS types from node type definitions ([6490291](https://github.com/constructive-io/constructive/commit/649029106322baeedda4ce33ed195d0c3029d252))
+
 # [0.4.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.3.1...node-type-registry@0.4.0) (2026-03-26)
 
 ### Bug Fixes

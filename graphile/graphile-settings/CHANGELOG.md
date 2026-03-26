@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.16.1...graphile-settings@4.16.2) (2026-03-26)
+
+### Bug Fixes
+
+- remove blueprint-types exports from plugins/index.ts (module was deleted) ([fde6446](https://github.com/constructive-io/constructive/commit/fde644630ab39cd1e1d9f12efbf341bf238ec2a2))
+
 ## [4.16.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.16.0...graphile-settings@4.16.1) (2026-03-26)
 
 **Note:** Version bump only for package graphile-settings
