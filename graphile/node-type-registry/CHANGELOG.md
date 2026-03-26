@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.3.1...node-type-registry@0.4.0) (2026-03-26)
+
+### Bug Fixes
+
+- **node-type-registry:** remove tx wrappers, add generated-file header with regen command ([e1dce46](https://github.com/constructive-io/constructive/commit/e1dce4662c26f13588eaf9a82edf17d6db8b8d5e))
+
+### Features
+
+- **node-type-registry:** extend generate-seed.ts to emit pgpm deploy/revert/verify files ([fee1211](https://github.com/constructive-io/constructive/commit/fee1211f32d5ae7225f1ab2e8397c4b42c0c4b04))
+
 ## [0.3.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.3.0...node-type-registry@0.3.1) (2026-03-26)
 
 **Note:** Version bump only for package node-type-registry
