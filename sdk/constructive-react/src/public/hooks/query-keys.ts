@@ -460,15 +460,6 @@ export const encryptedSecretsModuleKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...encryptedSecretsModuleKeys.details(), id] as const,
 } as const;
-export const fieldModuleKeys = {
-  /** All fieldModule queries */ all: ['fieldmodule'] as const,
-  /** List query keys */ lists: () => [...fieldModuleKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...fieldModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...fieldModuleKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...fieldModuleKeys.details(), id] as const,
-} as const;
 export const invitesModuleKeys = {
   /** All invitesModule queries */ all: ['invitesmodule'] as const,
   /** List query keys */ lists: () => [...invitesModuleKeys.all, 'list'] as const,
@@ -865,6 +856,15 @@ export const roleTypeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...roleTypeKeys.details(), id] as const,
 } as const;
+export const migrateFileKeys = {
+  /** All migrateFile queries */ all: ['migratefile'] as const,
+  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...migrateFileKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...migrateFileKeys.details(), id] as const,
+} as const;
 export const appLimitDefaultKeys = {
   /** All appLimitDefault queries */ all: ['applimitdefault'] as const,
   /** List query keys */ lists: () => [...appLimitDefaultKeys.all, 'list'] as const,
@@ -937,14 +937,14 @@ export const orgMembershipDefaultKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgMembershipDefaultKeys.details(), id] as const,
 } as const;
-export const sqlMigrationKeys = {
-  /** All sqlMigration queries */ all: ['sqlmigration'] as const,
-  /** List query keys */ lists: () => [...sqlMigrationKeys.all, 'list'] as const,
+export const sqlActionKeys = {
+  /** All sqlAction queries */ all: ['sqlaction'] as const,
+  /** List query keys */ lists: () => [...sqlActionKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...sqlMigrationKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...sqlMigrationKeys.all, 'detail'] as const,
+    [...sqlActionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...sqlActionKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...sqlMigrationKeys.details(), id] as const,
+    [...sqlActionKeys.details(), id] as const,
 } as const;
 export const userKeys = {
   /** All user queries */ all: ['user'] as const,
@@ -1098,7 +1098,6 @@ export const queryKeys = {
   denormalizedTableField: denormalizedTableFieldKeys,
   emailsModule: emailsModuleKeys,
   encryptedSecretsModule: encryptedSecretsModuleKeys,
-  fieldModule: fieldModuleKeys,
   invitesModule: invitesModuleKeys,
   levelsModule: levelsModuleKeys,
   limitsModule: limitsModuleKeys,
@@ -1143,6 +1142,7 @@ export const queryKeys = {
   store: storeKeys,
   appPermissionDefault: appPermissionDefaultKeys,
   roleType: roleTypeKeys,
+  migrateFile: migrateFileKeys,
   appLimitDefault: appLimitDefaultKeys,
   orgLimitDefault: orgLimitDefaultKeys,
   nodeTypeRegistry: nodeTypeRegistryKeys,
@@ -1151,7 +1151,7 @@ export const queryKeys = {
   appMembershipDefault: appMembershipDefaultKeys,
   rlsModule: rlsModuleKeys,
   orgMembershipDefault: orgMembershipDefaultKeys,
-  sqlMigration: sqlMigrationKeys,
+  sqlAction: sqlActionKeys,
   user: userKeys,
   astMigration: astMigrationKeys,
   appMembership: appMembershipKeys,

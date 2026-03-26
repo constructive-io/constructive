@@ -9,6 +9,7 @@ export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
+export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 export interface GetAllRecord {
   path: string[] | null;
@@ -595,17 +596,6 @@ export interface EncryptedSecretsModule {
   tableId: string | null;
   tableName: string | null;
 }
-export interface FieldModule {
-  id: string | null;
-  databaseId: string | null;
-  privateSchemaId: string | null;
-  tableId: string | null;
-  fieldId: string | null;
-  nodeType: string | null;
-  data: unknown | null;
-  triggers: string[] | null;
-  functions: string[] | null;
-}
 export interface InvitesModule {
   id: string | null;
   databaseId: string | null;
@@ -1132,6 +1122,11 @@ export interface RoleType {
   id: number | null;
   name: string | null;
 }
+export interface MigrateFile {
+  id: string | null;
+  databaseId: string | null;
+  upload: ConstructiveInternalTypeUpload | null;
+}
 export interface AppLimitDefault {
   id: string | null;
   name: string | null;
@@ -1203,7 +1198,7 @@ export interface OrgMembershipDefault {
   deleteMemberCascadeGroups: boolean | null;
   createGroupsCascadeMembers: boolean | null;
 }
-export interface SqlMigration {
+export interface SqlAction {
   id: number | null;
   name: string | null;
   databaseId: string | null;

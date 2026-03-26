@@ -26,7 +26,7 @@
     "build:dev": "makage build --dev",
     "pregenerate": "rimraf src/admin src/auth src/objects src/public src/index.ts",
     "generate": "pnpm run pregenerate && tsx scripts/generate-sdk.ts",
-    "pregenerate:migrate-client": "rimraf ../migrate-client/src/migrate ../migrate-client/src/index.ts",
+    "pregenerate:migrate-client": "rimraf ../migrate-client/src/migrate",
     "generate:migrate-client": "pnpm run pregenerate:migrate-client && tsx scripts/generate-migrate-client.ts",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",

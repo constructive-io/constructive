@@ -75,7 +75,6 @@ csdk auth set-token <your-token>
 | `denormalized-table-field` | denormalizedTableField CRUD operations |
 | `emails-module` | emailsModule CRUD operations |
 | `encrypted-secrets-module` | encryptedSecretsModule CRUD operations |
-| `field-module` | fieldModule CRUD operations |
 | `invites-module` | invitesModule CRUD operations |
 | `levels-module` | levelsModule CRUD operations |
 | `limits-module` | limitsModule CRUD operations |
@@ -120,6 +119,7 @@ csdk auth set-token <your-token>
 | `store` | store CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
 | `role-type` | roleType CRUD operations |
+| `migrate-file` | migrateFile CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `node-type-registry` | nodeTypeRegistry CRUD operations |
@@ -128,7 +128,7 @@ csdk auth set-token <your-token>
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
-| `sql-migration` | sqlMigration CRUD operations |
+| `sql-action` | sqlAction CRUD operations |
 | `user` | user CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
 | `app-membership` | appMembership CRUD operations |
@@ -1702,35 +1702,6 @@ CRUD operations for EncryptedSecretsModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`
 
-### `field-module`
-
-CRUD operations for FieldModule records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all fieldModule records |
-| `get` | Get a fieldModule by id |
-| `create` | Create a new fieldModule |
-| `update` | Update an existing fieldModule |
-| `delete` | Delete a fieldModule |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `privateSchemaId` | UUID |
-| `tableId` | UUID |
-| `fieldId` | UUID |
-| `nodeType` | String |
-| `data` | JSON |
-| `triggers` | String |
-| `functions` | String |
-
-**Required create fields:** `databaseId`, `nodeType`
-**Optional create fields (backend defaults):** `privateSchemaId`, `tableId`, `fieldId`, `data`, `triggers`, `functions`
-
 ### `invites-module`
 
 CRUD operations for InvitesModule records.
@@ -3045,6 +3016,28 @@ CRUD operations for RoleType records.
 
 **Required create fields:** `name`
 
+### `migrate-file`
+
+CRUD operations for MigrateFile records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all migrateFile records |
+| `get` | Get a migrateFile by id |
+| `create` | Create a new migrateFile |
+| `update` | Update an existing migrateFile |
+| `delete` | Delete a migrateFile |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `upload` | Upload |
+
+**Optional create fields (backend defaults):** `databaseId`, `upload`
+
 ### `app-limit-default`
 
 CRUD operations for AppLimitDefault records.
@@ -3258,17 +3251,17 @@ CRUD operations for OrgMembershipDefault records.
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
-### `sql-migration`
+### `sql-action`
 
-CRUD operations for SqlMigration records.
+CRUD operations for SqlAction records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all sqlMigration records |
-| `get` | Get a sqlMigration by id |
-| `create` | Create a new sqlMigration |
-| `update` | Update an existing sqlMigration |
-| `delete` | Delete a sqlMigration |
+| `list` | List all sqlAction records |
+| `get` | Get a sqlAction by id |
+| `create` | Create a new sqlAction |
+| `update` | Update an existing sqlAction |
+| `delete` | Delete a sqlAction |
 
 **Fields:**
 
