@@ -70,7 +70,6 @@ const db = createClient({
 | `denormalizedTableField` | findMany, findOne, create, update, delete |
 | `emailsModule` | findMany, findOne, create, update, delete |
 | `encryptedSecretsModule` | findMany, findOne, create, update, delete |
-| `fieldModule` | findMany, findOne, create, update, delete |
 | `invitesModule` | findMany, findOne, create, update, delete |
 | `levelsModule` | findMany, findOne, create, update, delete |
 | `limitsModule` | findMany, findOne, create, update, delete |
@@ -115,6 +114,7 @@ const db = createClient({
 | `store` | findMany, findOne, create, update, delete |
 | `appPermissionDefault` | findMany, findOne, create, update, delete |
 | `roleType` | findMany, findOne, create, update, delete |
+| `migrateFile` | findMany, findOne, create, update, delete |
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
 | `nodeTypeRegistry` | findMany, findOne, create, update, delete |
@@ -123,7 +123,7 @@ const db = createClient({
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `rlsModule` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
-| `sqlMigration` | findMany, findOne, create, update, delete |
+| `sqlAction` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
 | `astMigration` | findMany, findOne, create, update, delete |
 | `appMembership` | findMany, findOne, create, update, delete |
@@ -1990,43 +1990,6 @@ const updated = await db.encryptedSecretsModule.update({ where: { id: '<UUID>' }
 const deleted = await db.encryptedSecretsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.fieldModule`
-
-CRUD operations for FieldModule records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `privateSchemaId` | UUID | Yes |
-| `tableId` | UUID | Yes |
-| `fieldId` | UUID | Yes |
-| `nodeType` | String | Yes |
-| `data` | JSON | Yes |
-| `triggers` | String | Yes |
-| `functions` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all fieldModule records
-const items = await db.fieldModule.findMany({ select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } }).execute();
-
-// Get one by id
-const item = await db.fieldModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, privateSchemaId: true, tableId: true, fieldId: true, nodeType: true, data: true, triggers: true, functions: true } }).execute();
-
-// Create
-const created = await db.fieldModule.create({ data: { databaseId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', nodeType: '<String>', data: '<JSON>', triggers: '<String>', functions: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.fieldModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.fieldModule.delete({ where: { id: '<UUID>' } }).execute();
-```
-
 ### `db.invitesModule`
 
 CRUD operations for InvitesModule records.
@@ -3697,6 +3660,37 @@ const updated = await db.roleType.update({ where: { id: '<Int>' }, data: { name:
 const deleted = await db.roleType.delete({ where: { id: '<Int>' } }).execute();
 ```
 
+### `db.migrateFile`
+
+CRUD operations for MigrateFile records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `upload` | ConstructiveInternalTypeUpload | Yes |
+
+**Operations:**
+
+```typescript
+// List all migrateFile records
+const items = await db.migrateFile.findMany({ select: { id: true, databaseId: true, upload: true } }).execute();
+
+// Get one by id
+const item = await db.migrateFile.findOne({ id: '<UUID>', select: { id: true, databaseId: true, upload: true } }).execute();
+
+// Create
+const created = await db.migrateFile.create({ data: { databaseId: '<UUID>', upload: '<Upload>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.migrateFile.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.migrateFile.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.appLimitDefault`
 
 CRUD operations for AppLimitDefault records.
@@ -3976,9 +3970,9 @@ const updated = await db.orgMembershipDefault.update({ where: { id: '<UUID>' }, 
 const deleted = await db.orgMembershipDefault.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.sqlMigration`
+### `db.sqlAction`
 
-CRUD operations for SqlMigration records.
+CRUD operations for SqlAction records.
 
 **Fields:**
 
@@ -4001,20 +3995,20 @@ CRUD operations for SqlMigration records.
 **Operations:**
 
 ```typescript
-// List all sqlMigration records
-const items = await db.sqlMigration.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+// List all sqlAction records
+const items = await db.sqlAction.findMany({ select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Get one by id
-const item = await db.sqlMigration.findOne({ id: '<Int>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
+const item = await db.sqlAction.findOne({ id: '<Int>', select: { id: true, name: true, databaseId: true, deploy: true, deps: true, payload: true, content: true, revert: true, verify: true, createdAt: true, action: true, actionId: true, actorId: true } }).execute();
 
 // Create
-const created = await db.sqlMigration.create({ data: { name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.sqlAction.create({ data: { name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.sqlMigration.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+const updated = await db.sqlAction.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.sqlMigration.delete({ where: { id: '<Int>' } }).execute();
+const deleted = await db.sqlAction.delete({ where: { id: '<Int>' } }).execute();
 ```
 
 ### `db.user`

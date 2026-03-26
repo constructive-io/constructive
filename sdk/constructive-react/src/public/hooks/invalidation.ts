@@ -64,7 +64,6 @@ import {
   denormalizedTableFieldKeys,
   emailsModuleKeys,
   encryptedSecretsModuleKeys,
-  fieldModuleKeys,
   invitesModuleKeys,
   levelsModuleKeys,
   limitsModuleKeys,
@@ -109,6 +108,7 @@ import {
   storeKeys,
   appPermissionDefaultKeys,
   roleTypeKeys,
+  migrateFileKeys,
   appLimitDefaultKeys,
   orgLimitDefaultKeys,
   nodeTypeRegistryKeys,
@@ -117,7 +117,7 @@ import {
   appMembershipDefaultKeys,
   rlsModuleKeys,
   orgMembershipDefaultKeys,
-  sqlMigrationKeys,
+  sqlActionKeys,
   userKeys,
   astMigrationKeys,
   appMembershipKeys,
@@ -931,23 +931,6 @@ export const invalidate = {
         queryKey: encryptedSecretsModuleKeys.detail(id),
       }),
   },
-  /** Invalidate fieldModule queries */ fieldModule: {
-    /** Invalidate all fieldModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: fieldModuleKeys.all,
-      }),
-    /** Invalidate fieldModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: fieldModuleKeys.lists(),
-      }),
-    /** Invalidate a specific fieldModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: fieldModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate invitesModule queries */ invitesModule: {
     /** Invalidate all invitesModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1660,6 +1643,23 @@ export const invalidate = {
         queryKey: roleTypeKeys.detail(id),
       }),
   },
+  /** Invalidate migrateFile queries */ migrateFile: {
+    /** Invalidate all migrateFile queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: migrateFileKeys.all,
+      }),
+    /** Invalidate migrateFile list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: migrateFileKeys.lists(),
+      }),
+    /** Invalidate a specific migrateFile */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: migrateFileKeys.detail(id),
+      }),
+  },
   /** Invalidate appLimitDefault queries */ appLimitDefault: {
     /** Invalidate all appLimitDefault queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1793,21 +1793,21 @@ export const invalidate = {
         queryKey: orgMembershipDefaultKeys.detail(id),
       }),
   },
-  /** Invalidate sqlMigration queries */ sqlMigration: {
-    /** Invalidate all sqlMigration queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate sqlAction queries */ sqlAction: {
+    /** Invalidate all sqlAction queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: sqlMigrationKeys.all,
+        queryKey: sqlActionKeys.all,
       }),
-    /** Invalidate sqlMigration list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate sqlAction list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: sqlMigrationKeys.lists(),
+        queryKey: sqlActionKeys.lists(),
       }),
-    /** Invalidate a specific sqlMigration */ detail: (
+    /** Invalidate a specific sqlAction */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: sqlMigrationKeys.detail(id),
+        queryKey: sqlActionKeys.detail(id),
       }),
   },
   /** Invalidate user queries */ user: {
@@ -2220,14 +2220,6 @@ export const remove = {
       queryKey: encryptedSecretsModuleKeys.detail(id),
     });
   },
-  /** Remove fieldModule from cache */ fieldModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: fieldModuleKeys.detail(id),
-    });
-  },
   /** Remove invitesModule from cache */ invitesModule: (
     queryClient: QueryClient,
     id: string | number
@@ -2535,6 +2527,14 @@ export const remove = {
       queryKey: roleTypeKeys.detail(id),
     });
   },
+  /** Remove migrateFile from cache */ migrateFile: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: migrateFileKeys.detail(id),
+    });
+  },
   /** Remove appLimitDefault from cache */ appLimitDefault: (
     queryClient: QueryClient,
     id: string | number
@@ -2593,12 +2593,9 @@ export const remove = {
       queryKey: orgMembershipDefaultKeys.detail(id),
     });
   },
-  /** Remove sqlMigration from cache */ sqlMigration: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
+  /** Remove sqlAction from cache */ sqlAction: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: sqlMigrationKeys.detail(id),
+      queryKey: sqlActionKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

@@ -47,7 +47,6 @@ import type {
   EncryptedSecretsModule,
   Enum,
   Field,
-  FieldModule,
   ForeignKeyConstraint,
   FullTextSearch,
   GetAllRecord,
@@ -60,6 +59,7 @@ import type {
   MembershipType,
   MembershipTypesModule,
   MembershipsModule,
+  MigrateFile,
   NodeTypeRegistry,
   Object,
   OrgAdminGrant,
@@ -97,7 +97,7 @@ import type {
   SiteMetadatum,
   SiteModule,
   SiteTheme,
-  SqlMigration,
+  SqlAction,
   Store,
   Table,
   TableGrant,
@@ -135,6 +135,7 @@ export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeHostname = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
+export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 export type ObjectCategory = 'CORE' | 'MODULE' | 'APP';
 /** Methods to use when ordering `CheckConstraint`. */
@@ -702,17 +703,6 @@ export type EncryptedSecretsModuleOrderBy =
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC';
-/** Methods to use when ordering `FieldModule`. */
-export type FieldModuleOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC';
 /** Methods to use when ordering `InvitesModule`. */
 export type InvitesModuleOrderBy =
   | 'NATURAL'
@@ -1320,6 +1310,13 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
+/** Methods to use when ordering `MigrateFile`. */
+export type MigrateFileOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC';
 /** Methods to use when ordering `AppLimitDefault`. */
 export type AppLimitDefaultOrderBy =
   | 'NATURAL'
@@ -1458,8 +1455,8 @@ export type AppLevelRequirementOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `SqlMigration`. */
-export type SqlMigrationOrderBy =
+/** Methods to use when ordering `SqlAction`. */
+export type SqlActionOrderBy =
   | 'NATURAL'
   | 'ID_ASC'
   | 'ID_DESC'
@@ -1795,10 +1792,6 @@ export interface DatabaseFilter {
   encryptedSecretsModules?: DatabaseToManyEncryptedSecretsModuleFilter;
   /** `encryptedSecretsModules` exist. */
   encryptedSecretsModulesExist?: boolean;
-  /** Filter by the object’s `fieldModules` relation. */
-  fieldModules?: DatabaseToManyFieldModuleFilter;
-  /** `fieldModules` exist. */
-  fieldModulesExist?: boolean;
   /** Filter by the object’s `invitesModules` relation. */
   invitesModules?: DatabaseToManyInvitesModuleFilter;
   /** `invitesModules` exist. */
@@ -5925,50 +5918,6 @@ export interface EncryptedSecretsModuleFilter {
   /** Filter by the object’s `table` relation. */
   table?: TableFilter;
 }
-/** A filter to be used against many `FieldModule` object types. All fields are combined with a logical ‘and.’ */
-export interface DatabaseToManyFieldModuleFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: FieldModuleFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: FieldModuleFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: FieldModuleFilter;
-}
-/** A filter to be used against `FieldModule` object types. All fields are combined with a logical ‘and.’ */
-export interface FieldModuleFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `privateSchemaId` field. */
-  privateSchemaId?: UUIDFilter;
-  /** Filter by the object’s `tableId` field. */
-  tableId?: UUIDFilter;
-  /** Filter by the object’s `fieldId` field. */
-  fieldId?: UUIDFilter;
-  /** Filter by the object’s `nodeType` field. */
-  nodeType?: StringFilter;
-  /** Filter by the object’s `data` field. */
-  data?: JSONFilter;
-  /** Filter by the object’s `triggers` field. */
-  triggers?: StringListFilter;
-  /** Filter by the object’s `functions` field. */
-  functions?: StringListFilter;
-  /** Checks for all expressions in this list. */
-  and?: FieldModuleFilter[];
-  /** Checks for any expressions in this list. */
-  or?: FieldModuleFilter[];
-  /** Negates the expression. */
-  not?: FieldModuleFilter;
-  /** Filter by the object’s `database` relation. */
-  database?: DatabaseFilter;
-  /** Filter by the object’s `field` relation. */
-  field?: FieldFilter;
-  /** Filter by the object’s `privateSchema` relation. */
-  privateSchema?: SchemaFilter;
-  /** Filter by the object’s `table` relation. */
-  table?: TableFilter;
-}
 /** A filter to be used against many `InvitesModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyInvitesModuleFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -7158,6 +7107,56 @@ export interface AppPermissionDefaultFilter {
   /** Negates the expression. */
   not?: AppPermissionDefaultFilter;
 }
+/** A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’ */
+export interface MigrateFileFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `upload` field. */
+  upload?: ConstructiveInternalTypeUploadFilter;
+  /** Checks for all expressions in this list. */
+  and?: MigrateFileFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MigrateFileFilter[];
+  /** Negates the expression. */
+  not?: MigrateFileFilter;
+}
+/** A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’ */
+export interface ConstructiveInternalTypeUploadFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: ConstructiveInternalTypeUpload;
+  /** Not equal to the specified value. */
+  notEqualTo?: ConstructiveInternalTypeUpload;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: ConstructiveInternalTypeUpload;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: ConstructiveInternalTypeUpload;
+  /** Included in the specified list. */
+  in?: ConstructiveInternalTypeUpload[];
+  /** Not included in the specified list. */
+  notIn?: ConstructiveInternalTypeUpload[];
+  /** Less than the specified value. */
+  lessThan?: ConstructiveInternalTypeUpload;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Greater than the specified value. */
+  greaterThan?: ConstructiveInternalTypeUpload;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: ConstructiveInternalTypeUpload;
+  /** Contains the specified JSON. */
+  contains?: ConstructiveInternalTypeUpload;
+  /** Contains the specified key. */
+  containsKey?: string;
+  /** Contains all of the specified keys. */
+  containsAllKeys?: string[];
+  /** Contains any of the specified keys. */
+  containsAnyKeys?: string[];
+  /** Contained by the specified JSON. */
+  containedBy?: ConstructiveInternalTypeUpload;
+}
 /** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLimitDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -7368,8 +7367,8 @@ export interface AppLevelRequirementFilter {
   /** Negates the expression. */
   not?: AppLevelRequirementFilter;
 }
-/** A filter to be used against `SqlMigration` object types. All fields are combined with a logical ‘and.’ */
-export interface SqlMigrationFilter {
+/** A filter to be used against `SqlAction` object types. All fields are combined with a logical ‘and.’ */
+export interface SqlActionFilter {
   /** Filter by the object’s `id` field. */
   id?: IntFilter;
   /** Filter by the object’s `name` field. */
@@ -7395,11 +7394,11 @@ export interface SqlMigrationFilter {
   /** Filter by the object’s `actorId` field. */
   actorId?: UUIDFilter;
   /** Checks for all expressions in this list. */
-  and?: SqlMigrationFilter[];
+  and?: SqlActionFilter[];
   /** Checks for any expressions in this list. */
-  or?: SqlMigrationFilter[];
+  or?: SqlActionFilter[];
   /** Negates the expression. */
-  not?: SqlMigrationFilter;
+  not?: SqlActionFilter;
 }
 /** A filter to be used against `AstMigration` object types. All fields are combined with a logical ‘and.’ */
 export interface AstMigrationFilter {
@@ -8173,6 +8172,17 @@ export interface PhoneNumberInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateMigrateFileInput {
+  clientMutationId?: string;
+  /** The `MigrateFile` to be created by this mutation. */
+  migrateFile: MigrateFileInput;
+}
+/** An input for mutations affecting `MigrateFile` */
+export interface MigrateFileInput {
+  id?: string;
+  databaseId?: string;
+  upload?: ConstructiveInternalTypeUpload;
+}
 export interface CreateAppLimitDefaultInput {
   clientMutationId?: string;
   /** The `AppLimitDefault` to be created by this mutation. */
@@ -8215,23 +8225,6 @@ export interface TableGrantInput {
   isGrant?: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateFieldModuleInput {
-  clientMutationId?: string;
-  /** The `FieldModule` to be created by this mutation. */
-  fieldModule: FieldModuleInput;
-}
-/** An input for mutations affecting `FieldModule` */
-export interface FieldModuleInput {
-  id?: string;
-  databaseId: string;
-  privateSchemaId?: string;
-  tableId?: string;
-  fieldId?: string;
-  nodeType: string;
-  data?: unknown;
-  triggers?: string[];
-  functions?: string[];
 }
 export interface CreateTableTemplateModuleInput {
   clientMutationId?: string;
@@ -8282,11 +8275,11 @@ export interface CreateNodeTypeRegistryInput {
 }
 /** An input for mutations affecting `NodeTypeRegistry` */
 export interface NodeTypeRegistryInput {
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, FieldImmutable) */
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
   name: string;
   /** snake_case slug for use in code and configuration (e.g., authz_direct_owner, data_timestamps) */
   slug: string;
-  /** Node type category: authz (authorization semantics), data (table-level behaviors), field (column-level behaviors), view (view query types), relation (relational structure between tables) */
+  /** Node type category: authz (authorization semantics), data (table-level behaviors), view (view query types), relation (relational structure between tables) */
   category: string;
   /** Human-readable display name for UI */
   displayName?: string;
@@ -8765,13 +8758,13 @@ export interface AppLevelInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateSqlMigrationInput {
+export interface CreateSqlActionInput {
   clientMutationId?: string;
-  /** The `SqlMigration` to be created by this mutation. */
-  sqlMigration: SqlMigrationInput;
+  /** The `SqlAction` to be created by this mutation. */
+  sqlAction: SqlActionInput;
 }
-/** An input for mutations affecting `SqlMigration` */
-export interface SqlMigrationInput {
+/** An input for mutations affecting `SqlAction` */
+export interface SqlActionInput {
   id?: number;
   name?: string;
   databaseId?: string;
@@ -10549,24 +10542,6 @@ export interface TableGrantPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateFieldModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `FieldModule` being updated. */
-  fieldModulePatch: FieldModulePatch;
-}
-/** Represents an update to a `FieldModule`. Fields that are set will be updated. */
-export interface FieldModulePatch {
-  id?: string;
-  databaseId?: string;
-  privateSchemaId?: string;
-  tableId?: string;
-  fieldId?: string;
-  nodeType?: string;
-  data?: unknown;
-  triggers?: string[];
-  functions?: string[];
-}
 export interface UpdateTableTemplateModuleInput {
   clientMutationId?: string;
   id: string;
@@ -10613,18 +10588,18 @@ export interface OrgChartEdgeGrantPatch {
 }
 export interface UpdateNodeTypeRegistryInput {
   clientMutationId?: string;
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, FieldImmutable) */
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
   name: string;
   /** An object where the defined keys will be set on the `NodeTypeRegistry` being updated. */
   nodeTypeRegistryPatch: NodeTypeRegistryPatch;
 }
 /** Represents an update to a `NodeTypeRegistry`. Fields that are set will be updated. */
 export interface NodeTypeRegistryPatch {
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, FieldImmutable) */
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
   name?: string;
   /** snake_case slug for use in code and configuration (e.g., authz_direct_owner, data_timestamps) */
   slug?: string;
-  /** Node type category: authz (authorization semantics), data (table-level behaviors), field (column-level behaviors), view (view query types), relation (relational structure between tables) */
+  /** Node type category: authz (authorization semantics), data (table-level behaviors), view (view query types), relation (relational structure between tables) */
   category?: string;
   /** Human-readable display name for UI */
   displayName?: string;
@@ -12479,10 +12454,6 @@ export interface DeleteTableGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteFieldModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteTableTemplateModuleInput {
   clientMutationId?: string;
   id: string;
@@ -12493,7 +12464,7 @@ export interface DeleteOrgChartEdgeGrantInput {
 }
 export interface DeleteNodeTypeRegistryInput {
   clientMutationId?: string;
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, FieldImmutable) */
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
   name: string;
 }
 export interface DeleteMembershipTypeInput {
@@ -13040,6 +13011,13 @@ export interface PhoneNumberConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `MigrateFile` values. */
+export interface MigrateFileConnection {
+  nodes: MigrateFile[];
+  edges: MigrateFileEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `AppLimitDefault` values. */
 export interface AppLimitDefaultConnection {
   nodes: AppLimitDefault[];
@@ -13058,13 +13036,6 @@ export interface OrgLimitDefaultConnection {
 export interface TableGrantConnection {
   nodes: TableGrant[];
   edges: TableGrantEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `FieldModule` values. */
-export interface FieldModuleConnection {
-  nodes: FieldModule[];
-  edges: FieldModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -13236,10 +13207,10 @@ export interface AppLevelConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `SqlMigration` values. */
-export interface SqlMigrationConnection {
-  nodes: SqlMigration[];
-  edges: SqlMigrationEdge[];
+/** A connection to a list of `SqlAction` values. */
+export interface SqlActionConnection {
+  nodes: SqlAction[];
+  edges: SqlActionEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -13847,6 +13818,11 @@ export interface CreatePhoneNumberPayload {
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
 }
+export interface CreateMigrateFilePayload {
+  clientMutationId?: string | null;
+  /** The `MigrateFile` that was created by this mutation. */
+  migrateFile?: MigrateFile | null;
+}
 export interface CreateAppLimitDefaultPayload {
   clientMutationId?: string | null;
   /** The `AppLimitDefault` that was created by this mutation. */
@@ -13864,12 +13840,6 @@ export interface CreateTableGrantPayload {
   /** The `TableGrant` that was created by this mutation. */
   tableGrant?: TableGrant | null;
   tableGrantEdge?: TableGrantEdge | null;
-}
-export interface CreateFieldModulePayload {
-  clientMutationId?: string | null;
-  /** The `FieldModule` that was created by this mutation. */
-  fieldModule?: FieldModule | null;
-  fieldModuleEdge?: FieldModuleEdge | null;
 }
 export interface CreateTableTemplateModulePayload {
   clientMutationId?: string | null;
@@ -14039,10 +14009,10 @@ export interface CreateAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface CreateSqlMigrationPayload {
+export interface CreateSqlActionPayload {
   clientMutationId?: string | null;
-  /** The `SqlMigration` that was created by this mutation. */
-  sqlMigration?: SqlMigration | null;
+  /** The `SqlAction` that was created by this mutation. */
+  sqlAction?: SqlAction | null;
 }
 export interface CreateDatabaseTransferPayload {
   clientMutationId?: string | null;
@@ -14486,12 +14456,6 @@ export interface UpdateTableGrantPayload {
   /** The `TableGrant` that was updated by this mutation. */
   tableGrant?: TableGrant | null;
   tableGrantEdge?: TableGrantEdge | null;
-}
-export interface UpdateFieldModulePayload {
-  clientMutationId?: string | null;
-  /** The `FieldModule` that was updated by this mutation. */
-  fieldModule?: FieldModule | null;
-  fieldModuleEdge?: FieldModuleEdge | null;
 }
 export interface UpdateTableTemplateModulePayload {
   clientMutationId?: string | null;
@@ -15098,12 +15062,6 @@ export interface DeleteTableGrantPayload {
   /** The `TableGrant` that was deleted by this mutation. */
   tableGrant?: TableGrant | null;
   tableGrantEdge?: TableGrantEdge | null;
-}
-export interface DeleteFieldModulePayload {
-  clientMutationId?: string | null;
-  /** The `FieldModule` that was deleted by this mutation. */
-  fieldModule?: FieldModule | null;
-  fieldModuleEdge?: FieldModuleEdge | null;
 }
 export interface DeleteTableTemplateModulePayload {
   clientMutationId?: string | null;
@@ -15746,6 +15704,12 @@ export interface PhoneNumberEdge {
   /** The `PhoneNumber` at the end of the edge. */
   node?: PhoneNumber | null;
 }
+/** A `MigrateFile` edge in the connection. */
+export interface MigrateFileEdge {
+  cursor?: string | null;
+  /** The `MigrateFile` at the end of the edge. */
+  node?: MigrateFile | null;
+}
 /** A `AppLimitDefault` edge in the connection. */
 export interface AppLimitDefaultEdge {
   cursor?: string | null;
@@ -15763,12 +15727,6 @@ export interface TableGrantEdge {
   cursor?: string | null;
   /** The `TableGrant` at the end of the edge. */
   node?: TableGrant | null;
-}
-/** A `FieldModule` edge in the connection. */
-export interface FieldModuleEdge {
-  cursor?: string | null;
-  /** The `FieldModule` at the end of the edge. */
-  node?: FieldModule | null;
 }
 /** A `TableTemplateModule` edge in the connection. */
 export interface TableTemplateModuleEdge {
@@ -15914,11 +15872,11 @@ export interface AppLevelEdge {
   /** The `AppLevel` at the end of the edge. */
   node?: AppLevel | null;
 }
-/** A `SqlMigration` edge in the connection. */
-export interface SqlMigrationEdge {
+/** A `SqlAction` edge in the connection. */
+export interface SqlActionEdge {
   cursor?: string | null;
-  /** The `SqlMigration` at the end of the edge. */
-  node?: SqlMigration | null;
+  /** The `SqlAction` at the end of the edge. */
+  node?: SqlAction | null;
 }
 /** A `DatabaseTransfer` edge in the connection. */
 export interface DatabaseTransferEdge {

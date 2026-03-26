@@ -54,7 +54,6 @@ import { DefaultIdsModuleModel } from './models/defaultIdsModule';
 import { DenormalizedTableFieldModel } from './models/denormalizedTableField';
 import { EmailsModuleModel } from './models/emailsModule';
 import { EncryptedSecretsModuleModel } from './models/encryptedSecretsModule';
-import { FieldModuleModel } from './models/fieldModule';
 import { InvitesModuleModel } from './models/invitesModule';
 import { LevelsModuleModel } from './models/levelsModule';
 import { LimitsModuleModel } from './models/limitsModule';
@@ -99,6 +98,7 @@ import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
 import { RoleTypeModel } from './models/roleType';
+import { MigrateFileModel } from './models/migrateFile';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
@@ -107,7 +107,7 @@ import { CommitModel } from './models/commit';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { RlsModuleModel } from './models/rlsModule';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
-import { SqlMigrationModel } from './models/sqlMigration';
+import { SqlActionModel } from './models/sqlAction';
 import { UserModel } from './models/user';
 import { AstMigrationModel } from './models/astMigration';
 import { AppMembershipModel } from './models/appMembership';
@@ -197,7 +197,6 @@ export function createClient(config: OrmClientConfig) {
     denormalizedTableField: new DenormalizedTableFieldModel(client),
     emailsModule: new EmailsModuleModel(client),
     encryptedSecretsModule: new EncryptedSecretsModuleModel(client),
-    fieldModule: new FieldModuleModel(client),
     invitesModule: new InvitesModuleModel(client),
     levelsModule: new LevelsModuleModel(client),
     limitsModule: new LimitsModuleModel(client),
@@ -242,6 +241,7 @@ export function createClient(config: OrmClientConfig) {
     store: new StoreModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
     roleType: new RoleTypeModel(client),
+    migrateFile: new MigrateFileModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
     nodeTypeRegistry: new NodeTypeRegistryModel(client),
@@ -250,7 +250,7 @@ export function createClient(config: OrmClientConfig) {
     appMembershipDefault: new AppMembershipDefaultModel(client),
     rlsModule: new RlsModuleModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
-    sqlMigration: new SqlMigrationModel(client),
+    sqlAction: new SqlActionModel(client),
     user: new UserModel(client),
     astMigration: new AstMigrationModel(client),
     appMembership: new AppMembershipModel(client),
