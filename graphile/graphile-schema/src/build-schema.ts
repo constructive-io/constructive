@@ -1,4 +1,3 @@
-import deepmerge from 'deepmerge'
 import { printSchema } from 'graphql'
 import { ConstructivePreset, makePgService } from 'graphile-settings'
 import { makeSchema } from 'graphile-build'
@@ -24,8 +23,16 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
   // causing "database has active sessions" errors during ephemeral DB teardown.
   const pool = getPgPool(config)
 
-  const basePreset: GraphileConfig.Preset = {
-    extends: [ConstructivePreset],
+  // Compose presets using Graphile's native `extends` mechanism instead of
+  // deepmerge.  deepmerge recursively clones every nested object — including
+  // the pg Pool (EventEmitter internals) and the entire PostGraphile preset
+  // tree — which overflows the call stack.
+  const preset: GraphileConfig.Preset = {
+    extends: [
+      ConstructivePreset,
+      ...(opts.graphile?.extends ?? []),
+    ],
+    plugins: opts.graphile?.plugins ?? [],
     pgServices: [
       makePgService({
         pool,
@@ -33,10 +40,6 @@ export async function buildSchemaSDL(opts: BuildSchemaOptions): Promise<string> 
       }),
     ],
   }
-
-  const preset: GraphileConfig.Preset = opts.graphile
-    ? deepmerge(basePreset, opts.graphile)
-    : basePreset
 
   const { schema } = await makeSchema(preset)
   return printSchema(schema)
