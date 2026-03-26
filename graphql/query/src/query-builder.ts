@@ -1,5 +1,5 @@
 import { DocumentNode, print as gqlPrint } from 'graphql';
-import { camelize, pluralize, underscore } from 'inflekt';
+import { toCamelCase, toPascalCase, pluralize, underscore } from 'inflekt';
 
 import {
   createOne,
@@ -145,13 +145,13 @@ export class QueryBuilder {
     const getInputName = (mutationType: string): string => {
       switch (mutationType) {
         case 'delete': {
-          return `Delete${camelize(this._model)}Input`;
+          return `Delete${toPascalCase(this._model)}Input`;
         }
         case 'create': {
-          return `Create${camelize(this._model)}Input`;
+          return `Create${toPascalCase(this._model)}Input`;
         }
         case 'patch': {
-          return `Update${camelize(this._model)}Input`;
+          return `Update${toPascalCase(this._model)}Input`;
         }
         default:
           throw new Error('Unhandled mutation type' + mutationType);
@@ -194,7 +194,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      camelize(['get', underscore(this._key), 'query'].join('_'), true),
+      toCamelCase(['get', underscore(this._key), 'query'].join('_')),
     );
 
     const defn = this._introspection[this._key];
@@ -216,7 +216,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      camelize(['get', underscore(this._key), 'query', 'all'].join('_'), true),
+      toCamelCase(['get', underscore(this._key), 'query', 'all'].join('_')),
     );
 
     const defn = this._introspection[this._key];
@@ -237,9 +237,8 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      camelize(
+      toCamelCase(
         ['get', underscore(this._key), 'count', 'query'].join('_'),
-        true,
       ),
     );
 
@@ -259,7 +258,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      camelize(['get', underscore(this._key), 'query'].join('_'), true),
+      toCamelCase(['get', underscore(this._key), 'query'].join('_')),
     );
 
     const defn = this._introspection[this._key];
@@ -281,7 +280,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      camelize([underscore(this._key), 'mutation'].join('_'), true),
+      toCamelCase([underscore(this._key), 'mutation'].join('_')),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -302,7 +301,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      camelize([underscore(this._key), 'mutation'].join('_'), true),
+      toCamelCase([underscore(this._key), 'mutation'].join('_')),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -323,7 +322,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      camelize([underscore(this._key), 'mutation'].join('_'), true),
+      toCamelCase([underscore(this._key), 'mutation'].join('_')),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -560,5 +559,5 @@ function isRelationalField(fieldName: string, modelMeta: MetaTable): boolean {
 // Get getMany op name from model
 // ie. UserSetting => userSettings
 function modelNameToGetMany(model: string): string {
-  return camelize(pluralize(underscore(model)), true);
+  return toCamelCase(pluralize(underscore(model)));
 }

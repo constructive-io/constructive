@@ -4,7 +4,7 @@
  * These are exported so that packages/cli can use the same questions,
  * types, and transform utilities, ensuring consistency between the two CLIs.
  */
-import { camelize } from 'inflekt';
+import { toCamelCase } from 'inflekt';
 import { inflektTree } from 'inflekt/transform-keys';
 import type { Question } from 'inquirerer';
 
@@ -150,14 +150,7 @@ const skipNonTopLevel = (key: string, path: string[]) =>
   !isTopLevel(key, path) || key === '_' || key.startsWith('_');
 
 export const camelizeArgv = (argv: Record<string, any>): Record<string, any> =>
-  inflektTree(
-    argv,
-    (key) => {
-      const underscored = key.replace(/-/g, '_');
-      return camelize(underscored, true);
-    },
-    { skip: skipNonTopLevel },
-  );
+  inflektTree(argv, toCamelCase, { skip: skipNonTopLevel });
 
 export const hyphenateKeys = (obj: Record<string, any>): Record<string, any> =>
   inflektTree(

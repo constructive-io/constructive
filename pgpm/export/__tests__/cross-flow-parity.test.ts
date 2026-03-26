@@ -15,7 +15,7 @@
 import { getConnections, seed } from 'pgsql-test';
 import type { PgTestClient } from 'pgsql-test';
 import type { PgConfig } from 'pg-env';
-import { camelize } from 'inflekt';
+import { toCamelCase } from 'inflekt';
 
 import { exportMeta } from '../src/export-meta';
 import { exportGraphQLMeta } from '../src/export-graphql-meta';
@@ -96,7 +96,7 @@ function createMockGraphQLClient(pgClient: PgTestClient): GraphQLClient {
       return result.rows.map(row => {
         const camelRow: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(row)) {
-          camelRow[camelize(key, true)] = value;
+          camelRow[toCamelCase(key)] = value;
         }
         return camelRow as T;
       });

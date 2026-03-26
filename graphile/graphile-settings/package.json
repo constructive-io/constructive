@@ -53,7 +53,7 @@
     "graphile-upload-plugin": "workspace:^",
     "graphile-utils": "5.0.0-rc.8",
     "graphql": "16.13.0",
-    "inflekt": "^0.5.0",
+    "inflekt": "^0.5.1",
     "lru-cache": "^11.2.7",
     "pg": "^8.20.0",
     "pg-query-context": "workspace:^",

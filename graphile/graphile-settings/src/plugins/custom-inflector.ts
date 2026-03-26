@@ -6,7 +6,8 @@ import {
   pluralizeLast,
   distinctPluralize,
   fixCapitalisedPlural,
-  camelize,
+  toCamelCase,
+  toPascalCase,
 } from 'inflekt';
 
 /**
@@ -58,7 +59,7 @@ function getBaseName(attributeName: string): string | null {
  */
 function baseNameMatches(baseName: string, otherName: string): boolean {
   const singularizedName = singularize(otherName);
-  return camelize(baseName, true) === camelize(singularizedName, true);
+  return toCamelCase(baseName) === toCamelCase(singularizedName);
 }
 
 /**
@@ -203,7 +204,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        */
       allRowsConnection(_previous, _options, resource) {
         const resourceName = this._singularizedResourceName(resource);
-        return camelize(distinctPluralize(resourceName), true);
+        return toCamelCase(distinctPluralize(resourceName));
       },
 
       /**
@@ -211,7 +212,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
        */
       allRowsList(_previous, _options, resource) {
         const resourceName = this._singularizedResourceName(resource);
-        return camelize(distinctPluralize(resourceName), true) + 'List';
+        return toCamelCase(distinctPluralize(resourceName)) + 'List';
       },
 
       /**
@@ -232,7 +233,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           const attributeName = relation.localAttributes[0];
           const baseName = getBaseName(attributeName);
           if (baseName) {
-            return camelize(baseName, true);
+            return toCamelCase(baseName);
           }
         }
 
@@ -244,9 +245,8 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           foreignPk &&
           arraysMatch(foreignPk.attributes, relation.remoteAttributes)
         ) {
-          return camelize(
+          return toCamelCase(
             this._singularizedCodecName(relation.remoteResource.codec),
-            true
           );
         }
         return previous!(details);
@@ -277,15 +277,13 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           if (baseName) {
             const oppositeBaseName = getOppositeBaseName(baseName);
             if (oppositeBaseName) {
-              return camelize(
+              return toCamelCase(
                 `${oppositeBaseName}_${this._singularizedCodecName(relation.remoteResource.codec)}`,
-                true
               );
             }
             if (baseNameMatches(baseName, codec.name)) {
-              return camelize(
+              return toCamelCase(
                 this._singularizedCodecName(relation.remoteResource.codec),
-                true
               );
             }
           }
@@ -315,17 +313,15 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           if (baseName) {
             const oppositeBaseName = getOppositeBaseName(baseName);
             if (oppositeBaseName) {
-              return camelize(
+              return toCamelCase(
                 `${oppositeBaseName}_${distinctPluralize(this._singularizedCodecName(relation.remoteResource.codec))}`,
-                true
               );
             }
             if (baseNameMatches(baseName, codec.name)) {
-              return camelize(
+              return toCamelCase(
                 distinctPluralize(
                   this._singularizedCodecName(relation.remoteResource.codec)
                 ),
-                true
               );
             }
           }
@@ -336,11 +332,10 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           (u: { isPrimary: boolean }) => u.isPrimary
         );
         if (pk && arraysMatch(pk.attributes, relation.remoteAttributes)) {
-          return camelize(
+          return toCamelCase(
             distinctPluralize(
               this._singularizedCodecName(relation.remoteResource.codec)
             ),
-            true
           );
         }
         return previous!(details);
@@ -371,9 +366,8 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           return baseOverride;
         }
 
-        const simpleName = camelize(
+        const simpleName = toCamelCase(
           distinctPluralize(this._singularizedCodecName(rightTable.codec)),
-          true
         );
 
         const leftRelations = leftTable.getRelations();
@@ -418,7 +412,7 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           return unique.extensions?.tags?.fieldName;
         }
         if (unique.isPrimary) {
-          return camelize(this._singularizedCodecName(resource.codec), true);
+          return toCamelCase(this._singularizedCodecName(resource.codec));
         }
         return previous!(details);
       },
@@ -432,9 +426,8 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           return unique.extensions.tags.updateFieldName;
         }
         if (unique.isPrimary) {
-          return camelize(
+          return toCamelCase(
             `update_${this._singularizedCodecName(resource.codec)}`,
-            true
           );
         }
         return previous!(details);
@@ -449,9 +442,8 @@ export const InflektPlugin: GraphileConfig.Plugin = {
           return unique.extensions.tags.deleteFieldName;
         }
         if (unique.isPrimary) {
-          return camelize(
+          return toCamelCase(
             `delete_${this._singularizedCodecName(resource.codec)}`,
-            true
           );
         }
         return previous!(details);
