@@ -19,11 +19,13 @@ Options:
   --port <port>      Host port mapping (default: 5432)
   --user <user>      PostgreSQL user (default: postgres)
   --password <pass>  PostgreSQL password (default: password)
+  --shm-size <size>  Shared memory size for container (default: 2g)
   --recreate         Remove and recreate container on start
 
 Examples:
   pgpm docker start                           Start default PostgreSQL container
   pgpm docker start --port 5433               Start on custom port
+  pgpm docker start --shm-size 4g             Start with 4GB shared memory
   pgpm docker start --recreate                Remove and recreate container
   pgpm docker stop                            Stop PostgreSQL container
 `;
@@ -34,6 +36,7 @@ interface DockerRunOptions {
   port: number;
   user: string;
   password: string;
+  shmSize: string;
   recreate?: boolean;
 }
 
@@ -106,7 +109,7 @@ async function containerExists(name: string): Promise<boolean> {
 }
 
 async function startContainer(options: DockerRunOptions): Promise<void> {
-  const { name, image, port, user, password, recreate } = options;
+  const { name, image, port, user, password, shmSize, recreate } = options;
 
   const dockerAvailable = await checkDockerAvailable();
   if (!dockerAvailable) {
@@ -147,6 +150,7 @@ async function startContainer(options: DockerRunOptions): Promise<void> {
     'run',
     '-d',
     '--name', name,
+    '--shm-size', shmSize,
     '-e', `POSTGRES_USER=${user}`,
     '-e', `POSTGRES_PASSWORD=${password}`,
     '-p', `${port}:5432`,
@@ -215,11 +219,12 @@ export default async (
   const port = typeof args.port === 'number' ? args.port : 5432;
   const user = (args.user as string) || 'postgres';
   const password = (args.password as string) || 'password';
+  const shmSize = (args['shm-size'] as string) || (args.shmSize as string) || '2g';
   const recreate = args.recreate === true;
 
   switch (subcommand) {
   case 'start':
-    await startContainer({ name, image, port, user, password, recreate });
+    await startContainer({ name, image, port, user, password, shmSize, recreate });
     break;
 
   case 'stop':
