@@ -25,7 +25,7 @@ import type { QueryOptions } from '../types/query';
 import type { Table } from '../types/schema';
 import type { FieldSelection } from '../types/selection';
 import { convertToSelectionOptions, isRelationalField } from './field-selector';
-import { fuzzyFindByName } from './name-matching';
+import { fuzzyFindByName } from 'inflekt';
 import {
   normalizeInflectionValue,
   toCamelCasePlural,
@@ -788,9 +788,8 @@ function findRelatedTable(
     return null;
   }
 
-  // Find the related table using shared fuzzy matching.
+  // Find the related table using shared fuzzy matching from inflekt.
   // Handles PascalCase table names vs snake_case/camelCase/plural codec names.
-  // TODO: replace with fuzzyFindByName from inflekt once 0.4.0 is published
   return fuzzyFindByName(allTables, referencedTableName, (tbl) => tbl.name) ?? null;
 }
 

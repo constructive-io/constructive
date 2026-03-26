@@ -1,7 +1,14 @@
 /**
  * Codegen utilities - naming conventions, type mapping, and helpers
  */
-import { pluralize } from 'inflekt';
+import {
+  lcFirst,
+  pluralize,
+  toCamelCase,
+  toPascalCase,
+  toScreamingSnake,
+  ucFirst,
+} from 'inflekt';
 
 import type {
   Field,
@@ -11,45 +18,8 @@ import type {
 } from '../../types/schema';
 import { scalarToFilterType, scalarToTsType } from './scalars';
 
-// ============================================================================
-// String manipulation
-// NOTE: lcFirst, ucFirst already exist in inflekt; toCamelCase, toPascalCase,
-// toScreamingSnake are available in inflekt >=0.4.0.  Once that version is
-// published these can be replaced with re-exports from inflekt.
-// ============================================================================
-
-/** Lowercase first character */
-export function lcFirst(str: string): string {
-  return str.charAt(0).toLowerCase() + str.slice(1);
-}
-
-/** Uppercase first character */
-export function ucFirst(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/** Convert to camelCase */
-export function toCamelCase(str: string): string {
-  return str
-    .replace(/[-_](.)/g, (_, char) => char.toUpperCase())
-    .replace(/^(.)/, (_, char) => char.toLowerCase());
-}
-
-/** Convert to PascalCase */
-export function toPascalCase(str: string): string {
-  return str
-    .replace(/[-_](.)/g, (_, char) => char.toUpperCase())
-    .replace(/^(.)/, (_, char) => char.toUpperCase());
-}
-
-/** Convert to SCREAMING_SNAKE_CASE */
-export function toScreamingSnake(str: string): string {
-  return str
-    .replace(/([A-Z])/g, '_$1')
-    .replace(/[-\s]/g, '_')
-    .toUpperCase()
-    .replace(/^_/, '');
-}
+// Re-export string manipulation helpers from inflekt (single source of truth)
+export { lcFirst, toCamelCase, toPascalCase, toScreamingSnake, ucFirst };
 
 // ============================================================================
 // Naming conventions for generated code

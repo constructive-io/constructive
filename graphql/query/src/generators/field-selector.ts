@@ -9,7 +9,7 @@ import type {
   FieldSelectionPreset,
   SimpleFieldSelection,
 } from '../types/selection';
-import { fuzzyFindByName } from './name-matching';
+import { fuzzyFindByName } from 'inflekt';
 
 const relationalFieldSetCache = new WeakMap<Table, Set<string>>();
 
@@ -294,9 +294,8 @@ function getRelatedTableScalarFields(
     return {};
   }
 
-  // Find the related table in allTables using shared fuzzy matching.
+  // Find the related table in allTables using shared fuzzy matching from inflekt.
   // Handles PascalCase table names vs snake_case/camelCase/plural codec names.
-  // TODO: replace with fuzzyFindByName from inflekt once 0.4.0 is published
   const relatedTable = fuzzyFindByName(
     allTables,
     referencedTableName,
