@@ -43,12 +43,14 @@ export function buildBelongsToRelations(
       sameAttributes(unique.attributes, localAttributes),
     );
 
+    const remoteCodec = relation.remoteResource?.codec;
+
     belongsTo.push({
       fieldName: relationName,
       isUnique,
-      type: relation.remoteResource?.codec?.name || null,
+      type: remoteCodec?.name || null,
       keys: buildFieldList(localAttributes, codec, attributes, context),
-      references: { name: relation.remoteResource?.codec?.name || 'unknown' },
+      references: { name: remoteCodec?.name || 'unknown' },
     });
   }
 
@@ -73,12 +75,14 @@ export function buildReverseRelations(
       sameAttributes(unique.attributes, remoteAttributes),
     );
 
+    const remoteCodec = relation.remoteResource?.codec;
+
     const meta: HasRelation = {
       fieldName: relationName,
       isUnique,
-      type: relation.remoteResource?.codec?.name || null,
+      type: remoteCodec?.name || null,
       keys: buildFieldList(relation.localAttributes || [], codec, attributes, context),
-      referencedBy: { name: relation.remoteResource?.codec?.name || 'unknown' },
+      referencedBy: { name: remoteCodec?.name || 'unknown' },
     };
 
     if (isUnique) {

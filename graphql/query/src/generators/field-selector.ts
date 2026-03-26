@@ -9,6 +9,7 @@ import type {
   FieldSelectionPreset,
   SimpleFieldSelection,
 } from '../types/selection';
+import { fuzzyFindByName } from 'inflekt';
 
 const relationalFieldSetCache = new WeakMap<Table, Set<string>>();
 
@@ -293,11 +294,17 @@ function getRelatedTableScalarFields(
     return {};
   }
 
-  // Find the related table in allTables
-  const relatedTable = allTables.find((t) => t.name === referencedTableName);
+  // Find the related table in allTables using shared fuzzy matching from inflekt.
+  // Handles PascalCase table names vs snake_case/camelCase/plural codec names.
+  const relatedTable = fuzzyFindByName(
+    allTables,
+    referencedTableName,
+    (t) => t.name,
+  );
   if (!relatedTable) {
-    // Related table not found in schema - return empty selection
-    return {};
+    // Related table not found in schema — return fallback { __typename: true }
+    // so the query remains valid (nodes need at least one subfield).
+    return { __typename: true };
   }
 
   // Get ALL scalar fields from the related table (non-relational fields)
