@@ -117,46 +117,38 @@ function partialOf(inner: t.TSType): t.TSTypeReference {
 }
 
 // ---------------------------------------------------------------------------
-// Schema sanitizer — schema-typescript only handles string enums, so we
-// strip non-string enum values and let the base type (number/integer/boolean)
-// stand on its own.
+// Schema sanitizer — ensures array types have an items spec (schema-typescript
+// throws without one).  Numeric/boolean enum handling is fixed upstream as of
+// schema-typescript@0.14.2.
 // ---------------------------------------------------------------------------
 
-function sanitizeSchema(schema: Record<string, unknown>): Record<string, unknown> {
+function ensureArrayItems(schema: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = { ...schema };
-
-  // Strip enum arrays that contain non-string values
-  if (Array.isArray(out.enum)) {
-    const allStrings = (out.enum as unknown[]).every((v) => typeof v === 'string');
-    if (!allStrings) {
-      delete out.enum;
-    }
-  }
-
-  // Recurse into properties
-  if (out.properties && typeof out.properties === 'object') {
-    const props: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(out.properties as Record<string, unknown>)) {
-      props[k] = v && typeof v === 'object' ? sanitizeSchema(v as Record<string, unknown>) : v;
-    }
-    out.properties = props;
-  }
 
   // Ensure arrays have an items spec (schema-typescript throws without one)
   if (out.type === 'array' && !out.items) {
     out.items = { type: 'string' };
   }
 
+  // Recurse into properties
+  if (out.properties && typeof out.properties === 'object') {
+    const props: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(out.properties as Record<string, unknown>)) {
+      props[k] = v && typeof v === 'object' ? ensureArrayItems(v as Record<string, unknown>) : v;
+    }
+    out.properties = props;
+  }
+
   // Recurse into items
   if (out.items && typeof out.items === 'object') {
-    out.items = sanitizeSchema(out.items as Record<string, unknown>);
+    out.items = ensureArrayItems(out.items as Record<string, unknown>);
   }
 
   // Recurse into composition keywords
   for (const keyword of ['oneOf', 'anyOf', 'allOf'] as const) {
     if (Array.isArray(out[keyword])) {
       out[keyword] = (out[keyword] as unknown[]).map((s) =>
-        s && typeof s === 'object' ? sanitizeSchema(s as Record<string, unknown>) : s
+        s && typeof s === 'object' ? ensureArrayItems(s as Record<string, unknown>) : s
       );
     }
   }
@@ -177,8 +169,7 @@ function generateParamsInterfaces(
     const schema = nt.parameter_schema;
     const typeName = `${nt.name}Params`;
 
-    // Sanitize to work around schema-typescript's string-only enum handling
-    const sanitized = sanitizeSchema({ ...schema, title: typeName });
+    const sanitized = ensureArrayItems({ ...schema, title: typeName });
     const astNodes = generateTypeScriptTypes(sanitized as SchemaTS_JSONSchema, {
       includePropertyComments: true,
       includeTypeComments: false,

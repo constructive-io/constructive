@@ -166,7 +166,7 @@ export interface DataPostGISParams {
   /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
   srid?: number;
   /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
-  dimension?: number;
+  dimension?: 2 | 3 | 4;
   /* Use geography type instead of geometry (for geodetic calculations on the sphere) */
   use_geography?: boolean;
   /* Spatial index method */
@@ -189,7 +189,7 @@ export interface DataPostGISAggregateParams {
   /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
   srid?: number;
   /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
-  dimension?: number;
+  dimension?: 2 | 3 | 4;
   /* Use geography type instead of geometry */
   use_geography?: boolean;
   /* Spatial index method for the aggregate field */
