@@ -54,15 +54,16 @@ function buildS3Key(contentHash: string): string {
 }
 
 /**
- * Resolve the database_id from the pgClient's current database.
- * This queries metaschema to find the database row for the current connection.
+ * Resolve the database_id from the JWT context.
+ * The server middleware sets jwt.claims.database_id, which is accessible
+ * via jwt_private.current_database_id() — a simple function call, no
+ * metaschema query needed.
  */
 async function resolveDatabaseId(pgClient: any): Promise<string | null> {
   const result = await pgClient.query(
-    `SELECT id FROM metaschema_public.database WHERE db_name = current_database() LIMIT 1`,
+    `SELECT jwt_private.current_database_id() AS id`,
   );
-  if (result.rows.length === 0) return null;
-  return result.rows[0].id;
+  return result.rows[0]?.id ?? null;
 }
 
 // --- Plugin factory ---
