@@ -1,6 +1,6 @@
 # node-type-registry
 
-Node type definitions for the Constructive blueprint system. Single source of truth for all Authz*, Data*, Field*, Relation*, View*, and Table* node types.
+Node type definitions for the Constructive blueprint system. Single source of truth for all Authz*, Data*, Relation*, View*, and Table* node types.
 
 ## Usage
 
@@ -11,19 +11,75 @@ import { allNodeTypes, AuthzDirectOwner, DataId } from 'node-type-registry';
 console.log(AuthzDirectOwner.parameter_schema);
 
 // Get all node types as a flat array
-console.log(allNodeTypes.length); // 50
+console.log(allNodeTypes.length); // 52
 ```
 
-## Preset (opt-in blueprint types)
+## Blueprint Types (generated)
+
+The package exports TypeScript types that match the JSONB shape expected by `construct_blueprint()`. These provide client-side autocomplete and type safety when building blueprint definitions — the GraphQL API itself accepts plain JSONB.
+
+```typescript
+import type {
+  BlueprintDefinition,
+  BlueprintTable,
+  BlueprintNode,
+  BlueprintRelation,
+  BlueprintField,
+  BlueprintIndex,
+} from 'node-type-registry';
+
+const definition: BlueprintDefinition = {
+  tables: [
+    {
+      ref: 'tasks',
+      table_name: 'tasks',
+      nodes: [
+        'DataId',
+        'DataTimestamps',
+        { $type: 'DataDirectOwner', data: { include_id: false } },
+      ],
+      fields: [
+        { name: 'title', type: 'text', is_not_null: true },
+        { name: 'description', type: 'text' },
+      ],
+      policies: [{ $type: 'AuthzDirectOwner' }],
+    },
+  ],
+  relations: [
+    {
+      $type: 'RelationBelongsTo',
+      source_ref: 'tasks',
+      target_ref: 'projects',
+      delete_action: 'c',
+    },
+  ],
+};
+```
+
+### Regenerating types
+
+When node type definitions are added or modified, regenerate with:
+
+```bash
+cd graphile/node-type-registry && pnpm generate:types
+```
+
+This produces `src/blueprint-types.generated.ts` from the TS node type source of truth.
+
+## Codegen: SQL seed
+
+Generate SQL seed scripts for `node_type_registry` table:
+
+```bash
+cd graphile/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema
+```
+
+## Preset (deprecated)
+
+> **Note:** The `NodeTypeRegistryPreset` is no longer the recommended approach.
+> Use the generated TypeScript types instead (see above). The preset remains
+> available for backward compatibility but will be removed in a future version.
 
 ```typescript
 import { NodeTypeRegistryPreset } from 'node-type-registry/preset';
-
-const sdl = await buildSchemaSDL({
-  database: dbConfig.database,
-  schemas,
-  graphile: { extends: [NodeTypeRegistryPreset] },
-});
 ```
-
-This preset generates `@oneOf` typed GraphQL input types (`BlueprintDefinitionInput`, etc.) from the TS node type definitions. It is **not** included in `ConstructivePreset` — it must be explicitly added by consumers that need blueprint types.
