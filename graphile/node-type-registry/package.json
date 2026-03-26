@@ -27,14 +27,16 @@
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "generate:seed": "ts-node src/codegen/generate-seed.ts"
+    "generate:seed": "ts-node src/codegen/generate-seed.ts",
+    "generate:types": "ts-node src/codegen/generate-types.ts"
   },
   "dependencies": {
+    "@babel/generator": "^7.29.0",
+    "@babel/types": "^7.29.0",
     "@pgsql/types": "^17.6.2",
     "@pgsql/utils": "^17.8.14",
-    "graphile-config": "1.0.0-rc.6",
-    "graphile-settings": "workspace:^",
-    "pgsql-deparser": "^17.18.1"
+    "pgsql-deparser": "^17.18.1",
+    "schema-typescript": "^0.14.2"
   },
   "devDependencies": {
     "makage": "^0.1.10"
