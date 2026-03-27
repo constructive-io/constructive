@@ -12,6 +12,7 @@ import {
   resolveInnerInputType,
   ucFirst,
   lcFirst,
+  toPascalCase,
   getCreateInputTypeName,
   getPatchTypeName,
 } from '../utils';
@@ -276,13 +277,6 @@ function buildArgvType(): t.TSTypeAnnotation {
   );
 }
 
-/**
- * Convert a kebab-case string to PascalCase: "find-first" → "FindFirst"
- */
-function kebabToPascal(str: string): string {
-  return str.split('-').map((s) => ucFirst(s)).join('');
-}
-
 function buildSubcommandSwitch(
   subcommands: string[],
   handlerPrefix: string,
@@ -291,7 +285,7 @@ function buildSubcommandSwitch(
   const cases = subcommands.map((sub) =>
     t.switchCase(t.stringLiteral(sub), [
       t.returnStatement(
-        t.callExpression(t.identifier(`${handlerPrefix}${kebabToPascal(sub)}`), [
+        t.callExpression(t.identifier(`${handlerPrefix}${toPascalCase(sub)}`), [
           t.identifier('argv'),
           t.identifier('prompter'),
         ]),
