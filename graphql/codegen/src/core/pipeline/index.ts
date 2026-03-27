@@ -14,7 +14,6 @@ import type {
   Table,
   TypeRegistry,
 } from '../../types/schema';
-import { enrichPgTypesFromMeta, enrichPgTypesFromMetaFile } from '../introspect/enrich-pg-types';
 import { enrichManyToManyRelations } from '../introspect/enrich-relations';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
 import type { SchemaSource } from '../introspect/source';
@@ -127,24 +126,6 @@ export async function runCodegenPipeline(
   if (tablesMeta?.length) {
     enrichManyToManyRelations(tables, tablesMeta);
     log(`  Enriched M:N relations from _meta (${tablesMeta.length} tables)`);
-  }
-
-  // 2b. Enrich fields with pgType from _meta (database mode provides this automatically)
-  if (tablesMeta?.length) {
-    const enrichedCount = enrichPgTypesFromMeta(tables, tablesMeta);
-    if (enrichedCount > 0) {
-      log(`  Enriched ${enrichedCount} fields with pgType from _meta`);
-    }
-  }
-
-  // 2c. Enrich fields with pgType from metaFile sidecar (file/schemaDir/endpoint mode)
-  if (config.metaFile) {
-    const enrichedCount = enrichPgTypesFromMetaFile(tables, config.metaFile);
-    if (enrichedCount > 0) {
-      log(`  Enriched ${enrichedCount} fields with pgType from metaFile: ${config.metaFile}`);
-    } else {
-      log(`  No pgType enrichments from metaFile: ${config.metaFile}`);
-    }
   }
 
   // 3. Filter tables by config (combine exclude and systemExclude)

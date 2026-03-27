@@ -8,7 +8,6 @@
 import type { Question } from 'inquirerer';
 
 import { findConfigFile, loadConfigFile } from '../core/config';
-import { buildMetaFromTables, writeMetaFile } from '../core/dump-pg-types';
 import { expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget, generate, generateMulti } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import {
@@ -31,12 +30,6 @@ export async function runCodegenHandler(
   prompter: Prompter,
 ): Promise<void> {
   const args = camelizeArgv(argv as Record<string, any>);
-
-  // Handle --dump-meta: run pipeline, extract _meta table metadata, write JSON
-  if (args.dumpMeta) {
-    await handleDumpMeta(args, prompter);
-    return;
-  }
 
   const schemaConfig = args.schemaEnabled
     ? {
@@ -135,57 +128,4 @@ export async function runCodegenHandler(
     ...(schemaConfig ? { schema: schemaConfig } : {}),
   });
   printResult(result);
-}
-
-async function handleDumpMeta(
-  args: Record<string, unknown>,
-  prompter: Prompter,
-): Promise<void> {
-  const hasSourceFlags = Boolean(
-    args.endpoint || args.schemaFile || args.schemaDir || args.schemas || args.apiNames
-  );
-  const configPath =
-    (args.config as string | undefined) ||
-    (!hasSourceFlags ? findConfigFile() : undefined);
-
-  let fileConfig: GraphQLSDKConfigTarget = {};
-  if (configPath) {
-    const loaded = await loadConfigFile(configPath);
-    if (!loaded.success) {
-      console.error('x', loaded.error);
-      process.exit(1);
-    }
-    fileConfig = loaded.config as GraphQLSDKConfigTarget;
-  }
-
-  const seeded = seedArgvFromConfig(args, fileConfig);
-  const answers = hasResolvedCodegenSource(seeded)
-    ? seeded
-    : await prompter.prompt(seeded, codegenQuestions);
-  const options = buildGenerateOptions(answers, fileConfig);
-
-  // Run the pipeline to get tables (we need the full codegen pipeline to infer tables)
-  const result = await generate({
-    ...options,
-    dryRun: true, // Don't write codegen files, just get pipeline data
-  });
-
-  if (!result.success || !result.pipelineData?.tables.length) {
-    console.error('x', result.message || 'No tables found');
-    process.exit(1);
-  }
-
-  const meta = buildMetaFromTables(result.pipelineData.tables);
-  const outputPath = typeof args.dumpMeta === 'string'
-    ? args.dumpMeta
-    : '_meta.json';
-  const written = await writeMetaFile(meta, outputPath);
-
-  const tableCount = meta.length;
-  const fieldCount = meta.reduce((sum, t) => sum + (t.fields?.length ?? 0), 0);
-  console.log(`[ok] Wrote _meta.json: ${tableCount} tables, ${fieldCount} fields`);
-  console.log(`     ${written}`);
-  console.log('');
-  console.log('Usage: add metaFile to your codegen config:');
-  console.log(`  { metaFile: '${outputPath}' }`);
 }

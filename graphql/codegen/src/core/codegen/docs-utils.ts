@@ -153,8 +153,10 @@ function isPostGISField(f: Field): boolean {
 }
 
 function isEmbeddingField(f: Field): boolean {
-  const pgType = f.type.pgType?.toLowerCase();
-  if (pgType === 'vector') return true;
+  // VectorCodecPlugin maps pgvector `vector` columns to the `Vector` GQL scalar.
+  // This is the primary detection path — no _meta or pgType enrichment needed.
+  if (f.type.gqlType === 'Vector') return true;
+  // Legacy fallback: name-based heuristic for schemas without VectorCodecPlugin
   if (/embedding$/i.test(f.name) && f.type.isArray && f.type.gqlType === 'Float') return true;
   return false;
 }
