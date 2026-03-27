@@ -82,6 +82,7 @@ CRUD operations for Car records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all car records |
+| \`find-first\` | Find first matching car record |
 | \`get\` | Get a car by id |
 | \`create\` | Create a new car |
 | \`update\` | Update an existing car |
@@ -107,6 +108,7 @@ CRUD operations for Driver records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all driver records |
+| \`find-first\` | Find first matching driver record |
 | \`get\` | Get a driver by id |
 | \`create\` | Create a new driver |
 | \`update\` | Update an existing driver |
@@ -282,6 +284,8 @@ CRUD operations for Car records via myapp CLI
 \`\`\`bash
 myapp car list
 myapp car list --where.<field>.<op> <value> --orderBy <values>
+myapp car list --limit 10 --after <cursor>
+myapp car find-first --where.<field>.<op> <value>
 myapp car get --id <UUID>
 myapp car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 myapp car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
@@ -300,6 +304,18 @@ myapp car list
 
 \`\`\`bash
 myapp car list --limit 10 --offset 0
+\`\`\`
+
+### List car records with cursor pagination
+
+\`\`\`bash
+myapp car list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching car
+
+\`\`\`bash
+myapp car find-first --where.id.equalTo <value>
 \`\`\`
 
 ### List car records with field selection
@@ -340,6 +356,8 @@ CRUD operations for Driver records via myapp CLI
 \`\`\`bash
 myapp driver list
 myapp driver list --where.<field>.<op> <value> --orderBy <values>
+myapp driver list --limit 10 --after <cursor>
+myapp driver find-first --where.<field>.<op> <value>
 myapp driver get --id <UUID>
 myapp driver create --name <String> --licenseNumber <String>
 myapp driver update --id <UUID> [--name <String>] [--licenseNumber <String>]
@@ -358,6 +376,18 @@ myapp driver list
 
 \`\`\`bash
 myapp driver list --limit 10 --offset 0
+\`\`\`
+
+### List driver records with cursor pagination
+
+\`\`\`bash
+myapp driver list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching driver
+
+\`\`\`bash
+myapp driver find-first --where.id.equalTo <value>
 \`\`\`
 
 ### List driver records with field selection
@@ -676,7 +706,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -691,7 +721,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -701,6 +731,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -717,7 +749,10 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
     const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const after = typeof argv.after === "string" ? argv.after as string : undefined;
+    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       make: true,
@@ -735,6 +770,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
         first: limit
+      } : {}),
+      ...(after !== undefined ? {
+        after
+      } : {}),
+      ...(last !== undefined && !isNaN(last) ? {
+        last
+      } : {}),
+      ...(before !== undefined ? {
+        before
       } : {}),
       ...(offset !== undefined && !isNaN(offset) ? {
         offset
@@ -754,6 +798,40 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const findFirstArgs = {
+      select,
+      ...(where !== undefined ? {
+        where
+      } : {}),
+      ...(condition !== undefined ? {
+        condition
+      } : {})
+    };
+    const client = getClient();
+    const result = await client.car.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -1136,7 +1214,7 @@ const fieldSchema: FieldSchema = {
   name: "string",
   licenseNumber: "string"
 };
-const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  find-first            Find first matching driver record\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -1151,7 +1229,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -1161,6 +1239,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -1177,7 +1257,10 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
     const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const after = typeof argv.after === "string" ? argv.after as string : undefined;
+    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       name: true,
@@ -1192,6 +1275,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
         first: limit
+      } : {}),
+      ...(after !== undefined ? {
+        after
+      } : {}),
+      ...(last !== undefined && !isNaN(last) ? {
+        last
+      } : {}),
+      ...(before !== undefined ? {
+        before
       } : {}),
       ...(offset !== undefined && !isNaN(offset) ? {
         offset
@@ -1211,6 +1303,37 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      name: true,
+      licenseNumber: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const findFirstArgs = {
+      select,
+      ...(where !== undefined ? {
+        where
+      } : {}),
+      ...(condition !== undefined ? {
+        condition
+      } : {})
+    };
+    const client = getClient();
+    const result = await client.driver.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -1905,6 +2028,14 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "description": "List User records (auth target, supports pagination, field selection, filtering, and ordering)",
     "inputSchema": {
       "properties": {
+        "after": {
+          "description": "Cursor for forward pagination",
+          "type": "string",
+        },
+        "before": {
+          "description": "Cursor for backward pagination",
+          "type": "string",
+        },
         "condition.<field>.<op>": {
           "description": "Dot-notation condition filter",
           "type": "string",
@@ -1913,8 +2044,12 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
           "description": "Comma-separated list of fields to return",
           "type": "string",
         },
+        "last": {
+          "description": "Number of records from the end (backward pagination)",
+          "type": "number",
+        },
         "limit": {
-          "description": "Max number of records to return",
+          "description": "Max number of records to return (forward pagination)",
           "type": "number",
         },
         "offset": {
@@ -1933,6 +2068,27 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
       "type": "object",
     },
     "name": "myapp_auth_user_list",
+  },
+  {
+    "description": "Find first matching User record (auth target, supports field selection and filtering)",
+    "inputSchema": {
+      "properties": {
+        "condition.<field>.<op>": {
+          "description": "Dot-notation condition filter",
+          "type": "string",
+        },
+        "fields": {
+          "description": "Comma-separated list of fields to return",
+          "type": "string",
+        },
+        "where.<field>.<op>": {
+          "description": "Dot-notation filter (e.g. --where.status.equalTo active)",
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "name": "myapp_auth_user_find_first",
   },
   {
     "description": "Get a single User record by id (auth target)",
@@ -2078,6 +2234,14 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "description": "List Member records (members target, supports pagination, field selection, filtering, and ordering)",
     "inputSchema": {
       "properties": {
+        "after": {
+          "description": "Cursor for forward pagination",
+          "type": "string",
+        },
+        "before": {
+          "description": "Cursor for backward pagination",
+          "type": "string",
+        },
         "condition.<field>.<op>": {
           "description": "Dot-notation condition filter",
           "type": "string",
@@ -2086,8 +2250,12 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
           "description": "Comma-separated list of fields to return",
           "type": "string",
         },
+        "last": {
+          "description": "Number of records from the end (backward pagination)",
+          "type": "number",
+        },
         "limit": {
-          "description": "Max number of records to return",
+          "description": "Max number of records to return (forward pagination)",
           "type": "number",
         },
         "offset": {
@@ -2106,6 +2274,27 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
       "type": "object",
     },
     "name": "myapp_members_member_list",
+  },
+  {
+    "description": "Find first matching Member record (members target, supports field selection and filtering)",
+    "inputSchema": {
+      "properties": {
+        "condition.<field>.<op>": {
+          "description": "Dot-notation condition filter",
+          "type": "string",
+        },
+        "fields": {
+          "description": "Comma-separated list of fields to return",
+          "type": "string",
+        },
+        "where.<field>.<op>": {
+          "description": "Dot-notation filter (e.g. --where.status.equalTo active)",
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "name": "myapp_members_member_find_first",
   },
   {
     "description": "Get a single Member record by id (members target)",
@@ -2203,6 +2392,14 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "description": "List Car records (app target, supports pagination, field selection, filtering, and ordering)",
     "inputSchema": {
       "properties": {
+        "after": {
+          "description": "Cursor for forward pagination",
+          "type": "string",
+        },
+        "before": {
+          "description": "Cursor for backward pagination",
+          "type": "string",
+        },
         "condition.<field>.<op>": {
           "description": "Dot-notation condition filter",
           "type": "string",
@@ -2211,8 +2408,12 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
           "description": "Comma-separated list of fields to return",
           "type": "string",
         },
+        "last": {
+          "description": "Number of records from the end (backward pagination)",
+          "type": "number",
+        },
         "limit": {
-          "description": "Max number of records to return",
+          "description": "Max number of records to return (forward pagination)",
           "type": "number",
         },
         "offset": {
@@ -2231,6 +2432,27 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
       "type": "object",
     },
     "name": "myapp_app_car_list",
+  },
+  {
+    "description": "Find first matching Car record (app target, supports field selection and filtering)",
+    "inputSchema": {
+      "properties": {
+        "condition.<field>.<op>": {
+          "description": "Dot-notation condition filter",
+          "type": "string",
+        },
+        "fields": {
+          "description": "Comma-separated list of fields to return",
+          "type": "string",
+        },
+        "where.<field>.<op>": {
+          "description": "Dot-notation filter (e.g. --where.status.equalTo active)",
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "name": "myapp_app_car_find_first",
   },
   {
     "description": "Get a single Car record by id (app target)",
@@ -2534,6 +2756,7 @@ CRUD operations for User records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all user records |
+| \`find-first\` | Find first matching user record |
 | \`get\` | Get a user by id |
 | \`create\` | Create a new user |
 | \`update\` | Update an existing user |
@@ -2578,6 +2801,7 @@ CRUD operations for Member records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all member records |
+| \`find-first\` | Find first matching member record |
 | \`get\` | Get a member by id |
 | \`create\` | Create a new member |
 | \`update\` | Update an existing member |
@@ -2601,6 +2825,7 @@ CRUD operations for Car records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all car records |
+| \`find-first\` | Find first matching car record |
 | \`get\` | Get a car by id |
 | \`create\` | Create a new car |
 | \`update\` | Update an existing car |
@@ -2816,6 +3041,8 @@ CRUD operations for User records via myapp CLI (auth target)
 \`\`\`bash
 myapp auth:user list
 myapp auth:user list --where.<field>.<op> <value> --orderBy <values>
+myapp auth:user list --limit 10 --after <cursor>
+myapp auth:user find-first --where.<field>.<op> <value>
 myapp auth:user get --id <UUID>
 myapp auth:user create --email <String> --name <String>
 myapp auth:user update --id <UUID> [--email <String>] [--name <String>]
@@ -2834,6 +3061,18 @@ myapp auth:user list
 
 \`\`\`bash
 myapp auth:user list --limit 10 --offset 0
+\`\`\`
+
+### List user records with cursor pagination
+
+\`\`\`bash
+myapp auth:user list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching user
+
+\`\`\`bash
+myapp auth:user find-first --where.id.equalTo <value>
 \`\`\`
 
 ### List user records with filtering and ordering
@@ -2957,6 +3196,8 @@ CRUD operations for Member records via myapp CLI (members target)
 \`\`\`bash
 myapp members:member list
 myapp members:member list --where.<field>.<op> <value> --orderBy <values>
+myapp members:member list --limit 10 --after <cursor>
+myapp members:member find-first --where.<field>.<op> <value>
 myapp members:member get --id <UUID>
 myapp members:member create --role <String>
 myapp members:member update --id <UUID> [--role <String>]
@@ -2975,6 +3216,18 @@ myapp members:member list
 
 \`\`\`bash
 myapp members:member list --limit 10 --offset 0
+\`\`\`
+
+### List member records with cursor pagination
+
+\`\`\`bash
+myapp members:member list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching member
+
+\`\`\`bash
+myapp members:member find-first --where.id.equalTo <value>
 \`\`\`
 
 ### List member records with filtering and ordering
@@ -3049,6 +3302,8 @@ CRUD operations for Car records via myapp CLI (app target)
 \`\`\`bash
 myapp app:car list
 myapp app:car list --where.<field>.<op> <value> --orderBy <values>
+myapp app:car list --limit 10 --after <cursor>
+myapp app:car find-first --where.<field>.<op> <value>
 myapp app:car get --id <UUID>
 myapp app:car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 myapp app:car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
@@ -3067,6 +3322,18 @@ myapp app:car list
 
 \`\`\`bash
 myapp app:car list --limit 10 --offset 0
+\`\`\`
+
+### List car records with cursor pagination
+
+\`\`\`bash
+myapp app:car list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching car
+
+\`\`\`bash
+myapp app:car find-first --where.id.equalTo <value>
 \`\`\`
 
 ### List car records with filtering and ordering
@@ -3773,7 +4040,7 @@ const fieldSchema: FieldSchema = {
   email: "string",
   name: "string"
 };
-const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  find-first            Find first matching user record\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3788,7 +4055,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -3798,6 +4065,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -3814,7 +4083,10 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
     const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const after = typeof argv.after === "string" ? argv.after as string : undefined;
+    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       email: true,
@@ -3829,6 +4101,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
         first: limit
+      } : {}),
+      ...(after !== undefined ? {
+        after
+      } : {}),
+      ...(last !== undefined && !isNaN(last) ? {
+        last
+      } : {}),
+      ...(before !== undefined ? {
+        before
       } : {}),
       ...(offset !== undefined && !isNaN(offset) ? {
         offset
@@ -3848,6 +4129,37 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      email: true,
+      name: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const findFirstArgs = {
+      select,
+      ...(where !== undefined ? {
+        where
+      } : {}),
+      ...(condition !== undefined ? {
+        condition
+      } : {})
+    };
+    const client = getClient("auth");
+    const result = await client.user.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -4004,7 +4316,7 @@ const fieldSchema: FieldSchema = {
   id: "uuid",
   role: "string"
 };
-const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  find-first            Find first matching member record\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -4019,7 +4331,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -4029,6 +4341,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -4045,7 +4359,10 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
     const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const after = typeof argv.after === "string" ? argv.after as string : undefined;
+    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       role: true
@@ -4059,6 +4376,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
         first: limit
+      } : {}),
+      ...(after !== undefined ? {
+        after
+      } : {}),
+      ...(last !== undefined && !isNaN(last) ? {
+        last
+      } : {}),
+      ...(before !== undefined ? {
+        before
       } : {}),
       ...(offset !== undefined && !isNaN(offset) ? {
         offset
@@ -4078,6 +4404,36 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      role: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const findFirstArgs = {
+      select,
+      ...(where !== undefined ? {
+        where
+      } : {}),
+      ...(condition !== undefined ? {
+        condition
+      } : {})
+    };
+    const client = getClient("members");
+    const result = await client.member.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -4223,7 +4579,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -4238,7 +4594,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -4248,6 +4604,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -4264,7 +4622,10 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
     const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
     const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const after = typeof argv.after === "string" ? argv.after as string : undefined;
+    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       make: true,
@@ -4282,6 +4643,15 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
         first: limit
+      } : {}),
+      ...(after !== undefined ? {
+        after
+      } : {}),
+      ...(last !== undefined && !isNaN(last) ? {
+        last
+      } : {}),
+      ...(before !== undefined ? {
+        before
       } : {}),
       ...(offset !== undefined && !isNaN(offset) ? {
         offset
@@ -4301,6 +4671,40 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const findFirstArgs = {
+      select,
+      ...(where !== undefined ? {
+        where
+      } : {}),
+      ...(condition !== undefined ? {
+        condition
+      } : {})
+    };
+    const client = getClient("app");
+    const result = await client.car.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -4955,7 +5359,19 @@ exports[`target docs generator generates combined MCP config 1`] = `
         "properties": {
           "limit": {
             "type": "number",
-            "description": "Max number of records to return"
+            "description": "Max number of records to return (forward pagination)"
+          },
+          "last": {
+            "type": "number",
+            "description": "Number of records from the end (backward pagination)"
+          },
+          "after": {
+            "type": "string",
+            "description": "Cursor for forward pagination"
+          },
+          "before": {
+            "type": "string",
+            "description": "Cursor for backward pagination"
           },
           "offset": {
             "type": "number",
@@ -4976,6 +5392,27 @@ exports[`target docs generator generates combined MCP config 1`] = `
           "orderBy": {
             "type": "string",
             "description": "Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)"
+          }
+        }
+      }
+    },
+    {
+      "name": "myapp_car_find_first",
+      "description": "Find first matching Car record (supports field selection and filtering)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "string",
+            "description": "Comma-separated list of fields to return"
+          },
+          "where.<field>.<op>": {
+            "type": "string",
+            "description": "Dot-notation filter (e.g. --where.status.equalTo active)"
+          },
+          "condition.<field>.<op>": {
+            "type": "string",
+            "description": "Dot-notation condition filter"
           }
         }
       }
@@ -5131,7 +5568,19 @@ exports[`target docs generator generates combined MCP config 1`] = `
         "properties": {
           "limit": {
             "type": "number",
-            "description": "Max number of records to return"
+            "description": "Max number of records to return (forward pagination)"
+          },
+          "last": {
+            "type": "number",
+            "description": "Number of records from the end (backward pagination)"
+          },
+          "after": {
+            "type": "string",
+            "description": "Cursor for forward pagination"
+          },
+          "before": {
+            "type": "string",
+            "description": "Cursor for backward pagination"
           },
           "offset": {
             "type": "number",
@@ -5152,6 +5601,27 @@ exports[`target docs generator generates combined MCP config 1`] = `
           "orderBy": {
             "type": "string",
             "description": "Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)"
+          }
+        }
+      }
+    },
+    {
+      "name": "myapp_driver_find_first",
+      "description": "Find first matching Driver record (supports field selection and filtering)",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "string",
+            "description": "Comma-separated list of fields to return"
+          },
+          "where.<field>.<op>": {
+            "type": "string",
+            "description": "Dot-notation filter (e.g. --where.status.equalTo active)"
+          },
+          "condition.<field>.<op>": {
+            "type": "string",
+            "description": "Dot-notation condition filter"
           }
         }
       }

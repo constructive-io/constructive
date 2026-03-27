@@ -125,6 +125,7 @@ export function generateReadme(
       lines.push('| Subcommand | Description |');
       lines.push('|------------|-------------|');
       lines.push(`| \`list\` | List all ${singularName} records |`);
+      lines.push(`| \`find-first\` | Find first matching ${singularName} record |`);
       const readmeSpecialGroups = categorizeSpecialFields(table, registry);
       const readmeHasSearch = readmeSpecialGroups.some(
         (g) => g.category === 'search' || g.category === 'embedding',
@@ -412,12 +413,28 @@ export function getCliMcpTools(
       inputSchema: {
         type: 'object',
         properties: {
-          limit: { type: 'number', description: 'Max number of records to return' },
+          limit: { type: 'number', description: 'Max number of records to return (forward pagination)' },
+          last: { type: 'number', description: 'Number of records from the end (backward pagination)' },
+          after: { type: 'string', description: 'Cursor for forward pagination' },
+          before: { type: 'string', description: 'Cursor for backward pagination' },
           offset: { type: 'number', description: 'Number of records to skip' },
           fields: { type: 'string', description: 'Comma-separated list of fields to return' },
           'where.<field>.<op>': { type: 'string', description: 'Dot-notation filter (e.g. --where.name.equalTo foo)' },
           'condition.<field>.<op>': { type: 'string', description: 'Dot-notation condition filter' },
           orderBy: { type: 'string', description: 'Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)' },
+        },
+      },
+    });
+
+    tools.push({
+      name: `${toolName}_${kebab}_find_first`,
+      description: `Find first matching ${table.name} record (supports field selection and filtering)`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+          'where.<field>.<op>': { type: 'string', description: 'Dot-notation filter (e.g. --where.status.equalTo active)' },
+          'condition.<field>.<op>': { type: 'string', description: 'Dot-notation condition filter' },
         },
       },
     });
@@ -681,6 +698,8 @@ export function generateSkills(
         usage: [
           `${toolName} ${kebab} list`,
           `${toolName} ${kebab} list --where.<field>.<op> <value> --orderBy <values>`,
+          `${toolName} ${kebab} list --limit 10 --after <cursor>`,
+          `${toolName} ${kebab} find-first --where.<field>.<op> <value>`,
           ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
             ? [`${toolName} ${kebab} search <query>`]
             : []),
@@ -697,6 +716,14 @@ export function generateSkills(
           {
             description: `List ${singularName} records with pagination`,
             code: [`${toolName} ${kebab} list --limit 10 --offset 0`],
+          },
+          {
+            description: `List ${singularName} records with cursor pagination`,
+            code: [`${toolName} ${kebab} list --limit 10 --after <cursor>`],
+          },
+          {
+            description: `Find first matching ${singularName}`,
+            code: [`${toolName} ${kebab} find-first --where.${pk.name}.equalTo <value>`],
           },
           {
             description: `List ${singularName} records with field selection`,
@@ -1005,6 +1032,7 @@ export function generateMultiTargetReadme(
       lines.push('| Subcommand | Description |');
       lines.push('|------------|-------------|');
       lines.push(`| \`list\` | List all ${singularName} records |`);
+      lines.push(`| \`find-first\` | Find first matching ${singularName} record |`);
       const mtReadmeSpecialGroups = categorizeSpecialFields(table, registry);
       const mtReadmeHasSearch = mtReadmeSpecialGroups.some(
         (g) => g.category === 'search' || g.category === 'embedding',
@@ -1311,12 +1339,28 @@ export function getMultiTargetCliMcpTools(
         inputSchema: {
           type: 'object',
           properties: {
-            limit: { type: 'number', description: 'Max number of records to return' },
+            limit: { type: 'number', description: 'Max number of records to return (forward pagination)' },
+            last: { type: 'number', description: 'Number of records from the end (backward pagination)' },
+            after: { type: 'string', description: 'Cursor for forward pagination' },
+            before: { type: 'string', description: 'Cursor for backward pagination' },
             offset: { type: 'number', description: 'Number of records to skip' },
             fields: { type: 'string', description: 'Comma-separated list of fields to return' },
             'where.<field>.<op>': { type: 'string', description: 'Dot-notation filter (e.g. --where.name.equalTo foo)' },
             'condition.<field>.<op>': { type: 'string', description: 'Dot-notation condition filter' },
             orderBy: { type: 'string', description: 'Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)' },
+          },
+        },
+      });
+
+      tools.push({
+        name: `${prefix}_find_first`,
+        description: `Find first matching ${table.name} record (${tgt.name} target, supports field selection and filtering)`,
+        inputSchema: {
+          type: 'object',
+          properties: {
+            fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+            'where.<field>.<op>': { type: 'string', description: 'Dot-notation filter (e.g. --where.status.equalTo active)' },
+            'condition.<field>.<op>': { type: 'string', description: 'Dot-notation condition filter' },
           },
         },
       });
@@ -1641,6 +1685,8 @@ export function generateMultiTargetSkills(
           usage: [
             `${toolName} ${cmd} list`,
             `${toolName} ${cmd} list --where.<field>.<op> <value> --orderBy <values>`,
+            `${toolName} ${cmd} list --limit 10 --after <cursor>`,
+            `${toolName} ${cmd} find-first --where.<field>.<op> <value>`,
             ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
               ? [`${toolName} ${cmd} search <query>`]
               : []),
@@ -1657,6 +1703,14 @@ export function generateMultiTargetSkills(
             {
               description: `List ${singularName} records with pagination`,
               code: [`${toolName} ${cmd} list --limit 10 --offset 0`],
+            },
+            {
+              description: `List ${singularName} records with cursor pagination`,
+              code: [`${toolName} ${cmd} list --limit 10 --after <cursor>`],
+            },
+            {
+              description: `Find first matching ${singularName}`,
+              code: [`${toolName} ${cmd} find-first --where.${pk.name}.equalTo <value>`],
             },
             {
               description: `List ${singularName} records with filtering and ordering`,
