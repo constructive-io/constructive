@@ -329,7 +329,7 @@ function findTable(
   schemaName: string,
   tableName: string
 ): IntrospectionTableMeta | undefined {
-  return tables.find((t) => t.schemaName === schemaName && t.name === tableName);
+  return tables.find((tbl) => tbl.schemaName === schemaName && tbl.name === tableName);
 }
 
 function buildBlueprintField(
