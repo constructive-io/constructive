@@ -1,4 +1,6 @@
 import fs from 'node:fs/promises';
+import http from 'node:http';
+import https from 'node:https';
 import path from 'node:path';
 
 export const DEFAULT_TMP_ROOT = '/Users/zeta/Projects/interweb/src/agents/tmp';
@@ -47,7 +49,87 @@ export const writeJson = async (filePath, payload) => {
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const hasHostHeader = (headers = {}) =>
+  Object.keys(headers || {}).some((key) => key.toLowerCase() === 'host');
+
+const requestJsonViaNodeHttp = async ({ url, method, headers = {}, body = null, timeoutMs = 15000 }) => {
+  const startedAt = Date.now();
+
+  return await new Promise((resolve) => {
+    const target = new URL(url);
+    const client = target.protocol === 'https:' ? https : http;
+    const requestHeaders = { ...headers };
+    if (body != null && requestHeaders['Content-Length'] == null && requestHeaders['content-length'] == null) {
+      requestHeaders['Content-Length'] = Buffer.byteLength(body);
+    }
+
+    const req = client.request(
+      {
+        protocol: target.protocol,
+        hostname: target.hostname,
+        port: target.port || (target.protocol === 'https:' ? 443 : 80),
+        path: `${target.pathname}${target.search}`,
+        method,
+        headers: requestHeaders,
+      },
+      (res) => {
+        const chunks = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('end', () => {
+          const text = Buffer.concat(chunks).toString('utf8');
+          let json = null;
+          try {
+            json = JSON.parse(text);
+          } catch {
+            json = null;
+          }
+          resolve({
+            ok: Number(res.statusCode ?? 0) >= 200 && Number(res.statusCode ?? 0) < 300,
+            status: Number(res.statusCode ?? 0),
+            elapsedMs: Date.now() - startedAt,
+            json,
+            text,
+          });
+        });
+      },
+    );
+
+    req.on('error', (error) => {
+      resolve({
+        ok: false,
+        status: 0,
+        elapsedMs: Date.now() - startedAt,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+
+    req.setTimeout(timeoutMs, () => {
+      req.destroy(new Error(`Request timeout after ${timeoutMs}ms`));
+    });
+
+    if (body != null) {
+      req.write(body);
+    }
+    req.end();
+  });
+};
+
 export const postJson = async ({ url, payload, headers = {}, timeoutMs = 15000 }) => {
+  const mergedHeaders = {
+    'Content-Type': 'application/json',
+    ...headers,
+  };
+
+  if (hasHostHeader(mergedHeaders)) {
+    return await requestJsonViaNodeHttp({
+      url,
+      method: 'POST',
+      headers: mergedHeaders,
+      body: JSON.stringify(payload),
+      timeoutMs,
+    });
+  }
+
   const startedAt = Date.now();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -55,10 +137,7 @@ export const postJson = async ({ url, payload, headers = {}, timeoutMs = 15000 }
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
+      headers: mergedHeaders,
       body: JSON.stringify(payload),
       signal: controller.signal,
     });
@@ -91,6 +170,15 @@ export const postJson = async ({ url, payload, headers = {}, timeoutMs = 15000 }
 };
 
 export const getJson = async ({ url, headers = {}, timeoutMs = 10000 }) => {
+  if (hasHostHeader(headers)) {
+    return await requestJsonViaNodeHttp({
+      url,
+      method: 'GET',
+      headers,
+      timeoutMs,
+    });
+  }
+
   const startedAt = Date.now();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);

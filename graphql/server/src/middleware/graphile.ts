@@ -4,7 +4,11 @@ import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { GraphQLError, GraphQLFormattedError } from 'grafast/graphql';
-import { createGraphileInstance, type GraphileCacheEntry, graphileCache } from 'graphile-cache';
+import {
+  createGraphileInstance,
+  type GraphileCacheEntry,
+  graphileCache,
+} from 'graphile-cache';
 import type { GraphileConfig } from 'graphile-config';
 import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
@@ -13,6 +17,13 @@ import './types'; // for Request type
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
+import {
+  recordCacheCoalescedWait,
+  recordCacheLookupHit,
+  recordCacheLookupMiss,
+  recordCacheRecheckHit,
+  recordCacheSet,
+} from './observability/graphile-cache-activity-stats';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -122,6 +133,24 @@ export function clearInFlightMap(): void {
 
 const log = new Logger('graphile');
 const reqLabel = (req: Request): string => (req.requestId ? `[${req.requestId}]` : '[req]');
+const DEFAULT_SCHEMA_WAIT_TIME_MS = 15000;
+
+const resolveSchemaWaitTimeMs = (): number => {
+  const raw = process.env.GRAPHILE_SCHEMA_WAIT_TIME_MS;
+  if (!raw || raw.trim().length === 0) {
+    return DEFAULT_SCHEMA_WAIT_TIME_MS;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    log.warn(
+      `Invalid GRAPHILE_SCHEMA_WAIT_TIME_MS=${raw}; falling back to ${DEFAULT_SCHEMA_WAIT_TIME_MS}`,
+    );
+    return DEFAULT_SCHEMA_WAIT_TIME_MS;
+  }
+
+  return parsed;
+};
 
 /**
  * Build a PostGraphile v5 preset for a tenant.
@@ -131,6 +160,7 @@ const buildPreset = (
   schemas: string[],
   anonRole: string,
   roleName: string,
+  schemaWaitTimeMs: number,
 ): GraphileConfig.Preset => {
   return {
   extends: [ConstructivePreset],
@@ -145,6 +175,7 @@ const buildPreset = (
     graphiqlPath: '/graphiql',
     graphiql: true,
     graphiqlOnGraphQLGET: false,
+    schemaWaitTime: schemaWaitTimeMs,
     maskError,
   },
   grafast: {
@@ -193,6 +224,7 @@ const buildPreset = (
 
 export const graphile = (opts: ConstructiveOptions): RequestHandler => {
   const observabilityEnabled = isGraphqlObservabilityEnabled(opts.server?.host);
+  const schemaWaitTimeMs = resolveSchemaWaitTimeMs();
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const label = reqLabel(req);
@@ -215,10 +247,12 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       const cached = graphileCache.get(key);
       if (cached) {
+        recordCacheLookupHit();
         log.debug(`${label} PostGraphile cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
         return cached.handler(req, res, next);
       }
 
+      recordCacheLookupMiss();
       log.debug(`${label} PostGraphile cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
 
       // =========================================================================
@@ -226,6 +260,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // =========================================================================
       const inFlight = creating.get(key);
       if (inFlight) {
+        recordCacheCoalescedWait();
         log.debug(`${label} Coalescing request for PostGraphile[${key}] - waiting for in-flight creation`);
         try {
           const instance = await inFlight;
@@ -243,6 +278,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // Re-check cache after coalesced request failure (another retry may have succeeded)
       const recheckedCache = graphileCache.get(key);
       if (recheckedCache) {
+        recordCacheRecheckHit();
         log.debug(`${label} PostGraphile cache hit on re-check key=${key}`);
         return recheckedCache.handler(req, res, next);
       }
@@ -250,6 +286,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       // Re-check in-flight map (another retry may have started creation)
       const retryInFlight = creating.get(key);
       if (retryInFlight) {
+        recordCacheCoalescedWait();
         log.debug(`${label} Re-coalescing request for PostGraphile[${key}]`);
         const retryInstance = await retryInFlight;
         return retryInstance.handler(req, res, next);
@@ -269,7 +306,7 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       const pool = getPgPool(pgConfig);
 
       // Create promise and store in in-flight map BEFORE try block
-      const preset = buildPreset(pool, schema || [], anonRole, roleName);
+      const preset = buildPreset(pool, schema || [], anonRole, roleName, schemaWaitTimeMs);
       const creationPromise = observeGraphileBuild(
         {
           cacheKey: key,
@@ -283,7 +320,9 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
 
       try {
         const instance = await creationPromise;
+        const replaced = graphileCache.has(key);
         graphileCache.set(key, instance);
+        recordCacheSet(replaced);
         log.info(`${label} Cached PostGraphile v5 handler key=${key} db=${dbname}`);
         return instance.handler(req, res, next);
       } catch (error) {

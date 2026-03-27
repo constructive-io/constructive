@@ -4,8 +4,17 @@ import { svcCache, SVC_CACHE_TTL_MS } from '@pgpmjs/server-utils';
 import { getCacheStats } from 'graphile-cache';
 import { getInFlightCount, getInFlightKeys } from '../middleware/graphile';
 import { getGraphileBuildStats } from '../middleware/observability/graphile-build-stats';
+import { getGraphileCacheActivityStats } from '../middleware/observability/graphile-cache-activity-stats';
 
 const toMB = (bytes: number): string => `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+
+const safeSystemUptimeSeconds = (): number => {
+  try {
+    return os.uptime();
+  } catch {
+    return 0;
+  }
+};
 
 export interface DebugMemorySnapshot {
   pid: number;
@@ -53,6 +62,7 @@ export interface DebugMemorySnapshot {
     keys: string[];
   };
   graphileBuilds: ReturnType<typeof getGraphileBuildStats>;
+  graphileCacheActivity: ReturnType<typeof getGraphileCacheActivityStats>;
   uptimeMinutes: number;
   timestamp: string;
 }
@@ -88,7 +98,7 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
       loadAverage: os.loadavg(),
       freeMemoryBytes: os.freemem(),
       totalMemoryBytes: os.totalmem(),
-      uptimeSeconds: os.uptime(),
+      uptimeSeconds: safeSystemUptimeSeconds(),
     },
     v8: {
       heapStatistics: v8.getHeapStatistics(),
@@ -117,6 +127,7 @@ export const getDebugMemorySnapshot = (): DebugMemorySnapshot => {
       keys: getInFlightKeys(),
     },
     graphileBuilds: getGraphileBuildStats(),
+    graphileCacheActivity: getGraphileCacheActivityStats(),
     uptimeMinutes: process.uptime() / 60,
     timestamp: new Date().toISOString(),
   };

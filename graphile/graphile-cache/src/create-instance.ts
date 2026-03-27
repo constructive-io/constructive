@@ -9,6 +9,20 @@ interface GraphileInstanceOptions {
   cacheKey: string;
 }
 
+const waitForSchemaReady = async ({
+  serv,
+  cacheKey,
+}: {
+  serv: { getSchema: () => unknown };
+  cacheKey: string;
+}): Promise<void> => {
+  const schemaOrPromise = serv.getSchema();
+  if (!schemaOrPromise) {
+    throw new Error(`Schema unavailable after serv.ready for cacheKey=${cacheKey}`);
+  }
+  await Promise.resolve(schemaOrPromise);
+};
+
 /**
  * Create a PostGraphile v5 instance backed by grafserv/express.
  *
@@ -29,8 +43,10 @@ export const createGraphileInstance = async (
 
   const handler = express();
   const httpServer = createServer(handler);
+
   await serv.addTo(handler, httpServer);
   await serv.ready();
+  await waitForSchemaReady({ serv, cacheKey });
 
   return {
     pgl,

@@ -10,10 +10,25 @@ const log = new Logger('debug-sampler');
 
 const MAX_TOTAL_BYTES = 1024 * 1024 * 1024; // 1 GB
 
-const getSamplerIntervalMs = (): number => {
-  const raw = process.env.GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS;
-  const parsed = raw ? Number.parseInt(raw, 10) : 10_000;
-  return Number.isFinite(parsed) && parsed >= 1_000 ? parsed : 10_000;
+const MIN_INTERVAL_MS = 1_000;
+const DEFAULT_MEMORY_INTERVAL_MS = 10_000;
+const DEFAULT_DB_INTERVAL_MS = 30_000;
+
+const parseIntervalMs = (raw: string | undefined, fallback: number): number => {
+  const parsed = raw ? Number.parseInt(raw, 10) : fallback;
+  return Number.isFinite(parsed) && parsed >= MIN_INTERVAL_MS ? parsed : fallback;
+};
+
+const getMemorySamplerIntervalMs = (): number => {
+  return parseIntervalMs(
+    process.env.GRAPHQL_DEBUG_SAMPLER_MEMORY_INTERVAL_MS ?? process.env.GRAPHQL_DEBUG_SAMPLER_INTERVAL_MS,
+    DEFAULT_MEMORY_INTERVAL_MS,
+  );
+};
+
+const getDbSamplerIntervalMs = (memoryIntervalMs: number): number => {
+  const parsed = parseIntervalMs(process.env.GRAPHQL_DEBUG_SAMPLER_DB_INTERVAL_MS, DEFAULT_DB_INTERVAL_MS);
+  return Math.max(parsed, memoryIntervalMs);
 };
 
 const getSamplerRootDir = (): string => {
@@ -97,7 +112,8 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
     return null;
   }
 
-  const intervalMs = getSamplerIntervalMs();
+  const memoryIntervalMs = getMemorySamplerIntervalMs();
+  const dbIntervalMs = getDbSamplerIntervalMs(memoryIntervalMs);
   const logDir = createSessionLogDir();
   const memoryLogPath = path.join(logDir, 'debug-memory.ndjson');
   const dbLogPath = path.join(logDir, 'debug-db.ndjson');
@@ -107,6 +123,7 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
   let stopped = false;
   let inFlight: Promise<void> | null = null;
   let writeFailureLogged = false;
+  let lastDbSampleAt = 0;
 
   const runBackgroundWrite = (promise: Promise<unknown>, scope: string): void => {
     promise.catch((error) => {
@@ -147,11 +164,16 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
       await recordError('memory', error);
     }
 
-    try {
-      await appendJsonLine(dbLogPath, await getDebugDatabaseSnapshot(opts));
-    } catch (error) {
-      log.error('Failed to capture debug DB snapshot', error);
-      await recordError('db', error);
+    const now = Date.now();
+    if (lastDbSampleAt === 0 || now - lastDbSampleAt >= dbIntervalMs) {
+      try {
+        await appendJsonLine(dbLogPath, await getDebugDatabaseSnapshot(opts));
+      } catch (error) {
+        log.error('Failed to capture debug DB snapshot', error);
+        await recordError('db', error);
+      } finally {
+        lastDbSampleAt = Date.now();
+      }
     }
 
     await enforceMaxSize(getSamplerRootDir(), logDir);
@@ -182,7 +204,9 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
 
   const lifecyclePayload = {
     event: 'sampler_started',
-    intervalMs,
+    intervalMs: memoryIntervalMs,
+    memoryIntervalMs,
+    dbIntervalMs,
     logDir,
     pid: process.pid,
     timestamp: new Date().toISOString(),
@@ -190,9 +214,11 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
   runBackgroundWrite(appendJsonLine(memoryLogPath, lifecyclePayload), 'lifecycle-memory-start');
   runBackgroundWrite(appendJsonLine(dbLogPath, lifecyclePayload), 'lifecycle-db-start');
 
-  log.info(`Debug sampler writing snapshots every ${intervalMs}ms to ${logDir}`);
+  log.info(
+    `Debug sampler writing memory snapshots every ${memoryIntervalMs}ms and DB snapshots every ${dbIntervalMs}ms to ${logDir}`,
+  );
   tick();
-  timer = setInterval(tick, intervalMs);
+  timer = setInterval(tick, memoryIntervalMs);
   timer.unref();
 
   return {
@@ -209,7 +235,9 @@ export const startDebugSampler = (opts: ConstructiveOptions): DebugSamplerHandle
 
       const payload = {
         event: 'sampler_stopped',
-        intervalMs,
+        intervalMs: memoryIntervalMs,
+        memoryIntervalMs,
+        dbIntervalMs,
         logDir,
         pid: process.pid,
         timestamp: new Date().toISOString(),

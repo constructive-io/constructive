@@ -58,6 +58,26 @@ const credentialsPath = path.resolve(
 const tokenOutputPath = path.resolve(
   getArgValue(args, '--token-output', path.join(runDir, 'data', 'tokens.json')),
 );
+const dbTechValidationPath = path.resolve(
+  getArgValue(args, '--db-tech-validation', path.join(runDir, 'reports', 'db-tech-validation.json')),
+);
+const businessManifestPath = path.resolve(
+  getArgValue(args, '--business-manifest', path.join(runDir, 'data', 'business-table-manifest.json')),
+);
+const businessProfilesOutputPath = path.resolve(
+  getArgValue(
+    args,
+    '--business-profiles-output',
+    path.join(runDir, 'data', 'business-op-profiles.json'),
+  ),
+);
+const runDbpmTechValidation = !hasFlag(args, '--skip-dbpm-tech-validation');
+const dbpmTenantCount = Number.parseInt(
+  getArgValue(args, '--dbpm-tenant-count', String(Math.max(requireTenants, 2))),
+  10,
+);
+const dbpmUserPassword = getArgValue(args, '--dbpm-user-password', 'Constructive!23456');
+const dbpmUserPrefix = getArgValue(args, '--dbpm-user-prefix', `dbpm-preflight-${Date.now()}`);
 const keyspaceOutputPath = path.resolve(
   getArgValue(args, '--keyspace-output', path.join(runDir, 'data', 'tokens.keyspace.json')),
 );
@@ -237,6 +257,92 @@ const runTokenBuilder = async () => {
   });
 };
 
+const runDbpmTechValidationScript = async () => {
+  const scriptPath = fileURLToPath(new URL('./phase1-tech-validate-dbpm.mjs', import.meta.url));
+
+  return await new Promise((resolve) => {
+    const child = spawn(
+      process.execPath,
+      [
+        scriptPath,
+        '--run-dir',
+        runDir,
+        '--base-url',
+        baseUrl,
+        '--tenant-count',
+        String(dbpmTenantCount),
+        '--user-password',
+        dbpmUserPassword,
+        '--user-prefix',
+        dbpmUserPrefix,
+      ],
+      { stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += String(chunk);
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += String(chunk);
+    });
+
+    child.on('close', (code) => {
+      resolve({
+        code,
+        ok: code === 0,
+        stdout: stdout.trim(),
+        stderr: stderr.trim(),
+      });
+    });
+  });
+};
+
+const runBusinessProfileBuilder = async () => {
+  const scriptPath = fileURLToPath(new URL('./build-business-op-profiles.mjs', import.meta.url));
+
+  return await new Promise((resolve) => {
+    const child = spawn(
+      process.execPath,
+      [
+        scriptPath,
+        '--run-dir',
+        runDir,
+        '--base-url',
+        baseUrl,
+        '--manifest',
+        businessManifestPath,
+        '--tokens',
+        tokenOutputPath,
+        '--output',
+        businessProfilesOutputPath,
+      ],
+      { stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += String(chunk);
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += String(chunk);
+    });
+
+    child.on('close', (code) => {
+      resolve({
+        code,
+        ok: code === 0,
+        stdout: stdout.trim(),
+        stderr: stderr.trim(),
+      });
+    });
+  });
+};
+
 const runKeyspaceBuilder = async () => {
   const scriptPath = fileURLToPath(new URL('./build-keyspace-profiles.mjs', import.meta.url));
 
@@ -367,15 +473,19 @@ const main = async () => {
     };
 
     const orgCount = Number(tenantBaseline?.org_count ?? 0);
-    report.readiness.tenantReadyForPhase2 = orgCount >= requireTenants;
+    const orgScaleReady = orgCount >= requireTenants;
 
-    if (!report.readiness.tenantReadyForPhase2) {
+    if (!runDbpmTechValidation && !orgScaleReady) {
       const msg = `tenant scale insufficient: org_count=${orgCount} < min=${requireTenants}`;
       if (enforceTenantScale) {
         report.errors.push(msg);
       } else {
         report.warnings.push(`${msg} (allow-underprovisioned enabled)`);
       }
+    } else if (!orgScaleReady) {
+      report.warnings.push(
+        `org_count (${orgCount}) is below min-tenant-count (${requireTenants}); DBPM technical validation path will provide tenant scale gate.`,
+      );
     }
 
     if (!report.checks.debugMemory.ok) {
@@ -392,6 +502,49 @@ const main = async () => {
 
     await writeJson(path.join(dirs.dataDir, 'request-profiles.discovered.json'), profiles);
     await writeJson(path.join(dirs.dataDir, 'request-profiles.ready.json'), readyProfiles);
+
+    if (runDbpmTechValidation && report.errors.length === 0) {
+      const dbpmTechValidation = await runDbpmTechValidationScript();
+      report.checks.dbpmTechValidation = dbpmTechValidation;
+
+      if (!dbpmTechValidation.ok) {
+        report.errors.push(
+          `DBPM tech validation failed (exit=${dbpmTechValidation.code}). stderr=${dbpmTechValidation.stderr || 'none'}`,
+        );
+      } else if (!(await pathExists(dbTechValidationPath))) {
+        report.errors.push(`DBPM tech validation report not found: ${dbTechValidationPath}`);
+      } else if (!(await pathExists(businessManifestPath))) {
+        report.errors.push(`Business manifest not found: ${businessManifestPath}`);
+      } else {
+        const dbTechPayload = JSON.parse(await fs.readFile(dbTechValidationPath, 'utf8'));
+        const manifestPayload = JSON.parse(await fs.readFile(businessManifestPath, 'utf8'));
+        const manifestRows = Array.isArray(manifestPayload) ? manifestPayload : [];
+        const manifestTenantCount = manifestRows.length;
+
+        report.checks.dbpmValidation = {
+          reportPath: dbTechValidationPath,
+          manifestPath: businessManifestPath,
+          requestedTenants: Number(dbTechPayload?.summary?.requestedTenants ?? dbpmTenantCount),
+          successTenants: Number(dbTechPayload?.summary?.successTenants ?? manifestTenantCount),
+          failedTenants: Number(dbTechPayload?.summary?.failedTenants ?? 0),
+          passed: !!dbTechPayload?.summary?.passed,
+          manifestTenantCount,
+          minTenantCount: requireTenants,
+        };
+
+        const dbpmScaleReady = manifestTenantCount >= requireTenants;
+        report.readiness.tenantReadyForPhase2 = dbpmScaleReady;
+
+        if (!dbpmScaleReady) {
+          const msg = `DBPM manifest tenant count insufficient: manifestTenantCount=${manifestTenantCount} < min=${requireTenants}`;
+          if (enforceTenantScale) {
+            report.errors.push(msg);
+          } else {
+            report.warnings.push(`${msg} (allow-underprovisioned enabled)`);
+          }
+        }
+      }
+    }
 
     const hasCredentials = await pathExists(credentialsPath);
     if (!hasCredentials) {
@@ -443,6 +596,8 @@ const main = async () => {
           minTokenTenants,
           recommendedTokenTenants,
         };
+
+        report.readiness.tenantReadyForPhase2 = distinctTenantKeys.size >= requireTenants;
 
         if (successCount <= 0) {
           report.errors.push('Token pool generated zero usable token profiles.');
@@ -516,6 +671,38 @@ const main = async () => {
               report.warnings.push(
                 `Keyspace route keys below target: selected=${selectedRouteKeys}, target=${keyspaceTargetRouteKeys}`,
               );
+            }
+
+            const businessProfilesBuild = await runBusinessProfileBuilder();
+            report.checks.businessProfilesBuild = businessProfilesBuild;
+
+            if (!businessProfilesBuild.ok) {
+              report.errors.push(
+                `Business op profile build failed (exit=${businessProfilesBuild.code}). stderr=${businessProfilesBuild.stderr || 'none'}`,
+              );
+            } else if (!(await pathExists(businessProfilesOutputPath))) {
+              report.errors.push(`Business op profile output not found: ${businessProfilesOutputPath}`);
+            } else {
+              const businessPayload = JSON.parse(
+                await fs.readFile(businessProfilesOutputPath, 'utf8'),
+              );
+              const businessProfiles = Array.isArray(businessPayload?.profiles)
+                ? businessPayload.profiles
+                : [];
+              const businessTenantKeys = new Set(
+                businessProfiles.map((profile) => profile.tenantKey || profile.key).filter(Boolean),
+              );
+
+              report.checks.businessProfiles = {
+                outputPath: businessProfilesOutputPath,
+                successCount: Number(businessPayload?.successCount ?? businessProfiles.length),
+                failureCount: Number(businessPayload?.failureCount ?? 0),
+                distinctTenantKeys: businessTenantKeys.size,
+              };
+
+              if (businessProfiles.length === 0) {
+                report.errors.push('Business op profile builder produced zero profiles.');
+              }
             }
           }
         }
