@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.18.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.17.1...graphile-settings@4.18.0) (2026-03-27)
+
+### Features
+
+- **graphile-settings:** add isPrimaryKey, isForeignKey, description to FieldMeta ([c28175d](https://github.com/constructive-io/constructive/commit/c28175d3356f2d6ebc5b14c9810d4089f166cbed))
+
 ## [4.17.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.17.0...graphile-settings@4.17.1) (2026-03-27)
 
 **Note:** Version bump only for package graphile-settings

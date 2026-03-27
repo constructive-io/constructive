@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.25.0...@constructive-io/graphql-codegen@4.26.0) (2026-03-27)
+
+### Features
+
+- **codegen:** optional pgTypesFile enrichment for pgvector/tsvector/PostGIS detection ([9f3c122](https://github.com/constructive-io/constructive/commit/9f3c12264cc3b8089ba326c04b42bb35eb5d4d75))
+
 # [4.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.24.5...@constructive-io/graphql-codegen@4.25.0) (2026-03-27)
 
 ### Features
