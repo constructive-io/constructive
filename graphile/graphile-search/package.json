@@ -38,13 +38,13 @@
     "pgsql-test": "workspace:^"
   },
   "peerDependencies": {
-    "@dataplan/pg": "1.0.0-rc.8",
-    "graphile-build": "5.0.0-rc.6",
-    "graphile-build-pg": "5.0.0-rc.8",
-    "graphile-config": "1.0.0-rc.6",
+    "@dataplan/pg": "1.0.0",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
     "graphql": "16.13.0",
-    "pg-sql2": "5.0.0-rc.5",
-    "postgraphile": "5.0.0-rc.10"
+    "pg-sql2": "5.0.0",
+    "postgraphile": "5.0.0"
   },
   "keywords": [
     "postgraphile",

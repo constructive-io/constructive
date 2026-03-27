@@ -39,11 +39,11 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "peerDependencies": {
-    "graphile-build": "5.0.0-rc.6",
-    "graphile-build-pg": "5.0.0-rc.8",
-    "graphile-config": "1.0.0-rc.6",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
     "graphql": "16.13.0",
-    "postgraphile": "5.0.0-rc.10"
+    "postgraphile": "5.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
