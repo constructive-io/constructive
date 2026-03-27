@@ -37,9 +37,9 @@
     "parse"
   ],
   "devDependencies": {
-    "makage": "^0.1.12",
+    "makage": "^0.3.0",
     "pg-proto-parser": "^1.30.5",
-    "pgsql-deparser": "^17.18.1"
+    "pgsql-deparser": "^17.18.2"
   },
   "dependencies": {
     "@pgsql/types": "^17.6.2",

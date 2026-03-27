@@ -42,11 +42,11 @@
     "@0no-co/graphql.web": "^1.1.2",
     "@constructive-io/graphql-types": "workspace:^",
     "gql-ast": "workspace:^",
-    "graphql": "^16.13.0"
+    "graphql": "16.13.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.1.12",
+    "makage": "^0.3.0",
     "typescript": "^5.9.3"
   }
 }

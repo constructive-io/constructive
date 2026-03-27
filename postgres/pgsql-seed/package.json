@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.18.0",
-    "makage": "^0.1.12"
+    "makage": "^0.3.0"
   },
   "dependencies": {
     "@pgpmjs/core": "workspace:^",
