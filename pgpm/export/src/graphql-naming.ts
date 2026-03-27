@@ -13,8 +13,7 @@
  *   db_migrate.sql_actions -> sqlActions
  *   column database_id -> databaseId
  */
-import { toCamelCase, toPascalCase, distinctPluralize, singularizeLast } from 'inflekt';
-import { toSnakeCase } from 'komoji';
+import { toCamelCase, toPascalCase, toSnakeCase, distinctPluralize, singularizeLast } from 'inflekt';
 
 /**
  * Get the GraphQL query field name for a given Postgres table name.

@@ -1,6 +1,5 @@
 import { DocumentNode, print as gqlPrint } from 'graphql';
-import { toCamelCase, toPascalCase, pluralize } from 'inflekt';
-import { toSnakeCase } from 'komoji';
+import { toCamelCase, toPascalCase, toSnakeCase, pluralize } from 'inflekt';
 
 import {
   createOne,

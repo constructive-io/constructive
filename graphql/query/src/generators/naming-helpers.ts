@@ -7,8 +7,7 @@
  *
  * Back-ported from Dashboard's `packages/data/src/query-generator.ts`.
  */
-import { toCamelCase, pluralize } from 'inflekt';
-import { toConstantCase } from 'komoji';
+import { toCamelCase, toConstantCase, pluralize } from 'inflekt';
 
 import type { Table } from '../types/schema';
 

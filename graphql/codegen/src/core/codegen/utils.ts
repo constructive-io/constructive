@@ -5,10 +5,10 @@ import {
   lcFirst,
   pluralize,
   toCamelCase,
+  toConstantCase,
   toPascalCase,
   ucFirst,
 } from 'inflekt';
-import { toConstantCase } from 'komoji';
 
 import type {
   Field,
