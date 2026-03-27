@@ -206,7 +206,7 @@ function buildBlueprintField(): t.ExportNamedDeclaration {
         'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").'
       ),
       addJSDoc(
-        optionalProp('is_not_null', t.tsBooleanKeyword()),
+        optionalProp('is_required', t.tsBooleanKeyword()),
         'Whether the column has a NOT NULL constraint.'
       ),
       addJSDoc(
