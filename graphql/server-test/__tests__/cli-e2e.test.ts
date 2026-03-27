@@ -23,6 +23,9 @@ import * as ts from 'typescript';
 
 import { getConnections, seed } from '../src';
 import type { ServerInfo } from '../src/types';
+import type { Table } from '@constructive-io/graphql-codegen';
+import { generateCli } from '@constructive-io/graphql-codegen/core/codegen/cli';
+import { generateOrm } from '@constructive-io/graphql-codegen/core/codegen/orm';
 
 jest.setTimeout(120000);
 
@@ -71,19 +74,6 @@ const seedRoot = path.join(__dirname, '..', '__fixtures__', 'seed');
 const sql = (seedDir: string, file: string) =>
   path.join(seedRoot, seedDir, file);
 
-// Resolve the codegen internal modules (not re-exported at package top level)
-const codegenDir = path.dirname(
-  require.resolve('@constructive-io/graphql-codegen/package.json'),
-);
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const cliCodegen = require(
-  path.join(codegenDir, 'core', 'codegen', 'cli'),
-);
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const ormCodegen = require(
-  path.join(codegenDir, 'core', 'codegen', 'orm'),
-);
-
 const TOOL_NAME = 'cli-e2e-test';
 
 const TS_COMPILE_OPTIONS: ts.CompilerOptions = {
@@ -97,7 +87,7 @@ const TS_COMPILE_OPTIONS: ts.CompilerOptions = {
  * Build the Table object matching the simple-seed animals schema.
  * This mirrors what introspection would produce for the animals table.
  */
-function buildAnimalsTable() {
+function buildAnimalsTable(): Table {
   return {
     name: 'Animal',
     fields: [
@@ -319,7 +309,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
         {
           env: {
             ...process.env,
-            HOME: tmpHome,
+            APPSTASH_BASE_DIR: tmpHome,
             NODE_PATH: [
               distDir,
               ...resolveNodePaths(),
@@ -384,17 +374,17 @@ describe('CLI E2E — generated CLI against real DB', () => {
 
     // 3. Generate + transpile ORM files
     const animalsTable = buildAnimalsTable();
-    const ormResult = ormCodegen.generateOrm({
+    const ormResult = generateOrm({
       tables: [animalsTable],
       config: { codegen: { comments: false, condition: true } },
     });
     writeAndTranspile(srcDir, distDir, 'orm', ormResult.files);
 
     // 4. Generate + transpile CLI files
-    const cliResult = cliCodegen.generateCli({
+    const cliResult = generateCli({
       tables: [animalsTable],
       config: {
-        cli: { toolName: TOOL_NAME, cliEntryPoint: true },
+        cli: { toolName: TOOL_NAME, entryPoint: true },
         codegen: { comments: false, condition: true },
       },
     });
