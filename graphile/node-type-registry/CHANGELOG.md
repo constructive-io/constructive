@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.5.0...node-type-registry@0.5.1) (2026-03-27)
+
+### Bug Fixes
+
+- **node-type-registry:** BlueprintField uses is_required, not is_not_null ([8d000bf](https://github.com/constructive-io/constructive/commit/8d000bfba83495bfc481f061b34af16b1d1a5048))
+
 # [0.5.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.4.0...node-type-registry@0.5.0) (2026-03-26)
 
 ### Bug Fixes

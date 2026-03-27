@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.25.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.24.5...@constructive-io/graphql-codegen@4.25.0) (2026-03-27)
+
+### Features
+
+- **codegen:** add cursor pagination, find-first subcommand, and full TS SDK parity ([e834f20](https://github.com/constructive-io/constructive/commit/e834f209a0aea3a42f450f7603afb769d880eca9))
+- **codegen:** add pagination, offset, and field selection to CLI list commands ([45767b9](https://github.com/constructive-io/constructive/commit/45767b912872c52823b89bd4a9ab077a8d39f831))
+- **codegen:** add where/condition/orderBy filters and search subcommand to CLI ([2a3b991](https://github.com/constructive-io/constructive/commit/2a3b99181b07bb8acc8ebb5dab556ebb44b80db5))
+
 ## [4.24.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.24.4...@constructive-io/graphql-codegen@4.24.5) (2026-03-27)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

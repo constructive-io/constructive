@@ -1,6 +1,6 @@
 {
   "name": "graphile-postgis",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "description": "PostGIS support for PostGraphile v5",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
