@@ -37,14 +37,15 @@ interface IntrospectionFieldMeta {
   type: { pgType: string; gqlType: string; isArray: boolean };
   isNotNull: boolean;
   hasDefault: boolean;
+  isPrimaryKey: boolean;
+  isForeignKey: boolean;
+  description: string | null;
 }
 
 interface IntrospectionTableMeta {
   name: string;
   schemaName: string;
   fields: IntrospectionFieldMeta[];
-  primaryKeyConstraints: { fields: { name: string }[] }[];
-  foreignKeyConstraints: { fields: { name: string }[] }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -250,66 +251,31 @@ function pgTypeToTSType(pgType: string, isArray: boolean): t.TSType {
 }
 
 /**
- * Columns to exclude when deriving structural types from introspection.
- * These are internal DB columns, not part of the blueprint JSONB input.
+ * Derive a TS interface from an introspection table's columns.
+ *
+ * Fully procedural — uses field metadata to determine:
+ *   - Which columns to skip (isPrimaryKey || isForeignKey)
+ *   - Required vs optional (isNotNull && !hasDefault)
+ *   - JSDoc from PG column comments (description)
+ *
+ * Special-case overrides (e.g. typed discriminants) can be passed via
+ * `typeOverrides` for columns that need a non-default TS type.
  */
-const INTERNAL_COLUMNS = new Set([
-  'id',
-  'database_id',
-  'table_id',
-  'schema_id',
-  'field_id',
-  'field_ids',
-  'out_fields',
-  'smart_tags',
-  'category',
-  'module',
-  'scope',
-  'tags',
-  'include_field_ids',
-  'field_order',
-  'disabled',
-  'chk',
-  'chk_expr',
-  'default_value_ast',
-]);
-
-/** Derive a TS interface from an introspection table's columns. */
 function deriveInterfaceFromTable(
   table: IntrospectionTableMeta,
   interfaceName: string,
   description: string,
-  overrides?: Record<string, { tsType?: t.TSType; doc?: string; optional?: boolean; required?: boolean }>
+  typeOverrides?: Record<string, t.TSType>
 ): t.ExportNamedDeclaration {
-  const pkFields = new Set(
-    table.primaryKeyConstraints.flatMap((pk) => pk.fields.map((f) => f.name))
-  );
-  const fkFields = new Set(
-    table.foreignKeyConstraints.flatMap((fk) => fk.fields.map((f) => f.name))
-  );
-
   const members: t.TSTypeElement[] = [];
 
   for (const field of table.fields) {
-    // Skip internal columns
-    if (INTERNAL_COLUMNS.has(field.name)) continue;
-    if (pkFields.has(field.name)) continue;
-    if (fkFields.has(field.name)) continue;
+    // Skip PK and FK columns — these are internal to the DB schema
+    if (field.isPrimaryKey || field.isForeignKey) continue;
 
-    const override = overrides?.[field.name];
-
-    const tsType = override?.tsType ?? pgTypeToTSType(field.type.pgType, field.type.isArray);
-    const doc = override?.doc ?? `Derived from ${table.schemaName}.${table.name}.${field.name} (${field.type.pgType}).`;
-
-    // Determine optionality: required if NOT NULL and no default, unless overridden
-    let isRequired: boolean;
-    if (override?.optional !== undefined) {
-      isRequired = !override.optional;
-    } else if (override?.required !== undefined) {
-      isRequired = override.required;
-    } else {
-      isRequired = field.isNotNull && !field.hasDefault;
-    }
+    const tsType = typeOverrides?.[field.name] ?? pgTypeToTSType(field.type.pgType, field.type.isArray);
+    const doc = field.description ?? `${table.schemaName}.${table.name}.${field.name} (${field.type.pgType})`;
+    const isRequired = field.isNotNull && !field.hasDefault;
 
     const prop = isRequired
       ? requiredProp(field.name, tsType)
@@ -341,18 +307,6 @@ function buildBlueprintField(
       table,
       'BlueprintField',
       'A custom field (column) to add to a blueprint table. Derived from metaschema_public.field.',
-      {
-        name: { required: true, doc: 'The column name.' },
-        type: { required: true, doc: 'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").' },
-        is_required: { optional: true, doc: 'Whether the column has a NOT NULL constraint.' },
-        default_value: { optional: true, doc: 'SQL default value expression (e.g., "true", "now()").' },
-        description: { optional: true, doc: 'Comment/description for this field.' },
-        label: { optional: true, doc: 'Display label for this field.' },
-        api_required: { optional: true, doc: 'Whether the field is required in the API (enforced at GraphQL level).' },
-        min: { optional: true, doc: 'Minimum value constraint (character_length for text, value for numbers).' },
-        max: { optional: true, doc: 'Maximum value constraint (character_length for text, value for numbers).' },
-        regexp: { optional: true, doc: 'Regex pattern CHECK constraint for text/citext fields.' },
-      }
     );
   }
   // Static fallback
@@ -384,21 +338,11 @@ function buildBlueprintPolicy(
       'BlueprintPolicy',
       'An RLS policy entry for a blueprint table. Derived from metaschema_public.policy.',
       {
-        policy_type: {
-          tsType: policyTypeAnnotation,
-          required: true,
-          doc: 'Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll").'
-        },
-        name: { optional: true, doc: 'Optional custom name for this policy.' },
-        grantee_name: { optional: true, doc: 'Role for this policy.' },
-        privilege: { optional: true, doc: 'Privilege this policy applies to.' },
-        permissive: { optional: true, doc: 'Whether this policy is permissive (true) or restrictive (false).' },
-        data: {
-          tsType: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-          optional: true,
-          doc: 'Policy-specific data (structure varies by policy type).'
-        },
-      }
+        // policy_type gets a typed union of known Authz* node names
+        policy_type: policyTypeAnnotation,
+        // data is untyped JSONB — use Record<string, unknown>
+        data: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+      },
     );
   }
   // Static fallback
@@ -468,26 +412,11 @@ function buildBlueprintIndex(
       'BlueprintIndex',
       'An index definition within a blueprint. Derived from metaschema_public.index.',
       {
-        name: { optional: true, doc: 'Optional custom name for the index.' },
-        access_method: { required: true, doc: 'Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25").' },
-        is_unique: { optional: true, doc: 'Whether this is a unique index.' },
-        op_classes: { optional: true, doc: 'Operator classes for the index columns.' },
-        index_params: {
-          tsType: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-          optional: true,
-          doc: 'Index parameter expressions.'
-        },
-        where_clause: {
-          tsType: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-          optional: true,
-          doc: 'Partial index WHERE clause (AST).'
-        },
-        options: {
-          tsType: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-          optional: true,
-          doc: 'Additional index-specific options.'
-        },
-      }
+        // JSONB columns get Record<string, unknown> instead of the default
+        index_params: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+        where_clause: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+        options: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+      },
     );
   }
   // Static fallback
