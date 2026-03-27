@@ -17,6 +17,9 @@ export interface FieldMeta {
   type: TypeMeta;
   isNotNull: boolean;
   hasDefault: boolean;
+  isPrimaryKey: boolean;
+  isForeignKey: boolean;
+  description: string | null;
 }
 
 export interface TypeMeta {
@@ -136,6 +139,7 @@ export interface PgAttribute {
   codec?: PgCodec | null;
   notNull?: boolean;
   hasDefault?: boolean;
+  description?: string | null;
 }
 
 export interface PgUnique {

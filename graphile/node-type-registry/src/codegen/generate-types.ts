@@ -14,19 +14,39 @@
  * when building blueprint JSON.  The API itself accepts plain JSONB.
  *
  * Usage:
- *   npx ts-node src/codegen/generate-types.ts [--outdir <dir>]
+ *   npx ts-node src/codegen/generate-types.ts [--outdir <dir>] [--introspection <path>]
  */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const generate = require('@babel/generator').default ?? require('@babel/generator');
 import * as t from '@babel/types';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { generateTypeScriptTypes } from 'schema-typescript';
 import type { JSONSchema as SchemaTS_JSONSchema } from 'schema-typescript';
 
 import { allNodeTypes } from '../index';
 import type { NodeTypeDefinition } from '../types';
+
+// ---------------------------------------------------------------------------
+// Introspection types (subset of TableMeta from graphile-settings)
+// ---------------------------------------------------------------------------
+
+interface IntrospectionFieldMeta {
+  name: string;
+  type: { pgType: string; gqlType: string; isArray: boolean };
+  isNotNull: boolean;
+  hasDefault: boolean;
+  isPrimaryKey: boolean;
+  isForeignKey: boolean;
+  description: string | null;
+}
+
+interface IntrospectionTableMeta {
+  name: string;
+  schemaName: string;
+  fields: IntrospectionFieldMeta[];
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -194,68 +214,146 @@ function generateParamsInterfaces(
 }
 
 // ---------------------------------------------------------------------------
-// Static structural types (BlueprintField, BlueprintPolicy, etc.)
+// Introspection-driven structural type derivation
 // ---------------------------------------------------------------------------
 
-function buildBlueprintField(): t.ExportNamedDeclaration {
+/** Map PostgreSQL type names to TypeScript type annotations. */
+function pgTypeToTSType(pgType: string, isArray: boolean): t.TSType {
+  let base: t.TSType;
+  switch (pgType) {
+    case 'bool':
+    case 'boolean':
+      base = t.tsBooleanKeyword();
+      break;
+    case 'int2':
+    case 'int4':
+    case 'int8':
+    case 'integer':
+    case 'smallint':
+    case 'bigint':
+    case 'float4':
+    case 'float8':
+    case 'float':
+    case 'double precision':
+    case 'numeric':
+    case 'real':
+      base = t.tsNumberKeyword();
+      break;
+    case 'jsonb':
+    case 'json':
+      base = recordType(t.tsStringKeyword(), t.tsUnknownKeyword());
+      break;
+    default:
+      base = t.tsStringKeyword();
+      break;
+  }
+  return isArray ? t.tsArrayType(base) : base;
+}
+
+/**
+ * Derive a TS interface from an introspection table's columns.
+ *
+ * Fully procedural — uses field metadata to determine:
+ *   - Which columns to skip (isPrimaryKey || isForeignKey)
+ *   - Required vs optional (isNotNull && !hasDefault)
+ *   - JSDoc from PG column comments (description)
+ *
+ * Special-case overrides (e.g. typed discriminants) can be passed via
+ * `typeOverrides` for columns that need a non-default TS type.
+ */
+function deriveInterfaceFromTable(
+  table: IntrospectionTableMeta,
+  interfaceName: string,
+  description: string,
+  typeOverrides?: Record<string, t.TSType>
+): t.ExportNamedDeclaration {
+  const members: t.TSTypeElement[] = [];
+
+  for (const field of table.fields) {
+    // Skip PK and FK columns — these are internal to the DB schema
+    if (field.isPrimaryKey || field.isForeignKey) continue;
+
+    const tsType = typeOverrides?.[field.name] ?? pgTypeToTSType(field.type.pgType, field.type.isArray);
+    const doc = field.description ?? `${table.schemaName}.${table.name}.${field.name} (${field.type.pgType})`;
+    const isRequired = field.isNotNull && !field.hasDefault;
+
+    const prop = isRequired
+      ? requiredProp(field.name, tsType)
+      : optionalProp(field.name, tsType);
+    members.push(addJSDoc(prop, doc));
+  }
+
+  return addJSDoc(exportInterface(interfaceName, members), description);
+}
+
+// ---------------------------------------------------------------------------
+// Structural types — introspection-driven or static fallback
+// ---------------------------------------------------------------------------
+
+function findTable(
+  tables: IntrospectionTableMeta[],
+  schemaName: string,
+  tableName: string
+): IntrospectionTableMeta | undefined {
+  return tables.find((tbl) => tbl.schemaName === schemaName && tbl.name === tableName);
+}
+
+function buildBlueprintField(
+  introspection?: IntrospectionTableMeta[]
+): t.ExportNamedDeclaration {
+  const table = introspection && findTable(introspection, 'metaschema_public', 'field');
+  if (table) {
+    return deriveInterfaceFromTable(
+      table,
+      'BlueprintField',
+      'A custom field (column) to add to a blueprint table. Derived from metaschema_public.field.',
+    );
+  }
+  // Static fallback
   return addJSDoc(
     exportInterface('BlueprintField', [
       addJSDoc(requiredProp('name', t.tsStringKeyword()), 'The column name.'),
-      addJSDoc(
-        requiredProp('type', t.tsStringKeyword()),
-        'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").'
-      ),
-      addJSDoc(
-        optionalProp('is_required', t.tsBooleanKeyword()),
-        'Whether the column has a NOT NULL constraint.'
-      ),
-      addJSDoc(
-        optionalProp('default_value', t.tsStringKeyword()),
-        'SQL default value expression (e.g., "true", "now()").'
-      ),
-      addJSDoc(
-        optionalProp('description', t.tsStringKeyword()),
-        'Comment/description for this field.'
-      ),
+      addJSDoc(requiredProp('type', t.tsStringKeyword()), 'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").'),
+      addJSDoc(optionalProp('is_required', t.tsBooleanKeyword()), 'Whether the column has a NOT NULL constraint.'),
+      addJSDoc(optionalProp('default_value', t.tsStringKeyword()), 'SQL default value expression (e.g., "true", "now()").'),
+      addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.'),
     ]),
     'A custom field (column) to add to a blueprint table.'
   );
 }
 
 function buildBlueprintPolicy(
-  authzNodes: NodeTypeDefinition[]
+  authzNodes: NodeTypeDefinition[],
+  introspection?: IntrospectionTableMeta[]
 ): t.ExportNamedDeclaration {
   const policyTypeAnnotation =
     authzNodes.length > 0
       ? strUnion(authzNodes.map((nt) => nt.name))
       : t.tsStringKeyword();
 
+  const table = introspection && findTable(introspection, 'metaschema_public', 'policy');
+  if (table) {
+    return deriveInterfaceFromTable(
+      table,
+      'BlueprintPolicy',
+      'An RLS policy entry for a blueprint table. Derived from metaschema_public.policy.',
+      {
+        // policy_type gets a typed union of known Authz* node names
+        policy_type: policyTypeAnnotation,
+        // data is untyped JSONB — use Record<string, unknown>
+        data: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+      },
+    );
+  }
+  // Static fallback
   return addJSDoc(
     exportInterface('BlueprintPolicy', [
-      addJSDoc(
-        requiredProp('$type', policyTypeAnnotation),
-        'Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll").'
-      ),
-      addJSDoc(
-        optionalProp('policy_role', t.tsStringKeyword()),
-        'Role for this policy. Defaults to "authenticated".'
-      ),
-      addJSDoc(
-        optionalProp('permissive', t.tsBooleanKeyword()),
-        'Whether this policy is permissive (true) or restrictive (false).'
-      ),
-      addJSDoc(
-        optionalProp('policy_name', t.tsStringKeyword()),
-        'Optional custom name for this policy.'
-      ),
-      addJSDoc(
-        optionalProp('privileges', t.tsArrayType(t.tsStringKeyword())),
-        'Privileges this policy applies to.'
-      ),
-      addJSDoc(
-        optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())),
-        'Policy-specific data (structure varies by policy type).'
-      ),
+      addJSDoc(requiredProp('policy_type', policyTypeAnnotation), 'Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll").'),
+      addJSDoc(optionalProp('policy_role', t.tsStringKeyword()), 'Role for this policy. Defaults to "authenticated".'),
+      addJSDoc(optionalProp('permissive', t.tsBooleanKeyword()), 'Whether this policy is permissive (true) or restrictive (false).'),
+      addJSDoc(optionalProp('policy_name', t.tsStringKeyword()), 'Optional custom name for this policy.'),
+      addJSDoc(optionalProp('privileges', t.tsArrayType(t.tsStringKeyword())), 'Privileges this policy applies to.'),
+      addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).'),
     ]),
     'An RLS policy entry for a blueprint table.'
   );
@@ -304,41 +402,34 @@ function buildBlueprintFullTextSearch(): t.ExportNamedDeclaration {
   );
 }
 
-function buildBlueprintIndex(): t.ExportNamedDeclaration {
+function buildBlueprintIndex(
+  introspection?: IntrospectionTableMeta[]
+): t.ExportNamedDeclaration {
+  const table = introspection && findTable(introspection, 'metaschema_public', 'index');
+  if (table) {
+    return deriveInterfaceFromTable(
+      table,
+      'BlueprintIndex',
+      'An index definition within a blueprint. Derived from metaschema_public.index.',
+      {
+        // JSONB columns get Record<string, unknown> instead of the default
+        index_params: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+        where_clause: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+        options: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
+      },
+    );
+  }
+  // Static fallback
   return addJSDoc(
     exportInterface('BlueprintIndex', [
-      addJSDoc(
-        requiredProp('table_ref', t.tsStringKeyword()),
-        'Reference key of the table this index belongs to.'
-      ),
-      addJSDoc(
-        optionalProp('column', t.tsStringKeyword()),
-        'Single column name for the index. Mutually exclusive with "columns".'
-      ),
-      addJSDoc(
-        optionalProp('columns', t.tsArrayType(t.tsStringKeyword())),
-        'Array of column names for a multi-column index. Mutually exclusive with "column".'
-      ),
-      addJSDoc(
-        requiredProp('access_method', t.tsStringKeyword()),
-        'Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25").'
-      ),
-      addJSDoc(
-        optionalProp('is_unique', t.tsBooleanKeyword()),
-        'Whether this is a unique index.'
-      ),
-      addJSDoc(
-        optionalProp('name', t.tsStringKeyword()),
-        'Optional custom name for the index.'
-      ),
-      addJSDoc(
-        optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())),
-        'Operator classes for the index columns.'
-      ),
-      addJSDoc(
-        optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())),
-        'Additional index-specific options.'
-      ),
+      addJSDoc(requiredProp('table_ref', t.tsStringKeyword()), 'Reference key of the table this index belongs to.'),
+      addJSDoc(optionalProp('column', t.tsStringKeyword()), 'Single column name for the index.'),
+      addJSDoc(optionalProp('columns', t.tsArrayType(t.tsStringKeyword())), 'Array of column names for a multi-column index.'),
+      addJSDoc(requiredProp('access_method', t.tsStringKeyword()), 'Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25").'),
+      addJSDoc(optionalProp('is_unique', t.tsBooleanKeyword()), 'Whether this is a unique index.'),
+      addJSDoc(optionalProp('name', t.tsStringKeyword()), 'Optional custom name for the index.'),
+      addJSDoc(optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())), 'Operator classes for the index columns.'),
+      addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.'),
     ]),
     'An index definition within a blueprint.'
   );
@@ -543,7 +634,7 @@ function sectionComment(title: string): t.Statement {
 // Main generator
 // ---------------------------------------------------------------------------
 
-function buildProgram(): string {
+function buildProgram(introspection?: IntrospectionTableMeta[]): string {
   const statements: t.Statement[] = [];
 
   // Group node types by category
@@ -576,13 +667,16 @@ function buildProgram(): string {
     statements.push(...generateParamsInterfaces(nts));
   }
 
-  // -- Static structural types --
-  statements.push(sectionComment('Static structural types'));
-  statements.push(buildBlueprintField());
-  statements.push(buildBlueprintPolicy(authzNodes));
+  // -- Structural types (introspection-driven when available) --
+  const introspectionSource = introspection
+    ? 'Derived from introspection JSON'
+    : 'Static fallback (no introspection provided)';
+  statements.push(sectionComment(`Structural types — ${introspectionSource}`));
+  statements.push(buildBlueprintField(introspection));
+  statements.push(buildBlueprintPolicy(authzNodes, introspection));
   statements.push(buildBlueprintFtsSource());
   statements.push(buildBlueprintFullTextSearch());
-  statements.push(buildBlueprintIndex());
+  statements.push(buildBlueprintIndex(introspection));
 
   // -- Node types discriminated union --
   statements.push(
@@ -631,7 +725,19 @@ function main() {
   const outdir =
     outdirIdx !== -1 ? args[outdirIdx + 1] : join(__dirname, '..');
 
-  const content = buildProgram();
+  const introspectionIdx = args.indexOf('--introspection');
+  let introspection: IntrospectionTableMeta[] | undefined;
+  if (introspectionIdx !== -1 && args[introspectionIdx + 1]) {
+    const introspectionPath = args[introspectionIdx + 1];
+    console.log(`Reading introspection from ${introspectionPath}`);
+    const raw = readFileSync(introspectionPath, 'utf-8');
+    introspection = JSON.parse(raw) as IntrospectionTableMeta[];
+    console.log(`Loaded ${introspection.length} tables from introspection`);
+  } else {
+    console.log('No --introspection flag; using static fallback types');
+  }
+
+  const content = buildProgram(introspection);
   const filename = 'blueprint-types.generated.ts';
   const filepath = join(outdir, filename);
 

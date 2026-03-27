@@ -248,8 +248,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "authorId",
               "type": {
                 "gqlType": "UUID",
@@ -263,8 +266,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "comment_author_fkey",
           "refFields": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -286,8 +292,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "postId",
               "type": {
                 "gqlType": "UUID",
@@ -301,8 +310,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "comment_post_fkey",
           "refFields": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -325,8 +337,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -343,8 +358,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": true,
         "isNotNull": true,
+        "isPrimaryKey": false,
         "name": "authorId",
         "type": {
           "gqlType": "UUID",
@@ -355,8 +373,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": false,
         "name": "body",
         "type": {
           "gqlType": "String",
@@ -367,8 +388,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": true,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": true,
         "name": "id",
         "type": {
           "gqlType": "UUID",
@@ -379,8 +403,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": true,
         "isNotNull": true,
+        "isPrimaryKey": false,
         "name": "postId",
         "type": {
           "gqlType": "UUID",
@@ -395,8 +422,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "authorId",
             "type": {
               "gqlType": "UUID",
@@ -410,8 +440,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "comment_author_fkey",
         "refFields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -433,8 +466,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "postId",
             "type": {
               "gqlType": "UUID",
@@ -448,8 +484,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "comment_post_fkey",
         "refFields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -476,8 +515,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -512,8 +554,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -541,8 +586,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "authorId",
               "type": {
                 "gqlType": "UUID",
@@ -563,8 +611,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "postId",
               "type": {
                 "gqlType": "UUID",
@@ -595,8 +646,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "authorId",
               "type": {
                 "gqlType": "UUID",
@@ -610,8 +664,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "post_author_fkey",
           "refFields": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -634,8 +691,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -652,8 +712,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": true,
         "isNotNull": true,
+        "isPrimaryKey": false,
         "name": "authorId",
         "type": {
           "gqlType": "UUID",
@@ -664,8 +727,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": true,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": true,
         "name": "id",
         "type": {
           "gqlType": "UUID",
@@ -676,8 +742,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": false,
         "isNotNull": false,
+        "isPrimaryKey": false,
         "name": "metadata",
         "type": {
           "gqlType": "JSON",
@@ -688,8 +757,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": false,
         "name": "title",
         "type": {
           "gqlType": "String",
@@ -704,8 +776,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "authorId",
             "type": {
               "gqlType": "UUID",
@@ -719,8 +794,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "post_author_fkey",
         "refFields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -747,8 +825,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -783,8 +864,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -812,8 +896,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "authorId",
               "type": {
                 "gqlType": "UUID",
@@ -836,8 +923,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -858,8 +948,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -882,8 +975,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -904,8 +1000,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -929,8 +1028,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionLeftConstraint": {
             "fields": [
               {
+                "description": null,
                 "hasDefault": false,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "postId",
                 "type": {
                   "gqlType": "UUID",
@@ -944,8 +1046,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "post_post_tags",
             "refFields": [
               {
+                "description": null,
                 "hasDefault": true,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "id",
                 "type": {
                   "gqlType": "UUID",
@@ -966,8 +1071,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionLeftKeyAttributes": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "postId",
               "type": {
                 "gqlType": "UUID",
@@ -981,8 +1089,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionRightConstraint": {
             "fields": [
               {
+                "description": null,
                 "hasDefault": false,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "tagId",
                 "type": {
                   "gqlType": "UUID",
@@ -996,8 +1107,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "post_tag_tag_fkey",
             "refFields": [
               {
+                "description": null,
                 "hasDefault": true,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "id",
                 "type": {
                   "gqlType": "UUID",
@@ -1018,8 +1132,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionRightKeyAttributes": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "tagId",
               "type": {
                 "gqlType": "UUID",
@@ -1035,8 +1152,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "leftKeyAttributes": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1049,8 +1169,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           ],
           "rightKeyAttributes": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1077,8 +1200,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "postId",
               "type": {
                 "gqlType": "UUID",
@@ -1092,8 +1218,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "post_tag_post_fkey",
           "refFields": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1115,8 +1244,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "tagId",
               "type": {
                 "gqlType": "UUID",
@@ -1130,8 +1262,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "name": "post_tag_tag_fkey",
           "refFields": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1154,8 +1289,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "postId",
             "type": {
               "gqlType": "UUID",
@@ -1166,8 +1304,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             },
           },
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "tagId",
             "type": {
               "gqlType": "UUID",
@@ -1184,8 +1325,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": true,
         "isNotNull": true,
+        "isPrimaryKey": true,
         "name": "postId",
         "type": {
           "gqlType": "UUID",
@@ -1196,8 +1340,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": true,
         "isNotNull": true,
+        "isPrimaryKey": true,
         "name": "tagId",
         "type": {
           "gqlType": "UUID",
@@ -1212,8 +1359,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "postId",
             "type": {
               "gqlType": "UUID",
@@ -1227,8 +1377,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "post_tag_post_fkey",
         "refFields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1250,8 +1403,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "tagId",
             "type": {
               "gqlType": "UUID",
@@ -1265,8 +1421,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         "name": "post_tag_tag_fkey",
         "refFields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1294,8 +1453,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "postId",
             "type": {
               "gqlType": "UUID",
@@ -1306,8 +1468,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             },
           },
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "tagId",
             "type": {
               "gqlType": "UUID",
@@ -1342,8 +1507,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "postId",
             "type": {
               "gqlType": "UUID",
@@ -1354,8 +1522,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             },
           },
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "tagId",
             "type": {
               "gqlType": "UUID",
@@ -1383,8 +1554,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "postId",
               "type": {
                 "gqlType": "UUID",
@@ -1405,8 +1579,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "tagId",
               "type": {
                 "gqlType": "UUID",
@@ -1437,8 +1614,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1455,8 +1635,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "slug",
               "type": {
                 "gqlType": "String",
@@ -1473,8 +1656,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "description": null,
         "hasDefault": true,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": true,
         "name": "id",
         "type": {
           "gqlType": "UUID",
@@ -1485,8 +1671,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": false,
         "name": "slug",
         "type": {
           "gqlType": "String",
@@ -1505,8 +1694,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1527,8 +1719,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "slug",
             "type": {
               "gqlType": "String",
@@ -1563,8 +1758,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1593,8 +1791,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1617,8 +1818,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1642,8 +1846,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionLeftConstraint": {
             "fields": [
               {
+                "description": null,
                 "hasDefault": false,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "tagId",
                 "type": {
                   "gqlType": "UUID",
@@ -1657,8 +1864,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "tag_post_tags",
             "refFields": [
               {
+                "description": null,
                 "hasDefault": true,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "id",
                 "type": {
                   "gqlType": "UUID",
@@ -1679,8 +1889,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionLeftKeyAttributes": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "tagId",
               "type": {
                 "gqlType": "UUID",
@@ -1694,8 +1907,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "junctionRightConstraint": {
             "fields": [
               {
+                "description": null,
                 "hasDefault": false,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "postId",
                 "type": {
                   "gqlType": "UUID",
@@ -1709,8 +1925,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
             "name": "post_tag_post_fkey",
             "refFields": [
               {
+                "description": null,
                 "hasDefault": true,
+                "isForeignKey": false,
                 "isNotNull": true,
+                "isPrimaryKey": false,
                 "name": "id",
                 "type": {
                   "gqlType": "UUID",
@@ -1731,8 +1950,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "junctionRightKeyAttributes": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "postId",
               "type": {
                 "gqlType": "UUID",
@@ -1748,8 +1970,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           },
           "leftKeyAttributes": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1762,8 +1987,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           ],
           "rightKeyAttributes": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1786,8 +2014,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "slug",
             "type": {
               "gqlType": "String",
@@ -1808,8 +2039,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       "primaryKey": {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1826,8 +2060,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         {
           "fields": [
             {
+              "description": null,
               "hasDefault": false,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "emailAddress",
               "type": {
                 "gqlType": "ConstructiveInternalTypeEmail",
@@ -1844,8 +2081,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
     },
     "fields": [
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": false,
         "isNotNull": false,
+        "isPrimaryKey": false,
         "name": "displayName",
         "type": {
           "gqlType": "String",
@@ -1856,8 +2096,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": false,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": false,
         "name": "emailAddress",
         "type": {
           "gqlType": "ConstructiveInternalTypeEmail",
@@ -1868,8 +2111,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         },
       },
       {
+        "description": null,
         "hasDefault": true,
+        "isForeignKey": false,
         "isNotNull": true,
+        "isPrimaryKey": true,
         "name": "id",
         "type": {
           "gqlType": "UUID",
@@ -1888,8 +2134,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "emailAddress",
             "type": {
               "gqlType": "ConstructiveInternalTypeEmail",
@@ -1910,8 +2159,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
         ],
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1946,8 +2198,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": true,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "id",
             "type": {
               "gqlType": "UUID",
@@ -1976,8 +2231,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -1998,8 +2256,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -2022,8 +2283,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -2044,8 +2308,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
           "isUnique": false,
           "keys": [
             {
+              "description": null,
               "hasDefault": true,
+              "isForeignKey": false,
               "isNotNull": true,
+              "isPrimaryKey": false,
               "name": "id",
               "type": {
                 "gqlType": "UUID",
@@ -2070,8 +2337,11 @@ exports[`MetaSchemaPlugin snapshot scenarios produces stable metadata for a mult
       {
         "fields": [
           {
+            "description": null,
             "hasDefault": false,
+            "isForeignKey": false,
             "isNotNull": true,
+            "isPrimaryKey": false,
             "name": "emailAddress",
             "type": {
               "gqlType": "ConstructiveInternalTypeEmail",

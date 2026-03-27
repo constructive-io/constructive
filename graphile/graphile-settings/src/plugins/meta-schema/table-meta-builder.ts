@@ -41,8 +41,24 @@ function buildTableMeta(
   const uniques = getUniques(resource);
   const relations = getRelations(resource);
 
+  // Compute PK and FK attribute name sets for field metadata
+  const pkAttrNames = new Set<string>();
+  const fkAttrNames = new Set<string>();
+  for (const unique of uniques) {
+    if (unique.isPrimary) {
+      for (const attrName of unique.attributes) pkAttrNames.add(attrName);
+    }
+  }
+  for (const relation of Object.values(relations)) {
+    if (relation.isReferencee !== false) continue;
+    for (const attrName of relation.localAttributes || []) fkAttrNames.add(attrName);
+  }
+
   const fields = Object.entries(attributes).map(([attrName, attr]) =>
-    buildFieldMeta(context.inflectAttr(attrName, codec), attr, context.build),
+    buildFieldMeta(context.inflectAttr(attrName, codec), attr, context.build, {
+      isPrimaryKey: pkAttrNames.has(attrName),
+      isForeignKey: fkAttrNames.has(attrName),
+    }),
   );
   const indexes = buildIndexes(codec, attributes, uniques, context);
   const primaryKey = buildPrimaryKey(codec, attributes, uniques, context);
