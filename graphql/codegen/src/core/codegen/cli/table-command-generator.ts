@@ -311,90 +311,12 @@ function buildSubcommandSwitch(
   return t.switchStatement(t.identifier('subcommand'), cases);
 }
 
-/**
- * Build AST for parsing a numeric CLI flag:
- *   typeof argv.<name> === 'number' ? argv.<name> as number
- *     : typeof argv.<name> === 'string' ? parseInt(argv.<name> as string, 10) : undefined
- */
-function buildParseIntFlag(name: string): t.VariableDeclaration {
-  const member = () => t.memberExpression(t.identifier('argv'), t.identifier(name));
-  return t.variableDeclaration('const', [
-    t.variableDeclarator(
-      t.identifier(name),
-      t.conditionalExpression(
-        t.binaryExpression('===', t.unaryExpression('typeof', member()), t.stringLiteral('number')),
-        t.tsAsExpression(member(), t.tsNumberKeyword()),
-        t.conditionalExpression(
-          t.binaryExpression('===', t.unaryExpression('typeof', member()), t.stringLiteral('string')),
-          t.callExpression(t.identifier('parseInt'), [
-            t.tsAsExpression(member(), t.tsStringKeyword()),
-            t.numericLiteral(10),
-          ]),
-          t.identifier('undefined'),
-        ),
-      ),
-    ),
-  ]);
-}
-
-/**
- * Build AST for parsing a string CLI flag:
- *   typeof argv.<name> === 'string' ? argv.<name> as string : undefined
- */
-function buildParseStringFlag(name: string): t.VariableDeclaration {
-  const member = () => t.memberExpression(t.identifier('argv'), t.identifier(name));
-  return t.variableDeclaration('const', [
-    t.variableDeclarator(
-      t.identifier(name),
-      t.conditionalExpression(
-        t.binaryExpression('===', t.unaryExpression('typeof', member()), t.stringLiteral('string')),
-        t.tsAsExpression(member(), t.tsStringKeyword()),
-        t.identifier('undefined'),
-      ),
-    ),
-  ]);
-}
-
-/**
- * Build a conditional spread for an optional findMany arg:
- *   ...(value !== undefined ? { key: value } : {})
- * For numeric flags, also checks !isNaN(value).
- */
-function buildOptionalSpread(key: string, varName?: string, isNumeric?: boolean): t.SpreadElement {
-  const id = t.identifier(varName ?? key);
-  const check = isNumeric
-    ? t.logicalExpression(
-        '&&',
-        t.binaryExpression('!==', id, t.identifier('undefined')),
-        t.unaryExpression('!', t.callExpression(t.identifier('isNaN'), [id])),
-      )
-    : t.binaryExpression('!==', id, t.identifier('undefined'));
-  return t.spreadElement(
-    t.conditionalExpression(
-      check,
-      t.objectExpression([
-        t.objectProperty(t.identifier(key), id, false, key === (varName ?? key)),
-      ]),
-      t.objectExpression([]),
-    ),
-  );
-}
-
 function buildListHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
   // --- Build the try body ---
   const tryBody: t.Statement[] = [];
-
-  // Parse numeric flags: limit, last, offset
-  tryBody.push(buildParseIntFlag('limit'));
-  tryBody.push(buildParseIntFlag('last'));
-  tryBody.push(buildParseIntFlag('offset'));
-
-  // Parse string flags: after, before
-  tryBody.push(buildParseStringFlag('after'));
-  tryBody.push(buildParseStringFlag('before'));
 
   // const defaultSelect = { id: true, name: true, ... };
   tryBody.push(
@@ -403,113 +325,14 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
     ]),
   );
 
-  // const select = typeof argv.fields === 'string'
-  //   ? buildSelectFromPaths(argv.fields as string)
-  //   : defaultSelect;
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('select'),
-        t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('fields'))),
-            t.stringLiteral('string'),
-          ),
-          t.callExpression(t.identifier('buildSelectFromPaths'), [
-            t.tsAsExpression(
-              t.memberExpression(t.identifier('argv'), t.identifier('fields')),
-              t.tsStringKeyword(),
-            ),
-          ]),
-          t.identifier('defaultSelect'),
-        ),
-      ),
-    ]),
-  );
-
-  // const parsed = unflattenDotNotation(argv);
-  // Reconstruct nested objects from dot-notation CLI flags:
-  //   --where.id.equalTo abc  →  { where: { id: { equalTo: 'abc' } } }
-  //   --condition.name.like '%foo%'  →  { condition: { name: { like: '%foo%' } } }
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('parsed'),
-        t.callExpression(t.identifier('unflattenDotNotation'), [
-          t.identifier('argv'),
-        ]),
-      ),
-    ]),
-  );
-
-  // const where = parsed.where;
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('where'),
-        t.memberExpression(t.identifier('parsed'), t.identifier('where')),
-      ),
-    ]),
-  );
-
-  // const condition = parsed.condition;
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('condition'),
-        t.memberExpression(t.identifier('parsed'), t.identifier('condition')),
-      ),
-    ]),
-  );
-
-  // const orderBy = typeof argv.orderBy === 'string' ? argv.orderBy.split(',') : undefined;
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('orderBy'),
-        t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('orderBy'))),
-            t.stringLiteral('string'),
-          ),
-          t.callExpression(
-            t.memberExpression(
-              t.tsAsExpression(
-                t.memberExpression(t.identifier('argv'), t.identifier('orderBy')),
-                t.tsStringKeyword(),
-              ),
-              t.identifier('split'),
-            ),
-            [t.stringLiteral(',')],
-          ),
-          t.identifier('undefined'),
-        ),
-      ),
-    ]),
-  );
-
-  // Build findMany args with all supported options (matching TS SDK FindManyArgs)
+  // const findManyArgs = parseFindManyArgs(argv, defaultSelect);
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('findManyArgs'),
-        t.objectExpression([
-          t.objectProperty(t.identifier('select'), t.identifier('select'), false, true),
-          // Forward pagination: first (--limit) + after (cursor)
-          buildOptionalSpread('first', 'limit', true),
-          buildOptionalSpread('after'),
-          // Backward pagination: last + before (cursor)
-          buildOptionalSpread('last', undefined, true),
-          buildOptionalSpread('before'),
-          // Offset pagination
-          buildOptionalSpread('offset', undefined, true),
-          // Filtering
-          buildOptionalSpread('where'),
-          buildOptionalSpread('condition'),
-          // Ordering
-          buildOptionalSpread('orderBy'),
+        t.callExpression(t.identifier('parseFindManyArgs'), [
+          t.identifier('argv'),
+          t.identifier('defaultSelect'),
         ]),
       ),
     ]),
@@ -585,64 +408,14 @@ function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?:
     ]),
   );
 
-  // const select = typeof argv.fields === 'string' ? buildSelectFromPaths(argv.fields) : defaultSelect;
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('select'),
-        t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('fields'))),
-            t.stringLiteral('string'),
-          ),
-          t.callExpression(t.identifier('buildSelectFromPaths'), [
-            t.tsAsExpression(
-              t.memberExpression(t.identifier('argv'), t.identifier('fields')),
-              t.tsStringKeyword(),
-            ),
-          ]),
-          t.identifier('defaultSelect'),
-        ),
-      ),
-    ]),
-  );
-
-  // Dot-notation parsing for where/condition
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('parsed'),
-        t.callExpression(t.identifier('unflattenDotNotation'), [t.identifier('argv')]),
-      ),
-    ]),
-  );
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('where'),
-        t.memberExpression(t.identifier('parsed'), t.identifier('where')),
-      ),
-    ]),
-  );
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('condition'),
-        t.memberExpression(t.identifier('parsed'), t.identifier('condition')),
-      ),
-    ]),
-  );
-
-  // Build findFirst args (select, where, condition — matches TS SDK FindFirstArgs)
+  // const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('findFirstArgs'),
-        t.objectExpression([
-          t.objectProperty(t.identifier('select'), t.identifier('select'), false, true),
-          buildOptionalSpread('where'),
-          buildOptionalSpread('condition'),
+        t.callExpression(t.identifier('parseFindFirstArgs'), [
+          t.identifier('argv'),
+          t.identifier('defaultSelect'),
         ]),
       ),
     ]),
@@ -825,186 +598,32 @@ function buildSearchHandler(
     }
   }
 
-  // const where = { ...whereClause };
+  // const searchWhere = { tsvContent: { query }, ... };
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
-        t.identifier('where'),
+        t.identifier('searchWhere'),
         t.objectExpression(whereProps),
       ),
     ]),
   );
 
-  // limit
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('limit'),
-        t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('limit'))),
-            t.stringLiteral('number'),
-          ),
-          t.tsAsExpression(
-            t.memberExpression(t.identifier('argv'), t.identifier('limit')),
-            t.tsNumberKeyword(),
-          ),
-          t.conditionalExpression(
-            t.binaryExpression(
-              '===',
-              t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('limit'))),
-              t.stringLiteral('string'),
-            ),
-            t.callExpression(t.identifier('parseInt'), [
-              t.tsAsExpression(
-                t.memberExpression(t.identifier('argv'), t.identifier('limit')),
-                t.tsStringKeyword(),
-              ),
-              t.numericLiteral(10),
-            ]),
-            t.identifier('undefined'),
-          ),
-        ),
-      ),
-    ]),
-  );
-
-  // offset
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('offset'),
-        t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('offset'))),
-            t.stringLiteral('number'),
-          ),
-          t.tsAsExpression(
-            t.memberExpression(t.identifier('argv'), t.identifier('offset')),
-            t.tsNumberKeyword(),
-          ),
-          t.conditionalExpression(
-            t.binaryExpression(
-              '===',
-              t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('offset'))),
-              t.stringLiteral('string'),
-            ),
-            t.callExpression(t.identifier('parseInt'), [
-              t.tsAsExpression(
-                t.memberExpression(t.identifier('argv'), t.identifier('offset')),
-                t.tsStringKeyword(),
-              ),
-              t.numericLiteral(10),
-            ]),
-            t.identifier('undefined'),
-          ),
-        ),
-      ),
-    ]),
-  );
-
-  // defaultSelect
+  // const defaultSelect = { ... };
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(t.identifier('defaultSelect'), defaultSelectObj),
     ]),
   );
 
-  // select
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('select'),
-        t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('fields'))),
-            t.stringLiteral('string'),
-          ),
-          t.callExpression(t.identifier('buildSelectFromPaths'), [
-            t.tsAsExpression(
-              t.memberExpression(t.identifier('argv'), t.identifier('fields')),
-              t.tsStringKeyword(),
-            ),
-          ]),
-          t.identifier('defaultSelect'),
-        ),
-      ),
-    ]),
-  );
-
-  // orderBy
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('orderBy'),
-        t.conditionalExpression(
-          t.binaryExpression(
-            '===',
-            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('orderBy'))),
-            t.stringLiteral('string'),
-          ),
-          t.callExpression(
-            t.memberExpression(
-              t.tsAsExpression(
-                t.memberExpression(t.identifier('argv'), t.identifier('orderBy')),
-                t.tsStringKeyword(),
-              ),
-              t.identifier('split'),
-            ),
-            [t.stringLiteral(',')],
-          ),
-          t.identifier('undefined'),
-        ),
-      ),
-    ]),
-  );
-
-  // Build findManyArgs
+  // const findManyArgs = parseFindManyArgs(argv, defaultSelect, searchWhere);
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('findManyArgs'),
-        t.objectExpression([
-          t.objectProperty(t.identifier('select'), t.identifier('select'), false, true),
-          t.objectProperty(t.identifier('where'), t.identifier('where'), false, true),
-          t.spreadElement(
-            t.conditionalExpression(
-              t.logicalExpression(
-                '&&',
-                t.binaryExpression('!==', t.identifier('limit'), t.identifier('undefined')),
-                t.unaryExpression('!', t.callExpression(t.identifier('isNaN'), [t.identifier('limit')])),
-              ),
-              t.objectExpression([
-                t.objectProperty(t.identifier('first'), t.identifier('limit')),
-              ]),
-              t.objectExpression([]),
-            ),
-          ),
-          t.spreadElement(
-            t.conditionalExpression(
-              t.logicalExpression(
-                '&&',
-                t.binaryExpression('!==', t.identifier('offset'), t.identifier('undefined')),
-                t.unaryExpression('!', t.callExpression(t.identifier('isNaN'), [t.identifier('offset')])),
-              ),
-              t.objectExpression([
-                t.objectProperty(t.identifier('offset'), t.identifier('offset'), false, true),
-              ]),
-              t.objectExpression([]),
-            ),
-          ),
-          t.spreadElement(
-            t.conditionalExpression(
-              t.binaryExpression('!==', t.identifier('orderBy'), t.identifier('undefined')),
-              t.objectExpression([
-                t.objectProperty(t.identifier('orderBy'), t.identifier('orderBy'), false, true),
-              ]),
-              t.objectExpression([]),
-            ),
-          ),
+        t.callExpression(t.identifier('parseFindManyArgs'), [
+          t.identifier('argv'),
+          t.identifier('defaultSelect'),
+          t.identifier('searchWhere'),
         ]),
       ),
     ]),
@@ -1449,7 +1068,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
 
   const utilsPath = options?.targetName ? '../../utils' : '../utils';
   statements.push(
-    createImportDeclaration(utilsPath, ['buildSelectFromPaths', 'coerceAnswers', 'stripUndefined', 'unflattenDotNotation']),
+    createImportDeclaration(utilsPath, ['coerceAnswers', 'parseFindFirstArgs', 'parseFindManyArgs', 'stripUndefined']),
   );
   statements.push(
     createImportDeclaration(utilsPath, ['FieldSchema'], true),

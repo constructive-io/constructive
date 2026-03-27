@@ -695,7 +695,7 @@ exports[`cli-generator generates commands/car.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateCarInput, CarPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -748,11 +748,6 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 }
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
-    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
-    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
-    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
-    const after = typeof argv.after === "string" ? argv.after as string : undefined;
-    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       make: true,
@@ -761,38 +756,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isElectric: true,
       createdAt: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
-    const findManyArgs = {
-      select,
-      ...(limit !== undefined && !isNaN(limit) ? {
-        first: limit
-      } : {}),
-      ...(after !== undefined ? {
-        after
-      } : {}),
-      ...(last !== undefined && !isNaN(last) ? {
-        last
-      } : {}),
-      ...(before !== undefined ? {
-        before
-      } : {}),
-      ...(offset !== undefined && !isNaN(offset) ? {
-        offset
-      } : {}),
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {}),
-      ...(orderBy !== undefined ? {
-        orderBy
-      } : {})
-    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient();
     const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -814,19 +778,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isElectric: true,
       createdAt: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const findFirstArgs = {
-      select,
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {})
-    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient();
     const result = await client.car.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -1206,7 +1158,7 @@ exports[`cli-generator generates commands/driver.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateDriverInput, DriverPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -1256,48 +1208,12 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 }
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
-    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
-    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
-    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
-    const after = typeof argv.after === "string" ? argv.after as string : undefined;
-    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       name: true,
       licenseNumber: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
-    const findManyArgs = {
-      select,
-      ...(limit !== undefined && !isNaN(limit) ? {
-        first: limit
-      } : {}),
-      ...(after !== undefined ? {
-        after
-      } : {}),
-      ...(last !== undefined && !isNaN(last) ? {
-        last
-      } : {}),
-      ...(before !== undefined ? {
-        before
-      } : {}),
-      ...(offset !== undefined && !isNaN(offset) ? {
-        offset
-      } : {}),
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {}),
-      ...(orderBy !== undefined ? {
-        orderBy
-      } : {})
-    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient();
     const result = await client.driver.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -1316,19 +1232,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       name: true,
       licenseNumber: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const findFirstArgs = {
-      select,
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {})
-    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient();
     const result = await client.driver.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3285,7 +3189,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 1`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateUserInput, UserPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3335,48 +3239,12 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 }
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
-    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
-    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
-    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
-    const after = typeof argv.after === "string" ? argv.after as string : undefined;
-    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       email: true,
       name: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
-    const findManyArgs = {
-      select,
-      ...(limit !== undefined && !isNaN(limit) ? {
-        first: limit
-      } : {}),
-      ...(after !== undefined ? {
-        after
-      } : {}),
-      ...(last !== undefined && !isNaN(last) ? {
-        last
-      } : {}),
-      ...(before !== undefined ? {
-        before
-      } : {}),
-      ...(offset !== undefined && !isNaN(offset) ? {
-        offset
-      } : {}),
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {}),
-      ...(orderBy !== undefined ? {
-        orderBy
-      } : {})
-    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("auth");
     const result = await client.user.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3395,19 +3263,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       email: true,
       name: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const findFirstArgs = {
-      select,
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {})
-    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient("auth");
     const result = await client.user.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3562,7 +3418,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 2`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateMemberInput, MemberPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3611,47 +3467,11 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 }
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
-    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
-    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
-    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
-    const after = typeof argv.after === "string" ? argv.after as string : undefined;
-    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       role: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
-    const findManyArgs = {
-      select,
-      ...(limit !== undefined && !isNaN(limit) ? {
-        first: limit
-      } : {}),
-      ...(after !== undefined ? {
-        after
-      } : {}),
-      ...(last !== undefined && !isNaN(last) ? {
-        last
-      } : {}),
-      ...(before !== undefined ? {
-        before
-      } : {}),
-      ...(offset !== undefined && !isNaN(offset) ? {
-        offset
-      } : {}),
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {}),
-      ...(orderBy !== undefined ? {
-        orderBy
-      } : {})
-    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("members");
     const result = await client.member.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3669,19 +3489,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       id: true,
       role: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const findFirstArgs = {
-      select,
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {})
-    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient("members");
     const result = await client.member.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3821,7 +3629,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 3`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateCarInput, CarPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3874,11 +3682,6 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
 }
 async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
-    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
-    const last = typeof argv.last === "number" ? argv.last as number : typeof argv.last === "string" ? parseInt(argv.last as string, 10) : undefined;
-    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
-    const after = typeof argv.after === "string" ? argv.after as string : undefined;
-    const before = typeof argv.before === "string" ? argv.before as string : undefined;
     const defaultSelect = {
       id: true,
       make: true,
@@ -3887,38 +3690,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isElectric: true,
       createdAt: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
-    const findManyArgs = {
-      select,
-      ...(limit !== undefined && !isNaN(limit) ? {
-        first: limit
-      } : {}),
-      ...(after !== undefined ? {
-        after
-      } : {}),
-      ...(last !== undefined && !isNaN(last) ? {
-        last
-      } : {}),
-      ...(before !== undefined ? {
-        before
-      } : {}),
-      ...(offset !== undefined && !isNaN(offset) ? {
-        offset
-      } : {}),
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {}),
-      ...(orderBy !== undefined ? {
-        orderBy
-      } : {})
-    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("app");
     const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3940,19 +3712,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isElectric: true,
       createdAt: true
     };
-    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const parsed = unflattenDotNotation(argv);
-    const where = parsed.where;
-    const condition = parsed.condition;
-    const findFirstArgs = {
-      select,
-      ...(where !== undefined ? {
-        where
-      } : {}),
-      ...(condition !== undefined ? {
-        condition
-      } : {})
-    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient("app");
     const result = await client.car.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
