@@ -82,6 +82,7 @@ CRUD operations for Car records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all car records |
+| \`find-first\` | Find first matching car record |
 | \`get\` | Get a car by id |
 | \`create\` | Create a new car |
 | \`update\` | Update an existing car |
@@ -107,6 +108,7 @@ CRUD operations for Driver records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all driver records |
+| \`find-first\` | Find first matching driver record |
 | \`get\` | Get a driver by id |
 | \`create\` | Create a new driver |
 | \`update\` | Update an existing driver |
@@ -281,6 +283,9 @@ CRUD operations for Car records via myapp CLI
 
 \`\`\`bash
 myapp car list
+myapp car list --where.<field>.<op> <value> --orderBy <values>
+myapp car list --limit 10 --after <cursor>
+myapp car find-first --where.<field>.<op> <value>
 myapp car get --id <UUID>
 myapp car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 myapp car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
@@ -289,10 +294,40 @@ myapp car delete --id <UUID>
 
 ## Examples
 
-### List all car records
+### List car records
 
 \`\`\`bash
 myapp car list
+\`\`\`
+
+### List car records with pagination
+
+\`\`\`bash
+myapp car list --limit 10 --offset 0
+\`\`\`
+
+### List car records with cursor pagination
+
+\`\`\`bash
+myapp car list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching car
+
+\`\`\`bash
+myapp car find-first --where.id.equalTo <value>
+\`\`\`
+
+### List car records with field selection
+
+\`\`\`bash
+myapp car list --fields id,id
+\`\`\`
+
+### List car records with filtering and ordering
+
+\`\`\`bash
+myapp car list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a car
@@ -320,6 +355,9 @@ CRUD operations for Driver records via myapp CLI
 
 \`\`\`bash
 myapp driver list
+myapp driver list --where.<field>.<op> <value> --orderBy <values>
+myapp driver list --limit 10 --after <cursor>
+myapp driver find-first --where.<field>.<op> <value>
 myapp driver get --id <UUID>
 myapp driver create --name <String> --licenseNumber <String>
 myapp driver update --id <UUID> [--name <String>] [--licenseNumber <String>]
@@ -328,10 +366,40 @@ myapp driver delete --id <UUID>
 
 ## Examples
 
-### List all driver records
+### List driver records
 
 \`\`\`bash
 myapp driver list
+\`\`\`
+
+### List driver records with pagination
+
+\`\`\`bash
+myapp driver list --limit 10 --offset 0
+\`\`\`
+
+### List driver records with cursor pagination
+
+\`\`\`bash
+myapp driver list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching driver
+
+\`\`\`bash
+myapp driver find-first --where.id.equalTo <value>
+\`\`\`
+
+### List driver records with field selection
+
+\`\`\`bash
+myapp driver list --fields id,id
+\`\`\`
+
+### List driver records with filtering and ordering
+
+\`\`\`bash
+myapp driver list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a driver
@@ -627,7 +695,7 @@ exports[`cli-generator generates commands/car.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { coerceAnswers, stripUndefined } from "../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateCarInput, CarPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -638,7 +706,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List all car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -653,7 +721,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -663,6 +731,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -676,22 +746,44 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient();
-    const result = await client.car.findMany({
-      select: {
-        id: true,
-        make: true,
-        model: true,
-        year: true,
-        isElectric: true,
-        createdAt: true
-      }
-    }).execute();
+    const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const client = getClient();
+    const result = await client.car.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -1066,7 +1158,7 @@ exports[`cli-generator generates commands/driver.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { coerceAnswers, stripUndefined } from "../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateDriverInput, DriverPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -1074,7 +1166,7 @@ const fieldSchema: FieldSchema = {
   name: "string",
   licenseNumber: "string"
 };
-const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List all driver records\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  find-first            Find first matching driver record\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -1089,7 +1181,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -1099,6 +1191,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -1112,19 +1206,38 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      name: true,
+      licenseNumber: true
+    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient();
-    const result = await client.driver.findMany({
-      select: {
-        id: true,
-        name: true,
-        licenseNumber: true
-      }
-    }).execute();
+    const result = await client.driver.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      name: true,
+      licenseNumber: true
+    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const client = getClient();
+    const result = await client.driver.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -1644,579 +1757,6 @@ See the \`references/\` directory for detailed per-entity API documentation:
 "
 `;
 
-exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
-[
-  {
-    "description": "Create a named API context with per-target endpoint overrides",
-    "inputSchema": {
-      "properties": {
-        "app_endpoint": {
-          "description": "app GraphQL endpoint (default: http://app.localhost/graphql)",
-          "type": "string",
-        },
-        "auth_endpoint": {
-          "description": "auth GraphQL endpoint (default: http://auth.localhost/graphql)",
-          "type": "string",
-        },
-        "members_endpoint": {
-          "description": "members GraphQL endpoint (default: http://members.localhost/graphql)",
-          "type": "string",
-        },
-        "name": {
-          "description": "Context name",
-          "type": "string",
-        },
-      },
-      "required": [
-        "name",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_context_create",
-  },
-  {
-    "description": "List all configured API contexts",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_context_list",
-  },
-  {
-    "description": "Set the active API context (switches all targets at once)",
-    "inputSchema": {
-      "properties": {
-        "name": {
-          "description": "Context name to activate",
-          "type": "string",
-        },
-      },
-      "required": [
-        "name",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_context_use",
-  },
-  {
-    "description": "Show the currently active API context",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_context_current",
-  },
-  {
-    "description": "Delete an API context",
-    "inputSchema": {
-      "properties": {
-        "name": {
-          "description": "Context name to delete",
-          "type": "string",
-        },
-      },
-      "required": [
-        "name",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_context_delete",
-  },
-  {
-    "description": "Store a bearer token for the current context (shared across all targets)",
-    "inputSchema": {
-      "properties": {
-        "token": {
-          "description": "Bearer token value",
-          "type": "string",
-        },
-      },
-      "required": [
-        "token",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_credentials_set_token",
-  },
-  {
-    "description": "Show authentication status for all contexts",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_credentials_status",
-  },
-  {
-    "description": "Remove credentials for the current context",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_credentials_logout",
-  },
-  {
-    "description": "Get a config variable value for the current context",
-    "inputSchema": {
-      "properties": {
-        "key": {
-          "description": "Variable name",
-          "type": "string",
-        },
-      },
-      "required": [
-        "key",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_config_get",
-  },
-  {
-    "description": "Set a config variable value for the current context",
-    "inputSchema": {
-      "properties": {
-        "key": {
-          "description": "Variable name",
-          "type": "string",
-        },
-        "value": {
-          "description": "Variable value",
-          "type": "string",
-        },
-      },
-      "required": [
-        "key",
-        "value",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_config_set",
-  },
-  {
-    "description": "List all config variables for the current context",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_config_list",
-  },
-  {
-    "description": "Delete a config variable for the current context",
-    "inputSchema": {
-      "properties": {
-        "key": {
-          "description": "Variable name to delete",
-          "type": "string",
-        },
-      },
-      "required": [
-        "key",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_config_delete",
-  },
-  {
-    "description": "List all User records (auth target)",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_auth_user_list",
-  },
-  {
-    "description": "Get a single User record by id (auth target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "User id",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_auth_user_get",
-  },
-  {
-    "description": "Create a new User record (auth target)",
-    "inputSchema": {
-      "properties": {
-        "email": {
-          "description": "User email",
-          "type": "string",
-        },
-        "name": {
-          "description": "User name",
-          "type": "string",
-        },
-      },
-      "required": [
-        "email",
-        "name",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_auth_user_create",
-  },
-  {
-    "description": "Update an existing User record (auth target)",
-    "inputSchema": {
-      "properties": {
-        "email": {
-          "description": "User email",
-          "type": "string",
-        },
-        "id": {
-          "description": "User id",
-          "type": "string",
-        },
-        "name": {
-          "description": "User name",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_auth_user_update",
-  },
-  {
-    "description": "Delete a User record by id (auth target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "User id",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_auth_user_delete",
-  },
-  {
-    "_meta": {
-      "fields": [
-        {
-          "editable": false,
-          "name": "id",
-          "primaryKey": true,
-          "type": "UUID",
-        },
-        {
-          "editable": true,
-          "name": "email",
-          "primaryKey": false,
-          "type": "String",
-        },
-        {
-          "editable": true,
-          "name": "name",
-          "primaryKey": false,
-          "type": "String",
-        },
-      ],
-    },
-    "description": "List available fields for User (auth target)",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_auth_user_fields",
-  },
-  {
-    "description": "Get the currently authenticated user (auth target)",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_auth_current-user",
-  },
-  {
-    "description": "Authenticate a user (auth target)",
-    "inputSchema": {
-      "properties": {
-        "email": {
-          "description": "email",
-          "type": "string",
-        },
-        "password": {
-          "description": "password",
-          "type": "string",
-        },
-        "save_token": {
-          "description": "Auto-save returned token to credentials",
-          "type": "boolean",
-        },
-      },
-      "required": [
-        "email",
-        "password",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_auth_login",
-  },
-  {
-    "description": "List all Member records (members target)",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_members_member_list",
-  },
-  {
-    "description": "Get a single Member record by id (members target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "Member id",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_members_member_get",
-  },
-  {
-    "description": "Create a new Member record (members target)",
-    "inputSchema": {
-      "properties": {
-        "role": {
-          "description": "Member role",
-          "type": "string",
-        },
-      },
-      "required": [
-        "role",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_members_member_create",
-  },
-  {
-    "description": "Update an existing Member record (members target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "Member id",
-          "type": "string",
-        },
-        "role": {
-          "description": "Member role",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_members_member_update",
-  },
-  {
-    "description": "Delete a Member record by id (members target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "Member id",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_members_member_delete",
-  },
-  {
-    "_meta": {
-      "fields": [
-        {
-          "editable": false,
-          "name": "id",
-          "primaryKey": true,
-          "type": "UUID",
-        },
-        {
-          "editable": true,
-          "name": "role",
-          "primaryKey": false,
-          "type": "String",
-        },
-      ],
-    },
-    "description": "List available fields for Member (members target)",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_members_member_fields",
-  },
-  {
-    "description": "List all Car records (app target)",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_app_car_list",
-  },
-  {
-    "description": "Get a single Car record by id (app target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "Car id",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_app_car_get",
-  },
-  {
-    "description": "Create a new Car record (app target)",
-    "inputSchema": {
-      "properties": {
-        "isElectric": {
-          "description": "Car isElectric",
-          "type": "boolean",
-        },
-        "make": {
-          "description": "Car make",
-          "type": "string",
-        },
-        "model": {
-          "description": "Car model",
-          "type": "string",
-        },
-        "year": {
-          "description": "Car year",
-          "type": "integer",
-        },
-      },
-      "required": [
-        "make",
-        "model",
-        "year",
-        "isElectric",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_app_car_create",
-  },
-  {
-    "description": "Update an existing Car record (app target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "Car id",
-          "type": "string",
-        },
-        "isElectric": {
-          "description": "Car isElectric",
-          "type": "boolean",
-        },
-        "make": {
-          "description": "Car make",
-          "type": "string",
-        },
-        "model": {
-          "description": "Car model",
-          "type": "string",
-        },
-        "year": {
-          "description": "Car year",
-          "type": "integer",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_app_car_update",
-  },
-  {
-    "description": "Delete a Car record by id (app target)",
-    "inputSchema": {
-      "properties": {
-        "id": {
-          "description": "Car id",
-          "type": "string",
-        },
-      },
-      "required": [
-        "id",
-      ],
-      "type": "object",
-    },
-    "name": "myapp_app_car_delete",
-  },
-  {
-    "_meta": {
-      "fields": [
-        {
-          "editable": false,
-          "name": "id",
-          "primaryKey": true,
-          "type": "UUID",
-        },
-        {
-          "editable": true,
-          "name": "make",
-          "primaryKey": false,
-          "type": "String",
-        },
-        {
-          "editable": true,
-          "name": "model",
-          "primaryKey": false,
-          "type": "String",
-        },
-        {
-          "editable": true,
-          "name": "year",
-          "primaryKey": false,
-          "type": "Int",
-        },
-        {
-          "editable": true,
-          "name": "isElectric",
-          "primaryKey": false,
-          "type": "Boolean",
-        },
-        {
-          "editable": false,
-          "name": "createdAt",
-          "primaryKey": false,
-          "type": "Datetime",
-        },
-      ],
-    },
-    "description": "List available fields for Car (app target)",
-    "inputSchema": {
-      "properties": {},
-      "type": "object",
-    },
-    "name": "myapp_app_car_fields",
-  },
-]
-`;
-
 exports[`multi-target cli docs generates multi-target README 1`] = `
 "# myapp CLI
 
@@ -2373,6 +1913,7 @@ CRUD operations for User records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all user records |
+| \`find-first\` | Find first matching user record |
 | \`get\` | Get a user by id |
 | \`create\` | Create a new user |
 | \`update\` | Update an existing user |
@@ -2417,6 +1958,7 @@ CRUD operations for Member records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all member records |
+| \`find-first\` | Find first matching member record |
 | \`get\` | Get a member by id |
 | \`create\` | Create a new member |
 | \`update\` | Update an existing member |
@@ -2440,6 +1982,7 @@ CRUD operations for Car records.
 | Subcommand | Description |
 |------------|-------------|
 | \`list\` | List all car records |
+| \`find-first\` | Find first matching car record |
 | \`get\` | Get a car by id |
 | \`create\` | Create a new car |
 | \`update\` | Update an existing car |
@@ -2654,6 +2197,9 @@ CRUD operations for User records via myapp CLI (auth target)
 
 \`\`\`bash
 myapp auth:user list
+myapp auth:user list --where.<field>.<op> <value> --orderBy <values>
+myapp auth:user list --limit 10 --after <cursor>
+myapp auth:user find-first --where.<field>.<op> <value>
 myapp auth:user get --id <UUID>
 myapp auth:user create --email <String> --name <String>
 myapp auth:user update --id <UUID> [--email <String>] [--name <String>]
@@ -2662,10 +2208,34 @@ myapp auth:user delete --id <UUID>
 
 ## Examples
 
-### List all user records
+### List user records
 
 \`\`\`bash
 myapp auth:user list
+\`\`\`
+
+### List user records with pagination
+
+\`\`\`bash
+myapp auth:user list --limit 10 --offset 0
+\`\`\`
+
+### List user records with cursor pagination
+
+\`\`\`bash
+myapp auth:user list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching user
+
+\`\`\`bash
+myapp auth:user find-first --where.id.equalTo <value>
+\`\`\`
+
+### List user records with filtering and ordering
+
+\`\`\`bash
+myapp auth:user list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a user
@@ -2782,6 +2352,9 @@ CRUD operations for Member records via myapp CLI (members target)
 
 \`\`\`bash
 myapp members:member list
+myapp members:member list --where.<field>.<op> <value> --orderBy <values>
+myapp members:member list --limit 10 --after <cursor>
+myapp members:member find-first --where.<field>.<op> <value>
 myapp members:member get --id <UUID>
 myapp members:member create --role <String>
 myapp members:member update --id <UUID> [--role <String>]
@@ -2790,10 +2363,34 @@ myapp members:member delete --id <UUID>
 
 ## Examples
 
-### List all member records
+### List member records
 
 \`\`\`bash
 myapp members:member list
+\`\`\`
+
+### List member records with pagination
+
+\`\`\`bash
+myapp members:member list --limit 10 --offset 0
+\`\`\`
+
+### List member records with cursor pagination
+
+\`\`\`bash
+myapp members:member list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching member
+
+\`\`\`bash
+myapp members:member find-first --where.id.equalTo <value>
+\`\`\`
+
+### List member records with filtering and ordering
+
+\`\`\`bash
+myapp members:member list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a member
@@ -2861,6 +2458,9 @@ CRUD operations for Car records via myapp CLI (app target)
 
 \`\`\`bash
 myapp app:car list
+myapp app:car list --where.<field>.<op> <value> --orderBy <values>
+myapp app:car list --limit 10 --after <cursor>
+myapp app:car find-first --where.<field>.<op> <value>
 myapp app:car get --id <UUID>
 myapp app:car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 myapp app:car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
@@ -2869,10 +2469,34 @@ myapp app:car delete --id <UUID>
 
 ## Examples
 
-### List all car records
+### List car records
 
 \`\`\`bash
 myapp app:car list
+\`\`\`
+
+### List car records with pagination
+
+\`\`\`bash
+myapp app:car list --limit 10 --offset 0
+\`\`\`
+
+### List car records with cursor pagination
+
+\`\`\`bash
+myapp app:car list --limit 10 --after <cursor>
+\`\`\`
+
+### Find first matching car
+
+\`\`\`bash
+myapp app:car find-first --where.id.equalTo <value>
+\`\`\`
+
+### List car records with filtering and ordering
+
+\`\`\`bash
+myapp app:car list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a car
@@ -3565,7 +3189,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 1`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { coerceAnswers, stripUndefined } from "../../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateUserInput, UserPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3573,7 +3197,7 @@ const fieldSchema: FieldSchema = {
   email: "string",
   name: "string"
 };
-const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List all user records\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  find-first            Find first matching user record\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3588,7 +3212,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -3598,6 +3222,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -3611,19 +3237,38 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      email: true,
+      name: true
+    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("auth");
-    const result = await client.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true
-      }
-    }).execute();
+    const result = await client.user.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      email: true,
+      name: true
+    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const client = getClient("auth");
+    const result = await client.user.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -3773,14 +3418,14 @@ exports[`multi-target cli generator generates target-prefixed table commands 2`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { coerceAnswers, stripUndefined } from "../../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateMemberInput, MemberPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   role: "string"
 };
-const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List all member records\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  find-first            Find first matching member record\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3795,7 +3440,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -3805,6 +3450,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -3818,18 +3465,36 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      role: true
+    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("members");
-    const result = await client.member.findMany({
-      select: {
-        id: true,
-        role: true
-      }
-    }).execute();
+    const result = await client.member.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      role: true
+    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const client = getClient("members");
+    const result = await client.member.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -3964,7 +3629,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 3`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { coerceAnswers, stripUndefined } from "../../utils";
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateCarInput, CarPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3975,7 +3640,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List all car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3990,7 +3655,7 @@ export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirer
       type: "autocomplete",
       name: "subcommand",
       message: "What do you want to do?",
-      options: ["list", "get", "create", "update", "delete"]
+      options: ["list", "find-first", "get", "create", "update", "delete"]
     }]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
   }
@@ -4000,6 +3665,8 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
   switch (subcommand) {
     case "list":
       return handleList(argv, prompter);
+    case "find-first":
+      return handleFindFirst(argv, prompter);
     case "get":
       return handleGet(argv, prompter);
     case "create":
@@ -4013,22 +3680,44 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("app");
-    const result = await client.car.findMany({
-      select: {
-        id: true,
-        make: true,
-        model: true,
-        year: true,
-        isElectric: true,
-        createdAt: true
-      }
-    }).execute();
+    const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const client = getClient("app");
+    const result = await client.car.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error("Failed to find record.");
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -4504,771 +4193,6 @@ See the \`references/\` directory for detailed per-entity API documentation:
 - [driver](references/driver.md)
 - [current-user](references/current-user.md)
 - [login](references/login.md)
-"
-`;
-
-exports[`target docs generator generates combined MCP config 1`] = `
-"{
-  "name": "myapp",
-  "version": "1.0.0",
-  "description": "MCP tool definitions for myapp SDK (auto-generated from GraphQL schema)",
-  "tools": [
-    {
-      "name": "myapp_context_create",
-      "description": "Create a named API context pointing at a GraphQL endpoint",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Context name"
-          },
-          "endpoint": {
-            "type": "string",
-            "description": "GraphQL endpoint URL"
-          }
-        },
-        "required": [
-          "name",
-          "endpoint"
-        ]
-      }
-    },
-    {
-      "name": "myapp_context_list",
-      "description": "List all configured API contexts",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_context_use",
-      "description": "Set the active API context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Context name to activate"
-          }
-        },
-        "required": [
-          "name"
-        ]
-      }
-    },
-    {
-      "name": "myapp_context_current",
-      "description": "Show the currently active API context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_context_delete",
-      "description": "Delete an API context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Context name to delete"
-          }
-        },
-        "required": [
-          "name"
-        ]
-      }
-    },
-    {
-      "name": "myapp_auth_set_token",
-      "description": "Store a bearer token for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "Bearer token value"
-          }
-        },
-        "required": [
-          "token"
-        ]
-      }
-    },
-    {
-      "name": "myapp_auth_status",
-      "description": "Show authentication status for all contexts",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_auth_logout",
-      "description": "Remove credentials for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_config_get",
-      "description": "Get a config variable value for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Variable name"
-          }
-        },
-        "required": [
-          "key"
-        ]
-      }
-    },
-    {
-      "name": "myapp_config_set",
-      "description": "Set a config variable value for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Variable name"
-          },
-          "value": {
-            "type": "string",
-            "description": "Variable value"
-          }
-        },
-        "required": [
-          "key",
-          "value"
-        ]
-      }
-    },
-    {
-      "name": "myapp_config_list",
-      "description": "List all config variables for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_config_delete",
-      "description": "Delete a config variable for the current context",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "Variable name to delete"
-          }
-        },
-        "required": [
-          "key"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_list",
-      "description": "List all Car records",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_car_get",
-      "description": "Get a single Car record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_create",
-      "description": "Create a new Car record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "make": {
-            "type": "string",
-            "description": "Car make"
-          },
-          "model": {
-            "type": "string",
-            "description": "Car model"
-          },
-          "year": {
-            "type": "integer",
-            "description": "Car year"
-          },
-          "isElectric": {
-            "type": "boolean",
-            "description": "Car isElectric"
-          }
-        },
-        "required": [
-          "make",
-          "model",
-          "year",
-          "isElectric"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_update",
-      "description": "Update an existing Car record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          },
-          "make": {
-            "type": "string",
-            "description": "Car make"
-          },
-          "model": {
-            "type": "string",
-            "description": "Car model"
-          },
-          "year": {
-            "type": "integer",
-            "description": "Car year"
-          },
-          "isElectric": {
-            "type": "boolean",
-            "description": "Car isElectric"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_delete",
-      "description": "Delete a Car record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_car_fields",
-      "description": "List available fields for Car",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "make",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "model",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "year",
-            "type": "Int",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "isElectric",
-            "type": "Boolean",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "createdAt",
-            "type": "Datetime",
-            "editable": false,
-            "primaryKey": false
-          }
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_list",
-      "description": "List all Driver records",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_driver_get",
-      "description": "Get a single Driver record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_create",
-      "description": "Create a new Driver record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Driver name"
-          },
-          "licenseNumber": {
-            "type": "string",
-            "description": "Driver licenseNumber"
-          }
-        },
-        "required": [
-          "name",
-          "licenseNumber"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_update",
-      "description": "Update an existing Driver record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          },
-          "name": {
-            "type": "string",
-            "description": "Driver name"
-          },
-          "licenseNumber": {
-            "type": "string",
-            "description": "Driver licenseNumber"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_delete",
-      "description": "Delete a Driver record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "myapp_driver_fields",
-      "description": "List available fields for Driver",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "name",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "licenseNumber",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          }
-        ]
-      }
-    },
-    {
-      "name": "myapp_current-user",
-      "description": "Get the currently authenticated user",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "myapp_login",
-      "description": "Authenticate a user",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "password"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      }
-    },
-    {
-      "name": "orm_car_findMany",
-      "description": "List all Car records via ORM",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "first": {
-            "type": "integer",
-            "description": "Limit number of results"
-          },
-          "offset": {
-            "type": "integer",
-            "description": "Offset for pagination"
-          }
-        }
-      }
-    },
-    {
-      "name": "orm_car_findOne",
-      "description": "Get a single Car record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "orm_car_create",
-      "description": "Create a new Car record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "make": {
-            "type": "string",
-            "description": "Car make"
-          },
-          "model": {
-            "type": "string",
-            "description": "Car model"
-          },
-          "year": {
-            "type": "integer",
-            "description": "Car year"
-          },
-          "isElectric": {
-            "type": "boolean",
-            "description": "Car isElectric"
-          }
-        },
-        "required": [
-          "make",
-          "model",
-          "year",
-          "isElectric"
-        ]
-      }
-    },
-    {
-      "name": "orm_car_update",
-      "description": "Update an existing Car record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          },
-          "make": {
-            "type": "string",
-            "description": "Car make"
-          },
-          "model": {
-            "type": "string",
-            "description": "Car model"
-          },
-          "year": {
-            "type": "integer",
-            "description": "Car year"
-          },
-          "isElectric": {
-            "type": "boolean",
-            "description": "Car isElectric"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "orm_car_delete",
-      "description": "Delete a Car record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Car id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "make",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "model",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "year",
-            "type": "Int",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "isElectric",
-            "type": "Boolean",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "createdAt",
-            "type": "Datetime",
-            "editable": false,
-            "primaryKey": false
-          }
-        ]
-      }
-    },
-    {
-      "name": "orm_driver_findMany",
-      "description": "List all Driver records via ORM",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "first": {
-            "type": "integer",
-            "description": "Limit number of results"
-          },
-          "offset": {
-            "type": "integer",
-            "description": "Offset for pagination"
-          }
-        }
-      }
-    },
-    {
-      "name": "orm_driver_findOne",
-      "description": "Get a single Driver record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "orm_driver_create",
-      "description": "Create a new Driver record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Driver name"
-          },
-          "licenseNumber": {
-            "type": "string",
-            "description": "Driver licenseNumber"
-          }
-        },
-        "required": [
-          "name",
-          "licenseNumber"
-        ]
-      }
-    },
-    {
-      "name": "orm_driver_update",
-      "description": "Update an existing Driver record",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          },
-          "name": {
-            "type": "string",
-            "description": "Driver name"
-          },
-          "licenseNumber": {
-            "type": "string",
-            "description": "Driver licenseNumber"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      }
-    },
-    {
-      "name": "orm_driver_delete",
-      "description": "Delete a Driver record by id",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Driver id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "_meta": {
-        "fields": [
-          {
-            "name": "id",
-            "type": "UUID",
-            "editable": false,
-            "primaryKey": true
-          },
-          {
-            "name": "name",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          },
-          {
-            "name": "licenseNumber",
-            "type": "String",
-            "editable": true,
-            "primaryKey": false
-          }
-        ]
-      }
-    },
-    {
-      "name": "orm_query_currentUser",
-      "description": "Get the currently authenticated user",
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    {
-      "name": "orm_mutation_login",
-      "description": "Authenticate a user",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "email"
-          },
-          "password": {
-            "type": "string",
-            "description": "password"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      }
-    }
-  ]
-}
 "
 `;
 

@@ -1,5 +1,5 @@
 import { DocumentNode, print as gqlPrint } from 'graphql';
-import { toCamelCase, toPascalCase, pluralize, underscore } from 'inflekt';
+import { toCamelCase, toPascalCase, toSnakeCase, pluralize } from 'inflekt';
 
 import {
   createOne,
@@ -194,7 +194,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      toCamelCase(['get', underscore(this._key), 'query'].join('_')),
+      toCamelCase(['get', toSnakeCase(this._key), 'query'].join('_')),
     );
 
     const defn = this._introspection[this._key];
@@ -216,7 +216,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      toCamelCase(['get', underscore(this._key), 'query', 'all'].join('_')),
+      toCamelCase(['get', toSnakeCase(this._key), 'query', 'all'].join('_')),
     );
 
     const defn = this._introspection[this._key];
@@ -238,7 +238,7 @@ export class QueryBuilder {
 
     this.queryName(
       toCamelCase(
-        ['get', underscore(this._key), 'count', 'query'].join('_'),
+        ['get', toSnakeCase(this._key), 'count', 'query'].join('_'),
       ),
     );
 
@@ -258,7 +258,7 @@ export class QueryBuilder {
     this._key = this._findQuery();
 
     this.queryName(
-      toCamelCase(['get', underscore(this._key), 'query'].join('_')),
+      toCamelCase(['get', toSnakeCase(this._key), 'query'].join('_')),
     );
 
     const defn = this._introspection[this._key];
@@ -280,7 +280,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      toCamelCase([underscore(this._key), 'mutation'].join('_')),
+      toCamelCase([toSnakeCase(this._key), 'mutation'].join('_')),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -301,7 +301,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      toCamelCase([underscore(this._key), 'mutation'].join('_')),
+      toCamelCase([toSnakeCase(this._key), 'mutation'].join('_')),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -322,7 +322,7 @@ export class QueryBuilder {
     this._key = this._findMutation();
 
     this.queryName(
-      toCamelCase([underscore(this._key), 'mutation'].join('_')),
+      toCamelCase([toSnakeCase(this._key), 'mutation'].join('_')),
     );
 
     const defn = this._introspection[this._key] as MutationDefinition;
@@ -559,5 +559,5 @@ function isRelationalField(fieldName: string, modelMeta: MetaTable): boolean {
 // Get getMany op name from model
 // ie. UserSetting => userSettings
 function modelNameToGetMany(model: string): string {
-  return toCamelCase(pluralize(underscore(model)));
+  return toCamelCase(pluralize(toSnakeCase(model)));
 }

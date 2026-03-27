@@ -1,7 +1,7 @@
 import { mkdirSync, rmSync } from 'fs';
 import { sync as glob } from 'glob';
 import { Inquirerer } from 'inquirerer';
-import { toSnakeCase } from 'komoji';
+import { toSnakeCase } from 'inflekt';
 import path from 'path';
 
 import { PgpmPackage, getMissingInstallableModules, parseAuthor } from '@pgpmjs/core';

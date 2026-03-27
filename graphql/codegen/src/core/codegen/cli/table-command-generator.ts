@@ -12,11 +12,14 @@ import {
   resolveInnerInputType,
   ucFirst,
   lcFirst,
+  toPascalCase,
   getCreateInputTypeName,
   getPatchTypeName,
 } from '../utils';
 import type { Table, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
+import { categorizeSpecialFields } from '../docs-utils';
+import type { SpecialFieldGroup } from '../docs-utils';
 
 function createImportDeclaration(
   moduleSpecifier: string,
@@ -282,7 +285,7 @@ function buildSubcommandSwitch(
   const cases = subcommands.map((sub) =>
     t.switchCase(t.stringLiteral(sub), [
       t.returnStatement(
-        t.callExpression(t.identifier(`${handlerPrefix}${ucFirst(sub)}`), [
+        t.callExpression(t.identifier(`${handlerPrefix}${toPascalCase(sub)}`), [
           t.identifier('argv'),
           t.identifier('prompter'),
         ]),
@@ -310,28 +313,63 @@ function buildSubcommandSwitch(
 
 function buildListHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
-  const selectObj = buildSelectObject(table, typeRegistry);
+  const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
-  const tryBody: t.Statement[] = [
-    buildGetClientStatement(targetName),
+  // --- Build the try body ---
+  const tryBody: t.Statement[] = [];
+
+  // const defaultSelect = { id: true, name: true, ... };
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier('defaultSelect'), defaultSelectObj),
+    ]),
+  );
+
+  // const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('findManyArgs'),
+        t.callExpression(t.identifier('parseFindManyArgs'), [
+          t.identifier('argv'),
+          t.identifier('defaultSelect'),
+        ]),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildGetClientStatement(targetName));
+
+  // const result = await client.<singular>.findMany(findManyArgs).execute();
+  tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('result'),
         t.awaitExpression(
-          buildOrmCall(
-            singularName,
-            'findMany',
-            t.objectExpression([
-              t.objectProperty(t.identifier('select'), selectObj),
-            ]),
+          t.callExpression(
+            t.memberExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.memberExpression(
+                    t.identifier('client'),
+                    t.identifier(singularName),
+                  ),
+                  t.identifier('findMany'),
+                ),
+                [t.identifier('findManyArgs')],
+              ),
+              t.identifier('execute'),
+            ),
+            [],
           ),
         ),
       ),
     ]),
-    buildJsonLog(t.identifier('result')),
-  ];
+  );
 
-  const argvParam = t.identifier('_argv');
+  tryBody.push(buildJsonLog(t.identifier('result')));
+
+  const argvParam = t.identifier('argv');
   argvParam.typeAnnotation = buildArgvType();
   const prompterParam = t.identifier('_prompter');
   prompterParam.typeAnnotation = t.tsTypeAnnotation(
@@ -345,6 +383,297 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
       t.tryStatement(
         t.blockStatement(tryBody),
         buildErrorCatch('Failed to list records.'),
+      ),
+    ]),
+    false,
+    true,
+  );
+}
+
+/**
+ * Build a `handleFindFirst` function — CLI equivalent of the TS SDK's findFirst().
+ * Accepts --fields, --where.<field>.<op>, --condition.<field>.<op> flags.
+ * Internally calls findMany with first:1 and returns a single record (or null).
+ */
+function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
+  const { singularName } = getTableNames(table);
+  const defaultSelectObj = buildSelectObject(table, typeRegistry);
+
+  const tryBody: t.Statement[] = [];
+
+  // const defaultSelect = { ... };
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier('defaultSelect'), defaultSelectObj),
+    ]),
+  );
+
+  // const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('findFirstArgs'),
+        t.callExpression(t.identifier('parseFindFirstArgs'), [
+          t.identifier('argv'),
+          t.identifier('defaultSelect'),
+        ]),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildGetClientStatement(targetName));
+
+  // const result = await client.<singular>.findFirst(findFirstArgs).execute();
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('result'),
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.memberExpression(t.identifier('client'), t.identifier(singularName)),
+                  t.identifier('findFirst'),
+                ),
+                [t.identifier('findFirstArgs')],
+              ),
+              t.identifier('execute'),
+            ),
+            [],
+          ),
+        ),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildJsonLog(t.identifier('result')));
+
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = buildArgvType();
+  const prompterParam = t.identifier('_prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+
+  return t.functionDeclaration(
+    t.identifier('handleFindFirst'),
+    [argvParam, prompterParam],
+    t.blockStatement([
+      t.tryStatement(
+        t.blockStatement(tryBody),
+        buildErrorCatch('Failed to find record.'),
+      ),
+    ]),
+    false,
+    true,
+  );
+}
+
+/**
+ * Build a `handleSearch` function for tables with search-capable fields.
+ * Extracts the first positional arg as the query string and auto-builds a
+ * `where` clause that targets all detected search fields (tsvector, BM25,
+ * trigram, vector embedding).  Supports --limit, --offset, --fields, --orderBy.
+ */
+function buildSearchHandler(
+  table: Table,
+  specialGroups: SpecialFieldGroup[],
+  targetName?: string,
+  typeRegistry?: TypeRegistry,
+): t.FunctionDeclaration {
+  const { singularName } = getTableNames(table);
+  const defaultSelectObj = buildSelectObject(table, typeRegistry);
+
+  const tryBody: t.Statement[] = [];
+
+  // const query = Array.isArray(argv._) && argv._.length > 0 ? String(argv._[0]) : undefined;
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('query'),
+        t.conditionalExpression(
+          t.logicalExpression(
+            '&&',
+            t.callExpression(
+              t.memberExpression(t.identifier('Array'), t.identifier('isArray')),
+              [t.memberExpression(t.identifier('argv'), t.identifier('_'))],
+            ),
+            t.binaryExpression(
+              '>',
+              t.memberExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('_')),
+                t.identifier('length'),
+              ),
+              t.numericLiteral(0),
+            ),
+          ),
+          t.callExpression(t.identifier('String'), [
+            t.memberExpression(
+              t.memberExpression(t.identifier('argv'), t.identifier('_')),
+              t.numericLiteral(0),
+              true,
+            ),
+          ]),
+          t.identifier('undefined'),
+        ),
+      ),
+    ]),
+  );
+
+  // if (!query) { console.error('Usage: ... search <query>'); process.exit(1); }
+  tryBody.push(
+    t.ifStatement(
+      t.unaryExpression('!', t.identifier('query')),
+      t.blockStatement([
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('console'), t.identifier('error')),
+            [t.stringLiteral('Error: search requires a <query> argument')],
+          ),
+        ),
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('process'), t.identifier('exit')),
+            [t.numericLiteral(1)],
+          ),
+        ),
+      ]),
+    ),
+  );
+
+  // Build the where clause properties from detected search fields
+  // e.g. { tsvContent: { query }, bm25Body: { query }, trgmTitle: { value: query, threshold: 0.3 }, vectorEmbedding: { value: query } }
+  const whereProps: t.ObjectProperty[] = [];
+  for (const group of specialGroups) {
+    for (const field of group.fields) {
+      if (field.type.pgType?.toLowerCase() === 'tsvector') {
+        // tsvector field: { query }
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(field.name),
+            t.objectExpression([
+              t.objectProperty(t.identifier('query'), t.identifier('query'), false, true),
+            ]),
+          ),
+        );
+      } else if (/Bm25Score$/.test(field.name)) {
+        // BM25 computed score field — derive the input field name:
+        // bodyBm25Score -> bm25Body (strip trailing "Bm25Score", prefix with "bm25")
+        const baseName = field.name.replace(/Bm25Score$/, '');
+        const inputFieldName = `bm25${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}`;
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(inputFieldName),
+            t.objectExpression([
+              t.objectProperty(t.identifier('query'), t.identifier('query'), false, true),
+            ]),
+          ),
+        );
+      } else if (/TrgmSimilarity$/.test(field.name)) {
+        // Trigram computed score field — derive the input field name:
+        // titleTrgmSimilarity -> trgmTitle
+        const baseName = field.name.replace(/TrgmSimilarity$/, '');
+        const inputFieldName = `trgm${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}`;
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(inputFieldName),
+            t.objectExpression([
+              t.objectProperty(t.identifier('value'), t.identifier('query')),
+              t.objectProperty(t.identifier('threshold'), t.numericLiteral(0.3)),
+            ]),
+          ),
+        );
+      } else if (group.category === 'embedding') {
+        // Vector embedding field: { value: query }
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(field.name),
+            t.objectExpression([
+              t.objectProperty(t.identifier('value'), t.identifier('query')),
+            ]),
+          ),
+        );
+      }
+    }
+  }
+
+  // const searchWhere = { tsvContent: { query }, ... };
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('searchWhere'),
+        t.objectExpression(whereProps),
+      ),
+    ]),
+  );
+
+  // const defaultSelect = { ... };
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier('defaultSelect'), defaultSelectObj),
+    ]),
+  );
+
+  // const findManyArgs = parseFindManyArgs(argv, defaultSelect, searchWhere);
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('findManyArgs'),
+        t.callExpression(t.identifier('parseFindManyArgs'), [
+          t.identifier('argv'),
+          t.identifier('defaultSelect'),
+          t.identifier('searchWhere'),
+        ]),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildGetClientStatement(targetName));
+
+  // const result = await client.<singular>.findMany(findManyArgs).execute();
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('result'),
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.memberExpression(
+                    t.identifier('client'),
+                    t.identifier(singularName),
+                  ),
+                  t.identifier('findMany'),
+                ),
+                [t.identifier('findManyArgs')],
+              ),
+              t.identifier('execute'),
+            ),
+            [],
+          ),
+        ),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildJsonLog(t.identifier('result')));
+
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = buildArgvType();
+  const prompterParam = t.identifier('_prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+
+  return t.functionDeclaration(
+    t.identifier('handleSearch'),
+    [argvParam, prompterParam],
+    t.blockStatement([
+      t.tryStatement(
+        t.blockStatement(tryBody),
+        buildErrorCatch('Failed to search records.'),
       ),
     ]),
     false,
@@ -739,7 +1068,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
 
   const utilsPath = options?.targetName ? '../../utils' : '../utils';
   statements.push(
-    createImportDeclaration(utilsPath, ['coerceAnswers', 'stripUndefined']),
+    createImportDeclaration(utilsPath, ['coerceAnswers', 'parseFindFirstArgs', 'parseFindManyArgs', 'stripUndefined']),
   );
   statements.push(
     createImportDeclaration(utilsPath, ['FieldSchema'], true),
@@ -787,7 +1116,14 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const hasDelete = table.query?.delete !== undefined && table.query?.delete !== null;
   const hasGet = table.query?.one !== null || hasUpdate || hasDelete;
 
-  const subcommands: string[] = ['list'];
+  // Detect whether this table has search-capable fields (tsvector, BM25, trgm, vector embedding)
+  const specialGroups = categorizeSpecialFields(table, options?.typeRegistry);
+  const hasSearchFields = specialGroups.some(
+    (g) => g.category === 'search' || g.category === 'embedding',
+  );
+
+  const subcommands: string[] = ['list', 'find-first'];
+  if (hasSearchFields) subcommands.push('search');
   if (hasGet) subcommands.push('get');
   subcommands.push('create');
   if (hasUpdate) subcommands.push('update');
@@ -798,13 +1134,48 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     `${commandName} <command>`,
     '',
     'Commands:',
-    `  list                  List all ${singularName} records`,
+    `  list                  List ${singularName} records`,
+    `  find-first            Find first matching ${singularName} record`,
   ];
+  if (hasSearchFields) usageLines.push(`  search <query>        Search ${singularName} records`);
   if (hasGet) usageLines.push(`  get                   Get a ${singularName} by ID`);
   usageLines.push(`  create                Create a new ${singularName}`);
   if (hasUpdate) usageLines.push(`  update                Update an existing ${singularName}`);
   if (hasDelete) usageLines.push(`  delete                Delete a ${singularName}`);
-  usageLines.push('', '  --help, -h            Show this help message', '');
+  usageLines.push(
+    '',
+    'List Options:',
+    '  --limit <n>           Max number of records to return (forward pagination)',
+    '  --last <n>            Number of records from the end (backward pagination)',
+    '  --after <cursor>      Cursor for forward pagination',
+    '  --before <cursor>     Cursor for backward pagination',
+    '  --offset <n>          Number of records to skip',
+    '  --fields <fields>     Comma-separated list of fields to return',
+    '  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)',
+    '  --condition.<f>.<op>  Condition filter (dot-notation)',
+    '  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)',
+    '',
+    'Find-First Options:',
+    '  --fields <fields>     Comma-separated list of fields to return',
+    '  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)',
+    '  --condition.<f>.<op>  Condition filter (dot-notation)',
+    '',
+  );
+  if (hasSearchFields) {
+    usageLines.push(
+      'Search Options:',
+      '  <query>               Search query string (required)',
+      '  --limit <n>           Max number of records to return',
+      '  --offset <n>          Number of records to skip',
+      '  --fields <fields>     Comma-separated list of fields to return',
+      '  --orderBy <values>    Comma-separated list of ordering values',
+      '',
+    );
+  }
+  usageLines.push(
+    '  --help, -h            Show this help message',
+    '',
+  );
 
   statements.push(
     t.variableDeclaration('const', [
@@ -969,6 +1340,8 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const tn = options?.targetName;
   const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
   statements.push(buildListHandler(table, tn, options?.typeRegistry));
+  statements.push(buildFindFirstHandler(table, tn, options?.typeRegistry));
+  if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, tn, options?.typeRegistry));
   if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
   statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));

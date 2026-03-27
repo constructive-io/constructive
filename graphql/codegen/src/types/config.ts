@@ -157,14 +157,6 @@ export interface DocsConfig {
   agents?: boolean;
 
   /**
-   * Generate mcp.json — MCP (Model Context Protocol) tool definitions
-   * Each CLI command becomes a tool with typed inputSchema (JSON Schema)
-   * Ready to plug into any MCP-compatible agent
-   * @default false
-   */
-  mcp?: boolean;
-
-  /**
    * Generate .agents/skills/ directory — per-entity SKILL.md files with YAML frontmatter.
    * Skills are written to {workspaceRoot}/.agents/skills/ (not nested in output).
    * Uses composable naming: orm-{target}-{entity}, hooks-{target}-{entity}, cli-{target}-{entity}.
@@ -412,7 +404,7 @@ export interface GraphQLSDKConfigTarget {
    * Controls which doc formats are generated alongside code for each generator target.
    * Applied globally to all enabled generators (ORM, React Query, CLI).
    * Set to `true` to enable all formats, or configure individually.
-   * @default { readme: true, agents: true, mcp: false }
+   * @default { readme: true, agents: true }
    */
   docs?: DocsConfig | boolean;
 

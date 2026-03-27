@@ -11,7 +11,7 @@ import {
   lcFirst,
   toCamelCase,
   toPascalCase,
-  toScreamingSnake,
+  toConstantCase,
   ucFirst,
 } from '../../core/codegen/utils';
 import type { Relations, Table } from '../../types/schema';
@@ -62,10 +62,10 @@ describe('utils', () => {
       expect(toPascalCase('helloWorld')).toBe('HelloWorld');
     });
 
-    it('toScreamingSnake converts to SCREAMING_SNAKE_CASE', () => {
-      expect(toScreamingSnake('helloWorld')).toBe('HELLO_WORLD');
-      expect(toScreamingSnake('HelloWorld')).toBe('HELLO_WORLD');
-      expect(toScreamingSnake('hello')).toBe('HELLO');
+    it('toConstantCase converts to CONSTANT_CASE', () => {
+      expect(toConstantCase('helloWorld')).toBe('HELLO_WORLD');
+      expect(toConstantCase('HelloWorld')).toBe('HELLO_WORLD');
+      expect(toConstantCase('hello')).toBe('HELLO');
     });
   });
 

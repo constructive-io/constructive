@@ -16,7 +16,7 @@ import {
   buildSkillFile,
   buildSkillReference,
 } from '../docs-utils';
-import type { GeneratedDocFile, McpTool } from '../docs-utils';
+import type { GeneratedDocFile } from '../docs-utils';
 import {
   getScalarFields,
   getTableNames,
@@ -25,7 +25,7 @@ import {
 import { getFieldsWithDefaults } from './table-command-generator';
 
 export { resolveDocsConfig } from '../docs-utils';
-export type { GeneratedDocFile, McpTool } from '../docs-utils';
+export type { GeneratedDocFile } from '../docs-utils';
 
 export function generateReadme(
   tables: Table[],
@@ -125,6 +125,14 @@ export function generateReadme(
       lines.push('| Subcommand | Description |');
       lines.push('|------------|-------------|');
       lines.push(`| \`list\` | List all ${singularName} records |`);
+      lines.push(`| \`find-first\` | Find first matching ${singularName} record |`);
+      const readmeSpecialGroups = categorizeSpecialFields(table, registry);
+      const readmeHasSearch = readmeSpecialGroups.some(
+        (g) => g.category === 'search' || g.category === 'embedding',
+      );
+      if (readmeHasSearch) {
+        lines.push(`| \`search <query>\` | Search ${singularName} records |`);
+      }
       lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
@@ -264,261 +272,6 @@ export function generateAgentsDocs(
   };
 }
 
-export function getCliMcpTools(
-  tables: Table[],
-  customOperations: Operation[],
-  toolName: string,
-  registry?: TypeRegistry,
-): McpTool[] {
-  const tools: McpTool[] = [];
-
-  tools.push({
-    name: `${toolName}_context_create`,
-    description: 'Create a named API context pointing at a GraphQL endpoint',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Context name' },
-        endpoint: { type: 'string', description: 'GraphQL endpoint URL' },
-      },
-      required: ['name', 'endpoint'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_context_list`,
-    description: 'List all configured API contexts',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_context_use`,
-    description: 'Set the active API context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Context name to activate' },
-      },
-      required: ['name'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_context_current`,
-    description: 'Show the currently active API context',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_context_delete`,
-    description: 'Delete an API context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Context name to delete' },
-      },
-      required: ['name'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_auth_set_token`,
-    description: 'Store a bearer token for the current context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        token: { type: 'string', description: 'Bearer token value' },
-      },
-      required: ['token'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_auth_status`,
-    description: 'Show authentication status for all contexts',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_auth_logout`,
-    description: 'Remove credentials for the current context',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_config_get`,
-    description: 'Get a config variable value for the current context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        key: { type: 'string', description: 'Variable name' },
-      },
-      required: ['key'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_config_set`,
-    description: 'Set a config variable value for the current context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        key: { type: 'string', description: 'Variable name' },
-        value: { type: 'string', description: 'Variable value' },
-      },
-      required: ['key', 'value'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_config_list`,
-    description: 'List all config variables for the current context',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_config_delete`,
-    description: 'Delete a config variable for the current context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        key: { type: 'string', description: 'Variable name to delete' },
-      },
-      required: ['key'],
-    },
-  });
-
-  for (const table of tables) {
-    const { singularName } = getTableNames(table);
-    const kebab = toKebabCase(singularName);
-    const pk = getPrimaryKeyInfo(table)[0];
-    const scalarFields = getScalarFields(table);
-    const editableFields = getEditableFields(table, registry);
-    const defaultFields = getFieldsWithDefaults(table, registry);
-    const requiredCreateFieldNames = editableFields
-      .filter((f) => !defaultFields.has(f.name))
-      .map((f) => f.name);
-
-    tools.push({
-      name: `${toolName}_${kebab}_list`,
-      description: `List all ${table.name} records`,
-      inputSchema: { type: 'object', properties: {} },
-    });
-
-    tools.push({
-      name: `${toolName}_${kebab}_get`,
-      description: `Get a single ${table.name} record by ${pk.name}`,
-      inputSchema: {
-        type: 'object',
-        properties: {
-          [pk.name]: {
-            type: gqlTypeToJsonSchemaType(pk.gqlType),
-            description: `${table.name} ${pk.name}`,
-          },
-        },
-        required: [pk.name],
-      },
-    });
-
-    const createProps: Record<string, unknown> = {};
-    for (const f of editableFields) {
-      createProps[f.name] = {
-        type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
-        description: `${table.name} ${f.name}`,
-      };
-    }
-    tools.push({
-      name: `${toolName}_${kebab}_create`,
-      description: `Create a new ${table.name} record`,
-      inputSchema: {
-        type: 'object',
-        properties: createProps,
-        ...(requiredCreateFieldNames.length > 0 ? { required: requiredCreateFieldNames } : {}),
-      },
-    });
-
-    const updateProps: Record<string, unknown> = {
-      [pk.name]: {
-        type: gqlTypeToJsonSchemaType(pk.gqlType),
-        description: `${table.name} ${pk.name}`,
-      },
-    };
-    for (const f of editableFields) {
-      updateProps[f.name] = {
-        type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
-        description: `${table.name} ${f.name}`,
-      };
-    }
-    tools.push({
-      name: `${toolName}_${kebab}_update`,
-      description: `Update an existing ${table.name} record`,
-      inputSchema: {
-        type: 'object',
-        properties: updateProps,
-        required: [pk.name],
-      },
-    });
-
-    tools.push({
-      name: `${toolName}_${kebab}_delete`,
-      description: `Delete a ${table.name} record by ${pk.name}`,
-      inputSchema: {
-        type: 'object',
-        properties: {
-          [pk.name]: {
-            type: gqlTypeToJsonSchemaType(pk.gqlType),
-            description: `${table.name} ${pk.name}`,
-          },
-        },
-        required: [pk.name],
-      },
-    });
-
-    tools.push({
-      name: `${toolName}_${kebab}_fields`,
-      description: `List available fields for ${table.name}`,
-      inputSchema: { type: 'object', properties: {} },
-      _meta: {
-        fields: scalarFields.map((f) => ({
-          name: f.name,
-          type: cleanTypeName(f.type.gqlType),
-          editable: editableFields.some((ef) => ef.name === f.name),
-          primaryKey: f.name === pk.name,
-        })),
-      },
-    });
-  }
-
-  for (const op of customOperations) {
-    const kebab = toKebabCase(op.name);
-    const flat = flattenArgs(op.args, registry);
-    const props: Record<string, unknown> = {};
-    const required: string[] = [];
-
-    for (const a of flat) {
-      props[a.flag] = {
-        type: gqlTypeToJsonSchemaType(a.type),
-        description: a.description || a.flag,
-      };
-      if (a.required) {
-        required.push(a.flag);
-      }
-    }
-
-    tools.push({
-      name: `${toolName}_${kebab}`,
-      description: op.description || op.name,
-      inputSchema: {
-        type: 'object',
-        properties: props,
-        ...(required.length > 0 ? { required } : {}),
-      },
-    });
-  }
-
-  return tools;
-}
-
 export function generateSkills(
   tables: Table[],
   customOperations: Operation[],
@@ -641,6 +394,12 @@ export function generateSkills(
         description: skillSpecialDesc,
         usage: [
           `${toolName} ${kebab} list`,
+          `${toolName} ${kebab} list --where.<field>.<op> <value> --orderBy <values>`,
+          `${toolName} ${kebab} list --limit 10 --after <cursor>`,
+          `${toolName} ${kebab} find-first --where.<field>.<op> <value>`,
+          ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+            ? [`${toolName} ${kebab} search <query>`]
+            : []),
           `${toolName} ${kebab} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
           `${toolName} ${kebab} create ${createFlags}`,
           `${toolName} ${kebab} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
@@ -648,9 +407,35 @@ export function generateSkills(
         ],
         examples: [
           {
-            description: `List all ${singularName} records`,
+            description: `List ${singularName} records`,
             code: [`${toolName} ${kebab} list`],
           },
+          {
+            description: `List ${singularName} records with pagination`,
+            code: [`${toolName} ${kebab} list --limit 10 --offset 0`],
+          },
+          {
+            description: `List ${singularName} records with cursor pagination`,
+            code: [`${toolName} ${kebab} list --limit 10 --after <cursor>`],
+          },
+          {
+            description: `Find first matching ${singularName}`,
+            code: [`${toolName} ${kebab} find-first --where.${pk.name}.equalTo <value>`],
+          },
+          {
+            description: `List ${singularName} records with field selection`,
+            code: [`${toolName} ${kebab} list --fields id,${pk.name}`],
+          },
+          {
+            description: `List ${singularName} records with filtering and ordering`,
+            code: [`${toolName} ${kebab} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
+          },
+          ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+            ? [{
+                description: `Search ${singularName} records`,
+                code: [`${toolName} ${kebab} search "query text" --limit 10 --fields id,searchScore`],
+              }]
+            : []),
           {
             description: `Create a ${singularName}`,
             code: [
@@ -944,6 +729,14 @@ export function generateMultiTargetReadme(
       lines.push('| Subcommand | Description |');
       lines.push('|------------|-------------|');
       lines.push(`| \`list\` | List all ${singularName} records |`);
+      lines.push(`| \`find-first\` | Find first matching ${singularName} record |`);
+      const mtReadmeSpecialGroups = categorizeSpecialFields(table, registry);
+      const mtReadmeHasSearch = mtReadmeSpecialGroups.some(
+        (g) => g.category === 'search' || g.category === 'embedding',
+      );
+      if (mtReadmeHasSearch) {
+        lines.push(`| \`search <query>\` | Search ${singularName} records |`);
+      }
       lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
@@ -1094,275 +887,6 @@ export function generateMultiTargetAgentsDocs(
     fileName: 'AGENTS.md',
     content: lines.join('\n'),
   };
-}
-
-export function getMultiTargetCliMcpTools(
-  input: MultiTargetDocsInput,
-): McpTool[] {
-  const { toolName, builtinNames, targets, registry } = input;
-  const tools: McpTool[] = [];
-
-  const contextEndpointProps: Record<string, unknown> = {
-    name: { type: 'string', description: 'Context name' },
-  };
-  for (const tgt of targets) {
-    contextEndpointProps[`${tgt.name}_endpoint`] = {
-      type: 'string',
-      description: `${tgt.name} GraphQL endpoint (default: ${tgt.endpoint})`,
-    };
-  }
-  tools.push({
-    name: `${toolName}_${builtinNames.context}_create`,
-    description: 'Create a named API context with per-target endpoint overrides',
-    inputSchema: {
-      type: 'object',
-      properties: contextEndpointProps,
-      required: ['name'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.context}_list`,
-    description: 'List all configured API contexts',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.context}_use`,
-    description: 'Set the active API context (switches all targets at once)',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Context name to activate' },
-      },
-      required: ['name'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.context}_current`,
-    description: 'Show the currently active API context',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.context}_delete`,
-    description: 'Delete an API context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Context name to delete' },
-      },
-      required: ['name'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.auth}_set_token`,
-    description: 'Store a bearer token for the current context (shared across all targets)',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        token: { type: 'string', description: 'Bearer token value' },
-      },
-      required: ['token'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.auth}_status`,
-    description: 'Show authentication status for all contexts',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.auth}_logout`,
-    description: 'Remove credentials for the current context',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.config}_get`,
-    description: 'Get a config variable value for the current context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        key: { type: 'string', description: 'Variable name' },
-      },
-      required: ['key'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.config}_set`,
-    description: 'Set a config variable value for the current context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        key: { type: 'string', description: 'Variable name' },
-        value: { type: 'string', description: 'Variable value' },
-      },
-      required: ['key', 'value'],
-    },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.config}_list`,
-    description: 'List all config variables for the current context',
-    inputSchema: { type: 'object', properties: {} },
-  });
-
-  tools.push({
-    name: `${toolName}_${builtinNames.config}_delete`,
-    description: 'Delete a config variable for the current context',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        key: { type: 'string', description: 'Variable name to delete' },
-      },
-      required: ['key'],
-    },
-  });
-
-  for (const tgt of targets) {
-    for (const table of tgt.tables) {
-      const { singularName } = getTableNames(table);
-      const kebab = toKebabCase(singularName);
-      const pk = getPrimaryKeyInfo(table)[0];
-      const scalarFields = getScalarFields(table);
-      const editableFields = getEditableFields(table, registry);
-      const defaultFields = getFieldsWithDefaults(table, registry);
-      const requiredCreateFieldNames = editableFields
-        .filter((f) => !defaultFields.has(f.name))
-        .map((f) => f.name);
-      const prefix = `${toolName}_${tgt.name}_${kebab}`;
-
-      tools.push({
-        name: `${prefix}_list`,
-        description: `List all ${table.name} records (${tgt.name} target)`,
-        inputSchema: { type: 'object', properties: {} },
-      });
-
-      tools.push({
-        name: `${prefix}_get`,
-        description: `Get a single ${table.name} record by ${pk.name} (${tgt.name} target)`,
-        inputSchema: {
-          type: 'object',
-          properties: {
-            [pk.name]: {
-              type: gqlTypeToJsonSchemaType(pk.gqlType),
-              description: `${table.name} ${pk.name}`,
-            },
-          },
-          required: [pk.name],
-        },
-      });
-
-      const createProps: Record<string, unknown> = {};
-      for (const f of editableFields) {
-        createProps[f.name] = {
-          type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
-          description: `${table.name} ${f.name}`,
-        };
-      }
-      tools.push({
-        name: `${prefix}_create`,
-        description: `Create a new ${table.name} record (${tgt.name} target)`,
-        inputSchema: {
-          type: 'object',
-          properties: createProps,
-          ...(requiredCreateFieldNames.length > 0 ? { required: requiredCreateFieldNames } : {}),
-        },
-      });
-
-      const updateProps: Record<string, unknown> = {
-        [pk.name]: {
-          type: gqlTypeToJsonSchemaType(pk.gqlType),
-          description: `${table.name} ${pk.name}`,
-        },
-      };
-      for (const f of editableFields) {
-        updateProps[f.name] = {
-          type: gqlTypeToJsonSchemaType(cleanTypeName(f.type.gqlType)),
-          description: `${table.name} ${f.name}`,
-        };
-      }
-      tools.push({
-        name: `${prefix}_update`,
-        description: `Update an existing ${table.name} record (${tgt.name} target)`,
-        inputSchema: {
-          type: 'object',
-          properties: updateProps,
-          required: [pk.name],
-        },
-      });
-
-      tools.push({
-        name: `${prefix}_delete`,
-        description: `Delete a ${table.name} record by ${pk.name} (${tgt.name} target)`,
-        inputSchema: {
-          type: 'object',
-          properties: {
-            [pk.name]: {
-              type: gqlTypeToJsonSchemaType(pk.gqlType),
-              description: `${table.name} ${pk.name}`,
-            },
-          },
-          required: [pk.name],
-        },
-      });
-
-      tools.push({
-        name: `${prefix}_fields`,
-        description: `List available fields for ${table.name} (${tgt.name} target)`,
-        inputSchema: { type: 'object', properties: {} },
-        _meta: {
-          fields: scalarFields.map((f) => ({
-            name: f.name,
-            type: cleanTypeName(f.type.gqlType),
-            editable: editableFields.some((ef) => ef.name === f.name),
-            primaryKey: f.name === pk.name,
-          })),
-        },
-      });
-    }
-
-    for (const op of tgt.customOperations) {
-      const kebab = toKebabCase(op.name);
-      const flat = flattenArgs(op.args, registry);
-      const props: Record<string, unknown> = {};
-      const required: string[] = [];
-
-      for (const a of flat) {
-        props[a.flag] = {
-          type: gqlTypeToJsonSchemaType(a.type),
-          description: a.description || a.flag,
-        };
-        if (a.required) {
-          required.push(a.flag);
-        }
-      }
-
-      if (tgt.isAuthTarget && op.kind === 'mutation') {
-        props['save_token'] = {
-          type: 'boolean',
-          description: 'Auto-save returned token to credentials',
-        };
-      }
-
-      tools.push({
-        name: `${toolName}_${tgt.name}_${kebab}`,
-        description: `${op.description || op.name} (${tgt.name} target)`,
-        inputSchema: {
-          type: 'object',
-          properties: props,
-          ...(required.length > 0 ? { required } : {}),
-        },
-      });
-    }
-  }
-
-  return tools;
 }
 
 export function generateMultiTargetSkills(
@@ -1540,6 +1064,12 @@ export function generateMultiTargetSkills(
           description: mtSkillSpecialDesc,
           usage: [
             `${toolName} ${cmd} list`,
+            `${toolName} ${cmd} list --where.<field>.<op> <value> --orderBy <values>`,
+            `${toolName} ${cmd} list --limit 10 --after <cursor>`,
+            `${toolName} ${cmd} find-first --where.<field>.<op> <value>`,
+            ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+              ? [`${toolName} ${cmd} search <query>`]
+              : []),
             `${toolName} ${cmd} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
             `${toolName} ${cmd} create ${createFlags}`,
             `${toolName} ${cmd} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
@@ -1547,9 +1077,31 @@ export function generateMultiTargetSkills(
           ],
           examples: [
             {
-              description: `List all ${singularName} records`,
+              description: `List ${singularName} records`,
               code: [`${toolName} ${cmd} list`],
             },
+            {
+              description: `List ${singularName} records with pagination`,
+              code: [`${toolName} ${cmd} list --limit 10 --offset 0`],
+            },
+            {
+              description: `List ${singularName} records with cursor pagination`,
+              code: [`${toolName} ${cmd} list --limit 10 --after <cursor>`],
+            },
+            {
+              description: `Find first matching ${singularName}`,
+              code: [`${toolName} ${cmd} find-first --where.${pk.name}.equalTo <value>`],
+            },
+            {
+              description: `List ${singularName} records with filtering and ordering`,
+              code: [`${toolName} ${cmd} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
+            },
+            ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+              ? [{
+                  description: `Search ${singularName} records`,
+                  code: [`${toolName} ${cmd} search "query text" --limit 10 --fields id,searchScore`],
+                }]
+              : []),
             {
               description: `Create a ${singularName}`,
               code: [
