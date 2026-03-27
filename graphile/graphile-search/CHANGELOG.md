@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.3](https://github.com/constructive-io/constructive/compare/graphile-search@1.5.2...graphile-search@1.5.3) (2026-03-27)
+
+### Bug Fixes
+
+- eliminate sql.raw usage in pgvector and postgis plugins ([330a680](https://github.com/constructive-io/constructive/commit/330a6800e225d21f0c2378c0d29bdb816d72bcd1))
+
 ## [1.5.2](https://github.com/constructive-io/constructive/compare/graphile-search@1.5.1...graphile-search@1.5.2) (2026-03-27)
 
 **Note:** Version bump only for package graphile-search

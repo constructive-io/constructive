@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-worker",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "knative job worker",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-worker#readme",
@@ -46,7 +46,7 @@
     "@pgpm/database-jobs": "^0.18.0",
     "@pgpm/verify": "^0.18.0",
     "@pgpmjs/core": "workspace:^",
-    "makage": "^0.1.12",
+    "makage": "^0.3.0",
     "pgsql-test": "workspace:^"
   }
 }

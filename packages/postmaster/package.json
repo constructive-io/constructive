@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/postmaster",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Mailgun email sender for Constructive",
   "main": "index.js",
@@ -34,7 +34,7 @@
     "mailgun.js": "^10.2.3"
   },
   "devDependencies": {
-    "makage": "^0.1.12"
+    "makage": "^0.3.0"
   },
   "keywords": [
     "mailgun",

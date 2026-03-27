@@ -68,10 +68,16 @@ function resolveGqlTypeName(
   return nestedTypeName ? pgTypeToGqlType(nestedTypeName) : pgTypeName;
 }
 
+export interface BuildFieldMetaOptions {
+  isPrimaryKey?: boolean;
+  isForeignKey?: boolean;
+}
+
 export function buildFieldMeta(
   name: string,
   attr: PgAttribute | null | undefined,
   build?: GqlTypeResolverBuild,
+  options?: BuildFieldMetaOptions,
 ): FieldMeta {
   const pgType = attr?.codec?.name || 'unknown';
   const isNotNull = attr?.notNull || false;
@@ -88,5 +94,8 @@ export function buildFieldMeta(
     },
     isNotNull,
     hasDefault,
+    isPrimaryKey: options?.isPrimaryKey ?? false,
+    isForeignKey: options?.isForeignKey ?? false,
+    description: attr?.description ?? null,
   };
 }

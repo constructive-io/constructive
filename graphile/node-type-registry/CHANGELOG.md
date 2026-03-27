@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.5.1...node-type-registry@0.6.0) (2026-03-27)
+
+### Bug Fixes
+
+- avoid variable shadow in findTable (t -> tbl) ([f06802f](https://github.com/constructive-io/constructive/commit/f06802f11f8461d003f4c9690939e33f422f274b))
+
+### Features
+
+- **node-type-registry:** derive structural types from introspection JSON ([8231dc9](https://github.com/constructive-io/constructive/commit/8231dc905a1be1da1eb3c06ab4c7b349d9630523))
+
 ## [0.5.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.5.0...node-type-registry@0.5.1) (2026-03-27)
 
 ### Bug Fixes

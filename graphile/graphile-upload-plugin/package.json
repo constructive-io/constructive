@@ -1,6 +1,6 @@
 {
   "name": "graphile-upload-plugin",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "File upload support for PostGraphile v5",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -39,14 +39,14 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "peerDependencies": {
-    "graphile-build": "5.0.0-rc.6",
-    "graphile-build-pg": "5.0.0-rc.8",
-    "graphile-config": "1.0.0-rc.6",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
     "graphql": "16.13.0",
-    "postgraphile": "5.0.0-rc.10"
+    "postgraphile": "5.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.1.10"
+    "makage": "^0.3.0"
   }
 }

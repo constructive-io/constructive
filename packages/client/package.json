@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/client",
-  "version": "2.12.1",
+  "version": "2.12.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "PostgreSQL Client",
   "main": "index.js",
@@ -38,7 +38,7 @@
   ],
   "devDependencies": {
     "@types/pg": "^8.18.0",
-    "makage": "^0.1.12"
+    "makage": "^0.3.0"
   },
   "dependencies": {
     "pg": "^8.20.0"

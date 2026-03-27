@@ -1,6 +1,6 @@
 {
   "name": "graphile-connection-filter",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "PostGraphile v5 native connection filter plugin - adds advanced filtering to connections",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
@@ -42,16 +42,16 @@
   "devDependencies": {
     "@types/node": "^22.19.11",
     "graphile-test": "workspace:^",
-    "makage": "^0.1.10",
+    "makage": "^0.3.0",
     "pgsql-test": "workspace:^"
   },
   "peerDependencies": {
-    "@dataplan/pg": "1.0.0-rc.8",
-    "graphile-build": "5.0.0-rc.6",
-    "graphile-build-pg": "5.0.0-rc.8",
-    "graphile-config": "1.0.0-rc.6",
+    "@dataplan/pg": "1.0.0",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
     "graphql": "16.13.0",
-    "pg-sql2": "5.0.0-rc.5",
-    "postgraphile": "5.0.0-rc.10"
+    "pg-sql2": "5.0.0",
+    "postgraphile": "5.0.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/logger",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "Simple logger utility",
   "main": "index.js",
@@ -40,6 +40,6 @@
     "pgpmjs"
   ],
   "devDependencies": {
-    "makage": "^0.1.12"
+    "makage": "^0.3.0"
   }
 }

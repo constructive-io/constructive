@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/oauth",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "OAuth 2.0 client for social authentication (Google, GitHub, Facebook, LinkedIn)",
   "main": "index.js",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.1.12",
+    "makage": "^0.3.0",
     "ts-node": "^10.9.2"
   },
   "keywords": [

@@ -10,13 +10,25 @@ import type { SearchAdapter, SearchableColumn, FilterApplyResult } from '../type
 import type { SQL } from 'pg-sql2';
 
 /**
- * pgvector distance operators.
+ * Build a distance expression for the given metric.
+ * Uses explicit SQL template literals for each operator to avoid sql.raw.
  */
-const METRIC_OPERATORS: Record<string, string> = {
-  COSINE: '<=>',
-  L2: '<->',
-  IP: '<#>',
-};
+function buildDistanceExpr(
+  sql: any,
+  columnExpr: SQL,
+  vectorExpr: SQL,
+  metric: string,
+): SQL {
+  switch (metric) {
+    case 'L2':
+      return sql`(${columnExpr} <-> ${vectorExpr})`;
+    case 'IP':
+      return sql`(${columnExpr} <#> ${vectorExpr})`;
+    case 'COSINE':
+    default:
+      return sql`(${columnExpr} <=> ${vectorExpr})`;
+  }
+}
 
 function isVectorCodec(codec: any): boolean {
   return codec?.name === 'vector';
@@ -242,7 +254,6 @@ export function createPgvectorAdapter(
       if (!vector || !Array.isArray(vector) || vector.length === 0) return null;
 
       const resolvedMetric = metric || defaultMetric;
-      const operator = METRIC_OPERATORS[resolvedMetric] || METRIC_OPERATORS.COSINE;
       const vectorString = `[${vector.join(',')}]`;
       const vectorExpr = sql`${sql.value(vectorString)}::vector`;
 
@@ -264,15 +275,16 @@ export function createPgvectorAdapter(
         const chunksAlias = sql.identifier('__chunks');
 
         // Subquery: SELECT MIN(distance) FROM chunks WHERE chunks.parent_fk = parent.pk
+        const chunkDistanceExpr = buildDistanceExpr(sql, sql`${chunksAlias}.${chunkEmbedding}`, vectorExpr, resolvedMetric);
         const chunkDistanceSubquery = sql`(
-          SELECT MIN(${chunksAlias}.${chunkEmbedding} ${sql.raw(operator)} ${vectorExpr})
+          SELECT MIN(${chunkDistanceExpr})
           FROM ${chunksTableRef} AS ${chunksAlias}
           WHERE ${chunksAlias}.${parentFk} = ${parentId}
         )`;
 
         // Also compute direct parent distance if the parent has an embedding
         const parentColumnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
-        const parentDistanceExpr = sql`(${parentColumnExpr} ${sql.raw(operator)} ${vectorExpr})`;
+        const parentDistanceExpr = buildDistanceExpr(sql, parentColumnExpr, vectorExpr, resolvedMetric);
 
         // Use LEAST of parent distance and closest chunk distance
         // COALESCE handles cases where parent or chunks may not have embeddings
@@ -294,7 +306,7 @@ export function createPgvectorAdapter(
 
       // Standard (non-chunk) query
       const columnExpr = sql`${alias}.${sql.identifier(column.attributeName)}`;
-      const distanceExpr = sql`(${columnExpr} ${sql.raw(operator)} ${vectorExpr})`;
+      const distanceExpr = buildDistanceExpr(sql, columnExpr, vectorExpr, resolvedMetric);
 
       let whereClause: SQL | null = null;
       if (distance !== undefined && distance !== null) {

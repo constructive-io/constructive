@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/graphql-codegen",
-  "version": "4.25.0",
+  "version": "4.26.0",
   "description": "GraphQL SDK generator for Constructive databases with React Query hooks",
   "keywords": [
     "graphql",
@@ -58,7 +58,7 @@
     "@babel/types": "^7.29.0",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
-    "@inquirerer/utils": "^3.3.4",
+    "@inquirerer/utils": "^3.3.5",
     "@pgpmjs/core": "workspace:^",
     "ajv": "^8.18.0",
     "deepmerge": "^4.3.1",
@@ -70,12 +70,12 @@
     "inquirerer": "^4.7.0",
     "jiti": "^2.6.1",
     "komoji": "^0.9.0",
-    "oxfmt": "^0.40.0",
+    "oxfmt": "^0.42.0",
     "pg-cache": "workspace:^",
     "pg-env": "workspace:^",
     "pgsql-client": "workspace:^",
     "pgsql-seed": "workspace:^",
-    "undici": "^7.24.3"
+    "undici": "^7.24.6"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",

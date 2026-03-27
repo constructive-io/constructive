@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/knative-job-fn",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "knative job fn",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/jobs/tree/master/packages/knative-job-fn#readme",
@@ -33,7 +33,7 @@
     "url": "https://github.com/constructive-io/jobs/issues"
   },
   "devDependencies": {
-    "makage": "^0.1.12"
+    "makage": "^0.3.0"
   },
   "dependencies": {
     "@pgpmjs/logger": "workspace:^",

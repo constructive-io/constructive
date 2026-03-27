@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/csrf",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "author": "Constructive <developers@constructive.io>",
   "description": "CSRF protection utilities for Express applications",
   "main": "index.js",
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.1.12",
+    "makage": "^0.3.0",
     "ts-node": "^10.9.2"
   }
 }

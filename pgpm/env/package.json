@@ -1,6 +1,6 @@
 {
   "name": "@pgpmjs/env",
-  "version": "2.16.1",
+  "version": "2.16.2",
   "author": "Dan Lynch <Dan Lynch>",
   "description": "PGPM environment management",
   "main": "index.js",
@@ -41,6 +41,6 @@
     "env"
   ],
   "devDependencies": {
-    "makage": "^0.1.12"
+    "makage": "^0.3.0"
   }
 }

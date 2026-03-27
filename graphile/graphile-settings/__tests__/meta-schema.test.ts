@@ -807,6 +807,9 @@ describe('MetaSchemaPlugin', () => {
         },
         isNotNull: true,
         hasDefault: true,
+        isPrimaryKey: false,
+        isForeignKey: false,
+        description: null,
       });
     });
 

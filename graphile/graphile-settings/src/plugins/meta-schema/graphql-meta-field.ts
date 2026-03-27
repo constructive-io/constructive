@@ -42,6 +42,9 @@ function createMetaSchemaType(): GraphQLObjectType {
       type: { type: nn(MetaTypeType) },
       isNotNull: { type: nn(GraphQLBoolean) },
       hasDefault: { type: nn(GraphQLBoolean) },
+      isPrimaryKey: { type: nn(GraphQLBoolean) },
+      isForeignKey: { type: nn(GraphQLBoolean) },
+      description: { type: GraphQLString },
     }),
   });
 

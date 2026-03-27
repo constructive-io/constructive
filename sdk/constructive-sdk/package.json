@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/sdk",
-  "version": "0.12.6",
+  "version": "0.12.7",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive SDK - Auto-generated GraphQL types and ORM client",
   "main": "index.js",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@constructive-io/graphql-codegen": "workspace:^",
     "@types/node": "^22.19.11",
-    "makage": "^0.1.12",
+    "makage": "^0.3.0",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3"
   }
