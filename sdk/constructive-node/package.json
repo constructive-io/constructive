@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.1.12",
+    "makage": "^0.3.0",
     "typescript": "^5.9.3"
   }
 }

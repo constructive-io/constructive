@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.18.0",
-    "makage": "^0.1.10",
+    "makage": "^0.3.0",
     "pgsql-test": "workspace:^"
   },
   "keywords": [

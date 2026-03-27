@@ -42,8 +42,8 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "pgsql-deparser": "^17.18.1",
-    "pgsql-parser": "^17.9.13"
+    "pgsql-deparser": "^17.18.2",
+    "pgsql-parser": "^17.9.14"
   },
   "peerDependencies": {
     "grafast": "1.0.0-rc.9",
@@ -54,6 +54,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.1.10"
+    "makage": "^0.3.0"
   }
 }

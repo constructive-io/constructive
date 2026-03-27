@@ -53,6 +53,6 @@
   "devDependencies": {
     "@types/babel__generator": "^7.6.8",
     "@types/pg": "^8.18.0",
-    "makage": "^0.1.12"
+    "makage": "^0.3.0"
   }
 }
