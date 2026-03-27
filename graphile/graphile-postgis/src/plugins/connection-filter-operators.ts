@@ -10,21 +10,29 @@ import type { SQL } from 'pg-sql2';
 import { CONCRETE_SUBTYPES } from '../constants';
 import type { PostgisExtensionInfo } from './detect-extension';
 
-const ALLOWED_SQL_OPERATORS = new Set([
-  '=',
-  '&&',
-  '&&&',
-  '&<',
-  '&<|',
-  '&>',
-  '|&>',
-  '<<',
-  '<<|',
-  '>>',
-  '|>>',
-  '~',
-  '~=',
-]);
+/**
+ * Builds an infix operator SQL fragment from a validated operator string.
+ * Uses explicit template literals for each operator to avoid sql.raw.
+ */
+function buildOperatorExpr(op: string, i: SQL, v: SQL): SQL {
+  switch (op) {
+    case '=':   return sql.fragment`${i} = ${v}`;
+    case '&&':  return sql.fragment`${i} && ${v}`;
+    case '&&&': return sql.fragment`${i} &&& ${v}`;
+    case '&<':  return sql.fragment`${i} &< ${v}`;
+    case '&<|': return sql.fragment`${i} &<| ${v}`;
+    case '&>':  return sql.fragment`${i} &> ${v}`;
+    case '|&>': return sql.fragment`${i} |&> ${v}`;
+    case '<<':  return sql.fragment`${i} << ${v}`;
+    case '<<|': return sql.fragment`${i} <<| ${v}`;
+    case '>>':  return sql.fragment`${i} >> ${v}`;
+    case '|>>': return sql.fragment`${i} |>> ${v}`;
+    case '~':   return sql.fragment`${i} ~ ${v}`;
+    case '~=':  return sql.fragment`${i} ~= ${v}`;
+    default:
+      throw new Error(`Unexpected PostGIS SQL operator: ${op}`);
+  }
+}
 
 // PostGIS function-based operators
 const FUNCTION_SPECS: [string, string[], string, string][] = [
@@ -261,16 +269,14 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
 
     // Process SQL operator-based operators
     for (const [op, baseTypes, operatorName, description] of OPERATOR_SPECS) {
-      if (!ALLOWED_SQL_OPERATORS.has(op)) {
-        throw new Error(`Unexpected SQL operator: ${op}`);
-      }
-
       for (const baseType of baseTypes) {
+        // Capture op for closure
+        const capturedOp = op;
         allSpecs.push({
           typeNames: gqlTypeNamesByBase[baseType],
           operatorName,
           description,
-          resolve: (i: SQL, v: SQL) => sql.fragment`${i} ${sql.raw(op)} ${v}`
+          resolve: (i: SQL, v: SQL) => buildOperatorExpr(capturedOp, i, v)
         });
       }
     }
