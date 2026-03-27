@@ -401,8 +401,15 @@ export function getCliMcpTools(
 
     tools.push({
       name: `${toolName}_${kebab}_list`,
-      description: `List all ${table.name} records`,
-      inputSchema: { type: 'object', properties: {} },
+      description: `List ${table.name} records (supports pagination and field selection)`,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          limit: { type: 'number', description: 'Max number of records to return' },
+          offset: { type: 'number', description: 'Number of records to skip' },
+          fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+        },
+      },
     });
 
     tools.push({
@@ -648,8 +655,16 @@ export function generateSkills(
         ],
         examples: [
           {
-            description: `List all ${singularName} records`,
+            description: `List ${singularName} records`,
             code: [`${toolName} ${kebab} list`],
+          },
+          {
+            description: `List ${singularName} records with pagination`,
+            code: [`${toolName} ${kebab} list --limit 10 --offset 0`],
+          },
+          {
+            description: `List ${singularName} records with field selection`,
+            code: [`${toolName} ${kebab} list --fields id,${pk.name}`],
           },
           {
             description: `Create a ${singularName}`,
@@ -1239,8 +1254,15 @@ export function getMultiTargetCliMcpTools(
 
       tools.push({
         name: `${prefix}_list`,
-        description: `List all ${table.name} records (${tgt.name} target)`,
-        inputSchema: { type: 'object', properties: {} },
+        description: `List ${table.name} records (${tgt.name} target, supports pagination and field selection)`,
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Max number of records to return' },
+            offset: { type: 'number', description: 'Number of records to skip' },
+            fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+          },
+        },
       });
 
       tools.push({
@@ -1547,8 +1569,12 @@ export function generateMultiTargetSkills(
           ],
           examples: [
             {
-              description: `List all ${singularName} records`,
+              description: `List ${singularName} records`,
               code: [`${toolName} ${cmd} list`],
+            },
+            {
+              description: `List ${singularName} records with pagination`,
+              code: [`${toolName} ${cmd} list --limit 10 --offset 0`],
             },
             {
               description: `Create a ${singularName}`,

@@ -310,28 +310,187 @@ function buildSubcommandSwitch(
 
 function buildListHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
-  const selectObj = buildSelectObject(table, typeRegistry);
+  const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
-  const tryBody: t.Statement[] = [
-    buildGetClientStatement(targetName),
+  // --- Build the try body ---
+  const tryBody: t.Statement[] = [];
+
+  // const limit = typeof argv.limit === 'number' ? argv.limit
+  //   : typeof argv.limit === 'string' ? parseInt(argv.limit, 10) : undefined;
+  tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
-        t.identifier('result'),
-        t.awaitExpression(
-          buildOrmCall(
-            singularName,
-            'findMany',
-            t.objectExpression([
-              t.objectProperty(t.identifier('select'), selectObj),
+        t.identifier('limit'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('limit'))),
+            t.stringLiteral('number'),
+          ),
+          t.tsAsExpression(
+            t.memberExpression(t.identifier('argv'), t.identifier('limit')),
+            t.tsNumberKeyword(),
+          ),
+          t.conditionalExpression(
+            t.binaryExpression(
+              '===',
+              t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('limit'))),
+              t.stringLiteral('string'),
+            ),
+            t.callExpression(t.identifier('parseInt'), [
+              t.tsAsExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('limit')),
+                t.tsStringKeyword(),
+              ),
+              t.numericLiteral(10),
             ]),
+            t.identifier('undefined'),
           ),
         ),
       ),
     ]),
-    buildJsonLog(t.identifier('result')),
-  ];
+  );
 
-  const argvParam = t.identifier('_argv');
+  // const offset = typeof argv.offset === 'number' ? argv.offset
+  //   : typeof argv.offset === 'string' ? parseInt(argv.offset, 10) : undefined;
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('offset'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('offset'))),
+            t.stringLiteral('number'),
+          ),
+          t.tsAsExpression(
+            t.memberExpression(t.identifier('argv'), t.identifier('offset')),
+            t.tsNumberKeyword(),
+          ),
+          t.conditionalExpression(
+            t.binaryExpression(
+              '===',
+              t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('offset'))),
+              t.stringLiteral('string'),
+            ),
+            t.callExpression(t.identifier('parseInt'), [
+              t.tsAsExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('offset')),
+                t.tsStringKeyword(),
+              ),
+              t.numericLiteral(10),
+            ]),
+            t.identifier('undefined'),
+          ),
+        ),
+      ),
+    ]),
+  );
+
+  // const defaultSelect = { id: true, name: true, ... };
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier('defaultSelect'), defaultSelectObj),
+    ]),
+  );
+
+  // const select = typeof argv.fields === 'string'
+  //   ? buildSelectFromPaths(argv.fields as string)
+  //   : defaultSelect;
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('select'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('fields'))),
+            t.stringLiteral('string'),
+          ),
+          t.callExpression(t.identifier('buildSelectFromPaths'), [
+            t.tsAsExpression(
+              t.memberExpression(t.identifier('argv'), t.identifier('fields')),
+              t.tsStringKeyword(),
+            ),
+          ]),
+          t.identifier('defaultSelect'),
+        ),
+      ),
+    ]),
+  );
+
+  // Build findMany args: { select, ...(limit !== undefined && !isNaN(limit) ? { first: limit } : {}), ... }
+  // We build: const findManyArgs: Record<string, unknown> = { select };
+  // then conditionally add first, offset
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('findManyArgs'),
+        t.objectExpression([
+          t.objectProperty(t.identifier('select'), t.identifier('select'), false, true),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.logicalExpression(
+                '&&',
+                t.binaryExpression('!==', t.identifier('limit'), t.identifier('undefined')),
+                t.unaryExpression('!', t.callExpression(t.identifier('isNaN'), [t.identifier('limit')])),
+              ),
+              t.objectExpression([
+                t.objectProperty(t.identifier('first'), t.identifier('limit')),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.logicalExpression(
+                '&&',
+                t.binaryExpression('!==', t.identifier('offset'), t.identifier('undefined')),
+                t.unaryExpression('!', t.callExpression(t.identifier('isNaN'), [t.identifier('offset')])),
+              ),
+              t.objectExpression([
+                t.objectProperty(t.identifier('offset'), t.identifier('offset'), false, true),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+        ]),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildGetClientStatement(targetName));
+
+  // const result = await client.<singular>.findMany(findManyArgs).execute();
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('result'),
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.memberExpression(
+                    t.identifier('client'),
+                    t.identifier(singularName),
+                  ),
+                  t.identifier('findMany'),
+                ),
+                [t.identifier('findManyArgs')],
+              ),
+              t.identifier('execute'),
+            ),
+            [],
+          ),
+        ),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildJsonLog(t.identifier('result')));
+
+  const argvParam = t.identifier('argv');
   argvParam.typeAnnotation = buildArgvType();
   const prompterParam = t.identifier('_prompter');
   prompterParam.typeAnnotation = t.tsTypeAnnotation(
@@ -739,7 +898,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
 
   const utilsPath = options?.targetName ? '../../utils' : '../utils';
   statements.push(
-    createImportDeclaration(utilsPath, ['coerceAnswers', 'stripUndefined']),
+    createImportDeclaration(utilsPath, ['buildSelectFromPaths', 'coerceAnswers', 'stripUndefined']),
   );
   statements.push(
     createImportDeclaration(utilsPath, ['FieldSchema'], true),
@@ -798,13 +957,22 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     `${commandName} <command>`,
     '',
     'Commands:',
-    `  list                  List all ${singularName} records`,
+    `  list                  List ${singularName} records`,
   ];
   if (hasGet) usageLines.push(`  get                   Get a ${singularName} by ID`);
   usageLines.push(`  create                Create a new ${singularName}`);
   if (hasUpdate) usageLines.push(`  update                Update an existing ${singularName}`);
   if (hasDelete) usageLines.push(`  delete                Delete a ${singularName}`);
-  usageLines.push('', '  --help, -h            Show this help message', '');
+  usageLines.push(
+    '',
+    'List Options:',
+    '  --limit <n>           Max number of records to return',
+    '  --offset <n>          Number of records to skip',
+    '  --fields <fields>     Comma-separated list of fields to return',
+    '',
+    '  --help, -h            Show this help message',
+    '',
+  );
 
   statements.push(
     t.variableDeclaration('const', [

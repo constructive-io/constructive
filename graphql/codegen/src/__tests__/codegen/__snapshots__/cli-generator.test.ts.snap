@@ -289,10 +289,22 @@ myapp car delete --id <UUID>
 
 ## Examples
 
-### List all car records
+### List car records
 
 \`\`\`bash
 myapp car list
+\`\`\`
+
+### List car records with pagination
+
+\`\`\`bash
+myapp car list --limit 10 --offset 0
+\`\`\`
+
+### List car records with field selection
+
+\`\`\`bash
+myapp car list --fields id,id
 \`\`\`
 
 ### Create a car
@@ -328,10 +340,22 @@ myapp driver delete --id <UUID>
 
 ## Examples
 
-### List all driver records
+### List driver records
 
 \`\`\`bash
 myapp driver list
+\`\`\`
+
+### List driver records with pagination
+
+\`\`\`bash
+myapp driver list --limit 10 --offset 0
+\`\`\`
+
+### List driver records with field selection
+
+\`\`\`bash
+myapp driver list --fields id,id
 \`\`\`
 
 ### Create a driver
@@ -627,7 +651,7 @@ exports[`cli-generator generates commands/car.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { coerceAnswers, stripUndefined } from "../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateCarInput, CarPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -638,7 +662,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List all car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -676,19 +700,30 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const findManyArgs = {
+      select,
+      ...(limit !== undefined && !isNaN(limit) ? {
+        first: limit
+      } : {}),
+      ...(offset !== undefined && !isNaN(offset) ? {
+        offset
+      } : {})
+    };
     const client = getClient();
-    const result = await client.car.findMany({
-      select: {
-        id: true,
-        make: true,
-        model: true,
-        year: true,
-        isElectric: true,
-        createdAt: true
-      }
-    }).execute();
+    const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -1066,7 +1101,7 @@ exports[`cli-generator generates commands/driver.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { coerceAnswers, stripUndefined } from "../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateDriverInput, DriverPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -1074,7 +1109,7 @@ const fieldSchema: FieldSchema = {
   name: "string",
   licenseNumber: "string"
 };
-const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List all driver records\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -1112,16 +1147,27 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const defaultSelect = {
+      id: true,
+      name: true,
+      licenseNumber: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const findManyArgs = {
+      select,
+      ...(limit !== undefined && !isNaN(limit) ? {
+        first: limit
+      } : {}),
+      ...(offset !== undefined && !isNaN(offset) ? {
+        offset
+      } : {})
+    };
     const client = getClient();
-    const result = await client.driver.findMany({
-      select: {
-        id: true,
-        name: true,
-        licenseNumber: true
-      }
-    }).execute();
+    const result = await client.driver.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -1816,9 +1862,22 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "name": "myapp_config_delete",
   },
   {
-    "description": "List all User records (auth target)",
+    "description": "List User records (auth target, supports pagination and field selection)",
     "inputSchema": {
-      "properties": {},
+      "properties": {
+        "fields": {
+          "description": "Comma-separated list of fields to return",
+          "type": "string",
+        },
+        "limit": {
+          "description": "Max number of records to return",
+          "type": "number",
+        },
+        "offset": {
+          "description": "Number of records to skip",
+          "type": "number",
+        },
+      },
       "type": "object",
     },
     "name": "myapp_auth_user_list",
@@ -1964,9 +2023,22 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "name": "myapp_auth_login",
   },
   {
-    "description": "List all Member records (members target)",
+    "description": "List Member records (members target, supports pagination and field selection)",
     "inputSchema": {
-      "properties": {},
+      "properties": {
+        "fields": {
+          "description": "Comma-separated list of fields to return",
+          "type": "string",
+        },
+        "limit": {
+          "description": "Max number of records to return",
+          "type": "number",
+        },
+        "offset": {
+          "description": "Number of records to skip",
+          "type": "number",
+        },
+      },
       "type": "object",
     },
     "name": "myapp_members_member_list",
@@ -2064,9 +2136,22 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "name": "myapp_members_member_fields",
   },
   {
-    "description": "List all Car records (app target)",
+    "description": "List Car records (app target, supports pagination and field selection)",
     "inputSchema": {
-      "properties": {},
+      "properties": {
+        "fields": {
+          "description": "Comma-separated list of fields to return",
+          "type": "string",
+        },
+        "limit": {
+          "description": "Max number of records to return",
+          "type": "number",
+        },
+        "offset": {
+          "description": "Number of records to skip",
+          "type": "number",
+        },
+      },
       "type": "object",
     },
     "name": "myapp_app_car_list",
@@ -2662,10 +2747,16 @@ myapp auth:user delete --id <UUID>
 
 ## Examples
 
-### List all user records
+### List user records
 
 \`\`\`bash
 myapp auth:user list
+\`\`\`
+
+### List user records with pagination
+
+\`\`\`bash
+myapp auth:user list --limit 10 --offset 0
 \`\`\`
 
 ### Create a user
@@ -2790,10 +2881,16 @@ myapp members:member delete --id <UUID>
 
 ## Examples
 
-### List all member records
+### List member records
 
 \`\`\`bash
 myapp members:member list
+\`\`\`
+
+### List member records with pagination
+
+\`\`\`bash
+myapp members:member list --limit 10 --offset 0
 \`\`\`
 
 ### Create a member
@@ -2869,10 +2966,16 @@ myapp app:car delete --id <UUID>
 
 ## Examples
 
-### List all car records
+### List car records
 
 \`\`\`bash
 myapp app:car list
+\`\`\`
+
+### List car records with pagination
+
+\`\`\`bash
+myapp app:car list --limit 10 --offset 0
 \`\`\`
 
 ### Create a car
@@ -3565,7 +3668,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 1`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { coerceAnswers, stripUndefined } from "../../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateUserInput, UserPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3573,7 +3676,7 @@ const fieldSchema: FieldSchema = {
   email: "string",
   name: "string"
 };
-const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List all user records\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3611,16 +3714,27 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const defaultSelect = {
+      id: true,
+      email: true,
+      name: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const findManyArgs = {
+      select,
+      ...(limit !== undefined && !isNaN(limit) ? {
+        first: limit
+      } : {}),
+      ...(offset !== undefined && !isNaN(offset) ? {
+        offset
+      } : {})
+    };
     const client = getClient("auth");
-    const result = await client.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true
-      }
-    }).execute();
+    const result = await client.user.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -3773,14 +3887,14 @@ exports[`multi-target cli generator generates target-prefixed table commands 2`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { coerceAnswers, stripUndefined } from "../../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateMemberInput, MemberPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   role: "string"
 };
-const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List all member records\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3818,15 +3932,26 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const defaultSelect = {
+      id: true,
+      role: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const findManyArgs = {
+      select,
+      ...(limit !== undefined && !isNaN(limit) ? {
+        first: limit
+      } : {}),
+      ...(offset !== undefined && !isNaN(offset) ? {
+        offset
+      } : {})
+    };
     const client = getClient("members");
-    const result = await client.member.findMany({
-      select: {
-        id: true,
-        role: true
-      }
-    }).execute();
+    const result = await client.member.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -3964,7 +4089,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 3`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { coerceAnswers, stripUndefined } from "../../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateCarInput, CarPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3975,7 +4100,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List all car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -4013,19 +4138,30 @@ async function handleTableSubcommand(subcommand: string, argv: Partial<Record<st
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const limit = typeof argv.limit === "number" ? argv.limit as number : typeof argv.limit === "string" ? parseInt(argv.limit as string, 10) : undefined;
+    const offset = typeof argv.offset === "number" ? argv.offset as number : typeof argv.offset === "string" ? parseInt(argv.offset as string, 10) : undefined;
+    const defaultSelect = {
+      id: true,
+      make: true,
+      model: true,
+      year: true,
+      isElectric: true,
+      createdAt: true
+    };
+    const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
+    const findManyArgs = {
+      select,
+      ...(limit !== undefined && !isNaN(limit) ? {
+        first: limit
+      } : {}),
+      ...(offset !== undefined && !isNaN(offset) ? {
+        offset
+      } : {})
+    };
     const client = getClient("app");
-    const result = await client.car.findMany({
-      select: {
-        id: true,
-        make: true,
-        model: true,
-        year: true,
-        isElectric: true,
-        createdAt: true
-      }
-    }).execute();
+    const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -4677,10 +4813,23 @@ exports[`target docs generator generates combined MCP config 1`] = `
     },
     {
       "name": "myapp_car_list",
-      "description": "List all Car records",
+      "description": "List Car records (supports pagination and field selection)",
       "inputSchema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Max number of records to return"
+          },
+          "offset": {
+            "type": "number",
+            "description": "Number of records to skip"
+          },
+          "fields": {
+            "type": "string",
+            "description": "Comma-separated list of fields to return"
+          }
+        }
       }
     },
     {
@@ -4828,10 +4977,23 @@ exports[`target docs generator generates combined MCP config 1`] = `
     },
     {
       "name": "myapp_driver_list",
-      "description": "List all Driver records",
+      "description": "List Driver records (supports pagination and field selection)",
       "inputSchema": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "Max number of records to return"
+          },
+          "offset": {
+            "type": "number",
+            "description": "Number of records to skip"
+          },
+          "fields": {
+            "type": "string",
+            "description": "Comma-separated list of fields to return"
+          }
+        }
       }
     },
     {
