@@ -6,9 +6,9 @@ import {
   pluralize,
   toCamelCase,
   toPascalCase,
-  toScreamingSnake,
   ucFirst,
 } from 'inflekt';
+import { toConstantCase } from 'komoji';
 
 import type {
   Field,
@@ -19,7 +19,7 @@ import type {
 import { scalarToFilterType, scalarToTsType } from './scalars';
 
 // Re-export string manipulation helpers from inflekt (single source of truth)
-export { lcFirst, toCamelCase, toPascalCase, toScreamingSnake, ucFirst };
+export { lcFirst, toCamelCase, toPascalCase, toConstantCase, ucFirst };  
 
 // ============================================================================
 // Naming conventions for generated code

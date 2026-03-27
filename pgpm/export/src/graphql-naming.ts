@@ -13,7 +13,8 @@
  *   db_migrate.sql_actions -> sqlActions
  *   column database_id -> databaseId
  */
-import { toCamelCase, toPascalCase, distinctPluralize, singularizeLast, underscore } from 'inflekt';
+import { toCamelCase, toPascalCase, distinctPluralize, singularizeLast } from 'inflekt';
+import { toSnakeCase } from 'komoji';
 
 /**
  * Get the GraphQL query field name for a given Postgres table name.
@@ -36,7 +37,7 @@ export const graphqlRowToPostgresRow = (
 ): Record<string, unknown> => {
   const result: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(row)) {
-    result[underscore(key)] = value;
+    result[toSnakeCase(key)] = value;
   }
   return result;
 };
