@@ -14,6 +14,7 @@ import type {
   Table,
   TypeRegistry,
 } from '../../types/schema';
+import { enrichPgTypesFromFile } from '../introspect/enrich-pg-types';
 import { enrichManyToManyRelations } from '../introspect/enrich-relations';
 import { inferTablesFromIntrospection } from '../introspect/infer-tables';
 import type { SchemaSource } from '../introspect/source';
@@ -126,6 +127,16 @@ export async function runCodegenPipeline(
   if (tablesMeta?.length) {
     enrichManyToManyRelations(tables, tablesMeta);
     log(`  Enriched M:N relations from _meta (${tablesMeta.length} tables)`);
+  }
+
+  // 2b. Enrich fields with PostgreSQL type metadata from optional JSON file
+  if (config.pgTypesFile) {
+    const enrichedCount = enrichPgTypesFromFile(tables, config.pgTypesFile);
+    if (enrichedCount > 0) {
+      log(`  Enriched ${enrichedCount} fields with pg type metadata from ${config.pgTypesFile}`);
+    } else {
+      log(`  No pg type enrichments applied (file: ${config.pgTypesFile})`);
+    }
   }
 
   // 3. Filter tables by config (combine exclude and systemExclude)

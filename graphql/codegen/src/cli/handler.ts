@@ -8,6 +8,7 @@
 import type { Question } from 'inquirerer';
 
 import { findConfigFile, loadConfigFile } from '../core/config';
+import { buildPgTypesMap, writePgTypesFile } from '../core/dump-pg-types';
 import { expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget, generate, generateMulti } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import {
@@ -30,6 +31,12 @@ export async function runCodegenHandler(
   prompter: Prompter,
 ): Promise<void> {
   const args = camelizeArgv(argv as Record<string, any>);
+
+  // Handle --dump-pg-types: run pipeline, extract pg type metadata, write JSON
+  if (args.dumpPgTypes) {
+    await handleDumpPgTypes(args, prompter);
+    return;
+  }
 
   const schemaConfig = args.schemaEnabled
     ? {
@@ -128,4 +135,60 @@ export async function runCodegenHandler(
     ...(schemaConfig ? { schema: schemaConfig } : {}),
   });
   printResult(result);
+}
+
+async function handleDumpPgTypes(
+  args: Record<string, unknown>,
+  prompter: Prompter,
+): Promise<void> {
+  const hasSourceFlags = Boolean(
+    args.endpoint || args.schemaFile || args.schemaDir || args.schemas || args.apiNames
+  );
+  const configPath =
+    (args.config as string | undefined) ||
+    (!hasSourceFlags ? findConfigFile() : undefined);
+
+  let fileConfig: GraphQLSDKConfigTarget = {};
+  if (configPath) {
+    const loaded = await loadConfigFile(configPath);
+    if (!loaded.success) {
+      console.error('x', loaded.error);
+      process.exit(1);
+    }
+    fileConfig = loaded.config as GraphQLSDKConfigTarget;
+  }
+
+  const seeded = seedArgvFromConfig(args, fileConfig);
+  const answers = hasResolvedCodegenSource(seeded)
+    ? seeded
+    : await prompter.prompt(seeded, codegenQuestions);
+  const options = buildGenerateOptions(answers, fileConfig);
+
+  // Run the pipeline to get tables (we need the full codegen pipeline to infer tables)
+  const result = await generate({
+    ...options,
+    dryRun: true, // Don't write codegen files, just get pipeline data
+  });
+
+  if (!result.success || !result.pipelineData?.tables.length) {
+    console.error('x', result.message || 'No tables found');
+    process.exit(1);
+  }
+
+  const pgTypes = buildPgTypesMap(result.pipelineData.tables);
+  const outputPath = typeof args.dumpPgTypes === 'string'
+    ? args.dumpPgTypes
+    : 'pg-types.json';
+  const written = await writePgTypesFile(pgTypes, outputPath);
+
+  const tableCount = Object.keys(pgTypes).length;
+  const fieldCount = Object.values(pgTypes).reduce(
+    (sum, fields) => sum + Object.keys(fields).length,
+    0,
+  );
+  console.log(`[ok] Wrote pg-types.json: ${tableCount} tables, ${fieldCount} fields`);
+  console.log(`     ${written}`);
+  console.log('');
+  console.log('Usage: add pgTypesFile to your codegen config:');
+  console.log(`  { pgTypesFile: '${outputPath}' }`);
 }

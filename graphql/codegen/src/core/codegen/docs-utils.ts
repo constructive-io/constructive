@@ -161,7 +161,10 @@ function isEmbeddingField(f: Field): boolean {
 
 function isTsvectorField(f: Field): boolean {
   const pgType = f.type.pgType?.toLowerCase();
-  return pgType === 'tsvector';
+  if (pgType === 'tsvector') return true;
+  // Fallback: PostGraphile maps tsvector columns to the FullText GQL scalar
+  if (f.type.gqlType === 'FullText' && !f.type.isArray) return true;
+  return false;
 }
 
 function isSearchComputedField(f: Field): boolean {
