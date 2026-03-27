@@ -547,7 +547,7 @@ function buildSearchHandler(
   const whereProps: t.ObjectProperty[] = [];
   for (const group of specialGroups) {
     for (const field of group.fields) {
-      if (field.type.pgType?.toLowerCase() === 'tsvector') {
+      if (field.type.gqlType === 'FullText' && !field.type.isArray) {
         // tsvector field: { query }
         whereProps.push(
           t.objectProperty(

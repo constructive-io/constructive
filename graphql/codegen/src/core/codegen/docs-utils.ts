@@ -153,15 +153,20 @@ function isPostGISField(f: Field): boolean {
 }
 
 function isEmbeddingField(f: Field): boolean {
-  const pgType = f.type.pgType?.toLowerCase();
-  if (pgType === 'vector') return true;
+  // VectorCodecPlugin maps pgvector `vector` columns to the `Vector` GQL scalar.
+  // This is the primary detection path — no _meta or pgType enrichment needed.
+  if (f.type.gqlType === 'Vector') return true;
+  // Legacy fallback: name-based heuristic for schemas without VectorCodecPlugin
   if (/embedding$/i.test(f.name) && f.type.isArray && f.type.gqlType === 'Float') return true;
   return false;
 }
 
 function isTsvectorField(f: Field): boolean {
   const pgType = f.type.pgType?.toLowerCase();
-  return pgType === 'tsvector';
+  if (pgType === 'tsvector') return true;
+  // Fallback: PostGraphile maps tsvector columns to the FullText GQL scalar
+  if (f.type.gqlType === 'FullText' && !f.type.isArray) return true;
+  return false;
 }
 
 function isSearchComputedField(f: Field): boolean {

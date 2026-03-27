@@ -14,7 +14,7 @@
  * when building blueprint JSON.  The API itself accepts plain JSONB.
  *
  * Usage:
- *   npx ts-node src/codegen/generate-types.ts [--outdir <dir>] [--introspection <path>]
+ *   npx ts-node src/codegen/generate-types.ts [--outdir <dir>] [--meta <path>]
  */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -29,10 +29,10 @@ import { allNodeTypes } from '../index';
 import type { NodeTypeDefinition } from '../types';
 
 // ---------------------------------------------------------------------------
-// Introspection types (subset of TableMeta from graphile-settings)
+// _meta types (matches TableMeta / FieldMeta from MetaSchemaPlugin)
 // ---------------------------------------------------------------------------
 
-interface IntrospectionFieldMeta {
+interface MetaFieldInfo {
   name: string;
   type: { pgType: string; gqlType: string; isArray: boolean };
   isNotNull: boolean;
@@ -42,10 +42,10 @@ interface IntrospectionFieldMeta {
   description: string | null;
 }
 
-interface IntrospectionTableMeta {
+interface MetaTableInfo {
   name: string;
   schemaName: string;
-  fields: IntrospectionFieldMeta[];
+  fields: MetaFieldInfo[];
 }
 
 // ---------------------------------------------------------------------------
@@ -262,7 +262,7 @@ function pgTypeToTSType(pgType: string, isArray: boolean): t.TSType {
  * `typeOverrides` for columns that need a non-default TS type.
  */
 function deriveInterfaceFromTable(
-  table: IntrospectionTableMeta,
+  table: MetaTableInfo,
   interfaceName: string,
   description: string,
   typeOverrides?: Record<string, t.TSType>
@@ -291,22 +291,22 @@ function deriveInterfaceFromTable(
 // ---------------------------------------------------------------------------
 
 function findTable(
-  tables: IntrospectionTableMeta[],
+  tables: MetaTableInfo[],
   schemaName: string,
   tableName: string
-): IntrospectionTableMeta | undefined {
+): MetaTableInfo | undefined {
   return tables.find((tbl) => tbl.schemaName === schemaName && tbl.name === tableName);
 }
 
 function buildBlueprintField(
-  introspection?: IntrospectionTableMeta[]
+  meta?: MetaTableInfo[]
 ): t.ExportNamedDeclaration {
-  const table = introspection && findTable(introspection, 'metaschema_public', 'field');
+  const table = meta && findTable(meta, 'metaschema_public', 'field');
   if (table) {
     return deriveInterfaceFromTable(
       table,
       'BlueprintField',
-      'A custom field (column) to add to a blueprint table. Derived from metaschema_public.field.',
+      'A custom field (column) to add to a blueprint table. Derived from _meta.',
     );
   }
   // Static fallback
@@ -324,19 +324,19 @@ function buildBlueprintField(
 
 function buildBlueprintPolicy(
   authzNodes: NodeTypeDefinition[],
-  introspection?: IntrospectionTableMeta[]
+  meta?: MetaTableInfo[]
 ): t.ExportNamedDeclaration {
   const policyTypeAnnotation =
     authzNodes.length > 0
       ? strUnion(authzNodes.map((nt) => nt.name))
       : t.tsStringKeyword();
 
-  const table = introspection && findTable(introspection, 'metaschema_public', 'policy');
+  const table = meta && findTable(meta, 'metaschema_public', 'policy');
   if (table) {
     return deriveInterfaceFromTable(
       table,
       'BlueprintPolicy',
-      'An RLS policy entry for a blueprint table. Derived from metaschema_public.policy.',
+      'An RLS policy entry for a blueprint table. Derived from _meta.',
       {
         // policy_type gets a typed union of known Authz* node names
         policy_type: policyTypeAnnotation,
@@ -403,14 +403,14 @@ function buildBlueprintFullTextSearch(): t.ExportNamedDeclaration {
 }
 
 function buildBlueprintIndex(
-  introspection?: IntrospectionTableMeta[]
+  meta?: MetaTableInfo[]
 ): t.ExportNamedDeclaration {
-  const table = introspection && findTable(introspection, 'metaschema_public', 'index');
+  const table = meta && findTable(meta, 'metaschema_public', 'index');
   if (table) {
     return deriveInterfaceFromTable(
       table,
       'BlueprintIndex',
-      'An index definition within a blueprint. Derived from metaschema_public.index.',
+      'An index definition within a blueprint. Derived from _meta.',
       {
         // JSONB columns get Record<string, unknown> instead of the default
         index_params: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
@@ -634,7 +634,7 @@ function sectionComment(title: string): t.Statement {
 // Main generator
 // ---------------------------------------------------------------------------
 
-function buildProgram(introspection?: IntrospectionTableMeta[]): string {
+function buildProgram(meta?: MetaTableInfo[]): string {
   const statements: t.Statement[] = [];
 
   // Group node types by category
@@ -667,16 +667,16 @@ function buildProgram(introspection?: IntrospectionTableMeta[]): string {
     statements.push(...generateParamsInterfaces(nts));
   }
 
-  // -- Structural types (introspection-driven when available) --
-  const introspectionSource = introspection
-    ? 'Derived from introspection JSON'
-    : 'Static fallback (no introspection provided)';
-  statements.push(sectionComment(`Structural types — ${introspectionSource}`));
-  statements.push(buildBlueprintField(introspection));
-  statements.push(buildBlueprintPolicy(authzNodes, introspection));
+  // -- Structural types (_meta-driven when available, static fallback otherwise) --
+  const metaSource = meta
+    ? 'Derived from _meta'
+    : 'Static fallback (no _meta provided)';
+  statements.push(sectionComment(`Structural types — ${metaSource}`));
+  statements.push(buildBlueprintField(meta));
+  statements.push(buildBlueprintPolicy(authzNodes, meta));
   statements.push(buildBlueprintFtsSource());
   statements.push(buildBlueprintFullTextSearch());
-  statements.push(buildBlueprintIndex(introspection));
+  statements.push(buildBlueprintIndex(meta));
 
   // -- Node types discriminated union --
   statements.push(
@@ -725,19 +725,25 @@ function main() {
   const outdir =
     outdirIdx !== -1 ? args[outdirIdx + 1] : join(__dirname, '..');
 
-  const introspectionIdx = args.indexOf('--introspection');
-  let introspection: IntrospectionTableMeta[] | undefined;
-  if (introspectionIdx !== -1 && args[introspectionIdx + 1]) {
-    const introspectionPath = args[introspectionIdx + 1];
-    console.log(`Reading introspection from ${introspectionPath}`);
-    const raw = readFileSync(introspectionPath, 'utf-8');
-    introspection = JSON.parse(raw) as IntrospectionTableMeta[];
-    console.log(`Loaded ${introspection.length} tables from introspection`);
+  const metaIdx = args.indexOf('--meta');
+  let meta: MetaTableInfo[] | undefined;
+  if (metaIdx !== -1 && args[metaIdx + 1]) {
+    const metaPath = args[metaIdx + 1];
+    console.log(`Reading _meta from ${metaPath}`);
+    const raw = readFileSync(metaPath, 'utf-8');
+    const parsed = JSON.parse(raw);
+    // Accept both { tables: [...] } (GQL query result) and raw [...] (array)
+    meta = (Array.isArray(parsed) ? parsed : parsed?.tables ?? parsed?.data?._meta?.tables) as MetaTableInfo[] | undefined;
+    if (meta) {
+      console.log(`Loaded ${meta.length} tables from _meta`);
+    } else {
+      console.log('Could not find tables in _meta JSON; using static fallback types');
+    }
   } else {
-    console.log('No --introspection flag; using static fallback types');
+    console.log('No --meta flag; using static fallback types');
   }
 
-  const content = buildProgram(introspection);
+  const content = buildProgram(meta);
   const filename = 'blueprint-types.generated.ts';
   const filepath = join(outdir, filename);
 
