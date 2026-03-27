@@ -49,7 +49,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@dataplan/json": "1.0.0-rc.6",
+      "@dataplan/json": "1.0.0",
       "graphql": "16.13.0"
     },
     "publicHoistPattern": [
