@@ -1,4 +1,4 @@
-import { buildPgTypesMap } from '../../core/dump-pg-types';
+import { buildMetaFromTables } from '../../core/dump-pg-types';
 import type { Table } from '../../types/schema';
 
 function makeField(name: string, gqlType: string, isArray = false, pgType?: string | null) {
@@ -20,8 +20,8 @@ function makeTable(name: string, fields: ReturnType<typeof makeField>[]): Table 
   };
 }
 
-describe('buildPgTypesMap', () => {
-  it('should build map from tables with pgType', () => {
+describe('buildMetaFromTables', () => {
+  it('should build MetaTableInfo[] from tables with pgType', () => {
     const tables = [
       makeTable('Document', [
         makeField('id', 'UUID', false, 'uuid'),
@@ -30,17 +30,17 @@ describe('buildPgTypesMap', () => {
       ]),
     ];
 
-    const result = buildPgTypesMap(tables);
-    expect(result).toEqual({
-      Document: {
-        id: { pgType: 'uuid' },
-        vectorEmbedding: { pgType: 'vector' },
-        tsvContent: { pgType: 'tsvector' },
-      },
-    });
+    const result = buildMetaFromTables(tables);
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe('Document');
+    expect(result[0].fields).toEqual([
+      { name: 'id', type: { pgType: 'uuid', gqlType: 'UUID', isArray: false } },
+      { name: 'vectorEmbedding', type: { pgType: 'vector', gqlType: 'Float', isArray: true } },
+      { name: 'tsvContent', type: { pgType: 'tsvector', gqlType: 'FullText', isArray: false } },
+    ]);
   });
 
-  it('should set pgType to null when not available (template mode)', () => {
+  it('should set pgType to "unknown" when not available', () => {
     const tables = [
       makeTable('User', [
         makeField('id', 'UUID'),
@@ -48,49 +48,53 @@ describe('buildPgTypesMap', () => {
       ]),
     ];
 
-    const result = buildPgTypesMap(tables);
-    expect(result).toEqual({
-      User: {
-        id: { pgType: null },
-        name: { pgType: null },
-      },
-    });
+    const result = buildMetaFromTables(tables);
+    expect(result).toHaveLength(1);
+    expect(result[0].fields).toEqual([
+      { name: 'id', type: { pgType: 'unknown', gqlType: 'UUID', isArray: false } },
+      { name: 'name', type: { pgType: 'unknown', gqlType: 'String', isArray: false } },
+    ]);
   });
 
-  it('should include pgAlias and typmod when present', () => {
+  it('should preserve relations', () => {
     const tables: Table[] = [
       {
         name: 'Article',
         fields: [
-          {
-            name: 'embedding',
-            type: {
-              gqlType: 'Float',
-              isArray: true,
-              pgType: 'vector',
-              pgAlias: 'vector',
-              typmod: 768,
-            },
-          },
+          { name: 'id', type: { gqlType: 'UUID', isArray: false, pgType: 'uuid' } },
         ],
-        relations: { belongsTo: [], hasOne: [], hasMany: [], manyToMany: [] },
+        relations: {
+          belongsTo: [],
+          hasOne: [],
+          hasMany: [],
+          manyToMany: [{
+            fieldName: 'tags',
+            rightTable: 'Tag',
+            junctionTable: 'ArticleTag',
+            type: 'Tag',
+            junctionLeftKeyFields: ['articleId'],
+            junctionRightKeyFields: ['tagId'],
+            leftKeyFields: ['id'],
+            rightKeyFields: ['id'],
+          }],
+        },
       },
     ];
 
-    const result = buildPgTypesMap(tables);
-    expect(result.Article.embedding).toEqual({
-      pgType: 'vector',
-      pgAlias: 'vector',
-      typmod: 768,
-    });
+    const result = buildMetaFromTables(tables);
+    expect(result[0].relations.manyToMany).toHaveLength(1);
+    expect(result[0].relations.manyToMany[0].junctionTable.name).toBe('ArticleTag');
+    expect(result[0].relations.manyToMany[0].rightTable.name).toBe('Tag');
   });
 
   it('should handle empty tables array', () => {
-    expect(buildPgTypesMap([])).toEqual({});
+    expect(buildMetaFromTables([])).toEqual([]);
   });
 
   it('should handle tables with no fields', () => {
     const tables = [makeTable('Empty', [])];
-    expect(buildPgTypesMap(tables)).toEqual({});
+    const result = buildMetaFromTables(tables);
+    expect(result).toHaveLength(1);
+    expect(result[0].fields).toEqual([]);
   });
 });

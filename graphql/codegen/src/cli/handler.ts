@@ -8,7 +8,7 @@
 import type { Question } from 'inquirerer';
 
 import { findConfigFile, loadConfigFile } from '../core/config';
-import { buildPgTypesMap, writePgTypesFile } from '../core/dump-pg-types';
+import { buildMetaFromTables, writeMetaFile } from '../core/dump-pg-types';
 import { expandApiNamesToMultiTarget, expandSchemaDirToMultiTarget, generate, generateMulti } from '../core/generate';
 import type { GraphQLSDKConfigTarget } from '../types/config';
 import {
@@ -32,9 +32,9 @@ export async function runCodegenHandler(
 ): Promise<void> {
   const args = camelizeArgv(argv as Record<string, any>);
 
-  // Handle --dump-pg-types: run pipeline, extract pg type metadata, write JSON
-  if (args.dumpPgTypes) {
-    await handleDumpPgTypes(args, prompter);
+  // Handle --dump-meta: run pipeline, extract _meta table metadata, write JSON
+  if (args.dumpMeta) {
+    await handleDumpMeta(args, prompter);
     return;
   }
 
@@ -137,7 +137,7 @@ export async function runCodegenHandler(
   printResult(result);
 }
 
-async function handleDumpPgTypes(
+async function handleDumpMeta(
   args: Record<string, unknown>,
   prompter: Prompter,
 ): Promise<void> {
@@ -175,20 +175,17 @@ async function handleDumpPgTypes(
     process.exit(1);
   }
 
-  const pgTypes = buildPgTypesMap(result.pipelineData.tables);
-  const outputPath = typeof args.dumpPgTypes === 'string'
-    ? args.dumpPgTypes
-    : 'pg-types.json';
-  const written = await writePgTypesFile(pgTypes, outputPath);
+  const meta = buildMetaFromTables(result.pipelineData.tables);
+  const outputPath = typeof args.dumpMeta === 'string'
+    ? args.dumpMeta
+    : '_meta.json';
+  const written = await writeMetaFile(meta, outputPath);
 
-  const tableCount = Object.keys(pgTypes).length;
-  const fieldCount = Object.values(pgTypes).reduce(
-    (sum, fields) => sum + Object.keys(fields).length,
-    0,
-  );
-  console.log(`[ok] Wrote pg-types.json: ${tableCount} tables, ${fieldCount} fields`);
+  const tableCount = meta.length;
+  const fieldCount = meta.reduce((sum, t) => sum + (t.fields?.length ?? 0), 0);
+  console.log(`[ok] Wrote _meta.json: ${tableCount} tables, ${fieldCount} fields`);
   console.log(`     ${written}`);
   console.log('');
-  console.log('Usage: add pgTypesFile to your codegen config:');
-  console.log(`  { pgTypesFile: '${outputPath}' }`);
+  console.log('Usage: add metaFile to your codegen config:');
+  console.log(`  { metaFile: '${outputPath}' }`);
 }

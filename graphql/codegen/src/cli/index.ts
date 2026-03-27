@@ -42,12 +42,12 @@ Schema Export:
   --schema-output <dir>         Output directory for the exported schema file
   --schema-filename <name>      Filename for the exported schema (default: schema.graphql)
 
-PostgreSQL Type Metadata:
-  --dump-pg-types [path]        Generate pg-types.json from introspection.
-                                Captures pgType, pgAlias, typmod for each field.
-                                Use with pgTypesFile config option for precise detection
-                                of pgvector, tsvector, PostGIS columns.
-                                Default output: ./pg-types.json
+Metadata Export:
+  --dump-meta [path]            Generate _meta.json from introspection.
+                                Captures field-level pgType, relations, and other
+                                metadata from the MetaSchemaPlugin.
+                                Use with metaFile config option for file/schemaDir modes.
+                                Default output: ./_meta.json
 
   -h, --help                    Show this help message
   --version                     Show version number
@@ -86,7 +86,7 @@ export const options: Partial<CLIOptions> = {
       a: 'authorization',
       v: 'verbose',
     },
-    boolean: ['schema-enabled', 'dump-pg-types'],
+    boolean: ['schema-enabled', 'dump-meta'],
     string: [
       'config',
       'endpoint',

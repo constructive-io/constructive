@@ -7,12 +7,32 @@
 import type { IntrospectionQueryResponse } from '../../../types/introspection';
 
 /**
- * Minimal table metadata from the _meta query, used to enrich M:N relations
- * with junction key field information that isn't available from introspection alone.
+ * Field-level type metadata from _meta.
+ * Contains PostgreSQL-specific type info not available from GraphQL introspection.
+ */
+export interface MetaFieldType {
+  pgType: string;
+  gqlType: string;
+  isArray: boolean;
+}
+
+/**
+ * Field metadata from _meta.
+ */
+export interface MetaFieldInfo {
+  name: string;
+  type: MetaFieldType;
+}
+
+/**
+ * Table metadata from the _meta query.
+ * Provides field-level pgType info and M:N relation junction key details
+ * that aren't available from standard GraphQL introspection alone.
  */
 export interface MetaTableInfo {
   name: string;
   schemaName: string;
+  fields?: MetaFieldInfo[];
   relations: {
     manyToMany: Array<{
       fieldName: string | null;
@@ -37,8 +57,10 @@ export interface SchemaSourceResult {
   introspection: IntrospectionQueryResponse;
 
   /**
-   * Optional table metadata from _meta query (provides M:N junction key details).
-   * Present when the source supports _meta (database mode or endpoints with MetaSchemaPlugin).
+   * Optional table metadata from _meta query.
+   * Provides field-level pgType info and M:N junction key details.
+   * Present when the source supports _meta (database mode or endpoints with MetaSchemaPlugin),
+   * or loaded from a metaFile JSON sidecar in file/schemaDir mode.
    */
   tablesMeta?: MetaTableInfo[];
 }

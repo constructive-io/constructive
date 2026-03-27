@@ -3,10 +3,11 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 
 import {
-  enrichPgTypes,
-  enrichPgTypesFromFile,
-  loadPgTypesFile,
+  enrichPgTypesFromMeta,
+  enrichPgTypesFromMetaFile,
+  loadMetaFile,
 } from '../../core/introspect/enrich-pg-types';
+import type { MetaTableInfo } from '../../core/introspect/source/types';
 import type { Table } from '../../types/schema';
 
 function makeField(name: string, gqlType: string, isArray = false, pgType?: string) {
@@ -28,8 +29,23 @@ function makeTable(name: string, fields: ReturnType<typeof makeField>[]): Table 
   };
 }
 
-describe('enrichPgTypes', () => {
-  it('should enrich fields with pgType from map', () => {
+function makeMetaTable(
+  name: string,
+  fields: Array<{ name: string; pgType: string; gqlType?: string }>,
+): MetaTableInfo {
+  return {
+    name,
+    schemaName: 'public',
+    fields: fields.map((f) => ({
+      name: f.name,
+      type: { pgType: f.pgType, gqlType: f.gqlType ?? 'String', isArray: false },
+    })),
+    relations: { manyToMany: [] },
+  };
+}
+
+describe('enrichPgTypesFromMeta', () => {
+  it('should enrich fields with pgType from _meta', () => {
     const tables = [
       makeTable('Document', [
         makeField('id', 'UUID'),
@@ -38,52 +54,36 @@ describe('enrichPgTypes', () => {
       ]),
     ];
 
-    const count = enrichPgTypes(tables, {
-      Document: {
-        vectorEmbedding: { pgType: 'vector' },
-        tsvContent: { pgType: 'tsvector' },
-      },
-    });
-
-    expect(count).toBe(2);
-    expect(tables[0].fields[1].type.pgType).toBe('vector');
-    expect(tables[0].fields[2].type.pgType).toBe('tsvector');
-    // Should NOT touch fields not in the map
-    expect(tables[0].fields[0].type.pgType).toBeUndefined();
-  });
-
-  it('should enrich pgAlias and typmod', () => {
-    const tables = [
-      makeTable('Article', [
-        makeField('bodyEmbedding', 'Float', true),
+    const meta = [
+      makeMetaTable('Document', [
+        { name: 'id', pgType: 'uuid' },
+        { name: 'vectorEmbedding', pgType: 'vector' },
+        { name: 'tsvContent', pgType: 'tsvector' },
       ]),
     ];
 
-    const count = enrichPgTypes(tables, {
-      Article: {
-        bodyEmbedding: { pgType: 'vector', pgAlias: 'vector', typmod: 768 },
-      },
-    });
+    const count = enrichPgTypesFromMeta(tables, meta);
 
-    expect(count).toBe(1);
-    expect(tables[0].fields[0].type.pgType).toBe('vector');
-    expect(tables[0].fields[0].type.pgAlias).toBe('vector');
-    expect(tables[0].fields[0].type.typmod).toBe(768);
+    expect(count).toBe(3);
+    expect(tables[0].fields[0].type.pgType).toBe('uuid');
+    expect(tables[0].fields[1].type.pgType).toBe('vector');
+    expect(tables[0].fields[2].type.pgType).toBe('tsvector');
   });
 
-  it('should skip tables not in the map', () => {
+  it('should skip tables not in meta', () => {
     const tables = [
       makeTable('User', [makeField('id', 'UUID')]),
     ];
 
-    const count = enrichPgTypes(tables, {
-      Document: { vectorEmbedding: { pgType: 'vector' } },
-    });
+    const meta = [
+      makeMetaTable('Document', [{ name: 'vectorEmbedding', pgType: 'vector' }]),
+    ];
 
+    const count = enrichPgTypesFromMeta(tables, meta);
     expect(count).toBe(0);
   });
 
-  it('should skip fields not in the map', () => {
+  it('should skip fields not in meta', () => {
     const tables = [
       makeTable('Document', [
         makeField('id', 'UUID'),
@@ -91,11 +91,28 @@ describe('enrichPgTypes', () => {
       ]),
     ];
 
-    const count = enrichPgTypes(tables, {
-      Document: { vectorEmbedding: { pgType: 'vector' } },
-    });
+    const meta = [
+      makeMetaTable('Document', [{ name: 'vectorEmbedding', pgType: 'vector' }]),
+    ];
 
+    const count = enrichPgTypesFromMeta(tables, meta);
     expect(count).toBe(0);
+  });
+
+  it('should not overwrite existing pgType', () => {
+    const tables = [
+      makeTable('Document', [
+        makeField('vectorEmbedding', 'Float', true, 'existing_type'),
+      ]),
+    ];
+
+    const meta = [
+      makeMetaTable('Document', [{ name: 'vectorEmbedding', pgType: 'vector' }]),
+    ];
+
+    const count = enrichPgTypesFromMeta(tables, meta);
+    expect(count).toBe(0);
+    expect(tables[0].fields[0].type.pgType).toBe('existing_type');
   });
 
   it('should not overwrite gqlType or isArray', () => {
@@ -105,27 +122,53 @@ describe('enrichPgTypes', () => {
       ]),
     ];
 
-    enrichPgTypes(tables, {
-      Document: { vectorEmbedding: { pgType: 'vector' } },
-    });
+    const meta = [
+      makeMetaTable('Document', [{ name: 'vectorEmbedding', pgType: 'vector', gqlType: 'Int' }]),
+    ];
+
+    enrichPgTypesFromMeta(tables, meta);
 
     expect(tables[0].fields[0].type.gqlType).toBe('Float');
     expect(tables[0].fields[0].type.isArray).toBe(true);
     expect(tables[0].fields[0].type.pgType).toBe('vector');
   });
 
-  it('should handle empty map gracefully', () => {
+  it('should skip fields with pgType "unknown"', () => {
+    const tables = [
+      makeTable('User', [makeField('id', 'UUID')]),
+    ];
+
+    const meta = [
+      makeMetaTable('User', [{ name: 'id', pgType: 'unknown' }]),
+    ];
+
+    const count = enrichPgTypesFromMeta(tables, meta);
+    expect(count).toBe(0);
+  });
+
+  it('should handle empty meta gracefully', () => {
     const tables = [makeTable('User', [makeField('id', 'UUID')])];
-    const count = enrichPgTypes(tables, {});
+    const count = enrichPgTypesFromMeta(tables, []);
+    expect(count).toBe(0);
+  });
+
+  it('should handle meta without fields', () => {
+    const tables = [makeTable('User', [makeField('id', 'UUID')])];
+    const meta: MetaTableInfo[] = [{
+      name: 'User',
+      schemaName: 'public',
+      relations: { manyToMany: [] },
+    }];
+    const count = enrichPgTypesFromMeta(tables, meta);
     expect(count).toBe(0);
   });
 });
 
-describe('loadPgTypesFile', () => {
+describe('loadMetaFile', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pg-types-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'meta-test-'));
   });
 
   afterEach(() => {
@@ -133,42 +176,39 @@ describe('loadPgTypesFile', () => {
   });
 
   it('should return null for non-existent file', () => {
-    const result = loadPgTypesFile(path.join(tmpDir, 'nonexistent.json'));
+    const result = loadMetaFile(path.join(tmpDir, 'nonexistent.json'));
     expect(result).toBeNull();
   });
 
   it('should load valid JSON file', () => {
-    const filePath = path.join(tmpDir, 'pg-types.json');
-    fs.writeFileSync(filePath, JSON.stringify({
-      Document: { vectorEmbedding: { pgType: 'vector' } },
-    }));
+    const filePath = path.join(tmpDir, '_meta.json');
+    const meta = [makeMetaTable('Document', [{ name: 'vectorEmbedding', pgType: 'vector' }])];
+    fs.writeFileSync(filePath, JSON.stringify(meta));
 
-    const result = loadPgTypesFile(filePath);
-    expect(result).toEqual({
-      Document: { vectorEmbedding: { pgType: 'vector' } },
-    });
+    const result = loadMetaFile(filePath);
+    expect(result).toEqual(meta);
   });
 
   it('should throw on invalid JSON', () => {
     const filePath = path.join(tmpDir, 'bad.json');
     fs.writeFileSync(filePath, 'not json');
 
-    expect(() => loadPgTypesFile(filePath)).toThrow();
+    expect(() => loadMetaFile(filePath)).toThrow();
   });
 
-  it('should throw on non-object JSON', () => {
-    const filePath = path.join(tmpDir, 'array.json');
-    fs.writeFileSync(filePath, '["not", "an", "object"]');
+  it('should throw on non-array JSON', () => {
+    const filePath = path.join(tmpDir, 'object.json');
+    fs.writeFileSync(filePath, '{"not": "an array"}');
 
-    expect(() => loadPgTypesFile(filePath)).toThrow(/expected a JSON object/);
+    expect(() => loadMetaFile(filePath)).toThrow(/expected a JSON array/);
   });
 });
 
-describe('enrichPgTypesFromFile', () => {
+describe('enrichPgTypesFromMetaFile', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pg-types-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'meta-test-'));
   });
 
   afterEach(() => {
@@ -177,15 +217,14 @@ describe('enrichPgTypesFromFile', () => {
 
   it('should return 0 for non-existent file', () => {
     const tables = [makeTable('User', [makeField('id', 'UUID')])];
-    const count = enrichPgTypesFromFile(tables, path.join(tmpDir, 'nope.json'));
+    const count = enrichPgTypesFromMetaFile(tables, path.join(tmpDir, 'nope.json'));
     expect(count).toBe(0);
   });
 
   it('should load file and enrich tables', () => {
-    const filePath = path.join(tmpDir, 'pg-types.json');
-    fs.writeFileSync(filePath, JSON.stringify({
-      Document: { tsvContent: { pgType: 'tsvector' } },
-    }));
+    const filePath = path.join(tmpDir, '_meta.json');
+    const meta = [makeMetaTable('Document', [{ name: 'tsvContent', pgType: 'tsvector' }])];
+    fs.writeFileSync(filePath, JSON.stringify(meta));
 
     const tables = [
       makeTable('Document', [
@@ -193,7 +232,7 @@ describe('enrichPgTypesFromFile', () => {
       ]),
     ];
 
-    const count = enrichPgTypesFromFile(tables, filePath);
+    const count = enrichPgTypesFromMetaFile(tables, filePath);
     expect(count).toBe(1);
     expect(tables[0].fields[0].type.pgType).toBe('tsvector');
   });

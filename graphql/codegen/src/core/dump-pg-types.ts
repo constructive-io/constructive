@@ -1,63 +1,65 @@
 /**
- * Dump PostgreSQL Type Metadata
+ * Dump _meta Table Metadata
  *
- * Generates a pg-types.json file by running the codegen pipeline and
- * extracting the Table/Field metadata. When used with a database source
- * (which has access to PostGraphile's pg catalog), this captures pgType
- * information that isn't available from standard GraphQL introspection.
+ * Generates a _meta.json file by running the codegen pipeline and
+ * extracting table/field metadata in MetaTableInfo[] format.
  *
- * For sources that don't provide pgType (endpoint, file), the output
- * serves as a template: fields are listed with `pgType: null` so the
- * user can fill in the correct values manually.
+ * When used with a database source (which has MetaSchemaPlugin),
+ * this captures the full _meta data including pgType for every field.
+ *
+ * For sources without _meta (endpoint, file), the output captures
+ * whatever metadata is available from introspection alone.
+ *
+ * The output file can be used as a metaFile sidecar for file/schemaDir
+ * modes, giving them the same metadata that database mode gets automatically.
  */
 import * as fs from 'node:fs';
 import path from 'node:path';
 
 import type { Table } from '../types/schema';
-import type { PgTypesMap } from './introspect/enrich-pg-types';
+import type { MetaTableInfo } from './introspect/source/types';
 
 /**
- * Build a PgTypesMap from an array of Table objects.
- * Includes all fields, even those without pgType, so the output
- * can serve as a template for manual editing.
+ * Build a MetaTableInfo[] from an array of Table objects.
+ * Captures field-level pgType info in the same shape as _cachedTablesMeta.
  */
-export function buildPgTypesMap(tables: Table[]): PgTypesMap {
-  const result: PgTypesMap = {};
-
-  for (const table of tables) {
-    const fieldMap: Record<string, { pgType?: string | null; pgAlias?: string | null; typmod?: number | null }> = {};
-
-    for (const field of table.fields) {
-      const entry: { pgType?: string | null; pgAlias?: string | null; typmod?: number | null } = {};
-
-      // Always include pgType (even if null — serves as template placeholder)
-      entry.pgType = field.type.pgType ?? null;
-
-      // Only include pgAlias and typmod if they have values
-      if (field.type.pgAlias) entry.pgAlias = field.type.pgAlias;
-      if (field.type.typmod != null) entry.typmod = field.type.typmod;
-
-      fieldMap[field.name] = entry;
-    }
-
-    if (Object.keys(fieldMap).length > 0) {
-      result[table.name] = fieldMap;
-    }
-  }
-
-  return result;
+export function buildMetaFromTables(tables: Table[]): MetaTableInfo[] {
+  return tables.map((table) => ({
+    name: table.name,
+    schemaName: 'public', // Default; overridden if _meta provides actual schema
+    fields: table.fields.map((field) => ({
+      name: field.name,
+      type: {
+        pgType: field.type.pgType ?? 'unknown',
+        gqlType: field.type.gqlType,
+        isArray: field.type.isArray,
+      },
+    })),
+    relations: {
+      manyToMany: table.relations.manyToMany.map((rel) => ({
+        fieldName: rel.fieldName ?? null,
+        type: rel.type ?? null,
+        junctionTable: { name: rel.junctionTable ?? '' },
+        junctionLeftKeyAttributes: (rel.junctionLeftKeyFields ?? []).map((k) => ({ name: k })),
+        junctionRightKeyAttributes: (rel.junctionRightKeyFields ?? []).map((k) => ({ name: k })),
+        leftKeyAttributes: (rel.leftKeyFields ?? []).map((k) => ({ name: k })),
+        rightKeyAttributes: (rel.rightKeyFields ?? []).map((k) => ({ name: k })),
+        rightTable: { name: rel.rightTable ?? '' },
+      })),
+    },
+  }));
 }
 
 /**
- * Write a PgTypesMap to a JSON file.
+ * Write MetaTableInfo[] to a JSON file.
  */
-export async function writePgTypesFile(
-  pgTypes: PgTypesMap,
+export async function writeMetaFile(
+  meta: MetaTableInfo[],
   outputPath: string,
 ): Promise<string> {
   const resolved = path.resolve(outputPath);
   const dir = path.dirname(resolved);
   await fs.promises.mkdir(dir, { recursive: true });
-  await fs.promises.writeFile(resolved, JSON.stringify(pgTypes, null, 2) + '\n', 'utf-8');
+  await fs.promises.writeFile(resolved, JSON.stringify(meta, null, 2) + '\n', 'utf-8');
   return resolved;
 }

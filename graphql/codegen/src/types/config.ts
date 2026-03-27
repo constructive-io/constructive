@@ -263,18 +263,21 @@ export interface GraphQLSDKConfigTarget {
   db?: DbConfig;
 
   /**
-   * Path to a JSON file providing PostgreSQL-specific type metadata.
-   * Enriches inferred Table objects with pgType, pgAlias, and typmod
-   * that are not available from standard GraphQL introspection.
+   * Path to a _meta.json sidecar file providing table metadata.
+   * Enriches inferred Table objects with field-level pgType info
+   * that is not available from standard GraphQL introspection.
+   *
+   * In database mode, _meta data is fetched automatically from the MetaSchemaPlugin.
+   * For file/schemaDir/endpoint modes, provide this file to get the same metadata.
    *
    * When present, enables precise detection of pgvector, tsvector, PostGIS, etc.
    * When absent, codegen falls back to heuristic detection (name patterns, GQL types).
    *
-   * Generate this file with: `graphql-codegen --dump-pg-types`
+   * Generate this file with: `graphql-codegen --dump-meta`
    *
-   * Format: `{ "TableName": { "fieldName": { "pgType": "vector", ... } } }`
+   * Format: MetaTableInfo[] (same shape as _cachedTablesMeta from MetaSchemaPlugin)
    */
-  pgTypesFile?: string;
+  metaFile?: string;
 
   /**
    * Headers to include in introspection requests
