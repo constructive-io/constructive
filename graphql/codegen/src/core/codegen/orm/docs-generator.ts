@@ -1,4 +1,4 @@
-import { toKebabCase } from 'komoji';
+import { toKebabCase } from 'inflekt';
 
 import type { Operation, Table, TypeRegistry } from '../../../types/schema';
 import {
