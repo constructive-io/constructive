@@ -421,31 +421,42 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
     ]),
   );
 
-  // const where = parseJsonFlag(argv.where);
+  // const parsed = unflattenDotNotation(argv);
+  // Reconstruct nested objects from dot-notation CLI flags:
+  //   --where.id.equalTo abc  →  { where: { id: { equalTo: 'abc' } } }
+  //   --condition.name.like '%foo%'  →  { condition: { name: { like: '%foo%' } } }
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('parsed'),
+        t.callExpression(t.identifier('unflattenDotNotation'), [
+          t.identifier('argv'),
+        ]),
+      ),
+    ]),
+  );
+
+  // const where = parsed.where;
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('where'),
-        t.callExpression(t.identifier('parseJsonFlag'), [
-          t.memberExpression(t.identifier('argv'), t.identifier('where')),
-        ]),
+        t.memberExpression(t.identifier('parsed'), t.identifier('where')),
       ),
     ]),
   );
 
-  // const condition = parseJsonFlag(argv.condition);
+  // const condition = parsed.condition;
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
         t.identifier('condition'),
-        t.callExpression(t.identifier('parseJsonFlag'), [
-          t.memberExpression(t.identifier('argv'), t.identifier('condition')),
-        ]),
+        t.memberExpression(t.identifier('parsed'), t.identifier('condition')),
       ),
     ]),
   );
 
-  // const orderBy = typeof argv.orderBy === 'string' ? argv.orderBy.split(',') : parseJsonFlag(argv.orderBy);
+  // const orderBy = typeof argv.orderBy === 'string' ? argv.orderBy.split(',') : undefined;
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -466,9 +477,7 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
             ),
             [t.stringLiteral(',')],
           ),
-          t.callExpression(t.identifier('parseJsonFlag'), [
-            t.memberExpression(t.identifier('argv'), t.identifier('orderBy')),
-          ]),
+          t.identifier('undefined'),
         ),
       ),
     ]),
@@ -1343,7 +1352,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
 
   const utilsPath = options?.targetName ? '../../utils' : '../utils';
   statements.push(
-    createImportDeclaration(utilsPath, ['buildSelectFromPaths', 'coerceAnswers', 'parseJsonFlag', 'stripUndefined']),
+    createImportDeclaration(utilsPath, ['buildSelectFromPaths', 'coerceAnswers', 'stripUndefined', 'unflattenDotNotation']),
   );
   statements.push(
     createImportDeclaration(utilsPath, ['FieldSchema'], true),
@@ -1422,9 +1431,9 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     '  --limit <n>           Max number of records to return',
     '  --offset <n>          Number of records to skip',
     '  --fields <fields>     Comma-separated list of fields to return',
-    '  --where <json>        JSON filter expression for where clause',
-    '  --condition <json>    JSON filter expression for condition clause',
-    '  --orderBy <values>    Comma-separated list of ordering values (e.g. NAME_ASC,CREATED_AT_DESC)',
+    '  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)',
+    '  --condition.<f>.<op>  Condition filter (dot-notation)',
+    '  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)',
     '',
   );
   if (hasSearchFields) {

@@ -415,8 +415,8 @@ export function getCliMcpTools(
           limit: { type: 'number', description: 'Max number of records to return' },
           offset: { type: 'number', description: 'Number of records to skip' },
           fields: { type: 'string', description: 'Comma-separated list of fields to return' },
-          where: { type: 'string', description: 'JSON filter expression for where clause (e.g. {"name":{"equalTo":"foo"}})' },
-          condition: { type: 'string', description: 'JSON filter expression for condition clause' },
+          'where.<field>.<op>': { type: 'string', description: 'Dot-notation filter (e.g. --where.name.equalTo foo)' },
+          'condition.<field>.<op>': { type: 'string', description: 'Dot-notation condition filter' },
           orderBy: { type: 'string', description: 'Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)' },
         },
       },
@@ -680,7 +680,7 @@ export function generateSkills(
         description: skillSpecialDesc,
         usage: [
           `${toolName} ${kebab} list`,
-          `${toolName} ${kebab} list --where '<json>' --orderBy <values>`,
+          `${toolName} ${kebab} list --where.<field>.<op> <value> --orderBy <values>`,
           ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
             ? [`${toolName} ${kebab} search <query>`]
             : []),
@@ -704,7 +704,7 @@ export function generateSkills(
           },
           {
             description: `List ${singularName} records with filtering and ordering`,
-            code: [`${toolName} ${kebab} list --where '{"${pk.name}":{"equalTo":"<value>"}}' --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
+            code: [`${toolName} ${kebab} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
           },
           ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
             ? [{
@@ -1314,8 +1314,8 @@ export function getMultiTargetCliMcpTools(
             limit: { type: 'number', description: 'Max number of records to return' },
             offset: { type: 'number', description: 'Number of records to skip' },
             fields: { type: 'string', description: 'Comma-separated list of fields to return' },
-            where: { type: 'string', description: 'JSON filter expression for where clause (e.g. {"name":{"equalTo":"foo"}})' },
-            condition: { type: 'string', description: 'JSON filter expression for condition clause' },
+            'where.<field>.<op>': { type: 'string', description: 'Dot-notation filter (e.g. --where.name.equalTo foo)' },
+            'condition.<field>.<op>': { type: 'string', description: 'Dot-notation condition filter' },
             orderBy: { type: 'string', description: 'Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)' },
           },
         },
@@ -1640,7 +1640,7 @@ export function generateMultiTargetSkills(
           description: mtSkillSpecialDesc,
           usage: [
             `${toolName} ${cmd} list`,
-            `${toolName} ${cmd} list --where '<json>' --orderBy <values>`,
+            `${toolName} ${cmd} list --where.<field>.<op> <value> --orderBy <values>`,
             ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
               ? [`${toolName} ${cmd} search <query>`]
               : []),
@@ -1660,7 +1660,7 @@ export function generateMultiTargetSkills(
             },
             {
               description: `List ${singularName} records with filtering and ordering`,
-              code: [`${toolName} ${cmd} list --where '{"${pk.name}":{"equalTo":"<value>"}}' --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
+              code: [`${toolName} ${cmd} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
             },
             ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
               ? [{

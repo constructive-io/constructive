@@ -281,7 +281,7 @@ CRUD operations for Car records via myapp CLI
 
 \`\`\`bash
 myapp car list
-myapp car list --where '<json>' --orderBy <values>
+myapp car list --where.<field>.<op> <value> --orderBy <values>
 myapp car get --id <UUID>
 myapp car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 myapp car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
@@ -311,7 +311,7 @@ myapp car list --fields id,id
 ### List car records with filtering and ordering
 
 \`\`\`bash
-myapp car list --where '{"id":{"equalTo":"<value>"}}' --orderBy ID_ASC
+myapp car list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a car
@@ -339,7 +339,7 @@ CRUD operations for Driver records via myapp CLI
 
 \`\`\`bash
 myapp driver list
-myapp driver list --where '<json>' --orderBy <values>
+myapp driver list --where.<field>.<op> <value> --orderBy <values>
 myapp driver get --id <UUID>
 myapp driver create --name <String> --licenseNumber <String>
 myapp driver update --id <UUID> [--name <String>] [--licenseNumber <String>]
@@ -369,7 +369,7 @@ myapp driver list --fields id,id
 ### List driver records with filtering and ordering
 
 \`\`\`bash
-myapp driver list --where '{"id":{"equalTo":"<value>"}}' --orderBy ID_ASC
+myapp driver list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a driver
@@ -665,7 +665,7 @@ exports[`cli-generator generates commands/car.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { buildSelectFromPaths, coerceAnswers, parseJsonFlag, stripUndefined } from "../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateCarInput, CarPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -676,7 +676,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where <json>        JSON filter expression for where clause\\n  --condition <json>    JSON filter expression for condition clause\\n  --orderBy <values>    Comma-separated list of ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -727,9 +727,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true
     };
     const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const where = parseJsonFlag(argv.where);
-    const condition = parseJsonFlag(argv.condition);
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : parseJsonFlag(argv.orderBy);
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
     const findManyArgs = {
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
@@ -1127,7 +1128,7 @@ exports[`cli-generator generates commands/driver.ts 1`] = `
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
-import { buildSelectFromPaths, coerceAnswers, parseJsonFlag, stripUndefined } from "../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../utils";
 import type { FieldSchema } from "../utils";
 import type { CreateDriverInput, DriverPatch } from "../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -1135,7 +1136,7 @@ const fieldSchema: FieldSchema = {
   name: "string",
   licenseNumber: "string"
 };
-const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where <json>        JSON filter expression for where clause\\n  --condition <json>    JSON filter expression for condition clause\\n  --orderBy <values>    Comma-separated list of ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -1183,9 +1184,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       licenseNumber: true
     };
     const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const where = parseJsonFlag(argv.where);
-    const condition = parseJsonFlag(argv.condition);
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : parseJsonFlag(argv.orderBy);
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
     const findManyArgs = {
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
@@ -1903,8 +1905,8 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "description": "List User records (auth target, supports pagination, field selection, filtering, and ordering)",
     "inputSchema": {
       "properties": {
-        "condition": {
-          "description": "JSON filter expression for condition clause",
+        "condition.<field>.<op>": {
+          "description": "Dot-notation condition filter",
           "type": "string",
         },
         "fields": {
@@ -1923,8 +1925,8 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
           "description": "Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)",
           "type": "string",
         },
-        "where": {
-          "description": "JSON filter expression for where clause (e.g. {"name":{"equalTo":"foo"}})",
+        "where.<field>.<op>": {
+          "description": "Dot-notation filter (e.g. --where.name.equalTo foo)",
           "type": "string",
         },
       },
@@ -2076,8 +2078,8 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "description": "List Member records (members target, supports pagination, field selection, filtering, and ordering)",
     "inputSchema": {
       "properties": {
-        "condition": {
-          "description": "JSON filter expression for condition clause",
+        "condition.<field>.<op>": {
+          "description": "Dot-notation condition filter",
           "type": "string",
         },
         "fields": {
@@ -2096,8 +2098,8 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
           "description": "Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)",
           "type": "string",
         },
-        "where": {
-          "description": "JSON filter expression for where clause (e.g. {"name":{"equalTo":"foo"}})",
+        "where.<field>.<op>": {
+          "description": "Dot-notation filter (e.g. --where.name.equalTo foo)",
           "type": "string",
         },
       },
@@ -2201,8 +2203,8 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
     "description": "List Car records (app target, supports pagination, field selection, filtering, and ordering)",
     "inputSchema": {
       "properties": {
-        "condition": {
-          "description": "JSON filter expression for condition clause",
+        "condition.<field>.<op>": {
+          "description": "Dot-notation condition filter",
           "type": "string",
         },
         "fields": {
@@ -2221,8 +2223,8 @@ exports[`multi-target cli docs generates multi-target MCP tools 1`] = `
           "description": "Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)",
           "type": "string",
         },
-        "where": {
-          "description": "JSON filter expression for where clause (e.g. {"name":{"equalTo":"foo"}})",
+        "where.<field>.<op>": {
+          "description": "Dot-notation filter (e.g. --where.name.equalTo foo)",
           "type": "string",
         },
       },
@@ -2813,7 +2815,7 @@ CRUD operations for User records via myapp CLI (auth target)
 
 \`\`\`bash
 myapp auth:user list
-myapp auth:user list --where '<json>' --orderBy <values>
+myapp auth:user list --where.<field>.<op> <value> --orderBy <values>
 myapp auth:user get --id <UUID>
 myapp auth:user create --email <String> --name <String>
 myapp auth:user update --id <UUID> [--email <String>] [--name <String>]
@@ -2837,7 +2839,7 @@ myapp auth:user list --limit 10 --offset 0
 ### List user records with filtering and ordering
 
 \`\`\`bash
-myapp auth:user list --where '{"id":{"equalTo":"<value>"}}' --orderBy ID_ASC
+myapp auth:user list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a user
@@ -2954,7 +2956,7 @@ CRUD operations for Member records via myapp CLI (members target)
 
 \`\`\`bash
 myapp members:member list
-myapp members:member list --where '<json>' --orderBy <values>
+myapp members:member list --where.<field>.<op> <value> --orderBy <values>
 myapp members:member get --id <UUID>
 myapp members:member create --role <String>
 myapp members:member update --id <UUID> [--role <String>]
@@ -2978,7 +2980,7 @@ myapp members:member list --limit 10 --offset 0
 ### List member records with filtering and ordering
 
 \`\`\`bash
-myapp members:member list --where '{"id":{"equalTo":"<value>"}}' --orderBy ID_ASC
+myapp members:member list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a member
@@ -3046,7 +3048,7 @@ CRUD operations for Car records via myapp CLI (app target)
 
 \`\`\`bash
 myapp app:car list
-myapp app:car list --where '<json>' --orderBy <values>
+myapp app:car list --where.<field>.<op> <value> --orderBy <values>
 myapp app:car get --id <UUID>
 myapp app:car create --make <String> --model <String> --year <Int> --isElectric <Boolean>
 myapp app:car update --id <UUID> [--make <String>] [--model <String>] [--year <Int>] [--isElectric <Boolean>]
@@ -3070,7 +3072,7 @@ myapp app:car list --limit 10 --offset 0
 ### List car records with filtering and ordering
 
 \`\`\`bash
-myapp app:car list --where '{"id":{"equalTo":"<value>"}}' --orderBy ID_ASC
+myapp app:car list --where.id.equalTo <value> --orderBy ID_ASC
 \`\`\`
 
 ### Create a car
@@ -3763,7 +3765,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 1`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { buildSelectFromPaths, coerceAnswers, parseJsonFlag, stripUndefined } from "../../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateUserInput, UserPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -3771,7 +3773,7 @@ const fieldSchema: FieldSchema = {
   email: "string",
   name: "string"
 };
-const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where <json>        JSON filter expression for where clause\\n  --condition <json>    JSON filter expression for condition clause\\n  --orderBy <values>    Comma-separated list of ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3819,9 +3821,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       name: true
     };
     const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const where = parseJsonFlag(argv.where);
-    const condition = parseJsonFlag(argv.condition);
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : parseJsonFlag(argv.orderBy);
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
     const findManyArgs = {
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
@@ -3994,14 +3997,14 @@ exports[`multi-target cli generator generates target-prefixed table commands 2`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { buildSelectFromPaths, coerceAnswers, parseJsonFlag, stripUndefined } from "../../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateMemberInput, MemberPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
   role: "string"
 };
-const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where <json>        JSON filter expression for where clause\\n  --condition <json>    JSON filter expression for condition clause\\n  --orderBy <values>    Comma-separated list of ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -4048,9 +4051,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       role: true
     };
     const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const where = parseJsonFlag(argv.where);
-    const condition = parseJsonFlag(argv.condition);
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : parseJsonFlag(argv.orderBy);
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
     const findManyArgs = {
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
@@ -4208,7 +4212,7 @@ exports[`multi-target cli generator generates target-prefixed table commands 3`]
  */
 import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
-import { buildSelectFromPaths, coerceAnswers, parseJsonFlag, stripUndefined } from "../../utils";
+import { buildSelectFromPaths, coerceAnswers, stripUndefined, unflattenDotNotation } from "../../utils";
 import type { FieldSchema } from "../../utils";
 import type { CreateCarInput, CarPatch } from "../../../orm/input-types";
 const fieldSchema: FieldSchema = {
@@ -4219,7 +4223,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where <json>        JSON filter expression for where clause\\n  --condition <json>    JSON filter expression for condition clause\\n  --orderBy <values>    Comma-separated list of ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return\\n  --offset <n>          Number of records to skip\\n  --fields <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -4270,9 +4274,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true
     };
     const select = typeof argv.fields === "string" ? buildSelectFromPaths(argv.fields as string) : defaultSelect;
-    const where = parseJsonFlag(argv.where);
-    const condition = parseJsonFlag(argv.condition);
-    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : parseJsonFlag(argv.orderBy);
+    const parsed = unflattenDotNotation(argv);
+    const where = parsed.where;
+    const condition = parsed.condition;
+    const orderBy = typeof argv.orderBy === "string" ? (argv.orderBy as string).split(",") : undefined;
     const findManyArgs = {
       select,
       ...(limit !== undefined && !isNaN(limit) ? {
@@ -4960,13 +4965,13 @@ exports[`target docs generator generates combined MCP config 1`] = `
             "type": "string",
             "description": "Comma-separated list of fields to return"
           },
-          "where": {
+          "where.<field>.<op>": {
             "type": "string",
-            "description": "JSON filter expression for where clause (e.g. {\\"name\\":{\\"equalTo\\":\\"foo\\"}})"
+            "description": "Dot-notation filter (e.g. --where.name.equalTo foo)"
           },
-          "condition": {
+          "condition.<field>.<op>": {
             "type": "string",
-            "description": "JSON filter expression for condition clause"
+            "description": "Dot-notation condition filter"
           },
           "orderBy": {
             "type": "string",
@@ -5136,13 +5141,13 @@ exports[`target docs generator generates combined MCP config 1`] = `
             "type": "string",
             "description": "Comma-separated list of fields to return"
           },
-          "where": {
+          "where.<field>.<op>": {
             "type": "string",
-            "description": "JSON filter expression for where clause (e.g. {\\"name\\":{\\"equalTo\\":\\"foo\\"}})"
+            "description": "Dot-notation filter (e.g. --where.name.equalTo foo)"
           },
-          "condition": {
+          "condition.<field>.<op>": {
             "type": "string",
-            "description": "JSON filter expression for condition clause"
+            "description": "Dot-notation condition filter"
           },
           "orderBy": {
             "type": "string",
