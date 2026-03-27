@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/constructive-io/constructive/compare/graphile-schema@1.10.4...graphile-schema@1.11.0) (2026-03-27)
+
+### Features
+
+- **graphile-schema:** add buildIntrospectionJSON() for database metadata export ([c725c7e](https://github.com/constructive-io/constructive/commit/c725c7ec35c82e7826b826441e0605f58474db1c))
+
 ## [1.10.4](https://github.com/constructive-io/constructive/compare/graphile-schema@1.10.3...graphile-schema@1.10.4) (2026-03-26)
 
 **Note:** Version bump only for package graphile-schema

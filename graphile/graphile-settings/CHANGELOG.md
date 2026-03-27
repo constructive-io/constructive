@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.17.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.16.2...graphile-settings@4.17.0) (2026-03-27)
+
+### Features
+
+- **graphile-schema:** add buildIntrospectionJSON() for database metadata export ([c725c7e](https://github.com/constructive-io/constructive/commit/c725c7ec35c82e7826b826441e0605f58474db1c))
+
 ## [4.16.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.16.1...graphile-settings@4.16.2) (2026-03-26)
 
 ### Bug Fixes
