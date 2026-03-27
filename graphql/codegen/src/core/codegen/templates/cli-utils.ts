@@ -187,6 +187,24 @@ export function unflattenDotNotation(
  * @param paths - Comma-separated dot-notation field paths (e.g. 'clientMutationId,result.accessToken')
  * @returns The nested select object for the ORM
  */
+/**
+ * Parse a CLI flag value as JSON. Returns the parsed object on success,
+ * or `undefined` when the value is missing / not a string / not valid JSON.
+ *
+ * Used by generated list/search handlers to accept `--where`, `--condition`,
+ * and `--orderBy` flags.
+ */
+export function parseJsonFlag(
+  value: unknown,
+): unknown {
+  if (typeof value !== 'string') return undefined;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+}
+
 export function buildSelectFromPaths(
   paths: string,
 ): Record<string, unknown> {

@@ -125,6 +125,13 @@ export function generateReadme(
       lines.push('| Subcommand | Description |');
       lines.push('|------------|-------------|');
       lines.push(`| \`list\` | List all ${singularName} records |`);
+      const readmeSpecialGroups = categorizeSpecialFields(table, registry);
+      const readmeHasSearch = readmeSpecialGroups.some(
+        (g) => g.category === 'search' || g.category === 'embedding',
+      );
+      if (readmeHasSearch) {
+        lines.push(`| \`search <query>\` | Search ${singularName} records |`);
+      }
       lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
@@ -401,16 +408,41 @@ export function getCliMcpTools(
 
     tools.push({
       name: `${toolName}_${kebab}_list`,
-      description: `List ${table.name} records (supports pagination and field selection)`,
+      description: `List ${table.name} records (supports pagination, field selection, filtering, and ordering)`,
       inputSchema: {
         type: 'object',
         properties: {
           limit: { type: 'number', description: 'Max number of records to return' },
           offset: { type: 'number', description: 'Number of records to skip' },
           fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+          where: { type: 'string', description: 'JSON filter expression for where clause (e.g. {"name":{"equalTo":"foo"}})' },
+          condition: { type: 'string', description: 'JSON filter expression for condition clause' },
+          orderBy: { type: 'string', description: 'Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)' },
         },
       },
     });
+
+    const tableSpecialGroups = categorizeSpecialFields(table, registry);
+    const tableHasSearch = tableSpecialGroups.some(
+      (g) => g.category === 'search' || g.category === 'embedding',
+    );
+    if (tableHasSearch) {
+      tools.push({
+        name: `${toolName}_${kebab}_search`,
+        description: `Search ${table.name} records using full-text, trigram, BM25, or vector similarity`,
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Search query string' },
+            limit: { type: 'number', description: 'Max number of records to return' },
+            offset: { type: 'number', description: 'Number of records to skip' },
+            fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+            orderBy: { type: 'string', description: 'Comma-separated ordering values' },
+          },
+          required: ['query'],
+        },
+      });
+    }
 
     tools.push({
       name: `${toolName}_${kebab}_get`,
@@ -648,6 +680,10 @@ export function generateSkills(
         description: skillSpecialDesc,
         usage: [
           `${toolName} ${kebab} list`,
+          `${toolName} ${kebab} list --where '<json>' --orderBy <values>`,
+          ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+            ? [`${toolName} ${kebab} search <query>`]
+            : []),
           `${toolName} ${kebab} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
           `${toolName} ${kebab} create ${createFlags}`,
           `${toolName} ${kebab} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
@@ -666,6 +702,16 @@ export function generateSkills(
             description: `List ${singularName} records with field selection`,
             code: [`${toolName} ${kebab} list --fields id,${pk.name}`],
           },
+          {
+            description: `List ${singularName} records with filtering and ordering`,
+            code: [`${toolName} ${kebab} list --where '{"${pk.name}":{"equalTo":"<value>"}}' --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
+          },
+          ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+            ? [{
+                description: `Search ${singularName} records`,
+                code: [`${toolName} ${kebab} search "query text" --limit 10 --fields id,searchScore`],
+              }]
+            : []),
           {
             description: `Create a ${singularName}`,
             code: [
@@ -959,6 +1005,13 @@ export function generateMultiTargetReadme(
       lines.push('| Subcommand | Description |');
       lines.push('|------------|-------------|');
       lines.push(`| \`list\` | List all ${singularName} records |`);
+      const mtReadmeSpecialGroups = categorizeSpecialFields(table, registry);
+      const mtReadmeHasSearch = mtReadmeSpecialGroups.some(
+        (g) => g.category === 'search' || g.category === 'embedding',
+      );
+      if (mtReadmeHasSearch) {
+        lines.push(`| \`search <query>\` | Search ${singularName} records |`);
+      }
       lines.push(`| \`get\` | Get a ${singularName} by ${pk.name} |`);
       lines.push(`| \`create\` | Create a new ${singularName} |`);
       lines.push(`| \`update\` | Update an existing ${singularName} |`);
@@ -1254,16 +1307,41 @@ export function getMultiTargetCliMcpTools(
 
       tools.push({
         name: `${prefix}_list`,
-        description: `List ${table.name} records (${tgt.name} target, supports pagination and field selection)`,
+        description: `List ${table.name} records (${tgt.name} target, supports pagination, field selection, filtering, and ordering)`,
         inputSchema: {
           type: 'object',
           properties: {
             limit: { type: 'number', description: 'Max number of records to return' },
             offset: { type: 'number', description: 'Number of records to skip' },
             fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+            where: { type: 'string', description: 'JSON filter expression for where clause (e.g. {"name":{"equalTo":"foo"}})' },
+            condition: { type: 'string', description: 'JSON filter expression for condition clause' },
+            orderBy: { type: 'string', description: 'Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)' },
           },
         },
       });
+
+      const mtTableSpecialGroups = categorizeSpecialFields(table, registry);
+      const mtTableHasSearch = mtTableSpecialGroups.some(
+        (g) => g.category === 'search' || g.category === 'embedding',
+      );
+      if (mtTableHasSearch) {
+        tools.push({
+          name: `${prefix}_search`,
+          description: `Search ${table.name} records using full-text, trigram, BM25, or vector similarity (${tgt.name} target)`,
+          inputSchema: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'Search query string' },
+              limit: { type: 'number', description: 'Max number of records to return' },
+              offset: { type: 'number', description: 'Number of records to skip' },
+              fields: { type: 'string', description: 'Comma-separated list of fields to return' },
+              orderBy: { type: 'string', description: 'Comma-separated ordering values' },
+            },
+            required: ['query'],
+          },
+        });
+      }
 
       tools.push({
         name: `${prefix}_get`,
@@ -1562,6 +1640,10 @@ export function generateMultiTargetSkills(
           description: mtSkillSpecialDesc,
           usage: [
             `${toolName} ${cmd} list`,
+            `${toolName} ${cmd} list --where '<json>' --orderBy <values>`,
+            ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+              ? [`${toolName} ${cmd} search <query>`]
+              : []),
             `${toolName} ${cmd} get --${pk.name} <${cleanTypeName(pk.gqlType)}>`,
             `${toolName} ${cmd} create ${createFlags}`,
             `${toolName} ${cmd} update --${pk.name} <${cleanTypeName(pk.gqlType)}> ${editableFields.map((f) => `[--${f.name} <${cleanTypeName(f.type.gqlType)}>]`).join(' ')}`,
@@ -1576,6 +1658,16 @@ export function generateMultiTargetSkills(
               description: `List ${singularName} records with pagination`,
               code: [`${toolName} ${cmd} list --limit 10 --offset 0`],
             },
+            {
+              description: `List ${singularName} records with filtering and ordering`,
+              code: [`${toolName} ${cmd} list --where '{"${pk.name}":{"equalTo":"<value>"}}' --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
+            },
+            ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
+              ? [{
+                  description: `Search ${singularName} records`,
+                  code: [`${toolName} ${cmd} search "query text" --limit 10 --fields id,searchScore`],
+                }]
+              : []),
             {
               description: `Create a ${singularName}`,
               code: [

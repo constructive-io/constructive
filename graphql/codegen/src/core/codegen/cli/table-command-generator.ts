@@ -17,6 +17,8 @@ import {
 } from '../utils';
 import type { Table, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
+import { categorizeSpecialFields } from '../docs-utils';
+import type { SpecialFieldGroup } from '../docs-utils';
 
 function createImportDeclaration(
   moduleSpecifier: string,
@@ -419,9 +421,60 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
     ]),
   );
 
-  // Build findMany args: { select, ...(limit !== undefined && !isNaN(limit) ? { first: limit } : {}), ... }
-  // We build: const findManyArgs: Record<string, unknown> = { select };
-  // then conditionally add first, offset
+  // const where = parseJsonFlag(argv.where);
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('where'),
+        t.callExpression(t.identifier('parseJsonFlag'), [
+          t.memberExpression(t.identifier('argv'), t.identifier('where')),
+        ]),
+      ),
+    ]),
+  );
+
+  // const condition = parseJsonFlag(argv.condition);
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('condition'),
+        t.callExpression(t.identifier('parseJsonFlag'), [
+          t.memberExpression(t.identifier('argv'), t.identifier('condition')),
+        ]),
+      ),
+    ]),
+  );
+
+  // const orderBy = typeof argv.orderBy === 'string' ? argv.orderBy.split(',') : parseJsonFlag(argv.orderBy);
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('orderBy'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('orderBy'))),
+            t.stringLiteral('string'),
+          ),
+          t.callExpression(
+            t.memberExpression(
+              t.tsAsExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('orderBy')),
+                t.tsStringKeyword(),
+              ),
+              t.identifier('split'),
+            ),
+            [t.stringLiteral(',')],
+          ),
+          t.callExpression(t.identifier('parseJsonFlag'), [
+            t.memberExpression(t.identifier('argv'), t.identifier('orderBy')),
+          ]),
+        ),
+      ),
+    ]),
+  );
+
+  // Build findMany args with all supported options
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -450,6 +503,33 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
               ),
               t.objectExpression([
                 t.objectProperty(t.identifier('offset'), t.identifier('offset'), false, true),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.binaryExpression('!==', t.identifier('where'), t.identifier('undefined')),
+              t.objectExpression([
+                t.objectProperty(t.identifier('where'), t.identifier('where'), false, true),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.binaryExpression('!==', t.identifier('condition'), t.identifier('undefined')),
+              t.objectExpression([
+                t.objectProperty(t.identifier('condition'), t.identifier('condition'), false, true),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.binaryExpression('!==', t.identifier('orderBy'), t.identifier('undefined')),
+              t.objectExpression([
+                t.objectProperty(t.identifier('orderBy'), t.identifier('orderBy'), false, true),
               ]),
               t.objectExpression([]),
             ),
@@ -504,6 +584,371 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
       t.tryStatement(
         t.blockStatement(tryBody),
         buildErrorCatch('Failed to list records.'),
+      ),
+    ]),
+    false,
+    true,
+  );
+}
+
+/**
+ * Build a `handleSearch` function for tables with search-capable fields.
+ * Extracts the first positional arg as the query string and auto-builds a
+ * `where` clause that targets all detected search fields (tsvector, BM25,
+ * trigram, vector embedding).  Supports --limit, --offset, --fields, --orderBy.
+ */
+function buildSearchHandler(
+  table: Table,
+  specialGroups: SpecialFieldGroup[],
+  targetName?: string,
+  typeRegistry?: TypeRegistry,
+): t.FunctionDeclaration {
+  const { singularName } = getTableNames(table);
+  const defaultSelectObj = buildSelectObject(table, typeRegistry);
+
+  const tryBody: t.Statement[] = [];
+
+  // const query = Array.isArray(argv._) && argv._.length > 0 ? String(argv._[0]) : undefined;
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('query'),
+        t.conditionalExpression(
+          t.logicalExpression(
+            '&&',
+            t.callExpression(
+              t.memberExpression(t.identifier('Array'), t.identifier('isArray')),
+              [t.memberExpression(t.identifier('argv'), t.identifier('_'))],
+            ),
+            t.binaryExpression(
+              '>',
+              t.memberExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('_')),
+                t.identifier('length'),
+              ),
+              t.numericLiteral(0),
+            ),
+          ),
+          t.callExpression(t.identifier('String'), [
+            t.memberExpression(
+              t.memberExpression(t.identifier('argv'), t.identifier('_')),
+              t.numericLiteral(0),
+              true,
+            ),
+          ]),
+          t.identifier('undefined'),
+        ),
+      ),
+    ]),
+  );
+
+  // if (!query) { console.error('Usage: ... search <query>'); process.exit(1); }
+  tryBody.push(
+    t.ifStatement(
+      t.unaryExpression('!', t.identifier('query')),
+      t.blockStatement([
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('console'), t.identifier('error')),
+            [t.stringLiteral('Error: search requires a <query> argument')],
+          ),
+        ),
+        t.expressionStatement(
+          t.callExpression(
+            t.memberExpression(t.identifier('process'), t.identifier('exit')),
+            [t.numericLiteral(1)],
+          ),
+        ),
+      ]),
+    ),
+  );
+
+  // Build the where clause properties from detected search fields
+  // e.g. { tsvContent: { query }, bm25Body: { query }, trgmTitle: { value: query, threshold: 0.3 }, vectorEmbedding: { value: query } }
+  const whereProps: t.ObjectProperty[] = [];
+  for (const group of specialGroups) {
+    for (const field of group.fields) {
+      if (field.type.pgType?.toLowerCase() === 'tsvector') {
+        // tsvector field: { query }
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(field.name),
+            t.objectExpression([
+              t.objectProperty(t.identifier('query'), t.identifier('query'), false, true),
+            ]),
+          ),
+        );
+      } else if (/Bm25Score$/.test(field.name)) {
+        // BM25 computed score field — derive the input field name:
+        // bodyBm25Score -> bm25Body (strip trailing "Bm25Score", prefix with "bm25")
+        const baseName = field.name.replace(/Bm25Score$/, '');
+        const inputFieldName = `bm25${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}`;
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(inputFieldName),
+            t.objectExpression([
+              t.objectProperty(t.identifier('query'), t.identifier('query'), false, true),
+            ]),
+          ),
+        );
+      } else if (/TrgmSimilarity$/.test(field.name)) {
+        // Trigram computed score field — derive the input field name:
+        // titleTrgmSimilarity -> trgmTitle
+        const baseName = field.name.replace(/TrgmSimilarity$/, '');
+        const inputFieldName = `trgm${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}`;
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(inputFieldName),
+            t.objectExpression([
+              t.objectProperty(t.identifier('value'), t.identifier('query')),
+              t.objectProperty(t.identifier('threshold'), t.numericLiteral(0.3)),
+            ]),
+          ),
+        );
+      } else if (group.category === 'embedding') {
+        // Vector embedding field: { value: query }
+        whereProps.push(
+          t.objectProperty(
+            t.identifier(field.name),
+            t.objectExpression([
+              t.objectProperty(t.identifier('value'), t.identifier('query')),
+            ]),
+          ),
+        );
+      }
+    }
+  }
+
+  // const where = { ...whereClause };
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('where'),
+        t.objectExpression(whereProps),
+      ),
+    ]),
+  );
+
+  // limit
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('limit'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('limit'))),
+            t.stringLiteral('number'),
+          ),
+          t.tsAsExpression(
+            t.memberExpression(t.identifier('argv'), t.identifier('limit')),
+            t.tsNumberKeyword(),
+          ),
+          t.conditionalExpression(
+            t.binaryExpression(
+              '===',
+              t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('limit'))),
+              t.stringLiteral('string'),
+            ),
+            t.callExpression(t.identifier('parseInt'), [
+              t.tsAsExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('limit')),
+                t.tsStringKeyword(),
+              ),
+              t.numericLiteral(10),
+            ]),
+            t.identifier('undefined'),
+          ),
+        ),
+      ),
+    ]),
+  );
+
+  // offset
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('offset'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('offset'))),
+            t.stringLiteral('number'),
+          ),
+          t.tsAsExpression(
+            t.memberExpression(t.identifier('argv'), t.identifier('offset')),
+            t.tsNumberKeyword(),
+          ),
+          t.conditionalExpression(
+            t.binaryExpression(
+              '===',
+              t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('offset'))),
+              t.stringLiteral('string'),
+            ),
+            t.callExpression(t.identifier('parseInt'), [
+              t.tsAsExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('offset')),
+                t.tsStringKeyword(),
+              ),
+              t.numericLiteral(10),
+            ]),
+            t.identifier('undefined'),
+          ),
+        ),
+      ),
+    ]),
+  );
+
+  // defaultSelect
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(t.identifier('defaultSelect'), defaultSelectObj),
+    ]),
+  );
+
+  // select
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('select'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('fields'))),
+            t.stringLiteral('string'),
+          ),
+          t.callExpression(t.identifier('buildSelectFromPaths'), [
+            t.tsAsExpression(
+              t.memberExpression(t.identifier('argv'), t.identifier('fields')),
+              t.tsStringKeyword(),
+            ),
+          ]),
+          t.identifier('defaultSelect'),
+        ),
+      ),
+    ]),
+  );
+
+  // orderBy
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('orderBy'),
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', t.memberExpression(t.identifier('argv'), t.identifier('orderBy'))),
+            t.stringLiteral('string'),
+          ),
+          t.callExpression(
+            t.memberExpression(
+              t.tsAsExpression(
+                t.memberExpression(t.identifier('argv'), t.identifier('orderBy')),
+                t.tsStringKeyword(),
+              ),
+              t.identifier('split'),
+            ),
+            [t.stringLiteral(',')],
+          ),
+          t.identifier('undefined'),
+        ),
+      ),
+    ]),
+  );
+
+  // Build findManyArgs
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('findManyArgs'),
+        t.objectExpression([
+          t.objectProperty(t.identifier('select'), t.identifier('select'), false, true),
+          t.objectProperty(t.identifier('where'), t.identifier('where'), false, true),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.logicalExpression(
+                '&&',
+                t.binaryExpression('!==', t.identifier('limit'), t.identifier('undefined')),
+                t.unaryExpression('!', t.callExpression(t.identifier('isNaN'), [t.identifier('limit')])),
+              ),
+              t.objectExpression([
+                t.objectProperty(t.identifier('first'), t.identifier('limit')),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.logicalExpression(
+                '&&',
+                t.binaryExpression('!==', t.identifier('offset'), t.identifier('undefined')),
+                t.unaryExpression('!', t.callExpression(t.identifier('isNaN'), [t.identifier('offset')])),
+              ),
+              t.objectExpression([
+                t.objectProperty(t.identifier('offset'), t.identifier('offset'), false, true),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+          t.spreadElement(
+            t.conditionalExpression(
+              t.binaryExpression('!==', t.identifier('orderBy'), t.identifier('undefined')),
+              t.objectExpression([
+                t.objectProperty(t.identifier('orderBy'), t.identifier('orderBy'), false, true),
+              ]),
+              t.objectExpression([]),
+            ),
+          ),
+        ]),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildGetClientStatement(targetName));
+
+  // const result = await client.<singular>.findMany(findManyArgs).execute();
+  tryBody.push(
+    t.variableDeclaration('const', [
+      t.variableDeclarator(
+        t.identifier('result'),
+        t.awaitExpression(
+          t.callExpression(
+            t.memberExpression(
+              t.callExpression(
+                t.memberExpression(
+                  t.memberExpression(
+                    t.identifier('client'),
+                    t.identifier(singularName),
+                  ),
+                  t.identifier('findMany'),
+                ),
+                [t.identifier('findManyArgs')],
+              ),
+              t.identifier('execute'),
+            ),
+            [],
+          ),
+        ),
+      ),
+    ]),
+  );
+
+  tryBody.push(buildJsonLog(t.identifier('result')));
+
+  const argvParam = t.identifier('argv');
+  argvParam.typeAnnotation = buildArgvType();
+  const prompterParam = t.identifier('_prompter');
+  prompterParam.typeAnnotation = t.tsTypeAnnotation(
+    t.tsTypeReference(t.identifier('Inquirerer')),
+  );
+
+  return t.functionDeclaration(
+    t.identifier('handleSearch'),
+    [argvParam, prompterParam],
+    t.blockStatement([
+      t.tryStatement(
+        t.blockStatement(tryBody),
+        buildErrorCatch('Failed to search records.'),
       ),
     ]),
     false,
@@ -898,7 +1343,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
 
   const utilsPath = options?.targetName ? '../../utils' : '../utils';
   statements.push(
-    createImportDeclaration(utilsPath, ['buildSelectFromPaths', 'coerceAnswers', 'stripUndefined']),
+    createImportDeclaration(utilsPath, ['buildSelectFromPaths', 'coerceAnswers', 'parseJsonFlag', 'stripUndefined']),
   );
   statements.push(
     createImportDeclaration(utilsPath, ['FieldSchema'], true),
@@ -946,7 +1391,14 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const hasDelete = table.query?.delete !== undefined && table.query?.delete !== null;
   const hasGet = table.query?.one !== null || hasUpdate || hasDelete;
 
+  // Detect whether this table has search-capable fields (tsvector, BM25, trgm, vector embedding)
+  const specialGroups = categorizeSpecialFields(table, options?.typeRegistry);
+  const hasSearchFields = specialGroups.some(
+    (g) => g.category === 'search' || g.category === 'embedding',
+  );
+
   const subcommands: string[] = ['list'];
+  if (hasSearchFields) subcommands.push('search');
   if (hasGet) subcommands.push('get');
   subcommands.push('create');
   if (hasUpdate) subcommands.push('update');
@@ -959,6 +1411,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     'Commands:',
     `  list                  List ${singularName} records`,
   ];
+  if (hasSearchFields) usageLines.push(`  search <query>        Search ${singularName} records`);
   if (hasGet) usageLines.push(`  get                   Get a ${singularName} by ID`);
   usageLines.push(`  create                Create a new ${singularName}`);
   if (hasUpdate) usageLines.push(`  update                Update an existing ${singularName}`);
@@ -969,7 +1422,23 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     '  --limit <n>           Max number of records to return',
     '  --offset <n>          Number of records to skip',
     '  --fields <fields>     Comma-separated list of fields to return',
+    '  --where <json>        JSON filter expression for where clause',
+    '  --condition <json>    JSON filter expression for condition clause',
+    '  --orderBy <values>    Comma-separated list of ordering values (e.g. NAME_ASC,CREATED_AT_DESC)',
     '',
+  );
+  if (hasSearchFields) {
+    usageLines.push(
+      'Search Options:',
+      '  <query>               Search query string (required)',
+      '  --limit <n>           Max number of records to return',
+      '  --offset <n>          Number of records to skip',
+      '  --fields <fields>     Comma-separated list of fields to return',
+      '  --orderBy <values>    Comma-separated list of ordering values',
+      '',
+    );
+  }
+  usageLines.push(
     '  --help, -h            Show this help message',
     '',
   );
@@ -1137,6 +1606,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const tn = options?.targetName;
   const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
   statements.push(buildListHandler(table, tn, options?.typeRegistry));
+  if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, tn, options?.typeRegistry));
   if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
   statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));
