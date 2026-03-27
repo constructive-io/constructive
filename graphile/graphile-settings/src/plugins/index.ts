@@ -54,6 +54,22 @@ export {
   MetaSchemaPlugin,
   MetaSchemaPreset,
 } from './meta-schema';
+export type {
+  TableMeta,
+  FieldMeta,
+  TypeMeta,
+  IndexMeta,
+  ConstraintsMeta,
+  PrimaryKeyConstraintMeta,
+  UniqueConstraintMeta,
+  ForeignKeyConstraintMeta,
+  RelationsMeta,
+  BelongsToRelation,
+  HasRelation,
+  ManyToManyRelation,
+  InflectionMeta,
+  QueryMeta,
+} from './meta-schema/types';
 
 // PG type mappings for custom PostgreSQL types (email, url, etc.)
 export {
