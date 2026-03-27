@@ -12,7 +12,7 @@ import {
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
 } from './docs-utils';
-import type { GeneratedDocFile, McpTool } from './docs-utils';
+import type { GeneratedDocFile } from './docs-utils';
 import {
   getTableNames,
   getScalarFields,
@@ -238,138 +238,6 @@ export function generateHooksAgentsDocs(
     fileName: 'AGENTS.md',
     content: lines.join('\n'),
   };
-}
-
-export function getHooksMcpTools(
-  tables: Table[],
-  customOperations: Operation[],
-): McpTool[] {
-  const tools: McpTool[] = [];
-
-  for (const table of tables) {
-    const { singularName, pluralName } = getTableNames(table);
-    const pk = getPrimaryKeyInfo(table)[0];
-    const scalarFields = getScalarFields(table);
-
-    tools.push({
-      name: `hooks_${lcFirst(pluralName)}_query`,
-      description: table.description || `React Query hook to list all ${pluralName}`,
-      inputSchema: {
-        type: 'object',
-        properties: {
-          fields: {
-            type: 'object',
-            description: `Fields to select: { ${scalarFields.map((f) => f.name).join(', ')} }`,
-          },
-        },
-      },
-    });
-
-    if (hasValidPrimaryKey(table)) {
-      tools.push({
-        name: `hooks_${lcFirst(singularName)}_query`,
-        description: table.description || `React Query hook to get a single ${singularName} by ${pk.name}`,
-        inputSchema: {
-          type: 'object',
-          properties: {
-            [pk.name]: {
-              type: gqlTypeToJsonSchemaType(pk.gqlType),
-              description: `${table.name} ${pk.name}`,
-            },
-          },
-          required: [pk.name],
-        },
-      });
-    }
-
-    tools.push({
-      name: `hooks_create_${lcFirst(singularName)}_mutation`,
-      description: table.description || `React Query mutation hook to create a ${singularName}`,
-      inputSchema: {
-        type: 'object',
-        properties: Object.fromEntries(
-          scalarFields
-            .filter(
-              (f) =>
-                f.name !== pk.name &&
-                f.name !== 'nodeId' &&
-                f.name !== 'createdAt' &&
-                f.name !== 'updatedAt',
-            )
-            .map((f) => [
-              f.name,
-              {
-                type: gqlTypeToJsonSchemaType(f.type.gqlType),
-                description: `${table.name} ${f.name}`,
-              },
-            ]),
-        ),
-      },
-    });
-
-    if (hasValidPrimaryKey(table)) {
-      tools.push({
-        name: `hooks_update_${lcFirst(singularName)}_mutation`,
-        description: table.description || `React Query mutation hook to update a ${singularName}`,
-        inputSchema: {
-          type: 'object',
-          properties: {
-            [pk.name]: {
-              type: gqlTypeToJsonSchemaType(pk.gqlType),
-              description: `${table.name} ${pk.name}`,
-            },
-          },
-          required: [pk.name],
-        },
-      });
-
-      tools.push({
-        name: `hooks_delete_${lcFirst(singularName)}_mutation`,
-        description: table.description || `React Query mutation hook to delete a ${singularName}`,
-        inputSchema: {
-          type: 'object',
-          properties: {
-            [pk.name]: {
-              type: gqlTypeToJsonSchemaType(pk.gqlType),
-              description: `${table.name} ${pk.name}`,
-            },
-          },
-          required: [pk.name],
-        },
-      });
-    }
-  }
-
-  for (const op of customOperations) {
-    const hookName = getCustomHookName(op);
-    const props: Record<string, unknown> = {};
-    const required: string[] = [];
-
-    for (const arg of op.args) {
-      const isRequired = arg.type.kind === 'NON_NULL';
-      const baseType =
-        isRequired && arg.type.ofType ? arg.type.ofType : arg.type;
-      props[arg.name] = {
-        type: gqlTypeToJsonSchemaType(baseType.name ?? 'String'),
-        description: arg.description || arg.name,
-      };
-      if (isRequired) {
-        required.push(arg.name);
-      }
-    }
-
-    tools.push({
-      name: `hooks_${hookName}`,
-      description: op.description || `${ucFirst(op.kind)} hook for ${op.name}`,
-      inputSchema: {
-        type: 'object',
-        properties: props,
-        ...(required.length > 0 ? { required } : {}),
-      },
-    });
-  }
-
-  return tools;
 }
 
 export function generateHooksSkills(

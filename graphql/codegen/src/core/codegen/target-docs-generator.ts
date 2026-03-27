@@ -1,6 +1,6 @@
 import type { GraphQLSDKConfigTarget } from '../../types/config';
 import { getReadmeHeader, getReadmeFooter } from './docs-utils';
-import type { GeneratedDocFile, McpTool } from './docs-utils';
+import type { GeneratedDocFile } from './docs-utils';
 
 export interface TargetReadmeOptions {
   hasOrm: boolean;
@@ -113,23 +113,6 @@ export function generateTargetReadme(
   return {
     fileName: 'README.md',
     content: lines.join('\n'),
-  };
-}
-
-export function generateCombinedMcpConfig(
-  tools: McpTool[],
-  name: string,
-): GeneratedDocFile {
-  const mcpConfig = {
-    name,
-    version: '1.0.0',
-    description: `MCP tool definitions for ${name} SDK (auto-generated from GraphQL schema)`,
-    tools,
-  };
-
-  return {
-    fileName: 'mcp.json',
-    content: JSON.stringify(mcpConfig, null, 2) + '\n',
   };
 }
 
