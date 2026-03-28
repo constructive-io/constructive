@@ -58,7 +58,13 @@ export const RelationManyToMany: NodeTypeDefinition = {
       },
       "grant_privileges": {
         "type": "array",
-        "description": "Privilege grants for the junction table. Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns"
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": "Privilege grants for the junction table as [verb, columns] tuples (e.g. [['select','*'],['insert','*']]). Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns"
       },
       "policy_type": {
         "type": "string",
