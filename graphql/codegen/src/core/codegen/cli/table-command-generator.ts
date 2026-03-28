@@ -485,7 +485,11 @@ function buildAutoEmbedInputBlock(
 
 /**
  * Build the FindManyArgs type instantiation for a table:
- * FindManyArgs<SelectType, FilterType, ConditionType, OrderByType>
+ * FindManyArgs<SelectType, FilterType, ConditionType, OrderByType> & { select: SelectType }
+ *
+ * The intersection with { select: SelectType } makes select required,
+ * matching what the ORM's findMany method expects. parseFindManyArgs
+ * always sets select at runtime (from defaultSelect or --select flag).
  */
 function buildFindManyArgsType(table: Table, conditionEnabled: boolean): t.TSType {
   const { typeName } = getTableNames(table);
@@ -493,7 +497,7 @@ function buildFindManyArgsType(table: Table, conditionEnabled: boolean): t.TSTyp
   const whereTypeName = getFilterTypeName(table);
   const conditionTypeName = conditionEnabled ? getConditionTypeName(table) : undefined;
   const orderByTypeName = getOrderByTypeName(table);
-  return t.tsTypeReference(
+  const findManyType = t.tsTypeReference(
     t.identifier('FindManyArgs'),
     t.tsTypeParameterInstantiation([
       t.tsTypeReference(t.identifier(selectTypeName)),
@@ -504,18 +508,34 @@ function buildFindManyArgsType(table: Table, conditionEnabled: boolean): t.TSTyp
       t.tsTypeReference(t.identifier(orderByTypeName)),
     ]),
   );
+  // Intersect with { select: SelectType } to make select required
+  return t.tsIntersectionType([
+    findManyType,
+    t.tsTypeLiteral([
+      Object.assign(
+        t.tsPropertySignature(
+          t.identifier('select'),
+          t.tsTypeAnnotation(t.tsTypeReference(t.identifier(selectTypeName))),
+        ),
+        { optional: false },
+      ),
+    ]),
+  ]);
 }
 
 /**
  * Build the FindFirstArgs type instantiation for a table:
- * FindFirstArgs<SelectType, FilterType, ConditionType>
+ * FindFirstArgs<SelectType, FilterType, ConditionType> & { select: SelectType }
+ *
+ * The intersection with { select: SelectType } makes select required,
+ * matching what the ORM's findFirst method expects.
  */
 function buildFindFirstArgsType(table: Table, conditionEnabled: boolean): t.TSType {
   const { typeName } = getTableNames(table);
   const selectTypeName = `${typeName}Select`;
   const whereTypeName = getFilterTypeName(table);
   const conditionTypeName = conditionEnabled ? getConditionTypeName(table) : undefined;
-  return t.tsTypeReference(
+  const findFirstType = t.tsTypeReference(
     t.identifier('FindFirstArgs'),
     t.tsTypeParameterInstantiation([
       t.tsTypeReference(t.identifier(selectTypeName)),
@@ -525,6 +545,19 @@ function buildFindFirstArgsType(table: Table, conditionEnabled: boolean): t.TSTy
         : t.tsNeverKeyword(),
     ]),
   );
+  // Intersect with { select: SelectType } to make select required
+  return t.tsIntersectionType([
+    findFirstType,
+    t.tsTypeLiteral([
+      Object.assign(
+        t.tsPropertySignature(
+          t.identifier('select'),
+          t.tsTypeAnnotation(t.tsTypeReference(t.identifier(selectTypeName))),
+        ),
+        { optional: false },
+      ),
+    ]),
+  ]);
 }
 
 function buildListHandler(table: Table, vectorFieldNames: string[], targetName?: string, typeRegistry?: TypeRegistry, conditionEnabled = false): t.FunctionDeclaration {
