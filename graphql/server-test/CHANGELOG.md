@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.10.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.9.7...graphql-server-test@2.10.0) (2026-03-28)
+
+### Bug Fixes
+
+- address PR feedback — type Table, clean imports, use APPSTASH_BASE_DIR, bump appstash 0.7.0 ([41c629a](https://github.com/constructive-io/constructive/commit/41c629a0bfd1bb327afc9f82673f08bb9da257e0))
+- **server-test:** fix pgvector and \_meta test failures in CLI e2e ([62ac909](https://github.com/constructive-io/constructive/commit/62ac90905c7059c22108306ce6b024659f56fb07))
+- **server-test:** pgvector test checks ok:false instead of rejection ([a4ea714](https://github.com/constructive-io/constructive/commit/a4ea7145959d4ded4a5680ba8a82d1053c93e2e8))
+
+### Features
+
+- **codegen:** pluggable embedding system with --auto-embed flag ([4665bb8](https://github.com/constructive-io/constructive/commit/4665bb879046074d86c8130096746562233809ee))
+
 ## [2.9.7](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.9.6...graphql-server-test@2.9.7) (2026-03-27)
 
 **Note:** Version bump only for package graphql-server-test

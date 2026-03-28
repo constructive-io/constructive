@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.6.0...node-type-registry@0.6.1) (2026-03-28)
+
+### Bug Fixes
+
+- **node-type-registry:** grant_privileges type is string[][] not string[] ([c749f96](https://github.com/constructive-io/constructive/commit/c749f961a11dbc2d8d39befdbe457f1b0ef2ace6))
+
 # [0.6.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.5.1...node-type-registry@0.6.0) (2026-03-27)
 
 ### Bug Fixes

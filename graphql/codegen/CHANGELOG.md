@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.27.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.26.0...@constructive-io/graphql-codegen@4.27.0) (2026-03-28)
+
+### Bug Fixes
+
+- **codegen:** make select required in FindManyArgs/FindFirstArgs type params ([2ae00f5](https://github.com/constructive-io/constructive/commit/2ae00f5adef33e73d380d4c51bd8258e618e35ae))
+
+### Features
+
+- **codegen:** add --auto-embed support for create/update mutations ([ceba37c](https://github.com/constructive-io/constructive/commit/ceba37c80898b3af28c8cfc0ce0ad43c53cb67ec))
+- **codegen:** generate field-specific search examples in CLI docs ([8c1724d](https://github.com/constructive-io/constructive/commit/8c1724d421c108a6215040f7f44d2e038c37bc53))
+- **codegen:** pluggable embedding system with --auto-embed flag ([4665bb8](https://github.com/constructive-io/constructive/commit/4665bb879046074d86c8130096746562233809ee))
+
 # [4.26.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.25.0...@constructive-io/graphql-codegen@4.26.0) (2026-03-27)
 
 ### Features

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.8](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.12.7...@constructive-io/sdk@0.12.8) (2026-03-28)
+
+**Note:** Version bump only for package @constructive-io/sdk
+
 ## [0.12.7](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.12.6...@constructive-io/sdk@0.12.7) (2026-03-27)
 
 **Note:** Version bump only for package @constructive-io/sdk
