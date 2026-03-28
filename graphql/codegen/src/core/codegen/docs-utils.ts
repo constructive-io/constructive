@@ -359,13 +359,21 @@ export function buildSearchExamples(
         scoreFields.push(field.name);
       }
 
-      // pgvector embedding — uses column name, note about CLI limitation
+      // pgvector embedding — uses column name, with --auto-embed for text-to-vector
       if (group.category === 'embedding') {
         examples.push({
-          description: `Vector similarity search via \`${field.name}\` (requires JSON array)`,
+          description: `Vector similarity search via \`${field.name}\` (manual vector)`,
           code: [
-            `# Note: vector arrays must be passed as JSON strings via dot-notation`,
+            `# Pass a pre-computed vector array via dot-notation`,
             `${toolName} ${cmd} list --where.${field.name}.vector '[0.1,0.2,0.3]' --where.${field.name}.distance 1.0 --fields title,${field.name}VectorDistance`,
+          ],
+        });
+        examples.push({
+          description: `Vector semantic search via \`${field.name}\` with --auto-embed`,
+          code: [
+            `# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} search "semantic query" --auto-embed --fields title,${field.name}VectorDistance`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} list --where.${field.name}.vector "semantic query" --auto-embed --fields title,${field.name}VectorDistance`,
           ],
         });
       }

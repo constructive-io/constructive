@@ -311,7 +311,103 @@ function buildSubcommandSwitch(
   return t.switchStatement(t.identifier('subcommand'), cases);
 }
 
-function buildListHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
+/**
+ * Build an auto-embed block that resolves the embedder and converts text
+ * values in the where clause to vector embeddings.
+ *
+ * Generates code equivalent to:
+ *   if (argv['auto-embed']) {
+ *     const embedder = resolveEmbedder();
+ *     if (!embedder) {
+ *       console.error('--auto-embed requires an embedder. Set EMBEDDER_PROVIDER=ollama');
+ *       process.exit(1);
+ *     }
+ *     await autoEmbedWhere(findManyArgs.where ?? {}, ['fieldA', 'fieldB'], embedder);
+ *   }
+ *
+ * @param whereExpr - The expression to access the where clause (e.g. findManyArgs.where, searchWhere)
+ * @param vectorFieldNames - Names of vector embedding fields detected at codegen time
+ * @param assignBack - If true, assigns the result back to findManyArgs.where
+ */
+function buildAutoEmbedBlock(
+  whereExpr: t.Expression,
+  vectorFieldNames: string[],
+  assignBack: boolean = false,
+): t.IfStatement {
+  const fieldNamesArray = t.arrayExpression(
+    vectorFieldNames.map((n) => t.stringLiteral(n)),
+  );
+
+  const embedderDecl = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier('embedder'),
+      t.callExpression(t.identifier('resolveEmbedder'), []),
+    ),
+  ]);
+
+  const noEmbedderCheck = t.ifStatement(
+    t.unaryExpression('!', t.identifier('embedder')),
+    t.blockStatement([
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier('console'), t.identifier('error')),
+          [
+            t.stringLiteral(
+              '--auto-embed requires an embedder. Set EMBEDDER_PROVIDER=ollama (and optionally EMBEDDER_MODEL, EMBEDDER_BASE_URL).',
+            ),
+          ],
+        ),
+      ),
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier('process'), t.identifier('exit')),
+          [t.numericLiteral(1)],
+        ),
+      ),
+    ]),
+  );
+
+  const autoEmbedCall = t.awaitExpression(
+    t.callExpression(t.identifier('autoEmbedWhere'), [
+      t.logicalExpression(
+        '??',
+        whereExpr,
+        t.objectExpression([]),
+      ),
+      fieldNamesArray,
+      t.identifier('embedder'),
+    ]),
+  );
+
+  const bodyStatements: t.Statement[] = [embedderDecl, noEmbedderCheck];
+
+  if (assignBack) {
+    // findManyArgs.where = await autoEmbedWhere(findManyArgs.where ?? {}, [...], embedder);
+    bodyStatements.push(
+      t.expressionStatement(
+        t.assignmentExpression(
+          '=',
+          t.memberExpression(t.identifier('findManyArgs'), t.identifier('where')),
+          autoEmbedCall,
+        ),
+      ),
+    );
+  } else {
+    // await autoEmbedWhere(searchWhere, [...], embedder);
+    bodyStatements.push(t.expressionStatement(autoEmbedCall));
+  }
+
+  return t.ifStatement(
+    t.memberExpression(
+      t.identifier('argv'),
+      t.stringLiteral('auto-embed'),
+      true,
+    ),
+    t.blockStatement(bodyStatements),
+  );
+}
+
+function buildListHandler(table: Table, vectorFieldNames: string[], targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
@@ -337,6 +433,17 @@ function buildListHandler(table: Table, targetName?: string, typeRegistry?: Type
       ),
     ]),
   );
+
+  // Auto-embed vector fields in the where clause when --auto-embed is passed
+  if (vectorFieldNames.length > 0) {
+    tryBody.push(
+      buildAutoEmbedBlock(
+        t.memberExpression(t.identifier('findManyArgs'), t.identifier('where')),
+        vectorFieldNames,
+        true,
+      ),
+    );
+  }
 
   tryBody.push(buildGetClientStatement(targetName));
 
@@ -479,6 +586,7 @@ function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?:
 function buildSearchHandler(
   table: Table,
   specialGroups: SpecialFieldGroup[],
+  vectorFieldNames: string[],
   targetName?: string,
   typeRegistry?: TypeRegistry,
 ): t.FunctionDeclaration {
@@ -543,7 +651,7 @@ function buildSearchHandler(
   );
 
   // Build the where clause properties from detected search fields
-  // e.g. { tsvContent: { query }, bm25Body: { query }, trgmTitle: { value: query, threshold: 0.3 }, vectorEmbedding: { value: query } }
+  // e.g. { tsvContent: { query }, bm25Body: { query }, trgmTitle: { value: query, threshold: 0.3 }, vectorEmbedding: { vector: query } }
   const whereProps: t.ObjectProperty[] = [];
   for (const group of specialGroups) {
     for (const field of group.fields) {
@@ -585,12 +693,13 @@ function buildSearchHandler(
           ),
         );
       } else if (group.category === 'embedding') {
-        // Vector embedding field: { value: query }
+        // Vector embedding field: { vector: query }
+        // When --auto-embed is used, autoEmbedWhere will convert the text to a vector
         whereProps.push(
           t.objectProperty(
             t.identifier(field.name),
             t.objectExpression([
-              t.objectProperty(t.identifier('value'), t.identifier('query')),
+              t.objectProperty(t.identifier('vector'), t.identifier('query')),
             ]),
           ),
         );
@@ -607,6 +716,17 @@ function buildSearchHandler(
       ),
     ]),
   );
+
+  // Auto-embed vector fields in the where clause when --auto-embed is passed
+  if (vectorFieldNames.length > 0) {
+    tryBody.push(
+      buildAutoEmbedBlock(
+        t.identifier('searchWhere'),
+        vectorFieldNames,
+        false,
+      ),
+    );
+  }
 
   // const defaultSelect = { ... };
   tryBody.push(
@@ -1122,6 +1242,25 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     (g) => g.category === 'search' || g.category === 'embedding',
   );
 
+  // Collect vector embedding field names for --auto-embed support
+  const vectorFieldNames: string[] = [];
+  for (const group of specialGroups) {
+    if (group.category === 'embedding') {
+      for (const field of group.fields) {
+        vectorFieldNames.push(field.name);
+      }
+    }
+  }
+  const hasEmbeddings = vectorFieldNames.length > 0;
+
+  // Import embedder functions when table has vector embedding fields
+  if (hasEmbeddings) {
+    const embedderPath = options?.targetName ? '../../embedder' : '../embedder';
+    statements.push(
+      createImportDeclaration(embedderPath, ['resolveEmbedder', 'autoEmbedWhere']),
+    );
+  }
+
   const subcommands: string[] = ['list', 'find-first'];
   if (hasSearchFields) subcommands.push('search');
   if (hasGet) subcommands.push('get');
@@ -1169,6 +1308,20 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
       '  --offset <n>          Number of records to skip',
       '  --fields <fields>     Comma-separated list of fields to return',
       '  --orderBy <values>    Comma-separated list of ordering values',
+    );
+    if (hasEmbeddings) {
+      usageLines.push(
+        '  --auto-embed          Convert text queries to vectors via configured embedder',
+      );
+    }
+    usageLines.push('');
+  }
+  if (hasEmbeddings) {
+    usageLines.push(
+      'Embedding Options (for --auto-embed):',
+      '  Set EMBEDDER_PROVIDER=ollama to enable text-to-vector embedding.',
+      '  Optional: EMBEDDER_MODEL (default: nomic-embed-text)',
+      '  Optional: EMBEDDER_BASE_URL (default: http://localhost:11434)',
       '',
     );
   }
@@ -1339,9 +1492,9 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
 
   const tn = options?.targetName;
   const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
-  statements.push(buildListHandler(table, tn, options?.typeRegistry));
+  statements.push(buildListHandler(table, vectorFieldNames, tn, options?.typeRegistry));
   statements.push(buildFindFirstHandler(table, tn, options?.typeRegistry));
-  if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, tn, options?.typeRegistry));
+  if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, vectorFieldNames, tn, options?.typeRegistry));
   if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
   statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));
