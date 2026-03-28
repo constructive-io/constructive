@@ -15,6 +15,9 @@ import {
   toPascalCase,
   getCreateInputTypeName,
   getPatchTypeName,
+  getFilterTypeName,
+  getOrderByTypeName,
+  getConditionTypeName,
 } from '../utils';
 import type { Table, TypeRegistry } from '../../../types/schema';
 import type { GeneratedFile } from './executor-generator';
@@ -480,7 +483,51 @@ function buildAutoEmbedInputBlock(
   );
 }
 
-function buildListHandler(table: Table, vectorFieldNames: string[], targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
+/**
+ * Build the FindManyArgs type instantiation for a table:
+ * FindManyArgs<SelectType, FilterType, ConditionType, OrderByType>
+ */
+function buildFindManyArgsType(table: Table, conditionEnabled: boolean): t.TSType {
+  const { typeName } = getTableNames(table);
+  const selectTypeName = `${typeName}Select`;
+  const whereTypeName = getFilterTypeName(table);
+  const conditionTypeName = conditionEnabled ? getConditionTypeName(table) : undefined;
+  const orderByTypeName = getOrderByTypeName(table);
+  return t.tsTypeReference(
+    t.identifier('FindManyArgs'),
+    t.tsTypeParameterInstantiation([
+      t.tsTypeReference(t.identifier(selectTypeName)),
+      t.tsTypeReference(t.identifier(whereTypeName)),
+      conditionTypeName
+        ? t.tsTypeReference(t.identifier(conditionTypeName))
+        : t.tsNeverKeyword(),
+      t.tsTypeReference(t.identifier(orderByTypeName)),
+    ]),
+  );
+}
+
+/**
+ * Build the FindFirstArgs type instantiation for a table:
+ * FindFirstArgs<SelectType, FilterType, ConditionType>
+ */
+function buildFindFirstArgsType(table: Table, conditionEnabled: boolean): t.TSType {
+  const { typeName } = getTableNames(table);
+  const selectTypeName = `${typeName}Select`;
+  const whereTypeName = getFilterTypeName(table);
+  const conditionTypeName = conditionEnabled ? getConditionTypeName(table) : undefined;
+  return t.tsTypeReference(
+    t.identifier('FindFirstArgs'),
+    t.tsTypeParameterInstantiation([
+      t.tsTypeReference(t.identifier(selectTypeName)),
+      t.tsTypeReference(t.identifier(whereTypeName)),
+      conditionTypeName
+        ? t.tsTypeReference(t.identifier(conditionTypeName))
+        : t.tsNeverKeyword(),
+    ]),
+  );
+}
+
+function buildListHandler(table: Table, vectorFieldNames: string[], targetName?: string, typeRegistry?: TypeRegistry, conditionEnabled = true): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
@@ -494,18 +541,21 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
     ]),
   );
 
-  // const findManyArgs = parseFindManyArgs(argv, defaultSelect);
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('findManyArgs'),
-        t.callExpression(t.identifier('parseFindManyArgs'), [
-          t.identifier('argv'),
-          t.identifier('defaultSelect'),
-        ]),
-      ),
-    ]),
-  );
+  // const findManyArgs = parseFindManyArgs<FindManyArgs<...>>(argv, defaultSelect);
+  {
+    const callExpr = t.callExpression(t.identifier('parseFindManyArgs'), [
+      t.identifier('argv'),
+      t.identifier('defaultSelect'),
+    ]);
+    callExpr.typeParameters = t.tsTypeParameterInstantiation([
+      buildFindManyArgsType(table, conditionEnabled),
+    ]);
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier('findManyArgs'), callExpr),
+      ]),
+    );
+  }
 
   // Auto-embed vector fields in the where clause when --auto-embed is passed
   if (vectorFieldNames.length > 0) {
@@ -520,7 +570,7 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
 
   tryBody.push(buildGetClientStatement(targetName));
 
-  // const result = await client.<singular>.findMany(findManyArgs as any).execute();
+  // const result = await client.<singular>.findMany(findManyArgs).execute();
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -536,7 +586,7 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
                   ),
                   t.identifier('findMany'),
                 ),
-                [t.tsAsExpression(t.identifier('findManyArgs'), t.tsAnyKeyword())],
+                [t.identifier('findManyArgs')],
               ),
               t.identifier('execute'),
             ),
@@ -575,7 +625,7 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
  * Accepts --select, --where.<field>.<op>, --condition.<field>.<op> flags.
  * Internally calls findMany with first:1 and returns a single record (or null).
  */
-function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
+function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry, conditionEnabled = true): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
@@ -588,22 +638,25 @@ function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?:
     ]),
   );
 
-  // const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('findFirstArgs'),
-        t.callExpression(t.identifier('parseFindFirstArgs'), [
-          t.identifier('argv'),
-          t.identifier('defaultSelect'),
-        ]),
-      ),
-    ]),
-  );
+  // const findFirstArgs = parseFindFirstArgs<FindFirstArgs<...>>(argv, defaultSelect);
+  {
+    const callExpr = t.callExpression(t.identifier('parseFindFirstArgs'), [
+      t.identifier('argv'),
+      t.identifier('defaultSelect'),
+    ]);
+    callExpr.typeParameters = t.tsTypeParameterInstantiation([
+      buildFindFirstArgsType(table, conditionEnabled),
+    ]);
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier('findFirstArgs'), callExpr),
+      ]),
+    );
+  }
 
   tryBody.push(buildGetClientStatement(targetName));
 
-  // const result = await client.<singular>.findFirst(findFirstArgs as any).execute();
+  // const result = await client.<singular>.findFirst(findFirstArgs).execute();
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -616,7 +669,7 @@ function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?:
                   t.memberExpression(t.identifier('client'), t.identifier(singularName)),
                   t.identifier('findFirst'),
                 ),
-                [t.tsAsExpression(t.identifier('findFirstArgs'), t.tsAnyKeyword())],
+                [t.identifier('findFirstArgs')],
               ),
               t.identifier('execute'),
             ),
@@ -662,6 +715,7 @@ function buildSearchHandler(
   vectorFieldNames: string[],
   targetName?: string,
   typeRegistry?: TypeRegistry,
+  conditionEnabled = true,
 ): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
@@ -808,23 +862,26 @@ function buildSearchHandler(
     ]),
   );
 
-  // const findManyArgs = parseFindManyArgs(argv, defaultSelect, searchWhere);
-  tryBody.push(
-    t.variableDeclaration('const', [
-      t.variableDeclarator(
-        t.identifier('findManyArgs'),
-        t.callExpression(t.identifier('parseFindManyArgs'), [
-          t.identifier('argv'),
-          t.identifier('defaultSelect'),
-          t.identifier('searchWhere'),
-        ]),
-      ),
-    ]),
-  );
+  // const findManyArgs = parseFindManyArgs<FindManyArgs<...>>(argv, defaultSelect, searchWhere);
+  {
+    const callExpr = t.callExpression(t.identifier('parseFindManyArgs'), [
+      t.identifier('argv'),
+      t.identifier('defaultSelect'),
+      t.identifier('searchWhere'),
+    ]);
+    callExpr.typeParameters = t.tsTypeParameterInstantiation([
+      buildFindManyArgsType(table, conditionEnabled),
+    ]);
+    tryBody.push(
+      t.variableDeclaration('const', [
+        t.variableDeclarator(t.identifier('findManyArgs'), callExpr),
+      ]),
+    );
+  }
 
   tryBody.push(buildGetClientStatement(targetName));
 
-  // const result = await client.<singular>.findMany(findManyArgs as any).execute();
+  // const result = await client.<singular>.findMany(findManyArgs).execute();
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -840,7 +897,7 @@ function buildSearchHandler(
                   ),
                   t.identifier('findMany'),
                 ),
-                [t.tsAsExpression(t.identifier('findManyArgs'), t.tsAnyKeyword())],
+                [t.identifier('findManyArgs')],
               ),
               t.identifier('execute'),
             ),
@@ -1250,7 +1307,7 @@ export interface TableCommandOptions {
 }
 
 export function generateTableCommand(table: Table, options?: TableCommandOptions): GeneratedFile {
-  const { singularName } = getTableNames(table);
+  const { singularName, typeName } = getTableNames(table);
   const commandName = toKebabCase(singularName);
   const statements: t.Statement[] = [];
   const executorPath = options?.executorImportPath ?? '../executor';
@@ -1286,8 +1343,30 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   const inputTypesPath = options?.targetName
     ? `../../../orm/input-types`
     : `../../orm/input-types`;
+  // Import table-specific ORM types for generic type parameters on parseFindManyArgs/parseFindFirstArgs
+  const selectTypeName = `${typeName}Select`;
+  const whereTypeName = getFilterTypeName(table);
+  const conditionTypeName = getConditionTypeName(table);
+  const orderByTypeName = getOrderByTypeName(table);
+  // Condition types are always generated, so we always import them
+  const conditionEnabled = true;
   statements.push(
-    createImportDeclaration(inputTypesPath, [createInputTypeName, patchTypeName], true),
+    createImportDeclaration(inputTypesPath, [
+      createInputTypeName,
+      patchTypeName,
+      selectTypeName,
+      whereTypeName,
+      conditionTypeName,
+      orderByTypeName,
+    ], true),
+  );
+
+  // Import FindManyArgs/FindFirstArgs from select-types for proper generic typing
+  const selectTypesPath = options?.targetName
+    ? `../../../orm/select-types`
+    : `../../orm/select-types`;
+  statements.push(
+    createImportDeclaration(selectTypesPath, ['FindManyArgs', 'FindFirstArgs'], true),
   );
 
   // Generate field schema for type coercion
@@ -1579,9 +1658,9 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
 
   const tn = options?.targetName;
   const ormTypes = { createInputTypeName, patchTypeName, innerFieldName };
-  statements.push(buildListHandler(table, vectorFieldNames, tn, options?.typeRegistry));
-  statements.push(buildFindFirstHandler(table, tn, options?.typeRegistry));
-  if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, vectorFieldNames, tn, options?.typeRegistry));
+  statements.push(buildListHandler(table, vectorFieldNames, tn, options?.typeRegistry, conditionEnabled));
+  statements.push(buildFindFirstHandler(table, tn, options?.typeRegistry, conditionEnabled));
+  if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, vectorFieldNames, tn, options?.typeRegistry, conditionEnabled));
   if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
   statements.push(buildMutationHandler(table, 'create', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
   if (hasUpdate) statements.push(buildMutationHandler(table, 'update', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
