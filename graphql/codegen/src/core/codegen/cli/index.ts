@@ -14,7 +14,7 @@ import {
   generateMultiTargetContextCommand,
 } from './infra-generator';
 import { generateTableCommand } from './table-command-generator';
-import { generateUtilsFile, generateNodeFetchFile, generateEntryPointFile } from './utils-generator';
+import { generateUtilsFile, generateNodeFetchFile, generateEntryPointFile, generateEmbedderFile } from './utils-generator';
 
 export interface GenerateCliOptions {
   tables: Table[];
@@ -58,6 +58,14 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
 
   const utilsFile = generateUtilsFile();
   files.push(utilsFile);
+
+  // Generate embedder module if any table has vector embedding fields
+  const hasAnyEmbeddings = tables.some((t) =>
+    t.fields.some((f) => f.type.gqlType === 'Vector' || f.type.gqlType === '[Float]'),
+  );
+  if (hasAnyEmbeddings) {
+    files.push(generateEmbedderFile());
+  }
 
   // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
   if (useNodeHttpAdapter) {
@@ -180,6 +188,16 @@ export function generateMultiTargetCli(
   const utilsFile = generateUtilsFile();
   files.push(utilsFile);
 
+  // Generate embedder module if any target has tables with vector embedding fields
+  const hasAnyMtEmbeddings = targets.some((tgt) =>
+    tgt.tables.some((t) =>
+      t.fields.some((f) => f.type.gqlType === 'Vector' || f.type.gqlType === '[Float]'),
+    ),
+  );
+  if (hasAnyMtEmbeddings) {
+    files.push(generateEmbedderFile());
+  }
+
   // Generate node HTTP adapter if configured (for *.localhost subdomain routing)
   if (options.nodeHttpAdapter) {
     files.push(generateNodeFetchFile());
@@ -299,5 +317,5 @@ export {
 export type { MultiTargetDocsInput } from './docs-generator';
 export { resolveDocsConfig } from '../docs-utils';
 export type { GeneratedDocFile } from '../docs-utils';
-export { generateUtilsFile, generateEntryPointFile } from './utils-generator';
+export { generateUtilsFile, generateEntryPointFile, generateEmbedderFile } from './utils-generator';
 export type { GeneratedFile, MultiTargetExecutorInput } from './executor-generator';

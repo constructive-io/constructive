@@ -296,6 +296,161 @@ export function buildSpecialFieldsPlain(groups: SpecialFieldGroup[]): string[] {
   return lines;
 }
 
+// ---------------------------------------------------------------------------
+// Search-specific CLI examples for generated docs
+// ---------------------------------------------------------------------------
+
+export interface SearchExample {
+  description: string;
+  code: string[];
+}
+
+/**
+ * Build concrete, field-specific CLI examples for tables with search fields.
+ * Uses the same field-name derivation logic as buildSearchHandler in
+ * table-command-generator.ts so the examples match the actual generated code.
+ *
+ * Returns an empty array when the table has no search/embedding fields.
+ */
+export function buildSearchExamples(
+  specialGroups: SpecialFieldGroup[],
+  toolName: string,
+  cmd: string,
+): SearchExample[] {
+  const examples: SearchExample[] = [];
+  const scoreFields: string[] = [];
+
+  for (const group of specialGroups) {
+    for (const field of group.fields) {
+      // tsvector (FullText scalar) — where input uses the column name directly
+      if (field.type.gqlType === 'FullText' && !field.type.isArray) {
+        examples.push({
+          description: `Full-text search via tsvector (\`${field.name}\`)`,
+          code: [
+            `${toolName} ${cmd} list --where.${field.name} "search query" --select title,tsvRank`,
+          ],
+        });
+        scoreFields.push('tsvRank');
+      }
+
+      // BM25 computed score — bodyBm25Score → bm25Body
+      if (/Bm25Score$/.test(field.name)) {
+        const baseName = field.name.replace(/Bm25Score$/, '');
+        const inputName = `bm25${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}`;
+        examples.push({
+          description: `BM25 keyword search via \`${inputName}\``,
+          code: [
+            `${toolName} ${cmd} list --where.${inputName}.query "search query" --select title,${field.name}`,
+          ],
+        });
+        scoreFields.push(field.name);
+      }
+
+      // Trigram similarity — titleTrgmSimilarity → trgmTitle
+      if (/TrgmSimilarity$/.test(field.name)) {
+        const baseName = field.name.replace(/TrgmSimilarity$/, '');
+        const inputName = `trgm${baseName.charAt(0).toUpperCase()}${baseName.slice(1)}`;
+        examples.push({
+          description: `Fuzzy search via trigram similarity (\`${inputName}\`)`,
+          code: [
+            `${toolName} ${cmd} list --where.${inputName}.value "approximate query" --where.${inputName}.threshold 0.3 --select title,${field.name}`,
+          ],
+        });
+        scoreFields.push(field.name);
+      }
+
+      // pgvector embedding — uses column name, with --auto-embed for text-to-vector
+      if (group.category === 'embedding') {
+        examples.push({
+          description: `Vector similarity search via \`${field.name}\` (manual vector)`,
+          code: [
+            `# Pass a pre-computed vector array via dot-notation`,
+            `${toolName} ${cmd} list --where.${field.name}.vector '[0.1,0.2,0.3]' --where.${field.name}.distance 1.0 --select title,${field.name}VectorDistance`,
+          ],
+        });
+        examples.push({
+          description: `Vector semantic search via \`${field.name}\` with --auto-embed`,
+          code: [
+            `# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} search "semantic query" --auto-embed --select title,${field.name}VectorDistance`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} list --where.${field.name}.vector "semantic query" --auto-embed --select title,${field.name}VectorDistance`,
+          ],
+        });
+        examples.push({
+          description: `Create/update with auto-embedded \`${field.name}\` via --auto-embed`,
+          code: [
+            `# --auto-embed on create/update converts text strings in vector fields to embeddings before saving`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} create --${field.name} "text to embed" --auto-embed`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} update --${field.name} "new text to embed" --auto-embed`,
+          ],
+        });
+      }
+
+      // searchScore — composite blend field, useful for ordering
+      if (field.name === 'searchScore') {
+        scoreFields.push('searchScore');
+      }
+    }
+  }
+
+  // Composite fullTextSearch example (dispatches to all text adapters)
+  const hasTextSearch = specialGroups.some(
+    (g) => g.category === 'search' && g.fields.some(
+      (f) => f.type.gqlType === 'FullText' || /TrgmSimilarity$/.test(f.name) || /Bm25Score$/.test(f.name),
+    ),
+  );
+  if (hasTextSearch) {
+    const fieldsArg = scoreFields.length > 0
+      ? `title,${[...new Set(scoreFields)].join(',')}`
+      : 'title';
+    examples.push({
+      description: 'Composite search (fullTextSearch dispatches to all text adapters)',
+      code: [
+        `${toolName} ${cmd} list --where.fullTextSearch "search query" --select ${fieldsArg}`,
+      ],
+    });
+  }
+
+  // Combined search + pagination + ordering example
+  if (examples.length > 0) {
+    examples.push({
+      description: 'Search with pagination and field projection',
+      code: [
+        `${toolName} ${cmd} list --where.fullTextSearch "query" --limit 10 --select id,title,searchScore`,
+        `${toolName} ${cmd} search "query" --limit 10 --select id,title,searchScore`,
+      ],
+    });
+  }
+
+  return examples;
+}
+
+/**
+ * Build markdown lines for search-specific examples in README-style docs.
+ * Returns empty array when there are no search examples.
+ */
+export function buildSearchExamplesMarkdown(
+  specialGroups: SpecialFieldGroup[],
+  toolName: string,
+  cmd: string,
+): string[] {
+  const examples = buildSearchExamples(specialGroups, toolName, cmd);
+  if (examples.length === 0) return [];
+  const lines: string[] = [];
+  lines.push('**Search Examples:**');
+  lines.push('');
+  for (const ex of examples) {
+    lines.push(`*${ex.description}:*`);
+    lines.push('```bash');
+    for (const c of ex.code) {
+      lines.push(c);
+    }
+    lines.push('```');
+    lines.push('');
+  }
+  return lines;
+}
+
 /**
  * Represents a flattened argument for docs/skills generation.
  * INPUT_OBJECT args are expanded to dot-notation fields.

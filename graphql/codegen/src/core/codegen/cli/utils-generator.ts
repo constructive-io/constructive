@@ -94,3 +94,20 @@ export function generateEntryPointFile(): GeneratedFile {
     ),
   };
 }
+
+/**
+ * Generate an embedder.ts file with pluggable text-to-vector embedding.
+ *
+ * Provides a runtime embedder registry using @agentic-kit/ollama so that
+ * CLI search and list commands can convert text queries into vector arrays
+ * for pgvector similarity search when --auto-embed is passed.
+ */
+export function generateEmbedderFile(): GeneratedFile {
+  return {
+    fileName: 'embedder.ts',
+    content: readTemplateFile(
+      'embedder.ts',
+      'CLI embedder — pluggable text-to-vector embedding for search commands',
+    ),
+  };
+}

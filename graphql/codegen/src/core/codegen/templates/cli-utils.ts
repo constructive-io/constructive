@@ -229,16 +229,16 @@ export function parseOrderByFlag(
 }
 
 /**
- * Parse --fields flag into a select object, falling back to a default.
- * e.g. --fields id,name → { id: true, name: true }
+ * Parse --select flag into a select object, falling back to a default.
+ * e.g. --select id,name → { id: true, name: true }
  */
 export function parseSelectFlag(
   argv: Record<string, unknown>,
   defaultSelect: Record<string, unknown>,
 ): Record<string, unknown> {
-  const fields = argv.fields;
-  return typeof fields === 'string'
-    ? buildSelectFromPaths(fields)
+  const raw = argv.select;
+  return typeof raw === 'string'
+    ? buildSelectFromPaths(raw)
     : defaultSelect;
 }
 
