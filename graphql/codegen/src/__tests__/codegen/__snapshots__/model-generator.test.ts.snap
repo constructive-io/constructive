@@ -9,11 +9,11 @@ exports[`model-generator generates model with all CRUD methods 1`] = `
 import { OrmClient } from "../client";
 import { QueryBuilder, buildFindManyDocument, buildFindFirstDocument, buildFindOneDocument, buildCreateDocument, buildUpdateByPkDocument, buildDeleteByPkDocument } from "../query-builder";
 import type { ConnectionResult, FindManyArgs, FindFirstArgs, CreateArgs, UpdateArgs, DeleteArgs, InferSelectResult, StrictSelect } from "../select-types";
-import type { User, UserWithRelations, UserSelect, UserFilter, UserCondition, UsersOrderBy, CreateUserInput, UpdateUserInput, UserPatch } from "../input-types";
+import type { User, UserWithRelations, UserSelect, UserFilter, UsersOrderBy, CreateUserInput, UpdateUserInput, UserPatch } from "../input-types";
 import { connectionFieldsMap } from "../input-types";
 export class UserModel {
   constructor(private client: OrmClient) {}
-  findMany<S extends UserSelect>(args: FindManyArgs<S, UserFilter, UserCondition, UsersOrderBy> & {
+  findMany<S extends UserSelect>(args: FindManyArgs<S, UserFilter, never, UsersOrderBy> & {
     select: S;
   } & StrictSelect<S, UserSelect>): QueryBuilder<{
     users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
@@ -23,14 +23,13 @@ export class UserModel {
       variables
     } = buildFindManyDocument("User", "users", args.select, {
       where: args?.where,
-      condition: args?.condition,
       orderBy: args?.orderBy as string[] | undefined,
       first: args?.first,
       last: args?.last,
       after: args?.after,
       before: args?.before,
       offset: args?.offset
-    }, "UserFilter", "UsersOrderBy", connectionFieldsMap, "UserCondition");
+    }, "UserFilter", "UsersOrderBy", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -40,7 +39,7 @@ export class UserModel {
       variables
     });
   }
-  findFirst<S extends UserSelect>(args: FindFirstArgs<S, UserFilter, UserCondition> & {
+  findFirst<S extends UserSelect>(args: FindFirstArgs<S, UserFilter> & {
     select: S;
   } & StrictSelect<S, UserSelect>): QueryBuilder<{
     users: {
@@ -51,9 +50,8 @@ export class UserModel {
       document,
       variables
     } = buildFindFirstDocument("User", "users", args.select, {
-      where: args?.where,
-      condition: args?.condition
-    }, "UserFilter", connectionFieldsMap, "UserCondition");
+      where: args?.where
+    }, "UserFilter", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -160,11 +158,11 @@ exports[`model-generator generates model without update/delete when not availabl
 import { OrmClient } from "../client";
 import { QueryBuilder, buildFindManyDocument, buildFindFirstDocument, buildFindOneDocument, buildCreateDocument, buildUpdateByPkDocument, buildDeleteByPkDocument } from "../query-builder";
 import type { ConnectionResult, FindManyArgs, FindFirstArgs, CreateArgs, UpdateArgs, DeleteArgs, InferSelectResult, StrictSelect } from "../select-types";
-import type { AuditLog, AuditLogWithRelations, AuditLogSelect, AuditLogFilter, AuditLogCondition, AuditLogsOrderBy, CreateAuditLogInput, UpdateAuditLogInput, AuditLogPatch } from "../input-types";
+import type { AuditLog, AuditLogWithRelations, AuditLogSelect, AuditLogFilter, AuditLogsOrderBy, CreateAuditLogInput, UpdateAuditLogInput, AuditLogPatch } from "../input-types";
 import { connectionFieldsMap } from "../input-types";
 export class AuditLogModel {
   constructor(private client: OrmClient) {}
-  findMany<S extends AuditLogSelect>(args: FindManyArgs<S, AuditLogFilter, AuditLogCondition, AuditLogsOrderBy> & {
+  findMany<S extends AuditLogSelect>(args: FindManyArgs<S, AuditLogFilter, never, AuditLogsOrderBy> & {
     select: S;
   } & StrictSelect<S, AuditLogSelect>): QueryBuilder<{
     auditLogs: ConnectionResult<InferSelectResult<AuditLogWithRelations, S>>;
@@ -174,14 +172,13 @@ export class AuditLogModel {
       variables
     } = buildFindManyDocument("AuditLog", "auditLogs", args.select, {
       where: args?.where,
-      condition: args?.condition,
       orderBy: args?.orderBy as string[] | undefined,
       first: args?.first,
       last: args?.last,
       after: args?.after,
       before: args?.before,
       offset: args?.offset
-    }, "AuditLogFilter", "AuditLogsOrderBy", connectionFieldsMap, "AuditLogCondition");
+    }, "AuditLogFilter", "AuditLogsOrderBy", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -191,7 +188,7 @@ export class AuditLogModel {
       variables
     });
   }
-  findFirst<S extends AuditLogSelect>(args: FindFirstArgs<S, AuditLogFilter, AuditLogCondition> & {
+  findFirst<S extends AuditLogSelect>(args: FindFirstArgs<S, AuditLogFilter> & {
     select: S;
   } & StrictSelect<S, AuditLogSelect>): QueryBuilder<{
     auditLogs: {
@@ -202,9 +199,8 @@ export class AuditLogModel {
       document,
       variables
     } = buildFindFirstDocument("AuditLog", "auditLogs", args.select, {
-      where: args?.where,
-      condition: args?.condition
-    }, "AuditLogFilter", connectionFieldsMap, "AuditLogCondition");
+      where: args?.where
+    }, "AuditLogFilter", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -265,11 +261,11 @@ exports[`model-generator handles custom query/mutation names 1`] = `
 import { OrmClient } from "../client";
 import { QueryBuilder, buildFindManyDocument, buildFindFirstDocument, buildFindOneDocument, buildCreateDocument, buildUpdateByPkDocument, buildDeleteByPkDocument } from "../query-builder";
 import type { ConnectionResult, FindManyArgs, FindFirstArgs, CreateArgs, UpdateArgs, DeleteArgs, InferSelectResult, StrictSelect } from "../select-types";
-import type { Organization, OrganizationWithRelations, OrganizationSelect, OrganizationFilter, OrganizationCondition, OrganizationsOrderBy, CreateOrganizationInput, UpdateOrganizationInput, OrganizationPatch } from "../input-types";
+import type { Organization, OrganizationWithRelations, OrganizationSelect, OrganizationFilter, OrganizationsOrderBy, CreateOrganizationInput, UpdateOrganizationInput, OrganizationPatch } from "../input-types";
 import { connectionFieldsMap } from "../input-types";
 export class OrganizationModel {
   constructor(private client: OrmClient) {}
-  findMany<S extends OrganizationSelect>(args: FindManyArgs<S, OrganizationFilter, OrganizationCondition, OrganizationsOrderBy> & {
+  findMany<S extends OrganizationSelect>(args: FindManyArgs<S, OrganizationFilter, never, OrganizationsOrderBy> & {
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
     allOrganizations: ConnectionResult<InferSelectResult<OrganizationWithRelations, S>>;
@@ -279,14 +275,13 @@ export class OrganizationModel {
       variables
     } = buildFindManyDocument("Organization", "allOrganizations", args.select, {
       where: args?.where,
-      condition: args?.condition,
       orderBy: args?.orderBy as string[] | undefined,
       first: args?.first,
       last: args?.last,
       after: args?.after,
       before: args?.before,
       offset: args?.offset
-    }, "OrganizationFilter", "OrganizationsOrderBy", connectionFieldsMap, "OrganizationCondition");
+    }, "OrganizationFilter", "OrganizationsOrderBy", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
@@ -296,7 +291,7 @@ export class OrganizationModel {
       variables
     });
   }
-  findFirst<S extends OrganizationSelect>(args: FindFirstArgs<S, OrganizationFilter, OrganizationCondition> & {
+  findFirst<S extends OrganizationSelect>(args: FindFirstArgs<S, OrganizationFilter> & {
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
     allOrganizations: {
@@ -307,9 +302,8 @@ export class OrganizationModel {
       document,
       variables
     } = buildFindFirstDocument("Organization", "allOrganizations", args.select, {
-      where: args?.where,
-      condition: args?.condition
-    }, "OrganizationFilter", connectionFieldsMap, "OrganizationCondition");
+      where: args?.where
+    }, "OrganizationFilter", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",

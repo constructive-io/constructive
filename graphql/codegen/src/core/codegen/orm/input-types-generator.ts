@@ -2093,7 +2093,7 @@ export function generateInputTypesFile(
   comments: boolean = true,
   options?: { condition?: boolean },
 ): GeneratedInputTypesFile {
-  const conditionEnabled = options?.condition !== false;
+  const conditionEnabled = options?.condition === true;
   const statements: t.Statement[] = [];
   const tablesList = tables ?? [];
   const hasTables = tablesList.length > 0;

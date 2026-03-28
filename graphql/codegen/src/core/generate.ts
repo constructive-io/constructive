@@ -714,12 +714,14 @@ export async function generateMulti(
       firstTargetConfig?.nodeHttpAdapter === true ||
       (firstTargetConfig?.nodeHttpAdapter !== false);
 
+    const multiConditionEnabled = firstTargetConfig?.codegen?.condition === true;
     const { files } = generateMultiTargetCli({
       toolName,
       builtinNames: cliConfig.builtinNames,
       targets: cliTargets,
       nodeHttpAdapter: multiNodeHttpAdapter,
       entryPoint: cliConfig.entryPoint,
+      condition: multiConditionEnabled,
     });
 
     const cliFilesToWrite = files.map((file) => ({

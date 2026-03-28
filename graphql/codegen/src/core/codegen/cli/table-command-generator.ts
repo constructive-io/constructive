@@ -527,7 +527,7 @@ function buildFindFirstArgsType(table: Table, conditionEnabled: boolean): t.TSTy
   );
 }
 
-function buildListHandler(table: Table, vectorFieldNames: string[], targetName?: string, typeRegistry?: TypeRegistry, conditionEnabled = true): t.FunctionDeclaration {
+function buildListHandler(table: Table, vectorFieldNames: string[], targetName?: string, typeRegistry?: TypeRegistry, conditionEnabled = false): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
@@ -625,7 +625,7 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
  * Accepts --select, --where.<field>.<op>, --condition.<field>.<op> flags.
  * Internally calls findMany with first:1 and returns a single record (or null).
  */
-function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry, conditionEnabled = true): t.FunctionDeclaration {
+function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry, conditionEnabled = false): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
 
@@ -715,7 +715,7 @@ function buildSearchHandler(
   vectorFieldNames: string[],
   targetName?: string,
   typeRegistry?: TypeRegistry,
-  conditionEnabled = true,
+  conditionEnabled = false,
 ): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
@@ -1304,6 +1304,8 @@ export interface TableCommandOptions {
   executorImportPath?: string;
   /** TypeRegistry from introspection, used to check field defaults */
   typeRegistry?: TypeRegistry;
+  /** Whether PostGraphile condition types are enabled (default: true) */
+  condition?: boolean;
 }
 
 export function generateTableCommand(table: Table, options?: TableCommandOptions): GeneratedFile {
@@ -1346,17 +1348,16 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   // Import table-specific ORM types for generic type parameters on parseFindManyArgs/parseFindFirstArgs
   const selectTypeName = `${typeName}Select`;
   const whereTypeName = getFilterTypeName(table);
-  const conditionTypeName = getConditionTypeName(table);
   const orderByTypeName = getOrderByTypeName(table);
-  // Condition types are always generated, so we always import them
-  const conditionEnabled = true;
+  const conditionEnabled = options?.condition === true;
+  const conditionTypeName = conditionEnabled ? getConditionTypeName(table) : undefined;
   statements.push(
     createImportDeclaration(inputTypesPath, [
       createInputTypeName,
       patchTypeName,
       selectTypeName,
       whereTypeName,
-      conditionTypeName,
+      ...(conditionTypeName ? [conditionTypeName] : []),
       orderByTypeName,
     ], true),
   );

@@ -373,31 +373,6 @@ export interface CommentFilter {
   or?: CommentFilter[];
   not?: CommentFilter;
 }
-// ============ Table Condition Types ============
-export interface UserCondition {
-  id?: string | null;
-  email?: string | null;
-  name?: string | null;
-  age?: number | null;
-  isActive?: boolean | null;
-  createdAt?: string | null;
-  metadata?: unknown | null;
-}
-export interface PostCondition {
-  id?: string | null;
-  title?: string | null;
-  content?: string | null;
-  authorId?: string | null;
-  publishedAt?: string | null;
-  tags?: string | null;
-}
-export interface CommentCondition {
-  id?: string | null;
-  body?: string | null;
-  postId?: string | null;
-  authorId?: string | null;
-  createdAt?: string | null;
-}
 // ============ OrderBy Types ============
 export type UsersOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "AGE_ASC" | "AGE_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "METADATA_ASC" | "METADATA_DESC";
 export type PostsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "ID_ASC" | "ID_DESC" | "TITLE_ASC" | "TITLE_DESC" | "CONTENT_ASC" | "CONTENT_DESC" | "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "PUBLISHED_AT_ASC" | "PUBLISHED_AT_DESC" | "TAGS_ASC" | "TAGS_DESC";
@@ -771,16 +746,6 @@ export interface UserFilter {
   or?: UserFilter[];
   not?: UserFilter;
 }
-// ============ Table Condition Types ============
-export interface UserCondition {
-  id?: string | null;
-  email?: string | null;
-  name?: string | null;
-  age?: number | null;
-  isActive?: boolean | null;
-  createdAt?: string | null;
-  metadata?: unknown | null;
-}
 // ============ OrderBy Types ============
 export type UsersOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "AGE_ASC" | "AGE_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "METADATA_ASC" | "METADATA_DESC";
 // ============ CRUD Input Types ============
@@ -1095,16 +1060,6 @@ export interface UserFilter {
   and?: UserFilter[];
   or?: UserFilter[];
   not?: UserFilter;
-}
-// ============ Table Condition Types ============
-export interface UserCondition {
-  id?: string | null;
-  email?: string | null;
-  name?: string | null;
-  age?: number | null;
-  isActive?: boolean | null;
-  createdAt?: string | null;
-  metadata?: unknown | null;
 }
 // ============ OrderBy Types ============
 export type UsersOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "AGE_ASC" | "AGE_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "METADATA_ASC" | "METADATA_DESC";
@@ -1432,16 +1387,6 @@ export interface UserFilter {
   and?: UserFilter[];
   or?: UserFilter[];
   not?: UserFilter;
-}
-// ============ Table Condition Types ============
-export interface UserCondition {
-  id?: string | null;
-  email?: string | null;
-  name?: string | null;
-  age?: number | null;
-  isActive?: boolean | null;
-  createdAt?: string | null;
-  metadata?: unknown | null;
 }
 // ============ OrderBy Types ============
 export type UsersOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "AGE_ASC" | "AGE_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "METADATA_ASC" | "METADATA_DESC";
@@ -1814,22 +1759,6 @@ export interface ProfileFilter {
   and?: ProfileFilter[];
   or?: ProfileFilter[];
   not?: ProfileFilter;
-}
-// ============ Table Condition Types ============
-export interface UserCondition {
-  id?: string | null;
-  email?: string | null;
-  name?: string | null;
-  age?: number | null;
-  isActive?: boolean | null;
-  createdAt?: string | null;
-  metadata?: unknown | null;
-}
-export interface ProfileCondition {
-  id?: string | null;
-  bio?: string | null;
-  userId?: string | null;
-  avatarUrl?: string | null;
 }
 // ============ OrderBy Types ============
 export type UsersOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "ID_ASC" | "ID_DESC" | "EMAIL_ASC" | "EMAIL_DESC" | "NAME_ASC" | "NAME_DESC" | "AGE_ASC" | "AGE_DESC" | "IS_ACTIVE_ASC" | "IS_ACTIVE_DESC" | "CREATED_AT_ASC" | "CREATED_AT_DESC" | "METADATA_ASC" | "METADATA_DESC";
@@ -2209,20 +2138,6 @@ export interface CategoryFilter {
   and?: CategoryFilter[];
   or?: CategoryFilter[];
   not?: CategoryFilter;
-}
-// ============ Table Condition Types ============
-export interface PostCondition {
-  id?: string | null;
-  title?: string | null;
-  content?: string | null;
-  authorId?: string | null;
-  publishedAt?: string | null;
-  tags?: string | null;
-}
-export interface CategoryCondition {
-  id?: string | null;
-  name?: string | null;
-  slug?: string | null;
 }
 // ============ OrderBy Types ============
 export type PostsOrderBy = "PRIMARY_KEY_ASC" | "PRIMARY_KEY_DESC" | "NATURAL" | "ID_ASC" | "ID_DESC" | "TITLE_ASC" | "TITLE_DESC" | "CONTENT_ASC" | "CONTENT_DESC" | "AUTHOR_ID_ASC" | "AUTHOR_ID_DESC" | "PUBLISHED_AT_ASC" | "PUBLISHED_AT_DESC" | "TAGS_ASC" | "TAGS_DESC";
