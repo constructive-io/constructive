@@ -452,7 +452,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '2',
       '--where.species.equalTo',
       'Cat',
-      '--fields',
+      '--select',
       'id,name,species',
     );
 
@@ -486,7 +486,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       'list',
       '--limit',
       '2',
-      '--fields',
+      '--select',
       'id,name',
     );
     const page1Raw = JSON.parse(page1Output);
@@ -508,7 +508,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       '2',
       '--after',
       page1.pageInfo.endCursor,
-      '--fields',
+      '--select',
       'id,name',
     );
     const page2Raw = JSON.parse(page2Output);
@@ -536,7 +536,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       'find-first',
       '--where.name.equalTo',
       'Buddy',
-      '--fields',
+      '--select',
       'id,name,species',
     );
 
@@ -564,7 +564,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       'Cat',
       '--orderBy',
       'ID_ASC',
-      '--fields',
+      '--select',
       'id,name,species',
     );
 
@@ -593,7 +593,7 @@ describe('CLI E2E — generated CLI against real DB', () => {
       'list',
       '--where.species.equalTo',
       'Fish',
-      '--fields',
+      '--select',
       'id,name',
     );
 
@@ -857,7 +857,7 @@ describe('CLI E2E — search commands against real DB', () => {
       'list',
       '--where.tsvTsv',
       'machine learning',
-      '--fields',
+      '--select',
       'title,tsvRank',
     );
 
@@ -891,7 +891,7 @@ describe('CLI E2E — search commands against real DB', () => {
       'machin lerning',
       '--where.trgmTitle.threshold',
       '0.1',
-      '--fields',
+      '--select',
       'title,titleTrgmSimilarity',
     );
 
@@ -920,7 +920,7 @@ describe('CLI E2E — search commands against real DB', () => {
       'list',
       '--where.fullTextSearch',
       'vector databases',
-      '--fields',
+      '--select',
       'title,searchScore',
     );
 
@@ -955,7 +955,7 @@ describe('CLI E2E — search commands against real DB', () => {
       'PostgreSQL',
       '--limit',
       '2',
-      '--fields',
+      '--select',
       'title,tsvRank',
     );
 
@@ -993,7 +993,7 @@ describe('CLI E2E — search commands against real DB', () => {
       '[0.1,0.9,0.3]',
       '--where.vectorEmbedding.distance',
       '1.0',
-      '--fields',
+      '--select',
       'title,embeddingVectorDistance',
     );
 
@@ -1205,7 +1205,7 @@ describe('CLI E2E — embedder / --auto-embed', () => {
           'search',
           'machine learning',
           '--auto-embed',
-          '--fields',
+          '--select',
           'title',
         ],
         // Explicitly unset EMBEDDER_PROVIDER
@@ -1244,7 +1244,7 @@ describe('CLI E2E — embedder / --auto-embed', () => {
         '--where.embedding.vector',
         'machine learning AI',
         '--auto-embed',
-        '--fields',
+        '--select',
         'title,embeddingVectorDistance',
       ],
       {
@@ -1294,7 +1294,7 @@ describe('CLI E2E — embedder / --auto-embed', () => {
         'search',
         'vector databases',
         '--auto-embed',
-        '--fields',
+        '--select',
         'title',
       ],
       {

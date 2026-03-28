@@ -427,7 +427,7 @@ export function generateSkills(
           },
           {
             description: `List ${singularName} records with field selection`,
-            code: [`${toolName} ${kebab} list --fields id,${pk.name}`],
+            code: [`${toolName} ${kebab} list --select id,${pk.name}`],
           },
           {
             description: `List ${singularName} records with filtering and ordering`,

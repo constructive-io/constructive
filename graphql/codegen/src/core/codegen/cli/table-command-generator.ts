@@ -572,7 +572,7 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
 
 /**
  * Build a `handleFindFirst` function — CLI equivalent of the TS SDK's findFirst().
- * Accepts --fields, --where.<field>.<op>, --condition.<field>.<op> flags.
+ * Accepts --select, --where.<field>.<op>, --condition.<field>.<op> flags.
  * Internally calls findMany with first:1 and returns a single record (or null).
  */
 function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
@@ -654,7 +654,7 @@ function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?:
  * Build a `handleSearch` function for tables with search-capable fields.
  * Extracts the first positional arg as the query string and auto-builds a
  * `where` clause that targets all detected search fields (tsvector, BM25,
- * trigram, vector embedding).  Supports --limit, --offset, --fields, --orderBy.
+ * trigram, vector embedding).  Supports --limit, --offset, --select, --orderBy.
  */
 function buildSearchHandler(
   table: Table,
@@ -1376,13 +1376,13 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     '  --after <cursor>      Cursor for forward pagination',
     '  --before <cursor>     Cursor for backward pagination',
     '  --offset <n>          Number of records to skip',
-    '  --fields <fields>     Comma-separated list of fields to return',
+    '  --select <fields>     Comma-separated list of fields to return',
     '  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)',
     '  --condition.<f>.<op>  Condition filter (dot-notation)',
     '  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)',
     '',
     'Find-First Options:',
-    '  --fields <fields>     Comma-separated list of fields to return',
+    '  --select <fields>     Comma-separated list of fields to return',
     '  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)',
     '  --condition.<f>.<op>  Condition filter (dot-notation)',
     '',
@@ -1393,7 +1393,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
       '  <query>               Search query string (required)',
       '  --limit <n>           Max number of records to return',
       '  --offset <n>          Number of records to skip',
-      '  --fields <fields>     Comma-separated list of fields to return',
+      '  --select <fields>     Comma-separated list of fields to return',
       '  --orderBy <values>    Comma-separated list of ordering values',
     );
     if (hasEmbeddings) {

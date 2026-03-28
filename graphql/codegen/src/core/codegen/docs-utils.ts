@@ -327,7 +327,7 @@ export function buildSearchExamples(
         examples.push({
           description: `Full-text search via tsvector (\`${field.name}\`)`,
           code: [
-            `${toolName} ${cmd} list --where.${field.name} "search query" --fields title,tsvRank`,
+            `${toolName} ${cmd} list --where.${field.name} "search query" --select title,tsvRank`,
           ],
         });
         scoreFields.push('tsvRank');
@@ -340,7 +340,7 @@ export function buildSearchExamples(
         examples.push({
           description: `BM25 keyword search via \`${inputName}\``,
           code: [
-            `${toolName} ${cmd} list --where.${inputName}.query "search query" --fields title,${field.name}`,
+            `${toolName} ${cmd} list --where.${inputName}.query "search query" --select title,${field.name}`,
           ],
         });
         scoreFields.push(field.name);
@@ -353,7 +353,7 @@ export function buildSearchExamples(
         examples.push({
           description: `Fuzzy search via trigram similarity (\`${inputName}\`)`,
           code: [
-            `${toolName} ${cmd} list --where.${inputName}.value "approximate query" --where.${inputName}.threshold 0.3 --fields title,${field.name}`,
+            `${toolName} ${cmd} list --where.${inputName}.value "approximate query" --where.${inputName}.threshold 0.3 --select title,${field.name}`,
           ],
         });
         scoreFields.push(field.name);
@@ -365,15 +365,15 @@ export function buildSearchExamples(
           description: `Vector similarity search via \`${field.name}\` (manual vector)`,
           code: [
             `# Pass a pre-computed vector array via dot-notation`,
-            `${toolName} ${cmd} list --where.${field.name}.vector '[0.1,0.2,0.3]' --where.${field.name}.distance 1.0 --fields title,${field.name}VectorDistance`,
+            `${toolName} ${cmd} list --where.${field.name}.vector '[0.1,0.2,0.3]' --where.${field.name}.distance 1.0 --select title,${field.name}VectorDistance`,
           ],
         });
         examples.push({
           description: `Vector semantic search via \`${field.name}\` with --auto-embed`,
           code: [
             `# --auto-embed converts text to vectors using the configured embedder (e.g. Ollama nomic-embed-text)`,
-            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} search "semantic query" --auto-embed --fields title,${field.name}VectorDistance`,
-            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} list --where.${field.name}.vector "semantic query" --auto-embed --fields title,${field.name}VectorDistance`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} search "semantic query" --auto-embed --select title,${field.name}VectorDistance`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} list --where.${field.name}.vector "semantic query" --auto-embed --select title,${field.name}VectorDistance`,
           ],
         });
         examples.push({
@@ -406,7 +406,7 @@ export function buildSearchExamples(
     examples.push({
       description: 'Composite search (fullTextSearch dispatches to all text adapters)',
       code: [
-        `${toolName} ${cmd} list --where.fullTextSearch "search query" --fields ${fieldsArg}`,
+        `${toolName} ${cmd} list --where.fullTextSearch "search query" --select ${fieldsArg}`,
       ],
     });
   }
@@ -416,8 +416,8 @@ export function buildSearchExamples(
     examples.push({
       description: 'Search with pagination and field projection',
       code: [
-        `${toolName} ${cmd} list --where.fullTextSearch "query" --limit 10 --fields id,title,searchScore`,
-        `${toolName} ${cmd} search "query" --limit 10 --fields id,title,searchScore`,
+        `${toolName} ${cmd} list --where.fullTextSearch "query" --limit 10 --select id,title,searchScore`,
+        `${toolName} ${cmd} search "query" --limit 10 --select id,title,searchScore`,
       ],
     });
   }
