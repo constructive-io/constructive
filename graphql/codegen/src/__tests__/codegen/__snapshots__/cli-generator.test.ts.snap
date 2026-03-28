@@ -697,7 +697,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
-import type { CreateCarInput, CarPatch, CarSelect, CarFilter, CarCondition, CarsOrderBy } from "../../orm/input-types";
+import type { CreateCarInput, CarPatch, CarSelect, CarFilter, CarsOrderBy } from "../../orm/input-types";
 import type { FindManyArgs, FindFirstArgs } from "../../orm/select-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
@@ -757,7 +757,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isElectric: true,
       createdAt: true
     };
-    const findManyArgs = parseFindManyArgs<FindManyArgs<CarSelect, CarFilter, CarCondition, CarsOrderBy>>(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<FindManyArgs<CarSelect, CarFilter, never, CarsOrderBy>>(argv, defaultSelect);
     const client = getClient();
     const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -779,7 +779,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isElectric: true,
       createdAt: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter, CarCondition>>(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter, never>>(argv, defaultSelect);
     const client = getClient();
     const result = await client.car.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -1161,7 +1161,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../executor";
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../utils";
 import type { FieldSchema } from "../utils";
-import type { CreateDriverInput, DriverPatch, DriverSelect, DriverFilter, DriverCondition, DriversOrderBy } from "../../orm/input-types";
+import type { CreateDriverInput, DriverPatch, DriverSelect, DriverFilter, DriversOrderBy } from "../../orm/input-types";
 import type { FindManyArgs, FindFirstArgs } from "../../orm/select-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
@@ -1215,7 +1215,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       name: true,
       licenseNumber: true
     };
-    const findManyArgs = parseFindManyArgs<FindManyArgs<DriverSelect, DriverFilter, DriverCondition, DriversOrderBy>>(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<FindManyArgs<DriverSelect, DriverFilter, never, DriversOrderBy>>(argv, defaultSelect);
     const client = getClient();
     const result = await client.driver.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -1234,7 +1234,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       name: true,
       licenseNumber: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<DriverSelect, DriverFilter, DriverCondition>>(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<DriverSelect, DriverFilter, never>>(argv, defaultSelect);
     const client = getClient();
     const result = await client.driver.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3193,7 +3193,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
-import type { CreateUserInput, UserPatch, UserSelect, UserFilter, UserCondition, UsersOrderBy } from "../../../orm/input-types";
+import type { CreateUserInput, UserPatch, UserSelect, UserFilter, UsersOrderBy } from "../../../orm/input-types";
 import type { FindManyArgs, FindFirstArgs } from "../../../orm/select-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
@@ -3247,7 +3247,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       email: true,
       name: true
     };
-    const findManyArgs = parseFindManyArgs<FindManyArgs<UserSelect, UserFilter, UserCondition, UsersOrderBy>>(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<FindManyArgs<UserSelect, UserFilter, never, UsersOrderBy>>(argv, defaultSelect);
     const client = getClient("auth");
     const result = await client.user.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3266,7 +3266,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       email: true,
       name: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<UserSelect, UserFilter, UserCondition>>(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<UserSelect, UserFilter, never>>(argv, defaultSelect);
     const client = getClient("auth");
     const result = await client.user.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3423,7 +3423,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
-import type { CreateMemberInput, MemberPatch, MemberSelect, MemberFilter, MemberCondition, MembersOrderBy } from "../../../orm/input-types";
+import type { CreateMemberInput, MemberPatch, MemberSelect, MemberFilter, MembersOrderBy } from "../../../orm/input-types";
 import type { FindManyArgs, FindFirstArgs } from "../../../orm/select-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
@@ -3475,7 +3475,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       id: true,
       role: true
     };
-    const findManyArgs = parseFindManyArgs<FindManyArgs<MemberSelect, MemberFilter, MemberCondition, MembersOrderBy>>(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<FindManyArgs<MemberSelect, MemberFilter, never, MembersOrderBy>>(argv, defaultSelect);
     const client = getClient("members");
     const result = await client.member.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3493,7 +3493,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       id: true,
       role: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<MemberSelect, MemberFilter, MemberCondition>>(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<MemberSelect, MemberFilter, never>>(argv, defaultSelect);
     const client = getClient("members");
     const result = await client.member.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3635,7 +3635,7 @@ import { CLIOptions, Inquirerer, extractFirst } from "inquirerer";
 import { getClient } from "../../executor";
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from "../../utils";
 import type { FieldSchema } from "../../utils";
-import type { CreateCarInput, CarPatch, CarSelect, CarFilter, CarCondition, CarsOrderBy } from "../../../orm/input-types";
+import type { CreateCarInput, CarPatch, CarSelect, CarFilter, CarsOrderBy } from "../../../orm/input-types";
 import type { FindManyArgs, FindFirstArgs } from "../../../orm/select-types";
 const fieldSchema: FieldSchema = {
   id: "uuid",
@@ -3695,7 +3695,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isElectric: true,
       createdAt: true
     };
-    const findManyArgs = parseFindManyArgs<FindManyArgs<CarSelect, CarFilter, CarCondition, CarsOrderBy>>(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<FindManyArgs<CarSelect, CarFilter, never, CarsOrderBy>>(argv, defaultSelect);
     const client = getClient("app");
     const result = await client.car.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -3717,7 +3717,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isElectric: true,
       createdAt: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter, CarCondition>>(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter, never>>(argv, defaultSelect);
     const client = getClient("app");
     const result = await client.car.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

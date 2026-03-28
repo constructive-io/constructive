@@ -174,7 +174,7 @@ export function generateModelFile(
   options?: { condition?: boolean },
   allTables?: Table[],
 ): GeneratedModelFile {
-  const conditionEnabled = options?.condition !== false;
+  const conditionEnabled = options?.condition === true;
   const { typeName, singularName, pluralName } = getTableNames(table);
   const modelName = `${typeName}Model`;
   const baseFileName = lcFirst(typeName);

@@ -249,7 +249,7 @@ describe('model-generator', () => {
       },
     });
 
-    const result = generateModelFile(table, false);
+    const result = generateModelFile(table, false, { condition: true });
 
     // Condition type should be imported
     expect(result.content).toContain('ContactCondition');

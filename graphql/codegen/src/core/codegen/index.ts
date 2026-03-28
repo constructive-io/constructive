@@ -191,7 +191,7 @@ export function generate(options: GenerateOptions): GenerateResult {
   }
 
   // Condition types (PostGraphile simple equality filters)
-  const conditionEnabled = config.codegen?.condition !== false;
+  const conditionEnabled = config.codegen?.condition === true;
 
   // 4. Generate table-based query hooks (queries/*.ts)
   const queryHooks = generateAllQueryHooks(tables, {

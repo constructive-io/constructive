@@ -965,7 +965,7 @@ describe('plugin-injected condition fields', () => {
       },
     });
 
-    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+    const result = generateInputTypesFile(registry, new Set(), [contactTable], undefined, true, { condition: true });
 
     // Regular table column fields should still be present
     expect(result.content).toContain('export interface ContactCondition {');
@@ -1025,7 +1025,7 @@ describe('plugin-injected condition fields', () => {
       },
     });
 
-    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+    const result = generateInputTypesFile(registry, new Set(), [contactTable], undefined, true, { condition: true });
 
     // VectorNearbyInput should be generated (follows *Input pattern)
     expect(result.content).toContain('export interface VectorNearbyInput {');
@@ -1051,7 +1051,7 @@ describe('plugin-injected condition fields', () => {
       },
     });
 
-    const result = generateInputTypesFile(registry, new Set(), [contactTable]);
+    const result = generateInputTypesFile(registry, new Set(), [contactTable], undefined, true, { condition: true });
 
     // Count occurrences of 'id?' in the ContactCondition interface
     const conditionMatch = result.content.match(
@@ -1102,7 +1102,7 @@ describe('plugin-injected condition fields', () => {
 
   it('works without typeRegistry (backwards compatible)', () => {
     // When no typeRegistry has the condition type, only table columns are used
-    const result = generateInputTypesFile(new Map(), new Set(), [contactTable]);
+    const result = generateInputTypesFile(new Map(), new Set(), [contactTable], undefined, true, { condition: true });
 
     expect(result.content).toContain('export interface ContactCondition {');
     expect(result.content).toContain('id?: string | null;');

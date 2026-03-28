@@ -87,7 +87,7 @@ export function generateListQueryHook(
     reactQueryEnabled = true,
     useCentralizedKeys = true,
     hasRelationships = false,
-    condition: conditionEnabled = true,
+    condition: conditionEnabled = false,
   } = options;
   const { typeName, pluralName, singularName } = getTableNames(table);
   const hookName = getListQueryHookName(table);
