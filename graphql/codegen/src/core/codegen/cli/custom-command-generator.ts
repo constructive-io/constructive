@@ -1,5 +1,5 @@
 import * as t from '@babel/types';
-import { toKebabCase } from 'komoji';
+import { toKebabCase } from 'inflekt';
 
 import { generateCode } from '../babel-ast';
 import { getGeneratedFileHeader, ucFirst } from '../utils';
