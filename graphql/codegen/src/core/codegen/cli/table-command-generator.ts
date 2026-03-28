@@ -520,7 +520,7 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
 
   tryBody.push(buildGetClientStatement(targetName));
 
-  // const result = await client.<singular>.findMany(findManyArgs).execute();
+  // const result = await client.<singular>.findMany(findManyArgs as any).execute();
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -536,7 +536,7 @@ function buildListHandler(table: Table, vectorFieldNames: string[], targetName?:
                   ),
                   t.identifier('findMany'),
                 ),
-                [t.identifier('findManyArgs')],
+                [t.tsAsExpression(t.identifier('findManyArgs'), t.tsAnyKeyword())],
               ),
               t.identifier('execute'),
             ),
@@ -603,7 +603,7 @@ function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?:
 
   tryBody.push(buildGetClientStatement(targetName));
 
-  // const result = await client.<singular>.findFirst(findFirstArgs).execute();
+  // const result = await client.<singular>.findFirst(findFirstArgs as any).execute();
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -616,7 +616,7 @@ function buildFindFirstHandler(table: Table, targetName?: string, typeRegistry?:
                   t.memberExpression(t.identifier('client'), t.identifier(singularName)),
                   t.identifier('findFirst'),
                 ),
-                [t.identifier('findFirstArgs')],
+                [t.tsAsExpression(t.identifier('findFirstArgs'), t.tsAnyKeyword())],
               ),
               t.identifier('execute'),
             ),
@@ -824,7 +824,7 @@ function buildSearchHandler(
 
   tryBody.push(buildGetClientStatement(targetName));
 
-  // const result = await client.<singular>.findMany(findManyArgs).execute();
+  // const result = await client.<singular>.findMany(findManyArgs as any).execute();
   tryBody.push(
     t.variableDeclaration('const', [
       t.variableDeclarator(
@@ -840,7 +840,7 @@ function buildSearchHandler(
                   ),
                   t.identifier('findMany'),
                 ),
-                [t.identifier('findManyArgs')],
+                [t.tsAsExpression(t.identifier('findManyArgs'), t.tsAnyKeyword())],
               ),
               t.identifier('execute'),
             ),

@@ -758,7 +758,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     };
     const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient();
-    const result = await client.car.findMany(findManyArgs).execute();
+    const result = await client.car.findMany(findManyArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -780,7 +780,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     };
     const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient();
-    const result = await client.car.findFirst(findFirstArgs).execute();
+    const result = await client.car.findFirst(findFirstArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to find record.");
@@ -1215,7 +1215,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     };
     const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient();
-    const result = await client.driver.findMany(findManyArgs).execute();
+    const result = await client.driver.findMany(findManyArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -1234,7 +1234,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     };
     const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient();
-    const result = await client.driver.findFirst(findFirstArgs).execute();
+    const result = await client.driver.findFirst(findFirstArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to find record.");
@@ -3246,7 +3246,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     };
     const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("auth");
-    const result = await client.user.findMany(findManyArgs).execute();
+    const result = await client.user.findMany(findManyArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -3265,7 +3265,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     };
     const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient("auth");
-    const result = await client.user.findFirst(findFirstArgs).execute();
+    const result = await client.user.findFirst(findFirstArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to find record.");
@@ -3473,7 +3473,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     };
     const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("members");
-    const result = await client.member.findMany(findManyArgs).execute();
+    const result = await client.member.findMany(findManyArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -3491,7 +3491,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     };
     const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient("members");
-    const result = await client.member.findFirst(findFirstArgs).execute();
+    const result = await client.member.findFirst(findFirstArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to find record.");
@@ -3692,7 +3692,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
     };
     const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient("app");
-    const result = await client.car.findMany(findManyArgs).execute();
+    const result = await client.car.findMany(findManyArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to list records.");
@@ -3714,7 +3714,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
     };
     const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
     const client = getClient("app");
-    const result = await client.car.findFirst(findFirstArgs).execute();
+    const result = await client.car.findFirst(findFirstArgs as any).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Failed to find record.");
