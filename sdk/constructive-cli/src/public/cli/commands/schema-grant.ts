@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateSchemaGrantInput, SchemaGrantPatch } from '../../orm/input-types';
+import type {
+  CreateSchemaGrantInput,
+  SchemaGrantPatch,
+  SchemaGrantSelect,
+  SchemaGrantFilter,
+  SchemaGrantOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -74,7 +81,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<SchemaGrantSelect, SchemaGrantFilter, never, SchemaGrantOrderBy> & {
+        select: SchemaGrantSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.schemaGrant.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -96,7 +107,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<SchemaGrantSelect, SchemaGrantFilter, never> & {
+        select: SchemaGrantSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.schemaGrant.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

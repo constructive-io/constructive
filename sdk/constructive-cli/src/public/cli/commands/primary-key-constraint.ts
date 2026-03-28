@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreatePrimaryKeyConstraintInput,
   PrimaryKeyConstraintPatch,
+  PrimaryKeyConstraintSelect,
+  PrimaryKeyConstraintFilter,
+  PrimaryKeyConstraintOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -91,7 +95,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        PrimaryKeyConstraintSelect,
+        PrimaryKeyConstraintFilter,
+        never,
+        PrimaryKeyConstraintOrderBy
+      > & {
+        select: PrimaryKeyConstraintSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.primaryKeyConstraint.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -120,7 +133,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<PrimaryKeyConstraintSelect, PrimaryKeyConstraintFilter, never> & {
+        select: PrimaryKeyConstraintSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.primaryKeyConstraint.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

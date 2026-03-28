@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateOrgLimitInput, OrgLimitPatch } from '../../orm/input-types';
+import type {
+  CreateOrgLimitInput,
+  OrgLimitPatch,
+  OrgLimitSelect,
+  OrgLimitFilter,
+  OrgLimitOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
@@ -74,7 +81,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       max: true,
       entityId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<OrgLimitSelect, OrgLimitFilter, never, OrgLimitOrderBy> & {
+        select: OrgLimitSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgLimit.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -96,7 +107,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       max: true,
       entityId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgLimitSelect, OrgLimitFilter, never> & {
+        select: OrgLimitSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgLimit.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

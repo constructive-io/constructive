@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateAppPermissionDefaultInput,
   AppPermissionDefaultPatch,
+  AppPermissionDefaultSelect,
+  AppPermissionDefaultFilter,
+  AppPermissionDefaultOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   permissions: 'string',
@@ -69,7 +73,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       id: true,
       permissions: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        AppPermissionDefaultSelect,
+        AppPermissionDefaultFilter,
+        never,
+        AppPermissionDefaultOrderBy
+      > & {
+        select: AppPermissionDefaultSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appPermissionDefault.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -87,7 +100,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       id: true,
       permissions: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<AppPermissionDefaultSelect, AppPermissionDefaultFilter, never> & {
+        select: AppPermissionDefaultSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appPermissionDefault.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

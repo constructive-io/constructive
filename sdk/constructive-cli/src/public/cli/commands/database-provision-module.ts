@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateDatabaseProvisionModuleInput,
   DatabaseProvisionModulePatch,
+  DatabaseProvisionModuleSelect,
+  DatabaseProvisionModuleFilter,
+  DatabaseProvisionModuleOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseName: 'string',
@@ -93,7 +97,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
       completedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        DatabaseProvisionModuleSelect,
+        DatabaseProvisionModuleFilter,
+        never,
+        DatabaseProvisionModuleOrderBy
+      > & {
+        select: DatabaseProvisionModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.databaseProvisionModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -123,7 +136,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
       completedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, never> & {
+        select: DatabaseProvisionModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.databaseProvisionModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

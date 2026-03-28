@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateOrgMembershipDefaultInput,
   OrgMembershipDefaultPatch,
+  OrgMembershipDefaultSelect,
+  OrgMembershipDefaultFilter,
+  OrgMembershipDefaultOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -83,7 +87,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       deleteMemberCascadeGroups: true,
       createGroupsCascadeMembers: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        OrgMembershipDefaultSelect,
+        OrgMembershipDefaultFilter,
+        never,
+        OrgMembershipDefaultOrderBy
+      > & {
+        select: OrgMembershipDefaultSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgMembershipDefault.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -108,7 +121,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       deleteMemberCascadeGroups: true,
       createGroupsCascadeMembers: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgMembershipDefaultSelect, OrgMembershipDefaultFilter, never> & {
+        select: OrgMembershipDefaultSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgMembershipDefault.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

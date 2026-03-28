@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateConnectedAccountsModuleInput,
   ConnectedAccountsModulePatch,
+  ConnectedAccountsModuleSelect,
+  ConnectedAccountsModuleFilter,
+  ConnectedAccountsModuleOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -79,7 +83,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       ownerTableId: true,
       tableName: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        ConnectedAccountsModuleSelect,
+        ConnectedAccountsModuleFilter,
+        never,
+        ConnectedAccountsModuleOrderBy
+      > & {
+        select: ConnectedAccountsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.connectedAccountsModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -102,7 +115,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       ownerTableId: true,
       tableName: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<ConnectedAccountsModuleSelect, ConnectedAccountsModuleFilter, never> & {
+        select: ConnectedAccountsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.connectedAccountsModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

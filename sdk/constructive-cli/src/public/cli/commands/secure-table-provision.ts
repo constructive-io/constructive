@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateSecureTableProvisionInput,
   SecureTableProvisionPatch,
+  SecureTableProvisionSelect,
+  SecureTableProvisionFilter,
+  SecureTableProvisionOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -101,7 +105,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       policyData: true,
       outFields: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        SecureTableProvisionSelect,
+        SecureTableProvisionFilter,
+        never,
+        SecureTableProvisionOrderBy
+      > & {
+        select: SecureTableProvisionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.secureTableProvision.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -135,7 +148,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       policyData: true,
       outFields: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<SecureTableProvisionSelect, SecureTableProvisionFilter, never> & {
+        select: SecureTableProvisionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.secureTableProvision.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

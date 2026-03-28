@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateSqlActionInput, SqlActionPatch } from '../../orm/input-types';
+import type {
+  CreateSqlActionInput,
+  SqlActionPatch,
+  SqlActionSelect,
+  SqlActionFilter,
+  SqlActionOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'int',
   name: 'string',
@@ -82,7 +89,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       actionId: true,
       actorId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<SqlActionSelect, SqlActionFilter, never, SqlActionOrderBy> & {
+        select: SqlActionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.sqlAction.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -111,7 +122,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       actionId: true,
       actorId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<SqlActionSelect, SqlActionFilter, never> & {
+        select: SqlActionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.sqlAction.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

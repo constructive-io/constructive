@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateOrgChartEdgeInput, OrgChartEdgePatch } from '../../orm/input-types';
+import type {
+  CreateOrgChartEdgeInput,
+  OrgChartEdgePatch,
+  OrgChartEdgeSelect,
+  OrgChartEdgeFilter,
+  OrgChartEdgeOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -78,7 +85,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       positionTitle: true,
       positionLevel: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, never, OrgChartEdgeOrderBy> & {
+        select: OrgChartEdgeSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgChartEdge.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -102,7 +113,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       positionTitle: true,
       positionLevel: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, never> & {
+        select: OrgChartEdgeSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgChartEdge.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

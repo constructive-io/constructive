@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreatePermissionsModuleInput, PermissionsModulePatch } from '../../orm/input-types';
+import type {
+  CreatePermissionsModuleInput,
+  PermissionsModulePatch,
+  PermissionsModuleSelect,
+  PermissionsModuleFilter,
+  PermissionsModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -96,7 +103,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       getByMask: true,
       getMaskByName: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        PermissionsModuleSelect,
+        PermissionsModuleFilter,
+        never,
+        PermissionsModuleOrderBy
+      > & {
+        select: PermissionsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.permissionsModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -129,7 +145,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       getByMask: true,
       getMaskByName: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<PermissionsModuleSelect, PermissionsModuleFilter, never> & {
+        select: PermissionsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.permissionsModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

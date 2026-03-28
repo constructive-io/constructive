@@ -223,11 +223,11 @@ export function parseSelectFlag(
  *   const findManyArgs = parseFindManyArgs(argv, { id: true, name: true });
  *   const result = await client.user.findMany(findManyArgs).execute();
  */
-export function parseFindManyArgs(
+export function parseFindManyArgs<T = Record<string, unknown>>(
   argv: Record<string, unknown>,
   defaultSelect: Record<string, unknown>,
   extraWhere?: Record<string, unknown>
-): Record<string, unknown> {
+): T {
   const limit = parseIntFlag(argv, 'limit');
   const last = parseIntFlag(argv, 'last');
   const offset = parseIntFlag(argv, 'offset');
@@ -252,7 +252,7 @@ export function parseFindManyArgs(
     ...(where !== undefined ? { where } : {}),
     ...(condition !== undefined ? { condition } : {}),
     ...(orderBy !== undefined ? { orderBy } : {}),
-  };
+  } as unknown as T;
 }
 
 /**
@@ -260,10 +260,10 @@ export function parseFindManyArgs(
  * Like parseFindManyArgs but only includes select, where, and condition
  * (no pagination flags — findFirst returns the first matching record).
  */
-export function parseFindFirstArgs(
+export function parseFindFirstArgs<T = Record<string, unknown>>(
   argv: Record<string, unknown>,
   defaultSelect: Record<string, unknown>
-): Record<string, unknown> {
+): T {
   const select = parseSelectFlag(argv, defaultSelect);
   const parsed = unflattenDotNotation(argv);
   const where = parsed.where;
@@ -273,7 +273,7 @@ export function parseFindFirstArgs(
     select,
     ...(where !== undefined ? { where } : {}),
     ...(condition !== undefined ? { condition } : {}),
-  };
+  } as unknown as T;
 }
 
 export function buildSelectFromPaths(paths: string): Record<string, unknown> {

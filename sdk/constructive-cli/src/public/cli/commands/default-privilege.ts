@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateDefaultPrivilegeInput, DefaultPrivilegePatch } from '../../orm/input-types';
+import type {
+  CreateDefaultPrivilegeInput,
+  DefaultPrivilegePatch,
+  DefaultPrivilegeSelect,
+  DefaultPrivilegeFilter,
+  DefaultPrivilegeOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -76,7 +83,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       granteeName: true,
       isGrant: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        DefaultPrivilegeSelect,
+        DefaultPrivilegeFilter,
+        never,
+        DefaultPrivilegeOrderBy
+      > & {
+        select: DefaultPrivilegeSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.defaultPrivilege.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -99,7 +115,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       granteeName: true,
       isGrant: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, never> & {
+        select: DefaultPrivilegeSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.defaultPrivilege.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

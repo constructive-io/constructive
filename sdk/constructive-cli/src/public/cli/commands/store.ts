@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateStoreInput, StorePatch } from '../../orm/input-types';
+import type {
+  CreateStoreInput,
+  StorePatch,
+  StoreSelect,
+  StoreFilter,
+  StoreOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
@@ -72,7 +79,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       hash: true,
       createdAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<StoreSelect, StoreFilter, never, StoreOrderBy> & {
+        select: StoreSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.store.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -93,7 +104,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       hash: true,
       createdAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<StoreSelect, StoreFilter, never> & {
+        select: StoreSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.store.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

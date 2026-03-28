@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateCryptoAuthModuleInput, CryptoAuthModulePatch } from '../../orm/input-types';
+import type {
+  CreateCryptoAuthModuleInput,
+  CryptoAuthModulePatch,
+  CryptoAuthModuleSelect,
+  CryptoAuthModuleFilter,
+  CryptoAuthModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -90,7 +97,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       signUpWithKey: true,
       signInWithChallenge: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        CryptoAuthModuleSelect,
+        CryptoAuthModuleFilter,
+        never,
+        CryptoAuthModuleOrderBy
+      > & {
+        select: CryptoAuthModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.cryptoAuthModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -120,7 +136,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       signUpWithKey: true,
       signInWithChallenge: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<CryptoAuthModuleSelect, CryptoAuthModuleFilter, never> & {
+        select: CryptoAuthModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.cryptoAuthModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

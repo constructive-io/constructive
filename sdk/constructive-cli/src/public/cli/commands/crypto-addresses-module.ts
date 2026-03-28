@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateCryptoAddressesModuleInput,
   CryptoAddressesModulePatch,
+  CryptoAddressesModuleSelect,
+  CryptoAddressesModuleFilter,
+  CryptoAddressesModuleOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -81,7 +85,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       tableName: true,
       cryptoNetwork: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        CryptoAddressesModuleSelect,
+        CryptoAddressesModuleFilter,
+        never,
+        CryptoAddressesModuleOrderBy
+      > & {
+        select: CryptoAddressesModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.cryptoAddressesModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -105,7 +118,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tableName: true,
       cryptoNetwork: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, never> & {
+        select: CryptoAddressesModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.cryptoAddressesModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

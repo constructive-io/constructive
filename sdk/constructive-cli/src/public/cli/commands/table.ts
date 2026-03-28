@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateTableInput, TablePatch } from '../../orm/input-types';
+import type {
+  CreateTableInput,
+  TablePatch,
+  TableSelect,
+  TableFilter,
+  TableOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -100,7 +107,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<TableSelect, TableFilter, never, TableOrderBy> & {
+        select: TableSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.table.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -135,7 +146,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<TableSelect, TableFilter, never> & {
+        select: TableSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.table.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

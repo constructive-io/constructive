@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateConnectedAccountInput, ConnectedAccountPatch } from '../../orm/input-types';
+import type {
+  CreateConnectedAccountInput,
+  ConnectedAccountPatch,
+  ConnectedAccountSelect,
+  ConnectedAccountFilter,
+  ConnectedAccountOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   ownerId: 'uuid',
@@ -78,7 +85,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        ConnectedAccountSelect,
+        ConnectedAccountFilter,
+        never,
+        ConnectedAccountOrderBy
+      > & {
+        select: ConnectedAccountSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.connectedAccount.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -102,7 +118,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<ConnectedAccountSelect, ConnectedAccountFilter, never> & {
+        select: ConnectedAccountSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.connectedAccount.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateAppMembershipDefaultInput,
   AppMembershipDefaultPatch,
+  AppMembershipDefaultSelect,
+  AppMembershipDefaultFilter,
+  AppMembershipDefaultOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -79,7 +83,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isApproved: true,
       isVerified: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        AppMembershipDefaultSelect,
+        AppMembershipDefaultFilter,
+        never,
+        AppMembershipDefaultOrderBy
+      > & {
+        select: AppMembershipDefaultSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appMembershipDefault.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -102,7 +115,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isApproved: true,
       isVerified: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<AppMembershipDefaultSelect, AppMembershipDefaultFilter, never> & {
+        select: AppMembershipDefaultSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appMembershipDefault.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

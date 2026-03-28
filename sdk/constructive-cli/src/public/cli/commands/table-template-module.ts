@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateTableTemplateModuleInput,
   TableTemplateModulePatch,
+  TableTemplateModuleSelect,
+  TableTemplateModuleFilter,
+  TableTemplateModuleOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -83,7 +87,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       nodeType: true,
       data: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        TableTemplateModuleSelect,
+        TableTemplateModuleFilter,
+        never,
+        TableTemplateModuleOrderBy
+      > & {
+        select: TableTemplateModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.tableTemplateModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -108,7 +121,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       nodeType: true,
       data: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<TableTemplateModuleSelect, TableTemplateModuleFilter, never> & {
+        select: TableTemplateModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.tableTemplateModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

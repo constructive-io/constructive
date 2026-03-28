@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateRlsModuleInput, RlsModulePatch } from '../../orm/input-types';
+import type {
+  CreateRlsModuleInput,
+  RlsModulePatch,
+  RlsModuleSelect,
+  RlsModuleFilter,
+  RlsModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -84,7 +91,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       currentRole: true,
       currentRoleId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<RlsModuleSelect, RlsModuleFilter, never, RlsModuleOrderBy> & {
+        select: RlsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.rlsModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -111,7 +122,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       currentRole: true,
       currentRoleId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<RlsModuleSelect, RlsModuleFilter, never> & {
+        select: RlsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.rlsModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

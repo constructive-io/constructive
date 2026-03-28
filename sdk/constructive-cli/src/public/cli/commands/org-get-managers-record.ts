@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateOrgGetManagersRecordInput,
   OrgGetManagersRecordPatch,
+  OrgGetManagersRecordSelect,
+  OrgGetManagersRecordFilter,
+  OrgGetManagersRecordsOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   userId: 'uuid',
   depth: 'int',
@@ -63,7 +67,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       userId: true,
       depth: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        OrgGetManagersRecordSelect,
+        OrgGetManagersRecordFilter,
+        never,
+        OrgGetManagersRecordsOrderBy
+      > & {
+        select: OrgGetManagersRecordSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgGetManagersRecord.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -81,7 +94,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       userId: true,
       depth: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgGetManagersRecordSelect, OrgGetManagersRecordFilter, never> & {
+        select: OrgGetManagersRecordSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgGetManagersRecord.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

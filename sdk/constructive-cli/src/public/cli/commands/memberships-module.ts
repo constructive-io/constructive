@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateMembershipsModuleInput, MembershipsModulePatch } from '../../orm/input-types';
+import type {
+  CreateMembershipsModuleInput,
+  MembershipsModulePatch,
+  MembershipsModuleSelect,
+  MembershipsModuleFilter,
+  MembershipsModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -124,7 +131,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       entityIdsByPerm: true,
       entityIdsFunction: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        MembershipsModuleSelect,
+        MembershipsModuleFilter,
+        never,
+        MembershipsModuleOrderBy
+      > & {
+        select: MembershipsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.membershipsModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -171,7 +187,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       entityIdsByPerm: true,
       entityIdsFunction: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<MembershipsModuleSelect, MembershipsModuleFilter, never> & {
+        select: MembershipsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.membershipsModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

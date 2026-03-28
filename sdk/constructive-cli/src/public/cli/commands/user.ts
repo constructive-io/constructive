@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateUserInput, UserPatch } from '../../orm/input-types';
+import type {
+  CreateUserInput,
+  UserPatch,
+  UserSelect,
+  UserFilter,
+  UserOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   username: 'string',
@@ -82,7 +89,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<UserSelect, UserFilter, never, UserOrderBy> & {
+        select: UserSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.user.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -105,7 +116,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<UserSelect, UserFilter, never> & {
+        select: UserSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.user.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -142,7 +157,11 @@ async function handleSearch(argv: Partial<Record<string, unknown>>, _prompter: I
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect, searchWhere);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<UserSelect, UserFilter, never, UserOrderBy> & {
+        select: UserSelect;
+      }
+    >(argv, defaultSelect, searchWhere);
     const client = getClient();
     const result = await client.user.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));

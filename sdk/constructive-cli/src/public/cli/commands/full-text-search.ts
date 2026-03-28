@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateFullTextSearchInput, FullTextSearchPatch } from '../../orm/input-types';
+import type {
+  CreateFullTextSearchInput,
+  FullTextSearchPatch,
+  FullTextSearchSelect,
+  FullTextSearchFilter,
+  FullTextSearchOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -80,7 +87,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<FullTextSearchSelect, FullTextSearchFilter, never, FullTextSearchOrderBy> & {
+        select: FullTextSearchSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.fullTextSearch.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -105,7 +116,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<FullTextSearchSelect, FullTextSearchFilter, never> & {
+        select: FullTextSearchSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.fullTextSearch.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

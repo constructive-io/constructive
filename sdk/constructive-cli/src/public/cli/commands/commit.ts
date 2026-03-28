@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateCommitInput, CommitPatch } from '../../orm/input-types';
+import type {
+  CreateCommitInput,
+  CommitPatch,
+  CommitSelect,
+  CommitFilter,
+  CommitOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   message: 'string',
@@ -80,7 +87,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       treeId: true,
       date: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<CommitSelect, CommitFilter, never, CommitOrderBy> & {
+        select: CommitSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.commit.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -105,7 +116,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       treeId: true,
       date: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<CommitSelect, CommitFilter, never> & {
+        select: CommitSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.commit.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

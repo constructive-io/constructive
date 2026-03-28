@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateCheckConstraintInput, CheckConstraintPatch } from '../../orm/input-types';
+import type {
+  CreateCheckConstraintInput,
+  CheckConstraintPatch,
+  CheckConstraintSelect,
+  CheckConstraintFilter,
+  CheckConstraintOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -90,7 +97,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<CheckConstraintSelect, CheckConstraintFilter, never, CheckConstraintOrderBy> & {
+        select: CheckConstraintSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.checkConstraint.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -120,7 +131,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<CheckConstraintSelect, CheckConstraintFilter, never> & {
+        select: CheckConstraintSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.checkConstraint.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

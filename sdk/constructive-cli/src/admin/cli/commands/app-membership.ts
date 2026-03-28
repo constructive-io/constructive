@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateAppMembershipInput, AppMembershipPatch } from '../../orm/input-types';
+import type {
+  CreateAppMembershipInput,
+  AppMembershipPatch,
+  AppMembershipSelect,
+  AppMembershipFilter,
+  AppMembershipOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -94,7 +101,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       actorId: true,
       profileId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<AppMembershipSelect, AppMembershipFilter, never, AppMembershipOrderBy> & {
+        select: AppMembershipSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appMembership.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -126,7 +137,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       actorId: true,
       profileId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<AppMembershipSelect, AppMembershipFilter, never> & {
+        select: AppMembershipSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appMembership.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

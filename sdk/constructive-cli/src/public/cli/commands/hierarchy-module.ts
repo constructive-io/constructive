@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateHierarchyModuleInput, HierarchyModulePatch } from '../../orm/input-types';
+import type {
+  CreateHierarchyModuleInput,
+  HierarchyModulePatch,
+  HierarchyModuleSelect,
+  HierarchyModuleFilter,
+  HierarchyModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -102,7 +109,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isManagerOfFunction: true,
       createdAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<HierarchyModuleSelect, HierarchyModuleFilter, never, HierarchyModuleOrderBy> & {
+        select: HierarchyModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.hierarchyModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -138,7 +149,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isManagerOfFunction: true,
       createdAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<HierarchyModuleSelect, HierarchyModuleFilter, never> & {
+        select: HierarchyModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.hierarchyModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateDomainInput, DomainPatch } from '../../orm/input-types';
+import type {
+  CreateDomainInput,
+  DomainPatch,
+  DomainSelect,
+  DomainFilter,
+  DomainOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -74,7 +81,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       subdomain: true,
       domain: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<DomainSelect, DomainFilter, never, DomainOrderBy> & {
+        select: DomainSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.domain.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -96,7 +107,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       subdomain: true,
       domain: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<DomainSelect, DomainFilter, never> & {
+        select: DomainSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.domain.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

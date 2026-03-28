@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateUserAuthModuleInput, UserAuthModulePatch } from '../../orm/input-types';
+import type {
+  CreateUserAuthModuleInput,
+  UserAuthModulePatch,
+  UserAuthModuleSelect,
+  UserAuthModuleFilter,
+  UserAuthModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -114,7 +121,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       oneTimeTokenFunction: true,
       extendTokenExpires: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<UserAuthModuleSelect, UserAuthModuleFilter, never, UserAuthModuleOrderBy> & {
+        select: UserAuthModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.userAuthModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -156,7 +167,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       oneTimeTokenFunction: true,
       extendTokenExpires: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<UserAuthModuleSelect, UserAuthModuleFilter, never> & {
+        select: UserAuthModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.userAuthModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

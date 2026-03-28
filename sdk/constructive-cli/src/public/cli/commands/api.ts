@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateApiInput, ApiPatch } from '../../orm/input-types';
+import type {
+  CreateApiInput,
+  ApiPatch,
+  ApiSelect,
+  ApiFilter,
+  ApiOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -76,7 +83,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       anonRole: true,
       isPublic: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<ApiSelect, ApiFilter, never, ApiOrderBy> & {
+        select: ApiSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.api.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -99,7 +110,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       anonRole: true,
       isPublic: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<ApiSelect, ApiFilter, never> & {
+        select: ApiSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.api.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

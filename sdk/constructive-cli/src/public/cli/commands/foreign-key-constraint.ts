@@ -10,7 +10,11 @@ import type { FieldSchema } from '../utils';
 import type {
   CreateForeignKeyConstraintInput,
   ForeignKeyConstraintPatch,
+  ForeignKeyConstraintSelect,
+  ForeignKeyConstraintFilter,
+  ForeignKeyConstraintOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -101,7 +105,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        ForeignKeyConstraintSelect,
+        ForeignKeyConstraintFilter,
+        never,
+        ForeignKeyConstraintOrderBy
+      > & {
+        select: ForeignKeyConstraintSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.foreignKeyConstraint.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -135,7 +148,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, never> & {
+        select: ForeignKeyConstraintSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.foreignKeyConstraint.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

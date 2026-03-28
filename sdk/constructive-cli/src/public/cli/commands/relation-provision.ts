@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateRelationProvisionInput, RelationProvisionPatch } from '../../orm/input-types';
+import type {
+  CreateRelationProvisionInput,
+  RelationProvisionPatch,
+  RelationProvisionSelect,
+  RelationProvisionFilter,
+  RelationProvisionOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -124,7 +131,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       outSourceFieldId: true,
       outTargetFieldId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        RelationProvisionSelect,
+        RelationProvisionFilter,
+        never,
+        RelationProvisionOrderBy
+      > & {
+        select: RelationProvisionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.relationProvision.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -171,7 +187,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       outSourceFieldId: true,
       outTargetFieldId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<RelationProvisionSelect, RelationProvisionFilter, never> & {
+        select: RelationProvisionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.relationProvision.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

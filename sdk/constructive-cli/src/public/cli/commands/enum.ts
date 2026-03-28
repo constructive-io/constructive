@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateEnumInput, EnumPatch } from '../../orm/input-types';
+import type {
+  CreateEnumInput,
+  EnumPatch,
+  EnumSelect,
+  EnumFilter,
+  EnumOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -86,7 +93,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       scope: true,
       tags: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<EnumSelect, EnumFilter, never, EnumOrderBy> & {
+        select: EnumSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.enum.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -114,7 +125,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       scope: true,
       tags: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<EnumSelect, EnumFilter, never> & {
+        select: EnumSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.enum.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

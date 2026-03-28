@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateAstMigrationInput, AstMigrationPatch } from '../../orm/input-types';
+import type {
+  CreateAstMigrationInput,
+  AstMigrationPatch,
+  AstMigrationSelect,
+  AstMigrationFilter,
+  AstMigrationOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'int',
   databaseId: 'uuid',
@@ -82,7 +89,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       actionId: true,
       actorId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<AstMigrationSelect, AstMigrationFilter, never, AstMigrationOrderBy> & {
+        select: AstMigrationSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.astMigration.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -111,7 +122,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       actionId: true,
       actorId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<AstMigrationSelect, AstMigrationFilter, never> & {
+        select: AstMigrationSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.astMigration.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

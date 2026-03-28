@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateOrgClaimedInviteInput, OrgClaimedInvitePatch } from '../../orm/input-types';
+import type {
+  CreateOrgClaimedInviteInput,
+  OrgClaimedInvitePatch,
+  OrgClaimedInviteSelect,
+  OrgClaimedInviteFilter,
+  OrgClaimedInviteOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   data: 'json',
@@ -76,7 +83,16 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
       entityId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        OrgClaimedInviteSelect,
+        OrgClaimedInviteFilter,
+        never,
+        OrgClaimedInviteOrderBy
+      > & {
+        select: OrgClaimedInviteSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgClaimedInvite.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -99,7 +115,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
       entityId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgClaimedInviteSelect, OrgClaimedInviteFilter, never> & {
+        select: OrgClaimedInviteSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgClaimedInvite.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

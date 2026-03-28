@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateOrgMembershipInput, OrgMembershipPatch } from '../../orm/input-types';
+import type {
+  CreateOrgMembershipInput,
+  OrgMembershipPatch,
+  OrgMembershipSelect,
+  OrgMembershipFilter,
+  OrgMembershipOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -94,7 +101,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       entityId: true,
       profileId: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<OrgMembershipSelect, OrgMembershipFilter, never, OrgMembershipOrderBy> & {
+        select: OrgMembershipSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgMembership.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -126,7 +137,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       entityId: true,
       profileId: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgMembershipSelect, OrgMembershipFilter, never> & {
+        select: OrgMembershipSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgMembership.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

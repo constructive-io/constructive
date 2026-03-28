@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateSiteInput, SitePatch } from '../../orm/input-types';
+import type {
+  CreateSiteInput,
+  SitePatch,
+  SiteSelect,
+  SiteFilter,
+  SiteOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -80,7 +87,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       logo: true,
       dbname: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<SiteSelect, SiteFilter, never, SiteOrderBy> & {
+        select: SiteSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.site.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -105,7 +116,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       logo: true,
       dbname: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<SiteSelect, SiteFilter, never> & {
+        select: SiteSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.site.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateViewInput, ViewPatch } from '../../orm/input-types';
+import type {
+  CreateViewInput,
+  ViewPatch,
+  ViewSelect,
+  ViewFilter,
+  ViewOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -94,7 +101,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       scope: true,
       tags: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<ViewSelect, ViewFilter, never, ViewOrderBy> & {
+        select: ViewSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.view.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -126,7 +137,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       scope: true,
       tags: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<ViewSelect, ViewFilter, never> & {
+        select: ViewSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.view.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

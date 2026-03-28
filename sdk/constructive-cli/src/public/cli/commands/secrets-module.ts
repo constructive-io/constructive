@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateSecretsModuleInput, SecretsModulePatch } from '../../orm/input-types';
+import type {
+  CreateSecretsModuleInput,
+  SecretsModulePatch,
+  SecretsModuleSelect,
+  SecretsModuleFilter,
+  SecretsModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -72,7 +79,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       tableId: true,
       tableName: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<SecretsModuleSelect, SecretsModuleFilter, never, SecretsModuleOrderBy> & {
+        select: SecretsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.secretsModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -93,7 +104,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tableId: true,
       tableName: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<SecretsModuleSelect, SecretsModuleFilter, never> & {
+        select: SecretsModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.secretsModule.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

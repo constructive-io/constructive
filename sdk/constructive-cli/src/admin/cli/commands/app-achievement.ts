@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateAppAchievementInput, AppAchievementPatch } from '../../orm/input-types';
+import type {
+  CreateAppAchievementInput,
+  AppAchievementPatch,
+  AppAchievementSelect,
+  AppAchievementFilter,
+  AppAchievementOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   actorId: 'uuid',
@@ -74,7 +81,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
       updatedAt: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<AppAchievementSelect, AppAchievementFilter, never, AppAchievementOrderBy> & {
+        select: AppAchievementSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appAchievement.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -96,7 +107,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
       updatedAt: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<AppAchievementSelect, AppAchievementFilter, never> & {
+        select: AppAchievementSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.appAchievement.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));

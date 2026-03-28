@@ -7,7 +7,14 @@ import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
 import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateOrgPermissionInput, OrgPermissionPatch } from '../../orm/input-types';
+import type {
+  CreateOrgPermissionInput,
+  OrgPermissionPatch,
+  OrgPermissionSelect,
+  OrgPermissionFilter,
+  OrgPermissionOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   name: 'string',
@@ -72,7 +79,11 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       bitstr: true,
       description: true,
     };
-    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<OrgPermissionSelect, OrgPermissionFilter, never, OrgPermissionOrderBy> & {
+        select: OrgPermissionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgPermission.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
@@ -93,7 +104,11 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       bitstr: true,
       description: true,
     };
-    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgPermissionSelect, OrgPermissionFilter, never> & {
+        select: OrgPermissionSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
     const result = await client.orgPermission.findFirst(findFirstArgs).execute();
     console.log(JSON.stringify(result, null, 2));
