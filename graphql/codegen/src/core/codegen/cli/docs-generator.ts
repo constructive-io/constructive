@@ -10,6 +10,8 @@ import {
   getSearchFields,
   categorizeSpecialFields,
   buildSpecialFieldsMarkdown,
+  buildSearchExamples,
+  buildSearchExamplesMarkdown,
   getReadmeHeader,
   getReadmeFooter,
   gqlTypeToJsonSchemaType,
@@ -160,6 +162,7 @@ export function generateReadme(
       }
       const specialGroups = categorizeSpecialFields(table, registry);
       lines.push(...buildSpecialFieldsMarkdown(specialGroups));
+      lines.push(...buildSearchExamplesMarkdown(specialGroups, toolName, kebab));
       lines.push('');
     }
   }
@@ -430,12 +433,7 @@ export function generateSkills(
             description: `List ${singularName} records with filtering and ordering`,
             code: [`${toolName} ${kebab} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
           },
-          ...(skillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
-            ? [{
-                description: `Search ${singularName} records`,
-                code: [`${toolName} ${kebab} search "query text" --limit 10 --fields id,searchScore`],
-              }]
-            : []),
+          ...buildSearchExamples(skillSpecialGroups, toolName, kebab),
           {
             description: `Create a ${singularName}`,
             code: [
@@ -763,6 +761,7 @@ export function generateMultiTargetReadme(
       }
       const mtSpecialGroups = categorizeSpecialFields(table, registry);
       lines.push(...buildSpecialFieldsMarkdown(mtSpecialGroups));
+      lines.push(...buildSearchExamplesMarkdown(mtSpecialGroups, toolName, `${tgt.name}:${kebab}`));
       lines.push('');
     }
 
@@ -1096,12 +1095,7 @@ export function generateMultiTargetSkills(
               description: `List ${singularName} records with filtering and ordering`,
               code: [`${toolName} ${cmd} list --where.${pk.name}.equalTo <value> --orderBy ${pk.name.replace(/([A-Z])/g, '_$1').toUpperCase()}_ASC`],
             },
-            ...(mtSkillSpecialGroups.some((g) => g.category === 'search' || g.category === 'embedding')
-              ? [{
-                  description: `Search ${singularName} records`,
-                  code: [`${toolName} ${cmd} search "query text" --limit 10 --fields id,searchScore`],
-                }]
-              : []),
+            ...buildSearchExamples(mtSkillSpecialGroups, toolName, cmd),
             {
               description: `Create a ${singularName}`,
               code: [
