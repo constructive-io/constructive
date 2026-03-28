@@ -996,18 +996,22 @@ describe('CLI E2E — search commands against real DB', () => {
 
     // CLI dot-notation sends "[0.1,0.9,0.3]" as a string, not a vector.
     // The GraphQL server should reject it with a type error.
-    await expect(
-      runCli(
-        'article',
-        'list',
-        '--where.vectorEmbedding.vector',
-        '[0.1,0.9,0.3]',
-        '--where.vectorEmbedding.distance',
-        '1.0',
-        '--fields',
-        'title,embeddingVectorDistance',
-      ),
-    ).rejects.toThrow();
+    // The CLI still exits 0 but returns { ok: false, errors: [...] }.
+    const output = await runCli(
+      'article',
+      'list',
+      '--where.vectorEmbedding.vector',
+      '[0.1,0.9,0.3]',
+      '--where.vectorEmbedding.distance',
+      '1.0',
+      '--fields',
+      'title,embeddingVectorDistance',
+    );
+
+    const raw = JSON.parse(output);
+    expect(raw.ok).toBe(false);
+    expect(raw.errors).toBeDefined();
+    expect(raw.errors.length).toBeGreaterThanOrEqual(1);
   });
 
   // =========================================================================
