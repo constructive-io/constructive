@@ -376,6 +376,14 @@ export function buildSearchExamples(
             `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} list --where.${field.name}.vector "semantic query" --auto-embed --fields title,${field.name}VectorDistance`,
           ],
         });
+        examples.push({
+          description: `Create/update with auto-embedded \`${field.name}\` via --auto-embed`,
+          code: [
+            `# --auto-embed on create/update converts text strings in vector fields to embeddings before saving`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} create --${field.name} "text to embed" --auto-embed`,
+            `EMBEDDER_PROVIDER=ollama ${toolName} ${cmd} update --${field.name} "new text to embed" --auto-embed`,
+          ],
+        });
       }
 
       // searchScore — composite blend field, useful for ordering

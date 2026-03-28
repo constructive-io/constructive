@@ -1,10 +1,10 @@
 /**
- * CLI Embedder — pluggable text-to-vector embedding for CLI search commands
+ * CLI Embedder — pluggable text-to-vector embedding for CLI commands
  *
  * This is RUNTIME code that gets copied to generated output.
  * Provides a pluggable system for registering embedding functions so that
- * CLI search and list commands can convert text queries into vector arrays
- * for pgvector similarity search.
+ * CLI commands can convert text queries into vector arrays for pgvector
+ * similarity search (list/search) and create/update vector fields inline.
  *
  * Configuration via appstash config or environment variables:
  *   embedder.provider  = 'ollama' | 'custom'
@@ -136,4 +136,40 @@ export async function autoEmbedWhere(
     }
   }
   return where;
+}
+
+/**
+ * Auto-embed text values in mutation input data (create/update).
+ *
+ * When --auto-embed is passed on create or update, any vector field in
+ * the input data that contains a text string will be converted to an
+ * embedding vector using the configured embedder.
+ *
+ * Usage:
+ *   csdk article create --input.embedding "Machine learning concepts" --auto-embed
+ *   csdk article update --id xxx --input.embedding "Updated description" --auto-embed
+ *
+ * This is a CLI-only convenience — in production, database triggers or
+ * a job queue should handle embedding generation.
+ *
+ * @param data - The mutation input data object (mutated in place)
+ * @param vectorFieldNames - Names of vector embedding fields (e.g. ['embedding'])
+ * @param embedder - The resolved embedder function
+ * @returns The modified data object with text values replaced by vectors
+ */
+export async function autoEmbedInput(
+  data: Record<string, unknown>,
+  vectorFieldNames: string[],
+  embedder: EmbedderFunction,
+): Promise<Record<string, unknown>> {
+  for (const fieldName of vectorFieldNames) {
+    const fieldValue = data[fieldName];
+    if (typeof fieldValue === 'string') {
+      // Text string → embed to vector array
+      const embedding = await embedder(fieldValue);
+      data[fieldName] = embedding;
+    }
+    // If it's already an array (pre-computed vector), leave it as-is
+  }
+  return data;
 }

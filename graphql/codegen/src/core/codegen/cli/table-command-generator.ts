@@ -407,6 +407,79 @@ function buildAutoEmbedBlock(
   );
 }
 
+/**
+ * Build an auto-embed block for mutation handlers (create/update).
+ *
+ * Generates code equivalent to:
+ *   if (argv['auto-embed']) {
+ *     const embedder = resolveEmbedder();
+ *     if (!embedder) {
+ *       console.error('--auto-embed requires an embedder. Set EMBEDDER_PROVIDER=ollama');
+ *       process.exit(1);
+ *     }
+ *     await autoEmbedInput(cleanedData, ['embedding'], embedder);
+ *   }
+ *
+ * @param vectorFieldNames - Names of vector embedding fields detected at codegen time
+ */
+function buildAutoEmbedInputBlock(
+  vectorFieldNames: string[],
+): t.IfStatement {
+  const fieldNamesArray = t.arrayExpression(
+    vectorFieldNames.map((n) => t.stringLiteral(n)),
+  );
+
+  const embedderDecl = t.variableDeclaration('const', [
+    t.variableDeclarator(
+      t.identifier('embedder'),
+      t.callExpression(t.identifier('resolveEmbedder'), []),
+    ),
+  ]);
+
+  const noEmbedderCheck = t.ifStatement(
+    t.unaryExpression('!', t.identifier('embedder')),
+    t.blockStatement([
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier('console'), t.identifier('error')),
+          [
+            t.stringLiteral(
+              '--auto-embed requires an embedder. Set EMBEDDER_PROVIDER=ollama (and optionally EMBEDDER_MODEL, EMBEDDER_BASE_URL).',
+            ),
+          ],
+        ),
+      ),
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier('process'), t.identifier('exit')),
+          [t.numericLiteral(1)],
+        ),
+      ),
+    ]),
+  );
+
+  const autoEmbedCall = t.awaitExpression(
+    t.callExpression(t.identifier('autoEmbedInput'), [
+      t.identifier('cleanedData'),
+      fieldNamesArray,
+      t.identifier('embedder'),
+    ]),
+  );
+
+  return t.ifStatement(
+    t.memberExpression(
+      t.identifier('argv'),
+      t.stringLiteral('auto-embed'),
+      true,
+    ),
+    t.blockStatement([
+      embedderDecl,
+      noEmbedderCheck,
+      t.expressionStatement(autoEmbedCall),
+    ]),
+  );
+}
+
 function buildListHandler(table: Table, vectorFieldNames: string[], targetName?: string, typeRegistry?: TypeRegistry): t.FunctionDeclaration {
   const { singularName } = getTableNames(table);
   const defaultSelectObj = buildSelectObject(table, typeRegistry);
@@ -904,6 +977,7 @@ export function getFieldsWithDefaults(
 function buildMutationHandler(
   table: Table,
   operation: 'create' | 'update' | 'delete',
+  vectorFieldNames: string[],
   targetName?: string,
   typeRegistry?: TypeRegistry,
   ormTypes?: { createInputTypeName: string; innerFieldName: string; patchTypeName: string },
@@ -1124,6 +1198,12 @@ function buildMutationHandler(
         ),
       ]),
     );
+
+    // Inject --auto-embed block for create/update when table has vector fields.
+    // Converts text strings in vector fields to embeddings before the ORM call.
+    if (vectorFieldNames.length > 0) {
+      tryBody.push(buildAutoEmbedInputBlock(vectorFieldNames));
+    }
   }
 
   tryBody.push(
@@ -1257,7 +1337,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   if (hasEmbeddings) {
     const embedderPath = options?.targetName ? '../../embedder' : '../embedder';
     statements.push(
-      createImportDeclaration(embedderPath, ['resolveEmbedder', 'autoEmbedWhere']),
+      createImportDeclaration(embedderPath, ['resolveEmbedder', 'autoEmbedWhere', 'autoEmbedInput']),
     );
   }
 
@@ -1280,6 +1360,13 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   if (hasGet) usageLines.push(`  get                   Get a ${singularName} by ID`);
   usageLines.push(`  create                Create a new ${singularName}`);
   if (hasUpdate) usageLines.push(`  update                Update an existing ${singularName}`);
+  if (hasEmbeddings) {
+    usageLines.push(
+      '',
+      'Create/Update Options:',
+      '  --auto-embed          Convert text values in vector fields to embeddings before saving',
+    );
+  }
   if (hasDelete) usageLines.push(`  delete                Delete a ${singularName}`);
   usageLines.push(
     '',
@@ -1496,9 +1583,9 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
   statements.push(buildFindFirstHandler(table, tn, options?.typeRegistry));
   if (hasSearchFields) statements.push(buildSearchHandler(table, specialGroups, vectorFieldNames, tn, options?.typeRegistry));
   if (hasGet) statements.push(buildGetHandler(table, tn, options?.typeRegistry));
-  statements.push(buildMutationHandler(table, 'create', tn, options?.typeRegistry, ormTypes));
-  if (hasUpdate) statements.push(buildMutationHandler(table, 'update', tn, options?.typeRegistry, ormTypes));
-  if (hasDelete) statements.push(buildMutationHandler(table, 'delete', tn, options?.typeRegistry, ormTypes));
+  statements.push(buildMutationHandler(table, 'create', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
+  if (hasUpdate) statements.push(buildMutationHandler(table, 'update', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
+  if (hasDelete) statements.push(buildMutationHandler(table, 'delete', vectorFieldNames, tn, options?.typeRegistry, ormTypes));
 
   const header = getGeneratedFileHeader(`CLI commands for ${table.name}`);
   const code = generateCode(statements);
