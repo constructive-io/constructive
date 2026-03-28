@@ -117,11 +117,11 @@ const db = createClient({
 | `migrateFile` | findMany, findOne, create, update, delete |
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
-| `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `membershipType` | findMany, findOne, create, update, delete |
 | `commit` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `rlsModule` | findMany, findOne, create, update, delete |
+| `nodeTypeRegistry` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
 | `sqlAction` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
@@ -3753,43 +3753,6 @@ const updated = await db.orgLimitDefault.update({ where: { id: '<UUID>' }, data:
 const deleted = await db.orgLimitDefault.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.nodeTypeRegistry`
-
-CRUD operations for NodeTypeRegistry records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `name` | String | No |
-| `slug` | String | Yes |
-| `category` | String | Yes |
-| `displayName` | String | Yes |
-| `description` | String | Yes |
-| `parameterSchema` | JSON | Yes |
-| `tags` | String | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all nodeTypeRegistry records
-const items = await db.nodeTypeRegistry.findMany({ select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } }).execute();
-
-// Get one by name
-const item = await db.nodeTypeRegistry.findOne({ name: '<String>', select: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.nodeTypeRegistry.create({ data: { slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', parameterSchema: '<JSON>', tags: '<String>' }, select: { name: true } }).execute();
-
-// Update
-const updated = await db.nodeTypeRegistry.update({ where: { name: '<String>' }, data: { slug: '<String>' }, select: { name: true } }).execute();
-
-// Delete
-const deleted = await db.nodeTypeRegistry.delete({ where: { name: '<String>' } }).execute();
-```
-
 ### `db.membershipType`
 
 CRUD operations for MembershipType records.
@@ -3933,6 +3896,45 @@ const updated = await db.rlsModule.update({ where: { id: '<UUID>' }, data: { dat
 const deleted = await db.rlsModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.nodeTypeRegistry`
+
+CRUD operations for NodeTypeRegistry records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `name` | String | No |
+| `slug` | String | Yes |
+| `category` | String | Yes |
+| `displayName` | String | Yes |
+| `description` | String | Yes |
+| `summary` | String | Yes |
+| `parameterSchema` | JSON | Yes |
+| `guidance` | JSON | Yes |
+| `tags` | String | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all nodeTypeRegistry records
+const items = await db.nodeTypeRegistry.findMany({ select: { name: true, slug: true, category: true, displayName: true, description: true, summary: true, parameterSchema: true, guidance: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by name
+const item = await db.nodeTypeRegistry.findOne({ name: '<String>', select: { name: true, slug: true, category: true, displayName: true, description: true, summary: true, parameterSchema: true, guidance: true, tags: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.nodeTypeRegistry.create({ data: { slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', summary: '<String>', parameterSchema: '<JSON>', guidance: '<JSON>', tags: '<String>' }, select: { name: true } }).execute();
+
+// Update
+const updated = await db.nodeTypeRegistry.update({ where: { name: '<String>' }, data: { slug: '<String>' }, select: { name: true } }).execute();
+
+// Delete
+const deleted = await db.nodeTypeRegistry.delete({ where: { name: '<String>' } }).execute();
+```
+
 ### `db.orgMembershipDefault`
 
 CRUD operations for OrgMembershipDefault records.
@@ -4049,6 +4051,9 @@ const updated = await db.user.update({ where: { id: '<UUID>' }, data: { username
 // Delete
 const deleted = await db.user.delete({ where: { id: '<UUID>' } }).execute();
 ```
+
+> **Unified Search API fields:** `searchTsv`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
 
 ### `db.astMigration`
 

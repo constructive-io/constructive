@@ -120,6 +120,7 @@ CRUD operations for OrgGetManagersRecord records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgGetManagersRecord records |
+| `find-first` | Find first matching orgGetManagersRecord record |
 | `get` | Get a orgGetManagersRecord by id |
 | `create` | Create a new orgGetManagersRecord |
 | `update` | Update an existing orgGetManagersRecord |
@@ -141,6 +142,7 @@ CRUD operations for OrgGetSubordinatesRecord records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgGetSubordinatesRecord records |
+| `find-first` | Find first matching orgGetSubordinatesRecord record |
 | `get` | Get a orgGetSubordinatesRecord by id |
 | `create` | Create a new orgGetSubordinatesRecord |
 | `update` | Update an existing orgGetSubordinatesRecord |
@@ -162,6 +164,7 @@ CRUD operations for AppPermission records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appPermission records |
+| `find-first` | Find first matching appPermission record |
 | `get` | Get a appPermission by id |
 | `create` | Create a new appPermission |
 | `update` | Update an existing appPermission |
@@ -186,6 +189,7 @@ CRUD operations for OrgPermission records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgPermission records |
+| `find-first` | Find first matching orgPermission record |
 | `get` | Get a orgPermission by id |
 | `create` | Create a new orgPermission |
 | `update` | Update an existing orgPermission |
@@ -210,6 +214,7 @@ CRUD operations for AppLevelRequirement records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLevelRequirement records |
+| `find-first` | Find first matching appLevelRequirement record |
 | `get` | Get a appLevelRequirement by id |
 | `create` | Create a new appLevelRequirement |
 | `update` | Update an existing appLevelRequirement |
@@ -238,6 +243,7 @@ CRUD operations for OrgMember records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgMember records |
+| `find-first` | Find first matching orgMember record |
 | `get` | Get a orgMember by id |
 | `create` | Create a new orgMember |
 | `update` | Update an existing orgMember |
@@ -262,6 +268,7 @@ CRUD operations for AppPermissionDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appPermissionDefault records |
+| `find-first` | Find first matching appPermissionDefault record |
 | `get` | Get a appPermissionDefault by id |
 | `create` | Create a new appPermissionDefault |
 | `update` | Update an existing appPermissionDefault |
@@ -283,6 +290,7 @@ CRUD operations for OrgPermissionDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgPermissionDefault records |
+| `find-first` | Find first matching orgPermissionDefault record |
 | `get` | Get a orgPermissionDefault by id |
 | `create` | Create a new orgPermissionDefault |
 | `update` | Update an existing orgPermissionDefault |
@@ -306,6 +314,7 @@ CRUD operations for AppAdminGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appAdminGrant records |
+| `find-first` | Find first matching appAdminGrant record |
 | `get` | Get a appAdminGrant by id |
 | `create` | Create a new appAdminGrant |
 | `update` | Update an existing appAdminGrant |
@@ -332,6 +341,7 @@ CRUD operations for AppOwnerGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appOwnerGrant records |
+| `find-first` | Find first matching appOwnerGrant record |
 | `get` | Get a appOwnerGrant by id |
 | `create` | Create a new appOwnerGrant |
 | `update` | Update an existing appOwnerGrant |
@@ -358,6 +368,7 @@ CRUD operations for OrgAdminGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgAdminGrant records |
+| `find-first` | Find first matching orgAdminGrant record |
 | `get` | Get a orgAdminGrant by id |
 | `create` | Create a new orgAdminGrant |
 | `update` | Update an existing orgAdminGrant |
@@ -385,6 +396,7 @@ CRUD operations for OrgOwnerGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgOwnerGrant records |
+| `find-first` | Find first matching orgOwnerGrant record |
 | `get` | Get a orgOwnerGrant by id |
 | `create` | Create a new orgOwnerGrant |
 | `update` | Update an existing orgOwnerGrant |
@@ -412,6 +424,7 @@ CRUD operations for AppLimitDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLimitDefault records |
+| `find-first` | Find first matching appLimitDefault record |
 | `get` | Get a appLimitDefault by id |
 | `create` | Create a new appLimitDefault |
 | `update` | Update an existing appLimitDefault |
@@ -435,6 +448,7 @@ CRUD operations for OrgLimitDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgLimitDefault records |
+| `find-first` | Find first matching orgLimitDefault record |
 | `get` | Get a orgLimitDefault by id |
 | `create` | Create a new orgLimitDefault |
 | `update` | Update an existing orgLimitDefault |
@@ -458,6 +472,7 @@ CRUD operations for OrgChartEdgeGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgChartEdgeGrant records |
+| `find-first` | Find first matching orgChartEdgeGrant record |
 | `get` | Get a orgChartEdgeGrant by id |
 | `create` | Create a new orgChartEdgeGrant |
 | `update` | Update an existing orgChartEdgeGrant |
@@ -487,6 +502,7 @@ CRUD operations for MembershipType records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all membershipType records |
+| `find-first` | Find first matching membershipType record |
 | `get` | Get a membershipType by id |
 | `create` | Create a new membershipType |
 | `update` | Update an existing membershipType |
@@ -510,6 +526,7 @@ CRUD operations for AppLimit records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLimit records |
+| `find-first` | Find first matching appLimit record |
 | `get` | Get a appLimit by id |
 | `create` | Create a new appLimit |
 | `update` | Update an existing appLimit |
@@ -535,6 +552,7 @@ CRUD operations for AppAchievement records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appAchievement records |
+| `find-first` | Find first matching appAchievement record |
 | `get` | Get a appAchievement by id |
 | `create` | Create a new appAchievement |
 | `update` | Update an existing appAchievement |
@@ -561,6 +579,7 @@ CRUD operations for AppStep records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appStep records |
+| `find-first` | Find first matching appStep record |
 | `get` | Get a appStep by id |
 | `create` | Create a new appStep |
 | `update` | Update an existing appStep |
@@ -587,6 +606,7 @@ CRUD operations for ClaimedInvite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all claimedInvite records |
+| `find-first` | Find first matching claimedInvite record |
 | `get` | Get a claimedInvite by id |
 | `create` | Create a new claimedInvite |
 | `update` | Update an existing claimedInvite |
@@ -612,6 +632,7 @@ CRUD operations for AppGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appGrant records |
+| `find-first` | Find first matching appGrant record |
 | `get` | Get a appGrant by id |
 | `create` | Create a new appGrant |
 | `update` | Update an existing appGrant |
@@ -639,6 +660,7 @@ CRUD operations for AppMembershipDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appMembershipDefault records |
+| `find-first` | Find first matching appMembershipDefault record |
 | `get` | Get a appMembershipDefault by id |
 | `create` | Create a new appMembershipDefault |
 | `update` | Update an existing appMembershipDefault |
@@ -665,6 +687,7 @@ CRUD operations for OrgLimit records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgLimit records |
+| `find-first` | Find first matching orgLimit record |
 | `get` | Get a orgLimit by id |
 | `create` | Create a new orgLimit |
 | `update` | Update an existing orgLimit |
@@ -691,6 +714,7 @@ CRUD operations for OrgClaimedInvite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgClaimedInvite records |
+| `find-first` | Find first matching orgClaimedInvite record |
 | `get` | Get a orgClaimedInvite by id |
 | `create` | Create a new orgClaimedInvite |
 | `update` | Update an existing orgClaimedInvite |
@@ -718,6 +742,7 @@ CRUD operations for OrgGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgGrant records |
+| `find-first` | Find first matching orgGrant record |
 | `get` | Get a orgGrant by id |
 | `create` | Create a new orgGrant |
 | `update` | Update an existing orgGrant |
@@ -746,6 +771,7 @@ CRUD operations for OrgChartEdge records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgChartEdge records |
+| `find-first` | Find first matching orgChartEdge record |
 | `get` | Get a orgChartEdge by id |
 | `create` | Create a new orgChartEdge |
 | `update` | Update an existing orgChartEdge |
@@ -774,6 +800,7 @@ CRUD operations for OrgMembershipDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgMembershipDefault records |
+| `find-first` | Find first matching orgMembershipDefault record |
 | `get` | Get a orgMembershipDefault by id |
 | `create` | Create a new orgMembershipDefault |
 | `update` | Update an existing orgMembershipDefault |
@@ -803,6 +830,7 @@ CRUD operations for AppMembership records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appMembership records |
+| `find-first` | Find first matching appMembership record |
 | `get` | Get a appMembership by id |
 | `create` | Create a new appMembership |
 | `update` | Update an existing appMembership |
@@ -839,6 +867,7 @@ CRUD operations for OrgMembership records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgMembership records |
+| `find-first` | Find first matching orgMembership record |
 | `get` | Get a orgMembership by id |
 | `create` | Create a new orgMembership |
 | `update` | Update an existing orgMembership |
@@ -875,6 +904,7 @@ CRUD operations for Invite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all invite records |
+| `find-first` | Find first matching invite record |
 | `get` | Get a invite by id |
 | `create` | Create a new invite |
 | `update` | Update an existing invite |
@@ -906,6 +936,7 @@ CRUD operations for AppLevel records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLevel records |
+| `find-first` | Find first matching appLevel record |
 | `get` | Get a appLevel by id |
 | `create` | Create a new appLevel |
 | `update` | Update an existing appLevel |
@@ -933,6 +964,7 @@ CRUD operations for OrgInvite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgInvite records |
+| `find-first` | Find first matching orgInvite record |
 | `get` | Get a orgInvite by id |
 | `create` | Create a new orgInvite |
 | `update` | Update an existing orgInvite |

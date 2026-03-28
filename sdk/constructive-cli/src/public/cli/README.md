@@ -122,11 +122,11 @@ csdk auth set-token <your-token>
 | `migrate-file` | migrateFile CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
-| `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `commit` | commit CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
+| `node-type-registry` | nodeTypeRegistry CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
 | `user` | user CRUD operations |
@@ -253,6 +253,7 @@ CRUD operations for GetAllRecord records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all getAllRecord records |
+| `find-first` | Find first matching getAllRecord record |
 | `get` | Get a getAllRecord by id |
 | `create` | Create a new getAllRecord |
 | `update` | Update an existing getAllRecord |
@@ -274,6 +275,7 @@ CRUD operations for OrgGetManagersRecord records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgGetManagersRecord records |
+| `find-first` | Find first matching orgGetManagersRecord record |
 | `get` | Get a orgGetManagersRecord by id |
 | `create` | Create a new orgGetManagersRecord |
 | `update` | Update an existing orgGetManagersRecord |
@@ -295,6 +297,7 @@ CRUD operations for OrgGetSubordinatesRecord records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgGetSubordinatesRecord records |
+| `find-first` | Find first matching orgGetSubordinatesRecord record |
 | `get` | Get a orgGetSubordinatesRecord by id |
 | `create` | Create a new orgGetSubordinatesRecord |
 | `update` | Update an existing orgGetSubordinatesRecord |
@@ -316,6 +319,7 @@ CRUD operations for Object records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all object records |
+| `find-first` | Find first matching object record |
 | `get` | Get a object by id |
 | `create` | Create a new object |
 | `update` | Update an existing object |
@@ -344,6 +348,7 @@ CRUD operations for AppPermission records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appPermission records |
+| `find-first` | Find first matching appPermission record |
 | `get` | Get a appPermission by id |
 | `create` | Create a new appPermission |
 | `update` | Update an existing appPermission |
@@ -368,6 +373,7 @@ CRUD operations for OrgPermission records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgPermission records |
+| `find-first` | Find first matching orgPermission record |
 | `get` | Get a orgPermission by id |
 | `create` | Create a new orgPermission |
 | `update` | Update an existing orgPermission |
@@ -392,6 +398,7 @@ CRUD operations for AppLevelRequirement records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLevelRequirement records |
+| `find-first` | Find first matching appLevelRequirement record |
 | `get` | Get a appLevelRequirement by id |
 | `create` | Create a new appLevelRequirement |
 | `update` | Update an existing appLevelRequirement |
@@ -420,6 +427,7 @@ CRUD operations for Database records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all database records |
+| `find-first` | Find first matching database record |
 | `get` | Get a database by id |
 | `create` | Create a new database |
 | `update` | Update an existing database |
@@ -447,6 +455,7 @@ CRUD operations for Schema records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all schema records |
+| `find-first` | Find first matching schema record |
 | `get` | Get a schema by id |
 | `create` | Create a new schema |
 | `update` | Update an existing schema |
@@ -481,6 +490,7 @@ CRUD operations for Table records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all table records |
+| `find-first` | Find first matching table record |
 | `get` | Get a table by id |
 | `create` | Create a new table |
 | `update` | Update an existing table |
@@ -520,6 +530,7 @@ CRUD operations for CheckConstraint records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all checkConstraint records |
+| `find-first` | Find first matching checkConstraint record |
 | `get` | Get a checkConstraint by id |
 | `create` | Create a new checkConstraint |
 | `update` | Update an existing checkConstraint |
@@ -554,6 +565,7 @@ CRUD operations for Field records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all field records |
+| `find-first` | Find first matching field record |
 | `get` | Get a field by id |
 | `create` | Create a new field |
 | `update` | Update an existing field |
@@ -598,6 +610,7 @@ CRUD operations for ForeignKeyConstraint records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all foreignKeyConstraint records |
+| `find-first` | Find first matching foreignKeyConstraint record |
 | `get` | Get a foreignKeyConstraint by id |
 | `create` | Create a new foreignKeyConstraint |
 | `update` | Update an existing foreignKeyConstraint |
@@ -636,6 +649,7 @@ CRUD operations for FullTextSearch records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all fullTextSearch records |
+| `find-first` | Find first matching fullTextSearch record |
 | `get` | Get a fullTextSearch by id |
 | `create` | Create a new fullTextSearch |
 | `update` | Update an existing fullTextSearch |
@@ -665,6 +679,7 @@ CRUD operations for Index records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all index records |
+| `find-first` | Find first matching index record |
 | `get` | Get a index by id |
 | `create` | Create a new index |
 | `update` | Update an existing index |
@@ -704,6 +719,7 @@ CRUD operations for Policy records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all policy records |
+| `find-first` | Find first matching policy record |
 | `get` | Get a policy by id |
 | `create` | Create a new policy |
 | `update` | Update an existing policy |
@@ -741,6 +757,7 @@ CRUD operations for PrimaryKeyConstraint records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all primaryKeyConstraint records |
+| `find-first` | Find first matching primaryKeyConstraint record |
 | `get` | Get a primaryKeyConstraint by id |
 | `create` | Create a new primaryKeyConstraint |
 | `update` | Update an existing primaryKeyConstraint |
@@ -774,6 +791,7 @@ CRUD operations for TableGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all tableGrant records |
+| `find-first` | Find first matching tableGrant record |
 | `get` | Get a tableGrant by id |
 | `create` | Create a new tableGrant |
 | `update` | Update an existing tableGrant |
@@ -803,6 +821,7 @@ CRUD operations for Trigger records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all trigger records |
+| `find-first` | Find first matching trigger record |
 | `get` | Get a trigger by id |
 | `create` | Create a new trigger |
 | `update` | Update an existing trigger |
@@ -836,6 +855,7 @@ CRUD operations for UniqueConstraint records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all uniqueConstraint records |
+| `find-first` | Find first matching uniqueConstraint record |
 | `get` | Get a uniqueConstraint by id |
 | `create` | Create a new uniqueConstraint |
 | `update` | Update an existing uniqueConstraint |
@@ -870,6 +890,7 @@ CRUD operations for View records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all view records |
+| `find-first` | Find first matching view record |
 | `get` | Get a view by id |
 | `create` | Create a new view |
 | `update` | Update an existing view |
@@ -906,6 +927,7 @@ CRUD operations for ViewTable records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all viewTable records |
+| `find-first` | Find first matching viewTable record |
 | `get` | Get a viewTable by id |
 | `create` | Create a new viewTable |
 | `update` | Update an existing viewTable |
@@ -930,6 +952,7 @@ CRUD operations for ViewGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all viewGrant records |
+| `find-first` | Find first matching viewGrant record |
 | `get` | Get a viewGrant by id |
 | `create` | Create a new viewGrant |
 | `update` | Update an existing viewGrant |
@@ -957,6 +980,7 @@ CRUD operations for ViewRule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all viewRule records |
+| `find-first` | Find first matching viewRule record |
 | `get` | Get a viewRule by id |
 | `create` | Create a new viewRule |
 | `update` | Update an existing viewRule |
@@ -983,6 +1007,7 @@ CRUD operations for EmbeddingChunk records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all embeddingChunk records |
+| `find-first` | Find first matching embeddingChunk record |
 | `get` | Get a embeddingChunk by id |
 | `create` | Create a new embeddingChunk |
 | `update` | Update an existing embeddingChunk |
@@ -1021,6 +1046,7 @@ CRUD operations for TableTemplateModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all tableTemplateModule records |
+| `find-first` | Find first matching tableTemplateModule record |
 | `get` | Get a tableTemplateModule by id |
 | `create` | Create a new tableTemplateModule |
 | `update` | Update an existing tableTemplateModule |
@@ -1050,6 +1076,7 @@ CRUD operations for SecureTableProvision records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all secureTableProvision records |
+| `find-first` | Find first matching secureTableProvision record |
 | `get` | Get a secureTableProvision by id |
 | `create` | Create a new secureTableProvision |
 | `update` | Update an existing secureTableProvision |
@@ -1088,6 +1115,7 @@ CRUD operations for RelationProvision records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all relationProvision records |
+| `find-first` | Find first matching relationProvision record |
 | `get` | Get a relationProvision by id |
 | `create` | Create a new relationProvision |
 | `update` | Update an existing relationProvision |
@@ -1139,6 +1167,7 @@ CRUD operations for SchemaGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all schemaGrant records |
+| `find-first` | Find first matching schemaGrant record |
 | `get` | Get a schemaGrant by id |
 | `create` | Create a new schemaGrant |
 | `update` | Update an existing schemaGrant |
@@ -1165,6 +1194,7 @@ CRUD operations for DefaultPrivilege records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all defaultPrivilege records |
+| `find-first` | Find first matching defaultPrivilege record |
 | `get` | Get a defaultPrivilege by id |
 | `create` | Create a new defaultPrivilege |
 | `update` | Update an existing defaultPrivilege |
@@ -1192,6 +1222,7 @@ CRUD operations for Enum records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all enum records |
+| `find-first` | Find first matching enum record |
 | `get` | Get a enum by id |
 | `create` | Create a new enum |
 | `update` | Update an existing enum |
@@ -1224,6 +1255,7 @@ CRUD operations for ApiSchema records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all apiSchema records |
+| `find-first` | Find first matching apiSchema record |
 | `get` | Get a apiSchema by id |
 | `create` | Create a new apiSchema |
 | `update` | Update an existing apiSchema |
@@ -1247,6 +1279,7 @@ CRUD operations for ApiModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all apiModule records |
+| `find-first` | Find first matching apiModule record |
 | `get` | Get a apiModule by id |
 | `create` | Create a new apiModule |
 | `update` | Update an existing apiModule |
@@ -1271,6 +1304,7 @@ CRUD operations for Domain records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all domain records |
+| `find-first` | Find first matching domain record |
 | `get` | Get a domain by id |
 | `create` | Create a new domain |
 | `update` | Update an existing domain |
@@ -1297,6 +1331,7 @@ CRUD operations for SiteMetadatum records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all siteMetadatum records |
+| `find-first` | Find first matching siteMetadatum record |
 | `get` | Get a siteMetadatum by id |
 | `create` | Create a new siteMetadatum |
 | `update` | Update an existing siteMetadatum |
@@ -1323,6 +1358,7 @@ CRUD operations for SiteModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all siteModule records |
+| `find-first` | Find first matching siteModule record |
 | `get` | Get a siteModule by id |
 | `create` | Create a new siteModule |
 | `update` | Update an existing siteModule |
@@ -1347,6 +1383,7 @@ CRUD operations for SiteTheme records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all siteTheme records |
+| `find-first` | Find first matching siteTheme record |
 | `get` | Get a siteTheme by id |
 | `create` | Create a new siteTheme |
 | `update` | Update an existing siteTheme |
@@ -1370,6 +1407,7 @@ CRUD operations for TriggerFunction records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all triggerFunction records |
+| `find-first` | Find first matching triggerFunction record |
 | `get` | Get a triggerFunction by id |
 | `create` | Create a new triggerFunction |
 | `update` | Update an existing triggerFunction |
@@ -1396,6 +1434,7 @@ CRUD operations for DatabaseTransfer records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all databaseTransfer records |
+| `find-first` | Find first matching databaseTransfer record |
 | `get` | Get a databaseTransfer by id |
 | `create` | Create a new databaseTransfer |
 | `update` | Update an existing databaseTransfer |
@@ -1430,6 +1469,7 @@ CRUD operations for Api records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all api records |
+| `find-first` | Find first matching api record |
 | `get` | Get a api by id |
 | `create` | Create a new api |
 | `update` | Update an existing api |
@@ -1457,6 +1497,7 @@ CRUD operations for Site records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all site records |
+| `find-first` | Find first matching site record |
 | `get` | Get a site by id |
 | `create` | Create a new site |
 | `update` | Update an existing site |
@@ -1486,6 +1527,7 @@ CRUD operations for App records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all app records |
+| `find-first` | Find first matching app record |
 | `get` | Get a app by id |
 | `create` | Create a new app |
 | `update` | Update an existing app |
@@ -1515,6 +1557,7 @@ CRUD operations for ConnectedAccountsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all connectedAccountsModule records |
+| `find-first` | Find first matching connectedAccountsModule record |
 | `get` | Get a connectedAccountsModule by id |
 | `create` | Create a new connectedAccountsModule |
 | `update` | Update an existing connectedAccountsModule |
@@ -1542,6 +1585,7 @@ CRUD operations for CryptoAddressesModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all cryptoAddressesModule records |
+| `find-first` | Find first matching cryptoAddressesModule record |
 | `get` | Get a cryptoAddressesModule by id |
 | `create` | Create a new cryptoAddressesModule |
 | `update` | Update an existing cryptoAddressesModule |
@@ -1570,6 +1614,7 @@ CRUD operations for CryptoAuthModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all cryptoAuthModule records |
+| `find-first` | Find first matching cryptoAuthModule record |
 | `get` | Get a cryptoAuthModule by id |
 | `create` | Create a new cryptoAuthModule |
 | `update` | Update an existing cryptoAuthModule |
@@ -1604,6 +1649,7 @@ CRUD operations for DefaultIdsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all defaultIdsModule records |
+| `find-first` | Find first matching defaultIdsModule record |
 | `get` | Get a defaultIdsModule by id |
 | `create` | Create a new defaultIdsModule |
 | `update` | Update an existing defaultIdsModule |
@@ -1625,6 +1671,7 @@ CRUD operations for DenormalizedTableField records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all denormalizedTableField records |
+| `find-first` | Find first matching denormalizedTableField record |
 | `get` | Get a denormalizedTableField by id |
 | `create` | Create a new denormalizedTableField |
 | `update` | Update an existing denormalizedTableField |
@@ -1657,6 +1704,7 @@ CRUD operations for EmailsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all emailsModule records |
+| `find-first` | Find first matching emailsModule record |
 | `get` | Get a emailsModule by id |
 | `create` | Create a new emailsModule |
 | `update` | Update an existing emailsModule |
@@ -1684,6 +1732,7 @@ CRUD operations for EncryptedSecretsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all encryptedSecretsModule records |
+| `find-first` | Find first matching encryptedSecretsModule record |
 | `get` | Get a encryptedSecretsModule by id |
 | `create` | Create a new encryptedSecretsModule |
 | `update` | Update an existing encryptedSecretsModule |
@@ -1709,6 +1758,7 @@ CRUD operations for InvitesModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all invitesModule records |
+| `find-first` | Find first matching invitesModule record |
 | `get` | Get a invitesModule by id |
 | `create` | Create a new invitesModule |
 | `update` | Update an existing invitesModule |
@@ -1743,6 +1793,7 @@ CRUD operations for LevelsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all levelsModule records |
+| `find-first` | Find first matching levelsModule record |
 | `get` | Get a levelsModule by id |
 | `create` | Create a new levelsModule |
 | `update` | Update an existing levelsModule |
@@ -1789,6 +1840,7 @@ CRUD operations for LimitsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all limitsModule records |
+| `find-first` | Find first matching limitsModule record |
 | `get` | Get a limitsModule by id |
 | `create` | Create a new limitsModule |
 | `update` | Update an existing limitsModule |
@@ -1827,6 +1879,7 @@ CRUD operations for MembershipTypesModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all membershipTypesModule records |
+| `find-first` | Find first matching membershipTypesModule record |
 | `get` | Get a membershipTypesModule by id |
 | `create` | Create a new membershipTypesModule |
 | `update` | Update an existing membershipTypesModule |
@@ -1852,6 +1905,7 @@ CRUD operations for MembershipsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all membershipsModule records |
+| `find-first` | Find first matching membershipsModule record |
 | `get` | Get a membershipsModule by id |
 | `create` | Create a new membershipsModule |
 | `update` | Update an existing membershipsModule |
@@ -1903,6 +1957,7 @@ CRUD operations for PermissionsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all permissionsModule records |
+| `find-first` | Find first matching permissionsModule record |
 | `get` | Get a permissionsModule by id |
 | `create` | Create a new permissionsModule |
 | `update` | Update an existing permissionsModule |
@@ -1940,6 +1995,7 @@ CRUD operations for PhoneNumbersModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all phoneNumbersModule records |
+| `find-first` | Find first matching phoneNumbersModule record |
 | `get` | Get a phoneNumbersModule by id |
 | `create` | Create a new phoneNumbersModule |
 | `update` | Update an existing phoneNumbersModule |
@@ -1967,6 +2023,7 @@ CRUD operations for ProfilesModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all profilesModule records |
+| `find-first` | Find first matching profilesModule record |
 | `get` | Get a profilesModule by id |
 | `create` | Create a new profilesModule |
 | `update` | Update an existing profilesModule |
@@ -2005,6 +2062,7 @@ CRUD operations for SecretsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all secretsModule records |
+| `find-first` | Find first matching secretsModule record |
 | `get` | Get a secretsModule by id |
 | `create` | Create a new secretsModule |
 | `update` | Update an existing secretsModule |
@@ -2030,6 +2088,7 @@ CRUD operations for SessionsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all sessionsModule records |
+| `find-first` | Find first matching sessionsModule record |
 | `get` | Get a sessionsModule by id |
 | `create` | Create a new sessionsModule |
 | `update` | Update an existing sessionsModule |
@@ -2061,6 +2120,7 @@ CRUD operations for UserAuthModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all userAuthModule records |
+| `find-first` | Find first matching userAuthModule record |
 | `get` | Get a userAuthModule by id |
 | `create` | Create a new userAuthModule |
 | `update` | Update an existing userAuthModule |
@@ -2107,6 +2167,7 @@ CRUD operations for UsersModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all usersModule records |
+| `find-first` | Find first matching usersModule record |
 | `get` | Get a usersModule by id |
 | `create` | Create a new usersModule |
 | `update` | Update an existing usersModule |
@@ -2134,6 +2195,7 @@ CRUD operations for Blueprint records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all blueprint records |
+| `find-first` | Find first matching blueprint record |
 | `get` | Get a blueprint by id |
 | `create` | Create a new blueprint |
 | `update` | Update an existing blueprint |
@@ -2171,6 +2233,7 @@ CRUD operations for BlueprintTemplate records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all blueprintTemplate records |
+| `find-first` | Find first matching blueprintTemplate record |
 | `get` | Get a blueprintTemplate by id |
 | `create` | Create a new blueprintTemplate |
 | `update` | Update an existing blueprintTemplate |
@@ -2211,6 +2274,7 @@ CRUD operations for DatabaseProvisionModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all databaseProvisionModule records |
+| `find-first` | Find first matching databaseProvisionModule record |
 | `get` | Get a databaseProvisionModule by id |
 | `create` | Create a new databaseProvisionModule |
 | `update` | Update an existing databaseProvisionModule |
@@ -2245,6 +2309,7 @@ CRUD operations for AppAdminGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appAdminGrant records |
+| `find-first` | Find first matching appAdminGrant record |
 | `get` | Get a appAdminGrant by id |
 | `create` | Create a new appAdminGrant |
 | `update` | Update an existing appAdminGrant |
@@ -2271,6 +2336,7 @@ CRUD operations for AppOwnerGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appOwnerGrant records |
+| `find-first` | Find first matching appOwnerGrant record |
 | `get` | Get a appOwnerGrant by id |
 | `create` | Create a new appOwnerGrant |
 | `update` | Update an existing appOwnerGrant |
@@ -2297,6 +2363,7 @@ CRUD operations for AppGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appGrant records |
+| `find-first` | Find first matching appGrant record |
 | `get` | Get a appGrant by id |
 | `create` | Create a new appGrant |
 | `update` | Update an existing appGrant |
@@ -2324,6 +2391,7 @@ CRUD operations for OrgMembership records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgMembership records |
+| `find-first` | Find first matching orgMembership record |
 | `get` | Get a orgMembership by id |
 | `create` | Create a new orgMembership |
 | `update` | Update an existing orgMembership |
@@ -2360,6 +2428,7 @@ CRUD operations for OrgMember records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgMember records |
+| `find-first` | Find first matching orgMember record |
 | `get` | Get a orgMember by id |
 | `create` | Create a new orgMember |
 | `update` | Update an existing orgMember |
@@ -2384,6 +2453,7 @@ CRUD operations for OrgAdminGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgAdminGrant records |
+| `find-first` | Find first matching orgAdminGrant record |
 | `get` | Get a orgAdminGrant by id |
 | `create` | Create a new orgAdminGrant |
 | `update` | Update an existing orgAdminGrant |
@@ -2411,6 +2481,7 @@ CRUD operations for OrgOwnerGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgOwnerGrant records |
+| `find-first` | Find first matching orgOwnerGrant record |
 | `get` | Get a orgOwnerGrant by id |
 | `create` | Create a new orgOwnerGrant |
 | `update` | Update an existing orgOwnerGrant |
@@ -2438,6 +2509,7 @@ CRUD operations for OrgGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgGrant records |
+| `find-first` | Find first matching orgGrant record |
 | `get` | Get a orgGrant by id |
 | `create` | Create a new orgGrant |
 | `update` | Update an existing orgGrant |
@@ -2466,6 +2538,7 @@ CRUD operations for OrgChartEdge records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgChartEdge records |
+| `find-first` | Find first matching orgChartEdge record |
 | `get` | Get a orgChartEdge by id |
 | `create` | Create a new orgChartEdge |
 | `update` | Update an existing orgChartEdge |
@@ -2494,6 +2567,7 @@ CRUD operations for OrgChartEdgeGrant records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgChartEdgeGrant records |
+| `find-first` | Find first matching orgChartEdgeGrant record |
 | `get` | Get a orgChartEdgeGrant by id |
 | `create` | Create a new orgChartEdgeGrant |
 | `update` | Update an existing orgChartEdgeGrant |
@@ -2523,6 +2597,7 @@ CRUD operations for OrgPermissionDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgPermissionDefault records |
+| `find-first` | Find first matching orgPermissionDefault record |
 | `get` | Get a orgPermissionDefault by id |
 | `create` | Create a new orgPermissionDefault |
 | `update` | Update an existing orgPermissionDefault |
@@ -2546,6 +2621,7 @@ CRUD operations for AppLimit records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLimit records |
+| `find-first` | Find first matching appLimit record |
 | `get` | Get a appLimit by id |
 | `create` | Create a new appLimit |
 | `update` | Update an existing appLimit |
@@ -2571,6 +2647,7 @@ CRUD operations for OrgLimit records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgLimit records |
+| `find-first` | Find first matching orgLimit record |
 | `get` | Get a orgLimit by id |
 | `create` | Create a new orgLimit |
 | `update` | Update an existing orgLimit |
@@ -2597,6 +2674,7 @@ CRUD operations for AppStep records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appStep records |
+| `find-first` | Find first matching appStep record |
 | `get` | Get a appStep by id |
 | `create` | Create a new appStep |
 | `update` | Update an existing appStep |
@@ -2623,6 +2701,7 @@ CRUD operations for AppAchievement records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appAchievement records |
+| `find-first` | Find first matching appAchievement record |
 | `get` | Get a appAchievement by id |
 | `create` | Create a new appAchievement |
 | `update` | Update an existing appAchievement |
@@ -2649,6 +2728,7 @@ CRUD operations for AppLevel records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLevel records |
+| `find-first` | Find first matching appLevel record |
 | `get` | Get a appLevel by id |
 | `create` | Create a new appLevel |
 | `update` | Update an existing appLevel |
@@ -2676,6 +2756,7 @@ CRUD operations for Email records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all email records |
+| `find-first` | Find first matching email record |
 | `get` | Get a email by id |
 | `create` | Create a new email |
 | `update` | Update an existing email |
@@ -2703,6 +2784,7 @@ CRUD operations for PhoneNumber records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all phoneNumber records |
+| `find-first` | Find first matching phoneNumber record |
 | `get` | Get a phoneNumber by id |
 | `create` | Create a new phoneNumber |
 | `update` | Update an existing phoneNumber |
@@ -2731,6 +2813,7 @@ CRUD operations for CryptoAddress records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all cryptoAddress records |
+| `find-first` | Find first matching cryptoAddress record |
 | `get` | Get a cryptoAddress by id |
 | `create` | Create a new cryptoAddress |
 | `update` | Update an existing cryptoAddress |
@@ -2758,6 +2841,7 @@ CRUD operations for ConnectedAccount records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all connectedAccount records |
+| `find-first` | Find first matching connectedAccount record |
 | `get` | Get a connectedAccount by id |
 | `create` | Create a new connectedAccount |
 | `update` | Update an existing connectedAccount |
@@ -2786,6 +2870,7 @@ CRUD operations for Invite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all invite records |
+| `find-first` | Find first matching invite record |
 | `get` | Get a invite by id |
 | `create` | Create a new invite |
 | `update` | Update an existing invite |
@@ -2817,6 +2902,7 @@ CRUD operations for ClaimedInvite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all claimedInvite records |
+| `find-first` | Find first matching claimedInvite record |
 | `get` | Get a claimedInvite by id |
 | `create` | Create a new claimedInvite |
 | `update` | Update an existing claimedInvite |
@@ -2842,6 +2928,7 @@ CRUD operations for OrgInvite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgInvite records |
+| `find-first` | Find first matching orgInvite record |
 | `get` | Get a orgInvite by id |
 | `create` | Create a new orgInvite |
 | `update` | Update an existing orgInvite |
@@ -2876,6 +2963,7 @@ CRUD operations for OrgClaimedInvite records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgClaimedInvite records |
+| `find-first` | Find first matching orgClaimedInvite record |
 | `get` | Get a orgClaimedInvite by id |
 | `create` | Create a new orgClaimedInvite |
 | `update` | Update an existing orgClaimedInvite |
@@ -2903,6 +2991,7 @@ CRUD operations for AuditLog records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all auditLog records |
+| `find-first` | Find first matching auditLog record |
 | `get` | Get a auditLog by id |
 | `create` | Create a new auditLog |
 | `update` | Update an existing auditLog |
@@ -2931,6 +3020,7 @@ CRUD operations for Ref records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all ref records |
+| `find-first` | Find first matching ref record |
 | `get` | Get a ref by id |
 | `create` | Create a new ref |
 | `update` | Update an existing ref |
@@ -2956,6 +3046,7 @@ CRUD operations for Store records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all store records |
+| `find-first` | Find first matching store record |
 | `get` | Get a store by id |
 | `create` | Create a new store |
 | `update` | Update an existing store |
@@ -2981,6 +3072,7 @@ CRUD operations for AppPermissionDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appPermissionDefault records |
+| `find-first` | Find first matching appPermissionDefault record |
 | `get` | Get a appPermissionDefault by id |
 | `create` | Create a new appPermissionDefault |
 | `update` | Update an existing appPermissionDefault |
@@ -3002,6 +3094,7 @@ CRUD operations for RoleType records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all roleType records |
+| `find-first` | Find first matching roleType record |
 | `get` | Get a roleType by id |
 | `create` | Create a new roleType |
 | `update` | Update an existing roleType |
@@ -3023,6 +3116,7 @@ CRUD operations for MigrateFile records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all migrateFile records |
+| `find-first` | Find first matching migrateFile record |
 | `get` | Get a migrateFile by id |
 | `create` | Create a new migrateFile |
 | `update` | Update an existing migrateFile |
@@ -3045,6 +3139,7 @@ CRUD operations for AppLimitDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appLimitDefault records |
+| `find-first` | Find first matching appLimitDefault record |
 | `get` | Get a appLimitDefault by id |
 | `create` | Create a new appLimitDefault |
 | `update` | Update an existing appLimitDefault |
@@ -3068,6 +3163,7 @@ CRUD operations for OrgLimitDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgLimitDefault records |
+| `find-first` | Find first matching orgLimitDefault record |
 | `get` | Get a orgLimitDefault by id |
 | `create` | Create a new orgLimitDefault |
 | `update` | Update an existing orgLimitDefault |
@@ -3084,35 +3180,6 @@ CRUD operations for OrgLimitDefault records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`
 
-### `node-type-registry`
-
-CRUD operations for NodeTypeRegistry records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all nodeTypeRegistry records |
-| `get` | Get a nodeTypeRegistry by name |
-| `create` | Create a new nodeTypeRegistry |
-| `update` | Update an existing nodeTypeRegistry |
-| `delete` | Delete a nodeTypeRegistry |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `name` | String |
-| `slug` | String |
-| `category` | String |
-| `displayName` | String |
-| `description` | String |
-| `parameterSchema` | JSON |
-| `tags` | String |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `slug`, `category`
-**Optional create fields (backend defaults):** `displayName`, `description`, `parameterSchema`, `tags`
-
 ### `membership-type`
 
 CRUD operations for MembershipType records.
@@ -3120,6 +3187,7 @@ CRUD operations for MembershipType records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all membershipType records |
+| `find-first` | Find first matching membershipType record |
 | `get` | Get a membershipType by id |
 | `create` | Create a new membershipType |
 | `update` | Update an existing membershipType |
@@ -3143,6 +3211,7 @@ CRUD operations for Commit records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all commit records |
+| `find-first` | Find first matching commit record |
 | `get` | Get a commit by id |
 | `create` | Create a new commit |
 | `update` | Update an existing commit |
@@ -3172,6 +3241,7 @@ CRUD operations for AppMembershipDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appMembershipDefault records |
+| `find-first` | Find first matching appMembershipDefault record |
 | `get` | Get a appMembershipDefault by id |
 | `create` | Create a new appMembershipDefault |
 | `update` | Update an existing appMembershipDefault |
@@ -3198,6 +3268,7 @@ CRUD operations for RlsModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all rlsModule records |
+| `find-first` | Find first matching rlsModule record |
 | `get` | Get a rlsModule by id |
 | `create` | Create a new rlsModule |
 | `update` | Update an existing rlsModule |
@@ -3222,6 +3293,38 @@ CRUD operations for RlsModule records.
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
 
+### `node-type-registry`
+
+CRUD operations for NodeTypeRegistry records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all nodeTypeRegistry records |
+| `find-first` | Find first matching nodeTypeRegistry record |
+| `get` | Get a nodeTypeRegistry by name |
+| `create` | Create a new nodeTypeRegistry |
+| `update` | Update an existing nodeTypeRegistry |
+| `delete` | Delete a nodeTypeRegistry |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `name` | String |
+| `slug` | String |
+| `category` | String |
+| `displayName` | String |
+| `description` | String |
+| `summary` | String |
+| `parameterSchema` | JSON |
+| `guidance` | JSON |
+| `tags` | String |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `slug`, `category`
+**Optional create fields (backend defaults):** `displayName`, `description`, `summary`, `parameterSchema`, `guidance`, `tags`
+
 ### `org-membership-default`
 
 CRUD operations for OrgMembershipDefault records.
@@ -3229,6 +3332,7 @@ CRUD operations for OrgMembershipDefault records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all orgMembershipDefault records |
+| `find-first` | Find first matching orgMembershipDefault record |
 | `get` | Get a orgMembershipDefault by id |
 | `create` | Create a new orgMembershipDefault |
 | `update` | Update an existing orgMembershipDefault |
@@ -3258,6 +3362,7 @@ CRUD operations for SqlAction records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all sqlAction records |
+| `find-first` | Find first matching sqlAction record |
 | `get` | Get a sqlAction by id |
 | `create` | Create a new sqlAction |
 | `update` | Update an existing sqlAction |
@@ -3290,6 +3395,8 @@ CRUD operations for User records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all user records |
+| `find-first` | Find first matching user record |
+| `search <query>` | Search user records |
 | `get` | Get a user by id |
 | `create` | Create a new user |
 | `update` | Update an existing user |
@@ -3312,8 +3419,31 @@ CRUD operations for User records.
 | `searchScore` | Float |
 
 **Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `type`
-> **Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`
+> **Unified Search API fields:** `searchTsv`, `displayNameTrgmSimilarity`, `searchScore`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Full-text search via tsvector (`searchTsv`):*
+```bash
+csdk user list --where.searchTsv "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmDisplayName`):*
+```bash
+csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select title,displayNameTrgmSimilarity
+```
+
+*Composite search (fullTextSearch dispatches to all text adapters):*
+```bash
+csdk user list --where.fullTextSearch "search query" --select title,tsvRank,displayNameTrgmSimilarity,searchScore
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk user list --where.fullTextSearch "query" --limit 10 --select id,title,searchScore
+csdk user search "query" --limit 10 --select id,title,searchScore
+```
 
 
 ### `ast-migration`
@@ -3323,6 +3453,7 @@ CRUD operations for AstMigration records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all astMigration records |
+| `find-first` | Find first matching astMigration record |
 | `get` | Get a astMigration by id |
 | `create` | Create a new astMigration |
 | `update` | Update an existing astMigration |
@@ -3355,6 +3486,7 @@ CRUD operations for AppMembership records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all appMembership records |
+| `find-first` | Find first matching appMembership record |
 | `get` | Get a appMembership by id |
 | `create` | Create a new appMembership |
 | `update` | Update an existing appMembership |
@@ -3391,6 +3523,7 @@ CRUD operations for HierarchyModule records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all hierarchyModule records |
+| `find-first` | Find first matching hierarchyModule record |
 | `get` | Get a hierarchyModule by id |
 | `create` | Create a new hierarchyModule |
 | `update` | Update an existing hierarchyModule |

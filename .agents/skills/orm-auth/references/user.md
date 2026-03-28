@@ -4,6 +4,9 @@
 
 ORM operations for User records
 
+**Unified Search API fields:** `searchTsv`
+Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
 ## Usage
 
 ```typescript

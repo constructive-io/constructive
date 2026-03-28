@@ -866,15 +866,6 @@ export const orgLimitDefaultMutationKeys = {
   /** Delete orgLimitDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitdefault', 'delete', id] as const,
 } as const;
-export const nodeTypeRegistryMutationKeys = {
-  /** All nodeTypeRegistry mutation keys */ all: ['mutation', 'nodetyperegistry'] as const,
-  /** Create nodeTypeRegistry mutation key */ create: () =>
-    ['mutation', 'nodetyperegistry', 'create'] as const,
-  /** Update nodeTypeRegistry mutation key */ update: (id: string | number) =>
-    ['mutation', 'nodetyperegistry', 'update', id] as const,
-  /** Delete nodeTypeRegistry mutation key */ delete: (id: string | number) =>
-    ['mutation', 'nodetyperegistry', 'delete', id] as const,
-} as const;
 export const membershipTypeMutationKeys = {
   /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
   /** Create membershipType mutation key */ create: () =>
@@ -908,6 +899,15 @@ export const rlsModuleMutationKeys = {
     ['mutation', 'rlsmodule', 'update', id] as const,
   /** Delete rlsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'rlsmodule', 'delete', id] as const,
+} as const;
+export const nodeTypeRegistryMutationKeys = {
+  /** All nodeTypeRegistry mutation keys */ all: ['mutation', 'nodetyperegistry'] as const,
+  /** Create nodeTypeRegistry mutation key */ create: () =>
+    ['mutation', 'nodetyperegistry', 'create'] as const,
+  /** Update nodeTypeRegistry mutation key */ update: (id: string | number) =>
+    ['mutation', 'nodetyperegistry', 'update', id] as const,
+  /** Delete nodeTypeRegistry mutation key */ delete: (id: string | number) =>
+    ['mutation', 'nodetyperegistry', 'delete', id] as const,
 } as const;
 export const orgMembershipDefaultMutationKeys = {
   /** All orgMembershipDefault mutation keys */ all: ['mutation', 'orgmembershipdefault'] as const,
@@ -1231,11 +1231,11 @@ export const mutationKeys = {
   migrateFile: migrateFileMutationKeys,
   appLimitDefault: appLimitDefaultMutationKeys,
   orgLimitDefault: orgLimitDefaultMutationKeys,
-  nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   membershipType: membershipTypeMutationKeys,
   commit: commitMutationKeys,
   appMembershipDefault: appMembershipDefaultMutationKeys,
   rlsModule: rlsModuleMutationKeys,
+  nodeTypeRegistry: nodeTypeRegistryMutationKeys,
   orgMembershipDefault: orgMembershipDefaultMutationKeys,
   sqlAction: sqlActionMutationKeys,
   user: userMutationKeys,

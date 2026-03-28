@@ -111,11 +111,11 @@ import {
   migrateFileKeys,
   appLimitDefaultKeys,
   orgLimitDefaultKeys,
-  nodeTypeRegistryKeys,
   membershipTypeKeys,
   commitKeys,
   appMembershipDefaultKeys,
   rlsModuleKeys,
+  nodeTypeRegistryKeys,
   orgMembershipDefaultKeys,
   sqlActionKeys,
   userKeys,
@@ -1694,23 +1694,6 @@ export const invalidate = {
         queryKey: orgLimitDefaultKeys.detail(id),
       }),
   },
-  /** Invalidate nodeTypeRegistry queries */ nodeTypeRegistry: {
-    /** Invalidate all nodeTypeRegistry queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: nodeTypeRegistryKeys.all,
-      }),
-    /** Invalidate nodeTypeRegistry list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: nodeTypeRegistryKeys.lists(),
-      }),
-    /** Invalidate a specific nodeTypeRegistry */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: nodeTypeRegistryKeys.detail(id),
-      }),
-  },
   /** Invalidate membershipType queries */ membershipType: {
     /** Invalidate all membershipType queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1774,6 +1757,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: rlsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate nodeTypeRegistry queries */ nodeTypeRegistry: {
+    /** Invalidate all nodeTypeRegistry queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: nodeTypeRegistryKeys.all,
+      }),
+    /** Invalidate nodeTypeRegistry list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: nodeTypeRegistryKeys.lists(),
+      }),
+    /** Invalidate a specific nodeTypeRegistry */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: nodeTypeRegistryKeys.detail(id),
       }),
   },
   /** Invalidate orgMembershipDefault queries */ orgMembershipDefault: {
@@ -2551,14 +2551,6 @@ export const remove = {
       queryKey: orgLimitDefaultKeys.detail(id),
     });
   },
-  /** Remove nodeTypeRegistry from cache */ nodeTypeRegistry: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: nodeTypeRegistryKeys.detail(id),
-    });
-  },
   /** Remove membershipType from cache */ membershipType: (
     queryClient: QueryClient,
     id: string | number
@@ -2583,6 +2575,14 @@ export const remove = {
   /** Remove rlsModule from cache */ rlsModule: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: rlsModuleKeys.detail(id),
+    });
+  },
+  /** Remove nodeTypeRegistry from cache */ nodeTypeRegistry: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: nodeTypeRegistryKeys.detail(id),
     });
   },
   /** Remove orgMembershipDefault from cache */ orgMembershipDefault: (

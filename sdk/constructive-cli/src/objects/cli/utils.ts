@@ -168,6 +168,114 @@ export function unflattenDotNotation(answers: Record<string, unknown>): Record<s
  * @param paths - Comma-separated dot-notation field paths (e.g. 'clientMutationId,result.accessToken')
  * @returns The nested select object for the ORM
  */
+/**
+ * Parse a CLI flag as an integer.
+ * Handles minimist delivering numbers or strings depending on the input.
+ * Returns undefined when the flag is missing or not a valid number.
+ */
+export function parseIntFlag(argv: Record<string, unknown>, name: string): number | undefined {
+  const val = argv[name];
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') {
+    const n = parseInt(val, 10);
+    return isNaN(n) ? undefined : n;
+  }
+  return undefined;
+}
+
+/**
+ * Parse a CLI flag as a string.
+ * Returns undefined when the flag is missing or not a string.
+ */
+export function parseStringFlag(argv: Record<string, unknown>, name: string): string | undefined {
+  const val = argv[name];
+  return typeof val === 'string' ? val : undefined;
+}
+
+/**
+ * Parse --orderBy flag as a comma-separated list of enum values.
+ * e.g. --orderBy NAME_ASC,CREATED_AT_DESC → ['NAME_ASC', 'CREATED_AT_DESC']
+ */
+export function parseOrderByFlag(argv: Record<string, unknown>): string[] | undefined {
+  const val = argv.orderBy;
+  return typeof val === 'string' ? val.split(',') : undefined;
+}
+
+/**
+ * Parse --select flag into a select object, falling back to a default.
+ * e.g. --select id,name → { id: true, name: true }
+ */
+export function parseSelectFlag(
+  argv: Record<string, unknown>,
+  defaultSelect: Record<string, unknown>
+): Record<string, unknown> {
+  const raw = argv.select;
+  return typeof raw === 'string' ? buildSelectFromPaths(raw) : defaultSelect;
+}
+
+/**
+ * Build the full findManyArgs object from CLI argv.
+ * Parses all pagination, filtering, ordering, and field selection flags
+ * in one call.  Accepts an optional `extraWhere` to merge with dot-notation
+ * --where flags (used by the search handler to inject search clauses).
+ *
+ * @example
+ *   const findManyArgs = parseFindManyArgs(argv, { id: true, name: true });
+ *   const result = await client.user.findMany(findManyArgs).execute();
+ */
+export function parseFindManyArgs<T = Record<string, unknown>>(
+  argv: Record<string, unknown>,
+  defaultSelect: Record<string, unknown>,
+  extraWhere?: Record<string, unknown>
+): T {
+  const limit = parseIntFlag(argv, 'limit');
+  const last = parseIntFlag(argv, 'last');
+  const offset = parseIntFlag(argv, 'offset');
+  const after = parseStringFlag(argv, 'after');
+  const before = parseStringFlag(argv, 'before');
+  const select = parseSelectFlag(argv, defaultSelect);
+  const parsed = unflattenDotNotation(argv);
+  const where =
+    (parsed.where ?? extraWhere)
+      ? { ...(extraWhere ?? {}), ...((parsed.where as Record<string, unknown>) ?? {}) }
+      : undefined;
+  const condition = parsed.condition;
+  const orderBy = parseOrderByFlag(argv);
+
+  return {
+    select,
+    ...(limit !== undefined ? { first: limit } : {}),
+    ...(after !== undefined ? { after } : {}),
+    ...(last !== undefined ? { last } : {}),
+    ...(before !== undefined ? { before } : {}),
+    ...(offset !== undefined ? { offset } : {}),
+    ...(where !== undefined ? { where } : {}),
+    ...(condition !== undefined ? { condition } : {}),
+    ...(orderBy !== undefined ? { orderBy } : {}),
+  } as unknown as T;
+}
+
+/**
+ * Build findFirst args from CLI argv.
+ * Like parseFindManyArgs but only includes select, where, and condition
+ * (no pagination flags — findFirst returns the first matching record).
+ */
+export function parseFindFirstArgs<T = Record<string, unknown>>(
+  argv: Record<string, unknown>,
+  defaultSelect: Record<string, unknown>
+): T {
+  const select = parseSelectFlag(argv, defaultSelect);
+  const parsed = unflattenDotNotation(argv);
+  const where = parsed.where;
+  const condition = parsed.condition;
+
+  return {
+    select,
+    ...(where !== undefined ? { where } : {}),
+    ...(condition !== undefined ? { condition } : {}),
+  } as unknown as T;
+}
+
 export function buildSelectFromPaths(paths: string): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   const trimmedPaths = paths

@@ -5,9 +5,16 @@
  */
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
-import { coerceAnswers, stripUndefined } from '../utils';
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateOrgChartEdgeInput, OrgChartEdgePatch } from '../../orm/input-types';
+import type {
+  CreateOrgChartEdgeInput,
+  OrgChartEdgePatch,
+  OrgChartEdgeSelect,
+  OrgChartEdgeFilter,
+  OrgChartEdgeOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   createdAt: 'string',
@@ -19,7 +26,7 @@ const fieldSchema: FieldSchema = {
   positionLevel: 'int',
 };
 const usage =
-  '\norg-chart-edge <command>\n\nCommands:\n  list                  List all orgChartEdge records\n  get                   Get a orgChartEdge by ID\n  create                Create a new orgChartEdge\n  update                Update an existing orgChartEdge\n  delete                Delete a orgChartEdge\n\n  --help, -h            Show this help message\n';
+  '\norg-chart-edge <command>\n\nCommands:\n  list                  List orgChartEdge records\n  find-first            Find first matching orgChartEdge record\n  get                   Get a orgChartEdge by ID\n  create                Create a new orgChartEdge\n  update                Update an existing orgChartEdge\n  delete                Delete a orgChartEdge\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -36,7 +43,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'get', 'create', 'update', 'delete'],
+        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -51,6 +58,8 @@ async function handleTableSubcommand(
   switch (subcommand) {
     case 'list':
       return handleList(argv, prompter);
+    case 'find-first':
+      return handleFindFirst(argv, prompter);
     case 'get':
       return handleGet(argv, prompter);
     case 'create':
@@ -64,26 +73,56 @@ async function handleTableSubcommand(
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      entityId: true,
+      childId: true,
+      parentId: true,
+      positionTitle: true,
+      positionLevel: true,
+    };
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, never, OrgChartEdgeOrderBy> & {
+        select: OrgChartEdgeSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
-    const result = await client.orgChartEdge
-      .findMany({
-        select: {
-          id: true,
-          createdAt: true,
-          updatedAt: true,
-          entityId: true,
-          childId: true,
-          parentId: true,
-          positionTitle: true,
-          positionLevel: true,
-        },
-      })
-      .execute();
+    const result = await client.orgChartEdge.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to list records.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      entityId: true,
+      childId: true,
+      parentId: true,
+      positionTitle: true,
+      positionLevel: true,
+    };
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, never> & {
+        select: OrgChartEdgeSelect;
+      }
+    >(argv, defaultSelect);
+    const client = getClient();
+    const result = await client.orgChartEdge.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Failed to find record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

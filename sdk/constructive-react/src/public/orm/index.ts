@@ -101,11 +101,11 @@ import { RoleTypeModel } from './models/roleType';
 import { MigrateFileModel } from './models/migrateFile';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
-import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { MembershipTypeModel } from './models/membershipType';
 import { CommitModel } from './models/commit';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { RlsModuleModel } from './models/rlsModule';
+import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { SqlActionModel } from './models/sqlAction';
 import { UserModel } from './models/user';
@@ -243,11 +243,11 @@ export function createClient(config: OrmClientConfig) {
     migrateFile: new MigrateFileModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
-    nodeTypeRegistry: new NodeTypeRegistryModel(client),
     membershipType: new MembershipTypeModel(client),
     commit: new CommitModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     rlsModule: new RlsModuleModel(client),
+    nodeTypeRegistry: new NodeTypeRegistryModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     sqlAction: new SqlActionModel(client),
     user: new UserModel(client),

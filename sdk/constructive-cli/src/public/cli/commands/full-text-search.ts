@@ -5,9 +5,16 @@
  */
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
-import { coerceAnswers, stripUndefined } from '../utils';
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateFullTextSearchInput, FullTextSearchPatch } from '../../orm/input-types';
+import type {
+  CreateFullTextSearchInput,
+  FullTextSearchPatch,
+  FullTextSearchSelect,
+  FullTextSearchFilter,
+  FullTextSearchOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -20,7 +27,7 @@ const fieldSchema: FieldSchema = {
   updatedAt: 'string',
 };
 const usage =
-  '\nfull-text-search <command>\n\nCommands:\n  list                  List all fullTextSearch records\n  get                   Get a fullTextSearch by ID\n  create                Create a new fullTextSearch\n  update                Update an existing fullTextSearch\n  delete                Delete a fullTextSearch\n\n  --help, -h            Show this help message\n';
+  '\nfull-text-search <command>\n\nCommands:\n  list                  List fullTextSearch records\n  find-first            Find first matching fullTextSearch record\n  get                   Get a fullTextSearch by ID\n  create                Create a new fullTextSearch\n  update                Update an existing fullTextSearch\n  delete                Delete a fullTextSearch\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -37,7 +44,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'get', 'create', 'update', 'delete'],
+        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -52,6 +59,8 @@ async function handleTableSubcommand(
   switch (subcommand) {
     case 'list':
       return handleList(argv, prompter);
+    case 'find-first':
+      return handleFindFirst(argv, prompter);
     case 'get':
       return handleGet(argv, prompter);
     case 'create':
@@ -65,27 +74,58 @@ async function handleTableSubcommand(
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      databaseId: true,
+      tableId: true,
+      fieldId: true,
+      fieldIds: true,
+      weights: true,
+      langs: true,
+      createdAt: true,
+      updatedAt: true,
+    };
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<FullTextSearchSelect, FullTextSearchFilter, never, FullTextSearchOrderBy> & {
+        select: FullTextSearchSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
-    const result = await client.fullTextSearch
-      .findMany({
-        select: {
-          id: true,
-          databaseId: true,
-          tableId: true,
-          fieldId: true,
-          fieldIds: true,
-          weights: true,
-          langs: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      })
-      .execute();
+    const result = await client.fullTextSearch.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to list records.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      databaseId: true,
+      tableId: true,
+      fieldId: true,
+      fieldIds: true,
+      weights: true,
+      langs: true,
+      createdAt: true,
+      updatedAt: true,
+    };
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<FullTextSearchSelect, FullTextSearchFilter, never> & {
+        select: FullTextSearchSelect;
+      }
+    >(argv, defaultSelect);
+    const client = getClient();
+    const result = await client.fullTextSearch.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Failed to find record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

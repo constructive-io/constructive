@@ -4653,6 +4653,9 @@ type MetaField {
   type: MetaType!
   isNotNull: Boolean!
   hasDefault: Boolean!
+  isPrimaryKey: Boolean!
+  isForeignKey: Boolean!
+  description: String
 }
 
 """Information about a PostgreSQL type"""

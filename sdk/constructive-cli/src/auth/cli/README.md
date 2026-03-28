@@ -102,6 +102,7 @@ CRUD operations for Email records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all email records |
+| `find-first` | Find first matching email record |
 | `get` | Get a email by id |
 | `create` | Create a new email |
 | `update` | Update an existing email |
@@ -129,6 +130,7 @@ CRUD operations for PhoneNumber records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all phoneNumber records |
+| `find-first` | Find first matching phoneNumber record |
 | `get` | Get a phoneNumber by id |
 | `create` | Create a new phoneNumber |
 | `update` | Update an existing phoneNumber |
@@ -157,6 +159,7 @@ CRUD operations for CryptoAddress records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all cryptoAddress records |
+| `find-first` | Find first matching cryptoAddress record |
 | `get` | Get a cryptoAddress by id |
 | `create` | Create a new cryptoAddress |
 | `update` | Update an existing cryptoAddress |
@@ -184,6 +187,7 @@ CRUD operations for ConnectedAccount records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all connectedAccount records |
+| `find-first` | Find first matching connectedAccount record |
 | `get` | Get a connectedAccount by id |
 | `create` | Create a new connectedAccount |
 | `update` | Update an existing connectedAccount |
@@ -212,6 +216,7 @@ CRUD operations for AuditLog records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all auditLog records |
+| `find-first` | Find first matching auditLog record |
 | `get` | Get a auditLog by id |
 | `create` | Create a new auditLog |
 | `update` | Update an existing auditLog |
@@ -240,6 +245,7 @@ CRUD operations for RoleType records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all roleType records |
+| `find-first` | Find first matching roleType record |
 | `get` | Get a roleType by id |
 | `create` | Create a new roleType |
 | `update` | Update an existing roleType |
@@ -261,6 +267,8 @@ CRUD operations for User records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all user records |
+| `find-first` | Find first matching user record |
+| `search <query>` | Search user records |
 | `get` | Get a user by id |
 | `create` | Create a new user |
 | `update` | Update an existing user |
@@ -283,8 +291,31 @@ CRUD operations for User records.
 | `searchScore` | Float |
 
 **Optional create fields (backend defaults):** `username`, `displayName`, `profilePicture`, `type`
-> **Unified Search API fields:** `displayNameTrgmSimilarity`, `searchScore`
+> **Unified Search API fields:** `searchTsv`, `displayNameTrgmSimilarity`, `searchScore`
 > Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
+**Search Examples:**
+
+*Full-text search via tsvector (`searchTsv`):*
+```bash
+csdk user list --where.searchTsv "search query" --select title,tsvRank
+```
+
+*Fuzzy search via trigram similarity (`trgmDisplayName`):*
+```bash
+csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select title,displayNameTrgmSimilarity
+```
+
+*Composite search (fullTextSearch dispatches to all text adapters):*
+```bash
+csdk user list --where.fullTextSearch "search query" --select title,tsvRank,displayNameTrgmSimilarity,searchScore
+```
+
+*Search with pagination and field projection:*
+```bash
+csdk user list --where.fullTextSearch "query" --limit 10 --select id,title,searchScore
+csdk user search "query" --limit 10 --select id,title,searchScore
+```
 
 
 ## Custom Operations

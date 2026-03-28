@@ -1137,17 +1137,6 @@ export interface OrgLimitDefault {
   name: string | null;
   max: number | null;
 }
-export interface NodeTypeRegistry {
-  name: string | null;
-  slug: string | null;
-  category: string | null;
-  displayName: string | null;
-  description: string | null;
-  parameterSchema: unknown | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface MembershipType {
   id: number | null;
   name: string | null;
@@ -1186,6 +1175,19 @@ export interface RlsModule {
   authenticateStrict: string | null;
   currentRole: string | null;
   currentRoleId: string | null;
+}
+export interface NodeTypeRegistry {
+  name: string | null;
+  slug: string | null;
+  category: string | null;
+  displayName: string | null;
+  description: string | null;
+  summary: string | null;
+  parameterSchema: unknown | null;
+  guidance: unknown | null;
+  tags: string[] | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface OrgMembershipDefault {
   id: string | null;

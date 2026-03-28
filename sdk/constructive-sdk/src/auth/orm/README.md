@@ -278,6 +278,9 @@ const updated = await db.user.update({ where: { id: '<UUID>' }, data: { username
 const deleted = await db.user.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+> **Unified Search API fields:** `searchTsv`
+> Fields provided by the Unified Search plugin. Includes full-text search (tsvector/BM25), trigram similarity scores, and the combined searchScore. Computed fields are read-only and cannot be set in create/update operations.
+
 ## Custom Operations
 
 ### `db.query.currentIpAddress`

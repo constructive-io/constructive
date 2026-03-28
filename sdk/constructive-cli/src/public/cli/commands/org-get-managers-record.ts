@@ -5,18 +5,22 @@
  */
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
-import { coerceAnswers, stripUndefined } from '../utils';
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type {
   CreateOrgGetManagersRecordInput,
   OrgGetManagersRecordPatch,
+  OrgGetManagersRecordSelect,
+  OrgGetManagersRecordFilter,
+  OrgGetManagersRecordsOrderBy,
 } from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   userId: 'uuid',
   depth: 'int',
 };
 const usage =
-  '\norg-get-managers-record <command>\n\nCommands:\n  list                  List all orgGetManagersRecord records\n  create                Create a new orgGetManagersRecord\n\n  --help, -h            Show this help message\n';
+  '\norg-get-managers-record <command>\n\nCommands:\n  list                  List orgGetManagersRecord records\n  find-first            Find first matching orgGetManagersRecord record\n  create                Create a new orgGetManagersRecord\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -33,7 +37,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'create'],
+        options: ['list', 'find-first', 'create'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -48,6 +52,8 @@ async function handleTableSubcommand(
   switch (subcommand) {
     case 'list':
       return handleList(argv, prompter);
+    case 'find-first':
+      return handleFindFirst(argv, prompter);
     case 'create':
       return handleCreate(argv, prompter);
     default:
@@ -55,20 +61,49 @@ async function handleTableSubcommand(
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      userId: true,
+      depth: true,
+    };
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<
+        OrgGetManagersRecordSelect,
+        OrgGetManagersRecordFilter,
+        never,
+        OrgGetManagersRecordsOrderBy
+      > & {
+        select: OrgGetManagersRecordSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
-    const result = await client.orgGetManagersRecord
-      .findMany({
-        select: {
-          userId: true,
-          depth: true,
-        },
-      })
-      .execute();
+    const result = await client.orgGetManagersRecord.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to list records.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      userId: true,
+      depth: true,
+    };
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<OrgGetManagersRecordSelect, OrgGetManagersRecordFilter, never> & {
+        select: OrgGetManagersRecordSelect;
+      }
+    >(argv, defaultSelect);
+    const client = getClient();
+    const result = await client.orgGetManagersRecord.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Failed to find record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

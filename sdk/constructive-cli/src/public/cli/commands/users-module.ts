@@ -5,9 +5,16 @@
  */
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
-import { coerceAnswers, stripUndefined } from '../utils';
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
-import type { CreateUsersModuleInput, UsersModulePatch } from '../../orm/input-types';
+import type {
+  CreateUsersModuleInput,
+  UsersModulePatch,
+  UsersModuleSelect,
+  UsersModuleFilter,
+  UsersModuleOrderBy,
+} from '../../orm/input-types';
+import type { FindManyArgs, FindFirstArgs } from '../../orm/select-types';
 const fieldSchema: FieldSchema = {
   id: 'uuid',
   databaseId: 'uuid',
@@ -18,7 +25,7 @@ const fieldSchema: FieldSchema = {
   typeTableName: 'string',
 };
 const usage =
-  '\nusers-module <command>\n\nCommands:\n  list                  List all usersModule records\n  get                   Get a usersModule by ID\n  create                Create a new usersModule\n  update                Update an existing usersModule\n  delete                Delete a usersModule\n\n  --help, -h            Show this help message\n';
+  '\nusers-module <command>\n\nCommands:\n  list                  List usersModule records\n  find-first            Find first matching usersModule record\n  get                   Get a usersModule by ID\n  create                Create a new usersModule\n  update                Update an existing usersModule\n  delete                Delete a usersModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -35,7 +42,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'get', 'create', 'update', 'delete'],
+        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -50,6 +57,8 @@ async function handleTableSubcommand(
   switch (subcommand) {
     case 'list':
       return handleList(argv, prompter);
+    case 'find-first':
+      return handleFindFirst(argv, prompter);
     case 'get':
       return handleGet(argv, prompter);
     case 'create':
@@ -63,25 +72,54 @@ async function handleTableSubcommand(
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      databaseId: true,
+      schemaId: true,
+      tableId: true,
+      tableName: true,
+      typeTableId: true,
+      typeTableName: true,
+    };
+    const findManyArgs = parseFindManyArgs<
+      FindManyArgs<UsersModuleSelect, UsersModuleFilter, never, UsersModuleOrderBy> & {
+        select: UsersModuleSelect;
+      }
+    >(argv, defaultSelect);
     const client = getClient();
-    const result = await client.usersModule
-      .findMany({
-        select: {
-          id: true,
-          databaseId: true,
-          schemaId: true,
-          tableId: true,
-          tableName: true,
-          typeTableId: true,
-          typeTableName: true,
-        },
-      })
-      .execute();
+    const result = await client.usersModule.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to list records.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      databaseId: true,
+      schemaId: true,
+      tableId: true,
+      tableName: true,
+      typeTableId: true,
+      typeTableName: true,
+    };
+    const findFirstArgs = parseFindFirstArgs<
+      FindFirstArgs<UsersModuleSelect, UsersModuleFilter, never> & {
+        select: UsersModuleSelect;
+      }
+    >(argv, defaultSelect);
+    const client = getClient();
+    const result = await client.usersModule.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Failed to find record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

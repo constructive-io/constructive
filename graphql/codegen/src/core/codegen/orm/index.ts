@@ -66,7 +66,7 @@ export interface GenerateOrmResult {
 export function generateOrm(options: GenerateOrmOptions): GenerateOrmResult {
   const { tables, customOperations, sharedTypesPath } = options;
   const commentsEnabled = options.config.codegen?.comments !== false;
-  const conditionEnabled = options.config.codegen?.condition !== false;
+  const conditionEnabled = options.config.codegen?.condition === true;
   const files: GeneratedFile[] = [];
 
   // Use shared types when a sharedTypesPath is provided (unified output mode)

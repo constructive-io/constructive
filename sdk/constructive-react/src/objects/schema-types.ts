@@ -593,6 +593,9 @@ export interface MetaField {
   type: MetaType;
   isNotNull: boolean;
   hasDefault: boolean;
+  isPrimaryKey: boolean;
+  isForeignKey: boolean;
+  description?: string | null;
 }
 /** Information about a database index */
 export interface MetaIndex {
