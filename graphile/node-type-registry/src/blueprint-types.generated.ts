@@ -559,8 +559,8 @@ export interface RelationManyToManyParams {
   };
   /* Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Default: [authenticated] */
   grant_roles?: string[];
-  /* Privilege grants for the junction table. Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns */
-  grant_privileges?: string[];
+  /* Privilege grants for the junction table as [verb, columns] tuples (e.g. [['select','*'],['insert','*']]). Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns */
+  grant_privileges?: string[][];
   /* RLS policy type for the junction table. Forwarded to secure_table_provision as-is. NULL means no policy. */
   policy_type?: string;
   /* Privileges the policy applies to. Forwarded to secure_table_provision as-is. NULL means derived from grant_privileges verbs. */
@@ -643,7 +643,7 @@ export interface ViewCompositeParams {
 }
 /**
  * ===========================================================================
- * Static structural types
+ * Structural types — Static fallback (no _meta provided)
  * ===========================================================================
  */
 ;
@@ -663,7 +663,7 @@ export interface BlueprintField {
 /** An RLS policy entry for a blueprint table. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  policy_type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
   /** Role for this policy. Defaults to "authenticated". */
   policy_role?: string;
   /** Whether this policy is permissive (true) or restrictive (false). */
@@ -697,9 +697,9 @@ export interface BlueprintFullTextSearch {
 export interface BlueprintIndex {
   /** Reference key of the table this index belongs to. */
   table_ref: string;
-  /** Single column name for the index. Mutually exclusive with "columns". */
+  /** Single column name for the index. */
   column?: string;
-  /** Array of column names for a multi-column index. Mutually exclusive with "column". */
+  /** Array of column names for a multi-column index. */
   columns?: string[];
   /** Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25"). */
   access_method: string;
