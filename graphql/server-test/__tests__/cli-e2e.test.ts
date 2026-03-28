@@ -18,11 +18,8 @@
  *
  * Suite 2 — Articles (search-seed):
  *   5 articles with tsvector, pg_trgm, optional pgvector columns
- *   Tests: search subcommand, tsvector search, trgm fuzzy matching,
- *          composite fullTextSearch, search+pagination, pgvector (conditional)
- *
- * Suite 3 — Blueprint generation:
- *   Tests: generate-types with live _meta, graceful fallback without --meta
+ *   Tests: tsvector search, trgm fuzzy matching, composite fullTextSearch,
+ *          search+pagination, pgvector error handling, schema introspection
  */
 
 import path from 'path';
@@ -284,78 +281,94 @@ function setupAppstashContext(
   }
 }
 
+/**
+ * Bootstrap script written to disk for the child process.
+ * Requires the generated CLI commands and executes them in non-interactive mode.
+ */
+const RUNNER_SCRIPT = `
+const { parseArgv, Inquirerer } = require('inquirerer');
+const { commands } = require('./cli/commands');
+
+const argv = parseArgv(process.argv);
+const prompter = new Inquirerer({
+  input: process.stdin,
+  output: process.stdout,
+  noTty: true,
+});
+
+commands(argv, prompter, { noTty: true })
+  .then(() => process.exit(0))
+  .catch((e) => {
+    console.error(e.message);
+    process.exit(1);
+  });
+`.trimStart();
+
+/**
+ * Run the compiled CLI as a child process.
+ * Uses spawn (not execFileSync) so the Node.js event loop stays unblocked —
+ * the GraphQL server in this process can respond to requests.
+ */
+function runCli(
+  distDir: string,
+  tmpHome: string,
+  ...args: string[]
+): Promise<string> {
+  const runnerPath = path.join(distDir, '_runner.js');
+  if (!fs.existsSync(runnerPath)) {
+    fs.writeFileSync(runnerPath, RUNNER_SCRIPT, 'utf-8');
+  }
+
+  return new Promise<string>((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [runnerPath, ...args],
+      {
+        env: {
+          ...process.env,
+          APPSTASH_BASE_DIR: tmpHome,
+          NODE_PATH: [
+            distDir,
+            ...resolveNodePaths(),
+          ].join(path.delimiter),
+        },
+        stdio: ['pipe', 'pipe', 'pipe'],
+      },
+    );
+
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk: Buffer) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk: Buffer) => {
+      stderr += chunk.toString();
+    });
+
+    const timer = setTimeout(() => {
+      child.kill();
+      reject(new Error(`CLI timed out after 30s.\nstdout: ${stdout}\nstderr: ${stderr}`));
+    }, 30000);
+
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      if (code !== 0) {
+        reject(new Error(`CLI exited with code ${code}.\nstdout: ${stdout}\nstderr: ${stderr}`));
+      } else {
+        resolve(stdout);
+      }
+    });
+
+    child.stdin.end();
+  });
+}
+
 describe('CLI E2E — generated CLI against real DB', () => {
   let server: ServerInfo;
   let teardown: () => Promise<void>;
   let tmpDir: string;
   let tmpHome: string;
   let distDir: string;
-
-  /**
-   * Run the compiled CLI as a child process (async).
-   * Uses spawn instead of execFileSync so the Node.js event loop stays
-   * unblocked — the GraphQL server in this process can respond to requests.
-   */
-  function runCli(...args: string[]): Promise<string> {
-    const runnerPath = path.join(distDir, '_runner.js');
-    if (!fs.existsSync(runnerPath)) {
-      fs.writeFileSync(
-        runnerPath,
-        [
-          "const { parseArgv, Inquirerer } = require('inquirerer');",
-          "const { commands } = require('./cli/commands');",
-          'const argv = parseArgv(process.argv);',
-          'const prompter = new Inquirerer({ input: process.stdin, output: process.stdout, noTty: true });',
-          "commands(argv, prompter, { noTty: true }).then(() => process.exit(0)).catch(e => { console.error(e.message); process.exit(1); });",
-        ].join('\n'),
-        'utf-8',
-      );
-    }
-
-    return new Promise<string>((resolve, reject) => {
-      const child = spawn(
-        process.execPath,
-        [runnerPath, ...args],
-        {
-          env: {
-            ...process.env,
-            APPSTASH_BASE_DIR: tmpHome,
-            NODE_PATH: [
-              distDir,
-              ...resolveNodePaths(),
-            ].join(path.delimiter),
-          },
-          stdio: ['pipe', 'pipe', 'pipe'],
-        },
-      );
-
-      let stdout = '';
-      let stderr = '';
-      child.stdout.on('data', (chunk: Buffer) => {
-        stdout += chunk.toString();
-      });
-      child.stderr.on('data', (chunk: Buffer) => {
-        stderr += chunk.toString();
-      });
-
-      const timer = setTimeout(() => {
-        child.kill();
-        reject(new Error(`CLI timed out after 30s.\nstdout: ${stdout}\nstderr: ${stderr}`));
-      }, 30000);
-
-      child.on('close', (code) => {
-        clearTimeout(timer);
-        if (code !== 0) {
-          reject(new Error(`CLI exited with code ${code}.\nstdout: ${stdout}\nstderr: ${stderr}`));
-        } else {
-          resolve(stdout);
-        }
-      });
-
-      // Close stdin immediately — CLI runs in non-interactive mode
-      child.stdin.end();
-    });
-  }
 
   beforeAll(async () => {
     // 1. Spin up real DB + GraphQL server with simple-seed fixture
@@ -417,6 +430,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
 
   it('should list with --limit, --where (dot-notation), and --fields', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'animal',
       'list',
       '--limit',
@@ -451,6 +466,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
   it('should support cursor-based forward pagination (--after)', async () => {
     // First page: get 2 records
     const page1Output = await runCli(
+      distDir,
+      tmpHome,
       'animal',
       'list',
       '--limit',
@@ -469,6 +486,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
 
     // Second page: use the endCursor
     const page2Output = await runCli(
+      distDir,
+      tmpHome,
       'animal',
       'list',
       '--limit',
@@ -497,6 +516,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
 
   it('should find-first with --where.name.equalTo', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'animal',
       'find-first',
       '--where.name.equalTo',
@@ -521,6 +542,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
 
   it('should combine --where + --orderBy + --fields for sorted filtered results', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'animal',
       'list',
       '--where.species.equalTo',
@@ -550,6 +573,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
 
   it('should handle empty result sets gracefully', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'animal',
       'list',
       '--where.species.equalTo',
@@ -734,66 +759,6 @@ describe('CLI E2E — search commands against real DB', () => {
   let distDir: string;
   let hasVector = false;
 
-  function runCli(...args: string[]): Promise<string> {
-    const runnerPath = path.join(distDir, '_runner.js');
-    if (!fs.existsSync(runnerPath)) {
-      fs.writeFileSync(
-        runnerPath,
-        [
-          "const { parseArgv, Inquirerer } = require('inquirerer');",
-          "const { commands } = require('./cli/commands');",
-          'const argv = parseArgv(process.argv);',
-          'const prompter = new Inquirerer({ input: process.stdin, output: process.stdout, noTty: true });',
-          "commands(argv, prompter, { noTty: true }).then(() => process.exit(0)).catch(e => { console.error(e.message); process.exit(1); });",
-        ].join('\n'),
-        'utf-8',
-      );
-    }
-
-    return new Promise<string>((resolve, reject) => {
-      const child = spawn(
-        process.execPath,
-        [runnerPath, ...args],
-        {
-          env: {
-            ...process.env,
-            APPSTASH_BASE_DIR: tmpHome,
-            NODE_PATH: [
-              distDir,
-              ...resolveNodePaths(),
-            ].join(path.delimiter),
-          },
-          stdio: ['pipe', 'pipe', 'pipe'],
-        },
-      );
-
-      let stdout = '';
-      let stderr = '';
-      child.stdout.on('data', (chunk: Buffer) => {
-        stdout += chunk.toString();
-      });
-      child.stderr.on('data', (chunk: Buffer) => {
-        stderr += chunk.toString();
-      });
-
-      const timer = setTimeout(() => {
-        child.kill();
-        reject(new Error(`CLI timed out after 30s.\nstdout: ${stdout}\nstderr: ${stderr}`));
-      }, 30000);
-
-      child.on('close', (code) => {
-        clearTimeout(timer);
-        if (code !== 0) {
-          reject(new Error(`CLI exited with code ${code}.\nstdout: ${stdout}\nstderr: ${stderr}`));
-        } else {
-          resolve(stdout);
-        }
-      });
-
-      child.stdin.end();
-    });
-  }
-
   beforeAll(async () => {
     // 1. Spin up real DB + GraphQL server with search-seed fixture
     const conn = await getConnections(
@@ -872,6 +837,8 @@ describe('CLI E2E — search commands against real DB', () => {
 
   it('should filter articles by tsvector search via --where.tsvTsv', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'article',
       'list',
       '--where.tsvTsv',
@@ -902,6 +869,8 @@ describe('CLI E2E — search commands against real DB', () => {
 
   it('should filter articles by trgm similarity via dot-notation where', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'article',
       'list',
       '--where.trgmTitle.value',
@@ -931,6 +900,8 @@ describe('CLI E2E — search commands against real DB', () => {
 
   it('should filter via fullTextSearch composite filter', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'article',
       'list',
       '--where.fullTextSearch',
@@ -962,6 +933,8 @@ describe('CLI E2E — search commands against real DB', () => {
 
   it('should combine search filter with --limit for paginated results', async () => {
     const output = await runCli(
+      distDir,
+      tmpHome,
       'article',
       'list',
       '--where.tsvTsv',
@@ -998,6 +971,8 @@ describe('CLI E2E — search commands against real DB', () => {
     // The GraphQL server should reject it with a type error.
     // The CLI still exits 0 but returns { ok: false, errors: [...] }.
     const output = await runCli(
+      distDir,
+      tmpHome,
       'article',
       'list',
       '--where.vectorEmbedding.vector',
