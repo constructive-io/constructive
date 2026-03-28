@@ -708,17 +708,14 @@ importers:
         specifier: 16.13.0
         version: 16.13.0
       inflekt:
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.7.0
+        version: 0.7.0
       inquirerer:
         specifier: ^4.7.0
         version: 4.7.0
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
-      komoji:
-        specifier: ^0.9.0
-        version: 0.9.0
       oxfmt:
         specifier: ^0.42.0
         version: 0.42.0
@@ -7129,6 +7126,9 @@ packages:
 
   inflekt@0.6.0:
     resolution: {integrity: sha512-imrVt5ozDZMKUfy0OwwdpxzIAAGAEAZ7HosgkSBC759MgiCznLzjinG8Ytesw3qCMkmH+F8ogZh+PUH+PMolcg==}
+
+  inflekt@0.7.0:
+    resolution: {integrity: sha512-KJ87JtHQS3DMi3DBPmBB0rhUyB+QZtZy/74LEgPKy1np4zErNLmoZS0y9I8kuvVQypQCW1j1Yav8u6Vgqb1xPQ==}
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
@@ -14999,6 +14999,11 @@ snapshots:
   inflection@3.0.2: {}
 
   inflekt@0.6.0:
+    dependencies:
+      inflection: 3.0.2
+      komoji: 0.9.0
+
+  inflekt@0.7.0:
     dependencies:
       inflection: 3.0.2
       komoji: 0.9.0
