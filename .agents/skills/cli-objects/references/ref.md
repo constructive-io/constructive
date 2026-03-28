@@ -8,6 +8,9 @@ CRUD operations for Ref records via csdk CLI
 
 ```bash
 csdk ref list
+csdk ref list --where.<field>.<op> <value> --orderBy <values>
+csdk ref list --limit 10 --after <cursor>
+csdk ref find-first --where.<field>.<op> <value>
 csdk ref get --id <UUID>
 csdk ref create --name <String> --databaseId <UUID> --storeId <UUID> [--commitId <UUID>]
 csdk ref update --id <UUID> [--name <String>] [--databaseId <UUID>] [--storeId <UUID>] [--commitId <UUID>]
@@ -16,10 +19,40 @@ csdk ref delete --id <UUID>
 
 ## Examples
 
-### List all ref records
+### List ref records
 
 ```bash
 csdk ref list
+```
+
+### List ref records with pagination
+
+```bash
+csdk ref list --limit 10 --offset 0
+```
+
+### List ref records with cursor pagination
+
+```bash
+csdk ref list --limit 10 --after <cursor>
+```
+
+### Find first matching ref
+
+```bash
+csdk ref find-first --where.id.equalTo <value>
+```
+
+### List ref records with field selection
+
+```bash
+csdk ref list --select id,id
+```
+
+### List ref records with filtering and ordering
+
+```bash
+csdk ref list --where.id.equalTo <value> --orderBy ID_ASC
 ```
 
 ### Create a ref

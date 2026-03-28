@@ -5,7 +5,7 @@
  */
 import { CLIOptions, Inquirerer, extractFirst } from 'inquirerer';
 import { getClient } from '../executor';
-import { coerceAnswers, stripUndefined } from '../utils';
+import { coerceAnswers, parseFindFirstArgs, parseFindManyArgs, stripUndefined } from '../utils';
 import type { FieldSchema } from '../utils';
 import type { CreateTriggerInput, TriggerPatch } from '../../orm/input-types';
 const fieldSchema: FieldSchema = {
@@ -24,7 +24,7 @@ const fieldSchema: FieldSchema = {
   updatedAt: 'string',
 };
 const usage =
-  '\ntrigger <command>\n\nCommands:\n  list                  List all trigger records\n  get                   Get a trigger by ID\n  create                Create a new trigger\n  update                Update an existing trigger\n  delete                Delete a trigger\n\n  --help, -h            Show this help message\n';
+  '\ntrigger <command>\n\nCommands:\n  list                  List trigger records\n  find-first            Find first matching trigger record\n  get                   Get a trigger by ID\n  create                Create a new trigger\n  update                Update an existing trigger\n  delete                Delete a trigger\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -41,7 +41,7 @@ export default async (
         type: 'autocomplete',
         name: 'subcommand',
         message: 'What do you want to do?',
-        options: ['list', 'get', 'create', 'update', 'delete'],
+        options: ['list', 'find-first', 'get', 'create', 'update', 'delete'],
       },
     ]);
     return handleTableSubcommand(answer.subcommand as string, newArgv, prompter);
@@ -56,6 +56,8 @@ async function handleTableSubcommand(
   switch (subcommand) {
     case 'list':
       return handleList(argv, prompter);
+    case 'find-first':
+      return handleFindFirst(argv, prompter);
     case 'get':
       return handleGet(argv, prompter);
     case 'create':
@@ -69,31 +71,58 @@ async function handleTableSubcommand(
       process.exit(1);
   }
 }
-async function handleList(_argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
   try {
+    const defaultSelect = {
+      id: true,
+      databaseId: true,
+      tableId: true,
+      name: true,
+      event: true,
+      functionName: true,
+      smartTags: true,
+      category: true,
+      module: true,
+      scope: true,
+      tags: true,
+      createdAt: true,
+      updatedAt: true,
+    };
+    const findManyArgs = parseFindManyArgs(argv, defaultSelect);
     const client = getClient();
-    const result = await client.trigger
-      .findMany({
-        select: {
-          id: true,
-          databaseId: true,
-          tableId: true,
-          name: true,
-          event: true,
-          functionName: true,
-          smartTags: true,
-          category: true,
-          module: true,
-          scope: true,
-          tags: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      })
-      .execute();
+    const result = await client.trigger.findMany(findManyArgs).execute();
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Failed to list records.');
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    process.exit(1);
+  }
+}
+async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter: Inquirerer) {
+  try {
+    const defaultSelect = {
+      id: true,
+      databaseId: true,
+      tableId: true,
+      name: true,
+      event: true,
+      functionName: true,
+      smartTags: true,
+      category: true,
+      module: true,
+      scope: true,
+      tags: true,
+      createdAt: true,
+      updatedAt: true,
+    };
+    const findFirstArgs = parseFindFirstArgs(argv, defaultSelect);
+    const client = getClient();
+    const result = await client.trigger.findFirst(findFirstArgs).execute();
+    console.log(JSON.stringify(result, null, 2));
+  } catch (error) {
+    console.error('Failed to find record.');
     if (error instanceof Error) {
       console.error(error.message);
     }

@@ -883,15 +883,6 @@ export const orgLimitDefaultKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitDefaultKeys.details(), id] as const,
 } as const;
-export const nodeTypeRegistryKeys = {
-  /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
-  /** List query keys */ lists: () => [...nodeTypeRegistryKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...nodeTypeRegistryKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...nodeTypeRegistryKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...nodeTypeRegistryKeys.details(), id] as const,
-} as const;
 export const membershipTypeKeys = {
   /** All membershipType queries */ all: ['membershiptype'] as const,
   /** List query keys */ lists: () => [...membershipTypeKeys.all, 'list'] as const,
@@ -927,6 +918,15 @@ export const rlsModuleKeys = {
   /** Detail query keys */ details: () => [...rlsModuleKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...rlsModuleKeys.details(), id] as const,
+} as const;
+export const nodeTypeRegistryKeys = {
+  /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
+  /** List query keys */ lists: () => [...nodeTypeRegistryKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...nodeTypeRegistryKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...nodeTypeRegistryKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...nodeTypeRegistryKeys.details(), id] as const,
 } as const;
 export const orgMembershipDefaultKeys = {
   /** All orgMembershipDefault queries */ all: ['orgmembershipdefault'] as const,
@@ -1145,11 +1145,11 @@ export const queryKeys = {
   migrateFile: migrateFileKeys,
   appLimitDefault: appLimitDefaultKeys,
   orgLimitDefault: orgLimitDefaultKeys,
-  nodeTypeRegistry: nodeTypeRegistryKeys,
   membershipType: membershipTypeKeys,
   commit: commitKeys,
   appMembershipDefault: appMembershipDefaultKeys,
   rlsModule: rlsModuleKeys,
+  nodeTypeRegistry: nodeTypeRegistryKeys,
   orgMembershipDefault: orgMembershipDefaultKeys,
   sqlAction: sqlActionKeys,
   user: userKeys,

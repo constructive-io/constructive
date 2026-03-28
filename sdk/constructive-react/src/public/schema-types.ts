@@ -1335,17 +1335,6 @@ export type OrgLimitDefaultOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
-/** Methods to use when ordering `NodeTypeRegistry`. */
-export type NodeTypeRegistryOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC';
 /** Methods to use when ordering `MembershipType`. */
 export type MembershipTypeOrderBy =
   | 'NATURAL'
@@ -1421,6 +1410,17 @@ export type RlsModuleOrderBy =
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC';
+/** Methods to use when ordering `NodeTypeRegistry`. */
+export type NodeTypeRegistryOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'CATEGORY_ASC'
+  | 'CATEGORY_DESC';
 /** Methods to use when ordering `OrgMembershipDefault`. */
 export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
@@ -7187,33 +7187,6 @@ export interface OrgLimitDefaultFilter {
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
-/** A filter to be used against `NodeTypeRegistry` object types. All fields are combined with a logical ‘and.’ */
-export interface NodeTypeRegistryFilter {
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringFilter;
-  /** Filter by the object’s `category` field. */
-  category?: StringFilter;
-  /** Filter by the object’s `displayName` field. */
-  displayName?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `parameterSchema` field. */
-  parameterSchema?: JSONFilter;
-  /** Filter by the object’s `tags` field. */
-  tags?: StringListFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: NodeTypeRegistryFilter[];
-  /** Checks for any expressions in this list. */
-  or?: NodeTypeRegistryFilter[];
-  /** Negates the expression. */
-  not?: NodeTypeRegistryFilter;
-}
 /** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
 export interface MembershipTypeFilter {
   /** Filter by the object’s `id` field. */
@@ -7341,6 +7314,37 @@ export interface AppMembershipDefaultFilter {
   or?: AppMembershipDefaultFilter[];
   /** Negates the expression. */
   not?: AppMembershipDefaultFilter;
+}
+/** A filter to be used against `NodeTypeRegistry` object types. All fields are combined with a logical ‘and.’ */
+export interface NodeTypeRegistryFilter {
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `category` field. */
+  category?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `summary` field. */
+  summary?: StringFilter;
+  /** Filter by the object’s `parameterSchema` field. */
+  parameterSchema?: JSONFilter;
+  /** Filter by the object’s `guidance` field. */
+  guidance?: JSONFilter;
+  /** Filter by the object’s `tags` field. */
+  tags?: StringListFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: NodeTypeRegistryFilter[];
+  /** Checks for any expressions in this list. */
+  or?: NodeTypeRegistryFilter[];
+  /** Negates the expression. */
+  not?: NodeTypeRegistryFilter;
 }
 /** A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLevelRequirementFilter {
@@ -8268,30 +8272,6 @@ export interface OrgChartEdgeGrantInput {
   /** Timestamp when this grant or revocation was recorded */
   createdAt?: string;
 }
-export interface CreateNodeTypeRegistryInput {
-  clientMutationId?: string;
-  /** The `NodeTypeRegistry` to be created by this mutation. */
-  nodeTypeRegistry: NodeTypeRegistryInput;
-}
-/** An input for mutations affecting `NodeTypeRegistry` */
-export interface NodeTypeRegistryInput {
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
-  name: string;
-  /** snake_case slug for use in code and configuration (e.g., authz_direct_owner, data_timestamps) */
-  slug: string;
-  /** Node type category: authz (authorization semantics), data (table-level behaviors), view (view query types), relation (relational structure between tables) */
-  category: string;
-  /** Human-readable display name for UI */
-  displayName?: string;
-  /** Description of what this node type does */
-  description?: string;
-  /** JSON Schema defining valid parameters for this node type */
-  parameterSchema?: unknown;
-  /** Tags for categorization and filtering (e.g., ownership, membership, temporal, rls) */
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface CreateMembershipTypeInput {
   clientMutationId?: string;
   /** The `MembershipType` to be created by this mutation. */
@@ -8538,6 +8518,34 @@ export interface SessionsModuleInput {
   sessionsTable?: string;
   sessionCredentialsTable?: string;
   authSettingsTable?: string;
+}
+export interface CreateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  /** The `NodeTypeRegistry` to be created by this mutation. */
+  nodeTypeRegistry: NodeTypeRegistryInput;
+}
+/** An input for mutations affecting `NodeTypeRegistry` */
+export interface NodeTypeRegistryInput {
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
+  name: string;
+  /** snake_case slug for use in code and configuration (e.g., authz_direct_owner, data_timestamps) */
+  slug: string;
+  /** Node type category: authz (authorization semantics), data (table-level behaviors), view (view query types), relation (relational structure between tables) */
+  category: string;
+  /** Human-readable display name for UI */
+  displayName?: string;
+  /** Description of what this node type does */
+  description?: string;
+  /** Casual, approachable marketing description for onboarding UIs. Explains what the node type does and when you would use it in plain language. */
+  summary?: string;
+  /** JSON Schema defining valid parameters for this node type */
+  parameterSchema?: unknown;
+  /** Machine-readable usage guidance: privilege recommendations, combination patterns, warnings, anti-patterns. All fields optional. Keys: recommended_privileges, privilege_note, standalone_ok, suggested_companions, combination_note, typical_pattern, status, status_note, alternatives, warnings, anti_patterns, performance_note, requires, decision_semantics, related_nodes, examples */
+  guidance?: unknown;
+  /** Tags for categorization and filtering (e.g., ownership, membership, temporal, rls) */
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface CreateOrgLimitInput {
   clientMutationId?: string;
@@ -10586,32 +10594,6 @@ export interface OrgChartEdgeGrantPatch {
   /** Timestamp when this grant or revocation was recorded */
   createdAt?: string;
 }
-export interface UpdateNodeTypeRegistryInput {
-  clientMutationId?: string;
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
-  name: string;
-  /** An object where the defined keys will be set on the `NodeTypeRegistry` being updated. */
-  nodeTypeRegistryPatch: NodeTypeRegistryPatch;
-}
-/** Represents an update to a `NodeTypeRegistry`. Fields that are set will be updated. */
-export interface NodeTypeRegistryPatch {
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
-  name?: string;
-  /** snake_case slug for use in code and configuration (e.g., authz_direct_owner, data_timestamps) */
-  slug?: string;
-  /** Node type category: authz (authorization semantics), data (table-level behaviors), view (view query types), relation (relational structure between tables) */
-  category?: string;
-  /** Human-readable display name for UI */
-  displayName?: string;
-  /** Description of what this node type does */
-  description?: string;
-  /** JSON Schema defining valid parameters for this node type */
-  parameterSchema?: unknown;
-  /** Tags for categorization and filtering (e.g., ownership, membership, temporal, rls) */
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface UpdateMembershipTypeInput {
   clientMutationId?: string;
   /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
@@ -10880,6 +10862,36 @@ export interface SessionsModulePatch {
   sessionsTable?: string;
   sessionCredentialsTable?: string;
   authSettingsTable?: string;
+}
+export interface UpdateNodeTypeRegistryInput {
+  clientMutationId?: string;
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
+  name: string;
+  /** An object where the defined keys will be set on the `NodeTypeRegistry` being updated. */
+  nodeTypeRegistryPatch: NodeTypeRegistryPatch;
+}
+/** Represents an update to a `NodeTypeRegistry`. Fields that are set will be updated. */
+export interface NodeTypeRegistryPatch {
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
+  name?: string;
+  /** snake_case slug for use in code and configuration (e.g., authz_direct_owner, data_timestamps) */
+  slug?: string;
+  /** Node type category: authz (authorization semantics), data (table-level behaviors), view (view query types), relation (relational structure between tables) */
+  category?: string;
+  /** Human-readable display name for UI */
+  displayName?: string;
+  /** Description of what this node type does */
+  description?: string;
+  /** Casual, approachable marketing description for onboarding UIs. Explains what the node type does and when you would use it in plain language. */
+  summary?: string;
+  /** JSON Schema defining valid parameters for this node type */
+  parameterSchema?: unknown;
+  /** Machine-readable usage guidance: privilege recommendations, combination patterns, warnings, anti-patterns. All fields optional. Keys: recommended_privileges, privilege_note, standalone_ok, suggested_companions, combination_note, typical_pattern, status, status_note, alternatives, warnings, anti_patterns, performance_note, requires, decision_semantics, related_nodes, examples */
+  guidance?: unknown;
+  /** Tags for categorization and filtering (e.g., ownership, membership, temporal, rls) */
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface UpdateOrgLimitInput {
   clientMutationId?: string;
@@ -12462,11 +12474,6 @@ export interface DeleteOrgChartEdgeGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteNodeTypeRegistryInput {
-  clientMutationId?: string;
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
-  name: string;
-}
 export interface DeleteMembershipTypeInput {
   clientMutationId?: string;
   /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
@@ -12528,6 +12535,11 @@ export interface DeleteRlsModuleInput {
 export interface DeleteSessionsModuleInput {
   clientMutationId?: string;
   id: string;
+}
+export interface DeleteNodeTypeRegistryInput {
+  clientMutationId?: string;
+  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
+  name: string;
 }
 export interface DeleteOrgLimitInput {
   clientMutationId?: string;
@@ -13053,13 +13065,6 @@ export interface OrgChartEdgeGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `NodeTypeRegistry` values. */
-export interface NodeTypeRegistryConnection {
-  nodes: NodeTypeRegistry[];
-  edges: NodeTypeRegistryEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `MembershipType` values. */
 export interface MembershipTypeConnection {
   nodes: MembershipType[];
@@ -13134,6 +13139,13 @@ export interface RlsModuleConnection {
 export interface SessionsModuleConnection {
   nodes: SessionsModule[];
   edges: SessionsModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `NodeTypeRegistry` values. */
+export interface NodeTypeRegistryConnection {
+  nodes: NodeTypeRegistry[];
+  edges: NodeTypeRegistryEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -13853,12 +13865,6 @@ export interface CreateOrgChartEdgeGrantPayload {
   orgChartEdgeGrant?: OrgChartEdgeGrant | null;
   orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
 }
-export interface CreateNodeTypeRegistryPayload {
-  clientMutationId?: string | null;
-  /** The `NodeTypeRegistry` that was created by this mutation. */
-  nodeTypeRegistry?: NodeTypeRegistry | null;
-  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
-}
 export interface CreateMembershipTypePayload {
   clientMutationId?: string | null;
   /** The `MembershipType` that was created by this mutation. */
@@ -13942,6 +13948,12 @@ export interface CreateSessionsModulePayload {
   /** The `SessionsModule` that was created by this mutation. */
   sessionsModule?: SessionsModule | null;
   sessionsModuleEdge?: SessionsModuleEdge | null;
+}
+export interface CreateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was created by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
 }
 export interface CreateOrgLimitPayload {
   clientMutationId?: string | null;
@@ -14469,12 +14481,6 @@ export interface UpdateOrgChartEdgeGrantPayload {
   orgChartEdgeGrant?: OrgChartEdgeGrant | null;
   orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
 }
-export interface UpdateNodeTypeRegistryPayload {
-  clientMutationId?: string | null;
-  /** The `NodeTypeRegistry` that was updated by this mutation. */
-  nodeTypeRegistry?: NodeTypeRegistry | null;
-  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
-}
 export interface UpdateMembershipTypePayload {
   clientMutationId?: string | null;
   /** The `MembershipType` that was updated by this mutation. */
@@ -14558,6 +14564,12 @@ export interface UpdateSessionsModulePayload {
   /** The `SessionsModule` that was updated by this mutation. */
   sessionsModule?: SessionsModule | null;
   sessionsModuleEdge?: SessionsModuleEdge | null;
+}
+export interface UpdateNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was updated by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
 }
 export interface UpdateOrgLimitPayload {
   clientMutationId?: string | null;
@@ -15075,12 +15087,6 @@ export interface DeleteOrgChartEdgeGrantPayload {
   orgChartEdgeGrant?: OrgChartEdgeGrant | null;
   orgChartEdgeGrantEdge?: OrgChartEdgeGrantEdge | null;
 }
-export interface DeleteNodeTypeRegistryPayload {
-  clientMutationId?: string | null;
-  /** The `NodeTypeRegistry` that was deleted by this mutation. */
-  nodeTypeRegistry?: NodeTypeRegistry | null;
-  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
-}
 export interface DeleteMembershipTypePayload {
   clientMutationId?: string | null;
   /** The `MembershipType` that was deleted by this mutation. */
@@ -15164,6 +15170,12 @@ export interface DeleteSessionsModulePayload {
   /** The `SessionsModule` that was deleted by this mutation. */
   sessionsModule?: SessionsModule | null;
   sessionsModuleEdge?: SessionsModuleEdge | null;
+}
+export interface DeleteNodeTypeRegistryPayload {
+  clientMutationId?: string | null;
+  /** The `NodeTypeRegistry` that was deleted by this mutation. */
+  nodeTypeRegistry?: NodeTypeRegistry | null;
+  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
 }
 export interface DeleteOrgLimitPayload {
   clientMutationId?: string | null;
@@ -15740,12 +15752,6 @@ export interface OrgChartEdgeGrantEdge {
   /** The `OrgChartEdgeGrant` at the end of the edge. */
   node?: OrgChartEdgeGrant | null;
 }
-/** A `NodeTypeRegistry` edge in the connection. */
-export interface NodeTypeRegistryEdge {
-  cursor?: string | null;
-  /** The `NodeTypeRegistry` at the end of the edge. */
-  node?: NodeTypeRegistry | null;
-}
 /** A `MembershipType` edge in the connection. */
 export interface MembershipTypeEdge {
   cursor?: string | null;
@@ -15811,6 +15817,12 @@ export interface SessionsModuleEdge {
   cursor?: string | null;
   /** The `SessionsModule` at the end of the edge. */
   node?: SessionsModule | null;
+}
+/** A `NodeTypeRegistry` edge in the connection. */
+export interface NodeTypeRegistryEdge {
+  cursor?: string | null;
+  /** The `NodeTypeRegistry` at the end of the edge. */
+  node?: NodeTypeRegistry | null;
 }
 /** A `OrgLimit` edge in the connection. */
 export interface OrgLimitEdge {
@@ -16191,6 +16203,9 @@ export interface MetaField {
   type: MetaType;
   isNotNull: boolean;
   hasDefault: boolean;
+  isPrimaryKey: boolean;
+  isForeignKey: boolean;
+  description?: string | null;
 }
 /** Information about a database index */
 export interface MetaIndex {

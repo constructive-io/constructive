@@ -92,6 +92,7 @@ CRUD operations for GetAllRecord records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all getAllRecord records |
+| `find-first` | Find first matching getAllRecord record |
 | `get` | Get a getAllRecord by id |
 | `create` | Create a new getAllRecord |
 | `update` | Update an existing getAllRecord |
@@ -113,6 +114,7 @@ CRUD operations for Object records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all object records |
+| `find-first` | Find first matching object record |
 | `get` | Get a object by id |
 | `create` | Create a new object |
 | `update` | Update an existing object |
@@ -141,6 +143,7 @@ CRUD operations for Ref records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all ref records |
+| `find-first` | Find first matching ref record |
 | `get` | Get a ref by id |
 | `create` | Create a new ref |
 | `update` | Update an existing ref |
@@ -166,6 +169,7 @@ CRUD operations for Store records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all store records |
+| `find-first` | Find first matching store record |
 | `get` | Get a store by id |
 | `create` | Create a new store |
 | `update` | Update an existing store |
@@ -191,6 +195,7 @@ CRUD operations for Commit records.
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List all commit records |
+| `find-first` | Find first matching commit record |
 | `get` | Get a commit by id |
 | `create` | Create a new commit |
 | `update` | Update an existing commit |

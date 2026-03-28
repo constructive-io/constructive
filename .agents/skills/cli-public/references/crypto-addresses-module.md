@@ -8,6 +8,9 @@ CRUD operations for CryptoAddressesModule records via csdk CLI
 
 ```bash
 csdk crypto-addresses-module list
+csdk crypto-addresses-module list --where.<field>.<op> <value> --orderBy <values>
+csdk crypto-addresses-module list --limit 10 --after <cursor>
+csdk crypto-addresses-module find-first --where.<field>.<op> <value>
 csdk crypto-addresses-module get --id <UUID>
 csdk crypto-addresses-module create --databaseId <UUID> --tableName <String> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--cryptoNetwork <String>]
 csdk crypto-addresses-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--tableId <UUID>] [--ownerTableId <UUID>] [--tableName <String>] [--cryptoNetwork <String>]
@@ -16,10 +19,40 @@ csdk crypto-addresses-module delete --id <UUID>
 
 ## Examples
 
-### List all cryptoAddressesModule records
+### List cryptoAddressesModule records
 
 ```bash
 csdk crypto-addresses-module list
+```
+
+### List cryptoAddressesModule records with pagination
+
+```bash
+csdk crypto-addresses-module list --limit 10 --offset 0
+```
+
+### List cryptoAddressesModule records with cursor pagination
+
+```bash
+csdk crypto-addresses-module list --limit 10 --after <cursor>
+```
+
+### Find first matching cryptoAddressesModule
+
+```bash
+csdk crypto-addresses-module find-first --where.id.equalTo <value>
+```
+
+### List cryptoAddressesModule records with field selection
+
+```bash
+csdk crypto-addresses-module list --select id,id
+```
+
+### List cryptoAddressesModule records with filtering and ordering
+
+```bash
+csdk crypto-addresses-module list --where.id.equalTo <value> --orderBy ID_ASC
 ```
 
 ### Create a cryptoAddressesModule

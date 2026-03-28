@@ -538,11 +538,6 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
-| `useNodeTypeRegistriesQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useNodeTypeRegistryQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useCreateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useUpdateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useDeleteNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
@@ -563,6 +558,11 @@ function App() {
 | `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
 | `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
 | `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
+| `useNodeTypeRegistriesQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useNodeTypeRegistryQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useCreateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useUpdateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useDeleteNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
 | `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
@@ -2665,27 +2665,6 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
 create({ name: '<String>', max: '<Int>' });
 ```
 
-### NodeTypeRegistry
-
-```typescript
-// List all nodeTypeRegistries
-const { data, isLoading } = useNodeTypeRegistriesQuery({
-  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one nodeTypeRegistry
-const { data: item } = useNodeTypeRegistryQuery({
-  name: '<String>',
-  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, parameterSchema: true, tags: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a nodeTypeRegistry
-const { mutate: create } = useCreateNodeTypeRegistryMutation({
-  selection: { fields: { name: true } },
-});
-create({ slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', parameterSchema: '<JSON>', tags: '<String>' });
-```
-
 ### MembershipType
 
 ```typescript
@@ -2768,6 +2747,27 @@ const { mutate: create } = useCreateRlsModuleMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>' });
+```
+
+### NodeTypeRegistry
+
+```typescript
+// List all nodeTypeRegistries
+const { data, isLoading } = useNodeTypeRegistriesQuery({
+  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, summary: true, parameterSchema: true, guidance: true, tags: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one nodeTypeRegistry
+const { data: item } = useNodeTypeRegistryQuery({
+  name: '<String>',
+  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, summary: true, parameterSchema: true, guidance: true, tags: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a nodeTypeRegistry
+const { mutate: create } = useCreateNodeTypeRegistryMutation({
+  selection: { fields: { name: true } },
+});
+create({ slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', summary: '<String>', parameterSchema: '<JSON>', guidance: '<JSON>', tags: '<String>' });
 ```
 
 ### OrgMembershipDefault
