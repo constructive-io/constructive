@@ -153,8 +153,3 @@ export function generateTagLineContent(tag: Tag): string {
   
   return line;
 }
-
-/**
- * @deprecated Use writePgpmPlan instead. This alias is kept for backwards compatibility.
- */
-export const writeSqitchPlan = writePgpmPlan;

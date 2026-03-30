@@ -130,8 +130,3 @@ ${useTx ? 'COMMIT;' : ''}
 `;
   fs.writeFileSync(actualFile, content);
 };
-
-/**
- * @deprecated Use writePgpmFiles instead. This alias is kept for backwards compatibility.
- */
-export const writeSqitchFiles = writePgpmFiles;

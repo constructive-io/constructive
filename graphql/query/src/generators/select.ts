@@ -41,8 +41,6 @@ import {
   toUpdateMutationName,
 } from './naming-helpers';
 
-// Re-export naming helpers for backwards compatibility
-export { toCamelCasePlural, toOrderByTypeName } from './naming-helpers';
 
 /**
  * Convert Table to MetaObject format for QueryBuilder

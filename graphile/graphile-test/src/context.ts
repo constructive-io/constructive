@@ -87,7 +87,7 @@ interface V4Result<TData = unknown> {
  * - They may have `locations: undefined` instead of omitting the field
  * - They don't always include locations even when nodes are available
  *
- * This normalizes errors to match v4 format for backward compatibility.
+ * This normalizes errors to match v4 format.
  *
  * @param error - The GraphQL error to format
  * @param document - The original document (used to derive locations from path)
@@ -153,7 +153,7 @@ function formatErrorToV4(error: GraphQLError, document?: DocumentNode): V4Format
 
 /**
  * Normalize an ExecutionResult to match v4 PostGraphile output format.
- * This ensures backward compatibility with existing tests and consumers.
+ * This ensures existing tests and consumers work correctly.
  *
  * @param result - The execution result from grafast
  * @param document - The original document (used to derive locations from path)
@@ -333,7 +333,7 @@ export const runGraphQLInContext = async <T = ExecutionResult>({
     }
   }
 
-  // Normalize the result to match v4 PostGraphile format for backward compatibility
+  // Normalize the result to match v4 PostGraphile format
   return normalizeResult<T>(result, document);
 };
 

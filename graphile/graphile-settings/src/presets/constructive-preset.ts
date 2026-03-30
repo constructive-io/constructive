@@ -45,10 +45,6 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  * - pg_trgm fuzzy matching (similarTo/wordSimilarTo on text columns, similarity score fields,
  *   orderBy similarity — zero config, typo-tolerant)
  *
- * DEPRECATED:
- * - The `condition` argument has been removed. All filtering lives under `filter`.
- *   PgConditionArgumentPlugin and PgConditionCustomFieldsPlugin are disabled.
- *
  * RELATION FILTERS:
  * - Enabled via connectionFilterRelations: true
  * - Forward: filter child by parent (e.g. allOrders(filter: { clientByClientId: { name: { startsWith: "Acme" } } }))

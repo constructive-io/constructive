@@ -311,7 +311,8 @@ export function resolveReference(
 }
 
 /**
- * Simple plan file parser without validation (for backwards compatibility)
+ * Simple plan file parser without validation.
+ * Returns a PlanFile (without tags) for callers that don't need tag data.
  */
 export function parsePlanFileSimple(planPath: string): PlanFile {
   const result = parsePlanFile(planPath);

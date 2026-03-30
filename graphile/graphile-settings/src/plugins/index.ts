@@ -11,8 +11,6 @@ export { MinimalPreset } from './minimal-preset';
 export {
   InflektPlugin,
   InflektPreset,
-  CustomInflectorPlugin,
-  CustomInflectorPreset,
 } from './custom-inflector';
 
 // Conflict detector for multi-schema setups

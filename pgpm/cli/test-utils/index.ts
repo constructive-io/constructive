@@ -3,7 +3,7 @@ export * from './fixtures';
 export * from './init-argv';
 export * from './TestDatabase';
 
-// Re-export test utilities from @inquirerer/test for backwards compatibility
+// Re-export test utilities from @inquirerer/test
 export {
   KEY_SEQUENCES,
   setupTests,

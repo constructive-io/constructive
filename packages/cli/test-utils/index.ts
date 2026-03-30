@@ -1,6 +1,6 @@
 export * from './fixtures';
 
-// Re-export test utilities from @inquirerer/test for backwards compatibility
+// Re-export test utilities from @inquirerer/test
 export {
   KEY_SEQUENCES,
   setupTests,
