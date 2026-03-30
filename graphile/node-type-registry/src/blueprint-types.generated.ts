@@ -88,6 +88,18 @@ export interface DataEmbeddingParams {
   job_task_name?: string;
   /* Strategy for tracking embedding staleness. column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash of source fields. */
   stale_strategy?: "column" | "null" | "hash";
+  /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */
+  chunks?: {
+    /* Name of the text content column in the chunks table */content_field_name?: string;
+    /* Maximum number of characters per chunk */chunk_size?: number;
+    /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
+    /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
+    /* Metadata fields from parent to copy into chunks */metadata_fields?: {
+      [key: string]: unknown;
+    };
+    /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
+    /* Task identifier for the chunking job queue */chunking_task_name?: string;
+  };
 }
 /** Adds a tsvector column with GIN index and automatic trigger population from source fields. Enables PostgreSQL full-text search with configurable weights and language support. Leverages the existing metaschema full_text_search infrastructure. */
 export interface DataFullTextSearchParams {
@@ -143,6 +155,17 @@ export interface DataSearchParams {
     metric?: "cosine" | "l2" | "ip";
     source_fields?: string[];
     search_score_weight?: number;
+    /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */chunks?: {
+      /* Name of the text content column in the chunks table */content_field_name?: string;
+      /* Maximum number of characters per chunk */chunk_size?: number;
+      /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
+      /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
+      /* Metadata fields from parent to copy into chunks */metadata_fields?: {
+        [key: string]: unknown;
+      };
+      /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
+      /* Task identifier for the chunking job queue */chunking_task_name?: string;
+    };
   };
   /* Field names to tag with @trgmSearch for fuzzy/typo-tolerant matching */
   trgm_fields?: string[];

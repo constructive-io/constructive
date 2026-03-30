@@ -108,6 +108,52 @@ export const DataSearch: NodeTypeDefinition = {
           "search_score_weight": {
             "type": "number",
             "default": 1
+          },
+          "chunks": {
+            "type": "object",
+            "description": "Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking.",
+            "properties": {
+              "content_field_name": {
+                "type": "string",
+                "description": "Name of the text content column in the chunks table",
+                "default": "content"
+              },
+              "chunk_size": {
+                "type": "integer",
+                "description": "Maximum number of characters per chunk",
+                "default": 1000
+              },
+              "chunk_overlap": {
+                "type": "integer",
+                "description": "Number of overlapping characters between consecutive chunks",
+                "default": 200
+              },
+              "chunk_strategy": {
+                "type": "string",
+                "enum": [
+                  "fixed",
+                  "sentence",
+                  "paragraph",
+                  "semantic"
+                ],
+                "description": "Strategy for splitting text into chunks",
+                "default": "fixed"
+              },
+              "metadata_fields": {
+                "type": "object",
+                "description": "Metadata fields from parent to copy into chunks"
+              },
+              "enqueue_chunking_job": {
+                "type": "boolean",
+                "description": "Whether to auto-enqueue a chunking job on insert/update",
+                "default": true
+              },
+              "chunking_task_name": {
+                "type": "string",
+                "description": "Task identifier for the chunking job queue",
+                "default": "generate_chunks"
+              }
+            }
           }
         }
       },
