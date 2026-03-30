@@ -17,7 +17,7 @@ export * from './ast';
 export * from './custom-ast';
 
 // Query builder
-export { MetaObject, QueryBuilder } from './query-builder';
+export { MetaObject, QueryBuilder } from '@constructive-io/graphql-query';
 
 // Meta object utilities
 export { convertFromMetaSchema, validateMetaObject } from './meta-object';

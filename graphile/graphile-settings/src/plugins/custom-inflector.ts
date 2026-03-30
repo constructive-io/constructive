@@ -478,7 +478,3 @@ export const InflektPlugin: GraphileConfig.Plugin = {
 export const InflektPreset: GraphileConfig.Preset = {
   plugins: [InflektPlugin],
 };
-
-// Re-export for backwards compatibility
-export const CustomInflectorPlugin = InflektPlugin;
-export const CustomInflectorPreset = InflektPreset;

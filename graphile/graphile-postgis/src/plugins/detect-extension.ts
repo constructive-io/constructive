@@ -4,7 +4,6 @@ import type { PgCodec } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { PostgisExtensionInfo } from '../types';
 
-// Re-export for backward compat — other plugins import from here
 export type { PostgisExtensionInfo } from '../types';
 
 /**

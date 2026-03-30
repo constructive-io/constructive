@@ -54,7 +54,7 @@ const log = new Logger('server');
  *   server: { port: 4000 }
  * });
  *
- * // Using PgpmOptions (backward compatible)
+ * // Using PgpmOptions
  * GraphQLServer(pgpmOptions);
  * ```
  */

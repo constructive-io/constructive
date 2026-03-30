@@ -12,8 +12,6 @@ export {
   cleanTableToMetaObject,
   createASTQueryBuilder,
   generateIntrospectionSchema,
-  toCamelCasePlural,
-  toOrderByTypeName,
 } from './select';
 
 // Mutation generators (CREATE, UPDATE, DELETE)
@@ -34,6 +32,7 @@ export {
 // Naming helpers (server-aware inflection)
 export {
   normalizeInflectionValue,
+  toCamelCasePlural,
   toCamelCaseSingular,
   toCreateMutationName,
   toUpdateMutationName,
@@ -42,6 +41,7 @@ export {
   toUpdateInputTypeName,
   toDeleteInputTypeName,
   toFilterTypeName,
+  toOrderByTypeName,
   toPatchFieldName,
   toOrderByEnumValue,
 } from './naming-helpers';

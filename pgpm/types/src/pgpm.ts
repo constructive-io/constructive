@@ -49,10 +49,6 @@ export interface PgTestClientContext {
   [key: string]: string | null | undefined;
 }
 
-/**
-* @deprecated Use PgTestClientContext instead (typo fix)
-*/
-export type PgTextClientContext = PgTestClientContext;
 
 /**
  * Role mapping configuration for database security

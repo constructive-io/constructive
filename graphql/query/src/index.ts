@@ -27,7 +27,6 @@ export * from './types';
 
 // Meta object utilities (convert, validate)
 export * as MetaObject from './meta-object';
-// Also export meta-object functions directly for codegen backward compatibility
 export { convertFromMetaSchema } from './meta-object/convert';
 export { validateMetaObject, type ValidationResult } from './meta-object/validate';
 

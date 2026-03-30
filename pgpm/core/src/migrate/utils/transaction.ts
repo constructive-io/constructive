@@ -4,7 +4,7 @@ import { Pool, PoolClient } from 'pg';
 
 import { formatQueryHistory, truncateErrorOutput } from './errors';
 
-// Re-export error formatting functions for backward compatibility
+// Re-export error formatting functions
 export { formatQueryHistory, truncateErrorOutput } from './errors';
 
 const log = new Logger('migrate:transaction');

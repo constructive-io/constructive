@@ -58,8 +58,3 @@ export interface PgpmRow {
   deps?: string[];
   name?: string;
 }
-
-/**
- * @deprecated Use PgpmRow instead. This alias is kept for backwards compatibility.
- */
-export type SqitchRow = PgpmRow;

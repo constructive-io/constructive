@@ -73,13 +73,3 @@ Generate SQL seed scripts for `node_type_registry` table:
 ```bash
 cd graphile/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema
 ```
-
-## Preset (deprecated)
-
-> **Note:** The `NodeTypeRegistryPreset` is no longer the recommended approach.
-> Use the generated TypeScript types instead (see above). The preset remains
-> available for backward compatibility but will be removed in a future version.
-
-```typescript
-import { NodeTypeRegistryPreset } from 'node-type-registry/preset';
-```

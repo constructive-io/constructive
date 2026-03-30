@@ -8,7 +8,7 @@
  * HIDE_BY_DEFAULT). This plugin:
  *
  * 1. Creates codecs for tsvector/tsquery via gather.hooks.pgCodecs_findPgCodec
- *    (kept for backward compatibility with older versions; rc.8+ handles this
+ *    (rc.8+ handles this
  *    natively so the hook returns early when event.pgCodec is already set)
  * 2. Registers a custom "FullText" scalar type for tsvector columns
  * 3. Maps tsvector codec to the FullText scalar (isolating filter operators)
