@@ -540,14 +540,11 @@ function inferHasManyOrManyToMany(
   const isManyToMany = field.name.includes('By') && field.name.includes('And');
 
   if (isManyToMany) {
-    // For ManyToMany, extract the actual entity name from the field name prefix
-    // Field name pattern: {relatedEntities}By{JunctionTable}{Keys}
-    // e.g., "usersByMembershipActorIdAndEntityId" → "users" → "User"
-    // e.g., "productsByOrderItemOrderIdAndProductId" → "products" → "Product"
-    const prefixMatch = field.name.match(/^([a-z]+)By/i);
-    const actualEntityName = prefixMatch
-      ? singularize(ucFirst(prefixMatch[1]))
-      : relatedEntityName;
+    // Use the entity name already resolved from the connection type mapping.
+    // This is more reliable than re-singularizing from the field name prefix,
+    // which can produce incorrect inflections (e.g. "codebases" → "Codebasis"
+    // instead of the correct "Codebase").
+    const actualEntityName = relatedEntityName;
 
     // Try to extract junction table from field name
     // Pattern: {relatedEntities}By{JunctionTable}{Keys}
