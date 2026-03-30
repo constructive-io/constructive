@@ -23,9 +23,9 @@ export interface GisFieldValue {
 export interface PostgisExtensionInfo {
   /** The schema name where PostGIS is installed (e.g. 'public') */
   schemaName: string;
-  /** The geometry codec from the registry */
-  geometryCodec: PgCodec;
-  /** The geography codec from the registry (optional — not all databases use geography columns) */
+  /** The geometry codec from the registry (null if only geography columns are used) */
+  geometryCodec: PgCodec | null;
+  /** The geography codec from the registry (null if only geometry columns are used) */
   geographyCodec: PgCodec | null;
 }
 

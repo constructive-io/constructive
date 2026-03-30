@@ -43,13 +43,17 @@ export const PostgisExtensionDetectionPlugin: GraphileConfig.Plugin = {
             schemaName = pg.schemaName || 'public';
           } else if (pg.name === 'geography') {
             geographyCodec = codec;
+            if (!geometryCodec) {
+              schemaName = pg.schemaName || 'public';
+            }
           }
         }
 
-        // PostGIS requires at least the geometry codec to be present.
-        // Geography is optional — not all databases use geography columns,
-        // so PostGraphile may not introspect the geography type at all.
-        if (!geometryCodec) {
+        // PostGIS is detected when at least one of geometry or geography
+        // codecs is present. Some databases use only geography columns
+        // (e.g. use_geography: true in DataPostGIS), so PostGraphile may
+        // introspect geography but not geometry.
+        if (!geometryCodec && !geographyCodec) {
           return build;
         }
 

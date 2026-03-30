@@ -1,5 +1,7 @@
 import 'graphile-build';
+import 'graphile-build-pg';
 import 'graphile-connection-filter';
+import type { PgCodec } from '@dataplan/pg';
 import type {
   ConnectionFilterOperatorFactory,
   ConnectionFilterOperatorRegistration,
@@ -225,7 +227,10 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
       geography: []
     };
 
-    const codecPairs: [string, typeof geometryCodec][] = [['geometry', geometryCodec]];
+    const codecPairs: [string, PgCodec][] = [];
+    if (geometryCodec) {
+      codecPairs.push(['geometry', geometryCodec]);
+    }
     if (geographyCodec) {
       codecPairs.push(['geography', geographyCodec]);
     }
