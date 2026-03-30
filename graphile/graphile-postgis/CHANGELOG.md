@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.9.5](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.9.4...graphile-postgis@2.9.5) (2026-03-30)
+
+### Bug Fixes
+
+- **graphile-postgis:** detect PostGIS when only geography codecs are present ([7a44740](https://github.com/constructive-io/constructive/commit/7a447404a721c71ccd39c19e60dcb8d4ebf7433f))
+
 ## [2.9.4](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.9.3...graphile-postgis@2.9.4) (2026-03-28)
 
 **Note:** Version bump only for package graphile-postgis
