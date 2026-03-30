@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/node",
-  "version": "0.8.11",
+  "version": "0.8.12",
   "author": "Constructive <developers@constructive.io>",
   "description": "Constructive SDK for Node.js - Drop-in replacement for @constructive-io/sdk with Node.js HTTP adapter",
   "main": "index.js",

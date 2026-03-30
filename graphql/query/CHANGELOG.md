@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.12.8...@constructive-io/graphql-query@3.12.9) (2026-03-30)
+
+### Bug Fixes
+
+- **codegen:** use resolved entity name for manyToMany rightTable instead of re-singularizing ([a287578](https://github.com/constructive-io/constructive/commit/a2875780bb61068b61597006f565d456dc0bfbd0))
+
 ## [3.12.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.12.7...@constructive-io/graphql-query@3.12.8) (2026-03-30)
 
 **Note:** Version bump only for package @constructive-io/graphql-query

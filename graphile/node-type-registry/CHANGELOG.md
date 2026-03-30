@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.6.2...node-type-registry@0.7.0) (2026-03-30)
+
+### Features
+
+- **node-type-registry:** add chunks property to DataEmbedding and DataSearch embedding params ([b1e3bce](https://github.com/constructive-io/constructive/commit/b1e3bce678714975e6c4487f99d7258c8a6ff7a3))
+
 ## [0.6.2](https://github.com/constructive-io/constructive/compare/node-type-registry@0.6.1...node-type-registry@0.6.2) (2026-03-30)
 
 **Note:** Version bump only for package node-type-registry
