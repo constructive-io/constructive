@@ -17858,7 +17858,7 @@ type SecureTableProvision {
   grantRoles: [String]!
 
   """
-  PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants). Type safety is enforced by PostgreSQL at INSERT time.
+  PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time.
   """
   grantPrivileges: [JSON]!
 
@@ -18116,7 +18116,7 @@ type RelationProvision {
   grantRoles: [String]!
 
   """
-  For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne.
+  For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to '{}' (no grants — callers must explicitly specify privileges). Ignored for RelationBelongsTo/RelationHasOne.
   """
   grantPrivileges: [JSON]!
 
@@ -25091,7 +25091,7 @@ type Mutation {
   ): InitEmptyRepoPayload
 
   """
-  Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config in data. Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
+  Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
   """
   constructBlueprint(
     """
@@ -34052,7 +34052,7 @@ input SecureTableProvisionInput {
   grantRoles: [String]
 
   """
-  PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants). Type safety is enforced by PostgreSQL at INSERT time.
+  PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time.
   """
   grantPrivileges: [JSON]
 
@@ -34674,7 +34674,7 @@ input RelationProvisionInput {
   grantRoles: [String]
 
   """
-  For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne.
+  For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to '{}' (no grants — callers must explicitly specify privileges). Ignored for RelationBelongsTo/RelationHasOne.
   """
   grantPrivileges: [JSON]
 
@@ -40409,7 +40409,7 @@ input SecureTableProvisionPatch {
   grantRoles: [String]
 
   """
-  PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants). Type safety is enforced by PostgreSQL at INSERT time.
+  PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time.
   """
   grantPrivileges: [JSON]
 
@@ -41068,7 +41068,7 @@ input RelationProvisionPatch {
   grantRoles: [String]
 
   """
-  For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne.
+  For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to '{}' (no grants — callers must explicitly specify privileges). Ignored for RelationBelongsTo/RelationHasOne.
   """
   grantPrivileges: [JSON]
 
