@@ -618,7 +618,7 @@ export interface SecureTableProvision {
   fields?: Record<string, unknown>[] | null;
   /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
   grantRoles?: string[] | null;
-  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants). Type safety is enforced by PostgreSQL at INSERT time. */
+  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time. */
   grantPrivileges?: Record<string, unknown>[] | null;
   /** Policy generator type, e.g. 'AuthzEntityMembership', 'AuthzMembership', 'AuthzAllowAll'. NULL means no policy is created. When set, the trigger automatically enables RLS on the target table. */
   policyType?: string | null;
@@ -762,7 +762,7 @@ export interface RelationProvision {
   nodeData?: Record<string, unknown> | null;
   /** For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne. */
   grantRoles?: string[] | null;
-  /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to select/insert/delete for all columns. Ignored for RelationBelongsTo/RelationHasOne. */
+  /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to '{}' (no grants — callers must explicitly specify privileges). Ignored for RelationBelongsTo/RelationHasOne. */
   grantPrivileges?: Record<string, unknown>[] | null;
   /**
    * For RelationManyToMany: RLS policy type for the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
