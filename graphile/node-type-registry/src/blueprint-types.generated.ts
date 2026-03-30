@@ -897,7 +897,7 @@ export interface BlueprintTable {
   policies?: BlueprintPolicy[];
   /** Database roles to grant privileges to. Defaults to ["authenticated"]. */
   grant_roles?: string[];
-  /** Privilege grants as [verb, column] tuples or objects. */
+  /** Privilege grants as [verb, column] tuples or objects. Defaults to full CRUD (select/insert/update/delete for all columns). */
   grants?: unknown[];
   /** Whether to enable RLS on this table. Defaults to true. */
   use_rls?: boolean;
