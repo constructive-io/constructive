@@ -66,7 +66,7 @@
     "gql-ast": "workspace:^",
     "graphile-schema": "workspace:^",
     "graphql": "16.13.0",
-    "inflekt": "^0.7.0",
+    "inflekt": "^0.7.1",
     "inquirerer": "^4.7.0",
     "jiti": "^2.6.1",
     "oxfmt": "^0.42.0",
