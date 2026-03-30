@@ -49,7 +49,7 @@
     "@pgpmjs/types": "workspace:^",
     "csv-to-pg": "workspace:^",
     "glob": "^13.0.6",
-    "inflekt": "^0.6.0",
+    "inflekt": "^0.7.1",
     "inquirerer": "^4.7.0",
     "pg": "^8.20.0",
     "pg-cache": "workspace:^",
