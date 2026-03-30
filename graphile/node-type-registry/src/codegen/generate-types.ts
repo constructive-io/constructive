@@ -566,7 +566,7 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp('grants', t.tsArrayType(t.tsUnknownKeyword())),
-        'Privilege grants as [verb, column] tuples or objects. Defaults to full CRUD (select/insert/update/delete for all columns).'
+        'Privilege grants as [verb, column] tuples or objects. Defaults to empty (no grants — callers must explicitly specify).'
       ),
       addJSDoc(
         optionalProp('use_rls', t.tsBooleanKeyword()),
