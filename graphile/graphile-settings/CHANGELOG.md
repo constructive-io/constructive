@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.18.4](https://github.com/constructive-io/constructive/compare/graphile-settings@4.18.3...graphile-settings@4.18.4) (2026-03-31)
+
+### Bug Fixes
+
+- enable orderBy on all columns alongside filterBy in v5 plugin ([f28eaf2](https://github.com/constructive-io/constructive/commit/f28eaf2513593ae8ad9f495d62ecd2c1f2e874ec))
+
 ## [4.18.3](https://github.com/constructive-io/constructive/compare/graphile-settings@4.18.2...graphile-settings@4.18.3) (2026-03-30)
 
 **Note:** Version bump only for package graphile-settings
