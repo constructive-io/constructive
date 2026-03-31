@@ -370,6 +370,64 @@ export function generateSkills(
     }),
   });
 
+  // Embedder reference (generated once when any table has Vector fields)
+  const hasEmbeddings = tables.some((t) =>
+    categorizeSpecialFields(t, registry).some((g) => g.category === 'embedding'),
+  );
+  if (hasEmbeddings) {
+    referenceNames.push('embedder');
+    files.push({
+      fileName: `${skillName}/references/embedder.md`,
+      content: buildSkillReference({
+        title: 'Embedder Configuration',
+        description:
+          `Configure text-to-vector embedding for \`--auto-embed\` support in ${toolName}.\n\n` +
+          'When an embedder is configured, you can pass plain text to vector fields and ' +
+          'the CLI will automatically convert it to an embedding vector.\n\n' +
+          '**Supported providers:** ollama, openai\n\n' +
+          '**Configuration methods:** appstash config (persisted per-context) or environment variables',
+        usage: [
+          `# Configure via appstash config (persisted per-context)`,
+          `${toolName} config set embedder.provider <provider>`,
+          `${toolName} config set embedder.model <model>`,
+          `${toolName} config set embedder.baseUrl <url>`,
+          '',
+          `# Or configure via environment variables`,
+          `EMBEDDER_PROVIDER=<provider> EMBEDDER_MODEL=<model> EMBEDDER_BASE_URL=<url> ${toolName} <command>`,
+        ],
+        examples: [
+          {
+            description: 'Ollama with nomic-embed-text (open-source, local)',
+            code: [
+              `# Start Ollama locally and pull the model`,
+              `ollama pull nomic-embed-text`,
+              '',
+              `# Register the embedder`,
+              `${toolName} config set embedder.provider ollama`,
+              `${toolName} config set embedder.model nomic-embed-text`,
+              `${toolName} config set embedder.baseUrl http://localhost:11434`,
+              '',
+              `# Now use --auto-embed with any vector field`,
+              `${toolName} ${toKebabCase(getTableNames(tables[0]).singularName)} search "my query" --auto-embed`,
+            ],
+          },
+          {
+            description: 'OpenAI with an API key',
+            code: [
+              `# Register the embedder`,
+              `${toolName} config set embedder.provider openai`,
+              `${toolName} config set embedder.model text-embedding-3-small`,
+              `${toolName} config set embedder.apiKey sk-proj-...your-api-key`,
+              '',
+              `# Or use environment variables`,
+              `EMBEDDER_PROVIDER=openai EMBEDDER_MODEL=text-embedding-3-small EMBEDDER_API_KEY=sk-proj-...your-api-key ${toolName} ${toKebabCase(getTableNames(tables[0]).singularName)} search "my query" --auto-embed`,
+            ],
+          },
+        ],
+      }),
+    });
+  }
+
   // Table references
   for (const table of tables) {
     const { singularName } = getTableNames(table);
@@ -988,6 +1046,68 @@ export function generateMultiTargetSkills(
       ],
     }),
   });
+
+  // Embedder reference (generated once when any target has tables with Vector fields)
+  const allTargetTables = targets.flatMap((t) => t.tables);
+  const hasEmbeddings = allTargetTables.some((t) =>
+    categorizeSpecialFields(t, registry).some((g) => g.category === 'embedding'),
+  );
+  if (hasEmbeddings) {
+    const firstTableName = allTargetTables.length > 0
+      ? toKebabCase(getTableNames(allTargetTables[0]).singularName)
+      : 'model';
+    commonReferenceNames.push('embedder');
+    files.push({
+      fileName: `${commonSkillName}/references/embedder.md`,
+      content: buildSkillReference({
+        title: 'Embedder Configuration',
+        description:
+          `Configure text-to-vector embedding for \`--auto-embed\` support in ${toolName}.\n\n` +
+          'When an embedder is configured, you can pass plain text to vector fields and ' +
+          'the CLI will automatically convert it to an embedding vector.\n\n' +
+          '**Supported providers:** ollama, openai\n\n' +
+          '**Configuration methods:** appstash config (persisted per-context) or environment variables',
+        usage: [
+          `# Configure via appstash config (persisted per-context)`,
+          `${toolName} ${builtinNames.config} set embedder.provider <provider>`,
+          `${toolName} ${builtinNames.config} set embedder.model <model>`,
+          `${toolName} ${builtinNames.config} set embedder.baseUrl <url>`,
+          '',
+          `# Or configure via environment variables`,
+          `EMBEDDER_PROVIDER=<provider> EMBEDDER_MODEL=<model> EMBEDDER_BASE_URL=<url> ${toolName} <command>`,
+        ],
+        examples: [
+          {
+            description: 'Ollama with nomic-embed-text (open-source, local)',
+            code: [
+              `# Start Ollama locally and pull the model`,
+              `ollama pull nomic-embed-text`,
+              '',
+              `# Register the embedder`,
+              `${toolName} ${builtinNames.config} set embedder.provider ollama`,
+              `${toolName} ${builtinNames.config} set embedder.model nomic-embed-text`,
+              `${toolName} ${builtinNames.config} set embedder.baseUrl http://localhost:11434`,
+              '',
+              `# Now use --auto-embed with any vector field`,
+              `${toolName} ${targets[0]?.name ? `${targets[0].name}:` : ''}${firstTableName} search "my query" --auto-embed`,
+            ],
+          },
+          {
+            description: 'OpenAI with an API key',
+            code: [
+              `# Register the embedder`,
+              `${toolName} ${builtinNames.config} set embedder.provider openai`,
+              `${toolName} ${builtinNames.config} set embedder.model text-embedding-3-small`,
+              `${toolName} ${builtinNames.config} set embedder.apiKey sk-proj-...your-api-key`,
+              '',
+              `# Or use environment variables`,
+              `EMBEDDER_PROVIDER=openai EMBEDDER_MODEL=text-embedding-3-small EMBEDDER_API_KEY=sk-proj-...your-api-key ${toolName} ${targets[0]?.name ? `${targets[0].name}:` : ''}${firstTableName} search "my query" --auto-embed`,
+            ],
+          },
+        ],
+      }),
+    });
+  }
 
   // Common SKILL.md
   files.push({
