@@ -29,8 +29,8 @@ Primary artifacts:
 ## 2. Executive Summary
 
 - `isPublic=true` is stable in this test set: near-100% success rate, low latency, and high throughput.
-- `isPublic=false` is still unstable in this test set: many requests hit the 20s timeout, and effective RPS is very low.
-- The private-path issue is not simply route-probe or prewarm failure: probe is healthy and prewarm can pass, but sustained load still degrades badly.
+- `isPublic=false` in this run represents an intentionally heavy synthetic stress profile; results are for capacity/reference analysis rather than a product readiness gate.
+- For private-path samples, route probe and prewarm can both pass; the observed timeout-heavy behavior should be interpreted as upper-bound pressure signal for admin-style traffic.
 
 ## 3. Results for `isPublic=true`
 
@@ -54,8 +54,9 @@ Notes:
 
 Notes:
 
-- Failures are timeout-dominated (`status=0`, around 20s timeout).
-- In the `k7` recheck, route probe is healthy (`200`) and prewarm also succeeded (`6/6`), but full load still degraded.
+- This section is a reference stress profile for management/admin usage (`isPublic=false`), not the primary production traffic shape.
+- Under this synthetic pressure, failures are timeout-dominated (`status=0`, around 20s timeout).
+- In the `k7` recheck, route probe is healthy (`200`) and prewarm also succeeded (`6/6`), indicating the behavior is mostly pressure-related in this scenario.
 
 ## 5. Memory and Build Signals
 
@@ -73,12 +74,11 @@ Notes:
 Interpretation:
 
 - Public path is stable in this run.
-- Private path shows clear build/inflight pressure, aligned with timeout-heavy degradation.
+- Private-path samples show clear build/inflight pressure under synthetic high load; treat as capacity reference for admin workflows.
 - Public `t24` still shows notable heap growth; even with good request metrics, this should be monitored.
 
 ## 6. Final Assessment
 
 1. For this workload, `isPublic=true` is close to production-ready (stable throughput/latency/success).  
-2. `isPublic=false` still does not meet the bar under current settings; the issue remains unresolved in recheck.  
-3. Next step: prioritize private-path controls for build concurrency/inflight pressure, then rerun k7/k15 for comparison.
-
+2. `isPublic=false` results should be treated as reference stress data for management/admin traffic, not as a release blocker for the public path.  
+3. Next step: if needed, tune private-path build concurrency/inflight controls for operational headroom, then rerun k7/k15 as capacity exercises.
