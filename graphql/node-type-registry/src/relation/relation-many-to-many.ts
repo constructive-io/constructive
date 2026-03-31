@@ -5,7 +5,7 @@ export const RelationManyToMany: NodeTypeDefinition = {
   "slug": "relation_many_to_many",
   "category": "relation",
   "display_name": "Many to Many",
-  "description": "Creates a junction table between source and target tables with auto-derived naming and FK fields. The trigger creates a bare table (no implicit DataId or any node_type), adds FK fields to both tables, optionally creates a composite PK (use_composite_key), then forwards all security config to secure_table_provision as-is. The trigger never injects values the caller did not provide. Junction table FKs always CASCADE on delete.",
+  "description": "Creates a junction table between source and target tables with auto-derived naming and FK fields. The trigger creates a bare table (no implicit DataId), adds FK fields to both tables, optionally creates a composite PK (use_composite_key), then forwards all security config to secure_table_provision as-is. The trigger never injects values the caller did not provide. Junction table FKs always CASCADE on delete.",
   "parameter_schema": {
     "type": "object",
     "properties": {
@@ -38,16 +38,15 @@ export const RelationManyToMany: NodeTypeDefinition = {
       },
       "use_composite_key": {
         "type": "boolean",
-        "description": "When true, creates a composite PK from the two FK fields. When false, no PK is created by the trigger (use node_type=DataId for UUID PK). Mutually exclusive with node_type=DataId.",
+        "description": "When true, creates a composite PK from the two FK fields. When false, no PK is created by the trigger (use nodes with DataId for UUID PK). Mutually exclusive with nodes containing DataId.",
         "default": false
       },
-      "node_type": {
-        "type": "string",
-        "description": "Generator for field creation on junction table. Forwarded to secure_table_provision as-is. Examples: DataId, DataEntityMembership, DataDirectOwner. NULL means no additional fields."
-      },
-      "node_data": {
-        "type": "object",
-        "description": "Configuration for the generator. Forwarded to secure_table_provision as-is. Only used when node_type is set."
+      "nodes": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        },
+        "description": "Array of node objects for field creation on junction table. Each object has a $type key (e.g. DataId, DataEntityMembership) and optional data keys. Forwarded to secure_table_provision as-is. Empty array means no additional fields."
       },
       "grant_roles": {
         "type": "array",

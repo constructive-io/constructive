@@ -558,7 +558,7 @@ export interface RelationHasManyParams {
   /* Whether the FK field is NOT NULL */
   is_required?: boolean;
 }
-/** Creates a junction table between source and target tables with auto-derived naming and FK fields. The trigger creates a bare table (no implicit DataId or any node_type), adds FK fields to both tables, optionally creates a composite PK (use_composite_key), then forwards all security config to secure_table_provision as-is. The trigger never injects values the caller did not provide. Junction table FKs always CASCADE on delete. */
+/** Creates a junction table between source and target tables with auto-derived naming and FK fields. The trigger creates a bare table (no implicit DataId), adds FK fields to both tables, optionally creates a composite PK (use_composite_key), then forwards all security config to secure_table_provision as-is. The trigger never injects values the caller did not provide. Junction table FKs always CASCADE on delete. */
 export interface RelationManyToManyParams {
   /* First table in the M:N relationship */
   source_table_id: string;
@@ -572,14 +572,12 @@ export interface RelationManyToManyParams {
   source_field_name?: string;
   /* FK field name on junction for target table. Auto-derived if omitted (e.g., tags derives tag_id) */
   target_field_name?: string;
-  /* When true, creates a composite PK from the two FK fields. When false, no PK is created by the trigger (use node_type=DataId for UUID PK). Mutually exclusive with node_type=DataId. */
+  /* When true, creates a composite PK from the two FK fields. When false, no PK is created by the trigger (use nodes with DataId for UUID PK). Mutually exclusive with nodes containing DataId. */
   use_composite_key?: boolean;
-  /* Generator for field creation on junction table. Forwarded to secure_table_provision as-is. Examples: DataId, DataEntityMembership, DataDirectOwner. NULL means no additional fields. */
-  node_type?: string;
-  /* Configuration for the generator. Forwarded to secure_table_provision as-is. Only used when node_type is set. */
-  node_data?: {
+  /* Array of node objects for field creation on junction table. Each object has a $type key (e.g. DataId, DataEntityMembership) and optional data keys. Forwarded to secure_table_provision as-is. Empty array means no additional fields. */
+  nodes?: {
     [key: string]: unknown;
-  };
+  }[];
   /* Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Default: [authenticated] */
   grant_roles?: string[];
   /* Privilege grants for the junction table as [verb, columns] tuples (e.g. [['select','*'],['insert','*']]). Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns */
