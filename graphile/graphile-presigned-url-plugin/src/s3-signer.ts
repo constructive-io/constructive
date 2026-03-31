@@ -67,7 +67,8 @@ export async function generatePresignedGetUrl(
   };
 
   if (filename) {
-    params.ResponseContentDisposition = `attachment; filename="${filename}"`;
+    const sanitized = filename.replace(/["\\\r\n]/g, '_');
+    params.ResponseContentDisposition = `attachment; filename="${sanitized}"`;
   }
 
   const command = new GetObjectCommand(params as any);
