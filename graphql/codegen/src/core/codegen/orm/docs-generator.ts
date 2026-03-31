@@ -177,7 +177,7 @@ export function generateOrmAgentsDocs(
   lines.push('');
   lines.push('- Prisma-like ORM client for a GraphQL API (TypeScript)');
   lines.push(`- ${tableCount} model${tableCount !== 1 ? 's' : ''}${customOpCount > 0 ? `, ${customOpCount} custom operation${customOpCount !== 1 ? 's' : ''}` : ''}`);
-  lines.push('- All methods return a query builder; call `.execute()` to run');
+  lines.push('- All methods return a QueryBuilder; call `.execute()` to run, or `.unwrap()` to throw on error');
   lines.push('');
 
   lines.push('## Quick Start');
@@ -192,6 +192,30 @@ export function generateOrmAgentsDocs(
   lines.push('```');
   lines.push('');
 
+  lines.push('## Error Handling');
+  lines.push('');
+  lines.push('> **CRITICAL:** `.execute()` returns `{ ok, data, errors }` — it does **NOT** throw.');
+  lines.push('> A bare `try/catch` around `.execute()` will silently swallow errors.');
+  lines.push('');
+  lines.push('```typescript');
+  lines.push('// WRONG — errors are silently lost:');
+  lines.push('try { const r = await db.model.findMany({...}).execute(); } catch (e) { /* never runs */ }');
+  lines.push('');
+  lines.push('// RIGHT — .unwrap() throws GraphQLRequestError on failure:');
+  lines.push('const data = await db.model.findMany({...}).unwrap();');
+  lines.push('');
+  lines.push('// RIGHT — check .ok for control flow:');
+  lines.push('const result = await db.model.findMany({...}).execute();');
+  lines.push('if (!result.ok) { console.error(result.errors); return; }');
+  lines.push('return result.data;');
+  lines.push('```');
+  lines.push('');
+  lines.push('Available helpers on QueryBuilder (call **instead of** `.execute()`):');
+  lines.push('- `.unwrap()` — throws on error, returns typed data');
+  lines.push('- `.unwrapOr(default)` — returns default value on error');
+  lines.push('- `.unwrapOrElse(fn)` — calls callback with errors on failure');
+  lines.push('');
+
   lines.push('## Resources');
   lines.push('');
   lines.push(`- **Full API reference:** [README.md](./README.md) — model docs for all ${tableCount} tables`);
@@ -203,7 +227,7 @@ export function generateOrmAgentsDocs(
   lines.push('');
   lines.push('- Access models via `db.<ModelName>` (e.g. `db.User`)');
   lines.push('- CRUD methods: `findMany`, `findOne`, `create`, `update`, `delete`');
-  lines.push('- Always call `.execute()` to run the query');
+  lines.push('- Call `.unwrap()` to run and throw on error, or `.execute()` for discriminated union result');
   lines.push('- Custom operations via `db.query.<name>` or `db.mutation.<name>`');
   lines.push('');
 
