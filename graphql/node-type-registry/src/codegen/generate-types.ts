@@ -402,7 +402,30 @@ function buildBlueprintFullTextSearch(): t.ExportNamedDeclaration {
         'Source fields that feed into this tsvector.'
       ),
     ]),
-    'A full-text search configuration for a blueprint table.'
+    'A full-text search configuration for a blueprint table (top-level, requires table_name).'
+  );
+}
+
+function buildBlueprintTableFullTextSearch(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintTableFullTextSearch', [
+      addJSDoc(
+        requiredProp('field', t.tsStringKeyword()),
+        'Name of the tsvector field on the table.'
+      ),
+      addJSDoc(
+        requiredProp(
+          'sources',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintFtsSource')))
+        ),
+        'Source fields that feed into this tsvector.'
+      ),
+      addJSDoc(
+        optionalProp('schema_name', t.tsStringKeyword()),
+        'Optional schema name override.'
+      ),
+    ]),
+    'A full-text search configuration nested inside a table definition (table_name not required).'
   );
 }
 
@@ -436,7 +459,23 @@ function buildBlueprintIndex(
       addJSDoc(optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())), 'Operator classes for the index columns.'),
       addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.'),
     ]),
-    'An index definition within a blueprint.'
+    'An index definition within a blueprint (top-level, requires table_name).'
+  );
+}
+
+function buildBlueprintTableIndex(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintTableIndex', [
+      addJSDoc(optionalProp('column', t.tsStringKeyword()), 'Single column name for the index.'),
+      addJSDoc(optionalProp('columns', t.tsArrayType(t.tsStringKeyword())), 'Array of column names for a multi-column index.'),
+      addJSDoc(requiredProp('access_method', t.tsStringKeyword()), 'Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25").'),
+      addJSDoc(optionalProp('is_unique', t.tsBooleanKeyword()), 'Whether this is a unique index.'),
+      addJSDoc(optionalProp('name', t.tsStringKeyword()), 'Optional custom name for the index.'),
+      addJSDoc(optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())), 'Operator classes for the index columns.'),
+      addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.'),
+      addJSDoc(optionalProp('schema_name', t.tsStringKeyword()), 'Optional schema name override.'),
+    ]),
+    'An index definition nested inside a table definition (table_name not required).'
   );
 }
 
@@ -551,7 +590,23 @@ function buildBlueprintUniqueConstraint(): t.ExportNamedDeclaration {
         'Column names that form the unique constraint.'
       ),
     ]),
-    'A unique constraint definition within a blueprint.'
+    'A unique constraint definition within a blueprint (top-level, requires table_name).'
+  );
+}
+
+function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintTableUniqueConstraint', [
+      addJSDoc(
+        requiredProp('columns', t.tsArrayType(t.tsStringKeyword())),
+        'Column names that form the unique constraint.'
+      ),
+      addJSDoc(
+        optionalProp('schema_name', t.tsStringKeyword()),
+        'Optional schema name override.'
+      ),
+    ]),
+    'A unique constraint nested inside a table definition (table_name not required).'
   );
 }
 
@@ -598,6 +653,27 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('use_rls', t.tsBooleanKeyword()),
         'Whether to enable RLS on this table. Defaults to true.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'indexes',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableIndex')))
+        ),
+        'Table-level indexes (table_name inherited from parent).'
+      ),
+      addJSDoc(
+        optionalProp(
+          'full_text_searches',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableFullTextSearch')))
+        ),
+        'Table-level full-text search configurations (table_name inherited from parent).'
+      ),
+      addJSDoc(
+        optionalProp(
+          'unique_constraints',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableUniqueConstraint')))
+        ),
+        'Table-level unique constraints (table_name inherited from parent).'
       ),
     ]),
     'A table definition within a blueprint.'
@@ -712,8 +788,11 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintPolicy(authzNodes, meta));
   statements.push(buildBlueprintFtsSource());
   statements.push(buildBlueprintFullTextSearch());
+  statements.push(buildBlueprintTableFullTextSearch());
   statements.push(buildBlueprintIndex(meta));
+  statements.push(buildBlueprintTableIndex());
   statements.push(buildBlueprintUniqueConstraint());
+  statements.push(buildBlueprintTableUniqueConstraint());
 
   // -- Node types discriminated union --
   statements.push(
