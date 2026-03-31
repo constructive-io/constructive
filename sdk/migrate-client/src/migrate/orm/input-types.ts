@@ -345,17 +345,41 @@ export type MigrateFileOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
-  | 'ID_DESC';
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'UPLOAD_ASC'
+  | 'UPLOAD_DESC';
 export type SqlActionOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'DEPLOY_ASC'
-  | 'DEPLOY_DESC';
+  | 'DEPLOY_DESC'
+  | 'DEPS_ASC'
+  | 'DEPS_DESC'
+  | 'PAYLOAD_ASC'
+  | 'PAYLOAD_DESC'
+  | 'CONTENT_ASC'
+  | 'CONTENT_DESC'
+  | 'REVERT_ASC'
+  | 'REVERT_DESC'
+  | 'VERIFY_ASC'
+  | 'VERIFY_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'ACTION_ASC'
+  | 'ACTION_DESC'
+  | 'ACTION_ID_ASC'
+  | 'ACTION_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC';
 // ============ CRUD Input Types ============
 export interface CreateMigrateFileInput {
   clientMutationId?: string;

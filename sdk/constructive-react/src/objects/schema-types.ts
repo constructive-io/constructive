@@ -35,10 +35,14 @@ export type RefOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
   | 'STORE_ID_ASC'
-  | 'STORE_ID_DESC';
+  | 'STORE_ID_DESC'
+  | 'COMMIT_ID_ASC'
+  | 'COMMIT_ID_DESC';
 /** Methods to use when ordering `Store`. */
 export type StoreOrderBy =
   | 'NATURAL'
@@ -46,8 +50,14 @@ export type StoreOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
+  | 'DATABASE_ID_DESC'
+  | 'HASH_ASC'
+  | 'HASH_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC';
 /** Methods to use when ordering `Commit`. */
 export type CommitOrderBy =
   | 'NATURAL'
@@ -55,8 +65,22 @@ export type CommitOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'MESSAGE_ASC'
+  | 'MESSAGE_DESC'
   | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC';
+  | 'DATABASE_ID_DESC'
+  | 'STORE_ID_ASC'
+  | 'STORE_ID_DESC'
+  | 'PARENT_IDS_ASC'
+  | 'PARENT_IDS_DESC'
+  | 'AUTHOR_ID_ASC'
+  | 'AUTHOR_ID_DESC'
+  | 'COMMITTER_ID_ASC'
+  | 'COMMITTER_ID_DESC'
+  | 'TREE_ID_ASC'
+  | 'TREE_ID_DESC'
+  | 'DATE_ASC'
+  | 'DATE_DESC';
 /** Methods to use when ordering `Object`. */
 export type ObjectOrderBy =
   | 'NATURAL'
@@ -66,8 +90,16 @@ export type ObjectOrderBy =
   | 'ID_DESC'
   | 'DATABASE_ID_ASC'
   | 'DATABASE_ID_DESC'
+  | 'KIDS_ASC'
+  | 'KIDS_DESC'
+  | 'KTREE_ASC'
+  | 'KTREE_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
   | 'FRZN_ASC'
-  | 'FRZN_DESC';
+  | 'FRZN_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC';
 /** A filter to be used against `Ref` object types. All fields are combined with a logical ‘and.’ */
 export interface RefFilter {
   /** Filter by the object’s `id` field. */
