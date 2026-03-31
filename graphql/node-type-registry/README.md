@@ -35,7 +35,7 @@ const definition: BlueprintDefinition = {
       nodes: [
         'DataId',
         'DataTimestamps',
-        { $type: 'DataDirectOwner', data: { include_id: false } },
+        'DataDirectOwner',
       ],
       fields: [
         { name: 'title', type: 'text', is_not_null: true },
