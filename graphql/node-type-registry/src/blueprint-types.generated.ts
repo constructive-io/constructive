@@ -683,18 +683,18 @@ export interface BlueprintField {
   /** Comment/description for this field. */
   description?: string;
 }
-/** An RLS policy entry for a blueprint table. */
+/** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  policy_type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
+  privileges?: string[];
+  /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
+  permissive?: boolean;
   /** Role for this policy. Defaults to "authenticated". */
   policy_role?: string;
-  /** Whether this policy is permissive (true) or restrictive (false). */
-  permissive?: boolean;
   /** Optional custom name for this policy. */
   policy_name?: string;
-  /** Privileges this policy applies to. */
-  privileges?: string[];
   /** Policy-specific data (structure varies by policy type). */
   data?: Record<string, unknown>;
 }
@@ -764,6 +764,22 @@ export interface BlueprintTableIndex {
   op_classes?: string[];
   /** Additional index-specific options. */
   options?: Record<string, unknown>;
+  /** Optional schema name override. */
+  schema_name?: string;
+}
+/** A unique constraint definition within a blueprint (top-level, requires table_name). */
+export interface BlueprintUniqueConstraint {
+  /** Table name this unique constraint belongs to. */
+  table_name: string;
+  /** Optional schema name for disambiguation (falls back to top-level default). */
+  schema_name?: string;
+  /** Column names that form the unique constraint. */
+  columns: string[];
+}
+/** A unique constraint nested inside a table definition (table_name not required). */
+export interface BlueprintTableUniqueConstraint {
+  /** Column names that form the unique constraint. */
+  columns: string[];
   /** Optional schema name override. */
   schema_name?: string;
 }
@@ -946,22 +962,6 @@ export type BlueprintRelation = {
  * ===========================================================================
  */
 ;
-/** A unique constraint definition within a blueprint (top-level, requires table_name). */
-export interface BlueprintUniqueConstraint {
-  /** Table name this unique constraint belongs to. */
-  table_name: string;
-  /** Optional schema name for disambiguation (falls back to top-level default). */
-  schema_name?: string;
-  /** Column names that form the unique constraint. */
-  columns: string[];
-}
-/** A unique constraint nested inside a table definition (table_name not required). */
-export interface BlueprintTableUniqueConstraint {
-  /** Column names that form the unique constraint. */
-  columns: string[];
-  /** Optional schema name override. */
-  schema_name?: string;
-}
 /** A table definition within a blueprint. */
 export interface BlueprintTable {
   /** The PostgreSQL table name to create. */

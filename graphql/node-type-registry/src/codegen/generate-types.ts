@@ -324,38 +324,27 @@ function buildBlueprintField(
 
 function buildBlueprintPolicy(
   authzNodes: NodeTypeDefinition[],
-  meta?: MetaTableInfo[]
+  _meta?: MetaTableInfo[]
 ): t.ExportNamedDeclaration {
+  // BlueprintPolicy represents the blueprint JSON shape (not the DB table).
+  // The SQL procedure reads $type (not policy_type) from the JSONB:
+  //   v_policy_type := v_policy_entry->>'$type';
+  // So we always use the static definition with $type.
   const policyTypeAnnotation =
     authzNodes.length > 0
       ? strUnion(authzNodes.map((nt) => nt.name))
       : t.tsStringKeyword();
 
-  const table = meta && findTable(meta, 'metaschema_public', 'policy');
-  if (table) {
-    return deriveInterfaceFromTable(
-      table,
-      'BlueprintPolicy',
-      'An RLS policy entry for a blueprint table. Derived from _meta.',
-      {
-        // policy_type gets a typed union of known Authz* node names
-        policy_type: policyTypeAnnotation,
-        // data is untyped JSONB — use Record<string, unknown>
-        data: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-      },
-    );
-  }
-  // Static fallback
   return addJSDoc(
     exportInterface('BlueprintPolicy', [
-      addJSDoc(requiredProp('policy_type', policyTypeAnnotation), 'Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll").'),
+      addJSDoc(requiredProp('$type', policyTypeAnnotation), 'Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll").'),
+      addJSDoc(optionalProp('privileges', t.tsArrayType(t.tsStringKeyword())), 'Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]).'),
+      addJSDoc(optionalProp('permissive', t.tsBooleanKeyword()), 'Whether this policy is permissive (true) or restrictive (false). Defaults to true.'),
       addJSDoc(optionalProp('policy_role', t.tsStringKeyword()), 'Role for this policy. Defaults to "authenticated".'),
-      addJSDoc(optionalProp('permissive', t.tsBooleanKeyword()), 'Whether this policy is permissive (true) or restrictive (false).'),
       addJSDoc(optionalProp('policy_name', t.tsStringKeyword()), 'Optional custom name for this policy.'),
-      addJSDoc(optionalProp('privileges', t.tsArrayType(t.tsStringKeyword())), 'Privileges this policy applies to.'),
       addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).'),
     ]),
-    'An RLS policy entry for a blueprint table.'
+    'An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention.'
   );
 }
 
