@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.28.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.27.5...@constructive-io/graphql-codegen@4.28.0) (2026-03-31)
+
+### Bug Fixes
+
+- use .execute().unwrap() chaining pattern in generated AGENTS.md ([629c736](https://github.com/constructive-io/constructive/commit/629c736eaf2a413a8a393e44a181f7ed646a396d))
+
+### Features
+
+- add error handling guidance to generated ORM AGENTS.md ([017e713](https://github.com/constructive-io/constructive/commit/017e7139c9a88fe69f535498b2d991ea773901df))
+- **codegen:** generate embedder config reference for CLI docs ([128e678](https://github.com/constructive-io/constructive/commit/128e6783db419fbcdb2b9b7c147641d3e723bb52))
+
 ## [4.27.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.27.4...@constructive-io/graphql-codegen@4.27.5) (2026-03-31)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
