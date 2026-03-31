@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.7.1...node-type-registry@0.8.0) (2026-03-31)
+
+### Bug Fixes
+
+- change BlueprintPolicy.policy_type to $type to match SQL convention ([ff94a16](https://github.com/constructive-io/constructive/commit/ff94a162fe7c94d3e823dbc45d7a5651478c997a))
+
+### Features
+
+- add table-level BlueprintTableIndex, BlueprintTableFullTextSearch, BlueprintTableUniqueConstraint types ([142443f](https://github.com/constructive-io/constructive/commit/142443febe5cbb888362435bb4f320f2ac4621dd))
+- move node-type-registry to graphql/ and update for blueprint redesign ([7e17fae](https://github.com/constructive-io/constructive/commit/7e17faeb4b5f97868e5f50ebb9f09bdafa4e8081)), closes [#721](https://github.com/constructive-io/constructive/issues/721)
+
 ## [0.7.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.7.0...node-type-registry@0.7.1) (2026-03-31)
 
 **Note:** Version bump only for package node-type-registry
