@@ -21,8 +21,6 @@ export interface DataIdParams {
 export interface DataDirectOwnerParams {
   /* Column name for owner ID */
   owner_field_name?: string;
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
   /* If true, adds a foreign key constraint from owner_id to the users table */
   include_user_fk?: boolean;
 }
@@ -30,39 +28,27 @@ export interface DataDirectOwnerParams {
 export interface DataEntityMembershipParams {
   /* Column name for entity ID */
   entity_field_name?: string;
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
   /* If true, adds a foreign key constraint from entity_id to the users table */
   include_user_fk?: boolean;
 }
 /** Combines direct ownership with entity scoping. Adds both owner_id and entity_id columns. Enables AuthzDirectOwner, AuthzEntityMembership, and AuthzOrgHierarchy authorization. Particularly useful for OrgHierarchy where a user owns a row (owner_id) within an entity (entity_id), and managers above can see subordinate-owned records via the hierarchy closure table. */
 export interface DataOwnershipInEntityParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
   /* If true, adds foreign key constraints from owner_id and entity_id to the users table */
   include_user_fk?: boolean;
 }
 /** Adds automatic timestamp tracking with created_at and updated_at columns. */
 export interface DataTimestampsParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
 }
 /** Adds user tracking for creates/updates with created_by and updated_by columns. */
 export interface DataPeoplestampsParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
   /* If true, adds foreign key constraints from created_by and updated_by to the users table */
   include_user_fk?: boolean;
 }
 /** Adds publish state columns (is_published, published_at) for content visibility. Enables AuthzPublishable and AuthzTemporal authorization. */
 export interface DataPublishableParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
 }
 /** Adds soft delete support with deleted_at and is_deleted columns. */
 export interface DataSoftDeleteParams {
-  /* If true, also adds a UUID primary key column with auto-generation */
-  include_id?: boolean;
 }
 /** Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), stale tracking strategies (column, null, hash), and automatic job enqueue triggers for embedding generation. */
 export interface DataEmbeddingParams {

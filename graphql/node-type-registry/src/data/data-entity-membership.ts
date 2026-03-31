@@ -14,11 +14,6 @@ export const DataEntityMembership: NodeTypeDefinition = {
         "description": "Column name for entity ID",
         "default": "entity_id"
       },
-      "include_id": {
-        "type": "boolean",
-        "description": "If true, also adds a UUID primary key column with auto-generation",
-        "default": true
-      },
       "include_user_fk": {
         "type": "boolean",
         "description": "If true, adds a foreign key constraint from entity_id to the users table",
