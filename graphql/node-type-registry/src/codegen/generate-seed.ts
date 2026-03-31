@@ -143,7 +143,7 @@ const GENERATED_HEADER = [
   '-- GENERATED FILE — DO NOT EDIT',
   '--',
   '-- Regenerate with:',
-  '--   cd graphile/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema',
+  '--   cd graphql/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema',
   '--',
   '',
 ].join('\n');

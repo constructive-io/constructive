@@ -6,7 +6,7 @@
  *
  *   - Per-node-type parameter interfaces (via schema-typescript)
  *   - BlueprintNode  -- discriminated union of all non-relation node types
- *   - BlueprintRelation -- typed relation entries with $type, source_ref, target_ref
+ *   - BlueprintRelation -- typed relation entries with $type, source_table, target_table
  *   - BlueprintTable, BlueprintField, BlueprintPolicy, BlueprintIndex, etc.
  *   - BlueprintDefinition -- the top-level type matching the JSONB shape
  *
@@ -324,38 +324,27 @@ function buildBlueprintField(
 
 function buildBlueprintPolicy(
   authzNodes: NodeTypeDefinition[],
-  meta?: MetaTableInfo[]
+  _meta?: MetaTableInfo[]
 ): t.ExportNamedDeclaration {
+  // BlueprintPolicy represents the blueprint JSON shape (not the DB table).
+  // The SQL procedure reads $type (not policy_type) from the JSONB:
+  //   v_policy_type := v_policy_entry->>'$type';
+  // So we always use the static definition with $type.
   const policyTypeAnnotation =
     authzNodes.length > 0
       ? strUnion(authzNodes.map((nt) => nt.name))
       : t.tsStringKeyword();
 
-  const table = meta && findTable(meta, 'metaschema_public', 'policy');
-  if (table) {
-    return deriveInterfaceFromTable(
-      table,
-      'BlueprintPolicy',
-      'An RLS policy entry for a blueprint table. Derived from _meta.',
-      {
-        // policy_type gets a typed union of known Authz* node names
-        policy_type: policyTypeAnnotation,
-        // data is untyped JSONB — use Record<string, unknown>
-        data: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-      },
-    );
-  }
-  // Static fallback
   return addJSDoc(
     exportInterface('BlueprintPolicy', [
-      addJSDoc(requiredProp('policy_type', policyTypeAnnotation), 'Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll").'),
+      addJSDoc(requiredProp('$type', policyTypeAnnotation), 'Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll").'),
+      addJSDoc(optionalProp('privileges', t.tsArrayType(t.tsStringKeyword())), 'Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]).'),
+      addJSDoc(optionalProp('permissive', t.tsBooleanKeyword()), 'Whether this policy is permissive (true) or restrictive (false). Defaults to true.'),
       addJSDoc(optionalProp('policy_role', t.tsStringKeyword()), 'Role for this policy. Defaults to "authenticated".'),
-      addJSDoc(optionalProp('permissive', t.tsBooleanKeyword()), 'Whether this policy is permissive (true) or restrictive (false).'),
       addJSDoc(optionalProp('policy_name', t.tsStringKeyword()), 'Optional custom name for this policy.'),
-      addJSDoc(optionalProp('privileges', t.tsArrayType(t.tsStringKeyword())), 'Privileges this policy applies to.'),
       addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).'),
     ]),
-    'An RLS policy entry for a blueprint table.'
+    'An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention.'
   );
 }
 
@@ -383,8 +372,12 @@ function buildBlueprintFullTextSearch(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintFullTextSearch', [
       addJSDoc(
-        requiredProp('table_ref', t.tsStringKeyword()),
-        'Reference key of the table this full-text search belongs to.'
+        requiredProp('table_name', t.tsStringKeyword()),
+        'Table name this full-text search belongs to.'
+      ),
+      addJSDoc(
+        optionalProp('schema_name', t.tsStringKeyword()),
+        'Optional schema name for disambiguation (falls back to top-level default).'
       ),
       addJSDoc(
         requiredProp('field', t.tsStringKeyword()),
@@ -398,7 +391,30 @@ function buildBlueprintFullTextSearch(): t.ExportNamedDeclaration {
         'Source fields that feed into this tsvector.'
       ),
     ]),
-    'A full-text search configuration for a blueprint table.'
+    'A full-text search configuration for a blueprint table (top-level, requires table_name).'
+  );
+}
+
+function buildBlueprintTableFullTextSearch(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintTableFullTextSearch', [
+      addJSDoc(
+        requiredProp('field', t.tsStringKeyword()),
+        'Name of the tsvector field on the table.'
+      ),
+      addJSDoc(
+        requiredProp(
+          'sources',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintFtsSource')))
+        ),
+        'Source fields that feed into this tsvector.'
+      ),
+      addJSDoc(
+        optionalProp('schema_name', t.tsStringKeyword()),
+        'Optional schema name override.'
+      ),
+    ]),
+    'A full-text search configuration nested inside a table definition (table_name not required).'
   );
 }
 
@@ -422,7 +438,8 @@ function buildBlueprintIndex(
   // Static fallback
   return addJSDoc(
     exportInterface('BlueprintIndex', [
-      addJSDoc(requiredProp('table_ref', t.tsStringKeyword()), 'Reference key of the table this index belongs to.'),
+      addJSDoc(requiredProp('table_name', t.tsStringKeyword()), 'Table name this index belongs to.'),
+      addJSDoc(optionalProp('schema_name', t.tsStringKeyword()), 'Optional schema name for disambiguation (falls back to top-level default).'),
       addJSDoc(optionalProp('column', t.tsStringKeyword()), 'Single column name for the index.'),
       addJSDoc(optionalProp('columns', t.tsArrayType(t.tsStringKeyword())), 'Array of column names for a multi-column index.'),
       addJSDoc(requiredProp('access_method', t.tsStringKeyword()), 'Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25").'),
@@ -431,7 +448,23 @@ function buildBlueprintIndex(
       addJSDoc(optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())), 'Operator classes for the index columns.'),
       addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.'),
     ]),
-    'An index definition within a blueprint.'
+    'An index definition within a blueprint (top-level, requires table_name).'
+  );
+}
+
+function buildBlueprintTableIndex(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintTableIndex', [
+      addJSDoc(optionalProp('column', t.tsStringKeyword()), 'Single column name for the index.'),
+      addJSDoc(optionalProp('columns', t.tsArrayType(t.tsStringKeyword())), 'Array of column names for a multi-column index.'),
+      addJSDoc(requiredProp('access_method', t.tsStringKeyword()), 'Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25").'),
+      addJSDoc(optionalProp('is_unique', t.tsBooleanKeyword()), 'Whether this is a unique index.'),
+      addJSDoc(optionalProp('name', t.tsStringKeyword()), 'Optional custom name for the index.'),
+      addJSDoc(optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())), 'Operator classes for the index columns.'),
+      addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.'),
+      addJSDoc(optionalProp('schema_name', t.tsStringKeyword()), 'Optional schema name override.'),
+    ]),
+    'An index definition nested inside a table definition (table_name not required).'
   );
 }
 
@@ -506,8 +539,10 @@ function buildRelationTypes(
   const relationMembers: t.TSType[] = relationNodes.map((nt) => {
     const baseType = t.tsTypeLiteral([
       requiredProp('$type', strLit(nt.name)),
-      requiredProp('source_ref', t.tsStringKeyword()),
-      requiredProp('target_ref', t.tsStringKeyword()),
+      requiredProp('source_table', t.tsStringKeyword()),
+      requiredProp('target_table', t.tsStringKeyword()),
+      optionalProp('source_schema_name', t.tsStringKeyword()),
+      optionalProp('target_schema_name', t.tsStringKeyword()),
     ]);
 
     return t.tsIntersectionType([
@@ -528,16 +563,52 @@ function buildRelationTypes(
 // BlueprintTable and BlueprintDefinition
 // ---------------------------------------------------------------------------
 
+function buildBlueprintUniqueConstraint(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintUniqueConstraint', [
+      addJSDoc(
+        requiredProp('table_name', t.tsStringKeyword()),
+        'Table name this unique constraint belongs to.'
+      ),
+      addJSDoc(
+        optionalProp('schema_name', t.tsStringKeyword()),
+        'Optional schema name for disambiguation (falls back to top-level default).'
+      ),
+      addJSDoc(
+        requiredProp('columns', t.tsArrayType(t.tsStringKeyword())),
+        'Column names that form the unique constraint.'
+      ),
+    ]),
+    'A unique constraint definition within a blueprint (top-level, requires table_name).'
+  );
+}
+
+function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintTableUniqueConstraint', [
+      addJSDoc(
+        requiredProp('columns', t.tsArrayType(t.tsStringKeyword())),
+        'Column names that form the unique constraint.'
+      ),
+      addJSDoc(
+        optionalProp('schema_name', t.tsStringKeyword()),
+        'Optional schema name override.'
+      ),
+    ]),
+    'A unique constraint nested inside a table definition (table_name not required).'
+  );
+}
+
 function buildBlueprintTable(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintTable', [
       addJSDoc(
-        requiredProp('ref', t.tsStringKeyword()),
-        'Local reference key for this table (used by relations, indexes, fts).'
-      ),
-      addJSDoc(
         requiredProp('table_name', t.tsStringKeyword()),
         'The PostgreSQL table name to create.'
+      ),
+      addJSDoc(
+        optionalProp('schema_name', t.tsStringKeyword()),
+        'Optional schema name (falls back to top-level default).'
       ),
       addJSDoc(
         requiredProp(
@@ -571,6 +642,27 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('use_rls', t.tsBooleanKeyword()),
         'Whether to enable RLS on this table. Defaults to true.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'indexes',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableIndex')))
+        ),
+        'Table-level indexes (table_name inherited from parent).'
+      ),
+      addJSDoc(
+        optionalProp(
+          'full_text_searches',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableFullTextSearch')))
+        ),
+        'Table-level full-text search configurations (table_name inherited from parent).'
+      ),
+      addJSDoc(
+        optionalProp(
+          'unique_constraints',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableUniqueConstraint')))
+        ),
+        'Table-level unique constraints (table_name inherited from parent).'
       ),
     ]),
     'A table definition within a blueprint.'
@@ -609,6 +701,15 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
           )
         ),
         'Full-text search configurations.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'unique_constraints',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintUniqueConstraint'))
+          )
+        ),
+        'Unique constraints on table columns.'
       ),
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
@@ -676,7 +777,11 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintPolicy(authzNodes, meta));
   statements.push(buildBlueprintFtsSource());
   statements.push(buildBlueprintFullTextSearch());
+  statements.push(buildBlueprintTableFullTextSearch());
   statements.push(buildBlueprintIndex(meta));
+  statements.push(buildBlueprintTableIndex());
+  statements.push(buildBlueprintUniqueConstraint());
+  statements.push(buildBlueprintTableUniqueConstraint());
 
   // -- Node types discriminated union --
   statements.push(
@@ -703,7 +808,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
     '// GENERATED FILE \u2014 DO NOT EDIT',
     '//',
     '// Regenerate with:',
-    '//   cd graphile/node-type-registry && pnpm generate:types',
+    '//   cd graphql/node-type-registry && pnpm generate:types',
     '//',
     '// These types match the JSONB shape expected by construct_blueprint().',
     '// All field names are snake_case to match the SQL convention.',

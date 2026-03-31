@@ -1,7 +1,7 @@
 // GENERATED FILE — DO NOT EDIT
 //
 // Regenerate with:
-//   cd graphile/node-type-registry && pnpm generate:types
+//   cd graphql/node-type-registry && pnpm generate:types
 //
 // These types match the JSONB shape expected by construct_blueprint().
 // All field names are snake_case to match the SQL convention.
@@ -683,18 +683,18 @@ export interface BlueprintField {
   /** Comment/description for this field. */
   description?: string;
 }
-/** An RLS policy entry for a blueprint table. */
+/** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  policy_type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
+  privileges?: string[];
+  /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
+  permissive?: boolean;
   /** Role for this policy. Defaults to "authenticated". */
   policy_role?: string;
-  /** Whether this policy is permissive (true) or restrictive (false). */
-  permissive?: boolean;
   /** Optional custom name for this policy. */
   policy_name?: string;
-  /** Privileges this policy applies to. */
-  privileges?: string[];
   /** Policy-specific data (structure varies by policy type). */
   data?: Record<string, unknown>;
 }
@@ -707,19 +707,32 @@ export interface BlueprintFtsSource {
   /** Language for text search. Defaults to "english". */
   lang?: string;
 }
-/** A full-text search configuration for a blueprint table. */
+/** A full-text search configuration for a blueprint table (top-level, requires table_name). */
 export interface BlueprintFullTextSearch {
-  /** Reference key of the table this full-text search belongs to. */
-  table_ref: string;
+  /** Table name this full-text search belongs to. */
+  table_name: string;
+  /** Optional schema name for disambiguation (falls back to top-level default). */
+  schema_name?: string;
   /** Name of the tsvector field on the table. */
   field: string;
   /** Source fields that feed into this tsvector. */
   sources: BlueprintFtsSource[];
 }
-/** An index definition within a blueprint. */
+/** A full-text search configuration nested inside a table definition (table_name not required). */
+export interface BlueprintTableFullTextSearch {
+  /** Name of the tsvector field on the table. */
+  field: string;
+  /** Source fields that feed into this tsvector. */
+  sources: BlueprintFtsSource[];
+  /** Optional schema name override. */
+  schema_name?: string;
+}
+/** An index definition within a blueprint (top-level, requires table_name). */
 export interface BlueprintIndex {
-  /** Reference key of the table this index belongs to. */
-  table_ref: string;
+  /** Table name this index belongs to. */
+  table_name: string;
+  /** Optional schema name for disambiguation (falls back to top-level default). */
+  schema_name?: string;
   /** Single column name for the index. */
   column?: string;
   /** Array of column names for a multi-column index. */
@@ -734,6 +747,41 @@ export interface BlueprintIndex {
   op_classes?: string[];
   /** Additional index-specific options. */
   options?: Record<string, unknown>;
+}
+/** An index definition nested inside a table definition (table_name not required). */
+export interface BlueprintTableIndex {
+  /** Single column name for the index. */
+  column?: string;
+  /** Array of column names for a multi-column index. */
+  columns?: string[];
+  /** Index access method (e.g., "BTREE", "GIN", "GIST", "HNSW", "BM25"). */
+  access_method: string;
+  /** Whether this is a unique index. */
+  is_unique?: boolean;
+  /** Optional custom name for the index. */
+  name?: string;
+  /** Operator classes for the index columns. */
+  op_classes?: string[];
+  /** Additional index-specific options. */
+  options?: Record<string, unknown>;
+  /** Optional schema name override. */
+  schema_name?: string;
+}
+/** A unique constraint definition within a blueprint (top-level, requires table_name). */
+export interface BlueprintUniqueConstraint {
+  /** Table name this unique constraint belongs to. */
+  table_name: string;
+  /** Optional schema name for disambiguation (falls back to top-level default). */
+  schema_name?: string;
+  /** Column names that form the unique constraint. */
+  columns: string[];
+}
+/** A unique constraint nested inside a table definition (table_name not required). */
+export interface BlueprintTableUniqueConstraint {
+  /** Column names that form the unique constraint. */
+  columns: string[];
+  /** Optional schema name override. */
+  schema_name?: string;
 }
 /**
  * ===========================================================================
@@ -885,20 +933,28 @@ export type BlueprintNode = BlueprintNodeShorthand | BlueprintNodeObject;
 /** A relation entry in a blueprint definition. */
 export type BlueprintRelation = {
   $type: "RelationBelongsTo";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationBelongsToParams> | {
   $type: "RelationHasOne";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationHasOneParams> | {
   $type: "RelationHasMany";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationHasManyParams> | {
   $type: "RelationManyToMany";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationManyToManyParams>;
 /**
  * ===========================================================================
@@ -908,10 +964,10 @@ export type BlueprintRelation = {
 ;
 /** A table definition within a blueprint. */
 export interface BlueprintTable {
-  /** Local reference key for this table (used by relations, indexes, fts). */
-  ref: string;
   /** The PostgreSQL table name to create. */
   table_name: string;
+  /** Optional schema name (falls back to top-level default). */
+  schema_name?: string;
   /** Array of node type entries that define the table's behavior. */
   nodes: BlueprintNode[];
   /** Custom fields (columns) to add to the table. */
@@ -924,6 +980,12 @@ export interface BlueprintTable {
   grants?: unknown[];
   /** Whether to enable RLS on this table. Defaults to true. */
   use_rls?: boolean;
+  /** Table-level indexes (table_name inherited from parent). */
+  indexes?: BlueprintTableIndex[];
+  /** Table-level full-text search configurations (table_name inherited from parent). */
+  full_text_searches?: BlueprintTableFullTextSearch[];
+  /** Table-level unique constraints (table_name inherited from parent). */
+  unique_constraints?: BlueprintTableUniqueConstraint[];
 }
 /** The complete blueprint definition -- the JSONB shape accepted by construct_blueprint(). */
 export interface BlueprintDefinition {
@@ -935,4 +997,6 @@ export interface BlueprintDefinition {
   indexes?: BlueprintIndex[];
   /** Full-text search configurations. */
   full_text_searches?: BlueprintFullTextSearch[];
+  /** Unique constraints on table columns. */
+  unique_constraints?: BlueprintUniqueConstraint[];
 }
