@@ -201,8 +201,8 @@ export function generateOrmAgentsDocs(
   lines.push('// WRONG — errors are silently lost:');
   lines.push('try { const r = await db.model.findMany({...}).execute(); } catch (e) { /* never runs */ }');
   lines.push('');
-  lines.push('// RIGHT — .unwrap() throws GraphQLRequestError on failure:');
-  lines.push('const data = await db.model.findMany({...}).unwrap();');
+  lines.push('// RIGHT — .execute().unwrap() throws GraphQLRequestError on failure:');
+  lines.push('const data = await db.model.findMany({...}).execute().unwrap();');
   lines.push('');
   lines.push('// RIGHT — check .ok for control flow:');
   lines.push('const result = await db.model.findMany({...}).execute();');
@@ -210,10 +210,10 @@ export function generateOrmAgentsDocs(
   lines.push('return result.data;');
   lines.push('```');
   lines.push('');
-  lines.push('Available helpers on QueryBuilder (call **instead of** `.execute()`):');
-  lines.push('- `.unwrap()` — throws on error, returns typed data');
-  lines.push('- `.unwrapOr(default)` — returns default value on error');
-  lines.push('- `.unwrapOrElse(fn)` — calls callback with errors on failure');
+  lines.push('Available helpers (chain after `.execute()`):');
+  lines.push('- `.execute().unwrap()` — throws on error, returns typed data');
+  lines.push('- `.execute().unwrapOr(default)` — returns default value on error');
+  lines.push('- `.execute().unwrapOrElse(fn)` — calls callback with errors on failure');
   lines.push('');
 
   lines.push('## Resources');
@@ -227,7 +227,7 @@ export function generateOrmAgentsDocs(
   lines.push('');
   lines.push('- Access models via `db.<ModelName>` (e.g. `db.User`)');
   lines.push('- CRUD methods: `findMany`, `findOne`, `create`, `update`, `delete`');
-  lines.push('- Call `.unwrap()` to run and throw on error, or `.execute()` for discriminated union result');
+  lines.push('- Chain `.execute().unwrap()` to run and throw on error, or `.execute()` alone for discriminated union result');
   lines.push('- Custom operations via `db.query.<name>` or `db.mutation.<name>`');
   lines.push('');
 
