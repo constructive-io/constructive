@@ -76,7 +76,9 @@ export type AppPermissionDefaultOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
-  | 'ID_DESC';
+  | 'ID_DESC'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC';
 /** Methods to use when ordering `OrgPermissionDefault`. */
 export type OrgPermissionDefaultOrderBy =
   | 'NATURAL'
@@ -84,6 +86,8 @@ export type OrgPermissionDefaultOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `AppAdminGrant`. */
@@ -93,6 +97,8 @@ export type AppAdminGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -108,6 +114,8 @@ export type AppOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -123,6 +131,8 @@ export type OrgAdminGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -140,6 +150,8 @@ export type OrgOwnerGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -158,7 +170,9 @@ export type AppLimitDefaultOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC';
+  | 'NAME_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC';
 /** Methods to use when ordering `OrgLimitDefault`. */
 export type OrgLimitDefaultOrderBy =
   | 'NATURAL'
@@ -167,7 +181,9 @@ export type OrgLimitDefaultOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC';
+  | 'NAME_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC';
 /** Methods to use when ordering `OrgChartEdgeGrant`. */
 export type OrgChartEdgeGrantOrderBy =
   | 'NATURAL'
@@ -182,7 +198,15 @@ export type OrgChartEdgeGrantOrderBy =
   | 'PARENT_ID_ASC'
   | 'PARENT_ID_DESC'
   | 'GRANTOR_ID_ASC'
-  | 'GRANTOR_ID_DESC';
+  | 'GRANTOR_ID_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
+  | 'POSITION_TITLE_ASC'
+  | 'POSITION_TITLE_DESC'
+  | 'POSITION_LEVEL_ASC'
+  | 'POSITION_LEVEL_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC';
 /** Methods to use when ordering `MembershipType`. */
 export type MembershipTypeOrderBy =
   | 'NATURAL'
@@ -191,7 +215,11 @@ export type MembershipTypeOrderBy =
   | 'ID_ASC'
   | 'ID_DESC'
   | 'NAME_ASC'
-  | 'NAME_DESC';
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC';
 /** Methods to use when ordering `AppPermission`. */
 export type AppPermissionOrderBy =
   | 'NATURAL'
@@ -202,7 +230,11 @@ export type AppPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC';
+  | 'BITNUM_DESC'
+  | 'BITSTR_ASC'
+  | 'BITSTR_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC';
 /** Methods to use when ordering `OrgPermission`. */
 export type OrgPermissionOrderBy =
   | 'NATURAL'
@@ -213,7 +245,11 @@ export type OrgPermissionOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'BITNUM_ASC'
-  | 'BITNUM_DESC';
+  | 'BITNUM_DESC'
+  | 'BITSTR_ASC'
+  | 'BITSTR_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC';
 /** Methods to use when ordering `AppLimit`. */
 export type AppLimitOrderBy =
   | 'NATURAL'
@@ -224,7 +260,11 @@ export type AppLimitOrderBy =
   | 'NAME_ASC'
   | 'NAME_DESC'
   | 'ACTOR_ID_ASC'
-  | 'ACTOR_ID_DESC';
+  | 'ACTOR_ID_DESC'
+  | 'NUM_ASC'
+  | 'NUM_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC';
 /** Methods to use when ordering `AppAchievement`. */
 export type AppAchievementOrderBy =
   | 'NATURAL'
@@ -236,6 +276,8 @@ export type AppAchievementOrderBy =
   | 'ACTOR_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
+  | 'COUNT_ASC'
+  | 'COUNT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -251,6 +293,8 @@ export type AppStepOrderBy =
   | 'ACTOR_ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
+  | 'COUNT_ASC'
+  | 'COUNT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -262,6 +306,8 @@ export type ClaimedInviteOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
   | 'RECEIVER_ID_ASC'
@@ -277,6 +323,10 @@ export type AppGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'GRANTOR_ID_ASC'
@@ -299,7 +349,11 @@ export type AppMembershipDefaultOrderBy =
   | 'CREATED_BY_ASC'
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC';
+  | 'UPDATED_BY_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC';
 /** Methods to use when ordering `OrgLimit`. */
 export type OrgLimitOrderBy =
   | 'NATURAL'
@@ -311,6 +365,10 @@ export type OrgLimitOrderBy =
   | 'NAME_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
+  | 'NUM_ASC'
+  | 'NUM_DESC'
+  | 'MAX_ASC'
+  | 'MAX_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `OrgClaimedInvite`. */
@@ -320,6 +378,8 @@ export type OrgClaimedInviteOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
   | 'SENDER_ID_ASC'
   | 'SENDER_ID_DESC'
   | 'RECEIVER_ID_ASC'
@@ -337,6 +397,10 @@ export type OrgGrantOrderBy =
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'IS_GRANT_ASC'
+  | 'IS_GRANT_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -363,7 +427,11 @@ export type OrgChartEdgeOrderBy =
   | 'CHILD_ID_ASC'
   | 'CHILD_ID_DESC'
   | 'PARENT_ID_ASC'
-  | 'PARENT_ID_DESC';
+  | 'PARENT_ID_DESC'
+  | 'POSITION_TITLE_ASC'
+  | 'POSITION_TITLE_DESC'
+  | 'POSITION_LEVEL_ASC'
+  | 'POSITION_LEVEL_DESC';
 /** Methods to use when ordering `OrgMembershipDefault`. */
 export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
@@ -379,8 +447,14 @@ export type OrgMembershipDefaultOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
   | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
+  | 'ENTITY_ID_DESC'
+  | 'DELETE_MEMBER_CASCADE_GROUPS_ASC'
+  | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
+  | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
+  | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
 /** Methods to use when ordering `AppLevelRequirement`. */
 export type AppLevelRequirementOrderBy =
   | 'NATURAL'
@@ -392,6 +466,10 @@ export type AppLevelRequirementOrderBy =
   | 'NAME_DESC'
   | 'LEVEL_ASC'
   | 'LEVEL_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'REQUIRED_COUNT_ASC'
+  | 'REQUIRED_COUNT_DESC'
   | 'PRIORITY_ASC'
   | 'PRIORITY_DESC'
   | 'CREATED_AT_ASC'
@@ -413,10 +491,24 @@ export type AppMembershipOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'IS_BANNED_ASC'
+  | 'IS_BANNED_DESC'
+  | 'IS_DISABLED_ASC'
+  | 'IS_DISABLED_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
   | 'IS_ADMIN_DESC'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'GRANTED_ASC'
+  | 'GRANTED_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'PROFILE_ID_ASC'
@@ -436,10 +528,22 @@ export type OrgMembershipOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'IS_BANNED_ASC'
+  | 'IS_BANNED_DESC'
+  | 'IS_DISABLED_ASC'
+  | 'IS_DISABLED_DESC'
+  | 'IS_ACTIVE_ASC'
+  | 'IS_ACTIVE_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
   | 'IS_ADMIN_DESC'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC'
+  | 'GRANTED_ASC'
+  | 'GRANTED_DESC'
   | 'ACTOR_ID_ASC'
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
@@ -461,6 +565,14 @@ export type InviteOrderBy =
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
   | 'INVITE_VALID_DESC'
+  | 'INVITE_LIMIT_ASC'
+  | 'INVITE_LIMIT_DESC'
+  | 'INVITE_COUNT_ASC'
+  | 'INVITE_COUNT_DESC'
+  | 'MULTIPLE_ASC'
+  | 'MULTIPLE_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
@@ -476,6 +588,10 @@ export type AppLevelOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'IMAGE_ASC'
+  | 'IMAGE_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
   | 'CREATED_AT_ASC'
@@ -499,6 +615,14 @@ export type OrgInviteOrderBy =
   | 'INVITE_TOKEN_DESC'
   | 'INVITE_VALID_ASC'
   | 'INVITE_VALID_DESC'
+  | 'INVITE_LIMIT_ASC'
+  | 'INVITE_LIMIT_DESC'
+  | 'INVITE_COUNT_ASC'
+  | 'INVITE_COUNT_DESC'
+  | 'MULTIPLE_ASC'
+  | 'MULTIPLE_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
   | 'EXPIRES_AT_ASC'
   | 'EXPIRES_AT_DESC'
   | 'CREATED_AT_ASC'
