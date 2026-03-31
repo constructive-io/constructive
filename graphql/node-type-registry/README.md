@@ -31,7 +31,6 @@ import type {
 const definition: BlueprintDefinition = {
   tables: [
     {
-      ref: 'tasks',
       table_name: 'tasks',
       nodes: [
         'DataId',
@@ -48,9 +47,15 @@ const definition: BlueprintDefinition = {
   relations: [
     {
       $type: 'RelationBelongsTo',
-      source_ref: 'tasks',
-      target_ref: 'projects',
+      source_table: 'tasks',
+      target_table: 'projects',
       delete_action: 'c',
+    },
+  ],
+  unique_constraints: [
+    {
+      table_name: 'tasks',
+      columns: ['title', 'owner_id'],
     },
   ],
 };
@@ -61,7 +66,7 @@ const definition: BlueprintDefinition = {
 When node type definitions are added or modified, regenerate with:
 
 ```bash
-cd graphile/node-type-registry && pnpm generate:types
+cd graphql/node-type-registry && pnpm generate:types
 ```
 
 This produces `src/blueprint-types.generated.ts` from the TS node type source of truth.
@@ -71,5 +76,5 @@ This produces `src/blueprint-types.generated.ts` from the TS node type source of
 Generate SQL seed scripts for `node_type_registry` table:
 
 ```bash
-cd graphile/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema
+cd graphql/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema
 ```

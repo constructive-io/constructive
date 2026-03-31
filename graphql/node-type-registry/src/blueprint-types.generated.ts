@@ -1,7 +1,7 @@
 // GENERATED FILE — DO NOT EDIT
 //
 // Regenerate with:
-//   cd graphile/node-type-registry && pnpm generate:types
+//   cd graphql/node-type-registry && pnpm generate:types
 //
 // These types match the JSONB shape expected by construct_blueprint().
 // All field names are snake_case to match the SQL convention.
@@ -709,8 +709,10 @@ export interface BlueprintFtsSource {
 }
 /** A full-text search configuration for a blueprint table. */
 export interface BlueprintFullTextSearch {
-  /** Reference key of the table this full-text search belongs to. */
-  table_ref: string;
+  /** Table name this full-text search belongs to. */
+  table_name: string;
+  /** Optional schema name for disambiguation (falls back to top-level default). */
+  schema_name?: string;
   /** Name of the tsvector field on the table. */
   field: string;
   /** Source fields that feed into this tsvector. */
@@ -718,8 +720,10 @@ export interface BlueprintFullTextSearch {
 }
 /** An index definition within a blueprint. */
 export interface BlueprintIndex {
-  /** Reference key of the table this index belongs to. */
-  table_ref: string;
+  /** Table name this index belongs to. */
+  table_name: string;
+  /** Optional schema name for disambiguation (falls back to top-level default). */
+  schema_name?: string;
   /** Single column name for the index. */
   column?: string;
   /** Array of column names for a multi-column index. */
@@ -885,20 +889,28 @@ export type BlueprintNode = BlueprintNodeShorthand | BlueprintNodeObject;
 /** A relation entry in a blueprint definition. */
 export type BlueprintRelation = {
   $type: "RelationBelongsTo";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationBelongsToParams> | {
   $type: "RelationHasOne";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationHasOneParams> | {
   $type: "RelationHasMany";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationHasManyParams> | {
   $type: "RelationManyToMany";
-  source_ref: string;
-  target_ref: string;
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
 } & Partial<RelationManyToManyParams>;
 /**
  * ===========================================================================
@@ -906,12 +918,21 @@ export type BlueprintRelation = {
  * ===========================================================================
  */
 ;
+/** A unique constraint definition within a blueprint. */
+export interface BlueprintUniqueConstraint {
+  /** Table name this unique constraint belongs to. */
+  table_name: string;
+  /** Optional schema name for disambiguation (falls back to top-level default). */
+  schema_name?: string;
+  /** Column names that form the unique constraint. */
+  columns: string[];
+}
 /** A table definition within a blueprint. */
 export interface BlueprintTable {
-  /** Local reference key for this table (used by relations, indexes, fts). */
-  ref: string;
   /** The PostgreSQL table name to create. */
   table_name: string;
+  /** Optional schema name (falls back to top-level default). */
+  schema_name?: string;
   /** Array of node type entries that define the table's behavior. */
   nodes: BlueprintNode[];
   /** Custom fields (columns) to add to the table. */
@@ -935,4 +956,6 @@ export interface BlueprintDefinition {
   indexes?: BlueprintIndex[];
   /** Full-text search configurations. */
   full_text_searches?: BlueprintFullTextSearch[];
+  /** Unique constraints on table columns. */
+  unique_constraints?: BlueprintUniqueConstraint[];
 }
