@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.8.0...node-type-registry@0.9.0) (2026-04-01)
+
+### Features
+
+- update RelationManyToMany types - replace node_type/node_data with nodes[] array ([a2d9075](https://github.com/constructive-io/constructive/commit/a2d907584d677c9f6114f093e02e44b08163863e)), closes [#723](https://github.com/constructive-io/constructive/issues/723)
+
 # [0.8.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.7.1...node-type-registry@0.8.0) (2026-03-31)
 
 ### Bug Fixes

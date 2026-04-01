@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.7](https://github.com/constructive-io/constructive/compare/graphile-search@1.5.6...graphile-search@1.5.7) (2026-04-01)
+
+### Bug Fixes
+
+- correct search ordering for pgvector, BM25, and trgm with LIMIT ([096f74c](https://github.com/constructive-io/constructive/commit/096f74ccad282e7aba6e2d05ce7e95c5e3ca9fd0))
+
 ## [1.5.6](https://github.com/constructive-io/constructive/compare/graphile-search@1.5.5...graphile-search@1.5.6) (2026-03-31)
 
 **Note:** Version bump only for package graphile-search
