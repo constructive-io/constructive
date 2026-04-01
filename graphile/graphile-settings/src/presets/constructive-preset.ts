@@ -86,7 +86,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,
       maxFileSize: 10 * 1024 * 1024, // 10MB
     }),
-    PresignedUrlPreset({ s3: getPresignedUrlS3Config() }),
+    PresignedUrlPreset({ s3: getPresignedUrlS3Config }),
     SqlExpressionValidatorPreset(),
     PgTypeMappingsPreset,
     RequiredInputPreset,
