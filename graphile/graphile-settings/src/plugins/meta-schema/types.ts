@@ -136,12 +136,16 @@ export interface PgCodec {
   };
 }
 
+export interface PgAttributeExtensions extends Record<string, unknown> {
+  geometrySubtype?: string | null;
+}
+
 export interface PgAttribute {
   codec?: PgCodec | null;
   notNull?: boolean;
   hasDefault?: boolean;
   description?: string | null;
-  extensions?: Record<string, unknown> | null;
+  extensions?: PgAttributeExtensions | null;
 }
 
 export interface PgUnique {

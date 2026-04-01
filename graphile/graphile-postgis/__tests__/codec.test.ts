@@ -249,73 +249,76 @@ describe('PostgisCodecPlugin', () => {
     const attributeHook = (PostgisCodecPlugin as { gather: { hooks: { pgCodecs_attribute: Function } } })
       .gather.hooks.pgCodecs_attribute;
 
-    it('should store geometrySubtype for Polygon geometry column', async () => {
-      const typmod = getGISTypeModifier(GisSubtype.Polygon, false, false, 4326);
-      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
+    async function runAttributeHook({
+      codecName,
+      typmod,
+      withExtensions = true,
+    }: {
+      codecName: string;
+      typmod: number | null;
+      withExtensions?: boolean;
+    }) {
+      const attribute: Record<string, any> = { codec: { name: codecName } };
+      if (withExtensions) {
+        attribute.extensions = {};
+      }
       const event = { pgAttribute: { atttypmod: typmod }, attribute };
 
       await attributeHook({}, event);
-      expect(attribute.extensions.geometrySubtype).toBe('Polygon');
-    });
+      return attribute;
+    }
 
-    it('should store geometrySubtype for Point geometry column', async () => {
-      const typmod = getGISTypeModifier(GisSubtype.Point, false, false, 4326);
-      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
-      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+    it.each([
+      ['geometry', GisSubtype.Polygon, 'Polygon'],
+      ['geometry', GisSubtype.Point, 'Point'],
+      ['geography', GisSubtype.MultiPolygon, 'MultiPolygon'],
+    ])('stores geometrySubtype for %s subtype %s', async (codecName, subtype, expected) => {
+      const attribute = await runAttributeHook({
+        codecName,
+        typmod: getGISTypeModifier(subtype, false, false, 4326),
+      });
 
-      await attributeHook({}, event);
-      expect(attribute.extensions.geometrySubtype).toBe('Point');
-    });
-
-    it('should store geometrySubtype for MultiPolygon geography column', async () => {
-      const typmod = getGISTypeModifier(GisSubtype.MultiPolygon, false, false, 4326);
-      const attribute: Record<string, any> = { codec: { name: 'geography' }, extensions: {} };
-      const event = { pgAttribute: { atttypmod: typmod }, attribute };
-
-      await attributeHook({}, event);
-      expect(attribute.extensions.geometrySubtype).toBe('MultiPolygon');
+      expect(attribute.extensions.geometrySubtype).toBe(expected);
     });
 
     it('should skip unconstrained geometry (atttypmod = -1)', async () => {
-      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
-      const event = { pgAttribute: { atttypmod: -1 }, attribute };
-
-      await attributeHook({}, event);
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: -1,
+      });
       expect(attribute.extensions.geometrySubtype).toBeUndefined();
     });
 
     it('should skip when atttypmod is null', async () => {
-      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
-      const event = { pgAttribute: { atttypmod: null as number | null }, attribute };
-
-      await attributeHook({}, event);
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: null,
+      });
       expect(attribute.extensions.geometrySubtype).toBeUndefined();
     });
 
     it('should not store subtype for base Geometry (subtype=0)', async () => {
-      const typmod = getGISTypeModifier(GisSubtype.Geometry, false, false, 4326);
-      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
-      const event = { pgAttribute: { atttypmod: typmod }, attribute };
-
-      await attributeHook({}, event);
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: getGISTypeModifier(GisSubtype.Geometry, false, false, 4326),
+      });
       expect(attribute.extensions.geometrySubtype).toBeUndefined();
     });
 
     it('should skip non-geometry codec types', async () => {
-      const typmod = getGISTypeModifier(GisSubtype.Point, false, false, 4326);
-      const attribute: Record<string, any> = { codec: { name: 'text' }, extensions: {} };
-      const event = { pgAttribute: { atttypmod: typmod }, attribute };
-
-      await attributeHook({}, event);
+      const attribute = await runAttributeHook({
+        codecName: 'text',
+        typmod: getGISTypeModifier(GisSubtype.Point, false, false, 4326),
+      });
       expect(attribute.extensions.geometrySubtype).toBeUndefined();
     });
 
     it('should create extensions object if not present', async () => {
-      const typmod = getGISTypeModifier(GisSubtype.LineString, false, false, 4326);
-      const attribute: Record<string, any> = { codec: { name: 'geometry' } };
-      const event = { pgAttribute: { atttypmod: typmod }, attribute };
-
-      await attributeHook({}, event);
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: getGISTypeModifier(GisSubtype.LineString, false, false, 4326),
+        withExtensions: false,
+      });
       expect(attribute.extensions).toBeDefined();
       expect(attribute.extensions.geometrySubtype).toBe('LineString');
     });

@@ -21,6 +21,7 @@ exports[`MetaSchemaPlugin _meta query contract contains required selection paths
   "fields.type.gqlType",
   "fields.type.isArray",
   "fields.type.pgType",
+  "fields.type.subtype",
   "foreignKeyConstraints",
   "foreignKeyConstraints.fields",
   "foreignKeyConstraints.fields.name",
@@ -118,6 +119,7 @@ exports[`MetaSchemaPlugin _meta query contract has stable printed GraphQL text 1
           pgType
           gqlType
           isArray
+          subtype
         }
       }
       indexes {

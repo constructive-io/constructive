@@ -54,6 +54,12 @@ function normalizeGisType(raw: string): string {
   return GIS_TYPE_NORMALIZE[raw] ?? raw;
 }
 
+function getGeometrySubtypeName(typmod: number): string | null {
+  const { subtype } = getGISTypeDetails(typmod);
+  const subtypeName = GIS_SUBTYPE_NAME[subtype];
+  return subtypeName && subtypeName !== 'Geometry' ? subtypeName : null;
+}
+
 /**
  * Scalar PgCodec for PostGIS geometry/geography types.
  *
@@ -252,9 +258,8 @@ export const PostgisCodecPlugin: GraphileConfig.Plugin = {
         }
 
         try {
-          const details = getGISTypeDetails(typmod);
-          const subtypeName = GIS_SUBTYPE_NAME[details.subtype];
-          if (subtypeName && subtypeName !== 'Geometry') {
+          const subtypeName = getGeometrySubtypeName(typmod);
+          if (subtypeName) {
             if (!attribute.extensions) {
               attribute.extensions = {};
             }

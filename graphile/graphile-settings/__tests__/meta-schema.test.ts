@@ -346,7 +346,7 @@ query MetaContract {
       name
       schemaName
       query { all one create update delete }
-      fields { name type { pgType gqlType isArray } }
+      fields { name type { pgType gqlType isArray subtype } }
       indexes { name isUnique isPrimary columns fields { name } }
       constraints {
         primaryKey { name }
@@ -403,6 +403,7 @@ const REQUIRED_META_QUERY_PATHS = [
   'fields.type.pgType',
   'fields.type.gqlType',
   'fields.type.isArray',
+  'fields.type.subtype',
   'indexes.name',
   'indexes.isUnique',
   'indexes.isPrimary',
