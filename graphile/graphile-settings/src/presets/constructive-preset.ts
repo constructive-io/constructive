@@ -15,8 +15,10 @@ import {
 import { UnifiedSearchPreset, createMatchesOperatorFactory, createTrgmOperatorFactories } from 'graphile-search';
 import { GraphilePostgisPreset, createPostgisOperatorFactory } from 'graphile-postgis';
 import { UploadPreset } from 'graphile-upload-plugin';
+import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
+import { getPresignedUrlS3Config } from '../presigned-url-resolver';
 
 /**
  * Constructive PostGraphile v5 Preset
@@ -36,6 +38,7 @@ import { constructiveUploadFieldDefinitions } from '../upload-resolver';
  * - PostGIS support (geometry/geography types, GeoJSON scalar — auto-detects PostGIS extension)
  * - PostGIS connection filter operators (spatial filtering on geometry/geography columns)
  * - Upload plugin (file upload to S3/MinIO for image, upload, attachment domain columns)
+ * - Presigned URL plugin (requestUploadUrl, confirmUpload mutations + downloadUrl computed field)
  * - SQL expression validator (validates @sqlExpression columns in mutations)
  * - PG type mappings (maps custom types like email, url to GraphQL scalars)
  * - pgvector search (auto-discovers vector columns: filter fields, distance computed fields,
@@ -83,6 +86,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,
       maxFileSize: 10 * 1024 * 1024, // 10MB
     }),
+    PresignedUrlPreset({ s3: getPresignedUrlS3Config() }),
     SqlExpressionValidatorPreset(),
     PgTypeMappingsPreset,
     RequiredInputPreset,

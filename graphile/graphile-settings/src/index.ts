@@ -59,3 +59,6 @@ export { makePgService };
 
 // Upload utilities
 export { streamToStorage } from './upload-resolver';
+
+// Presigned URL utilities
+export { getPresignedUrlS3Config } from './presigned-url-resolver';
