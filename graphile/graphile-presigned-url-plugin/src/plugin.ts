@@ -23,7 +23,7 @@ import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
 
 import type { PresignedUrlPluginOptions } from './types';
-import { getStorageModuleConfig } from './storage-module-cache';
+import { getStorageModuleConfig, getBucketConfig } from './storage-module-cache';
 import { generatePresignedPutUrl, headObject } from './s3-signer';
 
 const log = new Logger('graphile-presigned-url:plugin');
@@ -188,20 +188,11 @@ export function createPresignedUrlPlugin(
                   }
                 }
 
-                // --- Look up the bucket (RLS enforced) ---
-                const bucketResult = await pgClient.query(
-                  `SELECT id, type, is_public, owner_id, allowed_mime_types, max_file_size
-                   FROM ${storageConfig.bucketsQualifiedName}
-                   WHERE key = $1
-                   LIMIT 1`,
-                  [bucketKey],
-                );
-
-                if (bucketResult.rows.length === 0) {
+                // --- Look up the bucket (cached; first miss queries via RLS) ---
+                const bucket = await getBucketConfig(pgClient, storageConfig, databaseId, bucketKey);
+                if (!bucket) {
                   throw new Error('BUCKET_NOT_FOUND');
                 }
-
-                const bucket = bucketResult.rows[0];
 
                 // --- Validate content type against bucket's allowed_mime_types ---
                 if (bucket.allowed_mime_types && bucket.allowed_mime_types.length > 0) {
