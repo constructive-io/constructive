@@ -28,6 +28,7 @@ export interface TypeMeta {
   isArray: boolean;
   isNotNull?: boolean;
   hasDefault?: boolean;
+  subtype?: string | null;
 }
 
 export interface IndexMeta {
@@ -140,6 +141,7 @@ export interface PgAttribute {
   notNull?: boolean;
   hasDefault?: boolean;
   description?: string | null;
+  extensions?: Record<string, unknown> | null;
 }
 
 export interface PgUnique {

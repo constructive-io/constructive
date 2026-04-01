@@ -82,6 +82,7 @@ export function buildFieldMeta(
   const pgType = attr?.codec?.name || 'unknown';
   const isNotNull = attr?.notNull || false;
   const hasDefault = attr?.hasDefault || false;
+  const subtype = (attr?.extensions as Record<string, unknown> | null | undefined)?.geometrySubtype as string | null ?? null;
 
   return {
     name,
@@ -91,6 +92,7 @@ export function buildFieldMeta(
       isArray: !!attr?.codec?.arrayOfCodec,
       isNotNull,
       hasDefault,
+      subtype,
     },
     isNotNull,
     hasDefault,

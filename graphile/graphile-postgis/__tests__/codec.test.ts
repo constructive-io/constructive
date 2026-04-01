@@ -1,6 +1,8 @@
 import type { PgCodec } from '@dataplan/pg';
 import { PostgisCodecPlugin } from '../src/plugins/codec';
 import type { GisFieldValue } from '../src/types';
+import { GisSubtype } from '../src/constants';
+import { getGISTypeModifier } from '../src/utils';
 
 // Test event shape matching the GatherHooks.pgCodecs_findPgCodec event
 interface MockEvent {
@@ -240,6 +242,82 @@ describe('PostgisCodecPlugin', () => {
         expect(codec.castFromPg).toBeDefined();
         expect(typeof codec.castFromPg).toBe('function');
       });
+    });
+  });
+
+  describe('pgCodecs_attribute hook', () => {
+    const attributeHook = (PostgisCodecPlugin as { gather: { hooks: { pgCodecs_attribute: Function } } })
+      .gather.hooks.pgCodecs_attribute;
+
+    it('should store geometrySubtype for Polygon geometry column', async () => {
+      const typmod = getGISTypeModifier(GisSubtype.Polygon, false, false, 4326);
+      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
+      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions.geometrySubtype).toBe('Polygon');
+    });
+
+    it('should store geometrySubtype for Point geometry column', async () => {
+      const typmod = getGISTypeModifier(GisSubtype.Point, false, false, 4326);
+      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
+      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions.geometrySubtype).toBe('Point');
+    });
+
+    it('should store geometrySubtype for MultiPolygon geography column', async () => {
+      const typmod = getGISTypeModifier(GisSubtype.MultiPolygon, false, false, 4326);
+      const attribute: Record<string, any> = { codec: { name: 'geography' }, extensions: {} };
+      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions.geometrySubtype).toBe('MultiPolygon');
+    });
+
+    it('should skip unconstrained geometry (atttypmod = -1)', async () => {
+      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
+      const event = { pgAttribute: { atttypmod: -1 }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should skip when atttypmod is null', async () => {
+      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
+      const event = { pgAttribute: { atttypmod: null as number | null }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should not store subtype for base Geometry (subtype=0)', async () => {
+      const typmod = getGISTypeModifier(GisSubtype.Geometry, false, false, 4326);
+      const attribute: Record<string, any> = { codec: { name: 'geometry' }, extensions: {} };
+      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should skip non-geometry codec types', async () => {
+      const typmod = getGISTypeModifier(GisSubtype.Point, false, false, 4326);
+      const attribute: Record<string, any> = { codec: { name: 'text' }, extensions: {} };
+      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should create extensions object if not present', async () => {
+      const typmod = getGISTypeModifier(GisSubtype.LineString, false, false, 4326);
+      const attribute: Record<string, any> = { codec: { name: 'geometry' } };
+      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+
+      await attributeHook({}, event);
+      expect(attribute.extensions).toBeDefined();
+      expect(attribute.extensions.geometrySubtype).toBe('LineString');
     });
   });
 });
