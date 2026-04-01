@@ -485,6 +485,147 @@ describe('graphile-search (unified search plugin)', () => {
     });
   });
 
+  // ─── orderBy + LIMIT correctness (regression tests) ─────────────────────
+
+  describe('orderBy + LIMIT returns top results (not arbitrary rows)', () => {
+    it('pgvector: LIMIT 1 with orderBy ASC returns the closest vector', async () => {
+      // Query vector [1,0,0] — doc 1 has embedding [1,0,0] (distance ≈ 0),
+      // so it must be the top result when ordering by distance ASC.
+      const allResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            where: { vectorEmbedding: { vector: [1, 0, 0], metric: COSINE } }
+            orderBy: EMBEDDING_VECTOR_DISTANCE_ASC
+          ) {
+            nodes { rowId title embeddingVectorDistance }
+          }
+        }
+      `);
+      expect(allResult.errors).toBeUndefined();
+      const allNodes = allResult.data!.allDocuments.nodes;
+      expect(allNodes.length).toBeGreaterThan(1);
+
+      // Now fetch with LIMIT 1 — should return the same first row
+      const limitResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            where: { vectorEmbedding: { vector: [1, 0, 0], metric: COSINE } }
+            orderBy: EMBEDDING_VECTOR_DISTANCE_ASC
+            first: 1
+          ) {
+            nodes { rowId title embeddingVectorDistance }
+          }
+        }
+      `);
+      expect(limitResult.errors).toBeUndefined();
+      const limitNodes = limitResult.data!.allDocuments.nodes;
+      expect(limitNodes).toHaveLength(1);
+
+      // The LIMIT 1 result must be the closest (smallest distance)
+      expect(limitNodes[0].rowId).toBe(allNodes[0].rowId);
+      expect(limitNodes[0].embeddingVectorDistance).toBe(allNodes[0].embeddingVectorDistance);
+    });
+
+    it('pgvector: results are actually sorted by distance ASC', async () => {
+      const result = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            where: { vectorEmbedding: { vector: [1, 0, 0], metric: COSINE } }
+            orderBy: EMBEDDING_VECTOR_DISTANCE_ASC
+          ) {
+            nodes { rowId embeddingVectorDistance }
+          }
+        }
+      `);
+      expect(result.errors).toBeUndefined();
+      const nodes = result.data!.allDocuments.nodes;
+      expect(nodes.length).toBeGreaterThan(1);
+
+      for (let i = 0; i < nodes.length - 1; i++) {
+        expect(nodes[i].embeddingVectorDistance).toBeLessThanOrEqual(
+          nodes[i + 1].embeddingVectorDistance!
+        );
+      }
+    });
+
+    it('BM25: LIMIT 2 with orderBy ASC returns the most relevant rows', async () => {
+      // Fetch all BM25 results sorted by score ASC (most negative = most relevant)
+      const allResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            where: { bm25Body: { query: "learning" } }
+            orderBy: BODY_BM25_SCORE_ASC
+          ) {
+            nodes { rowId title bodyBm25Score }
+          }
+        }
+      `);
+      expect(allResult.errors).toBeUndefined();
+      const allNodes = allResult.data!.allDocuments.nodes;
+      expect(allNodes.length).toBeGreaterThan(2);
+
+      // Now fetch with LIMIT 2
+      const limitResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            where: { bm25Body: { query: "learning" } }
+            orderBy: BODY_BM25_SCORE_ASC
+            first: 2
+          ) {
+            nodes { rowId title bodyBm25Score }
+          }
+        }
+      `);
+      expect(limitResult.errors).toBeUndefined();
+      const limitNodes = limitResult.data!.allDocuments.nodes;
+      expect(limitNodes).toHaveLength(2);
+
+      // The limited results must be the top-2 from the full sorted list
+      expect(limitNodes[0].rowId).toBe(allNodes[0].rowId);
+      expect(limitNodes[1].rowId).toBe(allNodes[1].rowId);
+    });
+
+    it('fullTextSearch + per-adapter orderBy: LIMIT returns top results', async () => {
+      // fullTextSearch dispatches to all text-compatible adapters.
+      // Per-adapter orderBy (e.g. BM25 score) still works correctly with LIMIT
+      // because the adapter score is a SQL-level expression.
+      // (Note: SEARCH_SCORE is a JS-computed composite and does not produce
+      //  SQL-level ORDER BY, so it should not be relied on with LIMIT.)
+      const allResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            where: { fullTextSearch: "machine learning" }
+            orderBy: BODY_BM25_SCORE_ASC
+          ) {
+            nodes { rowId title bodyBm25Score }
+          }
+        }
+      `);
+      expect(allResult.errors).toBeUndefined();
+      const allNodes = allResult.data!.allDocuments.nodes;
+      expect(allNodes.length).toBeGreaterThan(1);
+
+      // Now LIMIT 1
+      const limitResult = await query<AllDocumentsResult>(`
+        query {
+          allDocuments(
+            where: { fullTextSearch: "machine learning" }
+            orderBy: BODY_BM25_SCORE_ASC
+            first: 1
+          ) {
+            nodes { rowId title bodyBm25Score }
+          }
+        }
+      `);
+      expect(limitResult.errors).toBeUndefined();
+      const limitNodes = limitResult.data!.allDocuments.nodes;
+      expect(limitNodes).toHaveLength(1);
+
+      // Must be the most relevant BM25 row
+      expect(limitNodes[0].rowId).toBe(allNodes[0].rowId);
+    });
+  });
+
   // ─── Hybrid / multi-adapter queries ─────────────────────────────────────
 
   describe('hybrid search (multiple adapters active simultaneously)', () => {

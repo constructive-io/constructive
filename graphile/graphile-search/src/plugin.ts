@@ -182,6 +182,14 @@ export function createUnifiedSearchPlugin(
   // Per-codec cache of discovered columns, keyed by codec name
   const codecCache = new Map<string, AdapterColumnCache[]>();
 
+  // Bridge between orderBy enum apply and filter apply.
+  // The orderBy enum runs on the PgSelectStep while the filter runs on
+  // a separate query-builder object.  They share the same SQL `alias`
+  // reference, so we use a WeakMap keyed by that alias to pass the
+  // requested sort direction from the orderBy (which fires first) to
+  // the filter (which fires second and has the score expression).
+  const _pendingOrderDirections = new WeakMap<object, Record<string, string>>();
+
   /**
    * Get (or compute) the adapter columns for a given codec.
    *
@@ -634,11 +642,19 @@ export function createUnifiedSearchPlugin(
                 codec: codec as any,
                 attributeName: column.attributeName,
               });
-              const metaKey = `unified_order_${adapter.name}_${baseFieldName}`;
+              const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
               const makePlan =
                 (direction: 'ASC' | 'DESC') => (step: any) => {
-                  if (typeof step.setMeta === 'function') {
-                    step.setMeta(metaKey, direction);
+                  // Store the requested direction keyed by the SQL alias so
+                  // the filter's apply (which runs second) can read it.
+                  const aliasKey = step?.alias;
+                  if (aliasKey) {
+                    let dirs = _pendingOrderDirections.get(aliasKey);
+                    if (!dirs) {
+                      dirs = {};
+                      _pendingOrderDirections.set(aliasKey, dirs);
+                    }
+                    dirs[orderKey] = direction;
                   }
                 };
 
@@ -679,8 +695,14 @@ export function createUnifiedSearchPlugin(
 
             const makeSearchScorePlan =
               (direction: 'ASC' | 'DESC') => (step: any) => {
-                if (typeof step.setMeta === 'function') {
-                  step.setMeta('unified_order_search_score', direction);
+                const aliasKey = step?.alias;
+                if (aliasKey) {
+                  let dirs = _pendingOrderDirections.get(aliasKey);
+                  if (!dirs) {
+                    dirs = {};
+                    _pendingOrderDirections.set(aliasKey, dirs);
+                  }
+                  dirs['unified_order_search_score'] = direction;
                 }
               };
 
@@ -812,12 +834,12 @@ export function createUnifiedSearchPlugin(
                           qb.setMeta(scoreMetaKey, {
                             selectIndex: scoreIndex,
                           } as SearchScoreDetails);
-                        }
 
-                        // ORDER BY: only add when explicitly requested
-                        if (qb && typeof qb.getMetaRaw === 'function') {
-                          const orderMetaKey = `unified_order_${adapter.name}_${baseFieldName}`;
-                          const explicitDir = qb.getMetaRaw(orderMetaKey);
+                          // ORDER BY: read the direction stored by the orderBy
+                          // enum (which ran first) via the shared alias key.
+                          const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
+                          const dirs = _pendingOrderDirections.get($condition.alias);
+                          const explicitDir = dirs?.[orderKey];
                           if (explicitDir) {
                             qb.orderBy({
                               fragment: result.scoreExpression,
@@ -905,17 +927,17 @@ export function createUnifiedSearchPlugin(
                                 selectIndex: scoreIndex,
                               } as SearchScoreDetails);
 
-                              // ORDER BY: only add when explicitly requested via orderBy enum
-                              if (typeof qb.getMetaRaw === 'function') {
-                                const orderMetaKey = `unified_order_${adapter.name}_${baseFieldName}`;
-                                const explicitDir = qb.getMetaRaw(orderMetaKey);
-                                if (explicitDir) {
-                                  qb.orderBy({
-                                    fragment: result.scoreExpression,
-                                    codec: TYPES.float,
-                                    direction: explicitDir,
-                                  });
-                                }
+                              // ORDER BY: read the direction stored by the orderBy
+                              // enum (which ran first) via the shared alias key.
+                              const orderKey = `unified_order_${adapter.name}_${baseFieldName}`;
+                              const dirs = _pendingOrderDirections.get($condition.alias);
+                              const explicitDir = dirs?.[orderKey];
+                              if (explicitDir) {
+                                qb.orderBy({
+                                  fragment: result.scoreExpression,
+                                  codec: TYPES.float,
+                                  direction: explicitDir,
+                                });
                               }
                             }
                           }
