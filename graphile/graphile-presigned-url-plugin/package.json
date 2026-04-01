@@ -1,0 +1,61 @@
+{
+  "name": "graphile-presigned-url-plugin",
+  "version": "0.1.0",
+  "description": "Presigned URL upload plugin for PostGraphile v5 — requestUploadUrl, confirmUpload mutations and downloadUrl computed field",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "plugin",
+    "postgres",
+    "graphql",
+    "presigned-url",
+    "upload",
+    "s3"
+  ],
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1009.0",
+    "@aws-sdk/s3-request-presigner": "^3.1009.0",
+    "@pgpmjs/logger": "workspace:^",
+    "lru-cache": "^11.2.7"
+  },
+  "peerDependencies": {
+    "grafast": "1.0.0",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
+    "graphile-utils": "5.0.0",
+    "graphql": "16.13.0",
+    "postgraphile": "5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "makage": "^0.1.10"
+  }
+}
