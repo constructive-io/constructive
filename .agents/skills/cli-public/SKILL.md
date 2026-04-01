@@ -1,13 +1,13 @@
 ---
 name: cli-public
-description: CLI tool (csdk) for the public API — provides CRUD commands for 107 tables and 55 custom operations
+description: CLI tool (csdk) for the public API — provides CRUD commands for 109 tables and 61 custom operations
 ---
 
 # cli-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the public API — provides CRUD commands for 107 tables and 55 custom operations
+CLI tool (csdk) for the public API — provides CRUD commands for 109 tables and 61 custom operations
 
 ## Usage
 
@@ -23,13 +23,13 @@ csdk auth set-token <token>
 csdk config set <key> <value>
 csdk config get <key>
 
-# CRUD for any table (e.g. get-all-record)
-csdk get-all-record list
-csdk get-all-record get --id <value>
-csdk get-all-record create --<field> <value>
+# CRUD for any table (e.g. org-get-managers-record)
+csdk org-get-managers-record list
+csdk org-get-managers-record get --id <value>
+csdk org-get-managers-record create --<field> <value>
 
 # Non-interactive mode (skip all prompts, use flags only)
-csdk --no-tty get-all-record list
+csdk --no-tty org-get-managers-record list
 ```
 
 ## Examples
@@ -40,13 +40,13 @@ csdk --no-tty get-all-record list
 csdk context create local --endpoint http://localhost:5000/graphql
 csdk context use local
 csdk auth set-token <token>
-csdk get-all-record list
+csdk org-get-managers-record list
 ```
 
 ### Non-interactive mode (for scripts and CI)
 
 ```bash
-csdk --no-tty get-all-record create --<field> <value>
+csdk --no-tty org-get-managers-record create --<field> <value>
 ```
 
 ## References
@@ -56,9 +56,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [context](references/context.md)
 - [auth](references/auth.md)
 - [config](references/config.md)
-- [get-all-record](references/get-all-record.md)
 - [org-get-managers-record](references/org-get-managers-record.md)
 - [org-get-subordinates-record](references/org-get-subordinates-record.md)
+- [get-all-record](references/get-all-record.md)
 - [object](references/object.md)
 - [app-permission](references/app-permission.md)
 - [org-permission](references/org-permission.md)
@@ -119,6 +119,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [users-module](references/users-module.md)
 - [blueprint](references/blueprint.md)
 - [blueprint-template](references/blueprint-template.md)
+- [blueprint-construction](references/blueprint-construction.md)
+- [storage-module](references/storage-module.md)
 - [database-provision-module](references/database-provision-module.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
@@ -149,9 +151,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [store](references/store.md)
 - [app-permission-default](references/app-permission-default.md)
 - [role-type](references/role-type.md)
-- [migrate-file](references/migrate-file.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
+- [migrate-file](references/migrate-file.md)
 - [membership-type](references/membership-type.md)
 - [commit](references/commit.md)
 - [app-membership-default](references/app-membership-default.md)
@@ -173,6 +175,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-is-manager-of](references/org-is-manager-of.md)
 - [app-permissions-get-mask](references/app-permissions-get-mask.md)
 - [org-permissions-get-mask](references/org-permissions-get-mask.md)
+- [resolve-blueprint-table](references/resolve-blueprint-table.md)
 - [app-permissions-get-mask-by-names](references/app-permissions-get-mask-by-names.md)
 - [org-permissions-get-mask-by-names](references/org-permissions-get-mask-by-names.md)
 - [get-all-objects-from-root](references/get-all-objects-from-root.md)
@@ -198,15 +201,19 @@ See the `references/` directory for detailed per-entity API documentation:
 - [construct-blueprint](references/construct-blueprint.md)
 - [reset-password](references/reset-password.md)
 - [remove-node-at-path](references/remove-node-at-path.md)
-- [set-data-at-path](references/set-data-at-path.md)
-- [set-props-and-commit](references/set-props-and-commit.md)
 - [copy-template-to-blueprint](references/copy-template-to-blueprint.md)
-- [provision-database-with-user](references/provision-database-with-user.md)
 - [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
+- [provision-unique-constraint](references/provision-unique-constraint.md)
+- [provision-full-text-search](references/provision-full-text-search.md)
+- [provision-index](references/provision-index.md)
+- [set-data-at-path](references/set-data-at-path.md)
+- [set-props-and-commit](references/set-props-and-commit.md)
+- [provision-database-with-user](references/provision-database-with-user.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
 - [update-node-at-path](references/update-node-at-path.md)
 - [set-and-commit](references/set-and-commit.md)
+- [provision-relation](references/provision-relation.md)
 - [apply-rls](references/apply-rls.md)
 - [sign-in-one-time-token](references/sign-in-one-time-token.md)
 - [create-user-database](references/create-user-database.md)
@@ -214,6 +221,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [sign-in](references/sign-in.md)
 - [sign-up](references/sign-up.md)
 - [one-time-token](references/one-time-token.md)
+- [provision-table](references/provision-table.md)
 - [send-verification-email](references/send-verification-email.md)
 - [forgot-password](references/forgot-password.md)
 - [verify-password](references/verify-password.md)

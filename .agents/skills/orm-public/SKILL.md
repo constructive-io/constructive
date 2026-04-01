@@ -1,13 +1,13 @@
 ---
 name: orm-public
-description: ORM client for the public API — provides typed CRUD operations for 107 tables and 55 custom operations
+description: ORM client for the public API — provides typed CRUD operations for 109 tables and 61 custom operations
 ---
 
 # orm-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the public API — provides typed CRUD operations for 107 tables and 55 custom operations
+ORM client for the public API — provides typed CRUD operations for 109 tables and 61 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the public API — provides typed CRUD operations for 107 tables 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: getAllRecord, orgGetManagersRecord, orgGetSubordinatesRecord, object, appPermission, orgPermission, appLevelRequirement, database, ...
+// Available models: orgGetManagersRecord, orgGetSubordinatesRecord, getAllRecord, object, appPermission, orgPermission, appLevelRequirement, database, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -28,7 +28,7 @@ db.<model>.delete({ where: { id: '<UUID>' } }).execute()
 ### Query records
 
 ```typescript
-const items = await db.getAllRecord.findMany({
+const items = await db.orgGetManagersRecord.findMany({
   select: { id: true }
 }).execute();
 ```
@@ -37,9 +37,9 @@ const items = await db.getAllRecord.findMany({
 
 See the `references/` directory for detailed per-entity API documentation:
 
-- [get-all-record](references/get-all-record.md)
 - [org-get-managers-record](references/org-get-managers-record.md)
 - [org-get-subordinates-record](references/org-get-subordinates-record.md)
+- [get-all-record](references/get-all-record.md)
 - [object](references/object.md)
 - [app-permission](references/app-permission.md)
 - [org-permission](references/org-permission.md)
@@ -100,6 +100,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [users-module](references/users-module.md)
 - [blueprint](references/blueprint.md)
 - [blueprint-template](references/blueprint-template.md)
+- [blueprint-construction](references/blueprint-construction.md)
+- [storage-module](references/storage-module.md)
 - [database-provision-module](references/database-provision-module.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
@@ -130,9 +132,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [store](references/store.md)
 - [app-permission-default](references/app-permission-default.md)
 - [role-type](references/role-type.md)
-- [migrate-file](references/migrate-file.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
+- [migrate-file](references/migrate-file.md)
 - [membership-type](references/membership-type.md)
 - [commit](references/commit.md)
 - [app-membership-default](references/app-membership-default.md)
@@ -154,6 +156,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-is-manager-of](references/org-is-manager-of.md)
 - [app-permissions-get-mask](references/app-permissions-get-mask.md)
 - [org-permissions-get-mask](references/org-permissions-get-mask.md)
+- [resolve-blueprint-table](references/resolve-blueprint-table.md)
 - [app-permissions-get-mask-by-names](references/app-permissions-get-mask-by-names.md)
 - [org-permissions-get-mask-by-names](references/org-permissions-get-mask-by-names.md)
 - [get-all-objects-from-root](references/get-all-objects-from-root.md)
@@ -179,15 +182,19 @@ See the `references/` directory for detailed per-entity API documentation:
 - [construct-blueprint](references/construct-blueprint.md)
 - [reset-password](references/reset-password.md)
 - [remove-node-at-path](references/remove-node-at-path.md)
-- [set-data-at-path](references/set-data-at-path.md)
-- [set-props-and-commit](references/set-props-and-commit.md)
 - [copy-template-to-blueprint](references/copy-template-to-blueprint.md)
-- [provision-database-with-user](references/provision-database-with-user.md)
 - [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
+- [provision-unique-constraint](references/provision-unique-constraint.md)
+- [provision-full-text-search](references/provision-full-text-search.md)
+- [provision-index](references/provision-index.md)
+- [set-data-at-path](references/set-data-at-path.md)
+- [set-props-and-commit](references/set-props-and-commit.md)
+- [provision-database-with-user](references/provision-database-with-user.md)
 - [insert-node-at-path](references/insert-node-at-path.md)
 - [update-node-at-path](references/update-node-at-path.md)
 - [set-and-commit](references/set-and-commit.md)
+- [provision-relation](references/provision-relation.md)
 - [apply-rls](references/apply-rls.md)
 - [sign-in-one-time-token](references/sign-in-one-time-token.md)
 - [create-user-database](references/create-user-database.md)
@@ -195,6 +202,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [sign-in](references/sign-in.md)
 - [sign-up](references/sign-up.md)
 - [one-time-token](references/one-time-token.md)
+- [provision-table](references/provision-table.md)
 - [send-verification-email](references/send-verification-email.md)
 - [forgot-password](references/forgot-password.md)
 - [verify-password](references/verify-password.md)

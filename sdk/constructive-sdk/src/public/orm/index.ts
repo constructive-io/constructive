@@ -5,9 +5,9 @@
  */
 import { OrmClient } from './client';
 import type { OrmClientConfig } from './client';
-import { GetAllRecordModel } from './models/getAllRecord';
 import { OrgGetManagersRecordModel } from './models/orgGetManagersRecord';
 import { OrgGetSubordinatesRecordModel } from './models/orgGetSubordinatesRecord';
+import { GetAllRecordModel } from './models/getAllRecord';
 import { ObjectModel } from './models/object';
 import { AppPermissionModel } from './models/appPermission';
 import { OrgPermissionModel } from './models/orgPermission';
@@ -68,6 +68,8 @@ import { UserAuthModuleModel } from './models/userAuthModule';
 import { UsersModuleModel } from './models/usersModule';
 import { BlueprintModel } from './models/blueprint';
 import { BlueprintTemplateModel } from './models/blueprintTemplate';
+import { BlueprintConstructionModel } from './models/blueprintConstruction';
+import { StorageModuleModel } from './models/storageModule';
 import { DatabaseProvisionModuleModel } from './models/databaseProvisionModule';
 import { AppAdminGrantModel } from './models/appAdminGrant';
 import { AppOwnerGrantModel } from './models/appOwnerGrant';
@@ -98,9 +100,9 @@ import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
 import { AppPermissionDefaultModel } from './models/appPermissionDefault';
 import { RoleTypeModel } from './models/roleType';
-import { MigrateFileModel } from './models/migrateFile';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
+import { MigrateFileModel } from './models/migrateFile';
 import { MembershipTypeModel } from './models/membershipType';
 import { CommitModel } from './models/commit';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
@@ -147,9 +149,9 @@ export { createMutationOperations } from './mutation';
 export function createClient(config: OrmClientConfig) {
   const client = new OrmClient(config);
   return {
-    getAllRecord: new GetAllRecordModel(client),
     orgGetManagersRecord: new OrgGetManagersRecordModel(client),
     orgGetSubordinatesRecord: new OrgGetSubordinatesRecordModel(client),
+    getAllRecord: new GetAllRecordModel(client),
     object: new ObjectModel(client),
     appPermission: new AppPermissionModel(client),
     orgPermission: new OrgPermissionModel(client),
@@ -210,6 +212,8 @@ export function createClient(config: OrmClientConfig) {
     usersModule: new UsersModuleModel(client),
     blueprint: new BlueprintModel(client),
     blueprintTemplate: new BlueprintTemplateModel(client),
+    blueprintConstruction: new BlueprintConstructionModel(client),
+    storageModule: new StorageModuleModel(client),
     databaseProvisionModule: new DatabaseProvisionModuleModel(client),
     appAdminGrant: new AppAdminGrantModel(client),
     appOwnerGrant: new AppOwnerGrantModel(client),
@@ -240,9 +244,9 @@ export function createClient(config: OrmClientConfig) {
     store: new StoreModel(client),
     appPermissionDefault: new AppPermissionDefaultModel(client),
     roleType: new RoleTypeModel(client),
-    migrateFile: new MigrateFileModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
+    migrateFile: new MigrateFileModel(client),
     membershipType: new MembershipTypeModel(client),
     commit: new CommitModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),

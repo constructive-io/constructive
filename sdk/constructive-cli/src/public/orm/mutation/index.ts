@@ -23,15 +23,19 @@ import type {
   ConstructBlueprintInput,
   ResetPasswordInput,
   RemoveNodeAtPathInput,
-  SetDataAtPathInput,
-  SetPropsAndCommitInput,
   CopyTemplateToBlueprintInput,
-  ProvisionDatabaseWithUserInput,
   BootstrapUserInput,
   SetFieldOrderInput,
+  ProvisionUniqueConstraintInput,
+  ProvisionFullTextSearchInput,
+  ProvisionIndexInput,
+  SetDataAtPathInput,
+  SetPropsAndCommitInput,
+  ProvisionDatabaseWithUserInput,
   InsertNodeAtPathInput,
   UpdateNodeAtPathInput,
   SetAndCommitInput,
+  ProvisionRelationInput,
   ApplyRlsInput,
   SignInOneTimeTokenInput,
   CreateUserDatabaseInput,
@@ -39,6 +43,7 @@ import type {
   SignInInput,
   SignUpInput,
   OneTimeTokenInput,
+  ProvisionTableInput,
   SendVerificationEmailInput,
   ForgotPasswordInput,
   VerifyPasswordInput,
@@ -59,15 +64,19 @@ import type {
   ConstructBlueprintPayload,
   ResetPasswordPayload,
   RemoveNodeAtPathPayload,
-  SetDataAtPathPayload,
-  SetPropsAndCommitPayload,
   CopyTemplateToBlueprintPayload,
-  ProvisionDatabaseWithUserPayload,
   BootstrapUserPayload,
   SetFieldOrderPayload,
+  ProvisionUniqueConstraintPayload,
+  ProvisionFullTextSearchPayload,
+  ProvisionIndexPayload,
+  SetDataAtPathPayload,
+  SetPropsAndCommitPayload,
+  ProvisionDatabaseWithUserPayload,
   InsertNodeAtPathPayload,
   UpdateNodeAtPathPayload,
   SetAndCommitPayload,
+  ProvisionRelationPayload,
   ApplyRlsPayload,
   SignInOneTimeTokenPayload,
   CreateUserDatabasePayload,
@@ -75,6 +84,7 @@ import type {
   SignInPayload,
   SignUpPayload,
   OneTimeTokenPayload,
+  ProvisionTablePayload,
   SendVerificationEmailPayload,
   ForgotPasswordPayload,
   VerifyPasswordPayload,
@@ -95,15 +105,19 @@ import type {
   ConstructBlueprintPayloadSelect,
   ResetPasswordPayloadSelect,
   RemoveNodeAtPathPayloadSelect,
-  SetDataAtPathPayloadSelect,
-  SetPropsAndCommitPayloadSelect,
   CopyTemplateToBlueprintPayloadSelect,
-  ProvisionDatabaseWithUserPayloadSelect,
   BootstrapUserPayloadSelect,
   SetFieldOrderPayloadSelect,
+  ProvisionUniqueConstraintPayloadSelect,
+  ProvisionFullTextSearchPayloadSelect,
+  ProvisionIndexPayloadSelect,
+  SetDataAtPathPayloadSelect,
+  SetPropsAndCommitPayloadSelect,
+  ProvisionDatabaseWithUserPayloadSelect,
   InsertNodeAtPathPayloadSelect,
   UpdateNodeAtPathPayloadSelect,
   SetAndCommitPayloadSelect,
+  ProvisionRelationPayloadSelect,
   ApplyRlsPayloadSelect,
   SignInOneTimeTokenPayloadSelect,
   CreateUserDatabasePayloadSelect,
@@ -111,6 +125,7 @@ import type {
   SignInPayloadSelect,
   SignUpPayloadSelect,
   OneTimeTokenPayloadSelect,
+  ProvisionTablePayloadSelect,
   SendVerificationEmailPayloadSelect,
   ForgotPasswordPayloadSelect,
   VerifyPasswordPayloadSelect,
@@ -158,7 +173,7 @@ export interface InitEmptyRepoVariables {
 }
 /**
  * Variables for constructBlueprint
- * Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
+ * Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure.
  */
 export interface ConstructBlueprintVariables {
   input: ConstructBlueprintInput;
@@ -169,12 +184,6 @@ export interface ResetPasswordVariables {
 export interface RemoveNodeAtPathVariables {
   input: RemoveNodeAtPathInput;
 }
-export interface SetDataAtPathVariables {
-  input: SetDataAtPathInput;
-}
-export interface SetPropsAndCommitVariables {
-  input: SetPropsAndCommitInput;
-}
 /**
  * Variables for copyTemplateToBlueprint
  * Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
@@ -182,14 +191,41 @@ export interface SetPropsAndCommitVariables {
 export interface CopyTemplateToBlueprintVariables {
   input: CopyTemplateToBlueprintInput;
 }
-export interface ProvisionDatabaseWithUserVariables {
-  input: ProvisionDatabaseWithUserInput;
-}
 export interface BootstrapUserVariables {
   input: BootstrapUserInput;
 }
 export interface SetFieldOrderVariables {
   input: SetFieldOrderInput;
+}
+/**
+ * Variables for provisionUniqueConstraint
+ * Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
+ */
+export interface ProvisionUniqueConstraintVariables {
+  input: ProvisionUniqueConstraintInput;
+}
+/**
+ * Variables for provisionFullTextSearch
+ * Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
+ */
+export interface ProvisionFullTextSearchVariables {
+  input: ProvisionFullTextSearchInput;
+}
+/**
+ * Variables for provisionIndex
+ * Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
+ */
+export interface ProvisionIndexVariables {
+  input: ProvisionIndexInput;
+}
+export interface SetDataAtPathVariables {
+  input: SetDataAtPathInput;
+}
+export interface SetPropsAndCommitVariables {
+  input: SetPropsAndCommitInput;
+}
+export interface ProvisionDatabaseWithUserVariables {
+  input: ProvisionDatabaseWithUserInput;
 }
 export interface InsertNodeAtPathVariables {
   input: InsertNodeAtPathInput;
@@ -199,6 +235,13 @@ export interface UpdateNodeAtPathVariables {
 }
 export interface SetAndCommitVariables {
   input: SetAndCommitInput;
+}
+/**
+ * Variables for provisionRelation
+ * Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
+ */
+export interface ProvisionRelationVariables {
+  input: ProvisionRelationInput;
 }
 export interface ApplyRlsVariables {
   input: ApplyRlsInput;
@@ -239,6 +282,13 @@ export interface SignUpVariables {
 }
 export interface OneTimeTokenVariables {
   input: OneTimeTokenInput;
+}
+/**
+ * Variables for provisionTable
+ * Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+ */
+export interface ProvisionTableVariables {
+  input: ProvisionTableInput;
 }
 export interface SendVerificationEmailVariables {
   input: SendVerificationEmailInput;
@@ -718,64 +768,6 @@ export function createMutationOperations(client: OrmClient) {
           'RemoveNodeAtPathPayload'
         ),
       }),
-    setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
-      args: SetDataAtPathVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetDataAtPathPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setDataAtPath: InferSelectResult<SetDataAtPathPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetDataAtPath',
-        fieldName: 'setDataAtPath',
-        ...buildCustomDocument(
-          'mutation',
-          'SetDataAtPath',
-          'setDataAtPath',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetDataAtPathInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetDataAtPathPayload'
-        ),
-      }),
-    setPropsAndCommit: <S extends SetPropsAndCommitPayloadSelect>(
-      args: SetPropsAndCommitVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, SetPropsAndCommitPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        setPropsAndCommit: InferSelectResult<SetPropsAndCommitPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'SetPropsAndCommit',
-        fieldName: 'setPropsAndCommit',
-        ...buildCustomDocument(
-          'mutation',
-          'SetPropsAndCommit',
-          'setPropsAndCommit',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'SetPropsAndCommitInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'SetPropsAndCommitPayload'
-        ),
-      }),
     copyTemplateToBlueprint: <S extends CopyTemplateToBlueprintPayloadSelect>(
       args: CopyTemplateToBlueprintVariables,
       options: {
@@ -803,35 +795,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CopyTemplateToBlueprintPayload'
-        ),
-      }),
-    provisionDatabaseWithUser: <S extends ProvisionDatabaseWithUserPayloadSelect>(
-      args: ProvisionDatabaseWithUserVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, ProvisionDatabaseWithUserPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        provisionDatabaseWithUser: InferSelectResult<ProvisionDatabaseWithUserPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'ProvisionDatabaseWithUser',
-        fieldName: 'provisionDatabaseWithUser',
-        ...buildCustomDocument(
-          'mutation',
-          'ProvisionDatabaseWithUser',
-          'provisionDatabaseWithUser',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'ProvisionDatabaseWithUserInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'ProvisionDatabaseWithUserPayload'
         ),
       }),
     bootstrapUser: <S extends BootstrapUserPayloadSelect>(
@@ -890,6 +853,180 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetFieldOrderPayload'
+        ),
+      }),
+    provisionUniqueConstraint: <S extends ProvisionUniqueConstraintPayloadSelect>(
+      args: ProvisionUniqueConstraintVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionUniqueConstraintPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionUniqueConstraint: InferSelectResult<ProvisionUniqueConstraintPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionUniqueConstraint',
+        fieldName: 'provisionUniqueConstraint',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionUniqueConstraint',
+          'provisionUniqueConstraint',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionUniqueConstraintInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionUniqueConstraintPayload'
+        ),
+      }),
+    provisionFullTextSearch: <S extends ProvisionFullTextSearchPayloadSelect>(
+      args: ProvisionFullTextSearchVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionFullTextSearchPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionFullTextSearch: InferSelectResult<ProvisionFullTextSearchPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionFullTextSearch',
+        fieldName: 'provisionFullTextSearch',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionFullTextSearch',
+          'provisionFullTextSearch',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionFullTextSearchInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionFullTextSearchPayload'
+        ),
+      }),
+    provisionIndex: <S extends ProvisionIndexPayloadSelect>(
+      args: ProvisionIndexVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionIndexPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionIndex: InferSelectResult<ProvisionIndexPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionIndex',
+        fieldName: 'provisionIndex',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionIndex',
+          'provisionIndex',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionIndexInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionIndexPayload'
+        ),
+      }),
+    setDataAtPath: <S extends SetDataAtPathPayloadSelect>(
+      args: SetDataAtPathVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetDataAtPathPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setDataAtPath: InferSelectResult<SetDataAtPathPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetDataAtPath',
+        fieldName: 'setDataAtPath',
+        ...buildCustomDocument(
+          'mutation',
+          'SetDataAtPath',
+          'setDataAtPath',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetDataAtPathInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetDataAtPathPayload'
+        ),
+      }),
+    setPropsAndCommit: <S extends SetPropsAndCommitPayloadSelect>(
+      args: SetPropsAndCommitVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SetPropsAndCommitPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        setPropsAndCommit: InferSelectResult<SetPropsAndCommitPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SetPropsAndCommit',
+        fieldName: 'setPropsAndCommit',
+        ...buildCustomDocument(
+          'mutation',
+          'SetPropsAndCommit',
+          'setPropsAndCommit',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SetPropsAndCommitInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SetPropsAndCommitPayload'
+        ),
+      }),
+    provisionDatabaseWithUser: <S extends ProvisionDatabaseWithUserPayloadSelect>(
+      args: ProvisionDatabaseWithUserVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionDatabaseWithUserPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionDatabaseWithUser: InferSelectResult<ProvisionDatabaseWithUserPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionDatabaseWithUser',
+        fieldName: 'provisionDatabaseWithUser',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionDatabaseWithUser',
+          'provisionDatabaseWithUser',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionDatabaseWithUserInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionDatabaseWithUserPayload'
         ),
       }),
     insertNodeAtPath: <S extends InsertNodeAtPathPayloadSelect>(
@@ -977,6 +1114,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'SetAndCommitPayload'
+        ),
+      }),
+    provisionRelation: <S extends ProvisionRelationPayloadSelect>(
+      args: ProvisionRelationVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionRelationPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionRelation: InferSelectResult<ProvisionRelationPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionRelation',
+        fieldName: 'provisionRelation',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionRelation',
+          'provisionRelation',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionRelationInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionRelationPayload'
         ),
       }),
     applyRls: <S extends ApplyRlsPayloadSelect>(
@@ -1180,6 +1346,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'OneTimeTokenPayload'
+        ),
+      }),
+    provisionTable: <S extends ProvisionTablePayloadSelect>(
+      args: ProvisionTableVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionTablePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionTable: InferSelectResult<ProvisionTablePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionTable',
+        fieldName: 'provisionTable',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionTable',
+          'provisionTable',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionTableInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionTablePayload'
         ),
       }),
     sendVerificationEmail: <S extends SendVerificationEmailPayloadSelect>(

@@ -25,6 +25,7 @@ import type {
   AstMigration,
   AuditLog,
   Blueprint,
+  BlueprintConstruction,
   BlueprintTemplate,
   CheckConstraint,
   ClaimedInvite,
@@ -98,6 +99,7 @@ import type {
   SiteModule,
   SiteTheme,
   SqlAction,
+  StorageModule,
   Store,
   Table,
   TableGrant,
@@ -653,12 +655,10 @@ export type SecureTableProvisionOrderBy =
   | 'TABLE_ID_DESC'
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC'
-  | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
+  | 'NODES_ASC'
+  | 'NODES_DESC'
   | 'USE_RLS_ASC'
   | 'USE_RLS_DESC'
-  | 'NODE_DATA_ASC'
-  | 'NODE_DATA_DESC'
   | 'FIELDS_ASC'
   | 'FIELDS_DESC'
   | 'GRANT_ROLES_ASC'
@@ -718,10 +718,8 @@ export type RelationProvisionOrderBy =
   | 'CREATE_INDEX_DESC'
   | 'EXPOSE_IN_API_ASC'
   | 'EXPOSE_IN_API_DESC'
-  | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'NODE_DATA_ASC'
-  | 'NODE_DATA_DESC'
+  | 'NODES_ASC'
+  | 'NODES_DESC'
   | 'GRANT_ROLES_ASC'
   | 'GRANT_ROLES_DESC'
   | 'GRANT_PRIVILEGES_ASC'
@@ -1733,16 +1731,6 @@ export type BlueprintOrderBy =
   | 'DEFINITION_DESC'
   | 'TEMPLATE_ID_ASC'
   | 'TEMPLATE_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'CONSTRUCTED_AT_ASC'
-  | 'CONSTRUCTED_AT_DESC'
-  | 'ERROR_DETAILS_ASC'
-  | 'ERROR_DETAILS_DESC'
-  | 'REF_MAP_ASC'
-  | 'REF_MAP_DESC'
-  | 'CONSTRUCTED_DEFINITION_ASC'
-  | 'CONSTRUCTED_DEFINITION_DESC'
   | 'DEFINITION_HASH_ASC'
   | 'DEFINITION_HASH_DESC'
   | 'TABLE_HASHES_ASC'
@@ -1751,6 +1739,70 @@ export type BlueprintOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `BlueprintConstruction`. */
+export type BlueprintConstructionOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'BLUEPRINT_ID_ASC'
+  | 'BLUEPRINT_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'ERROR_DETAILS_ASC'
+  | 'ERROR_DETAILS_DESC'
+  | 'TABLE_MAP_ASC'
+  | 'TABLE_MAP_DESC'
+  | 'CONSTRUCTED_DEFINITION_ASC'
+  | 'CONSTRUCTED_DEFINITION_DESC'
+  | 'CONSTRUCTED_AT_ASC'
+  | 'CONSTRUCTED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `StorageModule`. */
+export type StorageModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'BUCKETS_TABLE_ID_ASC'
+  | 'BUCKETS_TABLE_ID_DESC'
+  | 'FILES_TABLE_ID_ASC'
+  | 'FILES_TABLE_ID_DESC'
+  | 'UPLOAD_REQUESTS_TABLE_ID_ASC'
+  | 'UPLOAD_REQUESTS_TABLE_ID_DESC'
+  | 'BUCKETS_TABLE_NAME_ASC'
+  | 'BUCKETS_TABLE_NAME_DESC'
+  | 'FILES_TABLE_NAME_ASC'
+  | 'FILES_TABLE_NAME_DESC'
+  | 'UPLOAD_REQUESTS_TABLE_NAME_ASC'
+  | 'UPLOAD_REQUESTS_TABLE_NAME_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'UPLOAD_URL_EXPIRY_SECONDS_ASC'
+  | 'UPLOAD_URL_EXPIRY_SECONDS_DESC'
+  | 'DOWNLOAD_URL_EXPIRY_SECONDS_ASC'
+  | 'DOWNLOAD_URL_EXPIRY_SECONDS_DESC'
+  | 'DEFAULT_MAX_FILE_SIZE_ASC'
+  | 'DEFAULT_MAX_FILE_SIZE_DESC'
+  | 'MAX_FILENAME_LENGTH_ASC'
+  | 'MAX_FILENAME_LENGTH_DESC'
+  | 'CACHE_TTL_SECONDS_ASC'
+  | 'CACHE_TTL_SECONDS_DESC';
 /** Methods to use when ordering `DatabaseProvisionModule`. */
 export type DatabaseProvisionModuleOrderBy =
   | 'NATURAL'
@@ -2354,15 +2406,6 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
-/** Methods to use when ordering `MigrateFile`. */
-export type MigrateFileOrderBy =
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'UPLOAD_ASC'
-  | 'UPLOAD_DESC';
 /** Methods to use when ordering `AppLimitDefault`. */
 export type AppLimitDefaultOrderBy =
   | 'NATURAL'
@@ -2385,6 +2428,15 @@ export type OrgLimitDefaultOrderBy =
   | 'NAME_DESC'
   | 'MAX_ASC'
   | 'MAX_DESC';
+/** Methods to use when ordering `MigrateFile`. */
+export type MigrateFileOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'UPLOAD_ASC'
+  | 'UPLOAD_DESC';
 /** Methods to use when ordering `MembershipType`. */
 export type MembershipTypeOrderBy =
   | 'NATURAL'
@@ -3068,6 +3120,14 @@ export interface DatabaseFilter {
   blueprints?: DatabaseToManyBlueprintFilter;
   /** `blueprints` exist. */
   blueprintsExist?: boolean;
+  /** Filter by the object’s `blueprintConstructions` relation. */
+  blueprintConstructions?: DatabaseToManyBlueprintConstructionFilter;
+  /** `blueprintConstructions` exist. */
+  blueprintConstructionsExist?: boolean;
+  /** Filter by the object’s `storageModules` relation. */
+  storageModules?: DatabaseToManyStorageModuleFilter;
+  /** `storageModules` exist. */
+  storageModulesExist?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -5643,12 +5703,10 @@ export interface SecureTableProvisionFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  /** Filter by the object’s `nodeType` field. */
-  nodeType?: StringFilter;
+  /** Filter by the object’s `nodes` field. */
+  nodes?: JSONFilter;
   /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
-  /** Filter by the object’s `nodeData` field. */
-  nodeData?: JSONFilter;
   /** Filter by the object’s `fields` field. */
   fields?: JSONListFilter;
   /** Filter by the object’s `grantRoles` field. */
@@ -5766,10 +5824,8 @@ export interface RelationProvisionFilter {
   createIndex?: BooleanFilter;
   /** Filter by the object’s `exposeInApi` field. */
   exposeInApi?: BooleanFilter;
-  /** Filter by the object’s `nodeType` field. */
-  nodeType?: StringFilter;
-  /** Filter by the object’s `nodeData` field. */
-  nodeData?: JSONFilter;
+  /** Filter by the object’s `nodes` field. */
+  nodes?: JSONFilter;
   /** Filter by the object’s `grantRoles` field. */
   grantRoles?: StringListFilter;
   /** Filter by the object’s `grantPrivileges` field. */
@@ -8100,16 +8156,6 @@ export interface BlueprintFilter {
   definition?: JSONFilter;
   /** Filter by the object’s `templateId` field. */
   templateId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `constructedAt` field. */
-  constructedAt?: DatetimeFilter;
-  /** Filter by the object’s `errorDetails` field. */
-  errorDetails?: StringFilter;
-  /** Filter by the object’s `refMap` field. */
-  refMap?: JSONFilter;
-  /** Filter by the object’s `constructedDefinition` field. */
-  constructedDefinition?: JSONFilter;
   /** Filter by the object’s `definitionHash` field. */
   definitionHash?: UUIDFilter;
   /** Filter by the object’s `tableHashes` field. */
@@ -8130,6 +8176,10 @@ export interface BlueprintFilter {
   template?: BlueprintTemplateFilter;
   /** A related `template` exists. */
   templateExists?: boolean;
+  /** Filter by the object’s `blueprintConstructions` relation. */
+  blueprintConstructions?: BlueprintToManyBlueprintConstructionFilter;
+  /** `blueprintConstructions` exist. */
+  blueprintConstructionsExist?: boolean;
 }
 /** A filter to be used against `BlueprintTemplate` object types. All fields are combined with a logical ‘and.’ */
 export interface BlueprintTemplateFilter {
@@ -8209,6 +8259,125 @@ export interface BlueprintTemplateToManyBlueprintFilter {
   every?: BlueprintFilter;
   /** Filters to entities where no related entity matches. */
   none?: BlueprintFilter;
+}
+/** A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintToManyBlueprintConstructionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintConstructionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintConstructionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintConstructionFilter;
+}
+/** A filter to be used against `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintConstructionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `blueprintId` field. */
+  blueprintId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `errorDetails` field. */
+  errorDetails?: StringFilter;
+  /** Filter by the object’s `tableMap` field. */
+  tableMap?: JSONFilter;
+  /** Filter by the object’s `constructedDefinition` field. */
+  constructedDefinition?: JSONFilter;
+  /** Filter by the object’s `constructedAt` field. */
+  constructedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintConstructionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintConstructionFilter[];
+  /** Negates the expression. */
+  not?: BlueprintConstructionFilter;
+  /** Filter by the object’s `blueprint` relation. */
+  blueprint?: BlueprintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyBlueprintConstructionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintConstructionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintConstructionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintConstructionFilter;
+}
+/** A filter to be used against many `StorageModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyStorageModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: StorageModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: StorageModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: StorageModuleFilter;
+}
+/** A filter to be used against `StorageModule` object types. All fields are combined with a logical ‘and.’ */
+export interface StorageModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `bucketsTableId` field. */
+  bucketsTableId?: UUIDFilter;
+  /** Filter by the object’s `filesTableId` field. */
+  filesTableId?: UUIDFilter;
+  /** Filter by the object’s `uploadRequestsTableId` field. */
+  uploadRequestsTableId?: UUIDFilter;
+  /** Filter by the object’s `bucketsTableName` field. */
+  bucketsTableName?: StringFilter;
+  /** Filter by the object’s `filesTableName` field. */
+  filesTableName?: StringFilter;
+  /** Filter by the object’s `uploadRequestsTableName` field. */
+  uploadRequestsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `uploadUrlExpirySeconds` field. */
+  uploadUrlExpirySeconds?: IntFilter;
+  /** Filter by the object’s `downloadUrlExpirySeconds` field. */
+  downloadUrlExpirySeconds?: IntFilter;
+  /** Filter by the object’s `defaultMaxFileSize` field. */
+  defaultMaxFileSize?: BigIntFilter;
+  /** Filter by the object’s `maxFilenameLength` field. */
+  maxFilenameLength?: IntFilter;
+  /** Filter by the object’s `cacheTtlSeconds` field. */
+  cacheTtlSeconds?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: StorageModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: StorageModuleFilter[];
+  /** Negates the expression. */
+  not?: StorageModuleFilter;
+  /** Filter by the object’s `bucketsTable` relation. */
+  bucketsTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `filesTable` relation. */
+  filesTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `uploadRequestsTable` relation. */
+  uploadRequestsTable?: TableFilter;
 }
 /** A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseProvisionModuleFilter {
@@ -8311,6 +8480,36 @@ export interface AppPermissionDefaultFilter {
   /** Negates the expression. */
   not?: AppPermissionDefaultFilter;
 }
+/** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `max` field. */
+  max?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLimitDefaultFilter[];
+  /** Negates the expression. */
+  not?: AppLimitDefaultFilter;
+}
+/** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgLimitDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `max` field. */
+  max?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgLimitDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgLimitDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgLimitDefaultFilter;
+}
 /** A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’ */
 export interface MigrateFileFilter {
   /** Filter by the object’s `id` field. */
@@ -8360,36 +8559,6 @@ export interface ConstructiveInternalTypeUploadFilter {
   containsAnyKeys?: string[];
   /** Contained by the specified JSON. */
   containedBy?: ConstructiveInternalTypeUpload;
-}
-/** A filter to be used against `AppLimitDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLimitDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `max` field. */
-  max?: IntFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLimitDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLimitDefaultFilter[];
-  /** Negates the expression. */
-  not?: AppLimitDefaultFilter;
-}
-/** A filter to be used against `OrgLimitDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgLimitDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `max` field. */
-  max?: IntFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgLimitDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgLimitDefaultFilter[];
-  /** Negates the expression. */
-  not?: OrgLimitDefaultFilter;
 }
 /** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
 export interface MembershipTypeFilter {
@@ -8715,6 +8884,46 @@ export interface RemoveNodeAtPathInput {
   root?: string;
   path?: string[];
 }
+export interface CopyTemplateToBlueprintInput {
+  clientMutationId?: string;
+  templateId?: string;
+  databaseId?: string;
+  ownerId?: string;
+  nameOverride?: string;
+  displayNameOverride?: string;
+}
+export interface BootstrapUserInput {
+  clientMutationId?: string;
+  targetDatabaseId?: string;
+  password?: string;
+  isAdmin?: boolean;
+  isOwner?: boolean;
+  username?: string;
+  displayName?: string;
+  returnApiKey?: boolean;
+}
+export interface SetFieldOrderInput {
+  clientMutationId?: string;
+  fieldIds?: string[];
+}
+export interface ProvisionUniqueConstraintInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  tableId?: string;
+  definition?: unknown;
+}
+export interface ProvisionFullTextSearchInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  tableId?: string;
+  definition?: unknown;
+}
+export interface ProvisionIndexInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  tableId?: string;
+  definition?: unknown;
+}
 export interface SetDataAtPathInput {
   clientMutationId?: string;
   dbId?: string;
@@ -8730,14 +8939,6 @@ export interface SetPropsAndCommitInput {
   path?: string[];
   data?: unknown;
 }
-export interface CopyTemplateToBlueprintInput {
-  clientMutationId?: string;
-  templateId?: string;
-  databaseId?: string;
-  ownerId?: string;
-  nameOverride?: string;
-  displayNameOverride?: string;
-}
 export interface ProvisionDatabaseWithUserInput {
   clientMutationId?: string;
   pDatabaseName?: string;
@@ -8745,20 +8946,6 @@ export interface ProvisionDatabaseWithUserInput {
   pSubdomain?: string;
   pModules?: string[];
   pOptions?: unknown;
-}
-export interface BootstrapUserInput {
-  clientMutationId?: string;
-  targetDatabaseId?: string;
-  password?: string;
-  isAdmin?: boolean;
-  isOwner?: boolean;
-  username?: string;
-  displayName?: string;
-  returnApiKey?: boolean;
-}
-export interface SetFieldOrderInput {
-  clientMutationId?: string;
-  fieldIds?: string[];
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
@@ -8787,6 +8974,29 @@ export interface SetAndCommitInput {
   data?: unknown;
   kids?: string[];
   ktree?: string[];
+}
+export interface ProvisionRelationInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  relationType?: string;
+  sourceTableId?: string;
+  targetTableId?: string;
+  fieldName?: string;
+  deleteAction?: string;
+  isRequired?: boolean;
+  apiRequired?: boolean;
+  createIndex?: boolean;
+  junctionTableId?: string;
+  junctionTableName?: string;
+  junctionSchemaId?: string;
+  sourceFieldName?: string;
+  targetFieldName?: string;
+  useCompositeKey?: boolean;
+  exposeInApi?: boolean;
+  nodes?: unknown;
+  grants?: unknown;
+  grantRoles?: string[];
+  policies?: unknown;
 }
 export interface ApplyRlsInput {
   clientMutationId?: string;
@@ -8839,6 +9049,22 @@ export interface OneTimeTokenInput {
   password?: string;
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
+}
+export interface ProvisionTableInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  schemaId?: string;
+  tableName?: string;
+  tableId?: string;
+  nodes?: unknown;
+  fields?: unknown;
+  policies?: unknown;
+  grants?: unknown;
+  grantRoles?: string[];
+  useRls?: boolean;
+  indexes?: unknown;
+  fullTextSearches?: unknown;
+  uniqueConstraints?: unknown;
 }
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
@@ -8893,22 +9119,6 @@ export interface ApiSchemaInput {
   schemaId: string;
   /** API that exposes this schema */
   apiId: string;
-}
-export interface CreateSiteThemeInput {
-  clientMutationId?: string;
-  /** The `SiteTheme` to be created by this mutation. */
-  siteTheme: SiteThemeInput;
-}
-/** An input for mutations affecting `SiteTheme` */
-export interface SiteThemeInput {
-  /** Unique identifier for this theme record */
-  id?: string;
-  /** Reference to the metaschema database */
-  databaseId: string;
-  /** Site this theme belongs to */
-  siteId: string;
-  /** JSONB object containing theme tokens (colors, typography, spacing, etc.) */
-  theme: unknown;
 }
 export interface CreateOrgMemberInput {
   clientMutationId?: string;
@@ -8978,6 +9188,22 @@ export interface SecretsModuleInput {
   schemaId?: string;
   tableId?: string;
   tableName?: string;
+}
+export interface CreateSiteThemeInput {
+  clientMutationId?: string;
+  /** The `SiteTheme` to be created by this mutation. */
+  siteTheme: SiteThemeInput;
+}
+/** An input for mutations affecting `SiteTheme` */
+export interface SiteThemeInput {
+  /** Unique identifier for this theme record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId: string;
+  /** Site this theme belongs to */
+  siteId: string;
+  /** JSONB object containing theme tokens (colors, typography, spacing, etc.) */
+  theme: unknown;
 }
 export interface CreateStoreInput {
   clientMutationId?: string;
@@ -9340,26 +9566,6 @@ export interface CryptoAddressesModuleInput {
   tableName: string;
   cryptoNetwork?: string;
 }
-export interface CreateConnectedAccountInput {
-  clientMutationId?: string;
-  /** The `ConnectedAccount` to be created by this mutation. */
-  connectedAccount: ConnectedAccountInput;
-}
-/** An input for mutations affecting `ConnectedAccount` */
-export interface ConnectedAccountInput {
-  id?: string;
-  ownerId?: string;
-  /** The service used, e.g. `twitter` or `github`. */
-  service: string;
-  /** A unique identifier for the user within the service */
-  identifier: string;
-  /** Additional profile details extracted from this login method */
-  details: unknown;
-  /** Whether this connected account has been verified */
-  isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface CreatePhoneNumberInput {
   clientMutationId?: string;
   /** The `PhoneNumber` to be created by this mutation. */
@@ -9379,17 +9585,6 @@ export interface PhoneNumberInput {
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateMigrateFileInput {
-  clientMutationId?: string;
-  /** The `MigrateFile` to be created by this mutation. */
-  migrateFile: MigrateFileInput;
-}
-/** An input for mutations affecting `MigrateFile` */
-export interface MigrateFileInput {
-  id?: string;
-  databaseId?: string;
-  upload?: ConstructiveInternalTypeUpload;
 }
 export interface CreateAppLimitDefaultInput {
   clientMutationId?: string;
@@ -9416,6 +9611,37 @@ export interface OrgLimitDefaultInput {
   name: string;
   /** Default maximum usage allowed for this limit */
   max?: number;
+}
+export interface CreateConnectedAccountInput {
+  clientMutationId?: string;
+  /** The `ConnectedAccount` to be created by this mutation. */
+  connectedAccount: ConnectedAccountInput;
+}
+/** An input for mutations affecting `ConnectedAccount` */
+export interface ConnectedAccountInput {
+  id?: string;
+  ownerId?: string;
+  /** The service used, e.g. `twitter` or `github`. */
+  service: string;
+  /** A unique identifier for the user within the service */
+  identifier: string;
+  /** Additional profile details extracted from this login method */
+  details: unknown;
+  /** Whether this connected account has been verified */
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface CreateMigrateFileInput {
+  clientMutationId?: string;
+  /** The `MigrateFile` to be created by this mutation. */
+  migrateFile: MigrateFileInput;
+}
+/** An input for mutations affecting `MigrateFile` */
+export interface MigrateFileInput {
+  id?: string;
+  databaseId?: string;
+  upload?: ConstructiveInternalTypeUpload;
 }
 export interface CreateTableGrantInput {
   clientMutationId?: string;
@@ -9685,6 +9911,36 @@ export interface SiteMetadatumInput {
   /** Open Graph image for social media previews */
   ogImage?: ConstructiveInternalTypeImage;
 }
+export interface CreateBlueprintConstructionInput {
+  clientMutationId?: string;
+  /** The `BlueprintConstruction` to be created by this mutation. */
+  blueprintConstruction: BlueprintConstructionInput;
+}
+/** An input for mutations affecting `BlueprintConstruction` */
+export interface BlueprintConstructionInput {
+  /** Unique identifier for this construction attempt. */
+  id?: string;
+  /** The blueprint that was constructed. */
+  blueprintId: string;
+  /** The database the blueprint was constructed into. */
+  databaseId: string;
+  /** The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved. */
+  schemaId?: string;
+  /** Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. failed: execution failed (see error_details). */
+  status?: string;
+  /** Error message from a failed construction attempt. NULL unless status is failed. */
+  errorDetails?: string;
+  /** Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
+  tableMap?: unknown;
+  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the blueprint definition. */
+  constructedDefinition?: unknown;
+  /** Timestamp when construction successfully completed. NULL until constructed. */
+  constructedAt?: string;
+  /** Timestamp when this construction attempt was created. */
+  createdAt?: string;
+  /** Timestamp when this construction attempt was last modified. */
+  updatedAt?: string;
+}
 export interface CreateRlsModuleInput {
   clientMutationId?: string;
   /** The `RlsModule` to be created by this mutation. */
@@ -9845,6 +10101,38 @@ export interface DomainInput {
   subdomain?: ConstructiveInternalTypeHostname;
   /** Root domain of the hostname */
   domain?: ConstructiveInternalTypeHostname;
+}
+export interface CreateBlueprintInput {
+  clientMutationId?: string;
+  /** The `Blueprint` to be created by this mutation. */
+  blueprint: BlueprintInput;
+}
+/** An input for mutations affecting `Blueprint` */
+export interface BlueprintInput {
+  /** Unique identifier for this blueprint. */
+  id?: string;
+  /** The user who owns this blueprint. */
+  ownerId: string;
+  /** The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database. */
+  databaseId: string;
+  /** Machine-readable name for the blueprint. Must be unique per database. */
+  name: string;
+  /** Human-readable display name for the blueprint. */
+  displayName: string;
+  /** Optional description of the blueprint. */
+  description?: string;
+  /** The blueprint definition as a JSONB document. Contains tables[] (each with table_name, optional schema_name, nodes[] for data behaviors, fields[], grants[], and policies[] using $type), relations[] (using $type with source_table/target_table and optional source_schema/target_schema), indexes[] (using table_name + column), and full_text_searches[] (using table_name + field + sources[]). Everything is name-based — no UUIDs in the definition. */
+  definition: unknown;
+  /** If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch. */
+  templateId?: string;
+  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly. */
+  definitionHash?: string;
+  /** JSONB map of table names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
+  tableHashes?: unknown;
+  /** Timestamp when this blueprint was created. */
+  createdAt?: string;
+  /** Timestamp when this blueprint was last modified. */
+  updatedAt?: string;
 }
 export interface CreateOrgGrantInput {
   clientMutationId?: string;
@@ -10149,48 +10437,6 @@ export interface ViewInput {
   module?: string;
   scope?: number;
   tags?: string[];
-}
-export interface CreateBlueprintInput {
-  clientMutationId?: string;
-  /** The `Blueprint` to be created by this mutation. */
-  blueprint: BlueprintInput;
-}
-/** An input for mutations affecting `Blueprint` */
-export interface BlueprintInput {
-  /** Unique identifier for this blueprint. */
-  id?: string;
-  /** The user who owns this blueprint. */
-  ownerId: string;
-  /** The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database. */
-  databaseId: string;
-  /** Machine-readable name for the blueprint. Must be unique per database. */
-  name: string;
-  /** Human-readable display name for the blueprint. */
-  displayName: string;
-  /** Optional description of the blueprint. */
-  description?: string;
-  /** The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing. */
-  definition: unknown;
-  /** If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch. */
-  templateId?: string;
-  /** Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft. */
-  status?: string;
-  /** Timestamp when construct_blueprint() successfully completed. NULL until constructed. */
-  constructedAt?: string;
-  /** Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed. */
-  errorDetails?: string;
-  /** Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
-  refMap?: unknown;
-  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed. */
-  constructedDefinition?: unknown;
-  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly. */
-  definitionHash?: string;
-  /** JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
-  tableHashes?: unknown;
-  /** Timestamp when this blueprint was created. */
-  createdAt?: string;
-  /** Timestamp when this blueprint was last modified. */
-  updatedAt?: string;
 }
 export interface CreatePermissionsModuleInput {
   clientMutationId?: string;
@@ -10687,6 +10933,30 @@ export interface HierarchyModuleInput {
   isManagerOfFunction?: string;
   createdAt?: string;
 }
+export interface CreateStorageModuleInput {
+  clientMutationId?: string;
+  /** The `StorageModule` to be created by this mutation. */
+  storageModule: StorageModuleInput;
+}
+/** An input for mutations affecting `StorageModule` */
+export interface StorageModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  uploadRequestsTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  uploadRequestsTableName?: string;
+  entityTableId?: string;
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
+}
 export interface CreateInviteInput {
   clientMutationId?: string;
   /** The `Invite` to be created by this mutation. */
@@ -10716,6 +10986,48 @@ export interface InviteInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface CreateSecureTableProvisionInput {
+  clientMutationId?: string;
+  /** The `SecureTableProvision` to be created by this mutation. */
+  secureTableProvision: SecureTableProvisionInput;
+}
+/** An input for mutations affecting `SecureTableProvision` */
+export interface SecureTableProvisionInput {
+  /** Unique identifier for this provision row. */
+  id?: string;
+  /** The database this provision belongs to. Required. */
+  databaseId: string;
+  /** Target schema for the table. Defaults to uuid_nil(); the trigger resolves this to the app_public schema if not explicitly provided. */
+  schemaId?: string;
+  /** Target table to provision. Defaults to uuid_nil(); the trigger creates or resolves the table via table_name if not explicitly provided. */
+  tableId?: string;
+  /** Name of the target table. Used to create or look up the table when table_id is not provided. If omitted, it is backfilled from the resolved table. */
+  tableName?: string;
+  /** Array of node objects to apply to the table. Each element is a jsonb object with a required "$type" key (one of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete, DataEmbedding, DataFullTextSearch, DataSlug, etc.) and an optional "data" key containing generator-specific configuration. Supports multiple nodes per row, matching the blueprint definition format. Example: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}]. Defaults to '[]' (no node processing). */
+  nodes?: unknown;
+  /** If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true. */
+  useRls?: boolean;
+  /** PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields). */
+  fields?: unknown[];
+  /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
+  grantRoles?: string[];
+  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time. */
+  grantPrivileges?: unknown[];
+  /** Policy generator type, e.g. 'AuthzEntityMembership', 'AuthzMembership', 'AuthzAllowAll'. NULL means no policy is created. When set, the trigger automatically enables RLS on the target table. */
+  policyType?: string;
+  /** Privileges the policy applies to, e.g. ARRAY['select','update']. NULL means privileges are derived from the grant_privileges verbs. */
+  policyPrivileges?: string[];
+  /** Role the policy targets. NULL means it falls back to the first role in grant_roles. */
+  policyRole?: string;
+  /** Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Defaults to true. */
+  policyPermissive?: boolean;
+  /** Custom suffix for the generated policy name. When NULL and policy_type is set, the trigger auto-derives a suffix from policy_type by stripping the Authz prefix and underscoring the remainder (e.g. AuthzDirectOwner becomes direct_owner, producing policy names like auth_sel_direct_owner). When explicitly set, the value is passed through as-is to metaschema.create_policy name parameter. This ensures multiple policies on the same table do not collide (e.g. AuthzDirectOwner + AuthzPublishable each get unique names). */
+  policyName?: string;
+  /** Opaque configuration passed through to metaschema.create_policy(). Structure varies by policy_type and is not interpreted by this trigger. Defaults to '{}'. */
+  policyData?: unknown;
+  /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
+  outFields?: string[];
+}
 export interface CreateForeignKeyConstraintInput {
   clientMutationId?: string;
   /** The `ForeignKeyConstraint` to be created by this mutation. */
@@ -10741,50 +11053,6 @@ export interface ForeignKeyConstraintInput {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateSecureTableProvisionInput {
-  clientMutationId?: string;
-  /** The `SecureTableProvision` to be created by this mutation. */
-  secureTableProvision: SecureTableProvisionInput;
-}
-/** An input for mutations affecting `SecureTableProvision` */
-export interface SecureTableProvisionInput {
-  /** Unique identifier for this provision row. */
-  id?: string;
-  /** The database this provision belongs to. Required. */
-  databaseId: string;
-  /** Target schema for the table. Defaults to uuid_nil(); the trigger resolves this to the app_public schema if not explicitly provided. */
-  schemaId?: string;
-  /** Target table to provision. Defaults to uuid_nil(); the trigger creates or resolves the table via table_name if not explicitly provided. */
-  tableId?: string;
-  /** Name of the target table. Used to create or look up the table when table_id is not provided. If omitted, it is backfilled from the resolved table. */
-  tableName?: string;
-  /** Which generator to invoke for field creation. One of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete. NULL means no field creation — the row only provisions grants and/or policies. */
-  nodeType?: string;
-  /** If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true. */
-  useRls?: boolean;
-  /** Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'. */
-  nodeData?: unknown;
-  /** PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields). */
-  fields?: unknown[];
-  /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
-  grantRoles?: string[];
-  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time. */
-  grantPrivileges?: unknown[];
-  /** Policy generator type, e.g. 'AuthzEntityMembership', 'AuthzMembership', 'AuthzAllowAll'. NULL means no policy is created. When set, the trigger automatically enables RLS on the target table. */
-  policyType?: string;
-  /** Privileges the policy applies to, e.g. ARRAY['select','update']. NULL means privileges are derived from the grant_privileges verbs. */
-  policyPrivileges?: string[];
-  /** Role the policy targets. NULL means it falls back to the first role in grant_roles. */
-  policyRole?: string;
-  /** Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Defaults to true. */
-  policyPermissive?: boolean;
-  /** Custom suffix for the generated policy name. When NULL and policy_type is set, the trigger auto-derives a suffix from policy_type by stripping the Authz prefix and underscoring the remainder (e.g. AuthzDirectOwner becomes direct_owner, producing policy names like auth_sel_direct_owner). When explicitly set, the value is passed through as-is to metaschema.create_policy name parameter. This ensures multiple policies on the same table do not collide (e.g. AuthzDirectOwner + AuthzPublishable each get unique names). */
-  policyName?: string;
-  /** Opaque configuration passed through to metaschema.create_policy(). Structure varies by policy_type and is not interpreted by this trigger. Defaults to '{}'. */
-  policyData?: unknown;
-  /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly. */
-  outFields?: string[];
 }
 export interface CreateOrgInviteInput {
   clientMutationId?: string;
@@ -10945,45 +11213,6 @@ export interface FieldInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateMembershipsModuleInput {
-  clientMutationId?: string;
-  /** The `MembershipsModule` to be created by this mutation. */
-  membershipsModule: MembershipsModuleInput;
-}
-/** An input for mutations affecting `MembershipsModule` */
-export interface MembershipsModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  membershipsTableId?: string;
-  membershipsTableName?: string;
-  membersTableId?: string;
-  membersTableName?: string;
-  membershipDefaultsTableId?: string;
-  membershipDefaultsTableName?: string;
-  grantsTableId?: string;
-  grantsTableName?: string;
-  actorTableId?: string;
-  limitsTableId?: string;
-  defaultLimitsTableId?: string;
-  permissionsTableId?: string;
-  defaultPermissionsTableId?: string;
-  sprtTableId?: string;
-  adminGrantsTableId?: string;
-  adminGrantsTableName?: string;
-  ownerGrantsTableId?: string;
-  ownerGrantsTableName?: string;
-  membershipType: number;
-  entityTableId?: string;
-  entityTableOwnerId?: string;
-  prefix?: string;
-  actorMaskCheck?: string;
-  actorPermCheck?: string;
-  entityIdsByMask?: string;
-  entityIdsByPerm?: string;
-  entityIdsFunction?: string;
-}
 export interface CreateRelationProvisionInput {
   clientMutationId?: string;
   /** The `RelationProvision` to be created by this mutation. */
@@ -11089,22 +11318,12 @@ export interface RelationProvisionInput {
    */
   exposeInApi?: boolean;
   /**
-   * For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-   *      Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
-   *      NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
-   *      Ignored for RelationBelongsTo/RelationHasOne.
+   * For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+   *      Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+   *      Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
    */
-  nodeType?: string;
-  /**
-   * For RelationManyToMany: configuration passed to the generator function for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-   *      Only used when node_type is set. Structure varies by node_type. Examples:
-   *      - DataId: {"field_name": "id"} (default field name is 'id')
-   *      - DataEntityMembership: {"entity_field_name": "entity_id", "include_id": false, "include_user_fk": true}
-   *      - DataDirectOwner: {"owner_field_name": "owner_id"}
-   *      Defaults to '{}' (empty object).
-   *      Ignored for RelationBelongsTo/RelationHasOne.
-   */
-  nodeData?: unknown;
+  nodes?: unknown;
   /** For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne. */
   grantRoles?: string[];
   /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to '{}' (no grants — callers must explicitly specify privileges). Ignored for RelationBelongsTo/RelationHasOne. */
@@ -11141,6 +11360,45 @@ export interface RelationProvisionInput {
   outSourceFieldId?: string;
   /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
   outTargetFieldId?: string;
+}
+export interface CreateMembershipsModuleInput {
+  clientMutationId?: string;
+  /** The `MembershipsModule` to be created by this mutation. */
+  membershipsModule: MembershipsModuleInput;
+}
+/** An input for mutations affecting `MembershipsModule` */
+export interface MembershipsModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  membershipsTableId?: string;
+  membershipsTableName?: string;
+  membersTableId?: string;
+  membersTableName?: string;
+  membershipDefaultsTableId?: string;
+  membershipDefaultsTableName?: string;
+  grantsTableId?: string;
+  grantsTableName?: string;
+  actorTableId?: string;
+  limitsTableId?: string;
+  defaultLimitsTableId?: string;
+  permissionsTableId?: string;
+  defaultPermissionsTableId?: string;
+  sprtTableId?: string;
+  adminGrantsTableId?: string;
+  adminGrantsTableName?: string;
+  ownerGrantsTableId?: string;
+  ownerGrantsTableName?: string;
+  membershipType: number;
+  entityTableId?: string;
+  entityTableOwnerId?: string;
+  prefix?: string;
+  actorMaskCheck?: string;
+  actorPermCheck?: string;
+  entityIdsByMask?: string;
+  entityIdsByPerm?: string;
+  entityIdsFunction?: string;
 }
 export interface UpdateDefaultIdsModuleInput {
   clientMutationId?: string;
@@ -11183,24 +11441,6 @@ export interface ApiSchemaPatch {
   schemaId?: string;
   /** API that exposes this schema */
   apiId?: string;
-}
-export interface UpdateSiteThemeInput {
-  clientMutationId?: string;
-  /** Unique identifier for this theme record */
-  id: string;
-  /** An object where the defined keys will be set on the `SiteTheme` being updated. */
-  siteThemePatch: SiteThemePatch;
-}
-/** Represents an update to a `SiteTheme`. Fields that are set will be updated. */
-export interface SiteThemePatch {
-  /** Unique identifier for this theme record */
-  id?: string;
-  /** Reference to the metaschema database */
-  databaseId?: string;
-  /** Site this theme belongs to */
-  siteId?: string;
-  /** JSONB object containing theme tokens (colors, typography, spacing, etc.) */
-  theme?: unknown;
 }
 export interface UpdateOrgMemberInput {
   clientMutationId?: string;
@@ -11277,6 +11517,24 @@ export interface SecretsModulePatch {
   schemaId?: string;
   tableId?: string;
   tableName?: string;
+}
+export interface UpdateSiteThemeInput {
+  clientMutationId?: string;
+  /** Unique identifier for this theme record */
+  id: string;
+  /** An object where the defined keys will be set on the `SiteTheme` being updated. */
+  siteThemePatch: SiteThemePatch;
+}
+/** Represents an update to a `SiteTheme`. Fields that are set will be updated. */
+export interface SiteThemePatch {
+  /** Unique identifier for this theme record */
+  id?: string;
+  /** Reference to the metaschema database */
+  databaseId?: string;
+  /** Site this theme belongs to */
+  siteId?: string;
+  /** JSONB object containing theme tokens (colors, typography, spacing, etc.) */
+  theme?: unknown;
 }
 export interface UpdateStoreInput {
   clientMutationId?: string;
@@ -11666,27 +11924,6 @@ export interface CryptoAddressesModulePatch {
   tableName?: string;
   cryptoNetwork?: string;
 }
-export interface UpdateConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `ConnectedAccount` being updated. */
-  connectedAccountPatch: ConnectedAccountPatch;
-}
-/** Represents an update to a `ConnectedAccount`. Fields that are set will be updated. */
-export interface ConnectedAccountPatch {
-  id?: string;
-  ownerId?: string;
-  /** The service used, e.g. `twitter` or `github`. */
-  service?: string;
-  /** A unique identifier for the user within the service */
-  identifier?: string;
-  /** Additional profile details extracted from this login method */
-  details?: unknown;
-  /** Whether this connected account has been verified */
-  isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface UpdatePhoneNumberInput {
   clientMutationId?: string;
   id: string;
@@ -11735,6 +11972,27 @@ export interface OrgLimitDefaultPatch {
   name?: string;
   /** Default maximum usage allowed for this limit */
   max?: number;
+}
+export interface UpdateConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `ConnectedAccount` being updated. */
+  connectedAccountPatch: ConnectedAccountPatch;
+}
+/** Represents an update to a `ConnectedAccount`. Fields that are set will be updated. */
+export interface ConnectedAccountPatch {
+  id?: string;
+  ownerId?: string;
+  /** The service used, e.g. `twitter` or `github`. */
+  service?: string;
+  /** A unique identifier for the user within the service */
+  identifier?: string;
+  /** Additional profile details extracted from this login method */
+  details?: unknown;
+  /** Whether this connected account has been verified */
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface UpdateTableGrantInput {
   clientMutationId?: string;
@@ -12027,6 +12285,38 @@ export interface SiteMetadatumPatch {
   /** Upload for Open Graph image for social media previews */
   ogImageUpload?: File;
 }
+export interface UpdateBlueprintConstructionInput {
+  clientMutationId?: string;
+  /** Unique identifier for this construction attempt. */
+  id: string;
+  /** An object where the defined keys will be set on the `BlueprintConstruction` being updated. */
+  blueprintConstructionPatch: BlueprintConstructionPatch;
+}
+/** Represents an update to a `BlueprintConstruction`. Fields that are set will be updated. */
+export interface BlueprintConstructionPatch {
+  /** Unique identifier for this construction attempt. */
+  id?: string;
+  /** The blueprint that was constructed. */
+  blueprintId?: string;
+  /** The database the blueprint was constructed into. */
+  databaseId?: string;
+  /** The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved. */
+  schemaId?: string;
+  /** Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. failed: execution failed (see error_details). */
+  status?: string;
+  /** Error message from a failed construction attempt. NULL unless status is failed. */
+  errorDetails?: string;
+  /** Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
+  tableMap?: unknown;
+  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the blueprint definition. */
+  constructedDefinition?: unknown;
+  /** Timestamp when construction successfully completed. NULL until constructed. */
+  constructedAt?: string;
+  /** Timestamp when this construction attempt was created. */
+  createdAt?: string;
+  /** Timestamp when this construction attempt was last modified. */
+  updatedAt?: string;
+}
 export interface UpdateRlsModuleInput {
   clientMutationId?: string;
   id: string;
@@ -12197,6 +12487,40 @@ export interface DomainPatch {
   subdomain?: ConstructiveInternalTypeHostname;
   /** Root domain of the hostname */
   domain?: ConstructiveInternalTypeHostname;
+}
+export interface UpdateBlueprintInput {
+  clientMutationId?: string;
+  /** Unique identifier for this blueprint. */
+  id: string;
+  /** An object where the defined keys will be set on the `Blueprint` being updated. */
+  blueprintPatch: BlueprintPatch;
+}
+/** Represents an update to a `Blueprint`. Fields that are set will be updated. */
+export interface BlueprintPatch {
+  /** Unique identifier for this blueprint. */
+  id?: string;
+  /** The user who owns this blueprint. */
+  ownerId?: string;
+  /** The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database. */
+  databaseId?: string;
+  /** Machine-readable name for the blueprint. Must be unique per database. */
+  name?: string;
+  /** Human-readable display name for the blueprint. */
+  displayName?: string;
+  /** Optional description of the blueprint. */
+  description?: string;
+  /** The blueprint definition as a JSONB document. Contains tables[] (each with table_name, optional schema_name, nodes[] for data behaviors, fields[], grants[], and policies[] using $type), relations[] (using $type with source_table/target_table and optional source_schema/target_schema), indexes[] (using table_name + column), and full_text_searches[] (using table_name + field + sources[]). Everything is name-based — no UUIDs in the definition. */
+  definition?: unknown;
+  /** If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch. */
+  templateId?: string;
+  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly. */
+  definitionHash?: string;
+  /** JSONB map of table names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
+  tableHashes?: unknown;
+  /** Timestamp when this blueprint was created. */
+  createdAt?: string;
+  /** Timestamp when this blueprint was last modified. */
+  updatedAt?: string;
 }
 export interface UpdateOrgGrantInput {
   clientMutationId?: string;
@@ -12495,50 +12819,6 @@ export interface ViewPatch {
   module?: string;
   scope?: number;
   tags?: string[];
-}
-export interface UpdateBlueprintInput {
-  clientMutationId?: string;
-  /** Unique identifier for this blueprint. */
-  id: string;
-  /** An object where the defined keys will be set on the `Blueprint` being updated. */
-  blueprintPatch: BlueprintPatch;
-}
-/** Represents an update to a `Blueprint`. Fields that are set will be updated. */
-export interface BlueprintPatch {
-  /** Unique identifier for this blueprint. */
-  id?: string;
-  /** The user who owns this blueprint. */
-  ownerId?: string;
-  /** The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database. */
-  databaseId?: string;
-  /** Machine-readable name for the blueprint. Must be unique per database. */
-  name?: string;
-  /** Human-readable display name for the blueprint. */
-  displayName?: string;
-  /** Optional description of the blueprint. */
-  description?: string;
-  /** The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing. */
-  definition?: unknown;
-  /** If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch. */
-  templateId?: string;
-  /** Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft. */
-  status?: string;
-  /** Timestamp when construct_blueprint() successfully completed. NULL until constructed. */
-  constructedAt?: string;
-  /** Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed. */
-  errorDetails?: string;
-  /** Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
-  refMap?: unknown;
-  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed. */
-  constructedDefinition?: unknown;
-  /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly. */
-  definitionHash?: string;
-  /** JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
-  tableHashes?: unknown;
-  /** Timestamp when this blueprint was created. */
-  createdAt?: string;
-  /** Timestamp when this blueprint was last modified. */
-  updatedAt?: string;
 }
 export interface UpdatePermissionsModuleInput {
   clientMutationId?: string;
@@ -13047,6 +13327,31 @@ export interface HierarchyModulePatch {
   isManagerOfFunction?: string;
   createdAt?: string;
 }
+export interface UpdateStorageModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `StorageModule` being updated. */
+  storageModulePatch: StorageModulePatch;
+}
+/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
+export interface StorageModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  uploadRequestsTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  uploadRequestsTableName?: string;
+  entityTableId?: string;
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
+}
 export interface UpdateInviteInput {
   clientMutationId?: string;
   id: string;
@@ -13077,6 +13382,50 @@ export interface InvitePatch {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateSecureTableProvisionInput {
+  clientMutationId?: string;
+  /** Unique identifier for this provision row. */
+  id: string;
+  /** An object where the defined keys will be set on the `SecureTableProvision` being updated. */
+  secureTableProvisionPatch: SecureTableProvisionPatch;
+}
+/** Represents an update to a `SecureTableProvision`. Fields that are set will be updated. */
+export interface SecureTableProvisionPatch {
+  /** Unique identifier for this provision row. */
+  id?: string;
+  /** The database this provision belongs to. Required. */
+  databaseId?: string;
+  /** Target schema for the table. Defaults to uuid_nil(); the trigger resolves this to the app_public schema if not explicitly provided. */
+  schemaId?: string;
+  /** Target table to provision. Defaults to uuid_nil(); the trigger creates or resolves the table via table_name if not explicitly provided. */
+  tableId?: string;
+  /** Name of the target table. Used to create or look up the table when table_id is not provided. If omitted, it is backfilled from the resolved table. */
+  tableName?: string;
+  /** Array of node objects to apply to the table. Each element is a jsonb object with a required "$type" key (one of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete, DataEmbedding, DataFullTextSearch, DataSlug, etc.) and an optional "data" key containing generator-specific configuration. Supports multiple nodes per row, matching the blueprint definition format. Example: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}]. Defaults to '[]' (no node processing). */
+  nodes?: unknown;
+  /** If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true. */
+  useRls?: boolean;
+  /** PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields). */
+  fields?: unknown[];
+  /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
+  grantRoles?: string[];
+  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time. */
+  grantPrivileges?: unknown[];
+  /** Policy generator type, e.g. 'AuthzEntityMembership', 'AuthzMembership', 'AuthzAllowAll'. NULL means no policy is created. When set, the trigger automatically enables RLS on the target table. */
+  policyType?: string;
+  /** Privileges the policy applies to, e.g. ARRAY['select','update']. NULL means privileges are derived from the grant_privileges verbs. */
+  policyPrivileges?: string[];
+  /** Role the policy targets. NULL means it falls back to the first role in grant_roles. */
+  policyRole?: string;
+  /** Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Defaults to true. */
+  policyPermissive?: boolean;
+  /** Custom suffix for the generated policy name. When NULL and policy_type is set, the trigger auto-derives a suffix from policy_type by stripping the Authz prefix and underscoring the remainder (e.g. AuthzDirectOwner becomes direct_owner, producing policy names like auth_sel_direct_owner). When explicitly set, the value is passed through as-is to metaschema.create_policy name parameter. This ensures multiple policies on the same table do not collide (e.g. AuthzDirectOwner + AuthzPublishable each get unique names). */
+  policyName?: string;
+  /** Opaque configuration passed through to metaschema.create_policy(). Structure varies by policy_type and is not interpreted by this trigger. Defaults to '{}'. */
+  policyData?: unknown;
+  /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
+  outFields?: string[];
+}
 export interface UpdateForeignKeyConstraintInput {
   clientMutationId?: string;
   id: string;
@@ -13103,52 +13452,6 @@ export interface ForeignKeyConstraintPatch {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
-}
-export interface UpdateSecureTableProvisionInput {
-  clientMutationId?: string;
-  /** Unique identifier for this provision row. */
-  id: string;
-  /** An object where the defined keys will be set on the `SecureTableProvision` being updated. */
-  secureTableProvisionPatch: SecureTableProvisionPatch;
-}
-/** Represents an update to a `SecureTableProvision`. Fields that are set will be updated. */
-export interface SecureTableProvisionPatch {
-  /** Unique identifier for this provision row. */
-  id?: string;
-  /** The database this provision belongs to. Required. */
-  databaseId?: string;
-  /** Target schema for the table. Defaults to uuid_nil(); the trigger resolves this to the app_public schema if not explicitly provided. */
-  schemaId?: string;
-  /** Target table to provision. Defaults to uuid_nil(); the trigger creates or resolves the table via table_name if not explicitly provided. */
-  tableId?: string;
-  /** Name of the target table. Used to create or look up the table when table_id is not provided. If omitted, it is backfilled from the resolved table. */
-  tableName?: string;
-  /** Which generator to invoke for field creation. One of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete. NULL means no field creation — the row only provisions grants and/or policies. */
-  nodeType?: string;
-  /** If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true. */
-  useRls?: boolean;
-  /** Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'. */
-  nodeData?: unknown;
-  /** PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields). */
-  fields?: unknown[];
-  /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
-  grantRoles?: string[];
-  /** PostgreSQL array of jsonb [privilege, columns] tuples defining table grants. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns; an array means column-level grant. Defaults to '{}' (no grants — callers must explicitly specify privileges). Type safety is enforced by PostgreSQL at INSERT time. */
-  grantPrivileges?: unknown[];
-  /** Policy generator type, e.g. 'AuthzEntityMembership', 'AuthzMembership', 'AuthzAllowAll'. NULL means no policy is created. When set, the trigger automatically enables RLS on the target table. */
-  policyType?: string;
-  /** Privileges the policy applies to, e.g. ARRAY['select','update']. NULL means privileges are derived from the grant_privileges verbs. */
-  policyPrivileges?: string[];
-  /** Role the policy targets. NULL means it falls back to the first role in grant_roles. */
-  policyRole?: string;
-  /** Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Defaults to true. */
-  policyPermissive?: boolean;
-  /** Custom suffix for the generated policy name. When NULL and policy_type is set, the trigger auto-derives a suffix from policy_type by stripping the Authz prefix and underscoring the remainder (e.g. AuthzDirectOwner becomes direct_owner, producing policy names like auth_sel_direct_owner). When explicitly set, the value is passed through as-is to metaschema.create_policy name parameter. This ensures multiple policies on the same table do not collide (e.g. AuthzDirectOwner + AuthzPublishable each get unique names). */
-  policyName?: string;
-  /** Opaque configuration passed through to metaschema.create_policy(). Structure varies by policy_type and is not interpreted by this trigger. Defaults to '{}'. */
-  policyData?: unknown;
-  /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly. */
-  outFields?: string[];
 }
 export interface UpdateOrgInviteInput {
   clientMutationId?: string;
@@ -13314,46 +13617,6 @@ export interface FieldPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateMembershipsModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `MembershipsModule` being updated. */
-  membershipsModulePatch: MembershipsModulePatch;
-}
-/** Represents an update to a `MembershipsModule`. Fields that are set will be updated. */
-export interface MembershipsModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  membershipsTableId?: string;
-  membershipsTableName?: string;
-  membersTableId?: string;
-  membersTableName?: string;
-  membershipDefaultsTableId?: string;
-  membershipDefaultsTableName?: string;
-  grantsTableId?: string;
-  grantsTableName?: string;
-  actorTableId?: string;
-  limitsTableId?: string;
-  defaultLimitsTableId?: string;
-  permissionsTableId?: string;
-  defaultPermissionsTableId?: string;
-  sprtTableId?: string;
-  adminGrantsTableId?: string;
-  adminGrantsTableName?: string;
-  ownerGrantsTableId?: string;
-  ownerGrantsTableName?: string;
-  membershipType?: number;
-  entityTableId?: string;
-  entityTableOwnerId?: string;
-  prefix?: string;
-  actorMaskCheck?: string;
-  actorPermCheck?: string;
-  entityIdsByMask?: string;
-  entityIdsByPerm?: string;
-  entityIdsFunction?: string;
-}
 export interface UpdateRelationProvisionInput {
   clientMutationId?: string;
   /** Unique identifier for this relation provision row. */
@@ -13461,22 +13724,12 @@ export interface RelationProvisionPatch {
    */
   exposeInApi?: boolean;
   /**
-   * For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-   *      Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
-   *      NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
-   *      Ignored for RelationBelongsTo/RelationHasOne.
+   * For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+   *      Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+   *      Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
    */
-  nodeType?: string;
-  /**
-   * For RelationManyToMany: configuration passed to the generator function for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-   *      Only used when node_type is set. Structure varies by node_type. Examples:
-   *      - DataId: {"field_name": "id"} (default field name is 'id')
-   *      - DataEntityMembership: {"entity_field_name": "entity_id", "include_id": false, "include_user_fk": true}
-   *      - DataDirectOwner: {"owner_field_name": "owner_id"}
-   *      Defaults to '{}' (empty object).
-   *      Ignored for RelationBelongsTo/RelationHasOne.
-   */
-  nodeData?: unknown;
+  nodes?: unknown;
   /** For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne. */
   grantRoles?: string[];
   /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to '{}' (no grants — callers must explicitly specify privileges). Ignored for RelationBelongsTo/RelationHasOne. */
@@ -13514,6 +13767,46 @@ export interface RelationProvisionPatch {
   /** Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly. */
   outTargetFieldId?: string;
 }
+export interface UpdateMembershipsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `MembershipsModule` being updated. */
+  membershipsModulePatch: MembershipsModulePatch;
+}
+/** Represents an update to a `MembershipsModule`. Fields that are set will be updated. */
+export interface MembershipsModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  membershipsTableId?: string;
+  membershipsTableName?: string;
+  membersTableId?: string;
+  membersTableName?: string;
+  membershipDefaultsTableId?: string;
+  membershipDefaultsTableName?: string;
+  grantsTableId?: string;
+  grantsTableName?: string;
+  actorTableId?: string;
+  limitsTableId?: string;
+  defaultLimitsTableId?: string;
+  permissionsTableId?: string;
+  defaultPermissionsTableId?: string;
+  sprtTableId?: string;
+  adminGrantsTableId?: string;
+  adminGrantsTableName?: string;
+  ownerGrantsTableId?: string;
+  ownerGrantsTableName?: string;
+  membershipType?: number;
+  entityTableId?: string;
+  entityTableOwnerId?: string;
+  prefix?: string;
+  actorMaskCheck?: string;
+  actorPermCheck?: string;
+  entityIdsByMask?: string;
+  entityIdsByPerm?: string;
+  entityIdsFunction?: string;
+}
 export interface DeleteDefaultIdsModuleInput {
   clientMutationId?: string;
   id: string;
@@ -13525,11 +13818,6 @@ export interface DeleteViewTableInput {
 export interface DeleteApiSchemaInput {
   clientMutationId?: string;
   /** Unique identifier for this API-schema mapping */
-  id: string;
-}
-export interface DeleteSiteThemeInput {
-  clientMutationId?: string;
-  /** Unique identifier for this theme record */
   id: string;
 }
 export interface DeleteOrgMemberInput {
@@ -13552,6 +13840,11 @@ export interface DeleteMembershipTypesModuleInput {
 }
 export interface DeleteSecretsModuleInput {
   clientMutationId?: string;
+  id: string;
+}
+export interface DeleteSiteThemeInput {
+  clientMutationId?: string;
+  /** Unique identifier for this theme record */
   id: string;
 }
 export interface DeleteStoreInput {
@@ -13650,10 +13943,6 @@ export interface DeleteCryptoAddressesModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeletePhoneNumberInput {
   clientMutationId?: string;
   id: string;
@@ -13663,6 +13952,10 @@ export interface DeleteAppLimitDefaultInput {
   id: string;
 }
 export interface DeleteOrgLimitDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteConnectedAccountInput {
   clientMutationId?: string;
   id: string;
 }
@@ -13732,6 +14025,11 @@ export interface DeleteSiteMetadatumInput {
   /** Unique identifier for this metadata record */
   id: string;
 }
+export interface DeleteBlueprintConstructionInput {
+  clientMutationId?: string;
+  /** Unique identifier for this construction attempt. */
+  id: string;
+}
 export interface DeleteRlsModuleInput {
   clientMutationId?: string;
   id: string;
@@ -13764,6 +14062,11 @@ export interface DeleteOrgChartEdgeInput {
 export interface DeleteDomainInput {
   clientMutationId?: string;
   /** Unique identifier for this domain record */
+  id: string;
+}
+export interface DeleteBlueprintInput {
+  clientMutationId?: string;
+  /** Unique identifier for this blueprint. */
   id: string;
 }
 export interface DeleteOrgGrantInput {
@@ -13816,11 +14119,6 @@ export interface DeleteEnumInput {
 }
 export interface DeleteViewInput {
   clientMutationId?: string;
-  id: string;
-}
-export interface DeleteBlueprintInput {
-  clientMutationId?: string;
-  /** Unique identifier for this blueprint. */
   id: string;
 }
 export interface DeletePermissionsModuleInput {
@@ -13898,17 +14196,21 @@ export interface DeleteHierarchyModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteInviteInput {
+export interface DeleteStorageModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteForeignKeyConstraintInput {
+export interface DeleteInviteInput {
   clientMutationId?: string;
   id: string;
 }
 export interface DeleteSecureTableProvisionInput {
   clientMutationId?: string;
   /** Unique identifier for this provision row. */
+  id: string;
+}
+export interface DeleteForeignKeyConstraintInput {
+  clientMutationId?: string;
   id: string;
 }
 export interface DeleteOrgInviteInput {
@@ -13931,21 +14233,14 @@ export interface DeleteFieldInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteMembershipsModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteRelationProvisionInput {
   clientMutationId?: string;
   /** Unique identifier for this relation provision row. */
   id: string;
 }
-/** A connection to a list of `GetAllRecord` values. */
-export interface GetAllConnection {
-  nodes: GetAllRecord[];
-  edges: GetAllEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
+export interface DeleteMembershipsModuleInput {
+  clientMutationId?: string;
+  id: string;
 }
 /** A connection to a list of `OrgGetManagersRecord` values. */
 export interface OrgGetManagersConnection {
@@ -13958,6 +14253,13 @@ export interface OrgGetManagersConnection {
 export interface OrgGetSubordinatesConnection {
   nodes: OrgGetSubordinatesRecord[];
   edges: OrgGetSubordinatesEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `GetAllRecord` values. */
+export interface GetAllConnection {
+  nodes: GetAllRecord[];
+  edges: GetAllEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14010,13 +14312,6 @@ export interface ApiSchemaConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `SiteTheme` values. */
-export interface SiteThemeConnection {
-  nodes: SiteTheme[];
-  edges: SiteThemeEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `OrgMember` values. */
 export interface OrgMemberConnection {
   nodes: OrgMember[];
@@ -14049,6 +14344,13 @@ export interface MembershipTypesModuleConnection {
 export interface SecretsModuleConnection {
   nodes: SecretsModule[];
   edges: SecretsModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `SiteTheme` values. */
+export interface SiteThemeConnection {
+  nodes: SiteTheme[];
+  edges: SiteThemeEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14213,24 +14515,10 @@ export interface CryptoAddressesModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `ConnectedAccount` values. */
-export interface ConnectedAccountConnection {
-  nodes: ConnectedAccount[];
-  edges: ConnectedAccountEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `PhoneNumber` values. */
 export interface PhoneNumberConnection {
   nodes: PhoneNumber[];
   edges: PhoneNumberEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `MigrateFile` values. */
-export interface MigrateFileConnection {
-  nodes: MigrateFile[];
-  edges: MigrateFileEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14245,6 +14533,20 @@ export interface AppLimitDefaultConnection {
 export interface OrgLimitDefaultConnection {
   nodes: OrgLimitDefault[];
   edges: OrgLimitDefaultEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ConnectedAccount` values. */
+export interface ConnectedAccountConnection {
+  nodes: ConnectedAccount[];
+  edges: ConnectedAccountEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `MigrateFile` values. */
+export interface MigrateFileConnection {
+  nodes: MigrateFile[];
+  edges: MigrateFileEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14332,6 +14634,13 @@ export interface SiteMetadatumConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `BlueprintConstruction` values. */
+export interface BlueprintConstructionConnection {
+  nodes: BlueprintConstruction[];
+  edges: BlueprintConstructionEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `RlsModule` values. */
 export interface RlsModuleConnection {
   nodes: RlsModule[];
@@ -14385,6 +14694,13 @@ export interface OrgChartEdgeConnection {
 export interface DomainConnection {
   nodes: Domain[];
   edges: DomainEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `Blueprint` values. */
+export interface BlueprintConnection {
+  nodes: Blueprint[];
+  edges: BlueprintEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14476,13 +14792,6 @@ export interface EnumConnection {
 export interface ViewConnection {
   nodes: View[];
   edges: ViewEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
-/** A connection to a list of `Blueprint` values. */
-export interface BlueprintConnection {
-  nodes: Blueprint[];
-  edges: BlueprintEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14619,6 +14928,13 @@ export interface HierarchyModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `StorageModule` values. */
+export interface StorageModuleConnection {
+  nodes: StorageModule[];
+  edges: StorageModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `Invite` values. */
 export interface InviteConnection {
   nodes: Invite[];
@@ -14626,17 +14942,17 @@ export interface InviteConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `ForeignKeyConstraint` values. */
-export interface ForeignKeyConstraintConnection {
-  nodes: ForeignKeyConstraint[];
-  edges: ForeignKeyConstraintEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `SecureTableProvision` values. */
 export interface SecureTableProvisionConnection {
   nodes: SecureTableProvision[];
   edges: SecureTableProvisionEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `ForeignKeyConstraint` values. */
+export interface ForeignKeyConstraintConnection {
+  nodes: ForeignKeyConstraint[];
+  edges: ForeignKeyConstraintEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14675,17 +14991,17 @@ export interface FieldConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `MembershipsModule` values. */
-export interface MembershipsModuleConnection {
-  nodes: MembershipsModule[];
-  edges: MembershipsModuleEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `RelationProvision` values. */
 export interface RelationProvisionConnection {
   nodes: RelationProvision[];
   edges: RelationProvisionEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `MembershipsModule` values. */
+export interface MembershipsModuleConnection {
+  nodes: MembershipsModule[];
+  edges: MembershipsModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -14743,13 +15059,35 @@ export interface InitEmptyRepoPayload {
 }
 export interface ConstructBlueprintPayload {
   clientMutationId?: string | null;
-  result?: unknown | null;
+  result?: string | null;
 }
 export interface ResetPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
 export interface RemoveNodeAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface CopyTemplateToBlueprintPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface BootstrapUserPayload {
+  clientMutationId?: string | null;
+  result?: BootstrapUserRecord[] | null;
+}
+export interface SetFieldOrderPayload {
+  clientMutationId?: string | null;
+}
+export interface ProvisionUniqueConstraintPayload {
+  clientMutationId?: string | null;
+}
+export interface ProvisionFullTextSearchPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export interface ProvisionIndexPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
@@ -14761,20 +15099,9 @@ export interface SetPropsAndCommitPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export interface CopyTemplateToBlueprintPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
 export interface ProvisionDatabaseWithUserPayload {
   clientMutationId?: string | null;
   result?: ProvisionDatabaseWithUserRecord[] | null;
-}
-export interface BootstrapUserPayload {
-  clientMutationId?: string | null;
-  result?: BootstrapUserRecord[] | null;
-}
-export interface SetFieldOrderPayload {
-  clientMutationId?: string | null;
 }
 export interface InsertNodeAtPathPayload {
   clientMutationId?: string | null;
@@ -14787,6 +15114,10 @@ export interface UpdateNodeAtPathPayload {
 export interface SetAndCommitPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface ProvisionRelationPayload {
+  clientMutationId?: string | null;
+  result?: ProvisionRelationRecord[] | null;
 }
 export interface ApplyRlsPayload {
   clientMutationId?: string | null;
@@ -14814,6 +15145,10 @@ export interface SignUpPayload {
 export interface OneTimeTokenPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface ProvisionTablePayload {
+  clientMutationId?: string | null;
+  result?: ProvisionTableRecord[] | null;
 }
 export interface SendVerificationEmailPayload {
   clientMutationId?: string | null;
@@ -14848,12 +15183,6 @@ export interface CreateApiSchemaPayload {
   apiSchema?: ApiSchema | null;
   apiSchemaEdge?: ApiSchemaEdge | null;
 }
-export interface CreateSiteThemePayload {
-  clientMutationId?: string | null;
-  /** The `SiteTheme` that was created by this mutation. */
-  siteTheme?: SiteTheme | null;
-  siteThemeEdge?: SiteThemeEdge | null;
-}
 export interface CreateOrgMemberPayload {
   clientMutationId?: string | null;
   /** The `OrgMember` that was created by this mutation. */
@@ -14883,6 +15212,12 @@ export interface CreateSecretsModulePayload {
   /** The `SecretsModule` that was created by this mutation. */
   secretsModule?: SecretsModule | null;
   secretsModuleEdge?: SecretsModuleEdge | null;
+}
+export interface CreateSiteThemePayload {
+  clientMutationId?: string | null;
+  /** The `SiteTheme` that was created by this mutation. */
+  siteTheme?: SiteTheme | null;
+  siteThemeEdge?: SiteThemeEdge | null;
 }
 export interface CreateStorePayload {
   clientMutationId?: string | null;
@@ -15022,22 +15357,11 @@ export interface CreateCryptoAddressesModulePayload {
   cryptoAddressesModule?: CryptoAddressesModule | null;
   cryptoAddressesModuleEdge?: CryptoAddressesModuleEdge | null;
 }
-export interface CreateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was created by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
 export interface CreatePhoneNumberPayload {
   clientMutationId?: string | null;
   /** The `PhoneNumber` that was created by this mutation. */
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export interface CreateMigrateFilePayload {
-  clientMutationId?: string | null;
-  /** The `MigrateFile` that was created by this mutation. */
-  migrateFile?: MigrateFile | null;
 }
 export interface CreateAppLimitDefaultPayload {
   clientMutationId?: string | null;
@@ -15050,6 +15374,17 @@ export interface CreateOrgLimitDefaultPayload {
   /** The `OrgLimitDefault` that was created by this mutation. */
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
+}
+export interface CreateConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was created by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
+}
+export interface CreateMigrateFilePayload {
+  clientMutationId?: string | null;
+  /** The `MigrateFile` that was created by this mutation. */
+  migrateFile?: MigrateFile | null;
 }
 export interface CreateTableGrantPayload {
   clientMutationId?: string | null;
@@ -15141,6 +15476,12 @@ export interface CreateSiteMetadatumPayload {
   siteMetadatum?: SiteMetadatum | null;
   siteMetadatumEdge?: SiteMetadatumEdge | null;
 }
+export interface CreateBlueprintConstructionPayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintConstruction` that was created by this mutation. */
+  blueprintConstruction?: BlueprintConstruction | null;
+  blueprintConstructionEdge?: BlueprintConstructionEdge | null;
+}
 export interface CreateRlsModulePayload {
   clientMutationId?: string | null;
   /** The `RlsModule` that was created by this mutation. */
@@ -15188,6 +15529,12 @@ export interface CreateDomainPayload {
   /** The `Domain` that was created by this mutation. */
   domain?: Domain | null;
   domainEdge?: DomainEdge | null;
+}
+export interface CreateBlueprintPayload {
+  clientMutationId?: string | null;
+  /** The `Blueprint` that was created by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
 export interface CreateOrgGrantPayload {
   clientMutationId?: string | null;
@@ -15271,12 +15618,6 @@ export interface CreateViewPayload {
   /** The `View` that was created by this mutation. */
   view?: View | null;
   viewEdge?: ViewEdge | null;
-}
-export interface CreateBlueprintPayload {
-  clientMutationId?: string | null;
-  /** The `Blueprint` that was created by this mutation. */
-  blueprint?: Blueprint | null;
-  blueprintEdge?: BlueprintEdge | null;
 }
 export interface CreatePermissionsModulePayload {
   clientMutationId?: string | null;
@@ -15391,23 +15732,29 @@ export interface CreateHierarchyModulePayload {
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
+export interface CreateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was created by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
 export interface CreateInvitePayload {
   clientMutationId?: string | null;
   /** The `Invite` that was created by this mutation. */
   invite?: Invite | null;
   inviteEdge?: InviteEdge | null;
 }
-export interface CreateForeignKeyConstraintPayload {
-  clientMutationId?: string | null;
-  /** The `ForeignKeyConstraint` that was created by this mutation. */
-  foreignKeyConstraint?: ForeignKeyConstraint | null;
-  foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
-}
 export interface CreateSecureTableProvisionPayload {
   clientMutationId?: string | null;
   /** The `SecureTableProvision` that was created by this mutation. */
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
+}
+export interface CreateForeignKeyConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ForeignKeyConstraint` that was created by this mutation. */
+  foreignKeyConstraint?: ForeignKeyConstraint | null;
+  foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
 export interface CreateOrgInvitePayload {
   clientMutationId?: string | null;
@@ -15439,17 +15786,17 @@ export interface CreateFieldPayload {
   field?: Field | null;
   fieldEdge?: FieldEdge | null;
 }
-export interface CreateMembershipsModulePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipsModule` that was created by this mutation. */
-  membershipsModule?: MembershipsModule | null;
-  membershipsModuleEdge?: MembershipsModuleEdge | null;
-}
 export interface CreateRelationProvisionPayload {
   clientMutationId?: string | null;
   /** The `RelationProvision` that was created by this mutation. */
   relationProvision?: RelationProvision | null;
   relationProvisionEdge?: RelationProvisionEdge | null;
+}
+export interface CreateMembershipsModulePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipsModule` that was created by this mutation. */
+  membershipsModule?: MembershipsModule | null;
+  membershipsModuleEdge?: MembershipsModuleEdge | null;
 }
 export interface UpdateDefaultIdsModulePayload {
   clientMutationId?: string | null;
@@ -15468,12 +15815,6 @@ export interface UpdateApiSchemaPayload {
   /** The `ApiSchema` that was updated by this mutation. */
   apiSchema?: ApiSchema | null;
   apiSchemaEdge?: ApiSchemaEdge | null;
-}
-export interface UpdateSiteThemePayload {
-  clientMutationId?: string | null;
-  /** The `SiteTheme` that was updated by this mutation. */
-  siteTheme?: SiteTheme | null;
-  siteThemeEdge?: SiteThemeEdge | null;
 }
 export interface UpdateOrgMemberPayload {
   clientMutationId?: string | null;
@@ -15504,6 +15845,12 @@ export interface UpdateSecretsModulePayload {
   /** The `SecretsModule` that was updated by this mutation. */
   secretsModule?: SecretsModule | null;
   secretsModuleEdge?: SecretsModuleEdge | null;
+}
+export interface UpdateSiteThemePayload {
+  clientMutationId?: string | null;
+  /** The `SiteTheme` that was updated by this mutation. */
+  siteTheme?: SiteTheme | null;
+  siteThemeEdge?: SiteThemeEdge | null;
 }
 export interface UpdateStorePayload {
   clientMutationId?: string | null;
@@ -15643,12 +15990,6 @@ export interface UpdateCryptoAddressesModulePayload {
   cryptoAddressesModule?: CryptoAddressesModule | null;
   cryptoAddressesModuleEdge?: CryptoAddressesModuleEdge | null;
 }
-export interface UpdateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was updated by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
 export interface UpdatePhoneNumberPayload {
   clientMutationId?: string | null;
   /** The `PhoneNumber` that was updated by this mutation. */
@@ -15666,6 +16007,12 @@ export interface UpdateOrgLimitDefaultPayload {
   /** The `OrgLimitDefault` that was updated by this mutation. */
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
+}
+export interface UpdateConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was updated by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
 }
 export interface UpdateTableGrantPayload {
   clientMutationId?: string | null;
@@ -15757,6 +16104,12 @@ export interface UpdateSiteMetadatumPayload {
   siteMetadatum?: SiteMetadatum | null;
   siteMetadatumEdge?: SiteMetadatumEdge | null;
 }
+export interface UpdateBlueprintConstructionPayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintConstruction` that was updated by this mutation. */
+  blueprintConstruction?: BlueprintConstruction | null;
+  blueprintConstructionEdge?: BlueprintConstructionEdge | null;
+}
 export interface UpdateRlsModulePayload {
   clientMutationId?: string | null;
   /** The `RlsModule` that was updated by this mutation. */
@@ -15804,6 +16157,12 @@ export interface UpdateDomainPayload {
   /** The `Domain` that was updated by this mutation. */
   domain?: Domain | null;
   domainEdge?: DomainEdge | null;
+}
+export interface UpdateBlueprintPayload {
+  clientMutationId?: string | null;
+  /** The `Blueprint` that was updated by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
 export interface UpdateOrgGrantPayload {
   clientMutationId?: string | null;
@@ -15882,12 +16241,6 @@ export interface UpdateViewPayload {
   /** The `View` that was updated by this mutation. */
   view?: View | null;
   viewEdge?: ViewEdge | null;
-}
-export interface UpdateBlueprintPayload {
-  clientMutationId?: string | null;
-  /** The `Blueprint` that was updated by this mutation. */
-  blueprint?: Blueprint | null;
-  blueprintEdge?: BlueprintEdge | null;
 }
 export interface UpdatePermissionsModulePayload {
   clientMutationId?: string | null;
@@ -15997,23 +16350,29 @@ export interface UpdateHierarchyModulePayload {
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
+export interface UpdateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was updated by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
 export interface UpdateInvitePayload {
   clientMutationId?: string | null;
   /** The `Invite` that was updated by this mutation. */
   invite?: Invite | null;
   inviteEdge?: InviteEdge | null;
 }
-export interface UpdateForeignKeyConstraintPayload {
-  clientMutationId?: string | null;
-  /** The `ForeignKeyConstraint` that was updated by this mutation. */
-  foreignKeyConstraint?: ForeignKeyConstraint | null;
-  foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
-}
 export interface UpdateSecureTableProvisionPayload {
   clientMutationId?: string | null;
   /** The `SecureTableProvision` that was updated by this mutation. */
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
+}
+export interface UpdateForeignKeyConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ForeignKeyConstraint` that was updated by this mutation. */
+  foreignKeyConstraint?: ForeignKeyConstraint | null;
+  foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
 export interface UpdateOrgInvitePayload {
   clientMutationId?: string | null;
@@ -16045,17 +16404,17 @@ export interface UpdateFieldPayload {
   field?: Field | null;
   fieldEdge?: FieldEdge | null;
 }
-export interface UpdateMembershipsModulePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipsModule` that was updated by this mutation. */
-  membershipsModule?: MembershipsModule | null;
-  membershipsModuleEdge?: MembershipsModuleEdge | null;
-}
 export interface UpdateRelationProvisionPayload {
   clientMutationId?: string | null;
   /** The `RelationProvision` that was updated by this mutation. */
   relationProvision?: RelationProvision | null;
   relationProvisionEdge?: RelationProvisionEdge | null;
+}
+export interface UpdateMembershipsModulePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipsModule` that was updated by this mutation. */
+  membershipsModule?: MembershipsModule | null;
+  membershipsModuleEdge?: MembershipsModuleEdge | null;
 }
 export interface DeleteDefaultIdsModulePayload {
   clientMutationId?: string | null;
@@ -16074,12 +16433,6 @@ export interface DeleteApiSchemaPayload {
   /** The `ApiSchema` that was deleted by this mutation. */
   apiSchema?: ApiSchema | null;
   apiSchemaEdge?: ApiSchemaEdge | null;
-}
-export interface DeleteSiteThemePayload {
-  clientMutationId?: string | null;
-  /** The `SiteTheme` that was deleted by this mutation. */
-  siteTheme?: SiteTheme | null;
-  siteThemeEdge?: SiteThemeEdge | null;
 }
 export interface DeleteOrgMemberPayload {
   clientMutationId?: string | null;
@@ -16110,6 +16463,12 @@ export interface DeleteSecretsModulePayload {
   /** The `SecretsModule` that was deleted by this mutation. */
   secretsModule?: SecretsModule | null;
   secretsModuleEdge?: SecretsModuleEdge | null;
+}
+export interface DeleteSiteThemePayload {
+  clientMutationId?: string | null;
+  /** The `SiteTheme` that was deleted by this mutation. */
+  siteTheme?: SiteTheme | null;
+  siteThemeEdge?: SiteThemeEdge | null;
 }
 export interface DeleteStorePayload {
   clientMutationId?: string | null;
@@ -16249,12 +16608,6 @@ export interface DeleteCryptoAddressesModulePayload {
   cryptoAddressesModule?: CryptoAddressesModule | null;
   cryptoAddressesModuleEdge?: CryptoAddressesModuleEdge | null;
 }
-export interface DeleteConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was deleted by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
 export interface DeletePhoneNumberPayload {
   clientMutationId?: string | null;
   /** The `PhoneNumber` that was deleted by this mutation. */
@@ -16272,6 +16625,12 @@ export interface DeleteOrgLimitDefaultPayload {
   /** The `OrgLimitDefault` that was deleted by this mutation. */
   orgLimitDefault?: OrgLimitDefault | null;
   orgLimitDefaultEdge?: OrgLimitDefaultEdge | null;
+}
+export interface DeleteConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `ConnectedAccount` that was deleted by this mutation. */
+  connectedAccount?: ConnectedAccount | null;
+  connectedAccountEdge?: ConnectedAccountEdge | null;
 }
 export interface DeleteTableGrantPayload {
   clientMutationId?: string | null;
@@ -16363,6 +16722,12 @@ export interface DeleteSiteMetadatumPayload {
   siteMetadatum?: SiteMetadatum | null;
   siteMetadatumEdge?: SiteMetadatumEdge | null;
 }
+export interface DeleteBlueprintConstructionPayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintConstruction` that was deleted by this mutation. */
+  blueprintConstruction?: BlueprintConstruction | null;
+  blueprintConstructionEdge?: BlueprintConstructionEdge | null;
+}
 export interface DeleteRlsModulePayload {
   clientMutationId?: string | null;
   /** The `RlsModule` that was deleted by this mutation. */
@@ -16410,6 +16775,12 @@ export interface DeleteDomainPayload {
   /** The `Domain` that was deleted by this mutation. */
   domain?: Domain | null;
   domainEdge?: DomainEdge | null;
+}
+export interface DeleteBlueprintPayload {
+  clientMutationId?: string | null;
+  /** The `Blueprint` that was deleted by this mutation. */
+  blueprint?: Blueprint | null;
+  blueprintEdge?: BlueprintEdge | null;
 }
 export interface DeleteOrgGrantPayload {
   clientMutationId?: string | null;
@@ -16488,12 +16859,6 @@ export interface DeleteViewPayload {
   /** The `View` that was deleted by this mutation. */
   view?: View | null;
   viewEdge?: ViewEdge | null;
-}
-export interface DeleteBlueprintPayload {
-  clientMutationId?: string | null;
-  /** The `Blueprint` that was deleted by this mutation. */
-  blueprint?: Blueprint | null;
-  blueprintEdge?: BlueprintEdge | null;
 }
 export interface DeletePermissionsModulePayload {
   clientMutationId?: string | null;
@@ -16603,23 +16968,29 @@ export interface DeleteHierarchyModulePayload {
   hierarchyModule?: HierarchyModule | null;
   hierarchyModuleEdge?: HierarchyModuleEdge | null;
 }
+export interface DeleteStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was deleted by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
 export interface DeleteInvitePayload {
   clientMutationId?: string | null;
   /** The `Invite` that was deleted by this mutation. */
   invite?: Invite | null;
   inviteEdge?: InviteEdge | null;
 }
-export interface DeleteForeignKeyConstraintPayload {
-  clientMutationId?: string | null;
-  /** The `ForeignKeyConstraint` that was deleted by this mutation. */
-  foreignKeyConstraint?: ForeignKeyConstraint | null;
-  foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
-}
 export interface DeleteSecureTableProvisionPayload {
   clientMutationId?: string | null;
   /** The `SecureTableProvision` that was deleted by this mutation. */
   secureTableProvision?: SecureTableProvision | null;
   secureTableProvisionEdge?: SecureTableProvisionEdge | null;
+}
+export interface DeleteForeignKeyConstraintPayload {
+  clientMutationId?: string | null;
+  /** The `ForeignKeyConstraint` that was deleted by this mutation. */
+  foreignKeyConstraint?: ForeignKeyConstraint | null;
+  foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
 export interface DeleteOrgInvitePayload {
   clientMutationId?: string | null;
@@ -16651,23 +17022,23 @@ export interface DeleteFieldPayload {
   field?: Field | null;
   fieldEdge?: FieldEdge | null;
 }
-export interface DeleteMembershipsModulePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipsModule` that was deleted by this mutation. */
-  membershipsModule?: MembershipsModule | null;
-  membershipsModuleEdge?: MembershipsModuleEdge | null;
-}
 export interface DeleteRelationProvisionPayload {
   clientMutationId?: string | null;
   /** The `RelationProvision` that was deleted by this mutation. */
   relationProvision?: RelationProvision | null;
   relationProvisionEdge?: RelationProvisionEdge | null;
 }
-/** A `GetAllRecord` edge in the connection. */
-export interface GetAllEdge {
+export interface DeleteMembershipsModulePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipsModule` that was deleted by this mutation. */
+  membershipsModule?: MembershipsModule | null;
+  membershipsModuleEdge?: MembershipsModuleEdge | null;
+}
+/** A `OrgGetManagersRecord` edge in the connection. */
+export interface OrgGetManagersEdge {
   cursor?: string | null;
-  /** The `GetAllRecord` at the end of the edge. */
-  node?: GetAllRecord | null;
+  /** The `OrgGetManagersRecord` at the end of the edge. */
+  node?: OrgGetManagersRecord | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -16680,17 +17051,17 @@ export interface PageInfo {
   /** When paginating forwards, the cursor to continue. */
   endCursor?: string | null;
 }
-/** A `OrgGetManagersRecord` edge in the connection. */
-export interface OrgGetManagersEdge {
-  cursor?: string | null;
-  /** The `OrgGetManagersRecord` at the end of the edge. */
-  node?: OrgGetManagersRecord | null;
-}
 /** A `OrgGetSubordinatesRecord` edge in the connection. */
 export interface OrgGetSubordinatesEdge {
   cursor?: string | null;
   /** The `OrgGetSubordinatesRecord` at the end of the edge. */
   node?: OrgGetSubordinatesRecord | null;
+}
+/** A `GetAllRecord` edge in the connection. */
+export interface GetAllEdge {
+  cursor?: string | null;
+  /** The `GetAllRecord` at the end of the edge. */
+  node?: GetAllRecord | null;
 }
 /** A `Object` edge in the connection. */
 export interface ObjectEdge {
@@ -16734,12 +17105,6 @@ export interface ApiSchemaEdge {
   /** The `ApiSchema` at the end of the edge. */
   node?: ApiSchema | null;
 }
-/** A `SiteTheme` edge in the connection. */
-export interface SiteThemeEdge {
-  cursor?: string | null;
-  /** The `SiteTheme` at the end of the edge. */
-  node?: SiteTheme | null;
-}
 /** A `OrgMember` edge in the connection. */
 export interface OrgMemberEdge {
   cursor?: string | null;
@@ -16769,6 +17134,12 @@ export interface SecretsModuleEdge {
   cursor?: string | null;
   /** The `SecretsModule` at the end of the edge. */
   node?: SecretsModule | null;
+}
+/** A `SiteTheme` edge in the connection. */
+export interface SiteThemeEdge {
+  cursor?: string | null;
+  /** The `SiteTheme` at the end of the edge. */
+  node?: SiteTheme | null;
 }
 /** A `Store` edge in the connection. */
 export interface StoreEdge {
@@ -16908,23 +17279,11 @@ export interface CryptoAddressesModuleEdge {
   /** The `CryptoAddressesModule` at the end of the edge. */
   node?: CryptoAddressesModule | null;
 }
-/** A `ConnectedAccount` edge in the connection. */
-export interface ConnectedAccountEdge {
-  cursor?: string | null;
-  /** The `ConnectedAccount` at the end of the edge. */
-  node?: ConnectedAccount | null;
-}
 /** A `PhoneNumber` edge in the connection. */
 export interface PhoneNumberEdge {
   cursor?: string | null;
   /** The `PhoneNumber` at the end of the edge. */
   node?: PhoneNumber | null;
-}
-/** A `MigrateFile` edge in the connection. */
-export interface MigrateFileEdge {
-  cursor?: string | null;
-  /** The `MigrateFile` at the end of the edge. */
-  node?: MigrateFile | null;
 }
 /** A `AppLimitDefault` edge in the connection. */
 export interface AppLimitDefaultEdge {
@@ -16937,6 +17296,18 @@ export interface OrgLimitDefaultEdge {
   cursor?: string | null;
   /** The `OrgLimitDefault` at the end of the edge. */
   node?: OrgLimitDefault | null;
+}
+/** A `ConnectedAccount` edge in the connection. */
+export interface ConnectedAccountEdge {
+  cursor?: string | null;
+  /** The `ConnectedAccount` at the end of the edge. */
+  node?: ConnectedAccount | null;
+}
+/** A `MigrateFile` edge in the connection. */
+export interface MigrateFileEdge {
+  cursor?: string | null;
+  /** The `MigrateFile` at the end of the edge. */
+  node?: MigrateFile | null;
 }
 /** A `TableGrant` edge in the connection. */
 export interface TableGrantEdge {
@@ -17010,6 +17381,12 @@ export interface SiteMetadatumEdge {
   /** The `SiteMetadatum` at the end of the edge. */
   node?: SiteMetadatum | null;
 }
+/** A `BlueprintConstruction` edge in the connection. */
+export interface BlueprintConstructionEdge {
+  cursor?: string | null;
+  /** The `BlueprintConstruction` at the end of the edge. */
+  node?: BlueprintConstruction | null;
+}
 /** A `RlsModule` edge in the connection. */
 export interface RlsModuleEdge {
   cursor?: string | null;
@@ -17057,6 +17434,12 @@ export interface DomainEdge {
   cursor?: string | null;
   /** The `Domain` at the end of the edge. */
   node?: Domain | null;
+}
+/** A `Blueprint` edge in the connection. */
+export interface BlueprintEdge {
+  cursor?: string | null;
+  /** The `Blueprint` at the end of the edge. */
+  node?: Blueprint | null;
 }
 /** A `OrgGrant` edge in the connection. */
 export interface OrgGrantEdge {
@@ -17135,12 +17518,6 @@ export interface ViewEdge {
   cursor?: string | null;
   /** The `View` at the end of the edge. */
   node?: View | null;
-}
-/** A `Blueprint` edge in the connection. */
-export interface BlueprintEdge {
-  cursor?: string | null;
-  /** The `Blueprint` at the end of the edge. */
-  node?: Blueprint | null;
 }
 /** A `PermissionsModule` edge in the connection. */
 export interface PermissionsModuleEdge {
@@ -17256,23 +17633,29 @@ export interface HierarchyModuleEdge {
   /** The `HierarchyModule` at the end of the edge. */
   node?: HierarchyModule | null;
 }
+/** A `StorageModule` edge in the connection. */
+export interface StorageModuleEdge {
+  cursor?: string | null;
+  /** The `StorageModule` at the end of the edge. */
+  node?: StorageModule | null;
+}
 /** A `Invite` edge in the connection. */
 export interface InviteEdge {
   cursor?: string | null;
   /** The `Invite` at the end of the edge. */
   node?: Invite | null;
 }
-/** A `ForeignKeyConstraint` edge in the connection. */
-export interface ForeignKeyConstraintEdge {
-  cursor?: string | null;
-  /** The `ForeignKeyConstraint` at the end of the edge. */
-  node?: ForeignKeyConstraint | null;
-}
 /** A `SecureTableProvision` edge in the connection. */
 export interface SecureTableProvisionEdge {
   cursor?: string | null;
   /** The `SecureTableProvision` at the end of the edge. */
   node?: SecureTableProvision | null;
+}
+/** A `ForeignKeyConstraint` edge in the connection. */
+export interface ForeignKeyConstraintEdge {
+  cursor?: string | null;
+  /** The `ForeignKeyConstraint` at the end of the edge. */
+  node?: ForeignKeyConstraint | null;
 }
 /** A `OrgInvite` edge in the connection. */
 export interface OrgInviteEdge {
@@ -17304,17 +17687,17 @@ export interface FieldEdge {
   /** The `Field` at the end of the edge. */
   node?: Field | null;
 }
-/** A `MembershipsModule` edge in the connection. */
-export interface MembershipsModuleEdge {
-  cursor?: string | null;
-  /** The `MembershipsModule` at the end of the edge. */
-  node?: MembershipsModule | null;
-}
 /** A `RelationProvision` edge in the connection. */
 export interface RelationProvisionEdge {
   cursor?: string | null;
   /** The `RelationProvision` at the end of the edge. */
   node?: RelationProvision | null;
+}
+/** A `MembershipsModule` edge in the connection. */
+export interface MembershipsModuleEdge {
+  cursor?: string | null;
+  /** The `MembershipsModule` at the end of the edge. */
+  node?: MembershipsModule | null;
 }
 /** Information about a database table */
 export interface MetaTable {
@@ -17330,10 +17713,6 @@ export interface MetaTable {
   inflection: MetaInflection;
   query: MetaQuery;
 }
-export interface ProvisionDatabaseWithUserRecord {
-  outDatabaseId?: string | null;
-  outApiKey?: string | null;
-}
 export interface BootstrapUserRecord {
   outUserId?: string | null;
   outEmail?: string | null;
@@ -17343,6 +17722,16 @@ export interface BootstrapUserRecord {
   outIsOwner?: boolean | null;
   outIsSudo?: boolean | null;
   outApiKey?: string | null;
+}
+export interface ProvisionDatabaseWithUserRecord {
+  outDatabaseId?: string | null;
+  outApiKey?: string | null;
+}
+export interface ProvisionRelationRecord {
+  outFieldId?: string | null;
+  outJunctionTableId?: string | null;
+  outSourceFieldId?: string | null;
+  outTargetFieldId?: string | null;
 }
 export interface SignInOneTimeTokenRecord {
   id?: string | null;
@@ -17372,6 +17761,10 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+}
+export interface ProvisionTableRecord {
+  outTableId?: string | null;
+  outFields?: string[] | null;
 }
 /** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
 export interface Session {

@@ -32,12 +32,12 @@ function App() {
 
 | Hook | Type | Description |
 |------|------|-------------|
-| `useGetAllQuery` | Query | List all getAll |
-| `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
 | `useOrgGetManagersQuery` | Query | List all orgGetManagers |
 | `useCreateOrgGetManagersRecordMutation` | Mutation | Create a orgGetManagersRecord |
 | `useOrgGetSubordinatesQuery` | Query | List all orgGetSubordinates |
 | `useCreateOrgGetSubordinatesRecordMutation` | Mutation | Create a orgGetSubordinatesRecord |
+| `useGetAllQuery` | Query | List all getAll |
+| `useCreateGetAllRecordMutation` | Mutation | Create a getAllRecord |
 | `useObjectsQuery` | Query | List all objects |
 | `useObjectQuery` | Query | Get one object |
 | `useCreateObjectMutation` | Mutation | Create a object |
@@ -153,11 +153,11 @@ function App() {
 | `useCreateTableTemplateModuleMutation` | Mutation | Create a tableTemplateModule |
 | `useUpdateTableTemplateModuleMutation` | Mutation | Update a tableTemplateModule |
 | `useDeleteTableTemplateModuleMutation` | Mutation | Delete a tableTemplateModule |
-| `useSecureTableProvisionsQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useSecureTableProvisionQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useCreateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useUpdateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useDeleteSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useSecureTableProvisionsQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useSecureTableProvisionQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useCreateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useUpdateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useDeleteSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
 | `useRelationProvisionsQuery` | Query | Provisions relational structure between tables. Supports four relation types:
      - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
      - RelationHasMany: adds a FK field on the target table referencing the source table (parent perspective: "projects has many tasks" -> tasks.project_id). Inverse of BelongsTo.
@@ -363,16 +363,26 @@ function App() {
 | `useCreateUsersModuleMutation` | Mutation | Create a usersModule |
 | `useUpdateUsersModuleMutation` | Mutation | Update a usersModule |
 | `useDeleteUsersModuleMutation` | Mutation | Delete a usersModule |
-| `useBlueprintsQuery` | Query | An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. |
-| `useBlueprintQuery` | Query | An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. |
-| `useCreateBlueprintMutation` | Mutation | An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. |
-| `useUpdateBlueprintMutation` | Mutation | An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. |
-| `useDeleteBlueprintMutation` | Mutation | An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. |
+| `useBlueprintsQuery` | Query | An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. |
+| `useBlueprintQuery` | Query | An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. |
+| `useCreateBlueprintMutation` | Mutation | An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. |
+| `useUpdateBlueprintMutation` | Mutation | An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. |
+| `useDeleteBlueprintMutation` | Mutation | An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. |
 | `useBlueprintTemplatesQuery` | Query | A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible). |
 | `useBlueprintTemplateQuery` | Query | A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible). |
 | `useCreateBlueprintTemplateMutation` | Mutation | A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible). |
 | `useUpdateBlueprintTemplateMutation` | Mutation | A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible). |
 | `useDeleteBlueprintTemplateMutation` | Mutation | A shareable, versioned schema recipe for the blueprint marketplace. Templates define arrays of secure_table_provision + relation_provision inputs that together describe a complete domain schema (e.g. e-commerce, telemedicine, habit tracker). Templates are never executed directly — they are copied into a blueprint first via copy_template_to_blueprint(). Can be private (owner-only) or public (marketplace-visible). |
+| `useBlueprintConstructionsQuery` | Query | Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts. |
+| `useBlueprintConstructionQuery` | Query | Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts. |
+| `useCreateBlueprintConstructionMutation` | Mutation | Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts. |
+| `useUpdateBlueprintConstructionMutation` | Mutation | Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts. |
+| `useDeleteBlueprintConstructionMutation` | Mutation | Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts. |
+| `useStorageModulesQuery` | Query | List all storageModules |
+| `useStorageModuleQuery` | Query | Get one storageModule |
+| `useCreateStorageModuleMutation` | Mutation | Create a storageModule |
+| `useUpdateStorageModuleMutation` | Mutation | Update a storageModule |
+| `useDeleteStorageModuleMutation` | Mutation | Delete a storageModule |
 | `useDatabaseProvisionModulesQuery` | Query | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
 | `useDatabaseProvisionModuleQuery` | Query | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
 | `useCreateDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
@@ -523,11 +533,6 @@ function App() {
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
 | `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
 | `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
-| `useMigrateFilesQuery` | Query | List all migrateFiles |
-| `useMigrateFileQuery` | Query | Get one migrateFile |
-| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
-| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
-| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
 | `useAppLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useAppLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useCreateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
@@ -538,6 +543,11 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useMigrateFilesQuery` | Query | List all migrateFiles |
+| `useMigrateFileQuery` | Query | Get one migrateFile |
+| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
+| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
+| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
 | `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
@@ -603,6 +613,7 @@ function App() {
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
 | `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
+| `useResolveBlueprintTableQuery` | Query | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `useAppPermissionsGetMaskByNamesQuery` | Query | appPermissionsGetMaskByNames |
 | `useOrgPermissionsGetMaskByNamesQuery` | Query | orgPermissionsGetMaskByNames |
 | `useGetAllObjectsFromRootQuery` | Query | Reads and enables pagination through a set of `Object`. |
@@ -625,18 +636,22 @@ function App() {
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useFreezeObjectsMutation` | Mutation | freezeObjects |
 | `useInitEmptyRepoMutation` | Mutation | initEmptyRepo |
-| `useConstructBlueprintMutation` | Mutation | Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map. |
+| `useConstructBlueprintMutation` | Mutation | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure. |
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
-| `useSetDataAtPathMutation` | Mutation | setDataAtPath |
-| `useSetPropsAndCommitMutation` | Mutation | setPropsAndCommit |
 | `useCopyTemplateToBlueprintMutation` | Mutation | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
-| `useProvisionDatabaseWithUserMutation` | Mutation | provisionDatabaseWithUser |
 | `useBootstrapUserMutation` | Mutation | bootstrapUser |
 | `useSetFieldOrderMutation` | Mutation | setFieldOrder |
+| `useProvisionUniqueConstraintMutation` | Mutation | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
+| `useProvisionFullTextSearchMutation` | Mutation | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
+| `useProvisionIndexMutation` | Mutation | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
+| `useSetDataAtPathMutation` | Mutation | setDataAtPath |
+| `useSetPropsAndCommitMutation` | Mutation | setPropsAndCommit |
+| `useProvisionDatabaseWithUserMutation` | Mutation | provisionDatabaseWithUser |
 | `useInsertNodeAtPathMutation` | Mutation | insertNodeAtPath |
 | `useUpdateNodeAtPathMutation` | Mutation | updateNodeAtPath |
 | `useSetAndCommitMutation` | Mutation | setAndCommit |
+| `useProvisionRelationMutation` | Mutation | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
 | `useApplyRlsMutation` | Mutation | applyRls |
 | `useSignInOneTimeTokenMutation` | Mutation | signInOneTimeToken |
 | `useCreateUserDatabaseMutation` | Mutation | Creates a new user database with all required modules, permissions, and RLS policies.
@@ -660,27 +675,13 @@ Example usage:
 | `useSignInMutation` | Mutation | signIn |
 | `useSignUpMutation` | Mutation | signUp |
 | `useOneTimeTokenMutation` | Mutation | oneTimeToken |
+| `useProvisionTableMutation` | Mutation | Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
 | `useVerifyTotpMutation` | Mutation | verifyTotp |
 
 ## Table Hooks
-
-### GetAllRecord
-
-```typescript
-// List all getAll
-const { data, isLoading } = useGetAllQuery({
-  selection: { fields: { path: true, data: true } },
-});
-
-// Create a getAllRecord
-const { mutate: create } = useCreateGetAllRecordMutation({
-  selection: { fields: { id: true } },
-});
-create({ path: '<String>', data: '<JSON>' });
-```
 
 ### OrgGetManagersRecord
 
@@ -710,6 +711,21 @@ const { mutate: create } = useCreateOrgGetSubordinatesRecordMutation({
   selection: { fields: { id: true } },
 });
 create({ userId: '<UUID>', depth: '<Int>' });
+```
+
+### GetAllRecord
+
+```typescript
+// List all getAll
+const { data, isLoading } = useGetAllQuery({
+  selection: { fields: { path: true, data: true } },
+});
+
+// Create a getAllRecord
+const { mutate: create } = useCreateGetAllRecordMutation({
+  selection: { fields: { id: true } },
+});
+create({ path: '<String>', data: '<JSON>' });
 ```
 
 ### Object
@@ -1200,20 +1216,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', ta
 ```typescript
 // List all secureTableProvisions
 const { data, isLoading } = useSecureTableProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
 });
 
 // Get one secureTableProvision
 const { data: item } = useSecureTableProvisionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
 });
 
 // Create a secureTableProvision
 const { mutate: create } = useCreateSecureTableProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodeType: '<String>', useRls: '<Boolean>', nodeData: '<JSON>', fields: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFields: '<UUID>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodes: '<JSON>', useRls: '<Boolean>', fields: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFields: '<UUID>' });
 ```
 
 ### RelationProvision
@@ -1221,20 +1237,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName:
 ```typescript
 // List all relationProvisions
 const { data, isLoading } = useRelationProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
 });
 
 // Get one relationProvision
 const { data: item } = useRelationProvisionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
 });
 
 // Create a relationProvision
 const { mutate: create } = useCreateRelationProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', relationType: '<String>', sourceTableId: '<UUID>', targetTableId: '<UUID>', fieldName: '<String>', deleteAction: '<String>', isRequired: '<Boolean>', apiRequired: '<Boolean>', junctionTableId: '<UUID>', junctionTableName: '<String>', junctionSchemaId: '<UUID>', sourceFieldName: '<String>', targetFieldName: '<String>', useCompositeKey: '<Boolean>', createIndex: '<Boolean>', exposeInApi: '<Boolean>', nodeType: '<String>', nodeData: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFieldId: '<UUID>', outJunctionTableId: '<UUID>', outSourceFieldId: '<UUID>', outTargetFieldId: '<UUID>' });
+create({ databaseId: '<UUID>', relationType: '<String>', sourceTableId: '<UUID>', targetTableId: '<UUID>', fieldName: '<String>', deleteAction: '<String>', isRequired: '<Boolean>', apiRequired: '<Boolean>', junctionTableId: '<UUID>', junctionTableName: '<String>', junctionSchemaId: '<UUID>', sourceFieldName: '<String>', targetFieldName: '<String>', useCompositeKey: '<Boolean>', createIndex: '<Boolean>', exposeInApi: '<Boolean>', nodes: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFieldId: '<UUID>', outJunctionTableId: '<UUID>', outSourceFieldId: '<UUID>', outTargetFieldId: '<UUID>' });
 ```
 
 ### SchemaGrant
@@ -1935,20 +1951,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName:
 ```typescript
 // List all blueprints
 const { data, isLoading } = useBlueprintsQuery({
-  selection: { fields: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, status: true, constructedAt: true, errorDetails: true, refMap: true, constructedDefinition: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one blueprint
 const { data: item } = useBlueprintQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, status: true, constructedAt: true, errorDetails: true, refMap: true, constructedDefinition: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a blueprint
 const { mutate: create } = useCreateBlueprintMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', databaseId: '<UUID>', name: '<String>', displayName: '<String>', description: '<String>', definition: '<JSON>', templateId: '<UUID>', status: '<String>', constructedAt: '<Datetime>', errorDetails: '<String>', refMap: '<JSON>', constructedDefinition: '<JSON>', definitionHash: '<UUID>', tableHashes: '<JSON>' });
+create({ ownerId: '<UUID>', databaseId: '<UUID>', name: '<String>', displayName: '<String>', description: '<String>', definition: '<JSON>', templateId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' });
 ```
 
 ### BlueprintTemplate
@@ -1970,6 +1986,48 @@ const { mutate: create } = useCreateBlueprintTemplateMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', version: '<String>', displayName: '<String>', description: '<String>', ownerId: '<UUID>', visibility: '<String>', categories: '<String>', tags: '<String>', definition: '<JSON>', definitionSchemaVersion: '<String>', source: '<String>', complexity: '<String>', copyCount: '<Int>', forkCount: '<Int>', forkedFromId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' });
+```
+
+### BlueprintConstruction
+
+```typescript
+// List all blueprintConstructions
+const { data, isLoading } = useBlueprintConstructionsQuery({
+  selection: { fields: { id: true, blueprintId: true, databaseId: true, schemaId: true, status: true, errorDetails: true, tableMap: true, constructedDefinition: true, constructedAt: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one blueprintConstruction
+const { data: item } = useBlueprintConstructionQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, blueprintId: true, databaseId: true, schemaId: true, status: true, errorDetails: true, tableMap: true, constructedDefinition: true, constructedAt: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a blueprintConstruction
+const { mutate: create } = useCreateBlueprintConstructionMutation({
+  selection: { fields: { id: true } },
+});
+create({ blueprintId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', status: '<String>', errorDetails: '<String>', tableMap: '<JSON>', constructedDefinition: '<JSON>', constructedAt: '<Datetime>' });
+```
+
+### StorageModule
+
+```typescript
+// List all storageModules
+const { data, isLoading } = useStorageModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, entityTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+});
+
+// Get one storageModule
+const { data: item } = useStorageModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, entityTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+});
+
+// Create a storageModule
+const { mutate: create } = useCreateStorageModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', uploadRequestsTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', uploadRequestsTableName: '<String>', entityTableId: '<UUID>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' });
 ```
 
 ### DatabaseProvisionModule
@@ -2602,27 +2660,6 @@ const { mutate: create } = useCreateRoleTypeMutation({
 create({ name: '<String>' });
 ```
 
-### MigrateFile
-
-```typescript
-// List all migrateFiles
-const { data, isLoading } = useMigrateFilesQuery({
-  selection: { fields: { id: true, databaseId: true, upload: true } },
-});
-
-// Get one migrateFile
-const { data: item } = useMigrateFileQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, upload: true } },
-});
-
-// Create a migrateFile
-const { mutate: create } = useCreateMigrateFileMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', upload: '<Upload>' });
-```
-
 ### AppLimitDefault
 
 ```typescript
@@ -2663,6 +2700,27 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', max: '<Int>' });
+```
+
+### MigrateFile
+
+```typescript
+// List all migrateFiles
+const { data, isLoading } = useMigrateFilesQuery({
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Get one migrateFile
+const { data: item } = useMigrateFileQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Create a migrateFile
+const { mutate: create } = useCreateMigrateFileMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', upload: '<Upload>' });
 ```
 
 ### MembershipType
@@ -3002,6 +3060,21 @@ orgPermissionsGetMask
   |----------|------|
   | `ids` | [UUID] |
 
+### `useResolveBlueprintTableQuery`
+
+Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `databaseId` | UUID |
+  | `tableName` | String |
+  | `schemaName` | String |
+  | `tableMap` | JSON |
+  | `defaultSchemaId` | UUID |
+
 ### `useAppPermissionsGetMaskByNamesQuery`
 
 appPermissionsGetMaskByNames
@@ -3264,7 +3337,7 @@ initEmptyRepo
 
 ### `useConstructBlueprintMutation`
 
-Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
+Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure.
 
 - **Type:** mutation
 - **Arguments:**
@@ -3295,28 +3368,6 @@ removeNodeAtPath
   |----------|------|
   | `input` | RemoveNodeAtPathInput (required) |
 
-### `useSetDataAtPathMutation`
-
-setDataAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetDataAtPathInput (required) |
-
-### `useSetPropsAndCommitMutation`
-
-setPropsAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetPropsAndCommitInput (required) |
-
 ### `useCopyTemplateToBlueprintMutation`
 
 Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
@@ -3327,17 +3378,6 @@ Creates a new blueprint by copying a template definition. Checks visibility: own
   | Argument | Type |
   |----------|------|
   | `input` | CopyTemplateToBlueprintInput (required) |
-
-### `useProvisionDatabaseWithUserMutation`
-
-provisionDatabaseWithUser
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionDatabaseWithUserInput (required) |
 
 ### `useBootstrapUserMutation`
 
@@ -3360,6 +3400,72 @@ setFieldOrder
   | Argument | Type |
   |----------|------|
   | `input` | SetFieldOrderInput (required) |
+
+### `useProvisionUniqueConstraintMutation`
+
+Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionUniqueConstraintInput (required) |
+
+### `useProvisionFullTextSearchMutation`
+
+Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionFullTextSearchInput (required) |
+
+### `useProvisionIndexMutation`
+
+Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionIndexInput (required) |
+
+### `useSetDataAtPathMutation`
+
+setDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetDataAtPathInput (required) |
+
+### `useSetPropsAndCommitMutation`
+
+setPropsAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetPropsAndCommitInput (required) |
+
+### `useProvisionDatabaseWithUserMutation`
+
+provisionDatabaseWithUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionDatabaseWithUserInput (required) |
 
 ### `useInsertNodeAtPathMutation`
 
@@ -3393,6 +3499,17 @@ setAndCommit
   | Argument | Type |
   |----------|------|
   | `input` | SetAndCommitInput (required) |
+
+### `useProvisionRelationMutation`
+
+Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionRelationInput (required) |
 
 ### `useApplyRlsMutation`
 
@@ -3486,6 +3603,17 @@ oneTimeToken
   | Argument | Type |
   |----------|------|
   | `input` | OneTimeTokenInput (required) |
+
+### `useProvisionTableMutation`
+
+Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionTableInput (required) |
 
 ### `useSendVerificationEmailMutation`
 
