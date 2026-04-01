@@ -28,11 +28,10 @@ import { generatePresignedPutUrl, headObject } from './s3-signer';
 
 const log = new Logger('graphile-presigned-url:plugin');
 
-// --- Validation constants ---
+// --- Protocol-level constants (not configurable) ---
 
 const MAX_CONTENT_HASH_LENGTH = 128;
 const MAX_CONTENT_TYPE_LENGTH = 255;
-const MAX_FILENAME_LENGTH = 1024;
 const MAX_BUCKET_KEY_LENGTH = 255;
 const SHA256_HEX_REGEX = /^[a-f0-9]{64}$/;
 
@@ -71,11 +70,7 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
 export function createPresignedUrlPlugin(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Plugin {
-  const {
-    s3,
-    urlExpirySeconds = 900,
-    maxFileSize = 200 * 1024 * 1024,
-  } = options;
+  const { s3 } = options;
 
   return extendSchema(() => ({
     typeDefs: gql`
@@ -168,19 +163,11 @@ export function createPresignedUrlPlugin(
             if (!contentType || typeof contentType !== 'string' || contentType.length > MAX_CONTENT_TYPE_LENGTH) {
               throw new Error('INVALID_CONTENT_TYPE');
             }
-            if (typeof size !== 'number' || size <= 0 || size > maxFileSize) {
-              throw new Error(`INVALID_FILE_SIZE: must be between 1 and ${maxFileSize} bytes`);
-            }
-            if (filename !== undefined && filename !== null) {
-              if (typeof filename !== 'string' || filename.length > MAX_FILENAME_LENGTH) {
-                throw new Error('INVALID_FILENAME');
-              }
-            }
 
             return withPgClient(pgSettings, async (pgClient: any) => {
               await pgClient.query('BEGIN');
               try {
-                // --- Resolve storage module config ---
+                // --- Resolve storage module config (all limits come from here) ---
                 const databaseId = await resolveDatabaseId(pgClient);
                 if (!databaseId) {
                   throw new Error('DATABASE_NOT_FOUND');
@@ -189,6 +176,16 @@ export function createPresignedUrlPlugin(
                 const storageConfig = await getStorageModuleConfig(pgClient, databaseId);
                 if (!storageConfig) {
                   throw new Error('STORAGE_MODULE_NOT_PROVISIONED');
+                }
+
+                // --- Validate size against storage module default (bucket override checked below) ---
+                if (typeof size !== 'number' || size <= 0 || size > storageConfig.defaultMaxFileSize) {
+                  throw new Error(`INVALID_FILE_SIZE: must be between 1 and ${storageConfig.defaultMaxFileSize} bytes`);
+                }
+                if (filename !== undefined && filename !== null) {
+                  if (typeof filename !== 'string' || filename.length > storageConfig.maxFilenameLength) {
+                    throw new Error('INVALID_FILENAME');
+                  }
                 }
 
                 // --- Look up the bucket (RLS enforced) ---
@@ -288,10 +285,10 @@ export function createPresignedUrlPlugin(
                   s3Key,
                   contentType,
                   size,
-                  urlExpirySeconds,
+                  storageConfig.uploadUrlExpirySeconds,
                 );
 
-                const expiresAt = new Date(Date.now() + urlExpirySeconds * 1000).toISOString();
+                const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
 
                 // --- Track the upload request ---
                 await pgClient.query(

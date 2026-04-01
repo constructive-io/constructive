@@ -29,8 +29,6 @@ import { createDownloadUrlPlugin } from './download-url-field';
  *         bucket: 'my-bucket',
  *         publicUrlPrefix: 'https://cdn.example.com',
  *       },
- *       urlExpirySeconds: 900,
- *       maxFileSize: 200 * 1024 * 1024,
  *     }),
  *   ],
  * };

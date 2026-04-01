@@ -18,6 +18,7 @@ import { Logger } from '@pgpmjs/logger';
 
 import type { PresignedUrlPluginOptions } from './types';
 import { generatePresignedGetUrl } from './s3-signer';
+import { getStorageModuleConfig } from './storage-module-cache';
 
 const log = new Logger('graphile-presigned-url:download-url');
 
@@ -34,7 +35,6 @@ export function createDownloadUrlPlugin(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Plugin {
   const { s3 } = options;
-  const downloadUrlExpirySeconds = 3600; // 1 hour for GET URLs
 
   return {
     name: 'PresignedUrlDownloadPlugin',
@@ -75,7 +75,7 @@ export function createDownloadUrlPlugin(
                     'URL to download this file. For public files, returns the public URL. ' +
                     'For private files, returns a time-limited presigned URL.',
                   type: GraphQLString,
-                  resolve(parent: any) {
+                  async resolve(parent: any, _args: any, context: any) {
                     const key = parent.key || parent.get?.('key');
                     const isPublic = parent.is_public ?? parent.get?.('is_public');
                     const filename = parent.filename || parent.get?.('filename');
@@ -91,6 +91,29 @@ export function createDownloadUrlPlugin(
                     if (isPublic && s3.publicUrlPrefix) {
                       // Public file: return direct URL
                       return `${s3.publicUrlPrefix}/${key}`;
+                    }
+
+                    // Resolve download URL expiry from storage module config (per-database)
+                    let downloadUrlExpirySeconds = 3600; // fallback default
+                    try {
+                      const withPgClient = context.pgSettings
+                        ? context.withPgClient
+                        : null;
+                      if (withPgClient) {
+                        const config = await withPgClient(null, async (pgClient: any) => {
+                          const dbResult = await pgClient.query(
+                            `SELECT jwt_private.current_database_id() AS id`,
+                          );
+                          const databaseId = dbResult.rows[0]?.id;
+                          if (!databaseId) return null;
+                          return getStorageModuleConfig(pgClient, databaseId);
+                        });
+                        if (config) {
+                          downloadUrlExpirySeconds = config.downloadUrlExpirySeconds;
+                        }
+                      }
+                    } catch {
+                      // Fall back to default if config lookup fails
                     }
 
                     // Private file: generate presigned GET URL

@@ -4,6 +4,13 @@ import type { StorageModuleConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:cache');
 
+// --- Defaults ---
+const DEFAULT_UPLOAD_URL_EXPIRY_SECONDS = 900; // 15 minutes
+const DEFAULT_DOWNLOAD_URL_EXPIRY_SECONDS = 3600; // 1 hour
+const DEFAULT_MAX_FILE_SIZE = 200 * 1024 * 1024; // 200MB
+const DEFAULT_MAX_FILENAME_LENGTH = 1024;
+const DEFAULT_CACHE_TTL_SECONDS = process.env.NODE_ENV === 'development' ? 300 : 3600;
+
 const FIVE_MINUTES_MS = 1000 * 60 * 5;
 const ONE_HOUR_MS = 1000 * 60 * 60;
 
@@ -36,7 +43,12 @@ const STORAGE_MODULE_QUERY = `
     fs.schema_name AS files_schema,
     ft.name AS files_table,
     urs.schema_name AS upload_requests_schema,
-    urt.name AS upload_requests_table
+    urt.name AS upload_requests_table,
+    sm.upload_url_expiry_seconds,
+    sm.download_url_expiry_seconds,
+    sm.default_max_file_size,
+    sm.max_filename_length,
+    sm.cache_ttl_seconds
   FROM metaschema_modules_public.storage_module sm
   JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
   JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
@@ -56,6 +68,11 @@ interface StorageModuleRow {
   files_table: string;
   upload_requests_schema: string;
   upload_requests_table: string;
+  upload_url_expiry_seconds: number | null;
+  download_url_expiry_seconds: number | null;
+  default_max_file_size: number | null;
+  max_filename_length: number | null;
+  cache_ttl_seconds: number | null;
 }
 
 /**
@@ -84,6 +101,8 @@ export async function getStorageModuleConfig(
   }
 
   const row = result.rows[0] as StorageModuleRow;
+  const cacheTtlSeconds = row.cache_ttl_seconds ?? DEFAULT_CACHE_TTL_SECONDS;
+
   const config: StorageModuleConfig = {
     id: row.id,
     bucketsQualifiedName: `"${row.buckets_schema}"."${row.buckets_table}"`,
@@ -93,6 +112,11 @@ export async function getStorageModuleConfig(
     bucketsTableName: row.buckets_table,
     filesTableName: row.files_table,
     uploadRequestsTableName: row.upload_requests_table,
+    uploadUrlExpirySeconds: row.upload_url_expiry_seconds ?? DEFAULT_UPLOAD_URL_EXPIRY_SECONDS,
+    downloadUrlExpirySeconds: row.download_url_expiry_seconds ?? DEFAULT_DOWNLOAD_URL_EXPIRY_SECONDS,
+    defaultMaxFileSize: row.default_max_file_size ?? DEFAULT_MAX_FILE_SIZE,
+    maxFilenameLength: row.max_filename_length ?? DEFAULT_MAX_FILENAME_LENGTH,
+    cacheTtlSeconds,
   };
 
   storageModuleCache.set(cacheKey, config);

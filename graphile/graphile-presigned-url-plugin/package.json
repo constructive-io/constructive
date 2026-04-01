@@ -46,13 +46,13 @@
     "lru-cache": "^11.2.7"
   },
   "peerDependencies": {
-    "grafast": "1.0.0-rc.9",
-    "graphile-build": "5.0.0-rc.6",
-    "graphile-build-pg": "5.0.0-rc.8",
-    "graphile-config": "1.0.0-rc.6",
-    "graphile-utils": "5.0.0-rc.8",
+    "grafast": "1.0.0",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
+    "graphile-utils": "5.0.0",
     "graphql": "16.13.0",
-    "postgraphile": "5.0.0-rc.10"
+    "postgraphile": "5.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.11",

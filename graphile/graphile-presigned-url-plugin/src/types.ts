@@ -33,6 +33,19 @@ export interface StorageModuleConfig {
   filesTableName: string;
   /** Upload requests table name */
   uploadRequestsTableName: string;
+
+  // --- Per-database configurable settings ---
+
+  /** Presigned PUT URL expiry in seconds (default: 900 = 15 min) */
+  uploadUrlExpirySeconds: number;
+  /** Presigned GET URL expiry in seconds (default: 3600 = 1 hour) */
+  downloadUrlExpirySeconds: number;
+  /** Default max file size in bytes (default: 200MB). Bucket-level max_file_size overrides this. */
+  defaultMaxFileSize: number;
+  /** Max filename length in characters (default: 1024) */
+  maxFilenameLength: number;
+  /** Cache TTL in seconds for this config entry (default: 300 dev / 3600 prod) */
+  cacheTtlSeconds: number;
 }
 
 /**
@@ -111,11 +124,4 @@ export interface S3Config {
 export interface PresignedUrlPluginOptions {
   /** S3 configuration */
   s3: S3Config;
-  /** Presigned URL expiry in seconds (default: 900 = 15 minutes) */
-  urlExpirySeconds?: number;
-  /** Maximum file size in bytes (default: 200MB) */
-  maxFileSize?: number;
-  /** Performance threshold for content hashing in bytes.
-   *  Above this size, use UUID key instead of content hash. (default: 200MB) */
-  hashThresholdBytes?: number;
 }
