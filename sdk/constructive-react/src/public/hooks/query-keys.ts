@@ -19,15 +19,6 @@
 // Entity Query Keys
 // ============================================================================
 
-export const getAllRecordKeys = {
-  /** All getAllRecord queries */ all: ['getallrecord'] as const,
-  /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...getAllRecordKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...getAllRecordKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...getAllRecordKeys.details(), id] as const,
-} as const;
 export const orgGetManagersRecordKeys = {
   /** All orgGetManagersRecord queries */ all: ['orggetmanagersrecord'] as const,
   /** List query keys */ lists: () => [...orgGetManagersRecordKeys.all, 'list'] as const,
@@ -45,6 +36,15 @@ export const orgGetSubordinatesRecordKeys = {
   /** Detail query keys */ details: () => [...orgGetSubordinatesRecordKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgGetSubordinatesRecordKeys.details(), id] as const,
+} as const;
+export const getAllRecordKeys = {
+  /** All getAllRecord queries */ all: ['getallrecord'] as const,
+  /** List query keys */ lists: () => [...getAllRecordKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...getAllRecordKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...getAllRecordKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...getAllRecordKeys.details(), id] as const,
 } as const;
 export const objectKeys = {
   /** All object queries */ all: ['object'] as const,
@@ -586,6 +586,24 @@ export const blueprintTemplateKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...blueprintTemplateKeys.details(), id] as const,
 } as const;
+export const blueprintConstructionKeys = {
+  /** All blueprintConstruction queries */ all: ['blueprintconstruction'] as const,
+  /** List query keys */ lists: () => [...blueprintConstructionKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...blueprintConstructionKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...blueprintConstructionKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...blueprintConstructionKeys.details(), id] as const,
+} as const;
+export const storageModuleKeys = {
+  /** All storageModule queries */ all: ['storagemodule'] as const,
+  /** List query keys */ lists: () => [...storageModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...storageModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...storageModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...storageModuleKeys.details(), id] as const,
+} as const;
 export const databaseProvisionModuleKeys = {
   /** All databaseProvisionModule queries */ all: ['databaseprovisionmodule'] as const,
   /** List query keys */ lists: () => [...databaseProvisionModuleKeys.all, 'list'] as const,
@@ -856,15 +874,6 @@ export const roleTypeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...roleTypeKeys.details(), id] as const,
 } as const;
-export const migrateFileKeys = {
-  /** All migrateFile queries */ all: ['migratefile'] as const,
-  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...migrateFileKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...migrateFileKeys.details(), id] as const,
-} as const;
 export const appLimitDefaultKeys = {
   /** All appLimitDefault queries */ all: ['applimitdefault'] as const,
   /** List query keys */ lists: () => [...appLimitDefaultKeys.all, 'list'] as const,
@@ -882,6 +891,15 @@ export const orgLimitDefaultKeys = {
   /** Detail query keys */ details: () => [...orgLimitDefaultKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitDefaultKeys.details(), id] as const,
+} as const;
+export const migrateFileKeys = {
+  /** All migrateFile queries */ all: ['migratefile'] as const,
+  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...migrateFileKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...migrateFileKeys.details(), id] as const,
 } as const;
 export const membershipTypeKeys = {
   /** All membershipType queries */ all: ['membershiptype'] as const,
@@ -1006,6 +1024,8 @@ export const customQueryKeys = {
     ['appPermissionsGetMask', variables] as const,
   /** Query key for orgPermissionsGetMask */ orgPermissionsGetMask: (variables?: object) =>
     ['orgPermissionsGetMask', variables] as const,
+  /** Query key for resolveBlueprintTable */ resolveBlueprintTable: (variables?: object) =>
+    ['resolveBlueprintTable', variables] as const,
   /** Query key for appPermissionsGetMaskByNames */ appPermissionsGetMaskByNames: (
     variables?: object
   ) => ['appPermissionsGetMaskByNames', variables] as const,
@@ -1049,9 +1069,9 @@ export const customQueryKeys = {
  * ```
  */
 export const queryKeys = {
-  getAllRecord: getAllRecordKeys,
   orgGetManagersRecord: orgGetManagersRecordKeys,
   orgGetSubordinatesRecord: orgGetSubordinatesRecordKeys,
+  getAllRecord: getAllRecordKeys,
   object: objectKeys,
   appPermission: appPermissionKeys,
   orgPermission: orgPermissionKeys,
@@ -1112,6 +1132,8 @@ export const queryKeys = {
   usersModule: usersModuleKeys,
   blueprint: blueprintKeys,
   blueprintTemplate: blueprintTemplateKeys,
+  blueprintConstruction: blueprintConstructionKeys,
+  storageModule: storageModuleKeys,
   databaseProvisionModule: databaseProvisionModuleKeys,
   appAdminGrant: appAdminGrantKeys,
   appOwnerGrant: appOwnerGrantKeys,
@@ -1142,9 +1164,9 @@ export const queryKeys = {
   store: storeKeys,
   appPermissionDefault: appPermissionDefaultKeys,
   roleType: roleTypeKeys,
-  migrateFile: migrateFileKeys,
   appLimitDefault: appLimitDefaultKeys,
   orgLimitDefault: orgLimitDefaultKeys,
+  migrateFile: migrateFileKeys,
   membershipType: membershipTypeKeys,
   commit: commitKeys,
   appMembershipDefault: appMembershipDefaultKeys,

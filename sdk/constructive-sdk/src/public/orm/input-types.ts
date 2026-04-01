@@ -241,10 +241,6 @@ export type ConstructiveInternalTypeOrigin = unknown;
 export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
 // ============ Entity Types ============
-export interface GetAllRecord {
-  path?: string[] | null;
-  data?: Record<string, unknown> | null;
-}
 export interface OrgGetManagersRecord {
   userId?: string | null;
   depth?: number | null;
@@ -252,6 +248,10 @@ export interface OrgGetManagersRecord {
 export interface OrgGetSubordinatesRecord {
   userId?: string | null;
   depth?: number | null;
+}
+export interface GetAllRecord {
+  path?: string[] | null;
+  data?: Record<string, unknown> | null;
 }
 export interface Object {
   hashUuid?: string | null;
@@ -596,7 +596,7 @@ export interface TableTemplateModule {
   nodeType?: string | null;
   data?: Record<string, unknown> | null;
 }
-/** Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. */
+/** Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. */
 export interface SecureTableProvision {
   /** Unique identifier for this provision row. */
   id: string;
@@ -608,12 +608,10 @@ export interface SecureTableProvision {
   tableId?: string | null;
   /** Name of the target table. Used to create or look up the table when table_id is not provided. If omitted, it is backfilled from the resolved table. */
   tableName?: string | null;
-  /** Which generator to invoke for field creation. One of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete. NULL means no field creation — the row only provisions grants and/or policies. */
-  nodeType?: string | null;
+  /** Array of node objects to apply to the table. Each element is a jsonb object with a required "$type" key (one of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete, DataEmbedding, DataFullTextSearch, DataSlug, etc.) and an optional "data" key containing generator-specific configuration. Supports multiple nodes per row, matching the blueprint definition format. Example: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}]. Defaults to '[]' (no node processing). */
+  nodes?: Record<string, unknown> | null;
   /** If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true. */
   useRls?: boolean | null;
-  /** Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'. */
-  nodeData?: Record<string, unknown> | null;
   /** PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields). */
   fields?: Record<string, unknown>[] | null;
   /** Database roles to grant privileges to. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. */
@@ -632,7 +630,7 @@ export interface SecureTableProvision {
   policyName?: string | null;
   /** Opaque configuration passed through to metaschema.create_policy(). Structure varies by policy_type and is not interpreted by this trigger. Defaults to '{}'. */
   policyData?: Record<string, unknown> | null;
-  /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly. */
+  /** Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly. */
   outFields?: string[] | null;
 }
 /**
@@ -744,22 +742,12 @@ export interface RelationProvision {
    */
   exposeInApi?: boolean | null;
   /**
-   * For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-   *      Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
-   *      NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
-   *      Ignored for RelationBelongsTo/RelationHasOne.
+   * For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+   *      Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+   *      Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+   *      Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
    */
-  nodeType?: string | null;
-  /**
-   * For RelationManyToMany: configuration passed to the generator function for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-   *      Only used when node_type is set. Structure varies by node_type. Examples:
-   *      - DataId: {"field_name": "id"} (default field name is 'id')
-   *      - DataEntityMembership: {"entity_field_name": "entity_id", "include_id": false, "include_user_fk": true}
-   *      - DataDirectOwner: {"owner_field_name": "owner_id"}
-   *      Defaults to '{}' (empty object).
-   *      Ignored for RelationBelongsTo/RelationHasOne.
-   */
-  nodeData?: Record<string, unknown> | null;
+  nodes?: Record<string, unknown> | null;
   /** For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne. */
   grantRoles?: string[] | null;
   /** For RelationManyToMany: privilege grants for the junction table. Forwarded to secure_table_provision as-is. Format: PostgreSQL array of jsonb [privilege, columns] tuples. Examples: ARRAY['["select","*"]'::jsonb, '["insert","*"]'::jsonb] for full access, or ARRAY['["update",["name","bio"]]'::jsonb] for column-level grants. "*" means all columns. Defaults to '{}' (no grants — callers must explicitly specify privileges). Ignored for RelationBelongsTo/RelationHasOne. */
@@ -1267,7 +1255,7 @@ export interface UsersModule {
   typeTableId?: string | null;
   typeTableName?: string | null;
 }
-/** An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction. */
+/** An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build. */
 export interface Blueprint {
   /** Unique identifier for this blueprint. */
   id: string;
@@ -1281,23 +1269,13 @@ export interface Blueprint {
   displayName?: string | null;
   /** Optional description of the blueprint. */
   description?: string | null;
-  /** The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing. */
+  /** The blueprint definition as a JSONB document. Contains tables[] (each with table_name, optional schema_name, nodes[] for data behaviors, fields[], grants[], and policies[] using $type), relations[] (using $type with source_table/target_table and optional source_schema/target_schema), indexes[] (using table_name + column), and full_text_searches[] (using table_name + field + sources[]). Everything is name-based — no UUIDs in the definition. */
   definition?: Record<string, unknown> | null;
   /** If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch. */
   templateId?: string | null;
-  /** Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft. */
-  status?: string | null;
-  /** Timestamp when construct_blueprint() successfully completed. NULL until constructed. */
-  constructedAt?: string | null;
-  /** Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed. */
-  errorDetails?: string | null;
-  /** Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
-  refMap?: Record<string, unknown> | null;
-  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed. */
-  constructedDefinition?: Record<string, unknown> | null;
   /** UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly. */
   definitionHash?: string | null;
-  /** JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
+  /** JSONB map of table names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger. */
   tableHashes?: Record<string, unknown> | null;
   /** Timestamp when this blueprint was created. */
   createdAt?: string | null;
@@ -1346,6 +1324,49 @@ export interface BlueprintTemplate {
   createdAt?: string | null;
   /** Timestamp when this template was last modified. */
   updatedAt?: string | null;
+}
+/** Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts. */
+export interface BlueprintConstruction {
+  /** Unique identifier for this construction attempt. */
+  id: string;
+  /** The blueprint that was constructed. */
+  blueprintId?: string | null;
+  /** The database the blueprint was constructed into. */
+  databaseId?: string | null;
+  /** The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved. */
+  schemaId?: string | null;
+  /** Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. failed: execution failed (see error_details). */
+  status?: string | null;
+  /** Error message from a failed construction attempt. NULL unless status is failed. */
+  errorDetails?: string | null;
+  /** Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object. */
+  tableMap?: Record<string, unknown> | null;
+  /** Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the blueprint definition. */
+  constructedDefinition?: Record<string, unknown> | null;
+  /** Timestamp when construction successfully completed. NULL until constructed. */
+  constructedAt?: string | null;
+  /** Timestamp when this construction attempt was created. */
+  createdAt?: string | null;
+  /** Timestamp when this construction attempt was last modified. */
+  updatedAt?: string | null;
+}
+export interface StorageModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  bucketsTableId?: string | null;
+  filesTableId?: string | null;
+  uploadRequestsTableId?: string | null;
+  bucketsTableName?: string | null;
+  filesTableName?: string | null;
+  uploadRequestsTableName?: string | null;
+  entityTableId?: string | null;
+  uploadUrlExpirySeconds?: number | null;
+  downloadUrlExpirySeconds?: number | null;
+  defaultMaxFileSize?: string | null;
+  maxFilenameLength?: number | null;
+  cacheTtlSeconds?: number | null;
 }
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
@@ -1775,11 +1796,6 @@ export interface RoleType {
   id: number;
   name?: string | null;
 }
-export interface MigrateFile {
-  id: string;
-  databaseId?: string | null;
-  upload?: ConstructiveInternalTypeUpload | null;
-}
 /** Default maximum values for each named limit, applied when no per-actor override exists */
 export interface AppLimitDefault {
   id: string;
@@ -1795,6 +1811,11 @@ export interface OrgLimitDefault {
   name?: string | null;
   /** Default maximum usage allowed for this limit */
   max?: number | null;
+}
+export interface MigrateFile {
+  id: string;
+  databaseId?: string | null;
+  upload?: ConstructiveInternalTypeUpload | null;
 }
 /** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
 export interface MembershipType {
@@ -2000,9 +2021,9 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 // ============ Entity Relation Types ============
-export interface GetAllRecordRelations {}
 export interface OrgGetManagersRecordRelations {}
 export interface OrgGetSubordinatesRecordRelations {}
+export interface GetAllRecordRelations {}
 export interface ObjectRelations {}
 export interface AppPermissionRelations {}
 export interface OrgPermissionRelations {}
@@ -2064,6 +2085,8 @@ export interface DatabaseRelations {
   secureTableProvisions?: ConnectionResult<SecureTableProvision>;
   relationProvisions?: ConnectionResult<RelationProvision>;
   blueprints?: ConnectionResult<Blueprint>;
+  blueprintConstructions?: ConnectionResult<BlueprintConstruction>;
+  storageModules?: ConnectionResult<StorageModule>;
   databaseProvisionModules?: ConnectionResult<DatabaseProvisionModule>;
 }
 export interface SchemaRelations {
@@ -2405,11 +2428,25 @@ export interface UsersModuleRelations {
 export interface BlueprintRelations {
   database?: Database | null;
   template?: BlueprintTemplate | null;
+  blueprintConstructions?: ConnectionResult<BlueprintConstruction>;
 }
 export interface BlueprintTemplateRelations {
   forkedFrom?: BlueprintTemplate | null;
   blueprintTemplatesByForkedFromId?: ConnectionResult<BlueprintTemplate>;
   blueprintsByTemplateId?: ConnectionResult<Blueprint>;
+}
+export interface BlueprintConstructionRelations {
+  blueprint?: Blueprint | null;
+  database?: Database | null;
+}
+export interface StorageModuleRelations {
+  bucketsTable?: Table | null;
+  database?: Database | null;
+  entityTable?: Table | null;
+  filesTable?: Table | null;
+  privateSchema?: Schema | null;
+  schema?: Schema | null;
+  uploadRequestsTable?: Table | null;
 }
 export interface DatabaseProvisionModuleRelations {
   database?: Database | null;
@@ -2515,9 +2552,9 @@ export interface RefRelations {}
 export interface StoreRelations {}
 export interface AppPermissionDefaultRelations {}
 export interface RoleTypeRelations {}
-export interface MigrateFileRelations {}
 export interface AppLimitDefaultRelations {}
 export interface OrgLimitDefaultRelations {}
+export interface MigrateFileRelations {}
 export interface MembershipTypeRelations {}
 export interface CommitRelations {}
 export interface AppMembershipDefaultRelations {}
@@ -2602,11 +2639,11 @@ export interface HierarchyModuleRelations {
   usersTable?: Table | null;
 }
 // ============ Entity Types With Relations ============
-export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type OrgGetManagersRecordWithRelations = OrgGetManagersRecord &
   OrgGetManagersRecordRelations;
 export type OrgGetSubordinatesRecordWithRelations = OrgGetSubordinatesRecord &
   OrgGetSubordinatesRecordRelations;
+export type GetAllRecordWithRelations = GetAllRecord & GetAllRecordRelations;
 export type ObjectWithRelations = Object & ObjectRelations;
 export type AppPermissionWithRelations = AppPermission & AppPermissionRelations;
 export type OrgPermissionWithRelations = OrgPermission & OrgPermissionRelations;
@@ -2675,6 +2712,9 @@ export type UserAuthModuleWithRelations = UserAuthModule & UserAuthModuleRelatio
 export type UsersModuleWithRelations = UsersModule & UsersModuleRelations;
 export type BlueprintWithRelations = Blueprint & BlueprintRelations;
 export type BlueprintTemplateWithRelations = BlueprintTemplate & BlueprintTemplateRelations;
+export type BlueprintConstructionWithRelations = BlueprintConstruction &
+  BlueprintConstructionRelations;
+export type StorageModuleWithRelations = StorageModule & StorageModuleRelations;
 export type DatabaseProvisionModuleWithRelations = DatabaseProvisionModule &
   DatabaseProvisionModuleRelations;
 export type AppAdminGrantWithRelations = AppAdminGrant & AppAdminGrantRelations;
@@ -2708,9 +2748,9 @@ export type StoreWithRelations = Store & StoreRelations;
 export type AppPermissionDefaultWithRelations = AppPermissionDefault &
   AppPermissionDefaultRelations;
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
-export type MigrateFileWithRelations = MigrateFile & MigrateFileRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
+export type MigrateFileWithRelations = MigrateFile & MigrateFileRelations;
 export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type CommitWithRelations = Commit & CommitRelations;
 export type AppMembershipDefaultWithRelations = AppMembershipDefault &
@@ -2725,10 +2765,6 @@ export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
 export type AppMembershipWithRelations = AppMembership & AppMembershipRelations;
 export type HierarchyModuleWithRelations = HierarchyModule & HierarchyModuleRelations;
 // ============ Entity Select Types ============
-export type GetAllRecordSelect = {
-  path?: boolean;
-  data?: boolean;
-};
 export type OrgGetManagersRecordSelect = {
   userId?: boolean;
   depth?: boolean;
@@ -2736,6 +2772,10 @@ export type OrgGetManagersRecordSelect = {
 export type OrgGetSubordinatesRecordSelect = {
   userId?: boolean;
   depth?: boolean;
+};
+export type GetAllRecordSelect = {
+  path?: boolean;
+  data?: boolean;
 };
 export type ObjectSelect = {
   hashUuid?: boolean;
@@ -3106,6 +3146,18 @@ export type DatabaseSelect = {
     first?: number;
     filter?: BlueprintFilter;
     orderBy?: BlueprintOrderBy[];
+  };
+  blueprintConstructions?: {
+    select: BlueprintConstructionSelect;
+    first?: number;
+    filter?: BlueprintConstructionFilter;
+    orderBy?: BlueprintConstructionOrderBy[];
+  };
+  storageModules?: {
+    select: StorageModuleSelect;
+    first?: number;
+    filter?: StorageModuleFilter;
+    orderBy?: StorageModuleOrderBy[];
   };
   databaseProvisionModules?: {
     select: DatabaseProvisionModuleSelect;
@@ -3711,9 +3763,8 @@ export type SecureTableProvisionSelect = {
   schemaId?: boolean;
   tableId?: boolean;
   tableName?: boolean;
-  nodeType?: boolean;
+  nodes?: boolean;
   useRls?: boolean;
-  nodeData?: boolean;
   fields?: boolean;
   grantRoles?: boolean;
   grantPrivileges?: boolean;
@@ -3752,8 +3803,7 @@ export type RelationProvisionSelect = {
   useCompositeKey?: boolean;
   createIndex?: boolean;
   exposeInApi?: boolean;
-  nodeType?: boolean;
-  nodeData?: boolean;
+  nodes?: boolean;
   grantRoles?: boolean;
   grantPrivileges?: boolean;
   policyType?: boolean;
@@ -4662,11 +4712,6 @@ export type BlueprintSelect = {
   description?: boolean;
   definition?: boolean;
   templateId?: boolean;
-  status?: boolean;
-  constructedAt?: boolean;
-  errorDetails?: boolean;
-  refMap?: boolean;
-  constructedDefinition?: boolean;
   definitionHash?: boolean;
   tableHashes?: boolean;
   createdAt?: boolean;
@@ -4676,6 +4721,12 @@ export type BlueprintSelect = {
   };
   template?: {
     select: BlueprintTemplateSelect;
+  };
+  blueprintConstructions?: {
+    select: BlueprintConstructionSelect;
+    first?: number;
+    filter?: BlueprintConstructionFilter;
+    orderBy?: BlueprintConstructionOrderBy[];
   };
 };
 export type BlueprintTemplateSelect = {
@@ -4713,6 +4764,64 @@ export type BlueprintTemplateSelect = {
     first?: number;
     filter?: BlueprintFilter;
     orderBy?: BlueprintOrderBy[];
+  };
+};
+export type BlueprintConstructionSelect = {
+  id?: boolean;
+  blueprintId?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  status?: boolean;
+  errorDetails?: boolean;
+  tableMap?: boolean;
+  constructedDefinition?: boolean;
+  constructedAt?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  blueprint?: {
+    select: BlueprintSelect;
+  };
+  database?: {
+    select: DatabaseSelect;
+  };
+};
+export type StorageModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  privateSchemaId?: boolean;
+  bucketsTableId?: boolean;
+  filesTableId?: boolean;
+  uploadRequestsTableId?: boolean;
+  bucketsTableName?: boolean;
+  filesTableName?: boolean;
+  uploadRequestsTableName?: boolean;
+  entityTableId?: boolean;
+  uploadUrlExpirySeconds?: boolean;
+  downloadUrlExpirySeconds?: boolean;
+  defaultMaxFileSize?: boolean;
+  maxFilenameLength?: boolean;
+  cacheTtlSeconds?: boolean;
+  bucketsTable?: {
+    select: TableSelect;
+  };
+  database?: {
+    select: DatabaseSelect;
+  };
+  entityTable?: {
+    select: TableSelect;
+  };
+  filesTable?: {
+    select: TableSelect;
+  };
+  privateSchema?: {
+    select: SchemaSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
+  };
+  uploadRequestsTable?: {
+    select: TableSelect;
   };
 };
 export type DatabaseProvisionModuleSelect = {
@@ -5135,11 +5244,6 @@ export type RoleTypeSelect = {
   id?: boolean;
   name?: boolean;
 };
-export type MigrateFileSelect = {
-  id?: boolean;
-  databaseId?: boolean;
-  upload?: boolean;
-};
 export type AppLimitDefaultSelect = {
   id?: boolean;
   name?: boolean;
@@ -5149,6 +5253,11 @@ export type OrgLimitDefaultSelect = {
   id?: boolean;
   name?: boolean;
   max?: boolean;
+};
+export type MigrateFileSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  upload?: boolean;
 };
 export type MembershipTypeSelect = {
   id?: boolean;
@@ -5642,13 +5751,6 @@ export type HierarchyModuleSelect = {
   };
 };
 // ============ Table Filter Types ============
-export interface GetAllRecordFilter {
-  path?: StringListFilter;
-  data?: JSONFilter;
-  and?: GetAllRecordFilter[];
-  or?: GetAllRecordFilter[];
-  not?: GetAllRecordFilter;
-}
 export interface OrgGetManagersRecordFilter {
   userId?: UUIDFilter;
   depth?: IntFilter;
@@ -5662,6 +5764,13 @@ export interface OrgGetSubordinatesRecordFilter {
   and?: OrgGetSubordinatesRecordFilter[];
   or?: OrgGetSubordinatesRecordFilter[];
   not?: OrgGetSubordinatesRecordFilter;
+}
+export interface GetAllRecordFilter {
+  path?: StringListFilter;
+  data?: JSONFilter;
+  and?: GetAllRecordFilter[];
+  or?: GetAllRecordFilter[];
+  not?: GetAllRecordFilter;
 }
 export interface ObjectFilter {
   /** Filter by the object’s `id` field. */
@@ -5992,6 +6101,14 @@ export interface DatabaseFilter {
   blueprints?: DatabaseToManyBlueprintFilter;
   /** `blueprints` exist. */
   blueprintsExist?: boolean;
+  /** Filter by the object’s `blueprintConstructions` relation. */
+  blueprintConstructions?: DatabaseToManyBlueprintConstructionFilter;
+  /** `blueprintConstructions` exist. */
+  blueprintConstructionsExist?: boolean;
+  /** Filter by the object’s `storageModules` relation. */
+  storageModules?: DatabaseToManyStorageModuleFilter;
+  /** `storageModules` exist. */
+  storageModulesExist?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -6856,12 +6973,10 @@ export interface SecureTableProvisionFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  /** Filter by the object’s `nodeType` field. */
-  nodeType?: StringFilter;
+  /** Filter by the object’s `nodes` field. */
+  nodes?: JSONFilter;
   /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
-  /** Filter by the object’s `nodeData` field. */
-  nodeData?: JSONFilter;
   /** Filter by the object’s `fields` field. */
   fields?: JSONListFilter;
   /** Filter by the object’s `grantRoles` field. */
@@ -6930,10 +7045,8 @@ export interface RelationProvisionFilter {
   createIndex?: BooleanFilter;
   /** Filter by the object’s `exposeInApi` field. */
   exposeInApi?: BooleanFilter;
-  /** Filter by the object’s `nodeType` field. */
-  nodeType?: StringFilter;
-  /** Filter by the object’s `nodeData` field. */
-  nodeData?: JSONFilter;
+  /** Filter by the object’s `nodes` field. */
+  nodes?: JSONFilter;
   /** Filter by the object’s `grantRoles` field. */
   grantRoles?: StringListFilter;
   /** Filter by the object’s `grantPrivileges` field. */
@@ -8262,16 +8375,6 @@ export interface BlueprintFilter {
   definition?: JSONFilter;
   /** Filter by the object’s `templateId` field. */
   templateId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `constructedAt` field. */
-  constructedAt?: DatetimeFilter;
-  /** Filter by the object’s `errorDetails` field. */
-  errorDetails?: StringFilter;
-  /** Filter by the object’s `refMap` field. */
-  refMap?: JSONFilter;
-  /** Filter by the object’s `constructedDefinition` field. */
-  constructedDefinition?: JSONFilter;
   /** Filter by the object’s `definitionHash` field. */
   definitionHash?: UUIDFilter;
   /** Filter by the object’s `tableHashes` field. */
@@ -8292,6 +8395,10 @@ export interface BlueprintFilter {
   template?: BlueprintTemplateFilter;
   /** A related `template` exists. */
   templateExists?: boolean;
+  /** Filter by the object’s `blueprintConstructions` relation. */
+  blueprintConstructions?: BlueprintToManyBlueprintConstructionFilter;
+  /** `blueprintConstructions` exist. */
+  blueprintConstructionsExist?: boolean;
 }
 export interface BlueprintTemplateFilter {
   /** Filter by the object’s `id` field. */
@@ -8352,6 +8459,96 @@ export interface BlueprintTemplateFilter {
   blueprintsByTemplateId?: BlueprintTemplateToManyBlueprintFilter;
   /** `blueprintsByTemplateId` exist. */
   blueprintsByTemplateIdExist?: boolean;
+}
+export interface BlueprintConstructionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `blueprintId` field. */
+  blueprintId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `errorDetails` field. */
+  errorDetails?: StringFilter;
+  /** Filter by the object’s `tableMap` field. */
+  tableMap?: JSONFilter;
+  /** Filter by the object’s `constructedDefinition` field. */
+  constructedDefinition?: JSONFilter;
+  /** Filter by the object’s `constructedAt` field. */
+  constructedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintConstructionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintConstructionFilter[];
+  /** Negates the expression. */
+  not?: BlueprintConstructionFilter;
+  /** Filter by the object’s `blueprint` relation. */
+  blueprint?: BlueprintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+export interface StorageModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `bucketsTableId` field. */
+  bucketsTableId?: UUIDFilter;
+  /** Filter by the object’s `filesTableId` field. */
+  filesTableId?: UUIDFilter;
+  /** Filter by the object’s `uploadRequestsTableId` field. */
+  uploadRequestsTableId?: UUIDFilter;
+  /** Filter by the object’s `bucketsTableName` field. */
+  bucketsTableName?: StringFilter;
+  /** Filter by the object’s `filesTableName` field. */
+  filesTableName?: StringFilter;
+  /** Filter by the object’s `uploadRequestsTableName` field. */
+  uploadRequestsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `uploadUrlExpirySeconds` field. */
+  uploadUrlExpirySeconds?: IntFilter;
+  /** Filter by the object’s `downloadUrlExpirySeconds` field. */
+  downloadUrlExpirySeconds?: IntFilter;
+  /** Filter by the object’s `defaultMaxFileSize` field. */
+  defaultMaxFileSize?: BigIntFilter;
+  /** Filter by the object’s `maxFilenameLength` field. */
+  maxFilenameLength?: IntFilter;
+  /** Filter by the object’s `cacheTtlSeconds` field. */
+  cacheTtlSeconds?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: StorageModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: StorageModuleFilter[];
+  /** Negates the expression. */
+  not?: StorageModuleFilter;
+  /** Filter by the object’s `bucketsTable` relation. */
+  bucketsTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `filesTable` relation. */
+  filesTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `uploadRequestsTable` relation. */
+  uploadRequestsTable?: TableFilter;
 }
 export interface DatabaseProvisionModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -9147,20 +9344,6 @@ export interface RoleTypeFilter {
   /** Negates the expression. */
   not?: RoleTypeFilter;
 }
-export interface MigrateFileFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `upload` field. */
-  upload?: ConstructiveInternalTypeUploadFilter;
-  /** Checks for all expressions in this list. */
-  and?: MigrateFileFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MigrateFileFilter[];
-  /** Negates the expression. */
-  not?: MigrateFileFilter;
-}
 export interface AppLimitDefaultFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -9188,6 +9371,20 @@ export interface OrgLimitDefaultFilter {
   or?: OrgLimitDefaultFilter[];
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
+}
+export interface MigrateFileFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `upload` field. */
+  upload?: ConstructiveInternalTypeUploadFilter;
+  /** Checks for all expressions in this list. */
+  and?: MigrateFileFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MigrateFileFilter[];
+  /** Negates the expression. */
+  not?: MigrateFileFilter;
 }
 export interface MembershipTypeFilter {
   /** Filter by the object’s `id` field. */
@@ -9763,14 +9960,6 @@ export interface HierarchyModuleFilter {
   usersTable?: TableFilter;
 }
 // ============ OrderBy Types ============
-export type GetAllRecordsOrderBy =
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NATURAL'
-  | 'PATH_ASC'
-  | 'PATH_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC';
 export type OrgGetManagersRecordsOrderBy =
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -9787,6 +9976,14 @@ export type OrgGetSubordinatesRecordsOrderBy =
   | 'USER_ID_DESC'
   | 'DEPTH_ASC'
   | 'DEPTH_DESC';
+export type GetAllRecordsOrderBy =
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'NATURAL'
+  | 'PATH_ASC'
+  | 'PATH_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC';
 export type ObjectOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -10445,12 +10642,10 @@ export type SecureTableProvisionOrderBy =
   | 'TABLE_ID_DESC'
   | 'TABLE_NAME_ASC'
   | 'TABLE_NAME_DESC'
-  | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
+  | 'NODES_ASC'
+  | 'NODES_DESC'
   | 'USE_RLS_ASC'
   | 'USE_RLS_DESC'
-  | 'NODE_DATA_ASC'
-  | 'NODE_DATA_DESC'
   | 'FIELDS_ASC'
   | 'FIELDS_DESC'
   | 'GRANT_ROLES_ASC'
@@ -10509,10 +10704,8 @@ export type RelationProvisionOrderBy =
   | 'CREATE_INDEX_DESC'
   | 'EXPOSE_IN_API_ASC'
   | 'EXPOSE_IN_API_DESC'
-  | 'NODE_TYPE_ASC'
-  | 'NODE_TYPE_DESC'
-  | 'NODE_DATA_ASC'
-  | 'NODE_DATA_DESC'
+  | 'NODES_ASC'
+  | 'NODES_DESC'
   | 'GRANT_ROLES_ASC'
   | 'GRANT_ROLES_DESC'
   | 'GRANT_PRIVILEGES_ASC'
@@ -11369,16 +11562,6 @@ export type BlueprintOrderBy =
   | 'DEFINITION_DESC'
   | 'TEMPLATE_ID_ASC'
   | 'TEMPLATE_ID_DESC'
-  | 'STATUS_ASC'
-  | 'STATUS_DESC'
-  | 'CONSTRUCTED_AT_ASC'
-  | 'CONSTRUCTED_AT_DESC'
-  | 'ERROR_DETAILS_ASC'
-  | 'ERROR_DETAILS_DESC'
-  | 'REF_MAP_ASC'
-  | 'REF_MAP_DESC'
-  | 'CONSTRUCTED_DEFINITION_ASC'
-  | 'CONSTRUCTED_DEFINITION_DESC'
   | 'DEFINITION_HASH_ASC'
   | 'DEFINITION_HASH_DESC'
   | 'TABLE_HASHES_ASC'
@@ -11431,6 +11614,68 @@ export type BlueprintTemplateOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+export type BlueprintConstructionOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'BLUEPRINT_ID_ASC'
+  | 'BLUEPRINT_ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'STATUS_ASC'
+  | 'STATUS_DESC'
+  | 'ERROR_DETAILS_ASC'
+  | 'ERROR_DETAILS_DESC'
+  | 'TABLE_MAP_ASC'
+  | 'TABLE_MAP_DESC'
+  | 'CONSTRUCTED_DEFINITION_ASC'
+  | 'CONSTRUCTED_DEFINITION_DESC'
+  | 'CONSTRUCTED_AT_ASC'
+  | 'CONSTRUCTED_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
+export type StorageModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'PRIVATE_SCHEMA_ID_ASC'
+  | 'PRIVATE_SCHEMA_ID_DESC'
+  | 'BUCKETS_TABLE_ID_ASC'
+  | 'BUCKETS_TABLE_ID_DESC'
+  | 'FILES_TABLE_ID_ASC'
+  | 'FILES_TABLE_ID_DESC'
+  | 'UPLOAD_REQUESTS_TABLE_ID_ASC'
+  | 'UPLOAD_REQUESTS_TABLE_ID_DESC'
+  | 'BUCKETS_TABLE_NAME_ASC'
+  | 'BUCKETS_TABLE_NAME_DESC'
+  | 'FILES_TABLE_NAME_ASC'
+  | 'FILES_TABLE_NAME_DESC'
+  | 'UPLOAD_REQUESTS_TABLE_NAME_ASC'
+  | 'UPLOAD_REQUESTS_TABLE_NAME_DESC'
+  | 'ENTITY_TABLE_ID_ASC'
+  | 'ENTITY_TABLE_ID_DESC'
+  | 'UPLOAD_URL_EXPIRY_SECONDS_ASC'
+  | 'UPLOAD_URL_EXPIRY_SECONDS_DESC'
+  | 'DOWNLOAD_URL_EXPIRY_SECONDS_ASC'
+  | 'DOWNLOAD_URL_EXPIRY_SECONDS_DESC'
+  | 'DEFAULT_MAX_FILE_SIZE_ASC'
+  | 'DEFAULT_MAX_FILE_SIZE_DESC'
+  | 'MAX_FILENAME_LENGTH_ASC'
+  | 'MAX_FILENAME_LENGTH_DESC'
+  | 'CACHE_TTL_SECONDS_ASC'
+  | 'CACHE_TTL_SECONDS_DESC';
 export type DatabaseProvisionModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -11983,14 +12228,6 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
-export type MigrateFileOrderBy =
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'UPLOAD_ASC'
-  | 'UPLOAD_DESC';
 export type AppLimitDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12011,6 +12248,14 @@ export type OrgLimitDefaultOrderBy =
   | 'NAME_DESC'
   | 'MAX_ASC'
   | 'MAX_DESC';
+export type MigrateFileOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'UPLOAD_ASC'
+  | 'UPLOAD_DESC';
 export type MembershipTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12300,26 +12545,6 @@ export type HierarchyModuleOrderBy =
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
 // ============ CRUD Input Types ============
-export interface CreateGetAllRecordInput {
-  clientMutationId?: string;
-  getAllRecord: {
-    path?: string[];
-    data?: Record<string, unknown>;
-  };
-}
-export interface GetAllRecordPatch {
-  path?: string[] | null;
-  data?: Record<string, unknown> | null;
-}
-export interface UpdateGetAllRecordInput {
-  clientMutationId?: string;
-  id: string;
-  getAllRecordPatch: GetAllRecordPatch;
-}
-export interface DeleteGetAllRecordInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateOrgGetManagersRecordInput {
   clientMutationId?: string;
   orgGetManagersRecord: {
@@ -12357,6 +12582,26 @@ export interface UpdateOrgGetSubordinatesRecordInput {
   orgGetSubordinatesRecordPatch: OrgGetSubordinatesRecordPatch;
 }
 export interface DeleteOrgGetSubordinatesRecordInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateGetAllRecordInput {
+  clientMutationId?: string;
+  getAllRecord: {
+    path?: string[];
+    data?: Record<string, unknown>;
+  };
+}
+export interface GetAllRecordPatch {
+  path?: string[] | null;
+  data?: Record<string, unknown> | null;
+}
+export interface UpdateGetAllRecordInput {
+  clientMutationId?: string;
+  id: string;
+  getAllRecordPatch: GetAllRecordPatch;
+}
+export interface DeleteGetAllRecordInput {
   clientMutationId?: string;
   id: string;
 }
@@ -13179,9 +13424,8 @@ export interface CreateSecureTableProvisionInput {
     schemaId?: string;
     tableId?: string;
     tableName?: string;
-    nodeType?: string;
+    nodes?: Record<string, unknown>;
     useRls?: boolean;
-    nodeData?: Record<string, unknown>;
     fields?: Record<string, unknown>[];
     grantRoles?: string[];
     grantPrivileges?: Record<string, unknown>[];
@@ -13199,9 +13443,8 @@ export interface SecureTableProvisionPatch {
   schemaId?: string | null;
   tableId?: string | null;
   tableName?: string | null;
-  nodeType?: string | null;
+  nodes?: Record<string, unknown> | null;
   useRls?: boolean | null;
-  nodeData?: Record<string, unknown> | null;
   fields?: Record<string, unknown>[] | null;
   grantRoles?: string[] | null;
   grantPrivileges?: Record<string, unknown>[] | null;
@@ -13241,8 +13484,7 @@ export interface CreateRelationProvisionInput {
     useCompositeKey?: boolean;
     createIndex?: boolean;
     exposeInApi?: boolean;
-    nodeType?: string;
-    nodeData?: Record<string, unknown>;
+    nodes?: Record<string, unknown>;
     grantRoles?: string[];
     grantPrivileges?: Record<string, unknown>[];
     policyType?: string;
@@ -13274,8 +13516,7 @@ export interface RelationProvisionPatch {
   useCompositeKey?: boolean | null;
   createIndex?: boolean | null;
   exposeInApi?: boolean | null;
-  nodeType?: string | null;
-  nodeData?: Record<string, unknown> | null;
+  nodes?: Record<string, unknown> | null;
   grantRoles?: string[] | null;
   grantPrivileges?: Record<string, unknown>[] | null;
   policyType?: string | null;
@@ -14444,11 +14685,6 @@ export interface CreateBlueprintInput {
     description?: string;
     definition: Record<string, unknown>;
     templateId?: string;
-    status?: string;
-    constructedAt?: string;
-    errorDetails?: string;
-    refMap?: Record<string, unknown>;
-    constructedDefinition?: Record<string, unknown>;
     definitionHash?: string;
     tableHashes?: Record<string, unknown>;
   };
@@ -14461,11 +14697,6 @@ export interface BlueprintPatch {
   description?: string | null;
   definition?: Record<string, unknown> | null;
   templateId?: string | null;
-  status?: string | null;
-  constructedAt?: string | null;
-  errorDetails?: string | null;
-  refMap?: Record<string, unknown> | null;
-  constructedDefinition?: Record<string, unknown> | null;
   definitionHash?: string | null;
   tableHashes?: Record<string, unknown> | null;
 }
@@ -14525,6 +14756,84 @@ export interface UpdateBlueprintTemplateInput {
   blueprintTemplatePatch: BlueprintTemplatePatch;
 }
 export interface DeleteBlueprintTemplateInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateBlueprintConstructionInput {
+  clientMutationId?: string;
+  blueprintConstruction: {
+    blueprintId: string;
+    databaseId: string;
+    schemaId?: string;
+    status?: string;
+    errorDetails?: string;
+    tableMap?: Record<string, unknown>;
+    constructedDefinition?: Record<string, unknown>;
+    constructedAt?: string;
+  };
+}
+export interface BlueprintConstructionPatch {
+  blueprintId?: string | null;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  status?: string | null;
+  errorDetails?: string | null;
+  tableMap?: Record<string, unknown> | null;
+  constructedDefinition?: Record<string, unknown> | null;
+  constructedAt?: string | null;
+}
+export interface UpdateBlueprintConstructionInput {
+  clientMutationId?: string;
+  id: string;
+  blueprintConstructionPatch: BlueprintConstructionPatch;
+}
+export interface DeleteBlueprintConstructionInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateStorageModuleInput {
+  clientMutationId?: string;
+  storageModule: {
+    databaseId: string;
+    schemaId?: string;
+    privateSchemaId?: string;
+    bucketsTableId?: string;
+    filesTableId?: string;
+    uploadRequestsTableId?: string;
+    bucketsTableName?: string;
+    filesTableName?: string;
+    uploadRequestsTableName?: string;
+    entityTableId?: string;
+    uploadUrlExpirySeconds?: number;
+    downloadUrlExpirySeconds?: number;
+    defaultMaxFileSize?: string;
+    maxFilenameLength?: number;
+    cacheTtlSeconds?: number;
+  };
+}
+export interface StorageModulePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  bucketsTableId?: string | null;
+  filesTableId?: string | null;
+  uploadRequestsTableId?: string | null;
+  bucketsTableName?: string | null;
+  filesTableName?: string | null;
+  uploadRequestsTableName?: string | null;
+  entityTableId?: string | null;
+  uploadUrlExpirySeconds?: number | null;
+  downloadUrlExpirySeconds?: number | null;
+  defaultMaxFileSize?: string | null;
+  maxFilenameLength?: number | null;
+  cacheTtlSeconds?: number | null;
+}
+export interface UpdateStorageModuleInput {
+  clientMutationId?: string;
+  id: string;
+  storageModulePatch: StorageModulePatch;
+}
+export interface DeleteStorageModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15295,26 +15604,6 @@ export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
 }
-export interface CreateMigrateFileInput {
-  clientMutationId?: string;
-  migrateFile: {
-    databaseId?: string;
-    upload?: ConstructiveInternalTypeUpload;
-  };
-}
-export interface MigrateFilePatch {
-  databaseId?: string | null;
-  upload?: ConstructiveInternalTypeUpload | null;
-}
-export interface UpdateMigrateFileInput {
-  clientMutationId?: string;
-  id: string;
-  migrateFilePatch: MigrateFilePatch;
-}
-export interface DeleteMigrateFileInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateAppLimitDefaultInput {
   clientMutationId?: string;
   appLimitDefault: {
@@ -15352,6 +15641,26 @@ export interface UpdateOrgLimitDefaultInput {
   orgLimitDefaultPatch: OrgLimitDefaultPatch;
 }
 export interface DeleteOrgLimitDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateMigrateFileInput {
+  clientMutationId?: string;
+  migrateFile: {
+    databaseId?: string;
+    upload?: ConstructiveInternalTypeUpload;
+  };
+}
+export interface MigrateFilePatch {
+  databaseId?: string | null;
+  upload?: ConstructiveInternalTypeUpload | null;
+}
+export interface UpdateMigrateFileInput {
+  clientMutationId?: string;
+  id: string;
+  migrateFilePatch: MigrateFilePatch;
+}
+export interface DeleteMigrateFileInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15782,6 +16091,8 @@ export const connectionFieldsMap = {
     secureTableProvisions: 'SecureTableProvision',
     relationProvisions: 'RelationProvision',
     blueprints: 'Blueprint',
+    blueprintConstructions: 'BlueprintConstruction',
+    storageModules: 'StorageModule',
     databaseProvisionModules: 'DatabaseProvisionModule',
   },
   Schema: {
@@ -15830,6 +16141,9 @@ export const connectionFieldsMap = {
     siteMetadata: 'SiteMetadatum',
     siteModules: 'SiteModule',
     siteThemes: 'SiteTheme',
+  },
+  Blueprint: {
+    blueprintConstructions: 'BlueprintConstruction',
   },
   BlueprintTemplate: {
     blueprintTemplatesByForkedFromId: 'BlueprintTemplate',
@@ -15959,6 +16273,46 @@ export interface RemoveNodeAtPathInput {
   root?: string;
   path?: string[];
 }
+export interface CopyTemplateToBlueprintInput {
+  clientMutationId?: string;
+  templateId?: string;
+  databaseId?: string;
+  ownerId?: string;
+  nameOverride?: string;
+  displayNameOverride?: string;
+}
+export interface BootstrapUserInput {
+  clientMutationId?: string;
+  targetDatabaseId?: string;
+  password?: string;
+  isAdmin?: boolean;
+  isOwner?: boolean;
+  username?: string;
+  displayName?: string;
+  returnApiKey?: boolean;
+}
+export interface SetFieldOrderInput {
+  clientMutationId?: string;
+  fieldIds?: string[];
+}
+export interface ProvisionUniqueConstraintInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  tableId?: string;
+  definition?: Record<string, unknown>;
+}
+export interface ProvisionFullTextSearchInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  tableId?: string;
+  definition?: Record<string, unknown>;
+}
+export interface ProvisionIndexInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  tableId?: string;
+  definition?: Record<string, unknown>;
+}
 export interface SetDataAtPathInput {
   clientMutationId?: string;
   dbId?: string;
@@ -15974,14 +16328,6 @@ export interface SetPropsAndCommitInput {
   path?: string[];
   data?: Record<string, unknown>;
 }
-export interface CopyTemplateToBlueprintInput {
-  clientMutationId?: string;
-  templateId?: string;
-  databaseId?: string;
-  ownerId?: string;
-  nameOverride?: string;
-  displayNameOverride?: string;
-}
 export interface ProvisionDatabaseWithUserInput {
   clientMutationId?: string;
   pDatabaseName?: string;
@@ -15989,20 +16335,6 @@ export interface ProvisionDatabaseWithUserInput {
   pSubdomain?: string;
   pModules?: string[];
   pOptions?: Record<string, unknown>;
-}
-export interface BootstrapUserInput {
-  clientMutationId?: string;
-  targetDatabaseId?: string;
-  password?: string;
-  isAdmin?: boolean;
-  isOwner?: boolean;
-  username?: string;
-  displayName?: string;
-  returnApiKey?: boolean;
-}
-export interface SetFieldOrderInput {
-  clientMutationId?: string;
-  fieldIds?: string[];
 }
 export interface InsertNodeAtPathInput {
   clientMutationId?: string;
@@ -16031,6 +16363,29 @@ export interface SetAndCommitInput {
   data?: Record<string, unknown>;
   kids?: string[];
   ktree?: string[];
+}
+export interface ProvisionRelationInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  relationType?: string;
+  sourceTableId?: string;
+  targetTableId?: string;
+  fieldName?: string;
+  deleteAction?: string;
+  isRequired?: boolean;
+  apiRequired?: boolean;
+  createIndex?: boolean;
+  junctionTableId?: string;
+  junctionTableName?: string;
+  junctionSchemaId?: string;
+  sourceFieldName?: string;
+  targetFieldName?: string;
+  useCompositeKey?: boolean;
+  exposeInApi?: boolean;
+  nodes?: Record<string, unknown>;
+  grants?: Record<string, unknown>;
+  grantRoles?: string[];
+  policies?: Record<string, unknown>;
 }
 export interface ApplyRlsInput {
   clientMutationId?: string;
@@ -16083,6 +16438,22 @@ export interface OneTimeTokenInput {
   password?: string;
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
+}
+export interface ProvisionTableInput {
+  clientMutationId?: string;
+  databaseId?: string;
+  schemaId?: string;
+  tableName?: string;
+  tableId?: string;
+  nodes?: Record<string, unknown>;
+  fields?: Record<string, unknown>;
+  policies?: Record<string, unknown>;
+  grants?: Record<string, unknown>;
+  grantRoles?: string[];
+  useRls?: boolean;
+  indexes?: Record<string, unknown>;
+  fullTextSearches?: Record<string, unknown>;
+  uniqueConstraints?: Record<string, unknown>;
 }
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
@@ -16576,6 +16947,24 @@ export interface DatabaseToManyBlueprintFilter {
   every?: BlueprintFilter;
   /** Filters to entities where no related entity matches. */
   none?: BlueprintFilter;
+}
+/** A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyBlueprintConstructionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintConstructionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintConstructionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintConstructionFilter;
+}
+/** A filter to be used against many `StorageModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DatabaseToManyStorageModuleFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: StorageModuleFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: StorageModuleFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: StorageModuleFilter;
 }
 /** A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseProvisionModuleFilter {
@@ -17237,6 +17626,15 @@ export interface IntervalFilter {
   greaterThan?: IntervalInput;
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: IntervalInput;
+}
+/** A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintToManyBlueprintConstructionFilter {
+  /** Filters to entities where at least one related entity matches. */
+  some?: BlueprintConstructionFilter;
+  /** Filters to entities where every related entity matches. */
+  every?: BlueprintConstructionFilter;
+  /** Filters to entities where no related entity matches. */
+  none?: BlueprintConstructionFilter;
 }
 /** A filter to be used against many `BlueprintTemplate` object types. All fields are combined with a logical ‘and.’ */
 export interface BlueprintTemplateToManyBlueprintTemplateFilter {
@@ -19950,12 +20348,10 @@ export interface SecureTableProvisionFilter {
   tableId?: UUIDFilter;
   /** Filter by the object’s `tableName` field. */
   tableName?: StringFilter;
-  /** Filter by the object’s `nodeType` field. */
-  nodeType?: StringFilter;
+  /** Filter by the object’s `nodes` field. */
+  nodes?: JSONFilter;
   /** Filter by the object’s `useRls` field. */
   useRls?: BooleanFilter;
-  /** Filter by the object’s `nodeData` field. */
-  nodeData?: JSONFilter;
   /** Filter by the object’s `fields` field. */
   fields?: JSONListFilter;
   /** Filter by the object’s `grantRoles` field. */
@@ -20025,10 +20421,8 @@ export interface RelationProvisionFilter {
   createIndex?: BooleanFilter;
   /** Filter by the object’s `exposeInApi` field. */
   exposeInApi?: BooleanFilter;
-  /** Filter by the object’s `nodeType` field. */
-  nodeType?: StringFilter;
-  /** Filter by the object’s `nodeData` field. */
-  nodeData?: JSONFilter;
+  /** Filter by the object’s `nodes` field. */
+  nodes?: JSONFilter;
   /** Filter by the object’s `grantRoles` field. */
   grantRoles?: StringListFilter;
   /** Filter by the object’s `grantPrivileges` field. */
@@ -20084,16 +20478,6 @@ export interface BlueprintFilter {
   definition?: JSONFilter;
   /** Filter by the object’s `templateId` field. */
   templateId?: UUIDFilter;
-  /** Filter by the object’s `status` field. */
-  status?: StringFilter;
-  /** Filter by the object’s `constructedAt` field. */
-  constructedAt?: DatetimeFilter;
-  /** Filter by the object’s `errorDetails` field. */
-  errorDetails?: StringFilter;
-  /** Filter by the object’s `refMap` field. */
-  refMap?: JSONFilter;
-  /** Filter by the object’s `constructedDefinition` field. */
-  constructedDefinition?: JSONFilter;
   /** Filter by the object’s `definitionHash` field. */
   definitionHash?: UUIDFilter;
   /** Filter by the object’s `tableHashes` field. */
@@ -20114,6 +20498,102 @@ export interface BlueprintFilter {
   template?: BlueprintTemplateFilter;
   /** A related `template` exists. */
   templateExists?: boolean;
+  /** Filter by the object’s `blueprintConstructions` relation. */
+  blueprintConstructions?: BlueprintToManyBlueprintConstructionFilter;
+  /** `blueprintConstructions` exist. */
+  blueprintConstructionsExist?: boolean;
+}
+/** A filter to be used against `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’ */
+export interface BlueprintConstructionFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `blueprintId` field. */
+  blueprintId?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `status` field. */
+  status?: StringFilter;
+  /** Filter by the object’s `errorDetails` field. */
+  errorDetails?: StringFilter;
+  /** Filter by the object’s `tableMap` field. */
+  tableMap?: JSONFilter;
+  /** Filter by the object’s `constructedDefinition` field. */
+  constructedDefinition?: JSONFilter;
+  /** Filter by the object’s `constructedAt` field. */
+  constructedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: BlueprintConstructionFilter[];
+  /** Checks for any expressions in this list. */
+  or?: BlueprintConstructionFilter[];
+  /** Negates the expression. */
+  not?: BlueprintConstructionFilter;
+  /** Filter by the object’s `blueprint` relation. */
+  blueprint?: BlueprintFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+}
+/** A filter to be used against `StorageModule` object types. All fields are combined with a logical ‘and.’ */
+export interface StorageModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `privateSchemaId` field. */
+  privateSchemaId?: UUIDFilter;
+  /** Filter by the object’s `bucketsTableId` field. */
+  bucketsTableId?: UUIDFilter;
+  /** Filter by the object’s `filesTableId` field. */
+  filesTableId?: UUIDFilter;
+  /** Filter by the object’s `uploadRequestsTableId` field. */
+  uploadRequestsTableId?: UUIDFilter;
+  /** Filter by the object’s `bucketsTableName` field. */
+  bucketsTableName?: StringFilter;
+  /** Filter by the object’s `filesTableName` field. */
+  filesTableName?: StringFilter;
+  /** Filter by the object’s `uploadRequestsTableName` field. */
+  uploadRequestsTableName?: StringFilter;
+  /** Filter by the object’s `entityTableId` field. */
+  entityTableId?: UUIDFilter;
+  /** Filter by the object’s `uploadUrlExpirySeconds` field. */
+  uploadUrlExpirySeconds?: IntFilter;
+  /** Filter by the object’s `downloadUrlExpirySeconds` field. */
+  downloadUrlExpirySeconds?: IntFilter;
+  /** Filter by the object’s `defaultMaxFileSize` field. */
+  defaultMaxFileSize?: BigIntFilter;
+  /** Filter by the object’s `maxFilenameLength` field. */
+  maxFilenameLength?: IntFilter;
+  /** Filter by the object’s `cacheTtlSeconds` field. */
+  cacheTtlSeconds?: IntFilter;
+  /** Checks for all expressions in this list. */
+  and?: StorageModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: StorageModuleFilter[];
+  /** Negates the expression. */
+  not?: StorageModuleFilter;
+  /** Filter by the object’s `bucketsTable` relation. */
+  bucketsTable?: TableFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `entityTable` relation. */
+  entityTable?: TableFilter;
+  /** A related `entityTable` exists. */
+  entityTableExists?: boolean;
+  /** Filter by the object’s `filesTable` relation. */
+  filesTable?: TableFilter;
+  /** Filter by the object’s `privateSchema` relation. */
+  privateSchema?: SchemaFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `uploadRequestsTable` relation. */
+  uploadRequestsTable?: TableFilter;
 }
 /** A filter to be used against `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseProvisionModuleFilter {
@@ -20486,6 +20966,14 @@ export interface DatabaseFilter {
   blueprints?: DatabaseToManyBlueprintFilter;
   /** `blueprints` exist. */
   blueprintsExist?: boolean;
+  /** Filter by the object’s `blueprintConstructions` relation. */
+  blueprintConstructions?: DatabaseToManyBlueprintConstructionFilter;
+  /** `blueprintConstructions` exist. */
+  blueprintConstructionsExist?: boolean;
+  /** Filter by the object’s `storageModules` relation. */
+  storageModules?: DatabaseToManyStorageModuleFilter;
+  /** `storageModules` exist. */
+  storageModulesExist?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -21525,6 +22013,31 @@ export interface FloatFilter {
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: number;
 }
+/** A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’ */
+export interface BigIntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
 /** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
 export interface UserFilter {
   /** Filter by the object’s `id` field. */
@@ -22210,7 +22723,7 @@ export type InitEmptyRepoPayloadSelect = {
 };
 export interface ConstructBlueprintPayload {
   clientMutationId?: string | null;
-  result?: Record<string, unknown> | null;
+  result?: string | null;
 }
 export type ConstructBlueprintPayloadSelect = {
   clientMutationId?: boolean;
@@ -22232,22 +22745,6 @@ export type RemoveNodeAtPathPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface SetDataAtPathPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type SetDataAtPathPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
-export interface SetPropsAndCommitPayload {
-  clientMutationId?: string | null;
-  result?: string | null;
-}
-export type SetPropsAndCommitPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: boolean;
-};
 export interface CopyTemplateToBlueprintPayload {
   clientMutationId?: string | null;
   result?: string | null;
@@ -22255,16 +22752,6 @@ export interface CopyTemplateToBlueprintPayload {
 export type CopyTemplateToBlueprintPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
-};
-export interface ProvisionDatabaseWithUserPayload {
-  clientMutationId?: string | null;
-  result?: ProvisionDatabaseWithUserRecord[] | null;
-}
-export type ProvisionDatabaseWithUserPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: ProvisionDatabaseWithUserRecordSelect;
-  };
 };
 export interface BootstrapUserPayload {
   clientMutationId?: string | null;
@@ -22281,6 +22768,54 @@ export interface SetFieldOrderPayload {
 }
 export type SetFieldOrderPayloadSelect = {
   clientMutationId?: boolean;
+};
+export interface ProvisionUniqueConstraintPayload {
+  clientMutationId?: string | null;
+}
+export type ProvisionUniqueConstraintPayloadSelect = {
+  clientMutationId?: boolean;
+};
+export interface ProvisionFullTextSearchPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type ProvisionFullTextSearchPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface ProvisionIndexPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type ProvisionIndexPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface SetDataAtPathPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type SetDataAtPathPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface SetPropsAndCommitPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type SetPropsAndCommitPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface ProvisionDatabaseWithUserPayload {
+  clientMutationId?: string | null;
+  result?: ProvisionDatabaseWithUserRecord[] | null;
+}
+export type ProvisionDatabaseWithUserPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: ProvisionDatabaseWithUserRecordSelect;
+  };
 };
 export interface InsertNodeAtPathPayload {
   clientMutationId?: string | null;
@@ -22305,6 +22840,16 @@ export interface SetAndCommitPayload {
 export type SetAndCommitPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface ProvisionRelationPayload {
+  clientMutationId?: string | null;
+  result?: ProvisionRelationRecord[] | null;
+}
+export type ProvisionRelationPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: ProvisionRelationRecordSelect;
+  };
 };
 export interface ApplyRlsPayload {
   clientMutationId?: string | null;
@@ -22367,6 +22912,16 @@ export interface OneTimeTokenPayload {
 export type OneTimeTokenPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface ProvisionTablePayload {
+  clientMutationId?: string | null;
+  result?: ProvisionTableRecord[] | null;
+}
+export type ProvisionTablePayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: ProvisionTableRecordSelect;
+  };
 };
 export interface SendVerificationEmailPayload {
   clientMutationId?: string | null;
@@ -25102,6 +25657,96 @@ export type DeleteBlueprintTemplatePayloadSelect = {
     select: BlueprintTemplateEdgeSelect;
   };
 };
+export interface CreateBlueprintConstructionPayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintConstruction` that was created by this mutation. */
+  blueprintConstruction?: BlueprintConstruction | null;
+  blueprintConstructionEdge?: BlueprintConstructionEdge | null;
+}
+export type CreateBlueprintConstructionPayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintConstruction?: {
+    select: BlueprintConstructionSelect;
+  };
+  blueprintConstructionEdge?: {
+    select: BlueprintConstructionEdgeSelect;
+  };
+};
+export interface UpdateBlueprintConstructionPayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintConstruction` that was updated by this mutation. */
+  blueprintConstruction?: BlueprintConstruction | null;
+  blueprintConstructionEdge?: BlueprintConstructionEdge | null;
+}
+export type UpdateBlueprintConstructionPayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintConstruction?: {
+    select: BlueprintConstructionSelect;
+  };
+  blueprintConstructionEdge?: {
+    select: BlueprintConstructionEdgeSelect;
+  };
+};
+export interface DeleteBlueprintConstructionPayload {
+  clientMutationId?: string | null;
+  /** The `BlueprintConstruction` that was deleted by this mutation. */
+  blueprintConstruction?: BlueprintConstruction | null;
+  blueprintConstructionEdge?: BlueprintConstructionEdge | null;
+}
+export type DeleteBlueprintConstructionPayloadSelect = {
+  clientMutationId?: boolean;
+  blueprintConstruction?: {
+    select: BlueprintConstructionSelect;
+  };
+  blueprintConstructionEdge?: {
+    select: BlueprintConstructionEdgeSelect;
+  };
+};
+export interface CreateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was created by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
+export type CreateStorageModulePayloadSelect = {
+  clientMutationId?: boolean;
+  storageModule?: {
+    select: StorageModuleSelect;
+  };
+  storageModuleEdge?: {
+    select: StorageModuleEdgeSelect;
+  };
+};
+export interface UpdateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was updated by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
+export type UpdateStorageModulePayloadSelect = {
+  clientMutationId?: boolean;
+  storageModule?: {
+    select: StorageModuleSelect;
+  };
+  storageModuleEdge?: {
+    select: StorageModuleEdgeSelect;
+  };
+};
+export interface DeleteStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was deleted by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
+export type DeleteStorageModulePayloadSelect = {
+  clientMutationId?: boolean;
+  storageModule?: {
+    select: StorageModuleSelect;
+  };
+  storageModuleEdge?: {
+    select: StorageModuleEdgeSelect;
+  };
+};
 export interface CreateDatabaseProvisionModulePayload {
   clientMutationId?: string | null;
   /** The `DatabaseProvisionModule` that was created by this mutation. */
@@ -26452,17 +27097,6 @@ export type DeleteRoleTypePayloadSelect = {
     select: RoleTypeEdgeSelect;
   };
 };
-export interface CreateMigrateFilePayload {
-  clientMutationId?: string | null;
-  /** The `MigrateFile` that was created by this mutation. */
-  migrateFile?: MigrateFile | null;
-}
-export type CreateMigrateFilePayloadSelect = {
-  clientMutationId?: boolean;
-  migrateFile?: {
-    select: MigrateFileSelect;
-  };
-};
 export interface CreateAppLimitDefaultPayload {
   clientMutationId?: string | null;
   /** The `AppLimitDefault` that was created by this mutation. */
@@ -26551,6 +27185,17 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
   };
   orgLimitDefaultEdge?: {
     select: OrgLimitDefaultEdgeSelect;
+  };
+};
+export interface CreateMigrateFilePayload {
+  clientMutationId?: string | null;
+  /** The `MigrateFile` that was created by this mutation. */
+  migrateFile?: MigrateFile | null;
+}
+export type CreateMigrateFilePayloadSelect = {
+  clientMutationId?: boolean;
+  migrateFile?: {
+    select: MigrateFileSelect;
   };
 };
 export interface CreateMembershipTypePayload {
@@ -27045,14 +27690,6 @@ export type AppLevelRequirementEdgeSelect = {
     select: AppLevelRequirementSelect;
   };
 };
-export interface ProvisionDatabaseWithUserRecord {
-  outDatabaseId?: string | null;
-  outApiKey?: string | null;
-}
-export type ProvisionDatabaseWithUserRecordSelect = {
-  outDatabaseId?: boolean;
-  outApiKey?: boolean;
-};
 export interface BootstrapUserRecord {
   outUserId?: string | null;
   outEmail?: string | null;
@@ -27072,6 +27709,26 @@ export type BootstrapUserRecordSelect = {
   outIsOwner?: boolean;
   outIsSudo?: boolean;
   outApiKey?: boolean;
+};
+export interface ProvisionDatabaseWithUserRecord {
+  outDatabaseId?: string | null;
+  outApiKey?: string | null;
+}
+export type ProvisionDatabaseWithUserRecordSelect = {
+  outDatabaseId?: boolean;
+  outApiKey?: boolean;
+};
+export interface ProvisionRelationRecord {
+  outFieldId?: string | null;
+  outJunctionTableId?: string | null;
+  outSourceFieldId?: string | null;
+  outTargetFieldId?: string | null;
+}
+export type ProvisionRelationRecordSelect = {
+  outFieldId?: boolean;
+  outJunctionTableId?: boolean;
+  outSourceFieldId?: boolean;
+  outTargetFieldId?: boolean;
 };
 export interface SignInOneTimeTokenRecord {
   id?: string | null;
@@ -27130,6 +27787,14 @@ export type SignUpRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+};
+export interface ProvisionTableRecord {
+  outTableId?: string | null;
+  outFields?: string[] | null;
+}
+export type ProvisionTableRecordSelect = {
+  outTableId?: boolean;
+  outFields?: boolean;
 };
 /** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
 export interface Session {
@@ -27845,6 +28510,30 @@ export type BlueprintTemplateEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: BlueprintTemplateSelect;
+  };
+};
+/** A `BlueprintConstruction` edge in the connection. */
+export interface BlueprintConstructionEdge {
+  cursor?: string | null;
+  /** The `BlueprintConstruction` at the end of the edge. */
+  node?: BlueprintConstruction | null;
+}
+export type BlueprintConstructionEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: BlueprintConstructionSelect;
+  };
+};
+/** A `StorageModule` edge in the connection. */
+export interface StorageModuleEdge {
+  cursor?: string | null;
+  /** The `StorageModule` at the end of the edge. */
+  node?: StorageModule | null;
+}
+export type StorageModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: StorageModuleSelect;
   };
 };
 /** A `DatabaseProvisionModule` edge in the connection. */

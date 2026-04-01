@@ -7,24 +7,6 @@ type Query {
   orgPermissionsGetPaddedMask(mask: BitString): BitString
   stepsAchieved(vlevel: String, vroleId: UUID): Boolean
   revParse(dbId: UUID, storeId: UUID, refname: String): UUID
-
-  """Reads and enables pagination through a set of `GetAllRecord`."""
-  getAll(
-    databaseId: UUID
-    id: UUID
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): GetAllConnection
   orgIsManagerOf(pEntityId: UUID, pManagerId: UUID, pUserId: UUID, pMaxDepth: Int): Boolean
 
   """Reads and enables pagination through a set of `OrgGetManagersRecord`."""
@@ -68,6 +50,29 @@ type Query {
   ): OrgGetSubordinatesConnection
   appPermissionsGetMask(ids: [UUID]): BitString
   orgPermissionsGetMask(ids: [UUID]): BitString
+
+  """
+  Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
+  """
+  resolveBlueprintTable(databaseId: UUID, tableName: String, schemaName: String, tableMap: JSON, defaultSchemaId: UUID): UUID
+
+  """Reads and enables pagination through a set of `GetAllRecord`."""
+  getAll(
+    databaseId: UUID
+    id: UUID
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): GetAllConnection
   appPermissionsGetMaskByNames(names: [String]): BitString
   orgPermissionsGetMaskByNames(names: [String]): BitString
 
@@ -250,35 +255,6 @@ type Query {
     orderBy: [ApiSchemaOrderBy!] = [PRIMARY_KEY_ASC]
   ): ApiSchemaConnection
 
-  """Reads and enables pagination through a set of `SiteTheme`."""
-  siteThemes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: SiteThemeFilter
-
-    """The method to use when ordering `SiteTheme`."""
-    orderBy: [SiteThemeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): SiteThemeConnection
-
   """Reads and enables pagination through a set of `OrgMember`."""
   orgMembers(
     """Only read the first `n` values of the set."""
@@ -425,6 +401,35 @@ type Query {
     """The method to use when ordering `SecretsModule`."""
     orderBy: [SecretsModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): SecretsModuleConnection
+
+  """Reads and enables pagination through a set of `SiteTheme`."""
+  siteThemes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: SiteThemeFilter
+
+    """The method to use when ordering `SiteTheme`."""
+    orderBy: [SiteThemeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SiteThemeConnection
 
   """Reads and enables pagination through a set of `Store`."""
   stores(
@@ -1095,35 +1100,6 @@ type Query {
     orderBy: [CryptoAddressesModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): CryptoAddressesModuleConnection
 
-  """Reads and enables pagination through a set of `ConnectedAccount`."""
-  connectedAccounts(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ConnectedAccountFilter
-
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountConnection
-
   """Reads and enables pagination through a set of `PhoneNumber`."""
   phoneNumbers(
     """Only read the first `n` values of the set."""
@@ -1152,35 +1128,6 @@ type Query {
     """The method to use when ordering `PhoneNumber`."""
     orderBy: [PhoneNumberOrderBy!] = [PRIMARY_KEY_ASC]
   ): PhoneNumberConnection
-
-  """Reads and enables pagination through a set of `MigrateFile`."""
-  migrateFiles(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: MigrateFileFilter
-
-    """The method to use when ordering `MigrateFile`."""
-    orderBy: [MigrateFileOrderBy!] = [NATURAL]
-  ): MigrateFileConnection
 
   """Reads and enables pagination through a set of `AppLimitDefault`."""
   appLimitDefaults(
@@ -1239,6 +1186,64 @@ type Query {
     """The method to use when ordering `OrgLimitDefault`."""
     orderBy: [OrgLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgLimitDefaultConnection
+
+  """Reads and enables pagination through a set of `ConnectedAccount`."""
+  connectedAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ConnectedAccountFilter
+
+    """The method to use when ordering `ConnectedAccount`."""
+    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ConnectedAccountConnection
+
+  """Reads and enables pagination through a set of `MigrateFile`."""
+  migrateFiles(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MigrateFileFilter
+
+    """The method to use when ordering `MigrateFile`."""
+    orderBy: [MigrateFileOrderBy!] = [NATURAL]
+  ): MigrateFileConnection
 
   """Reads and enables pagination through a set of `TableGrant`."""
   tableGrants(
@@ -1675,6 +1680,35 @@ type Query {
     orderBy: [SiteMetadatumOrderBy!] = [PRIMARY_KEY_ASC]
   ): SiteMetadatumConnection
 
+  """Reads and enables pagination through a set of `BlueprintConstruction`."""
+  blueprintConstructions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: BlueprintConstructionFilter
+
+    """The method to use when ordering `BlueprintConstruction`."""
+    orderBy: [BlueprintConstructionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BlueprintConstructionConnection
+
   """Reads and enables pagination through a set of `RlsModule`."""
   rlsModules(
     """Only read the first `n` values of the set."""
@@ -1906,6 +1940,35 @@ type Query {
     """The method to use when ordering `Domain`."""
     orderBy: [DomainOrderBy!] = [PRIMARY_KEY_ASC]
   ): DomainConnection
+
+  """Reads and enables pagination through a set of `Blueprint`."""
+  blueprints(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: BlueprintFilter
+
+    """The method to use when ordering `Blueprint`."""
+    orderBy: [BlueprintOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BlueprintConnection
 
   """Reads and enables pagination through a set of `OrgGrant`."""
   orgGrants(
@@ -2316,35 +2379,6 @@ type Query {
     """The method to use when ordering `View`."""
     orderBy: [ViewOrderBy!] = [PRIMARY_KEY_ASC]
   ): ViewConnection
-
-  """Reads and enables pagination through a set of `Blueprint`."""
-  blueprints(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: BlueprintFilter
-
-    """The method to use when ordering `Blueprint`."""
-    orderBy: [BlueprintOrderBy!] = [PRIMARY_KEY_ASC]
-  ): BlueprintConnection
 
   """Reads and enables pagination through a set of `PermissionsModule`."""
   permissionsModules(
@@ -2897,6 +2931,35 @@ type Query {
     orderBy: [HierarchyModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): HierarchyModuleConnection
 
+  """Reads and enables pagination through a set of `StorageModule`."""
+  storageModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: StorageModuleFilter
+
+    """The method to use when ordering `StorageModule`."""
+    orderBy: [StorageModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StorageModuleConnection
+
   """Reads and enables pagination through a set of `Invite`."""
   invites(
     """Only read the first `n` values of the set."""
@@ -2926,35 +2989,6 @@ type Query {
     orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
   ): InviteConnection
 
-  """Reads and enables pagination through a set of `ForeignKeyConstraint`."""
-  foreignKeyConstraints(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ForeignKeyConstraintFilter
-
-    """The method to use when ordering `ForeignKeyConstraint`."""
-    orderBy: [ForeignKeyConstraintOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ForeignKeyConstraintConnection
-
   """Reads and enables pagination through a set of `SecureTableProvision`."""
   secureTableProvisions(
     """Only read the first `n` values of the set."""
@@ -2983,6 +3017,35 @@ type Query {
     """The method to use when ordering `SecureTableProvision`."""
     orderBy: [SecureTableProvisionOrderBy!] = [PRIMARY_KEY_ASC]
   ): SecureTableProvisionConnection
+
+  """Reads and enables pagination through a set of `ForeignKeyConstraint`."""
+  foreignKeyConstraints(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ForeignKeyConstraintFilter
+
+    """The method to use when ordering `ForeignKeyConstraint`."""
+    orderBy: [ForeignKeyConstraintOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ForeignKeyConstraintConnection
 
   """Reads and enables pagination through a set of `OrgInvite`."""
   orgInvites(
@@ -3129,35 +3192,6 @@ type Query {
     orderBy: [FieldOrderBy!] = [PRIMARY_KEY_ASC]
   ): FieldConnection
 
-  """Reads and enables pagination through a set of `MembershipsModule`."""
-  membershipsModules(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: MembershipsModuleFilter
-
-    """The method to use when ordering `MembershipsModule`."""
-    orderBy: [MembershipsModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MembershipsModuleConnection
-
   """Reads and enables pagination through a set of `RelationProvision`."""
   relationProvisions(
     """Only read the first `n` values of the set."""
@@ -3187,6 +3221,35 @@ type Query {
     orderBy: [RelationProvisionOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationProvisionConnection
 
+  """Reads and enables pagination through a set of `MembershipsModule`."""
+  membershipsModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MembershipsModuleFilter
+
+    """The method to use when ordering `MembershipsModule`."""
+    orderBy: [MembershipsModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MembershipsModuleConnection
+
   """
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
   """
@@ -3203,60 +3266,6 @@ scalar InternetAddress
 
 """A string representing a series of binary bits"""
 scalar BitString
-
-"""A connection to a list of `GetAllRecord` values."""
-type GetAllConnection {
-  """A list of `GetAllRecord` objects."""
-  nodes: [GetAllRecord]!
-
-  """
-  A list of edges which contains the `GetAllRecord` and cursor to aid in pagination.
-  """
-  edges: [GetAllEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `GetAllRecord` you could get from the connection."""
-  totalCount: Int!
-}
-
-type GetAllRecord {
-  path: [String]
-  data: JSON
-}
-
-"""
-Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-"""A `GetAllRecord` edge in the connection."""
-type GetAllEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `GetAllRecord` at the end of the edge."""
-  node: GetAllRecord
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
 
 """A connection to a list of `OrgGetManagersRecord` values."""
 type OrgGetManagersConnection {
@@ -3291,6 +3300,24 @@ type OrgGetManagersEdge {
   node: OrgGetManagersRecord
 }
 
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
 """A connection to a list of `OrgGetSubordinatesRecord` values."""
 type OrgGetSubordinatesConnection {
   """A list of `OrgGetSubordinatesRecord` objects."""
@@ -3322,6 +3349,42 @@ type OrgGetSubordinatesEdge {
 
   """The `OrgGetSubordinatesRecord` at the end of the edge."""
   node: OrgGetSubordinatesRecord
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""A connection to a list of `GetAllRecord` values."""
+type GetAllConnection {
+  """A list of `GetAllRecord` objects."""
+  nodes: [GetAllRecord]!
+
+  """
+  A list of edges which contains the `GetAllRecord` and cursor to aid in pagination.
+  """
+  edges: [GetAllEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `GetAllRecord` you could get from the connection."""
+  totalCount: Int!
+}
+
+type GetAllRecord {
+  path: [String]
+  data: JSON
+}
+
+"""A `GetAllRecord` edge in the connection."""
+type GetAllEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `GetAllRecord` at the end of the edge."""
+  node: GetAllRecord
 }
 
 """A connection to a list of `Object` values."""
@@ -6534,6 +6597,64 @@ type Database {
     orderBy: [BlueprintOrderBy!] = [PRIMARY_KEY_ASC]
   ): BlueprintConnection!
 
+  """Reads and enables pagination through a set of `BlueprintConstruction`."""
+  blueprintConstructions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: BlueprintConstructionFilter
+
+    """The method to use when ordering `BlueprintConstruction`."""
+    orderBy: [BlueprintConstructionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BlueprintConstructionConnection!
+
+  """Reads and enables pagination through a set of `StorageModule`."""
+  storageModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: StorageModuleFilter
+
+    """The method to use when ordering `StorageModule`."""
+    orderBy: [StorageModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StorageModuleConnection!
+
   """
   Reads and enables pagination through a set of `DatabaseProvisionModule`.
   """
@@ -8408,6 +8529,18 @@ input DatabaseFilter {
 
   """`blueprints` exist."""
   blueprintsExist: Boolean
+
+  """Filter by the object’s `blueprintConstructions` relation."""
+  blueprintConstructions: DatabaseToManyBlueprintConstructionFilter
+
+  """`blueprintConstructions` exist."""
+  blueprintConstructionsExist: Boolean
+
+  """Filter by the object’s `storageModules` relation."""
+  storageModules: DatabaseToManyStorageModuleFilter
+
+  """`storageModules` exist."""
+  storageModulesExist: Boolean
 
   """Filter by the object’s `databaseProvisionModules` relation."""
   databaseProvisionModules: DatabaseToManyDatabaseProvisionModuleFilter
@@ -12598,14 +12731,11 @@ input SecureTableProvisionFilter {
   """Filter by the object’s `tableName` field."""
   tableName: StringFilter
 
-  """Filter by the object’s `nodeType` field."""
-  nodeType: StringFilter
+  """Filter by the object’s `nodes` field."""
+  nodes: JSONFilter
 
   """Filter by the object’s `useRls` field."""
   useRls: BooleanFilter
-
-  """Filter by the object’s `nodeData` field."""
-  nodeData: JSONFilter
 
   """Filter by the object’s `fields` field."""
   fields: JSONListFilter
@@ -12788,11 +12918,8 @@ input RelationProvisionFilter {
   """Filter by the object’s `exposeInApi` field."""
   exposeInApi: BooleanFilter
 
-  """Filter by the object’s `nodeType` field."""
-  nodeType: StringFilter
-
-  """Filter by the object’s `nodeData` field."""
-  nodeData: JSONFilter
+  """Filter by the object’s `nodes` field."""
+  nodes: JSONFilter
 
   """Filter by the object’s `grantRoles` field."""
   grantRoles: StringListFilter
@@ -16402,21 +16529,6 @@ input BlueprintFilter {
   """Filter by the object’s `templateId` field."""
   templateId: UUIDFilter
 
-  """Filter by the object’s `status` field."""
-  status: StringFilter
-
-  """Filter by the object’s `constructedAt` field."""
-  constructedAt: DatetimeFilter
-
-  """Filter by the object’s `errorDetails` field."""
-  errorDetails: StringFilter
-
-  """Filter by the object’s `refMap` field."""
-  refMap: JSONFilter
-
-  """Filter by the object’s `constructedDefinition` field."""
-  constructedDefinition: JSONFilter
-
   """Filter by the object’s `definitionHash` field."""
   definitionHash: UUIDFilter
 
@@ -16446,6 +16558,12 @@ input BlueprintFilter {
 
   """A related `template` exists."""
   templateExists: Boolean
+
+  """Filter by the object’s `blueprintConstructions` relation."""
+  blueprintConstructions: BlueprintToManyBlueprintConstructionFilter
+
+  """`blueprintConstructions` exist."""
+  blueprintConstructionsExist: Boolean
 }
 
 """
@@ -16567,6 +16685,236 @@ input BlueprintTemplateToManyBlueprintFilter {
   """Filters to entities where no related entity matches."""
   none: BlueprintFilter
 }
+
+"""
+A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’
+"""
+input BlueprintToManyBlueprintConstructionFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: BlueprintConstructionFilter
+
+  """Filters to entities where every related entity matches."""
+  every: BlueprintConstructionFilter
+
+  """Filters to entities where no related entity matches."""
+  none: BlueprintConstructionFilter
+}
+
+"""
+A filter to be used against `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’
+"""
+input BlueprintConstructionFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `blueprintId` field."""
+  blueprintId: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `status` field."""
+  status: StringFilter
+
+  """Filter by the object’s `errorDetails` field."""
+  errorDetails: StringFilter
+
+  """Filter by the object’s `tableMap` field."""
+  tableMap: JSONFilter
+
+  """Filter by the object’s `constructedDefinition` field."""
+  constructedDefinition: JSONFilter
+
+  """Filter by the object’s `constructedAt` field."""
+  constructedAt: DatetimeFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [BlueprintConstructionFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [BlueprintConstructionFilter!]
+
+  """Negates the expression."""
+  not: BlueprintConstructionFilter
+
+  """Filter by the object’s `blueprint` relation."""
+  blueprint: BlueprintFilter
+
+  """Filter by the object’s `database` relation."""
+  database: DatabaseFilter
+}
+
+"""
+A filter to be used against many `BlueprintConstruction` object types. All fields are combined with a logical ‘and.’
+"""
+input DatabaseToManyBlueprintConstructionFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: BlueprintConstructionFilter
+
+  """Filters to entities where every related entity matches."""
+  every: BlueprintConstructionFilter
+
+  """Filters to entities where no related entity matches."""
+  none: BlueprintConstructionFilter
+}
+
+"""
+A filter to be used against many `StorageModule` object types. All fields are combined with a logical ‘and.’
+"""
+input DatabaseToManyStorageModuleFilter {
+  """Filters to entities where at least one related entity matches."""
+  some: StorageModuleFilter
+
+  """Filters to entities where every related entity matches."""
+  every: StorageModuleFilter
+
+  """Filters to entities where no related entity matches."""
+  none: StorageModuleFilter
+}
+
+"""
+A filter to be used against `StorageModule` object types. All fields are combined with a logical ‘and.’
+"""
+input StorageModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `privateSchemaId` field."""
+  privateSchemaId: UUIDFilter
+
+  """Filter by the object’s `bucketsTableId` field."""
+  bucketsTableId: UUIDFilter
+
+  """Filter by the object’s `filesTableId` field."""
+  filesTableId: UUIDFilter
+
+  """Filter by the object’s `uploadRequestsTableId` field."""
+  uploadRequestsTableId: UUIDFilter
+
+  """Filter by the object’s `bucketsTableName` field."""
+  bucketsTableName: StringFilter
+
+  """Filter by the object’s `filesTableName` field."""
+  filesTableName: StringFilter
+
+  """Filter by the object’s `uploadRequestsTableName` field."""
+  uploadRequestsTableName: StringFilter
+
+  """Filter by the object’s `entityTableId` field."""
+  entityTableId: UUIDFilter
+
+  """Filter by the object’s `uploadUrlExpirySeconds` field."""
+  uploadUrlExpirySeconds: IntFilter
+
+  """Filter by the object’s `downloadUrlExpirySeconds` field."""
+  downloadUrlExpirySeconds: IntFilter
+
+  """Filter by the object’s `defaultMaxFileSize` field."""
+  defaultMaxFileSize: BigIntFilter
+
+  """Filter by the object’s `maxFilenameLength` field."""
+  maxFilenameLength: IntFilter
+
+  """Filter by the object’s `cacheTtlSeconds` field."""
+  cacheTtlSeconds: IntFilter
+
+  """Checks for all expressions in this list."""
+  and: [StorageModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [StorageModuleFilter!]
+
+  """Negates the expression."""
+  not: StorageModuleFilter
+
+  """Filter by the object’s `bucketsTable` relation."""
+  bucketsTable: TableFilter
+
+  """Filter by the object’s `database` relation."""
+  database: DatabaseFilter
+
+  """Filter by the object’s `entityTable` relation."""
+  entityTable: TableFilter
+
+  """A related `entityTable` exists."""
+  entityTableExists: Boolean
+
+  """Filter by the object’s `filesTable` relation."""
+  filesTable: TableFilter
+
+  """Filter by the object’s `privateSchema` relation."""
+  privateSchema: SchemaFilter
+
+  """Filter by the object’s `schema` relation."""
+  schema: SchemaFilter
+
+  """Filter by the object’s `uploadRequestsTable` relation."""
+  uploadRequestsTable: TableFilter
+}
+
+"""
+A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’
+"""
+input BigIntFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: BigInt
+
+  """Not equal to the specified value."""
+  notEqualTo: BigInt
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BigInt
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BigInt
+
+  """Included in the specified list."""
+  in: [BigInt!]
+
+  """Not included in the specified list."""
+  notIn: [BigInt!]
+
+  """Less than the specified value."""
+  lessThan: BigInt
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: BigInt
+
+  """Greater than the specified value."""
+  greaterThan: BigInt
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: BigInt
+}
+
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
 
 """
 A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’
@@ -18050,7 +18398,7 @@ type SecureTableProvisionConnection {
 }
 
 """
-Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via node_type, (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
+Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent.
 """
 type SecureTableProvision {
   """Unique identifier for this provision row."""
@@ -18075,19 +18423,14 @@ type SecureTableProvision {
   tableName: String
 
   """
-  Which generator to invoke for field creation. One of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete. NULL means no field creation — the row only provisions grants and/or policies.
+  Array of node objects to apply to the table. Each element is a jsonb object with a required "$type" key (one of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete, DataEmbedding, DataFullTextSearch, DataSlug, etc.) and an optional "data" key containing generator-specific configuration. Supports multiple nodes per row, matching the blueprint definition format. Example: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}]. Defaults to '[]' (no node processing).
   """
-  nodeType: String
+  nodes: JSON!
 
   """
   If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true.
   """
   useRls: Boolean!
-
-  """
-  Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'.
-  """
-  nodeData: JSON!
 
   """
   PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields).
@@ -18135,7 +18478,7 @@ type SecureTableProvision {
   policyData: JSON!
 
   """
-  Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly.
+  Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly.
   """
   outFields: [UUID]
 
@@ -18177,12 +18520,10 @@ enum SecureTableProvisionOrderBy {
   TABLE_ID_DESC
   TABLE_NAME_ASC
   TABLE_NAME_DESC
-  NODE_TYPE_ASC
-  NODE_TYPE_DESC
+  NODES_ASC
+  NODES_DESC
   USE_RLS_ASC
   USE_RLS_DESC
-  NODE_DATA_ASC
-  NODE_DATA_DESC
   FIELDS_ASC
   FIELDS_DESC
   GRANT_ROLES_ASC
@@ -18362,23 +18703,12 @@ type RelationProvision {
   exposeInApi: Boolean!
 
   """
-  For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-       Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
-       NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
-       Ignored for RelationBelongsTo/RelationHasOne.
+  For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+       Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+       Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+       Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
   """
-  nodeType: String
-
-  """
-  For RelationManyToMany: configuration passed to the generator function for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-       Only used when node_type is set. Structure varies by node_type. Examples:
-       - DataId: {"field_name": "id"} (default field name is 'id')
-       - DataEntityMembership: {"entity_field_name": "entity_id", "include_id": false, "include_user_fk": true}
-       - DataDirectOwner: {"owner_field_name": "owner_id"}
-       Defaults to '{}' (empty object).
-       Ignored for RelationBelongsTo/RelationHasOne.
-  """
-  nodeData: JSON!
+  nodes: JSON!
 
   """
   For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne.
@@ -18506,10 +18836,8 @@ enum RelationProvisionOrderBy {
   CREATE_INDEX_DESC
   EXPOSE_IN_API_ASC
   EXPOSE_IN_API_DESC
-  NODE_TYPE_ASC
-  NODE_TYPE_DESC
-  NODE_DATA_ASC
-  NODE_DATA_DESC
+  NODES_ASC
+  NODES_DESC
   GRANT_ROLES_ASC
   GRANT_ROLES_DESC
   GRANT_PRIVILEGES_ASC
@@ -21800,7 +22128,7 @@ type BlueprintConnection {
 }
 
 """
-An owned, executable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition before executing it with construct_blueprint(). Each blueprint tracks its execution status (draft/constructed/failed) and stores the ref_map of created table IDs after construction.
+An owned, editable blueprint scoped to a specific database. Created by copying from a blueprint_template via copy_template_to_blueprint() or built from scratch. The owner can customize the definition at any time. Execute it with construct_blueprint() which creates a separate blueprint_construction record to track the build.
 """
 type Blueprint {
   """Unique identifier for this blueprint."""
@@ -21824,7 +22152,7 @@ type Blueprint {
   description: String
 
   """
-  The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing.
+  The blueprint definition as a JSONB document. Contains tables[] (each with table_name, optional schema_name, nodes[] for data behaviors, fields[], grants[], and policies[] using $type), relations[] (using $type with source_table/target_table and optional source_schema/target_schema), indexes[] (using table_name + column), and full_text_searches[] (using table_name + field + sources[]). Everything is name-based — no UUIDs in the definition.
   """
   definition: JSON!
 
@@ -21834,37 +22162,12 @@ type Blueprint {
   templateId: UUID
 
   """
-  Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft.
-  """
-  status: String!
-
-  """
-  Timestamp when construct_blueprint() successfully completed. NULL until constructed.
-  """
-  constructedAt: Datetime
-
-  """
-  Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed.
-  """
-  errorDetails: String
-
-  """
-  Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object.
-  """
-  refMap: JSON!
-
-  """
-  Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed.
-  """
-  constructedDefinition: JSON
-
-  """
   UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly.
   """
   definitionHash: UUID
 
   """
-  JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger.
+  JSONB map of table names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger.
   """
   tableHashes: JSON
 
@@ -21881,6 +22184,35 @@ type Blueprint {
   Reads a single `BlueprintTemplate` that is related to this `Blueprint`.
   """
   template: BlueprintTemplate
+
+  """Reads and enables pagination through a set of `BlueprintConstruction`."""
+  blueprintConstructions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: BlueprintConstructionFilter
+
+    """The method to use when ordering `BlueprintConstruction`."""
+    orderBy: [BlueprintConstructionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BlueprintConstructionConnection!
 }
 
 """
@@ -22133,20 +22465,127 @@ enum BlueprintOrderBy {
   DEFINITION_DESC
   TEMPLATE_ID_ASC
   TEMPLATE_ID_DESC
-  STATUS_ASC
-  STATUS_DESC
-  CONSTRUCTED_AT_ASC
-  CONSTRUCTED_AT_DESC
-  ERROR_DETAILS_ASC
-  ERROR_DETAILS_DESC
-  REF_MAP_ASC
-  REF_MAP_DESC
-  CONSTRUCTED_DEFINITION_ASC
-  CONSTRUCTED_DEFINITION_DESC
   DEFINITION_HASH_ASC
   DEFINITION_HASH_DESC
   TABLE_HASHES_ASC
   TABLE_HASHES_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `BlueprintConstruction` values."""
+type BlueprintConstructionConnection {
+  """A list of `BlueprintConstruction` objects."""
+  nodes: [BlueprintConstruction]!
+
+  """
+  A list of edges which contains the `BlueprintConstruction` and cursor to aid in pagination.
+  """
+  edges: [BlueprintConstructionEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `BlueprintConstruction` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Tracks individual construction attempts of a blueprint. Each time construct_blueprint() is called, a new record is created here. This separates the editable blueprint definition from its build history, allowing blueprints to be re-executed, constructed into multiple databases, and maintain an audit trail of all construction attempts.
+"""
+type BlueprintConstruction {
+  """Unique identifier for this construction attempt."""
+  id: UUID!
+
+  """The blueprint that was constructed."""
+  blueprintId: UUID!
+
+  """The database the blueprint was constructed into."""
+  databaseId: UUID!
+
+  """
+  The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved.
+  """
+  schemaId: UUID
+
+  """
+  Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. failed: execution failed (see error_details).
+  """
+  status: String!
+
+  """
+  Error message from a failed construction attempt. NULL unless status is failed.
+  """
+  errorDetails: String
+
+  """
+  Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object.
+  """
+  tableMap: JSON!
+
+  """
+  Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the blueprint definition.
+  """
+  constructedDefinition: JSON
+
+  """
+  Timestamp when construction successfully completed. NULL until constructed.
+  """
+  constructedAt: Datetime
+
+  """Timestamp when this construction attempt was created."""
+  createdAt: Datetime!
+
+  """Timestamp when this construction attempt was last modified."""
+  updatedAt: Datetime!
+
+  """
+  Reads a single `Blueprint` that is related to this `BlueprintConstruction`.
+  """
+  blueprint: Blueprint
+
+  """
+  Reads a single `Database` that is related to this `BlueprintConstruction`.
+  """
+  database: Database
+}
+
+"""A `BlueprintConstruction` edge in the connection."""
+type BlueprintConstructionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `BlueprintConstruction` at the end of the edge."""
+  node: BlueprintConstruction
+}
+
+"""Methods to use when ordering `BlueprintConstruction`."""
+enum BlueprintConstructionOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  BLUEPRINT_ID_ASC
+  BLUEPRINT_ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  STATUS_ASC
+  STATUS_DESC
+  ERROR_DETAILS_ASC
+  ERROR_DETAILS_DESC
+  TABLE_MAP_ASC
+  TABLE_MAP_DESC
+  CONSTRUCTED_DEFINITION_ASC
+  CONSTRUCTED_DEFINITION_DESC
+  CONSTRUCTED_AT_ASC
+  CONSTRUCTED_AT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -22160,6 +22599,111 @@ type BlueprintEdge {
 
   """The `Blueprint` at the end of the edge."""
   node: Blueprint
+}
+
+"""A connection to a list of `StorageModule` values."""
+type StorageModuleConnection {
+  """A list of `StorageModule` objects."""
+  nodes: [StorageModule]!
+
+  """
+  A list of edges which contains the `StorageModule` and cursor to aid in pagination.
+  """
+  edges: [StorageModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `StorageModule` you could get from the connection."""
+  totalCount: Int!
+}
+
+type StorageModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  privateSchemaId: UUID!
+  bucketsTableId: UUID!
+  filesTableId: UUID!
+  uploadRequestsTableId: UUID!
+  bucketsTableName: String!
+  filesTableName: String!
+  uploadRequestsTableName: String!
+  entityTableId: UUID
+  uploadUrlExpirySeconds: Int
+  downloadUrlExpirySeconds: Int
+  defaultMaxFileSize: BigInt
+  maxFilenameLength: Int
+  cacheTtlSeconds: Int
+
+  """Reads a single `Table` that is related to this `StorageModule`."""
+  bucketsTable: Table
+
+  """Reads a single `Database` that is related to this `StorageModule`."""
+  database: Database
+
+  """Reads a single `Table` that is related to this `StorageModule`."""
+  entityTable: Table
+
+  """Reads a single `Table` that is related to this `StorageModule`."""
+  filesTable: Table
+
+  """Reads a single `Schema` that is related to this `StorageModule`."""
+  privateSchema: Schema
+
+  """Reads a single `Schema` that is related to this `StorageModule`."""
+  schema: Schema
+
+  """Reads a single `Table` that is related to this `StorageModule`."""
+  uploadRequestsTable: Table
+}
+
+"""A `StorageModule` edge in the connection."""
+type StorageModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `StorageModule` at the end of the edge."""
+  node: StorageModule
+}
+
+"""Methods to use when ordering `StorageModule`."""
+enum StorageModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  PRIVATE_SCHEMA_ID_ASC
+  PRIVATE_SCHEMA_ID_DESC
+  BUCKETS_TABLE_ID_ASC
+  BUCKETS_TABLE_ID_DESC
+  FILES_TABLE_ID_ASC
+  FILES_TABLE_ID_DESC
+  UPLOAD_REQUESTS_TABLE_ID_ASC
+  UPLOAD_REQUESTS_TABLE_ID_DESC
+  BUCKETS_TABLE_NAME_ASC
+  BUCKETS_TABLE_NAME_DESC
+  FILES_TABLE_NAME_ASC
+  FILES_TABLE_NAME_DESC
+  UPLOAD_REQUESTS_TABLE_NAME_ASC
+  UPLOAD_REQUESTS_TABLE_NAME_DESC
+  ENTITY_TABLE_ID_ASC
+  ENTITY_TABLE_ID_DESC
+  UPLOAD_URL_EXPIRY_SECONDS_ASC
+  UPLOAD_URL_EXPIRY_SECONDS_DESC
+  DOWNLOAD_URL_EXPIRY_SECONDS_ASC
+  DOWNLOAD_URL_EXPIRY_SECONDS_DESC
+  DEFAULT_MAX_FILE_SIZE_ASC
+  DEFAULT_MAX_FILE_SIZE_DESC
+  MAX_FILENAME_LENGTH_ASC
+  MAX_FILENAME_LENGTH_DESC
+  CACHE_TTL_SECONDS_ASC
+  CACHE_TTL_SECONDS_DESC
 }
 
 """A connection to a list of `DatabaseProvisionModule` values."""
@@ -24565,131 +25109,6 @@ enum RoleTypeOrderBy {
   NAME_DESC
 }
 
-"""A connection to a list of `MigrateFile` values."""
-type MigrateFileConnection {
-  """A list of `MigrateFile` objects."""
-  nodes: [MigrateFile]!
-
-  """
-  A list of edges which contains the `MigrateFile` and cursor to aid in pagination.
-  """
-  edges: [MigrateFileEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `MigrateFile` you could get from the connection."""
-  totalCount: Int!
-}
-
-type MigrateFile {
-  id: UUID
-  databaseId: UUID
-  upload: ConstructiveInternalTypeUpload
-}
-
-scalar ConstructiveInternalTypeUpload
-
-"""A `MigrateFile` edge in the connection."""
-type MigrateFileEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `MigrateFile` at the end of the edge."""
-  node: MigrateFile
-}
-
-"""
-A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’
-"""
-input MigrateFileFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `databaseId` field."""
-  databaseId: UUIDFilter
-
-  """Filter by the object’s `upload` field."""
-  upload: ConstructiveInternalTypeUploadFilter
-
-  """Checks for all expressions in this list."""
-  and: [MigrateFileFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [MigrateFileFilter!]
-
-  """Negates the expression."""
-  not: MigrateFileFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeUploadFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: ConstructiveInternalTypeUpload
-
-  """Not equal to the specified value."""
-  notEqualTo: ConstructiveInternalTypeUpload
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: ConstructiveInternalTypeUpload
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: ConstructiveInternalTypeUpload
-
-  """Included in the specified list."""
-  in: [ConstructiveInternalTypeUpload!]
-
-  """Not included in the specified list."""
-  notIn: [ConstructiveInternalTypeUpload!]
-
-  """Less than the specified value."""
-  lessThan: ConstructiveInternalTypeUpload
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: ConstructiveInternalTypeUpload
-
-  """Greater than the specified value."""
-  greaterThan: ConstructiveInternalTypeUpload
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: ConstructiveInternalTypeUpload
-
-  """Contains the specified JSON."""
-  contains: ConstructiveInternalTypeUpload
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: ConstructiveInternalTypeUpload
-}
-
-"""Methods to use when ordering `MigrateFile`."""
-enum MigrateFileOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  DATABASE_ID_ASC
-  DATABASE_ID_DESC
-  UPLOAD_ASC
-  UPLOAD_DESC
-}
-
 """A connection to a list of `AppLimitDefault` values."""
 type AppLimitDefaultConnection {
   """A list of `AppLimitDefault` objects."""
@@ -24842,6 +25261,131 @@ enum OrgLimitDefaultOrderBy {
   NAME_DESC
   MAX_ASC
   MAX_DESC
+}
+
+"""A connection to a list of `MigrateFile` values."""
+type MigrateFileConnection {
+  """A list of `MigrateFile` objects."""
+  nodes: [MigrateFile]!
+
+  """
+  A list of edges which contains the `MigrateFile` and cursor to aid in pagination.
+  """
+  edges: [MigrateFileEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MigrateFile` you could get from the connection."""
+  totalCount: Int!
+}
+
+type MigrateFile {
+  id: UUID
+  databaseId: UUID
+  upload: ConstructiveInternalTypeUpload
+}
+
+scalar ConstructiveInternalTypeUpload
+
+"""A `MigrateFile` edge in the connection."""
+type MigrateFileEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MigrateFile` at the end of the edge."""
+  node: MigrateFile
+}
+
+"""
+A filter to be used against `MigrateFile` object types. All fields are combined with a logical ‘and.’
+"""
+input MigrateFileFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `upload` field."""
+  upload: ConstructiveInternalTypeUploadFilter
+
+  """Checks for all expressions in this list."""
+  and: [MigrateFileFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [MigrateFileFilter!]
+
+  """Negates the expression."""
+  not: MigrateFileFilter
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeUpload fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeUploadFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: ConstructiveInternalTypeUpload
+
+  """Not equal to the specified value."""
+  notEqualTo: ConstructiveInternalTypeUpload
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ConstructiveInternalTypeUpload
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ConstructiveInternalTypeUpload
+
+  """Included in the specified list."""
+  in: [ConstructiveInternalTypeUpload!]
+
+  """Not included in the specified list."""
+  notIn: [ConstructiveInternalTypeUpload!]
+
+  """Less than the specified value."""
+  lessThan: ConstructiveInternalTypeUpload
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ConstructiveInternalTypeUpload
+
+  """Greater than the specified value."""
+  greaterThan: ConstructiveInternalTypeUpload
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ConstructiveInternalTypeUpload
+
+  """Contains the specified JSON."""
+  contains: ConstructiveInternalTypeUpload
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: ConstructiveInternalTypeUpload
+}
+
+"""Methods to use when ordering `MigrateFile`."""
+enum MigrateFileOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  UPLOAD_ASC
+  UPLOAD_DESC
 }
 
 """A connection to a list of `MembershipType` values."""
@@ -26295,7 +26839,7 @@ type Mutation {
   ): InitEmptyRepoPayload
 
   """
-  Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
+  Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure.
   """
   constructBlueprint(
     """
@@ -26315,18 +26859,6 @@ type Mutation {
     """
     input: RemoveNodeAtPathInput!
   ): RemoveNodeAtPathPayload
-  setDataAtPath(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SetDataAtPathInput!
-  ): SetDataAtPathPayload
-  setPropsAndCommit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SetPropsAndCommitInput!
-  ): SetPropsAndCommitPayload
 
   """
   Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
@@ -26337,12 +26869,6 @@ type Mutation {
     """
     input: CopyTemplateToBlueprintInput!
   ): CopyTemplateToBlueprintPayload
-  provisionDatabaseWithUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ProvisionDatabaseWithUserInput!
-  ): ProvisionDatabaseWithUserPayload
   bootstrapUser(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26355,6 +26881,54 @@ type Mutation {
     """
     input: SetFieldOrderInput!
   ): SetFieldOrderPayload
+
+  """
+  Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
+  """
+  provisionUniqueConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionUniqueConstraintInput!
+  ): ProvisionUniqueConstraintPayload
+
+  """
+  Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
+  """
+  provisionFullTextSearch(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionFullTextSearchInput!
+  ): ProvisionFullTextSearchPayload
+
+  """
+  Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
+  """
+  provisionIndex(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionIndexInput!
+  ): ProvisionIndexPayload
+  setDataAtPath(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetDataAtPathInput!
+  ): SetDataAtPathPayload
+  setPropsAndCommit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetPropsAndCommitInput!
+  ): SetPropsAndCommitPayload
+  provisionDatabaseWithUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionDatabaseWithUserInput!
+  ): ProvisionDatabaseWithUserPayload
   insertNodeAtPath(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26373,6 +26947,16 @@ type Mutation {
     """
     input: SetAndCommitInput!
   ): SetAndCommitPayload
+
+  """
+  Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
+  """
+  provisionRelation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionRelationInput!
+  ): ProvisionRelationPayload
   applyRls(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26417,6 +27001,16 @@ type Mutation {
     """
     input: OneTimeTokenInput!
   ): OneTimeTokenPayload
+
+  """
+  Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+  """
+  provisionTable(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionTableInput!
+  ): ProvisionTablePayload
   sendVerificationEmail(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -26466,14 +27060,6 @@ type Mutation {
     input: CreateApiSchemaInput!
   ): CreateApiSchemaPayload
 
-  """Creates a single `SiteTheme`."""
-  createSiteTheme(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateSiteThemeInput!
-  ): CreateSiteThemePayload
-
   """Creates a single `OrgMember`."""
   createOrgMember(
     """
@@ -26513,6 +27099,14 @@ type Mutation {
     """
     input: CreateSecretsModuleInput!
   ): CreateSecretsModulePayload
+
+  """Creates a single `SiteTheme`."""
+  createSiteTheme(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSiteThemeInput!
+  ): CreateSiteThemePayload
 
   """Creates a single `Store`."""
   createStore(
@@ -26698,14 +27292,6 @@ type Mutation {
     input: CreateCryptoAddressesModuleInput!
   ): CreateCryptoAddressesModulePayload
 
-  """Creates a single `ConnectedAccount`."""
-  createConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateConnectedAccountInput!
-  ): CreateConnectedAccountPayload
-
   """Creates a single `PhoneNumber`."""
   createPhoneNumber(
     """
@@ -26713,14 +27299,6 @@ type Mutation {
     """
     input: CreatePhoneNumberInput!
   ): CreatePhoneNumberPayload
-
-  """Creates a single `MigrateFile`."""
-  createMigrateFile(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMigrateFileInput!
-  ): CreateMigrateFilePayload
 
   """Creates a single `AppLimitDefault`."""
   createAppLimitDefault(
@@ -26737,6 +27315,22 @@ type Mutation {
     """
     input: CreateOrgLimitDefaultInput!
   ): CreateOrgLimitDefaultPayload
+
+  """Creates a single `ConnectedAccount`."""
+  createConnectedAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateConnectedAccountInput!
+  ): CreateConnectedAccountPayload
+
+  """Creates a single `MigrateFile`."""
+  createMigrateFile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMigrateFileInput!
+  ): CreateMigrateFilePayload
 
   """Creates a single `TableGrant`."""
   createTableGrant(
@@ -26858,6 +27452,14 @@ type Mutation {
     input: CreateSiteMetadatumInput!
   ): CreateSiteMetadatumPayload
 
+  """Creates a single `BlueprintConstruction`."""
+  createBlueprintConstruction(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateBlueprintConstructionInput!
+  ): CreateBlueprintConstructionPayload
+
   """Creates a single `RlsModule`."""
   createRlsModule(
     """
@@ -26921,6 +27523,14 @@ type Mutation {
     """
     input: CreateDomainInput!
   ): CreateDomainPayload
+
+  """Creates a single `Blueprint`."""
+  createBlueprint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateBlueprintInput!
+  ): CreateBlueprintPayload
 
   """Creates a single `OrgGrant`."""
   createOrgGrant(
@@ -27033,14 +27643,6 @@ type Mutation {
     """
     input: CreateViewInput!
   ): CreateViewPayload
-
-  """Creates a single `Blueprint`."""
-  createBlueprint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateBlueprintInput!
-  ): CreateBlueprintPayload
 
   """Creates a single `PermissionsModule`."""
   createPermissionsModule(
@@ -27194,6 +27796,14 @@ type Mutation {
     input: CreateHierarchyModuleInput!
   ): CreateHierarchyModulePayload
 
+  """Creates a single `StorageModule`."""
+  createStorageModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateStorageModuleInput!
+  ): CreateStorageModulePayload
+
   """Creates a single `Invite`."""
   createInvite(
     """
@@ -27202,14 +27812,6 @@ type Mutation {
     input: CreateInviteInput!
   ): CreateInvitePayload
 
-  """Creates a single `ForeignKeyConstraint`."""
-  createForeignKeyConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateForeignKeyConstraintInput!
-  ): CreateForeignKeyConstraintPayload
-
   """Creates a single `SecureTableProvision`."""
   createSecureTableProvision(
     """
@@ -27217,6 +27819,14 @@ type Mutation {
     """
     input: CreateSecureTableProvisionInput!
   ): CreateSecureTableProvisionPayload
+
+  """Creates a single `ForeignKeyConstraint`."""
+  createForeignKeyConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateForeignKeyConstraintInput!
+  ): CreateForeignKeyConstraintPayload
 
   """Creates a single `OrgInvite`."""
   createOrgInvite(
@@ -27258,14 +27868,6 @@ type Mutation {
     input: CreateFieldInput!
   ): CreateFieldPayload
 
-  """Creates a single `MembershipsModule`."""
-  createMembershipsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMembershipsModuleInput!
-  ): CreateMembershipsModulePayload
-
   """Creates a single `RelationProvision`."""
   createRelationProvision(
     """
@@ -27273,6 +27875,14 @@ type Mutation {
     """
     input: CreateRelationProvisionInput!
   ): CreateRelationProvisionPayload
+
+  """Creates a single `MembershipsModule`."""
+  createMembershipsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMembershipsModuleInput!
+  ): CreateMembershipsModulePayload
 
   """Updates a single `DefaultIdsModule` using a unique key and a patch."""
   updateDefaultIdsModule(
@@ -27297,14 +27907,6 @@ type Mutation {
     """
     input: UpdateApiSchemaInput!
   ): UpdateApiSchemaPayload
-
-  """Updates a single `SiteTheme` using a unique key and a patch."""
-  updateSiteTheme(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateSiteThemeInput!
-  ): UpdateSiteThemePayload
 
   """Updates a single `OrgMember` using a unique key and a patch."""
   updateOrgMember(
@@ -27349,6 +27951,14 @@ type Mutation {
     """
     input: UpdateSecretsModuleInput!
   ): UpdateSecretsModulePayload
+
+  """Updates a single `SiteTheme` using a unique key and a patch."""
+  updateSiteTheme(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSiteThemeInput!
+  ): UpdateSiteThemePayload
 
   """Updates a single `Store` using a unique key and a patch."""
   updateStore(
@@ -27542,14 +28152,6 @@ type Mutation {
     input: UpdateCryptoAddressesModuleInput!
   ): UpdateCryptoAddressesModulePayload
 
-  """Updates a single `ConnectedAccount` using a unique key and a patch."""
-  updateConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateConnectedAccountInput!
-  ): UpdateConnectedAccountPayload
-
   """Updates a single `PhoneNumber` using a unique key and a patch."""
   updatePhoneNumber(
     """
@@ -27573,6 +28175,14 @@ type Mutation {
     """
     input: UpdateOrgLimitDefaultInput!
   ): UpdateOrgLimitDefaultPayload
+
+  """Updates a single `ConnectedAccount` using a unique key and a patch."""
+  updateConnectedAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateConnectedAccountInput!
+  ): UpdateConnectedAccountPayload
 
   """Updates a single `TableGrant` using a unique key and a patch."""
   updateTableGrant(
@@ -27696,6 +28306,16 @@ type Mutation {
     input: UpdateSiteMetadatumInput!
   ): UpdateSiteMetadatumPayload
 
+  """
+  Updates a single `BlueprintConstruction` using a unique key and a patch.
+  """
+  updateBlueprintConstruction(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBlueprintConstructionInput!
+  ): UpdateBlueprintConstructionPayload
+
   """Updates a single `RlsModule` using a unique key and a patch."""
   updateRlsModule(
     """
@@ -27759,6 +28379,14 @@ type Mutation {
     """
     input: UpdateDomainInput!
   ): UpdateDomainPayload
+
+  """Updates a single `Blueprint` using a unique key and a patch."""
+  updateBlueprint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBlueprintInput!
+  ): UpdateBlueprintPayload
 
   """Updates a single `OrgGrant` using a unique key and a patch."""
   updateOrgGrant(
@@ -27869,14 +28497,6 @@ type Mutation {
     """
     input: UpdateViewInput!
   ): UpdateViewPayload
-
-  """Updates a single `Blueprint` using a unique key and a patch."""
-  updateBlueprint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBlueprintInput!
-  ): UpdateBlueprintPayload
 
   """Updates a single `PermissionsModule` using a unique key and a patch."""
   updatePermissionsModule(
@@ -28024,6 +28644,14 @@ type Mutation {
     input: UpdateHierarchyModuleInput!
   ): UpdateHierarchyModulePayload
 
+  """Updates a single `StorageModule` using a unique key and a patch."""
+  updateStorageModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateStorageModuleInput!
+  ): UpdateStorageModulePayload
+
   """Updates a single `Invite` using a unique key and a patch."""
   updateInvite(
     """
@@ -28031,16 +28659,6 @@ type Mutation {
     """
     input: UpdateInviteInput!
   ): UpdateInvitePayload
-
-  """
-  Updates a single `ForeignKeyConstraint` using a unique key and a patch.
-  """
-  updateForeignKeyConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateForeignKeyConstraintInput!
-  ): UpdateForeignKeyConstraintPayload
 
   """
   Updates a single `SecureTableProvision` using a unique key and a patch.
@@ -28051,6 +28669,16 @@ type Mutation {
     """
     input: UpdateSecureTableProvisionInput!
   ): UpdateSecureTableProvisionPayload
+
+  """
+  Updates a single `ForeignKeyConstraint` using a unique key and a patch.
+  """
+  updateForeignKeyConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateForeignKeyConstraintInput!
+  ): UpdateForeignKeyConstraintPayload
 
   """Updates a single `OrgInvite` using a unique key and a patch."""
   updateOrgInvite(
@@ -28092,14 +28720,6 @@ type Mutation {
     input: UpdateFieldInput!
   ): UpdateFieldPayload
 
-  """Updates a single `MembershipsModule` using a unique key and a patch."""
-  updateMembershipsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMembershipsModuleInput!
-  ): UpdateMembershipsModulePayload
-
   """Updates a single `RelationProvision` using a unique key and a patch."""
   updateRelationProvision(
     """
@@ -28107,6 +28727,14 @@ type Mutation {
     """
     input: UpdateRelationProvisionInput!
   ): UpdateRelationProvisionPayload
+
+  """Updates a single `MembershipsModule` using a unique key and a patch."""
+  updateMembershipsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMembershipsModuleInput!
+  ): UpdateMembershipsModulePayload
 
   """Deletes a single `DefaultIdsModule` using a unique key."""
   deleteDefaultIdsModule(
@@ -28131,14 +28759,6 @@ type Mutation {
     """
     input: DeleteApiSchemaInput!
   ): DeleteApiSchemaPayload
-
-  """Deletes a single `SiteTheme` using a unique key."""
-  deleteSiteTheme(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteSiteThemeInput!
-  ): DeleteSiteThemePayload
 
   """Deletes a single `OrgMember` using a unique key."""
   deleteOrgMember(
@@ -28179,6 +28799,14 @@ type Mutation {
     """
     input: DeleteSecretsModuleInput!
   ): DeleteSecretsModulePayload
+
+  """Deletes a single `SiteTheme` using a unique key."""
+  deleteSiteTheme(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSiteThemeInput!
+  ): DeleteSiteThemePayload
 
   """Deletes a single `Store` using a unique key."""
   deleteStore(
@@ -28364,14 +28992,6 @@ type Mutation {
     input: DeleteCryptoAddressesModuleInput!
   ): DeleteCryptoAddressesModulePayload
 
-  """Deletes a single `ConnectedAccount` using a unique key."""
-  deleteConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteConnectedAccountInput!
-  ): DeleteConnectedAccountPayload
-
   """Deletes a single `PhoneNumber` using a unique key."""
   deletePhoneNumber(
     """
@@ -28395,6 +29015,14 @@ type Mutation {
     """
     input: DeleteOrgLimitDefaultInput!
   ): DeleteOrgLimitDefaultPayload
+
+  """Deletes a single `ConnectedAccount` using a unique key."""
+  deleteConnectedAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteConnectedAccountInput!
+  ): DeleteConnectedAccountPayload
 
   """Deletes a single `TableGrant` using a unique key."""
   deleteTableGrant(
@@ -28516,6 +29144,14 @@ type Mutation {
     input: DeleteSiteMetadatumInput!
   ): DeleteSiteMetadatumPayload
 
+  """Deletes a single `BlueprintConstruction` using a unique key."""
+  deleteBlueprintConstruction(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBlueprintConstructionInput!
+  ): DeleteBlueprintConstructionPayload
+
   """Deletes a single `RlsModule` using a unique key."""
   deleteRlsModule(
     """
@@ -28579,6 +29215,14 @@ type Mutation {
     """
     input: DeleteDomainInput!
   ): DeleteDomainPayload
+
+  """Deletes a single `Blueprint` using a unique key."""
+  deleteBlueprint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBlueprintInput!
+  ): DeleteBlueprintPayload
 
   """Deletes a single `OrgGrant` using a unique key."""
   deleteOrgGrant(
@@ -28683,14 +29327,6 @@ type Mutation {
     """
     input: DeleteViewInput!
   ): DeleteViewPayload
-
-  """Deletes a single `Blueprint` using a unique key."""
-  deleteBlueprint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteBlueprintInput!
-  ): DeleteBlueprintPayload
 
   """Deletes a single `PermissionsModule` using a unique key."""
   deletePermissionsModule(
@@ -28836,6 +29472,14 @@ type Mutation {
     input: DeleteHierarchyModuleInput!
   ): DeleteHierarchyModulePayload
 
+  """Deletes a single `StorageModule` using a unique key."""
+  deleteStorageModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteStorageModuleInput!
+  ): DeleteStorageModulePayload
+
   """Deletes a single `Invite` using a unique key."""
   deleteInvite(
     """
@@ -28844,14 +29488,6 @@ type Mutation {
     input: DeleteInviteInput!
   ): DeleteInvitePayload
 
-  """Deletes a single `ForeignKeyConstraint` using a unique key."""
-  deleteForeignKeyConstraint(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteForeignKeyConstraintInput!
-  ): DeleteForeignKeyConstraintPayload
-
   """Deletes a single `SecureTableProvision` using a unique key."""
   deleteSecureTableProvision(
     """
@@ -28859,6 +29495,14 @@ type Mutation {
     """
     input: DeleteSecureTableProvisionInput!
   ): DeleteSecureTableProvisionPayload
+
+  """Deletes a single `ForeignKeyConstraint` using a unique key."""
+  deleteForeignKeyConstraint(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteForeignKeyConstraintInput!
+  ): DeleteForeignKeyConstraintPayload
 
   """Deletes a single `OrgInvite` using a unique key."""
   deleteOrgInvite(
@@ -28900,14 +29544,6 @@ type Mutation {
     input: DeleteFieldInput!
   ): DeleteFieldPayload
 
-  """Deletes a single `MembershipsModule` using a unique key."""
-  deleteMembershipsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMembershipsModuleInput!
-  ): DeleteMembershipsModulePayload
-
   """Deletes a single `RelationProvision` using a unique key."""
   deleteRelationProvision(
     """
@@ -28915,6 +29551,14 @@ type Mutation {
     """
     input: DeleteRelationProvisionInput!
   ): DeleteRelationProvisionPayload
+
+  """Deletes a single `MembershipsModule` using a unique key."""
+  deleteMembershipsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMembershipsModuleInput!
+  ): DeleteMembershipsModulePayload
 }
 
 """The output of our `sendAccountDeletionEmail` mutation."""
@@ -29248,7 +29892,7 @@ type ConstructBlueprintPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: JSON
+  result: UUID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -29321,63 +29965,6 @@ input RemoveNodeAtPathInput {
   path: [String]
 }
 
-"""The output of our `setDataAtPath` mutation."""
-type SetDataAtPathPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `setDataAtPath` mutation."""
-input SetDataAtPathInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  dbId: UUID
-  root: UUID
-  path: [String]
-  data: JSON
-}
-
-"""The output of our `setPropsAndCommit` mutation."""
-type SetPropsAndCommitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: UUID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `setPropsAndCommit` mutation."""
-input SetPropsAndCommitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  dbId: UUID
-  storeId: UUID
-  refname: String
-  path: [String]
-  data: JSON
-}
-
 """The output of our `copyTemplateToBlueprint` mutation."""
 type CopyTemplateToBlueprintPayload {
   """
@@ -29405,40 +29992,6 @@ input CopyTemplateToBlueprintInput {
   ownerId: UUID
   nameOverride: String
   displayNameOverride: String
-}
-
-"""The output of our `provisionDatabaseWithUser` mutation."""
-type ProvisionDatabaseWithUserPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: [ProvisionDatabaseWithUserRecord]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type ProvisionDatabaseWithUserRecord {
-  outDatabaseId: UUID
-  outApiKey: String
-}
-
-"""All input for the `provisionDatabaseWithUser` mutation."""
-input ProvisionDatabaseWithUserInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  pDatabaseName: String
-  pDomain: String
-  pSubdomain: String
-  pModules: [String]
-  pOptions: JSON
 }
 
 """The output of our `bootstrapUser` mutation."""
@@ -29505,6 +30058,177 @@ input SetFieldOrderInput {
   """
   clientMutationId: String
   fieldIds: [UUID]
+}
+
+"""The output of our `provisionUniqueConstraint` mutation."""
+type ProvisionUniqueConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `provisionUniqueConstraint` mutation."""
+input ProvisionUniqueConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  tableId: UUID
+  definition: JSON
+}
+
+"""The output of our `provisionFullTextSearch` mutation."""
+type ProvisionFullTextSearchPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `provisionFullTextSearch` mutation."""
+input ProvisionFullTextSearchInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  tableId: UUID
+  definition: JSON
+}
+
+"""The output of our `provisionIndex` mutation."""
+type ProvisionIndexPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `provisionIndex` mutation."""
+input ProvisionIndexInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  tableId: UUID
+  definition: JSON
+}
+
+"""The output of our `setDataAtPath` mutation."""
+type SetDataAtPathPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `setDataAtPath` mutation."""
+input SetDataAtPathInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  dbId: UUID
+  root: UUID
+  path: [String]
+  data: JSON
+}
+
+"""The output of our `setPropsAndCommit` mutation."""
+type SetPropsAndCommitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `setPropsAndCommit` mutation."""
+input SetPropsAndCommitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  dbId: UUID
+  storeId: UUID
+  refname: String
+  path: [String]
+  data: JSON
+}
+
+"""The output of our `provisionDatabaseWithUser` mutation."""
+type ProvisionDatabaseWithUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: [ProvisionDatabaseWithUserRecord]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type ProvisionDatabaseWithUserRecord {
+  outDatabaseId: UUID
+  outApiKey: String
+}
+
+"""All input for the `provisionDatabaseWithUser` mutation."""
+input ProvisionDatabaseWithUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  pDatabaseName: String
+  pDomain: String
+  pSubdomain: String
+  pModules: [String]
+  pOptions: JSON
 }
 
 """The output of our `insertNodeAtPath` mutation."""
@@ -29596,6 +30320,57 @@ input SetAndCommitInput {
   data: JSON
   kids: [UUID]
   ktree: [String]
+}
+
+"""The output of our `provisionRelation` mutation."""
+type ProvisionRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: [ProvisionRelationRecord]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type ProvisionRelationRecord {
+  outFieldId: UUID
+  outJunctionTableId: UUID
+  outSourceFieldId: UUID
+  outTargetFieldId: UUID
+}
+
+"""All input for the `provisionRelation` mutation."""
+input ProvisionRelationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  relationType: String
+  sourceTableId: UUID
+  targetTableId: UUID
+  fieldName: String
+  deleteAction: String
+  isRequired: Boolean
+  apiRequired: Boolean
+  createIndex: Boolean
+  junctionTableId: UUID
+  junctionTableName: String
+  junctionSchemaId: UUID
+  sourceFieldName: String
+  targetFieldName: String
+  useCompositeKey: Boolean
+  exposeInApi: Boolean
+  nodes: JSON
+  grants: JSON
+  grantRoles: [String]
+  policies: JSON
 }
 
 """The output of our `applyRls` mutation."""
@@ -29827,6 +30602,48 @@ input OneTimeTokenInput {
   password: String
   origin: ConstructiveInternalTypeOrigin
   rememberMe: Boolean
+}
+
+"""The output of our `provisionTable` mutation."""
+type ProvisionTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: [ProvisionTableRecord]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type ProvisionTableRecord {
+  outTableId: UUID
+  outFields: [UUID]
+}
+
+"""All input for the `provisionTable` mutation."""
+input ProvisionTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  databaseId: UUID
+  schemaId: UUID
+  tableName: String
+  tableId: UUID
+  nodes: JSON
+  fields: JSON
+  policies: JSON
+  grants: JSON
+  grantRoles: [String]
+  useRls: Boolean
+  indexes: JSON
+  fullTextSearches: JSON
+  uniqueConstraints: JSON
 }
 
 """The output of our `sendVerificationEmail` mutation."""
@@ -30116,58 +30933,6 @@ input ApiSchemaInput {
   apiId: UUID!
 }
 
-"""The output of our create `SiteTheme` mutation."""
-type CreateSiteThemePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SiteTheme` that was created by this mutation."""
-  siteTheme: SiteTheme
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SiteTheme`. May be used by Relay 1."""
-  siteThemeEdge(
-    """The method to use when ordering `SiteTheme`."""
-    orderBy: [SiteThemeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SiteThemeEdge
-}
-
-"""All input for the create `SiteTheme` mutation."""
-input CreateSiteThemeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `SiteTheme` to be created by this mutation."""
-  siteTheme: SiteThemeInput!
-}
-
-"""An input for mutations affecting `SiteTheme`"""
-input SiteThemeInput {
-  """Unique identifier for this theme record"""
-  id: UUID
-
-  """Reference to the metaschema database"""
-  databaseId: UUID!
-
-  """Site this theme belongs to"""
-  siteId: UUID!
-
-  """
-  JSONB object containing theme tokens (colors, typography, spacing, etc.)
-  """
-  theme: JSON!
-}
-
 """The output of our create `OrgMember` mutation."""
 type CreateOrgMemberPayload {
   """
@@ -30394,6 +31159,58 @@ input SecretsModuleInput {
   schemaId: UUID
   tableId: UUID
   tableName: String
+}
+
+"""The output of our create `SiteTheme` mutation."""
+type CreateSiteThemePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SiteTheme` that was created by this mutation."""
+  siteTheme: SiteTheme
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SiteTheme`. May be used by Relay 1."""
+  siteThemeEdge(
+    """The method to use when ordering `SiteTheme`."""
+    orderBy: [SiteThemeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteThemeEdge
+}
+
+"""All input for the create `SiteTheme` mutation."""
+input CreateSiteThemeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SiteTheme` to be created by this mutation."""
+  siteTheme: SiteThemeInput!
+}
+
+"""An input for mutations affecting `SiteTheme`"""
+input SiteThemeInput {
+  """Unique identifier for this theme record"""
+  id: UUID
+
+  """Reference to the metaschema database"""
+  databaseId: UUID!
+
+  """Site this theme belongs to"""
+  siteId: UUID!
+
+  """
+  JSONB object containing theme tokens (colors, typography, spacing, etc.)
+  """
+  theme: JSON!
 }
 
 """The output of our create `Store` mutation."""
@@ -31507,61 +32324,6 @@ input CryptoAddressesModuleInput {
   cryptoNetwork: String
 }
 
-"""The output of our create `ConnectedAccount` mutation."""
-type CreateConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` that was created by this mutation."""
-  connectedAccount: ConnectedAccount
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
-}
-
-"""All input for the create `ConnectedAccount` mutation."""
-input CreateConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` to be created by this mutation."""
-  connectedAccount: ConnectedAccountInput!
-}
-
-"""An input for mutations affecting `ConnectedAccount`"""
-input ConnectedAccountInput {
-  id: UUID
-  ownerId: UUID
-
-  """The service used, e.g. `twitter` or `github`."""
-  service: String!
-
-  """A unique identifier for the user within the service"""
-  identifier: String!
-
-  """Additional profile details extracted from this login method"""
-  details: JSON!
-
-  """Whether this connected account has been verified"""
-  isVerified: Boolean
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `PhoneNumber` mutation."""
 type CreatePhoneNumberPayload {
   """
@@ -31615,42 +32377,6 @@ input PhoneNumberInput {
   isPrimary: Boolean
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our create `MigrateFile` mutation."""
-type CreateMigrateFilePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` that was created by this mutation."""
-  migrateFile: MigrateFile
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `MigrateFile` mutation."""
-input CreateMigrateFileInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MigrateFile` to be created by this mutation."""
-  migrateFile: MigrateFileInput!
-}
-
-"""An input for mutations affecting `MigrateFile`"""
-input MigrateFileInput {
-  id: UUID
-  databaseId: UUID
-  upload: ConstructiveInternalTypeUpload
 }
 
 """The output of our create `AppLimitDefault` mutation."""
@@ -31743,6 +32469,97 @@ input OrgLimitDefaultInput {
 
   """Default maximum usage allowed for this limit"""
   max: Int
+}
+
+"""The output of our create `ConnectedAccount` mutation."""
+type CreateConnectedAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ConnectedAccount` that was created by this mutation."""
+  connectedAccount: ConnectedAccount
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
+  connectedAccountEdge(
+    """The method to use when ordering `ConnectedAccount`."""
+    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConnectedAccountEdge
+}
+
+"""All input for the create `ConnectedAccount` mutation."""
+input CreateConnectedAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ConnectedAccount` to be created by this mutation."""
+  connectedAccount: ConnectedAccountInput!
+}
+
+"""An input for mutations affecting `ConnectedAccount`"""
+input ConnectedAccountInput {
+  id: UUID
+  ownerId: UUID
+
+  """The service used, e.g. `twitter` or `github`."""
+  service: String!
+
+  """A unique identifier for the user within the service"""
+  identifier: String!
+
+  """Additional profile details extracted from this login method"""
+  details: JSON!
+
+  """Whether this connected account has been verified"""
+  isVerified: Boolean
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `MigrateFile` mutation."""
+type CreateMigrateFilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MigrateFile` that was created by this mutation."""
+  migrateFile: MigrateFile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `MigrateFile` mutation."""
+input CreateMigrateFileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MigrateFile` to be created by this mutation."""
+  migrateFile: MigrateFileInput!
+}
+
+"""An input for mutations affecting `MigrateFile`"""
+input MigrateFileInput {
+  id: UUID
+  databaseId: UUID
+  upload: ConstructiveInternalTypeUpload
 }
 
 """The output of our create `TableGrant` mutation."""
@@ -32535,6 +33352,89 @@ input SiteMetadatumInput {
   ogImage: ConstructiveInternalTypeImage
 }
 
+"""The output of our create `BlueprintConstruction` mutation."""
+type CreateBlueprintConstructionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `BlueprintConstruction` that was created by this mutation."""
+  blueprintConstruction: BlueprintConstruction
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `BlueprintConstruction`. May be used by Relay 1."""
+  blueprintConstructionEdge(
+    """The method to use when ordering `BlueprintConstruction`."""
+    orderBy: [BlueprintConstructionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BlueprintConstructionEdge
+}
+
+"""All input for the create `BlueprintConstruction` mutation."""
+input CreateBlueprintConstructionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `BlueprintConstruction` to be created by this mutation."""
+  blueprintConstruction: BlueprintConstructionInput!
+}
+
+"""An input for mutations affecting `BlueprintConstruction`"""
+input BlueprintConstructionInput {
+  """Unique identifier for this construction attempt."""
+  id: UUID
+
+  """The blueprint that was constructed."""
+  blueprintId: UUID!
+
+  """The database the blueprint was constructed into."""
+  databaseId: UUID!
+
+  """
+  The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved.
+  """
+  schemaId: UUID
+
+  """
+  Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. failed: execution failed (see error_details).
+  """
+  status: String
+
+  """
+  Error message from a failed construction attempt. NULL unless status is failed.
+  """
+  errorDetails: String
+
+  """
+  Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object.
+  """
+  tableMap: JSON
+
+  """
+  Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the blueprint definition.
+  """
+  constructedDefinition: JSON
+
+  """
+  Timestamp when construction successfully completed. NULL until constructed.
+  """
+  constructedAt: Datetime
+
+  """Timestamp when this construction attempt was created."""
+  createdAt: Datetime
+
+  """Timestamp when this construction attempt was last modified."""
+  updatedAt: Datetime
+}
+
 """The output of our create `RlsModule` mutation."""
 type CreateRlsModulePayload {
   """
@@ -32984,6 +33884,90 @@ input DomainInput {
 
   """Root domain of the hostname"""
   domain: ConstructiveInternalTypeHostname
+}
+
+"""The output of our create `Blueprint` mutation."""
+type CreateBlueprintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Blueprint` that was created by this mutation."""
+  blueprint: Blueprint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Blueprint`. May be used by Relay 1."""
+  blueprintEdge(
+    """The method to use when ordering `Blueprint`."""
+    orderBy: [BlueprintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BlueprintEdge
+}
+
+"""All input for the create `Blueprint` mutation."""
+input CreateBlueprintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Blueprint` to be created by this mutation."""
+  blueprint: BlueprintInput!
+}
+
+"""An input for mutations affecting `Blueprint`"""
+input BlueprintInput {
+  """Unique identifier for this blueprint."""
+  id: UUID
+
+  """The user who owns this blueprint."""
+  ownerId: UUID!
+
+  """
+  The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database.
+  """
+  databaseId: UUID!
+
+  """Machine-readable name for the blueprint. Must be unique per database."""
+  name: String!
+
+  """Human-readable display name for the blueprint."""
+  displayName: String!
+
+  """Optional description of the blueprint."""
+  description: String
+
+  """
+  The blueprint definition as a JSONB document. Contains tables[] (each with table_name, optional schema_name, nodes[] for data behaviors, fields[], grants[], and policies[] using $type), relations[] (using $type with source_table/target_table and optional source_schema/target_schema), indexes[] (using table_name + column), and full_text_searches[] (using table_name + field + sources[]). Everything is name-based — no UUIDs in the definition.
+  """
+  definition: JSON!
+
+  """
+  If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch.
+  """
+  templateId: UUID
+
+  """
+  UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly.
+  """
+  definitionHash: UUID
+
+  """
+  JSONB map of table names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger.
+  """
+  tableHashes: JSON
+
+  """Timestamp when this blueprint was created."""
+  createdAt: Datetime
+
+  """Timestamp when this blueprint was last modified."""
+  updatedAt: Datetime
 }
 
 """The output of our create `OrgGrant` mutation."""
@@ -33762,115 +34746,6 @@ input ViewInput {
   module: String
   scope: Int
   tags: [String]
-}
-
-"""The output of our create `Blueprint` mutation."""
-type CreateBlueprintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Blueprint` that was created by this mutation."""
-  blueprint: Blueprint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Blueprint`. May be used by Relay 1."""
-  blueprintEdge(
-    """The method to use when ordering `Blueprint`."""
-    orderBy: [BlueprintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BlueprintEdge
-}
-
-"""All input for the create `Blueprint` mutation."""
-input CreateBlueprintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Blueprint` to be created by this mutation."""
-  blueprint: BlueprintInput!
-}
-
-"""An input for mutations affecting `Blueprint`"""
-input BlueprintInput {
-  """Unique identifier for this blueprint."""
-  id: UUID
-
-  """The user who owns this blueprint."""
-  ownerId: UUID!
-
-  """
-  The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database.
-  """
-  databaseId: UUID!
-
-  """Machine-readable name for the blueprint. Must be unique per database."""
-  name: String!
-
-  """Human-readable display name for the blueprint."""
-  displayName: String!
-
-  """Optional description of the blueprint."""
-  description: String
-
-  """
-  The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing.
-  """
-  definition: JSON!
-
-  """
-  If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch.
-  """
-  templateId: UUID
-
-  """
-  Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft.
-  """
-  status: String
-
-  """
-  Timestamp when construct_blueprint() successfully completed. NULL until constructed.
-  """
-  constructedAt: Datetime
-
-  """
-  Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed.
-  """
-  errorDetails: String
-
-  """
-  Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object.
-  """
-  refMap: JSON
-
-  """
-  Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed.
-  """
-  constructedDefinition: JSON
-
-  """
-  UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly.
-  """
-  definitionHash: UUID
-
-  """
-  JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger.
-  """
-  tableHashes: JSON
-
-  """Timestamp when this blueprint was created."""
-  createdAt: Datetime
-
-  """Timestamp when this blueprint was last modified."""
-  updatedAt: Datetime
 }
 
 """The output of our create `PermissionsModule` mutation."""
@@ -35046,6 +35921,61 @@ input HierarchyModuleInput {
   createdAt: Datetime
 }
 
+"""The output of our create `StorageModule` mutation."""
+type CreateStorageModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `StorageModule` that was created by this mutation."""
+  storageModule: StorageModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `StorageModule`. May be used by Relay 1."""
+  storageModuleEdge(
+    """The method to use when ordering `StorageModule`."""
+    orderBy: [StorageModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StorageModuleEdge
+}
+
+"""All input for the create `StorageModule` mutation."""
+input CreateStorageModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `StorageModule` to be created by this mutation."""
+  storageModule: StorageModuleInput!
+}
+
+"""An input for mutations affecting `StorageModule`"""
+input StorageModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  bucketsTableId: UUID
+  filesTableId: UUID
+  uploadRequestsTableId: UUID
+  bucketsTableName: String
+  filesTableName: String
+  uploadRequestsTableName: String
+  entityTableId: UUID
+  uploadUrlExpirySeconds: Int
+  downloadUrlExpirySeconds: Int
+  defaultMaxFileSize: BigInt
+  maxFilenameLength: Int
+  cacheTtlSeconds: Int
+}
+
 """The output of our create `Invite` mutation."""
 type CreateInvitePayload {
   """
@@ -35115,63 +36045,6 @@ input InviteInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `ForeignKeyConstraint` mutation."""
-type CreateForeignKeyConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ForeignKeyConstraint` that was created by this mutation."""
-  foreignKeyConstraint: ForeignKeyConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ForeignKeyConstraint`. May be used by Relay 1."""
-  foreignKeyConstraintEdge(
-    """The method to use when ordering `ForeignKeyConstraint`."""
-    orderBy: [ForeignKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ForeignKeyConstraintEdge
-}
-
-"""All input for the create `ForeignKeyConstraint` mutation."""
-input CreateForeignKeyConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `ForeignKeyConstraint` to be created by this mutation."""
-  foreignKeyConstraint: ForeignKeyConstraintInput!
-}
-
-"""An input for mutations affecting `ForeignKeyConstraint`"""
-input ForeignKeyConstraintInput {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID!
-  name: String
-  description: String
-  smartTags: JSON
-  type: String
-  fieldIds: [UUID]!
-  refTableId: UUID!
-  refFieldIds: [UUID]!
-  deleteAction: String
-  updateAction: String
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our create `SecureTableProvision` mutation."""
 type CreateSecureTableProvisionPayload {
   """
@@ -35231,19 +36104,14 @@ input SecureTableProvisionInput {
   tableName: String
 
   """
-  Which generator to invoke for field creation. One of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete. NULL means no field creation — the row only provisions grants and/or policies.
+  Array of node objects to apply to the table. Each element is a jsonb object with a required "$type" key (one of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete, DataEmbedding, DataFullTextSearch, DataSlug, etc.) and an optional "data" key containing generator-specific configuration. Supports multiple nodes per row, matching the blueprint definition format. Example: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}]. Defaults to '[]' (no node processing).
   """
-  nodeType: String
+  nodes: JSON
 
   """
   If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true.
   """
   useRls: Boolean
-
-  """
-  Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'.
-  """
-  nodeData: JSON
 
   """
   PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields).
@@ -35291,9 +36159,66 @@ input SecureTableProvisionInput {
   policyData: JSON
 
   """
-  Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly.
+  Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly.
   """
   outFields: [UUID]
+}
+
+"""The output of our create `ForeignKeyConstraint` mutation."""
+type CreateForeignKeyConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ForeignKeyConstraint` that was created by this mutation."""
+  foreignKeyConstraint: ForeignKeyConstraint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ForeignKeyConstraint`. May be used by Relay 1."""
+  foreignKeyConstraintEdge(
+    """The method to use when ordering `ForeignKeyConstraint`."""
+    orderBy: [ForeignKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ForeignKeyConstraintEdge
+}
+
+"""All input for the create `ForeignKeyConstraint` mutation."""
+input CreateForeignKeyConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ForeignKeyConstraint` to be created by this mutation."""
+  foreignKeyConstraint: ForeignKeyConstraintInput!
+}
+
+"""An input for mutations affecting `ForeignKeyConstraint`"""
+input ForeignKeyConstraintInput {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID!
+  name: String
+  description: String
+  smartTags: JSON
+  type: String
+  fieldIds: [UUID]!
+  refTableId: UUID!
+  refFieldIds: [UUID]!
+  deleteAction: String
+  updateAction: String
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our create `OrgInvite` mutation."""
@@ -35620,76 +36545,6 @@ input FieldInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `MembershipsModule` mutation."""
-type CreateMembershipsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipsModule` that was created by this mutation."""
-  membershipsModule: MembershipsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipsModule`. May be used by Relay 1."""
-  membershipsModuleEdge(
-    """The method to use when ordering `MembershipsModule`."""
-    orderBy: [MembershipsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipsModuleEdge
-}
-
-"""All input for the create `MembershipsModule` mutation."""
-input CreateMembershipsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MembershipsModule` to be created by this mutation."""
-  membershipsModule: MembershipsModuleInput!
-}
-
-"""An input for mutations affecting `MembershipsModule`"""
-input MembershipsModuleInput {
-  id: UUID
-  databaseId: UUID!
-  schemaId: UUID
-  privateSchemaId: UUID
-  membershipsTableId: UUID
-  membershipsTableName: String
-  membersTableId: UUID
-  membersTableName: String
-  membershipDefaultsTableId: UUID
-  membershipDefaultsTableName: String
-  grantsTableId: UUID
-  grantsTableName: String
-  actorTableId: UUID
-  limitsTableId: UUID
-  defaultLimitsTableId: UUID
-  permissionsTableId: UUID
-  defaultPermissionsTableId: UUID
-  sprtTableId: UUID
-  adminGrantsTableId: UUID
-  adminGrantsTableName: String
-  ownerGrantsTableId: UUID
-  ownerGrantsTableName: String
-  membershipType: Int!
-  entityTableId: UUID
-  entityTableOwnerId: UUID
-  prefix: String
-  actorMaskCheck: String
-  actorPermCheck: String
-  entityIdsByMask: String
-  entityIdsByPerm: String
-  entityIdsFunction: String
-}
-
 """The output of our create `RelationProvision` mutation."""
 type CreateRelationProvisionPayload {
   """
@@ -35854,23 +36709,12 @@ input RelationProvisionInput {
   exposeInApi: Boolean
 
   """
-  For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-       Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
-       NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
-       Ignored for RelationBelongsTo/RelationHasOne.
+  For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+       Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+       Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+       Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
   """
-  nodeType: String
-
-  """
-  For RelationManyToMany: configuration passed to the generator function for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-       Only used when node_type is set. Structure varies by node_type. Examples:
-       - DataId: {"field_name": "id"} (default field name is 'id')
-       - DataEntityMembership: {"entity_field_name": "entity_id", "include_id": false, "include_user_fk": true}
-       - DataDirectOwner: {"owner_field_name": "owner_id"}
-       Defaults to '{}' (empty object).
-       Ignored for RelationBelongsTo/RelationHasOne.
-  """
-  nodeData: JSON
+  nodes: JSON
 
   """
   For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne.
@@ -35939,6 +36783,76 @@ input RelationProvisionInput {
   Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly.
   """
   outTargetFieldId: UUID
+}
+
+"""The output of our create `MembershipsModule` mutation."""
+type CreateMembershipsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipsModule` that was created by this mutation."""
+  membershipsModule: MembershipsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipsModule`. May be used by Relay 1."""
+  membershipsModuleEdge(
+    """The method to use when ordering `MembershipsModule`."""
+    orderBy: [MembershipsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipsModuleEdge
+}
+
+"""All input for the create `MembershipsModule` mutation."""
+input CreateMembershipsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MembershipsModule` to be created by this mutation."""
+  membershipsModule: MembershipsModuleInput!
+}
+
+"""An input for mutations affecting `MembershipsModule`"""
+input MembershipsModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  membershipsTableId: UUID
+  membershipsTableName: String
+  membersTableId: UUID
+  membersTableName: String
+  membershipDefaultsTableId: UUID
+  membershipDefaultsTableName: String
+  grantsTableId: UUID
+  grantsTableName: String
+  actorTableId: UUID
+  limitsTableId: UUID
+  defaultLimitsTableId: UUID
+  permissionsTableId: UUID
+  defaultPermissionsTableId: UUID
+  sprtTableId: UUID
+  adminGrantsTableId: UUID
+  adminGrantsTableName: String
+  ownerGrantsTableId: UUID
+  ownerGrantsTableName: String
+  membershipType: Int!
+  entityTableId: UUID
+  entityTableOwnerId: UUID
+  prefix: String
+  actorMaskCheck: String
+  actorPermCheck: String
+  entityIdsByMask: String
+  entityIdsByPerm: String
+  entityIdsFunction: String
 }
 
 """The output of our update `DefaultIdsModule` mutation."""
@@ -36090,65 +37004,6 @@ input ApiSchemaPatch {
 
   """API that exposes this schema"""
   apiId: UUID
-}
-
-"""The output of our update `SiteTheme` mutation."""
-type UpdateSiteThemePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SiteTheme` that was updated by this mutation."""
-  siteTheme: SiteTheme
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SiteTheme`. May be used by Relay 1."""
-  siteThemeEdge(
-    """The method to use when ordering `SiteTheme`."""
-    orderBy: [SiteThemeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SiteThemeEdge
-}
-
-"""All input for the `updateSiteTheme` mutation."""
-input UpdateSiteThemeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this theme record"""
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `SiteTheme` being updated.
-  """
-  siteThemePatch: SiteThemePatch!
-}
-
-"""
-Represents an update to a `SiteTheme`. Fields that are set will be updated.
-"""
-input SiteThemePatch {
-  """Unique identifier for this theme record"""
-  id: UUID
-
-  """Reference to the metaschema database"""
-  databaseId: UUID
-
-  """Site this theme belongs to"""
-  siteId: UUID
-
-  """
-  JSONB object containing theme tokens (colors, typography, spacing, etc.)
-  """
-  theme: JSON
 }
 
 """The output of our update `OrgMember` mutation."""
@@ -36403,6 +37258,65 @@ input SecretsModulePatch {
   schemaId: UUID
   tableId: UUID
   tableName: String
+}
+
+"""The output of our update `SiteTheme` mutation."""
+type UpdateSiteThemePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SiteTheme` that was updated by this mutation."""
+  siteTheme: SiteTheme
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SiteTheme`. May be used by Relay 1."""
+  siteThemeEdge(
+    """The method to use when ordering `SiteTheme`."""
+    orderBy: [SiteThemeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteThemeEdge
+}
+
+"""All input for the `updateSiteTheme` mutation."""
+input UpdateSiteThemeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this theme record"""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `SiteTheme` being updated.
+  """
+  siteThemePatch: SiteThemePatch!
+}
+
+"""
+Represents an update to a `SiteTheme`. Fields that are set will be updated.
+"""
+input SiteThemePatch {
+  """Unique identifier for this theme record"""
+  id: UUID
+
+  """Reference to the metaschema database"""
+  databaseId: UUID
+
+  """Site this theme belongs to"""
+  siteId: UUID
+
+  """
+  JSONB object containing theme tokens (colors, typography, spacing, etc.)
+  """
+  theme: JSON
 }
 
 """The output of our update `Store` mutation."""
@@ -37637,66 +38551,6 @@ input CryptoAddressesModulePatch {
   cryptoNetwork: String
 }
 
-"""The output of our update `ConnectedAccount` mutation."""
-type UpdateConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` that was updated by this mutation."""
-  connectedAccount: ConnectedAccount
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
-}
-
-"""All input for the `updateConnectedAccount` mutation."""
-input UpdateConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `ConnectedAccount` being updated.
-  """
-  connectedAccountPatch: ConnectedAccountPatch!
-}
-
-"""
-Represents an update to a `ConnectedAccount`. Fields that are set will be updated.
-"""
-input ConnectedAccountPatch {
-  id: UUID
-  ownerId: UUID
-
-  """The service used, e.g. `twitter` or `github`."""
-  service: String
-
-  """A unique identifier for the user within the service"""
-  identifier: String
-
-  """Additional profile details extracted from this login method"""
-  details: JSON
-
-  """Whether this connected account has been verified"""
-  isVerified: Boolean
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our update `PhoneNumber` mutation."""
 type UpdatePhoneNumberPayload {
   """
@@ -37857,6 +38711,66 @@ input OrgLimitDefaultPatch {
 
   """Default maximum usage allowed for this limit"""
   max: Int
+}
+
+"""The output of our update `ConnectedAccount` mutation."""
+type UpdateConnectedAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ConnectedAccount` that was updated by this mutation."""
+  connectedAccount: ConnectedAccount
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
+  connectedAccountEdge(
+    """The method to use when ordering `ConnectedAccount`."""
+    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConnectedAccountEdge
+}
+
+"""All input for the `updateConnectedAccount` mutation."""
+input UpdateConnectedAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `ConnectedAccount` being updated.
+  """
+  connectedAccountPatch: ConnectedAccountPatch!
+}
+
+"""
+Represents an update to a `ConnectedAccount`. Fields that are set will be updated.
+"""
+input ConnectedAccountPatch {
+  id: UUID
+  ownerId: UUID
+
+  """The service used, e.g. `twitter` or `github`."""
+  service: String
+
+  """A unique identifier for the user within the service"""
+  identifier: String
+
+  """Additional profile details extracted from this login method"""
+  details: JSON
+
+  """Whether this connected account has been verified"""
+  isVerified: Boolean
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our update `TableGrant` mutation."""
@@ -38742,6 +39656,96 @@ input SiteMetadatumPatch {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
+"""The output of our update `BlueprintConstruction` mutation."""
+type UpdateBlueprintConstructionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `BlueprintConstruction` that was updated by this mutation."""
+  blueprintConstruction: BlueprintConstruction
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `BlueprintConstruction`. May be used by Relay 1."""
+  blueprintConstructionEdge(
+    """The method to use when ordering `BlueprintConstruction`."""
+    orderBy: [BlueprintConstructionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BlueprintConstructionEdge
+}
+
+"""All input for the `updateBlueprintConstruction` mutation."""
+input UpdateBlueprintConstructionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this construction attempt."""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `BlueprintConstruction` being updated.
+  """
+  blueprintConstructionPatch: BlueprintConstructionPatch!
+}
+
+"""
+Represents an update to a `BlueprintConstruction`. Fields that are set will be updated.
+"""
+input BlueprintConstructionPatch {
+  """Unique identifier for this construction attempt."""
+  id: UUID
+
+  """The blueprint that was constructed."""
+  blueprintId: UUID
+
+  """The database the blueprint was constructed into."""
+  databaseId: UUID
+
+  """
+  The default schema used for tables that did not specify an explicit schema_name. NULL if not yet resolved.
+  """
+  schemaId: UUID
+
+  """
+  Execution state of this construction attempt. pending: created but not yet started. constructing: currently executing. constructed: successfully completed. failed: execution failed (see error_details).
+  """
+  status: String
+
+  """
+  Error message from a failed construction attempt. NULL unless status is failed.
+  """
+  errorDetails: String
+
+  """
+  Mapping of table names to created table UUIDs, populated after successful construction. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object.
+  """
+  tableMap: JSON
+
+  """
+  Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the blueprint definition.
+  """
+  constructedDefinition: JSON
+
+  """
+  Timestamp when construction successfully completed. NULL until constructed.
+  """
+  constructedAt: Datetime
+
+  """Timestamp when this construction attempt was created."""
+  createdAt: Datetime
+
+  """Timestamp when this construction attempt was last modified."""
+  updatedAt: Datetime
+}
+
 """The output of our update `RlsModule` mutation."""
 type UpdateRlsModulePayload {
   """
@@ -39237,6 +40241,97 @@ input DomainPatch {
 
   """Root domain of the hostname"""
   domain: ConstructiveInternalTypeHostname
+}
+
+"""The output of our update `Blueprint` mutation."""
+type UpdateBlueprintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Blueprint` that was updated by this mutation."""
+  blueprint: Blueprint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Blueprint`. May be used by Relay 1."""
+  blueprintEdge(
+    """The method to use when ordering `Blueprint`."""
+    orderBy: [BlueprintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BlueprintEdge
+}
+
+"""All input for the `updateBlueprint` mutation."""
+input UpdateBlueprintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this blueprint."""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Blueprint` being updated.
+  """
+  blueprintPatch: BlueprintPatch!
+}
+
+"""
+Represents an update to a `Blueprint`. Fields that are set will be updated.
+"""
+input BlueprintPatch {
+  """Unique identifier for this blueprint."""
+  id: UUID
+
+  """The user who owns this blueprint."""
+  ownerId: UUID
+
+  """
+  The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database.
+  """
+  databaseId: UUID
+
+  """Machine-readable name for the blueprint. Must be unique per database."""
+  name: String
+
+  """Human-readable display name for the blueprint."""
+  displayName: String
+
+  """Optional description of the blueprint."""
+  description: String
+
+  """
+  The blueprint definition as a JSONB document. Contains tables[] (each with table_name, optional schema_name, nodes[] for data behaviors, fields[], grants[], and policies[] using $type), relations[] (using $type with source_table/target_table and optional source_schema/target_schema), indexes[] (using table_name + column), and full_text_searches[] (using table_name + field + sources[]). Everything is name-based — no UUIDs in the definition.
+  """
+  definition: JSON
+
+  """
+  If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch.
+  """
+  templateId: UUID
+
+  """
+  UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly.
+  """
+  definitionHash: UUID
+
+  """
+  JSONB map of table names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger.
+  """
+  tableHashes: JSON
+
+  """Timestamp when this blueprint was created."""
+  createdAt: Datetime
+
+  """Timestamp when this blueprint was last modified."""
+  updatedAt: Datetime
 }
 
 """The output of our update `OrgGrant` mutation."""
@@ -40033,122 +41128,6 @@ input ViewPatch {
   module: String
   scope: Int
   tags: [String]
-}
-
-"""The output of our update `Blueprint` mutation."""
-type UpdateBlueprintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Blueprint` that was updated by this mutation."""
-  blueprint: Blueprint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Blueprint`. May be used by Relay 1."""
-  blueprintEdge(
-    """The method to use when ordering `Blueprint`."""
-    orderBy: [BlueprintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BlueprintEdge
-}
-
-"""All input for the `updateBlueprint` mutation."""
-input UpdateBlueprintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this blueprint."""
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Blueprint` being updated.
-  """
-  blueprintPatch: BlueprintPatch!
-}
-
-"""
-Represents an update to a `Blueprint`. Fields that are set will be updated.
-"""
-input BlueprintPatch {
-  """Unique identifier for this blueprint."""
-  id: UUID
-
-  """The user who owns this blueprint."""
-  ownerId: UUID
-
-  """
-  The database this blueprint is scoped to. Tables created by construct_blueprint() are provisioned in this database.
-  """
-  databaseId: UUID
-
-  """Machine-readable name for the blueprint. Must be unique per database."""
-  name: String
-
-  """Human-readable display name for the blueprint."""
-  displayName: String
-
-  """Optional description of the blueprint."""
-  description: String
-
-  """
-  The blueprint definition as a JSONB document. Same format as blueprint_template.definition: contains tables[] (with nodes[], fields[], grants[], policies[] using $type) and relations[] (using $type). This is a mutable copy that the owner can customize before executing.
-  """
-  definition: JSON
-
-  """
-  If this blueprint was created by copying a template, the ID of the source template. NULL if built from scratch.
-  """
-  templateId: UUID
-
-  """
-  Execution state of the blueprint. draft: not yet executed (definition can still be modified). constructed: successfully executed via construct_blueprint(). failed: execution failed (see error_details). Defaults to draft.
-  """
-  status: String
-
-  """
-  Timestamp when construct_blueprint() successfully completed. NULL until constructed.
-  """
-  constructedAt: Datetime
-
-  """
-  Error message from the most recent failed construct_blueprint() attempt. NULL unless status is failed.
-  """
-  errorDetails: String
-
-  """
-  Mapping of ref names to created table UUIDs, populated by construct_blueprint() after successful execution. Format: {"products": "uuid", "categories": "uuid", ...}. Defaults to empty object.
-  """
-  refMap: JSON
-
-  """
-  Immutable snapshot of the definition at construct-time. Preserved so the exact definition that was executed is recorded even if the user later modifies the definition for re-execution. NULL until constructed.
-  """
-  constructedDefinition: JSON
-
-  """
-  UUIDv5 Merkle root hash of the definition. Computed automatically via trigger from the ordered table_hashes. Used for content-addressable deduplication and provenance tracking. Backend-computed — clients should never set this directly.
-  """
-  definitionHash: UUID
-
-  """
-  JSONB map of table ref names to their individual UUIDv5 content hashes. Each table hash is computed from the canonical jsonb::text of the table entry. Enables structural comparison at the table level across blueprints and templates. Backend-computed via trigger.
-  """
-  tableHashes: JSON
-
-  """Timestamp when this blueprint was created."""
-  createdAt: Datetime
-
-  """Timestamp when this blueprint was last modified."""
-  updatedAt: Datetime
 }
 
 """The output of our update `PermissionsModule` mutation."""
@@ -41386,6 +42365,66 @@ input HierarchyModulePatch {
   createdAt: Datetime
 }
 
+"""The output of our update `StorageModule` mutation."""
+type UpdateStorageModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `StorageModule` that was updated by this mutation."""
+  storageModule: StorageModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `StorageModule`. May be used by Relay 1."""
+  storageModuleEdge(
+    """The method to use when ordering `StorageModule`."""
+    orderBy: [StorageModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StorageModuleEdge
+}
+
+"""All input for the `updateStorageModule` mutation."""
+input UpdateStorageModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `StorageModule` being updated.
+  """
+  storageModulePatch: StorageModulePatch!
+}
+
+"""
+Represents an update to a `StorageModule`. Fields that are set will be updated.
+"""
+input StorageModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  bucketsTableId: UUID
+  filesTableId: UUID
+  uploadRequestsTableId: UUID
+  bucketsTableName: String
+  filesTableName: String
+  uploadRequestsTableName: String
+  entityTableId: UUID
+  uploadUrlExpirySeconds: Int
+  downloadUrlExpirySeconds: Int
+  defaultMaxFileSize: BigInt
+  maxFilenameLength: Int
+  cacheTtlSeconds: Int
+}
+
 """The output of our update `Invite` mutation."""
 type UpdateInvitePayload {
   """
@@ -41460,68 +42499,6 @@ input InvitePatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `ForeignKeyConstraint` mutation."""
-type UpdateForeignKeyConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ForeignKeyConstraint` that was updated by this mutation."""
-  foreignKeyConstraint: ForeignKeyConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ForeignKeyConstraint`. May be used by Relay 1."""
-  foreignKeyConstraintEdge(
-    """The method to use when ordering `ForeignKeyConstraint`."""
-    orderBy: [ForeignKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ForeignKeyConstraintEdge
-}
-
-"""All input for the `updateForeignKeyConstraint` mutation."""
-input UpdateForeignKeyConstraintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `ForeignKeyConstraint` being updated.
-  """
-  foreignKeyConstraintPatch: ForeignKeyConstraintPatch!
-}
-
-"""
-Represents an update to a `ForeignKeyConstraint`. Fields that are set will be updated.
-"""
-input ForeignKeyConstraintPatch {
-  id: UUID
-  databaseId: UUID
-  tableId: UUID
-  name: String
-  description: String
-  smartTags: JSON
-  type: String
-  fieldIds: [UUID]
-  refTableId: UUID
-  refFieldIds: [UUID]
-  deleteAction: String
-  updateAction: String
-  category: ObjectCategory
-  module: String
-  scope: Int
-  tags: [String]
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our update `SecureTableProvision` mutation."""
 type UpdateSecureTableProvisionPayload {
   """
@@ -41588,19 +42565,14 @@ input SecureTableProvisionPatch {
   tableName: String
 
   """
-  Which generator to invoke for field creation. One of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete. NULL means no field creation — the row only provisions grants and/or policies.
+  Array of node objects to apply to the table. Each element is a jsonb object with a required "$type" key (one of: DataId, DataDirectOwner, DataEntityMembership, DataOwnershipInEntity, DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete, DataEmbedding, DataFullTextSearch, DataSlug, etc.) and an optional "data" key containing generator-specific configuration. Supports multiple nodes per row, matching the blueprint definition format. Example: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}]. Defaults to '[]' (no node processing).
   """
-  nodeType: String
+  nodes: JSON
 
   """
   If true and Row Level Security is not yet enabled on the target table, enable it. Automatically set to true by the trigger when policy_type is provided. Defaults to true.
   """
   useRls: Boolean
-
-  """
-  Configuration passed to the generator function for field creation (only used when node_type is set). Known keys include: field_name (text, default 'id') for DataId, owner_field_name (text, default 'owner_id') for DataDirectOwner/DataOwnershipInEntity, entity_field_name (text, default 'entity_id') for DataEntityMembership/DataOwnershipInEntity, include_id (boolean, default true) for most node_types, include_user_fk (boolean, default true) to add FK to users table, create_index (boolean, default true) to create btree indexes on FK fields for join and cascade performance. Defaults to '{}'.
-  """
-  nodeData: JSON
 
   """
   PostgreSQL array of jsonb field definition objects to create on the target table. Each object has keys: "name" (text, required), "type" (text, required), "default" (text, optional), "is_required" (boolean, optional, defaults to false), "min" (float, optional), "max" (float, optional), "regexp" (text, optional), "index" (boolean, optional, defaults to false — creates a btree index on the field). min/max generate CHECK constraints: for text/citext they constrain character_length, for integer/float types they constrain the value. regexp generates a CHECK (col ~ pattern) constraint for text/citext. Fields are created via metaschema.create_field() after any node_type generator runs, and their IDs are appended to out_fields. Example: ARRAY['{"name":"username","type":"citext","max":256,"regexp":"^[a-z0-9_]+$"}'::jsonb, '{"name":"score","type":"integer","min":0,"max":100}'::jsonb]. Defaults to '{}' (no additional fields).
@@ -41648,9 +42620,71 @@ input SecureTableProvisionPatch {
   policyData: JSON
 
   """
-  Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's generator. NULL when node_type is NULL or before the trigger runs. Callers should not set this directly.
+  Output column populated by the trigger after field creation. Contains the UUIDs of the metaschema fields created on the target table by this provision row's nodes. NULL when nodes is empty or before the trigger runs. Callers should not set this directly.
   """
   outFields: [UUID]
+}
+
+"""The output of our update `ForeignKeyConstraint` mutation."""
+type UpdateForeignKeyConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ForeignKeyConstraint` that was updated by this mutation."""
+  foreignKeyConstraint: ForeignKeyConstraint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ForeignKeyConstraint`. May be used by Relay 1."""
+  foreignKeyConstraintEdge(
+    """The method to use when ordering `ForeignKeyConstraint`."""
+    orderBy: [ForeignKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ForeignKeyConstraintEdge
+}
+
+"""All input for the `updateForeignKeyConstraint` mutation."""
+input UpdateForeignKeyConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `ForeignKeyConstraint` being updated.
+  """
+  foreignKeyConstraintPatch: ForeignKeyConstraintPatch!
+}
+
+"""
+Represents an update to a `ForeignKeyConstraint`. Fields that are set will be updated.
+"""
+input ForeignKeyConstraintPatch {
+  id: UUID
+  databaseId: UUID
+  tableId: UUID
+  name: String
+  description: String
+  smartTags: JSON
+  type: String
+  fieldIds: [UUID]
+  refTableId: UUID
+  refFieldIds: [UUID]
+  deleteAction: String
+  updateAction: String
+  category: ObjectCategory
+  module: String
+  scope: Int
+  tags: [String]
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
 """The output of our update `OrgInvite` mutation."""
@@ -42002,81 +43036,6 @@ input FieldPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `MembershipsModule` mutation."""
-type UpdateMembershipsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipsModule` that was updated by this mutation."""
-  membershipsModule: MembershipsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipsModule`. May be used by Relay 1."""
-  membershipsModuleEdge(
-    """The method to use when ordering `MembershipsModule`."""
-    orderBy: [MembershipsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipsModuleEdge
-}
-
-"""All input for the `updateMembershipsModule` mutation."""
-input UpdateMembershipsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `MembershipsModule` being updated.
-  """
-  membershipsModulePatch: MembershipsModulePatch!
-}
-
-"""
-Represents an update to a `MembershipsModule`. Fields that are set will be updated.
-"""
-input MembershipsModulePatch {
-  id: UUID
-  databaseId: UUID
-  schemaId: UUID
-  privateSchemaId: UUID
-  membershipsTableId: UUID
-  membershipsTableName: String
-  membersTableId: UUID
-  membersTableName: String
-  membershipDefaultsTableId: UUID
-  membershipDefaultsTableName: String
-  grantsTableId: UUID
-  grantsTableName: String
-  actorTableId: UUID
-  limitsTableId: UUID
-  defaultLimitsTableId: UUID
-  permissionsTableId: UUID
-  defaultPermissionsTableId: UUID
-  sprtTableId: UUID
-  adminGrantsTableId: UUID
-  adminGrantsTableName: String
-  ownerGrantsTableId: UUID
-  ownerGrantsTableName: String
-  membershipType: Int
-  entityTableId: UUID
-  entityTableOwnerId: UUID
-  prefix: String
-  actorMaskCheck: String
-  actorPermCheck: String
-  entityIdsByMask: String
-  entityIdsByPerm: String
-  entityIdsFunction: String
-}
-
 """The output of our update `RelationProvision` mutation."""
 type UpdateRelationProvisionPayload {
   """
@@ -42248,23 +43207,12 @@ input RelationProvisionPatch {
   exposeInApi: Boolean
 
   """
-  For RelationManyToMany: which generator to invoke for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-       Examples: DataId (creates UUID primary key), DataDirectOwner (creates owner_id field), DataEntityMembership (creates entity_id field), DataOwnershipInEntity (creates both owner_id and entity_id), DataTimestamps, DataPeoplestamps, DataPublishable, DataSoftDelete.
-       NULL means no field creation beyond the FK fields (and composite key if use_composite_key is true).
-       Ignored for RelationBelongsTo/RelationHasOne.
+  For RelationManyToMany: array of node objects to apply to the junction table. Each element is a jsonb object with a required "$type" key and an optional "data" key. Forwarded to provision_table as-is. The trigger does not interpret or validate this value.
+       Examples: [{"$type": "DataId"}, {"$type": "DataTimestamps"}, {"$type": "DataDirectOwner", "data": {"owner_field_name": "author_id"}}].
+       Defaults to '[]' (no node processing beyond the FK fields and composite key if use_composite_key is true).
+       Ignored for RelationBelongsTo/RelationHasOne/RelationHasMany.
   """
-  nodeType: String
-
-  """
-  For RelationManyToMany: configuration passed to the generator function for field creation on the junction table. Forwarded to secure_table_provision as-is. The trigger does not interpret or validate this value.
-       Only used when node_type is set. Structure varies by node_type. Examples:
-       - DataId: {"field_name": "id"} (default field name is 'id')
-       - DataEntityMembership: {"entity_field_name": "entity_id", "include_id": false, "include_user_fk": true}
-       - DataDirectOwner: {"owner_field_name": "owner_id"}
-       Defaults to '{}' (empty object).
-       Ignored for RelationBelongsTo/RelationHasOne.
-  """
-  nodeData: JSON
+  nodes: JSON
 
   """
   For RelationManyToMany: database roles to grant privileges to on the junction table. Forwarded to secure_table_provision as-is. Supports multiple roles, e.g. ARRAY['authenticated', 'admin']. Each role receives all privileges defined in grant_privileges. Defaults to ARRAY['authenticated']. Ignored for RelationBelongsTo/RelationHasOne.
@@ -42333,6 +43281,81 @@ input RelationProvisionPatch {
   Output column for RelationManyToMany: the UUID of the FK field on the junction table referencing the target table. Populated by the trigger. NULL for RelationBelongsTo/RelationHasOne. Callers should not set this directly.
   """
   outTargetFieldId: UUID
+}
+
+"""The output of our update `MembershipsModule` mutation."""
+type UpdateMembershipsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipsModule` that was updated by this mutation."""
+  membershipsModule: MembershipsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipsModule`. May be used by Relay 1."""
+  membershipsModuleEdge(
+    """The method to use when ordering `MembershipsModule`."""
+    orderBy: [MembershipsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipsModuleEdge
+}
+
+"""All input for the `updateMembershipsModule` mutation."""
+input UpdateMembershipsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `MembershipsModule` being updated.
+  """
+  membershipsModulePatch: MembershipsModulePatch!
+}
+
+"""
+Represents an update to a `MembershipsModule`. Fields that are set will be updated.
+"""
+input MembershipsModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  membershipsTableId: UUID
+  membershipsTableName: String
+  membersTableId: UUID
+  membersTableName: String
+  membershipDefaultsTableId: UUID
+  membershipDefaultsTableName: String
+  grantsTableId: UUID
+  grantsTableName: String
+  actorTableId: UUID
+  limitsTableId: UUID
+  defaultLimitsTableId: UUID
+  permissionsTableId: UUID
+  defaultPermissionsTableId: UUID
+  sprtTableId: UUID
+  adminGrantsTableId: UUID
+  adminGrantsTableName: String
+  ownerGrantsTableId: UUID
+  ownerGrantsTableName: String
+  membershipType: Int
+  entityTableId: UUID
+  entityTableOwnerId: UUID
+  prefix: String
+  actorMaskCheck: String
+  actorPermCheck: String
+  entityIdsByMask: String
+  entityIdsByPerm: String
+  entityIdsFunction: String
 }
 
 """The output of our delete `DefaultIdsModule` mutation."""
@@ -42433,41 +43456,6 @@ input DeleteApiSchemaInput {
   clientMutationId: String
 
   """Unique identifier for this API-schema mapping"""
-  id: UUID!
-}
-
-"""The output of our delete `SiteTheme` mutation."""
-type DeleteSiteThemePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `SiteTheme` that was deleted by this mutation."""
-  siteTheme: SiteTheme
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `SiteTheme`. May be used by Relay 1."""
-  siteThemeEdge(
-    """The method to use when ordering `SiteTheme`."""
-    orderBy: [SiteThemeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): SiteThemeEdge
-}
-
-"""All input for the `deleteSiteTheme` mutation."""
-input DeleteSiteThemeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this theme record"""
   id: UUID!
 }
 
@@ -42636,6 +43624,41 @@ input DeleteSecretsModuleInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `SiteTheme` mutation."""
+type DeleteSiteThemePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `SiteTheme` that was deleted by this mutation."""
+  siteTheme: SiteTheme
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `SiteTheme`. May be used by Relay 1."""
+  siteThemeEdge(
+    """The method to use when ordering `SiteTheme`."""
+    orderBy: [SiteThemeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SiteThemeEdge
+}
+
+"""All input for the `deleteSiteTheme` mutation."""
+input DeleteSiteThemeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this theme record"""
   id: UUID!
 }
 
@@ -43406,39 +44429,6 @@ input DeleteCryptoAddressesModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `ConnectedAccount` mutation."""
-type DeleteConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` that was deleted by this mutation."""
-  connectedAccount: ConnectedAccount
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
-}
-
-"""All input for the `deleteConnectedAccount` mutation."""
-input DeleteConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `PhoneNumber` mutation."""
 type DeletePhoneNumberPayload {
   """
@@ -43530,6 +44520,39 @@ type DeleteOrgLimitDefaultPayload {
 
 """All input for the `deleteOrgLimitDefault` mutation."""
 input DeleteOrgLimitDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `ConnectedAccount` mutation."""
+type DeleteConnectedAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ConnectedAccount` that was deleted by this mutation."""
+  connectedAccount: ConnectedAccount
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
+  connectedAccountEdge(
+    """The method to use when ordering `ConnectedAccount`."""
+    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ConnectedAccountEdge
+}
+
+"""All input for the `deleteConnectedAccount` mutation."""
+input DeleteConnectedAccountInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -44045,6 +45068,41 @@ input DeleteSiteMetadatumInput {
   id: UUID!
 }
 
+"""The output of our delete `BlueprintConstruction` mutation."""
+type DeleteBlueprintConstructionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `BlueprintConstruction` that was deleted by this mutation."""
+  blueprintConstruction: BlueprintConstruction
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `BlueprintConstruction`. May be used by Relay 1."""
+  blueprintConstructionEdge(
+    """The method to use when ordering `BlueprintConstruction`."""
+    orderBy: [BlueprintConstructionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BlueprintConstructionEdge
+}
+
+"""All input for the `deleteBlueprintConstruction` mutation."""
+input DeleteBlueprintConstructionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this construction attempt."""
+  id: UUID!
+}
+
 """The output of our delete `RlsModule` mutation."""
 type DeleteRlsModulePayload {
   """
@@ -44312,6 +45370,41 @@ input DeleteDomainInput {
   clientMutationId: String
 
   """Unique identifier for this domain record"""
+  id: UUID!
+}
+
+"""The output of our delete `Blueprint` mutation."""
+type DeleteBlueprintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Blueprint` that was deleted by this mutation."""
+  blueprint: Blueprint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Blueprint`. May be used by Relay 1."""
+  blueprintEdge(
+    """The method to use when ordering `Blueprint`."""
+    orderBy: [BlueprintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BlueprintEdge
+}
+
+"""All input for the `deleteBlueprint` mutation."""
+input DeleteBlueprintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this blueprint."""
   id: UUID!
 }
 
@@ -44741,41 +45834,6 @@ input DeleteViewInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `Blueprint` mutation."""
-type DeleteBlueprintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Blueprint` that was deleted by this mutation."""
-  blueprint: Blueprint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Blueprint`. May be used by Relay 1."""
-  blueprintEdge(
-    """The method to use when ordering `Blueprint`."""
-    orderBy: [BlueprintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BlueprintEdge
-}
-
-"""All input for the `deleteBlueprint` mutation."""
-input DeleteBlueprintInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this blueprint."""
   id: UUID!
 }
 
@@ -45379,6 +46437,39 @@ input DeleteHierarchyModuleInput {
   id: UUID!
 }
 
+"""The output of our delete `StorageModule` mutation."""
+type DeleteStorageModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `StorageModule` that was deleted by this mutation."""
+  storageModule: StorageModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `StorageModule`. May be used by Relay 1."""
+  storageModuleEdge(
+    """The method to use when ordering `StorageModule`."""
+    orderBy: [StorageModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StorageModuleEdge
+}
+
+"""All input for the `deleteStorageModule` mutation."""
+input DeleteStorageModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `Invite` mutation."""
 type DeleteInvitePayload {
   """
@@ -45404,39 +46495,6 @@ type DeleteInvitePayload {
 
 """All input for the `deleteInvite` mutation."""
 input DeleteInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `ForeignKeyConstraint` mutation."""
-type DeleteForeignKeyConstraintPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ForeignKeyConstraint` that was deleted by this mutation."""
-  foreignKeyConstraint: ForeignKeyConstraint
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ForeignKeyConstraint`. May be used by Relay 1."""
-  foreignKeyConstraintEdge(
-    """The method to use when ordering `ForeignKeyConstraint`."""
-    orderBy: [ForeignKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ForeignKeyConstraintEdge
-}
-
-"""All input for the `deleteForeignKeyConstraint` mutation."""
-input DeleteForeignKeyConstraintInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -45477,6 +46535,39 @@ input DeleteSecureTableProvisionInput {
   clientMutationId: String
 
   """Unique identifier for this provision row."""
+  id: UUID!
+}
+
+"""The output of our delete `ForeignKeyConstraint` mutation."""
+type DeleteForeignKeyConstraintPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `ForeignKeyConstraint` that was deleted by this mutation."""
+  foreignKeyConstraint: ForeignKeyConstraint
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `ForeignKeyConstraint`. May be used by Relay 1."""
+  foreignKeyConstraintEdge(
+    """The method to use when ordering `ForeignKeyConstraint`."""
+    orderBy: [ForeignKeyConstraintOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ForeignKeyConstraintEdge
+}
+
+"""All input for the `deleteForeignKeyConstraint` mutation."""
+input DeleteForeignKeyConstraintInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
   id: UUID!
 }
 
@@ -45645,39 +46736,6 @@ input DeleteFieldInput {
   id: UUID!
 }
 
-"""The output of our delete `MembershipsModule` mutation."""
-type DeleteMembershipsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipsModule` that was deleted by this mutation."""
-  membershipsModule: MembershipsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipsModule`. May be used by Relay 1."""
-  membershipsModuleEdge(
-    """The method to use when ordering `MembershipsModule`."""
-    orderBy: [MembershipsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipsModuleEdge
-}
-
-"""All input for the `deleteMembershipsModule` mutation."""
-input DeleteMembershipsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `RelationProvision` mutation."""
 type DeleteRelationProvisionPayload {
   """
@@ -45710,5 +46768,38 @@ input DeleteRelationProvisionInput {
   clientMutationId: String
 
   """Unique identifier for this relation provision row."""
+  id: UUID!
+}
+
+"""The output of our delete `MembershipsModule` mutation."""
+type DeleteMembershipsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipsModule` that was deleted by this mutation."""
+  membershipsModule: MembershipsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipsModule`. May be used by Relay 1."""
+  membershipsModuleEdge(
+    """The method to use when ordering `MembershipsModule`."""
+    orderBy: [MembershipsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipsModuleEdge
+}
+
+"""All input for the `deleteMembershipsModule` mutation."""
+input DeleteMembershipsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
   id: UUID!
 }

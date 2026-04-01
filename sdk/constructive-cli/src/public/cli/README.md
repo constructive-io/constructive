@@ -26,9 +26,9 @@ csdk auth set-token <your-token>
 | `context` | Manage API contexts (endpoints) |
 | `auth` | Manage authentication tokens |
 | `config` | Manage config key-value store (per-context) |
-| `get-all-record` | getAllRecord CRUD operations |
 | `org-get-managers-record` | orgGetManagersRecord CRUD operations |
 | `org-get-subordinates-record` | orgGetSubordinatesRecord CRUD operations |
+| `get-all-record` | getAllRecord CRUD operations |
 | `object` | object CRUD operations |
 | `app-permission` | appPermission CRUD operations |
 | `org-permission` | orgPermission CRUD operations |
@@ -89,6 +89,8 @@ csdk auth set-token <your-token>
 | `users-module` | usersModule CRUD operations |
 | `blueprint` | blueprint CRUD operations |
 | `blueprint-template` | blueprintTemplate CRUD operations |
+| `blueprint-construction` | blueprintConstruction CRUD operations |
+| `storage-module` | storageModule CRUD operations |
 | `database-provision-module` | databaseProvisionModule CRUD operations |
 | `app-admin-grant` | appAdminGrant CRUD operations |
 | `app-owner-grant` | appOwnerGrant CRUD operations |
@@ -119,9 +121,9 @@ csdk auth set-token <your-token>
 | `store` | store CRUD operations |
 | `app-permission-default` | appPermissionDefault CRUD operations |
 | `role-type` | roleType CRUD operations |
-| `migrate-file` | migrateFile CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
+| `migrate-file` | migrateFile CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `commit` | commit CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
@@ -143,6 +145,7 @@ csdk auth set-token <your-token>
 | `org-is-manager-of` | orgIsManagerOf |
 | `app-permissions-get-mask` | appPermissionsGetMask |
 | `org-permissions-get-mask` | orgPermissionsGetMask |
+| `resolve-blueprint-table` | Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error. |
 | `app-permissions-get-mask-by-names` | appPermissionsGetMaskByNames |
 | `org-permissions-get-mask-by-names` | orgPermissionsGetMaskByNames |
 | `get-all-objects-from-root` | Reads and enables pagination through a set of `Object`. |
@@ -165,18 +168,22 @@ csdk auth set-token <your-token>
 | `verify-email` | verifyEmail |
 | `freeze-objects` | freezeObjects |
 | `init-empty-repo` | initEmptyRepo |
-| `construct-blueprint` | Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map. |
+| `construct-blueprint` | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure. |
 | `reset-password` | resetPassword |
 | `remove-node-at-path` | removeNodeAtPath |
-| `set-data-at-path` | setDataAtPath |
-| `set-props-and-commit` | setPropsAndCommit |
 | `copy-template-to-blueprint` | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
-| `provision-database-with-user` | provisionDatabaseWithUser |
 | `bootstrap-user` | bootstrapUser |
 | `set-field-order` | setFieldOrder |
+| `provision-unique-constraint` | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
+| `provision-full-text-search` | Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id. |
+| `provision-index` | Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id. |
+| `set-data-at-path` | setDataAtPath |
+| `set-props-and-commit` | setPropsAndCommit |
+| `provision-database-with-user` | provisionDatabaseWithUser |
 | `insert-node-at-path` | insertNodeAtPath |
 | `update-node-at-path` | updateNodeAtPath |
 | `set-and-commit` | setAndCommit |
+| `provision-relation` | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
 | `apply-rls` | applyRls |
 | `sign-in-one-time-token` | signInOneTimeToken |
 | `create-user-database` | Creates a new user database with all required modules, permissions, and RLS policies.
@@ -200,6 +207,7 @@ Example usage:
 | `sign-in` | signIn |
 | `sign-up` | signUp |
 | `one-time-token` | oneTimeToken |
+| `provision-table` | Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `send-verification-email` | sendVerificationEmail |
 | `forgot-password` | forgotPassword |
 | `verify-password` | verifyPassword |
@@ -246,28 +254,6 @@ Variables are scoped to the active context and stored at `~/.csdk/config/`.
 
 ## Table Commands
 
-### `get-all-record`
-
-CRUD operations for GetAllRecord records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all getAllRecord records |
-| `find-first` | Find first matching getAllRecord record |
-| `get` | Get a getAllRecord by id |
-| `create` | Create a new getAllRecord |
-| `update` | Update an existing getAllRecord |
-| `delete` | Delete a getAllRecord |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `path` | String |
-| `data` | JSON |
-
-**Required create fields:** `path`, `data`
-
 ### `org-get-managers-record`
 
 CRUD operations for OrgGetManagersRecord records.
@@ -311,6 +297,28 @@ CRUD operations for OrgGetSubordinatesRecord records.
 | `depth` | Int |
 
 **Required create fields:** `userId`, `depth`
+
+### `get-all-record`
+
+CRUD operations for GetAllRecord records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all getAllRecord records |
+| `find-first` | Find first matching getAllRecord record |
+| `get` | Get a getAllRecord by id |
+| `create` | Create a new getAllRecord |
+| `update` | Update an existing getAllRecord |
+| `delete` | Delete a getAllRecord |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `path` | String |
+| `data` | JSON |
+
+**Required create fields:** `path`, `data`
 
 ### `object`
 
@@ -1091,9 +1099,8 @@ CRUD operations for SecureTableProvision records.
 | `schemaId` | UUID |
 | `tableId` | UUID |
 | `tableName` | String |
-| `nodeType` | String |
+| `nodes` | JSON |
 | `useRls` | Boolean |
-| `nodeData` | JSON |
 | `fields` | JSON |
 | `grantRoles` | String |
 | `grantPrivileges` | JSON |
@@ -1106,7 +1113,7 @@ CRUD operations for SecureTableProvision records.
 | `outFields` | UUID |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `nodeType`, `useRls`, `nodeData`, `fields`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFields`
+**Optional create fields (backend defaults):** `schemaId`, `tableId`, `tableName`, `nodes`, `useRls`, `fields`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFields`
 
 ### `relation-provision`
 
@@ -1142,8 +1149,7 @@ CRUD operations for RelationProvision records.
 | `useCompositeKey` | Boolean |
 | `createIndex` | Boolean |
 | `exposeInApi` | Boolean |
-| `nodeType` | String |
-| `nodeData` | JSON |
+| `nodes` | JSON |
 | `grantRoles` | String |
 | `grantPrivileges` | JSON |
 | `policyType` | String |
@@ -1158,7 +1164,7 @@ CRUD operations for RelationProvision records.
 | `outTargetFieldId` | UUID |
 
 **Required create fields:** `databaseId`, `relationType`, `sourceTableId`, `targetTableId`
-**Optional create fields (backend defaults):** `fieldName`, `deleteAction`, `isRequired`, `apiRequired`, `junctionTableId`, `junctionTableName`, `junctionSchemaId`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`, `createIndex`, `exposeInApi`, `nodeType`, `nodeData`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`
+**Optional create fields (backend defaults):** `fieldName`, `deleteAction`, `isRequired`, `apiRequired`, `junctionTableId`, `junctionTableName`, `junctionSchemaId`, `sourceFieldName`, `targetFieldName`, `useCompositeKey`, `createIndex`, `exposeInApi`, `nodes`, `grantRoles`, `grantPrivileges`, `policyType`, `policyPrivileges`, `policyRole`, `policyPermissive`, `policyName`, `policyData`, `outFieldId`, `outJunctionTableId`, `outSourceFieldId`, `outTargetFieldId`
 
 ### `schema-grant`
 
@@ -2213,18 +2219,13 @@ CRUD operations for Blueprint records.
 | `description` | String |
 | `definition` | JSON |
 | `templateId` | UUID |
-| `status` | String |
-| `constructedAt` | Datetime |
-| `errorDetails` | String |
-| `refMap` | JSON |
-| `constructedDefinition` | JSON |
 | `definitionHash` | UUID |
 | `tableHashes` | JSON |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `ownerId`, `databaseId`, `name`, `displayName`, `definition`
-**Optional create fields (backend defaults):** `description`, `templateId`, `status`, `constructedAt`, `errorDetails`, `refMap`, `constructedDefinition`, `definitionHash`, `tableHashes`
+**Optional create fields (backend defaults):** `description`, `templateId`, `definitionHash`, `tableHashes`
 
 ### `blueprint-template`
 
@@ -2266,6 +2267,75 @@ CRUD operations for BlueprintTemplate records.
 
 **Required create fields:** `name`, `displayName`, `ownerId`, `definition`
 **Optional create fields (backend defaults):** `version`, `description`, `visibility`, `categories`, `tags`, `definitionSchemaVersion`, `source`, `complexity`, `copyCount`, `forkCount`, `forkedFromId`, `definitionHash`, `tableHashes`
+
+### `blueprint-construction`
+
+CRUD operations for BlueprintConstruction records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all blueprintConstruction records |
+| `find-first` | Find first matching blueprintConstruction record |
+| `get` | Get a blueprintConstruction by id |
+| `create` | Create a new blueprintConstruction |
+| `update` | Update an existing blueprintConstruction |
+| `delete` | Delete a blueprintConstruction |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `blueprintId` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `status` | String |
+| `errorDetails` | String |
+| `tableMap` | JSON |
+| `constructedDefinition` | JSON |
+| `constructedAt` | Datetime |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `blueprintId`, `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `status`, `errorDetails`, `tableMap`, `constructedDefinition`, `constructedAt`
+
+### `storage-module`
+
+CRUD operations for StorageModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all storageModule records |
+| `find-first` | Find first matching storageModule record |
+| `get` | Get a storageModule by id |
+| `create` | Create a new storageModule |
+| `update` | Update an existing storageModule |
+| `delete` | Delete a storageModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `privateSchemaId` | UUID |
+| `bucketsTableId` | UUID |
+| `filesTableId` | UUID |
+| `uploadRequestsTableId` | UUID |
+| `bucketsTableName` | String |
+| `filesTableName` | String |
+| `uploadRequestsTableName` | String |
+| `entityTableId` | UUID |
+| `uploadUrlExpirySeconds` | Int |
+| `downloadUrlExpirySeconds` | Int |
+| `defaultMaxFileSize` | BigInt |
+| `maxFilenameLength` | Int |
+| `cacheTtlSeconds` | Int |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `bucketsTableId`, `filesTableId`, `uploadRequestsTableId`, `bucketsTableName`, `filesTableName`, `uploadRequestsTableName`, `entityTableId`, `uploadUrlExpirySeconds`, `downloadUrlExpirySeconds`, `defaultMaxFileSize`, `maxFilenameLength`, `cacheTtlSeconds`
 
 ### `database-provision-module`
 
@@ -3109,29 +3179,6 @@ CRUD operations for RoleType records.
 
 **Required create fields:** `name`
 
-### `migrate-file`
-
-CRUD operations for MigrateFile records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all migrateFile records |
-| `find-first` | Find first matching migrateFile record |
-| `get` | Get a migrateFile by id |
-| `create` | Create a new migrateFile |
-| `update` | Update an existing migrateFile |
-| `delete` | Delete a migrateFile |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `upload` | Upload |
-
-**Optional create fields (backend defaults):** `databaseId`, `upload`
-
 ### `app-limit-default`
 
 CRUD operations for AppLimitDefault records.
@@ -3179,6 +3226,29 @@ CRUD operations for OrgLimitDefault records.
 
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`
+
+### `migrate-file`
+
+CRUD operations for MigrateFile records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all migrateFile records |
+| `find-first` | Find first matching migrateFile record |
+| `get` | Get a migrateFile by id |
+| `create` | Create a new migrateFile |
+| `update` | Update an existing migrateFile |
+| `delete` | Delete a migrateFile |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `upload` | Upload |
+
+**Optional create fields (backend defaults):** `databaseId`, `upload`
 
 ### `membership-type`
 
@@ -3663,6 +3733,21 @@ orgPermissionsGetMask
   |----------|------|
   | `--ids` | UUID |
 
+### `resolve-blueprint-table`
+
+Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--databaseId` | UUID |
+  | `--tableName` | String |
+  | `--schemaName` | String |
+  | `--tableMap` | JSON |
+  | `--defaultSchemaId` | UUID |
+
 ### `app-permissions-get-mask-by-names`
 
 appPermissionsGetMaskByNames
@@ -3941,7 +4026,7 @@ initEmptyRepo
 
 ### `construct-blueprint`
 
-Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
+Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure.
 
 - **Type:** mutation
 - **Arguments:**
@@ -3980,6 +4065,94 @@ removeNodeAtPath
   | `--input.root` | UUID |
   | `--input.path` | String |
 
+### `copy-template-to-blueprint`
+
+Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.templateId` | UUID |
+  | `--input.databaseId` | UUID |
+  | `--input.ownerId` | UUID |
+  | `--input.nameOverride` | String |
+  | `--input.displayNameOverride` | String |
+
+### `bootstrap-user`
+
+bootstrapUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.targetDatabaseId` | UUID |
+  | `--input.password` | String |
+  | `--input.isAdmin` | Boolean |
+  | `--input.isOwner` | Boolean |
+  | `--input.username` | String |
+  | `--input.displayName` | String |
+  | `--input.returnApiKey` | Boolean |
+
+### `set-field-order`
+
+setFieldOrder
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.fieldIds` | UUID |
+
+### `provision-unique-constraint`
+
+Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.tableId` | UUID |
+  | `--input.definition` | JSON |
+
+### `provision-full-text-search`
+
+Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.tableId` | UUID |
+  | `--input.definition` | JSON |
+
+### `provision-index`
+
+Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.tableId` | UUID |
+  | `--input.definition` | JSON |
+
 ### `set-data-at-path`
 
 setDataAtPath
@@ -4011,22 +4184,6 @@ setPropsAndCommit
   | `--input.path` | String |
   | `--input.data` | JSON |
 
-### `copy-template-to-blueprint`
-
-Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.templateId` | UUID |
-  | `--input.databaseId` | UUID |
-  | `--input.ownerId` | UUID |
-  | `--input.nameOverride` | String |
-  | `--input.displayNameOverride` | String |
-
 ### `provision-database-with-user`
 
 provisionDatabaseWithUser
@@ -4042,36 +4199,6 @@ provisionDatabaseWithUser
   | `--input.pSubdomain` | String |
   | `--input.pModules` | String |
   | `--input.pOptions` | JSON |
-
-### `bootstrap-user`
-
-bootstrapUser
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.targetDatabaseId` | UUID |
-  | `--input.password` | String |
-  | `--input.isAdmin` | Boolean |
-  | `--input.isOwner` | Boolean |
-  | `--input.username` | String |
-  | `--input.displayName` | String |
-  | `--input.returnApiKey` | Boolean |
-
-### `set-field-order`
-
-setFieldOrder
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.fieldIds` | UUID |
 
 ### `insert-node-at-path`
 
@@ -4124,6 +4251,37 @@ setAndCommit
   | `--input.data` | JSON |
   | `--input.kids` | UUID |
   | `--input.ktree` | String |
+
+### `provision-relation`
+
+Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.relationType` | String |
+  | `--input.sourceTableId` | UUID |
+  | `--input.targetTableId` | UUID |
+  | `--input.fieldName` | String |
+  | `--input.deleteAction` | String |
+  | `--input.isRequired` | Boolean |
+  | `--input.apiRequired` | Boolean |
+  | `--input.createIndex` | Boolean |
+  | `--input.junctionTableId` | UUID |
+  | `--input.junctionTableName` | String |
+  | `--input.junctionSchemaId` | UUID |
+  | `--input.sourceFieldName` | String |
+  | `--input.targetFieldName` | String |
+  | `--input.useCompositeKey` | Boolean |
+  | `--input.exposeInApi` | Boolean |
+  | `--input.nodes` | JSON |
+  | `--input.grants` | JSON |
+  | `--input.grantRoles` | String |
+  | `--input.policies` | JSON |
 
 ### `apply-rls`
 
@@ -4248,6 +4406,30 @@ oneTimeToken
   | `--input.password` | String |
   | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
+
+### `provision-table`
+
+Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.databaseId` | UUID |
+  | `--input.schemaId` | UUID |
+  | `--input.tableName` | String |
+  | `--input.tableId` | UUID |
+  | `--input.nodes` | JSON |
+  | `--input.fields` | JSON |
+  | `--input.policies` | JSON |
+  | `--input.grants` | JSON |
+  | `--input.grantRoles` | String |
+  | `--input.useRls` | Boolean |
+  | `--input.indexes` | JSON |
+  | `--input.fullTextSearches` | JSON |
+  | `--input.uniqueConstraints` | JSON |
 
 ### `send-verification-email`
 

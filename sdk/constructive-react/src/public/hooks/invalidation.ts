@@ -15,9 +15,9 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import {
-  getAllRecordKeys,
   orgGetManagersRecordKeys,
   orgGetSubordinatesRecordKeys,
+  getAllRecordKeys,
   objectKeys,
   appPermissionKeys,
   orgPermissionKeys,
@@ -78,6 +78,8 @@ import {
   usersModuleKeys,
   blueprintKeys,
   blueprintTemplateKeys,
+  blueprintConstructionKeys,
+  storageModuleKeys,
   databaseProvisionModuleKeys,
   appAdminGrantKeys,
   appOwnerGrantKeys,
@@ -108,9 +110,9 @@ import {
   storeKeys,
   appPermissionDefaultKeys,
   roleTypeKeys,
-  migrateFileKeys,
   appLimitDefaultKeys,
   orgLimitDefaultKeys,
+  migrateFileKeys,
   membershipTypeKeys,
   commitKeys,
   appMembershipDefaultKeys,
@@ -143,23 +145,6 @@ import {
  * ```
  */
 export const invalidate = {
-  /** Invalidate getAllRecord queries */ getAllRecord: {
-    /** Invalidate all getAllRecord queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.all,
-      }),
-    /** Invalidate getAllRecord list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.lists(),
-      }),
-    /** Invalidate a specific getAllRecord */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: getAllRecordKeys.detail(id),
-      }),
-  },
   /** Invalidate orgGetManagersRecord queries */ orgGetManagersRecord: {
     /** Invalidate all orgGetManagersRecord queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -192,6 +177,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: orgGetSubordinatesRecordKeys.detail(id),
+      }),
+  },
+  /** Invalidate getAllRecord queries */ getAllRecord: {
+    /** Invalidate all getAllRecord queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllRecordKeys.all,
+      }),
+    /** Invalidate getAllRecord list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllRecordKeys.lists(),
+      }),
+    /** Invalidate a specific getAllRecord */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: getAllRecordKeys.detail(id),
       }),
   },
   /** Invalidate object queries */ object: {
@@ -1169,6 +1171,40 @@ export const invalidate = {
         queryKey: blueprintTemplateKeys.detail(id),
       }),
   },
+  /** Invalidate blueprintConstruction queries */ blueprintConstruction: {
+    /** Invalidate all blueprintConstruction queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: blueprintConstructionKeys.all,
+      }),
+    /** Invalidate blueprintConstruction list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: blueprintConstructionKeys.lists(),
+      }),
+    /** Invalidate a specific blueprintConstruction */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: blueprintConstructionKeys.detail(id),
+      }),
+  },
+  /** Invalidate storageModule queries */ storageModule: {
+    /** Invalidate all storageModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: storageModuleKeys.all,
+      }),
+    /** Invalidate storageModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: storageModuleKeys.lists(),
+      }),
+    /** Invalidate a specific storageModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: storageModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate databaseProvisionModule queries */ databaseProvisionModule: {
     /** Invalidate all databaseProvisionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1643,23 +1679,6 @@ export const invalidate = {
         queryKey: roleTypeKeys.detail(id),
       }),
   },
-  /** Invalidate migrateFile queries */ migrateFile: {
-    /** Invalidate all migrateFile queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: migrateFileKeys.all,
-      }),
-    /** Invalidate migrateFile list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: migrateFileKeys.lists(),
-      }),
-    /** Invalidate a specific migrateFile */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: migrateFileKeys.detail(id),
-      }),
-  },
   /** Invalidate appLimitDefault queries */ appLimitDefault: {
     /** Invalidate all appLimitDefault queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1692,6 +1711,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: orgLimitDefaultKeys.detail(id),
+      }),
+  },
+  /** Invalidate migrateFile queries */ migrateFile: {
+    /** Invalidate all migrateFile queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: migrateFileKeys.all,
+      }),
+    /** Invalidate migrateFile list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: migrateFileKeys.lists(),
+      }),
+    /** Invalidate a specific migrateFile */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: migrateFileKeys.detail(id),
       }),
   },
   /** Invalidate membershipType queries */ membershipType: {
@@ -1888,14 +1924,6 @@ export const invalidate = {
  * instead of just invalidating (which would trigger a refetch).
  */
 export const remove = {
-  /** Remove getAllRecord from cache */ getAllRecord: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: getAllRecordKeys.detail(id),
-    });
-  },
   /** Remove orgGetManagersRecord from cache */ orgGetManagersRecord: (
     queryClient: QueryClient,
     id: string | number
@@ -1910,6 +1938,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgGetSubordinatesRecordKeys.detail(id),
+    });
+  },
+  /** Remove getAllRecord from cache */ getAllRecord: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: getAllRecordKeys.detail(id),
     });
   },
   /** Remove object from cache */ object: (queryClient: QueryClient, id: string | number) => {
@@ -2329,6 +2365,22 @@ export const remove = {
       queryKey: blueprintTemplateKeys.detail(id),
     });
   },
+  /** Remove blueprintConstruction from cache */ blueprintConstruction: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: blueprintConstructionKeys.detail(id),
+    });
+  },
+  /** Remove storageModule from cache */ storageModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: storageModuleKeys.detail(id),
+    });
+  },
   /** Remove databaseProvisionModule from cache */ databaseProvisionModule: (
     queryClient: QueryClient,
     id: string | number
@@ -2527,14 +2579,6 @@ export const remove = {
       queryKey: roleTypeKeys.detail(id),
     });
   },
-  /** Remove migrateFile from cache */ migrateFile: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: migrateFileKeys.detail(id),
-    });
-  },
   /** Remove appLimitDefault from cache */ appLimitDefault: (
     queryClient: QueryClient,
     id: string | number
@@ -2549,6 +2593,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgLimitDefaultKeys.detail(id),
+    });
+  },
+  /** Remove migrateFile from cache */ migrateFile: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: migrateFileKeys.detail(id),
     });
   },
   /** Remove membershipType from cache */ membershipType: (

@@ -11,10 +11,6 @@ export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
 export type ConstructiveInternalTypeUpload = unknown;
 export type ConstructiveInternalTypeUrl = unknown;
-export interface GetAllRecord {
-  path: string[] | null;
-  data: unknown | null;
-}
 export interface OrgGetManagersRecord {
   userId: string | null;
   depth: number | null;
@@ -22,6 +18,10 @@ export interface OrgGetManagersRecord {
 export interface OrgGetSubordinatesRecord {
   userId: string | null;
   depth: number | null;
+}
+export interface GetAllRecord {
+  path: string[] | null;
+  data: unknown | null;
 }
 export interface Object {
   hashUuid: string | null;
@@ -352,9 +352,8 @@ export interface SecureTableProvision {
   schemaId: string | null;
   tableId: string | null;
   tableName: string | null;
-  nodeType: string | null;
+  nodes: unknown | null;
   useRls: boolean | null;
-  nodeData: unknown | null;
   fields: unknown[] | null;
   grantRoles: string[] | null;
   grantPrivileges: unknown[] | null;
@@ -384,8 +383,7 @@ export interface RelationProvision {
   useCompositeKey: boolean | null;
   createIndex: boolean | null;
   exposeInApi: boolean | null;
-  nodeType: string | null;
-  nodeData: unknown | null;
+  nodes: unknown | null;
   grantRoles: string[] | null;
   grantPrivileges: unknown[] | null;
   policyType: string | null;
@@ -814,11 +812,6 @@ export interface Blueprint {
   description: string | null;
   definition: unknown | null;
   templateId: string | null;
-  status: string | null;
-  constructedAt: string | null;
-  errorDetails: string | null;
-  refMap: unknown | null;
-  constructedDefinition: unknown | null;
   definitionHash: string | null;
   tableHashes: unknown | null;
   createdAt: string | null;
@@ -845,6 +838,37 @@ export interface BlueprintTemplate {
   tableHashes: unknown | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+export interface BlueprintConstruction {
+  id: string | null;
+  blueprintId: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  status: string | null;
+  errorDetails: string | null;
+  tableMap: unknown | null;
+  constructedDefinition: unknown | null;
+  constructedAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+export interface StorageModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  privateSchemaId: string | null;
+  bucketsTableId: string | null;
+  filesTableId: string | null;
+  uploadRequestsTableId: string | null;
+  bucketsTableName: string | null;
+  filesTableName: string | null;
+  uploadRequestsTableName: string | null;
+  entityTableId: string | null;
+  uploadUrlExpirySeconds: number | null;
+  downloadUrlExpirySeconds: number | null;
+  defaultMaxFileSize: string | null;
+  maxFilenameLength: number | null;
+  cacheTtlSeconds: number | null;
 }
 export interface DatabaseProvisionModule {
   id: string | null;
@@ -1122,11 +1146,6 @@ export interface RoleType {
   id: number | null;
   name: string | null;
 }
-export interface MigrateFile {
-  id: string | null;
-  databaseId: string | null;
-  upload: ConstructiveInternalTypeUpload | null;
-}
 export interface AppLimitDefault {
   id: string | null;
   name: string | null;
@@ -1136,6 +1155,11 @@ export interface OrgLimitDefault {
   id: string | null;
   name: string | null;
   max: number | null;
+}
+export interface MigrateFile {
+  id: string | null;
+  databaseId: string | null;
+  upload: ConstructiveInternalTypeUpload | null;
 }
 export interface MembershipType {
   id: number | null;

@@ -21,9 +21,9 @@ const db = createClient({
 
 | Model | Operations |
 |-------|------------|
-| `getAllRecord` | findMany, findOne, create, update, delete |
 | `orgGetManagersRecord` | findMany, findOne, create, update, delete |
 | `orgGetSubordinatesRecord` | findMany, findOne, create, update, delete |
+| `getAllRecord` | findMany, findOne, create, update, delete |
 | `object` | findMany, findOne, create, update, delete |
 | `appPermission` | findMany, findOne, create, update, delete |
 | `orgPermission` | findMany, findOne, create, update, delete |
@@ -84,6 +84,8 @@ const db = createClient({
 | `usersModule` | findMany, findOne, create, update, delete |
 | `blueprint` | findMany, findOne, create, update, delete |
 | `blueprintTemplate` | findMany, findOne, create, update, delete |
+| `blueprintConstruction` | findMany, findOne, create, update, delete |
+| `storageModule` | findMany, findOne, create, update, delete |
 | `databaseProvisionModule` | findMany, findOne, create, update, delete |
 | `appAdminGrant` | findMany, findOne, create, update, delete |
 | `appOwnerGrant` | findMany, findOne, create, update, delete |
@@ -114,9 +116,9 @@ const db = createClient({
 | `store` | findMany, findOne, create, update, delete |
 | `appPermissionDefault` | findMany, findOne, create, update, delete |
 | `roleType` | findMany, findOne, create, update, delete |
-| `migrateFile` | findMany, findOne, create, update, delete |
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
+| `migrateFile` | findMany, findOne, create, update, delete |
 | `membershipType` | findMany, findOne, create, update, delete |
 | `commit` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
@@ -130,36 +132,6 @@ const db = createClient({
 | `hierarchyModule` | findMany, findOne, create, update, delete |
 
 ## Table Operations
-
-### `db.getAllRecord`
-
-CRUD operations for GetAllRecord records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `path` | String | Yes |
-| `data` | JSON | Yes |
-
-**Operations:**
-
-```typescript
-// List all getAllRecord records
-const items = await db.getAllRecord.findMany({ select: { path: true, data: true } }).execute();
-
-// Get one by id
-const item = await db.getAllRecord.findOne({ id: '<UUID>', select: { path: true, data: true } }).execute();
-
-// Create
-const created = await db.getAllRecord.create({ data: { path: '<String>', data: '<JSON>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.getAllRecord.update({ where: { id: '<UUID>' }, data: { path: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.getAllRecord.delete({ where: { id: '<UUID>' } }).execute();
-```
 
 ### `db.orgGetManagersRecord`
 
@@ -219,6 +191,36 @@ const updated = await db.orgGetSubordinatesRecord.update({ where: { id: '<UUID>'
 
 // Delete
 const deleted = await db.orgGetSubordinatesRecord.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.getAllRecord`
+
+CRUD operations for GetAllRecord records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `path` | String | Yes |
+| `data` | JSON | Yes |
+
+**Operations:**
+
+```typescript
+// List all getAllRecord records
+const items = await db.getAllRecord.findMany({ select: { path: true, data: true } }).execute();
+
+// Get one by id
+const item = await db.getAllRecord.findOne({ id: '<UUID>', select: { path: true, data: true } }).execute();
+
+// Create
+const created = await db.getAllRecord.create({ data: { path: '<String>', data: '<JSON>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.getAllRecord.update({ where: { id: '<UUID>' }, data: { path: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.getAllRecord.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.object`
@@ -1155,9 +1157,8 @@ CRUD operations for SecureTableProvision records.
 | `schemaId` | UUID | Yes |
 | `tableId` | UUID | Yes |
 | `tableName` | String | Yes |
-| `nodeType` | String | Yes |
+| `nodes` | JSON | Yes |
 | `useRls` | Boolean | Yes |
-| `nodeData` | JSON | Yes |
 | `fields` | JSON | Yes |
 | `grantRoles` | String | Yes |
 | `grantPrivileges` | JSON | Yes |
@@ -1173,13 +1174,13 @@ CRUD operations for SecureTableProvision records.
 
 ```typescript
 // List all secureTableProvision records
-const items = await db.secureTableProvision.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } }).execute();
+const items = await db.secureTableProvision.findMany({ select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } }).execute();
 
 // Get one by id
-const item = await db.secureTableProvision.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodeType: true, useRls: true, nodeData: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } }).execute();
+const item = await db.secureTableProvision.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } }).execute();
 
 // Create
-const created = await db.secureTableProvision.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodeType: '<String>', useRls: '<Boolean>', nodeData: '<JSON>', fields: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFields: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.secureTableProvision.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodes: '<JSON>', useRls: '<Boolean>', fields: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFields: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.secureTableProvision.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -1213,8 +1214,7 @@ CRUD operations for RelationProvision records.
 | `useCompositeKey` | Boolean | Yes |
 | `createIndex` | Boolean | Yes |
 | `exposeInApi` | Boolean | Yes |
-| `nodeType` | String | Yes |
-| `nodeData` | JSON | Yes |
+| `nodes` | JSON | Yes |
 | `grantRoles` | String | Yes |
 | `grantPrivileges` | JSON | Yes |
 | `policyType` | String | Yes |
@@ -1232,13 +1232,13 @@ CRUD operations for RelationProvision records.
 
 ```typescript
 // List all relationProvision records
-const items = await db.relationProvision.findMany({ select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } }).execute();
+const items = await db.relationProvision.findMany({ select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } }).execute();
 
 // Get one by id
-const item = await db.relationProvision.findOne({ id: '<UUID>', select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodeType: true, nodeData: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } }).execute();
+const item = await db.relationProvision.findOne({ id: '<UUID>', select: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } }).execute();
 
 // Create
-const created = await db.relationProvision.create({ data: { databaseId: '<UUID>', relationType: '<String>', sourceTableId: '<UUID>', targetTableId: '<UUID>', fieldName: '<String>', deleteAction: '<String>', isRequired: '<Boolean>', apiRequired: '<Boolean>', junctionTableId: '<UUID>', junctionTableName: '<String>', junctionSchemaId: '<UUID>', sourceFieldName: '<String>', targetFieldName: '<String>', useCompositeKey: '<Boolean>', createIndex: '<Boolean>', exposeInApi: '<Boolean>', nodeType: '<String>', nodeData: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFieldId: '<UUID>', outJunctionTableId: '<UUID>', outSourceFieldId: '<UUID>', outTargetFieldId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.relationProvision.create({ data: { databaseId: '<UUID>', relationType: '<String>', sourceTableId: '<UUID>', targetTableId: '<UUID>', fieldName: '<String>', deleteAction: '<String>', isRequired: '<Boolean>', apiRequired: '<Boolean>', junctionTableId: '<UUID>', junctionTableName: '<String>', junctionSchemaId: '<UUID>', sourceFieldName: '<String>', targetFieldName: '<String>', useCompositeKey: '<Boolean>', createIndex: '<Boolean>', exposeInApi: '<Boolean>', nodes: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFieldId: '<UUID>', outJunctionTableId: '<UUID>', outSourceFieldId: '<UUID>', outTargetFieldId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.relationProvision.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
@@ -2527,11 +2527,6 @@ CRUD operations for Blueprint records.
 | `description` | String | Yes |
 | `definition` | JSON | Yes |
 | `templateId` | UUID | Yes |
-| `status` | String | Yes |
-| `constructedAt` | Datetime | Yes |
-| `errorDetails` | String | Yes |
-| `refMap` | JSON | Yes |
-| `constructedDefinition` | JSON | Yes |
 | `definitionHash` | UUID | Yes |
 | `tableHashes` | JSON | Yes |
 | `createdAt` | Datetime | No |
@@ -2541,13 +2536,13 @@ CRUD operations for Blueprint records.
 
 ```typescript
 // List all blueprint records
-const items = await db.blueprint.findMany({ select: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, status: true, constructedAt: true, errorDetails: true, refMap: true, constructedDefinition: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.blueprint.findMany({ select: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.blueprint.findOne({ id: '<UUID>', select: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, status: true, constructedAt: true, errorDetails: true, refMap: true, constructedDefinition: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.blueprint.findOne({ id: '<UUID>', select: { id: true, ownerId: true, databaseId: true, name: true, displayName: true, description: true, definition: true, templateId: true, definitionHash: true, tableHashes: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.blueprint.create({ data: { ownerId: '<UUID>', databaseId: '<UUID>', name: '<String>', displayName: '<String>', description: '<String>', definition: '<JSON>', templateId: '<UUID>', status: '<String>', constructedAt: '<Datetime>', errorDetails: '<String>', refMap: '<JSON>', constructedDefinition: '<JSON>', definitionHash: '<UUID>', tableHashes: '<JSON>' }, select: { id: true } }).execute();
+const created = await db.blueprint.create({ data: { ownerId: '<UUID>', databaseId: '<UUID>', name: '<String>', displayName: '<String>', description: '<String>', definition: '<JSON>', templateId: '<UUID>', definitionHash: '<UUID>', tableHashes: '<JSON>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.blueprint.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
@@ -2602,6 +2597,89 @@ const updated = await db.blueprintTemplate.update({ where: { id: '<UUID>' }, dat
 
 // Delete
 const deleted = await db.blueprintTemplate.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.blueprintConstruction`
+
+CRUD operations for BlueprintConstruction records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `blueprintId` | UUID | Yes |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `status` | String | Yes |
+| `errorDetails` | String | Yes |
+| `tableMap` | JSON | Yes |
+| `constructedDefinition` | JSON | Yes |
+| `constructedAt` | Datetime | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all blueprintConstruction records
+const items = await db.blueprintConstruction.findMany({ select: { id: true, blueprintId: true, databaseId: true, schemaId: true, status: true, errorDetails: true, tableMap: true, constructedDefinition: true, constructedAt: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.blueprintConstruction.findOne({ id: '<UUID>', select: { id: true, blueprintId: true, databaseId: true, schemaId: true, status: true, errorDetails: true, tableMap: true, constructedDefinition: true, constructedAt: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.blueprintConstruction.create({ data: { blueprintId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', status: '<String>', errorDetails: '<String>', tableMap: '<JSON>', constructedDefinition: '<JSON>', constructedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.blueprintConstruction.update({ where: { id: '<UUID>' }, data: { blueprintId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.blueprintConstruction.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.storageModule`
+
+CRUD operations for StorageModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `privateSchemaId` | UUID | Yes |
+| `bucketsTableId` | UUID | Yes |
+| `filesTableId` | UUID | Yes |
+| `uploadRequestsTableId` | UUID | Yes |
+| `bucketsTableName` | String | Yes |
+| `filesTableName` | String | Yes |
+| `uploadRequestsTableName` | String | Yes |
+| `entityTableId` | UUID | Yes |
+| `uploadUrlExpirySeconds` | Int | Yes |
+| `downloadUrlExpirySeconds` | Int | Yes |
+| `defaultMaxFileSize` | BigInt | Yes |
+| `maxFilenameLength` | Int | Yes |
+| `cacheTtlSeconds` | Int | Yes |
+
+**Operations:**
+
+```typescript
+// List all storageModule records
+const items = await db.storageModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, entityTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } }).execute();
+
+// Get one by id
+const item = await db.storageModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, entityTableId: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } }).execute();
+
+// Create
+const created = await db.storageModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', uploadRequestsTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', uploadRequestsTableName: '<String>', entityTableId: '<UUID>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.storageModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.storageModule.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.databaseProvisionModule`
@@ -3660,37 +3738,6 @@ const updated = await db.roleType.update({ where: { id: '<Int>' }, data: { name:
 const deleted = await db.roleType.delete({ where: { id: '<Int>' } }).execute();
 ```
 
-### `db.migrateFile`
-
-CRUD operations for MigrateFile records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `databaseId` | UUID | Yes |
-| `upload` | ConstructiveInternalTypeUpload | Yes |
-
-**Operations:**
-
-```typescript
-// List all migrateFile records
-const items = await db.migrateFile.findMany({ select: { id: true, databaseId: true, upload: true } }).execute();
-
-// Get one by id
-const item = await db.migrateFile.findOne({ id: '<UUID>', select: { id: true, databaseId: true, upload: true } }).execute();
-
-// Create
-const created = await db.migrateFile.create({ data: { databaseId: '<UUID>', upload: '<Upload>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.migrateFile.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.migrateFile.delete({ where: { id: '<UUID>' } }).execute();
-```
-
 ### `db.appLimitDefault`
 
 CRUD operations for AppLimitDefault records.
@@ -3751,6 +3798,37 @@ const updated = await db.orgLimitDefault.update({ where: { id: '<UUID>' }, data:
 
 // Delete
 const deleted = await db.orgLimitDefault.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.migrateFile`
+
+CRUD operations for MigrateFile records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `upload` | ConstructiveInternalTypeUpload | Yes |
+
+**Operations:**
+
+```typescript
+// List all migrateFile records
+const items = await db.migrateFile.findMany({ select: { id: true, databaseId: true, upload: true } }).execute();
+
+// Get one by id
+const item = await db.migrateFile.findOne({ id: '<UUID>', select: { id: true, databaseId: true, upload: true } }).execute();
+
+// Create
+const created = await db.migrateFile.create({ data: { databaseId: '<UUID>', upload: '<Upload>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.migrateFile.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.migrateFile.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.membershipType`
@@ -4334,6 +4412,25 @@ orgPermissionsGetMask
 const result = await db.query.orgPermissionsGetMask({ ids: '<UUID>' }).execute();
 ```
 
+### `db.query.resolveBlueprintTable`
+
+Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `databaseId` | UUID |
+  | `tableName` | String |
+  | `schemaName` | String |
+  | `tableMap` | JSON |
+  | `defaultSchemaId` | UUID |
+
+```typescript
+const result = await db.query.resolveBlueprintTable({ databaseId: '<UUID>', tableName: '<String>', schemaName: '<String>', tableMap: '<JSON>', defaultSchemaId: '<UUID>' }).execute();
+```
+
 ### `db.query.appPermissionsGetMaskByNames`
 
 appPermissionsGetMaskByNames
@@ -4684,7 +4781,7 @@ const result = await db.mutation.initEmptyRepo({ input: { dbId: '<UUID>', storeI
 
 ### `db.mutation.constructBlueprint`
 
-Executes a draft blueprint definition. Four phases: (1) create tables with nodes[], fields, and policies[], (2) create relations between tables, (3) create indexes on table fields (supports BTREE, HNSW, GIN, GIST, BM25, etc.), (4) create full-text search configurations with weighted multi-field TSVector support. nodes[] entries can be strings or {$type, data} objects. Relations use $type for relation_type with junction config as top-level fields (node_type, policy_type, grant_roles, grant_privileges, policy_data, policy_permissive, source_field_name, target_field_name, node_data). Indexes reference table_ref + column name(s) and are resolved to field_ids. Full-text searches reference table_ref + tsvector field + source fields with weights/langs. Builds a ref_map of local ref names to created table UUIDs. Updates blueprint status to constructed (or failed with error_details). Returns the ref_map.
+Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure.
 
 - **Type:** mutation
 - **Arguments:**
@@ -4727,36 +4824,6 @@ removeNodeAtPath
 const result = await db.mutation.removeNodeAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>' } }).execute();
 ```
 
-### `db.mutation.setDataAtPath`
-
-setDataAtPath
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetDataAtPathInput (required) |
-
-```typescript
-const result = await db.mutation.setDataAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
-```
-
-### `db.mutation.setPropsAndCommit`
-
-setPropsAndCommit
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SetPropsAndCommitInput (required) |
-
-```typescript
-const result = await db.mutation.setPropsAndCommit({ input: { dbId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute();
-```
-
 ### `db.mutation.copyTemplateToBlueprint`
 
 Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.
@@ -4770,21 +4837,6 @@ Creates a new blueprint by copying a template definition. Checks visibility: own
 
 ```typescript
 const result = await db.mutation.copyTemplateToBlueprint({ input: { templateId: '<UUID>', databaseId: '<UUID>', ownerId: '<UUID>', nameOverride: '<String>', displayNameOverride: '<String>' } }).execute();
-```
-
-### `db.mutation.provisionDatabaseWithUser`
-
-provisionDatabaseWithUser
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | ProvisionDatabaseWithUserInput (required) |
-
-```typescript
-const result = await db.mutation.provisionDatabaseWithUser({ input: { pDatabaseName: '<String>', pDomain: '<String>', pSubdomain: '<String>', pModules: '<String>', pOptions: '<JSON>' } }).execute();
 ```
 
 ### `db.mutation.bootstrapUser`
@@ -4815,6 +4867,96 @@ setFieldOrder
 
 ```typescript
 const result = await db.mutation.setFieldOrder({ input: { fieldIds: '<UUID>' } }).execute();
+```
+
+### `db.mutation.provisionUniqueConstraint`
+
+Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionUniqueConstraintInput (required) |
+
+```typescript
+const result = await db.mutation.provisionUniqueConstraint({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute();
+```
+
+### `db.mutation.provisionFullTextSearch`
+
+Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionFullTextSearchInput (required) |
+
+```typescript
+const result = await db.mutation.provisionFullTextSearch({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute();
+```
+
+### `db.mutation.provisionIndex`
+
+Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionIndexInput (required) |
+
+```typescript
+const result = await db.mutation.provisionIndex({ input: { databaseId: '<UUID>', tableId: '<UUID>', definition: '<JSON>' } }).execute();
+```
+
+### `db.mutation.setDataAtPath`
+
+setDataAtPath
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetDataAtPathInput (required) |
+
+```typescript
+const result = await db.mutation.setDataAtPath({ input: { dbId: '<UUID>', root: '<UUID>', path: '<String>', data: '<JSON>' } }).execute();
+```
+
+### `db.mutation.setPropsAndCommit`
+
+setPropsAndCommit
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SetPropsAndCommitInput (required) |
+
+```typescript
+const result = await db.mutation.setPropsAndCommit({ input: { dbId: '<UUID>', storeId: '<UUID>', refname: '<String>', path: '<String>', data: '<JSON>' } }).execute();
+```
+
+### `db.mutation.provisionDatabaseWithUser`
+
+provisionDatabaseWithUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionDatabaseWithUserInput (required) |
+
+```typescript
+const result = await db.mutation.provisionDatabaseWithUser({ input: { pDatabaseName: '<String>', pDomain: '<String>', pSubdomain: '<String>', pModules: '<String>', pOptions: '<JSON>' } }).execute();
 ```
 
 ### `db.mutation.insertNodeAtPath`
@@ -4860,6 +5002,21 @@ setAndCommit
 
 ```typescript
 const result = await db.mutation.setAndCommit({ input: '<SetAndCommitInput>' }).execute();
+```
+
+### `db.mutation.provisionRelation`
+
+Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionRelationInput (required) |
+
+```typescript
+const result = await db.mutation.provisionRelation({ input: '<ProvisionRelationInput>' }).execute();
 ```
 
 ### `db.mutation.applyRls`
@@ -4981,6 +5138,21 @@ oneTimeToken
 
 ```typescript
 const result = await db.mutation.oneTimeToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
+```
+
+### `db.mutation.provisionTable`
+
+Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionTableInput (required) |
+
+```typescript
+const result = await db.mutation.provisionTable({ input: '<ProvisionTableInput>' }).execute();
 ```
 
 ### `db.mutation.sendVerificationEmail`

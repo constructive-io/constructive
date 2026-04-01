@@ -44,6 +44,17 @@ export interface AppPermissionsGetMaskVariables {
 export interface OrgPermissionsGetMaskVariables {
   ids?: string[];
 }
+/**
+ * Variables for resolveBlueprintTable
+ * Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.
+ */
+export interface ResolveBlueprintTableVariables {
+  databaseId?: string;
+  tableName?: string;
+  schemaName?: string;
+  tableMap?: unknown;
+  defaultSchemaId?: string;
+}
 export interface AppPermissionsGetMaskByNamesVariables {
   names?: string[];
 }
@@ -400,6 +411,51 @@ export function createQueryOperations(client: OrmClient) {
             {
               name: 'ids',
               type: '[UUID]',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    resolveBlueprintTable: (
+      args: ResolveBlueprintTableVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        resolveBlueprintTable: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ResolveBlueprintTable',
+        fieldName: 'resolveBlueprintTable',
+        ...buildCustomDocument(
+          'query',
+          'ResolveBlueprintTable',
+          'resolveBlueprintTable',
+          options?.select,
+          args,
+          [
+            {
+              name: 'databaseId',
+              type: 'UUID',
+            },
+            {
+              name: 'tableName',
+              type: 'String',
+            },
+            {
+              name: 'schemaName',
+              type: 'String',
+            },
+            {
+              name: 'tableMap',
+              type: 'JSON',
+            },
+            {
+              name: 'defaultSchemaId',
+              type: 'UUID',
             },
           ],
           connectionFieldsMap,
