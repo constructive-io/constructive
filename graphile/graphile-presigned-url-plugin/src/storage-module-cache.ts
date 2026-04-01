@@ -1,6 +1,6 @@
 import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
-import type { StorageModuleConfig } from './types';
+import type { StorageModuleConfig, BucketConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:cache');
 
@@ -125,9 +125,115 @@ export async function getStorageModuleConfig(
   return config;
 }
 
+// --- Bucket metadata cache ---
+
 /**
- * Clear the storage module cache (useful for testing or schema changes).
+ * LRU cache for per-database bucket metadata.
+ *
+ * Buckets are essentially static config — created once and rarely changed.
+ * Caching avoids a DB query on every requestUploadUrl call. The bucket
+ * lookup in the plugin runs under RLS, but since AuthzEntityMembership
+ * grants all org members access to all org buckets, and the cached data
+ * is just config (mime types, size limits), bypassing RLS on cache hits
+ * is safe. The important RLS is on the files table (INSERT/UPDATE),
+ * which is never cached.
+ *
+ * Keys: `bucket:${databaseId}:${bucketKey}`
+ * TTL: same as storage module cache (5min dev / 1hr prod)
+ */
+const bucketCache = new LRUCache<string, BucketConfig>({
+  max: 500, // many buckets across many databases
+  ttl: process.env.NODE_ENV === 'development' ? FIVE_MINUTES_MS : ONE_HOUR_MS,
+  updateAgeOnGet: true,
+});
+
+/**
+ * Resolve bucket metadata for a given database + bucket key, using the LRU cache.
+ *
+ * On cache miss, queries the bucket table (RLS-enforced via pgSettings on
+ * the pgClient). On cache hit, returns the cached metadata directly.
+ *
+ * @param pgClient - A pg client from the Graphile context
+ * @param storageConfig - The resolved StorageModuleConfig for this database
+ * @param databaseId - The metaschema database UUID (used as cache key prefix)
+ * @param bucketKey - The bucket key (e.g., "public", "private")
+ * @returns BucketConfig or null if the bucket doesn't exist / isn't accessible
+ */
+export async function getBucketConfig(
+  pgClient: { query: (sql: string, params: unknown[]) => Promise<{ rows: unknown[] }> },
+  storageConfig: StorageModuleConfig,
+  databaseId: string,
+  bucketKey: string,
+): Promise<BucketConfig | null> {
+  const cacheKey = `bucket:${databaseId}:${bucketKey}`;
+  const cached = bucketCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  log.debug(`Bucket cache miss for ${databaseId}:${bucketKey}, querying DB...`);
+
+  const result = await pgClient.query(
+    `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size
+     FROM ${storageConfig.bucketsQualifiedName}
+     WHERE key = $1
+     LIMIT 1`,
+    [bucketKey],
+  );
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0] as {
+    id: string;
+    key: string;
+    type: string;
+    is_public: boolean;
+    owner_id: string;
+    allowed_mime_types: string[] | null;
+    max_file_size: number | null;
+  };
+
+  const config: BucketConfig = {
+    id: row.id,
+    key: row.key,
+    type: row.type as BucketConfig['type'],
+    is_public: row.is_public,
+    owner_id: row.owner_id,
+    allowed_mime_types: row.allowed_mime_types,
+    max_file_size: row.max_file_size,
+  };
+
+  bucketCache.set(cacheKey, config);
+  log.debug(`Cached bucket config for ${databaseId}:${bucketKey} (id=${config.id})`);
+
+  return config;
+}
+
+/**
+ * Clear the storage module cache AND bucket cache.
+ * Useful for testing or schema changes.
  */
 export function clearStorageModuleCache(): void {
   storageModuleCache.clear();
+  bucketCache.clear();
+}
+
+/**
+ * Clear cached bucket entries for a specific database.
+ * Useful when bucket config changes are detected.
+ */
+export function clearBucketCache(databaseId?: string): void {
+  if (!databaseId) {
+    bucketCache.clear();
+    return;
+  }
+  // Evict all entries for this database
+  const prefix = `bucket:${databaseId}:`;
+  for (const key of bucketCache.keys()) {
+    if (key.startsWith(prefix)) {
+      bucketCache.delete(key);
+    }
+  }
 }
