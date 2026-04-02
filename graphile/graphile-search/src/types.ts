@@ -114,7 +114,7 @@ export interface SearchAdapter {
   /**
    * Whether this adapter supports plain text search queries.
    * If true, the adapter's columns will be included in the automatic
-   * `fullTextSearch` composite filter that fans out the same text query
+   * `unifiedSearch` composite filter that fans out the same text query
    * to all text-compatible adapters simultaneously.
    *
    * Adapters that require non-text input (e.g. pgvector needs a vector array)
@@ -125,7 +125,7 @@ export interface SearchAdapter {
   supportsTextSearch?: boolean;
 
   /**
-   * Build the filter value for a text search query dispatched by fullTextSearch.
+   * Build the filter value for a text search query dispatched by unifiedSearch.
    * Only called when supportsTextSearch is true.
    * Converts a plain text string into the adapter-specific filter input format.
    *
@@ -209,14 +209,14 @@ export interface UnifiedSearchOptions {
   enableSearchScore?: boolean;
 
   /**
-   * Whether to expose the `fullTextSearch` composite filter field.
+   * Whether to expose the `unifiedSearch` composite filter field.
    * When enabled, every table with at least one text-compatible adapter gets a
-   * `fullTextSearch: String` field on its filter type. Providing a value fans
+   * `unifiedSearch: String` field on its filter type. Providing a value fans
    * out the same text query to all adapters where `supportsTextSearch: true`,
    * combining their WHERE clauses with OR (match any algorithm).
    * @default true
    */
-  enableFullTextSearch?: boolean;
+  enableUnifiedSearch?: boolean;
 
   /**
    * Custom weights for the composite searchScore. Keys are adapter names,

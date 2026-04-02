@@ -393,7 +393,7 @@ export function buildSearchExamples(
     }
   }
 
-  // Composite fullTextSearch example (dispatches to all text adapters)
+  // Composite unifiedSearch example (dispatches to all text adapters)
   const hasTextSearch = specialGroups.some(
     (g) => g.category === 'search' && g.fields.some(
       (f) => f.type.gqlType === 'FullText' || /TrgmSimilarity$/.test(f.name) || /Bm25Score$/.test(f.name),
@@ -404,9 +404,9 @@ export function buildSearchExamples(
       ? `title,${[...new Set(scoreFields)].join(',')}`
       : 'title';
     examples.push({
-      description: 'Composite search (fullTextSearch dispatches to all text adapters)',
+      description: 'Composite search (unifiedSearch dispatches to all text adapters)',
       code: [
-        `${toolName} ${cmd} list --where.fullTextSearch "search query" --select ${fieldsArg}`,
+        `${toolName} ${cmd} list --where.unifiedSearch "search query" --select ${fieldsArg}`,
       ],
     });
   }
@@ -416,7 +416,7 @@ export function buildSearchExamples(
     examples.push({
       description: 'Search with pagination and field projection',
       code: [
-        `${toolName} ${cmd} list --where.fullTextSearch "query" --limit 10 --select id,title,searchScore`,
+        `${toolName} ${cmd} list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore`,
         `${toolName} ${cmd} search "query" --limit 10 --select id,title,searchScore`,
       ],
     });

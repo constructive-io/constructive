@@ -58,7 +58,7 @@ describe('graphile-search (unified search plugin)', () => {
         createPgvectorAdapter(),
       ],
       enableSearchScore: true,
-      enableFullTextSearch: true,
+      enableUnifiedSearch: true,
     });
 
     const testPreset = {
@@ -585,8 +585,8 @@ describe('graphile-search (unified search plugin)', () => {
       expect(limitNodes[1].rowId).toBe(allNodes[1].rowId);
     });
 
-    it('fullTextSearch + per-adapter orderBy: LIMIT returns top results', async () => {
-      // fullTextSearch dispatches to all text-compatible adapters.
+    it('unifiedSearch + per-adapter orderBy: LIMIT returns top results', async () => {
+      // unifiedSearch dispatches to all text-compatible adapters.
       // Per-adapter orderBy (e.g. BM25 score) still works correctly with LIMIT
       // because the adapter score is a SQL-level expression.
       // (Note: SEARCH_SCORE is a JS-computed composite and does not produce
@@ -594,7 +594,7 @@ describe('graphile-search (unified search plugin)', () => {
       const allResult = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            where: { fullTextSearch: "machine learning" }
+            where: { unifiedSearch: "machine learning" }
             orderBy: BODY_BM25_SCORE_ASC
           ) {
             nodes { rowId title bodyBm25Score }
@@ -609,7 +609,7 @@ describe('graphile-search (unified search plugin)', () => {
       const limitResult = await query<AllDocumentsResult>(`
         query {
           allDocuments(
-            where: { fullTextSearch: "machine learning" }
+            where: { unifiedSearch: "machine learning" }
             orderBy: BODY_BM25_SCORE_ASC
             first: 1
           ) {
@@ -732,8 +732,8 @@ describe('graphile-search (unified search plugin)', () => {
       }
     });
 
-    it('mega query v2: fullTextSearch + searchScore with composite ordering', async () => {
-      // Mega Query v2 — New-style: uses the unified `fullTextSearch` composite
+    it('mega query v2: unifiedSearch + searchScore with composite ordering', async () => {
+      // Mega Query v2 — New-style: uses the unified `unifiedSearch` composite
       // filter that fans out to all text-compatible algorithms (tsvector, BM25, trgm)
       // with a single string, plus a manual pgvector filter for semantic search.
       // Orders by composite searchScore (highest overall relevance first).
@@ -741,9 +741,9 @@ describe('graphile-search (unified search plugin)', () => {
         query MegaQueryV2_UnifiedSearch {
           allDocuments(
             where: {
-              # fullTextSearch: single string fans out to tsvector + BM25 + trgm
+              # unifiedSearch: single string fans out to tsvector + BM25 + trgm
               # automatically — no need to specify each algorithm separately
-              fullTextSearch: "machine learning"
+              unifiedSearch: "machine learning"
 
               # pgvector still needs its own filter (vectors aren't text)
               vectorEmbedding: { vector: [1, 0, 0], metric: COSINE }
@@ -757,7 +757,7 @@ describe('graphile-search (unified search plugin)', () => {
               title
               body
 
-              # Per-adapter scores — populated by fullTextSearch for text algorithms
+              # Per-adapter scores — populated by unifiedSearch for text algorithms
               tsvRank
               bodyBm25Score
               titleTrgmSimilarity
@@ -788,14 +788,14 @@ describe('graphile-search (unified search plugin)', () => {
     });
   });
 
-  // ─── fullTextSearch composite filter ────────────────────────────────────
+  // ─── unifiedSearch composite filter ────────────────────────────────────
 
-  describe('fullTextSearch composite filter', () => {
-    it('fullTextSearch field exists on the filter type', async () => {
+  describe('unifiedSearch composite filter', () => {
+    it('unifiedSearch field exists on the filter type', async () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            fullTextSearch: "learning"
+            unifiedSearch: "learning"
           }) {
             nodes {
               title
@@ -813,7 +813,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            fullTextSearch: "machine learning"
+            unifiedSearch: "machine learning"
           }) {
             nodes {
               title
@@ -843,7 +843,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            fullTextSearch: "learning"
+            unifiedSearch: "learning"
             tsvTsv: "machine"
           }) {
             nodes {
@@ -856,7 +856,7 @@ describe('graphile-search (unified search plugin)', () => {
 
       expect(result.errors).toBeUndefined();
       const nodes = result.data?.allDocuments?.nodes ?? [];
-      // The algorithm-specific filter (tsvTsv) narrows further within the fullTextSearch results
+      // The algorithm-specific filter (tsvTsv) narrows further within the unifiedSearch results
       expect(nodes).toBeDefined();
     });
 
@@ -864,7 +864,7 @@ describe('graphile-search (unified search plugin)', () => {
       const result = await query<AllDocumentsResult>(`
         query {
           allDocuments(where: {
-            fullTextSearch: "xyzzy_nonexistent_term_12345"
+            unifiedSearch: "xyzzy_nonexistent_term_12345"
           }) {
             nodes {
               title
@@ -908,14 +908,14 @@ describe('graphile-search (unified search plugin)', () => {
   });
 });
 
-// ─── fullTextSearch disabled (separate suite — needs its own DB connection) ───
+// ─── unifiedSearch disabled (separate suite — needs its own DB connection) ───
 
-describe('fullTextSearch can be disabled', () => {
+describe('unifiedSearch can be disabled', () => {
   let disabledQuery: QueryFn;
   let disabledTeardown: (() => Promise<void>) | undefined;
 
   beforeAll(async () => {
-    // Build a plugin with fullTextSearch DISABLED
+    // Build a plugin with unifiedSearch DISABLED
     const disabledPlugin = createUnifiedSearchPlugin({
       adapters: [
         createTsvectorAdapter(),
@@ -923,7 +923,7 @@ describe('fullTextSearch can be disabled', () => {
         createTrgmAdapter({ defaultThreshold: 0.1 }),
       ],
       enableSearchScore: true,
-      enableFullTextSearch: false,
+      enableUnifiedSearch: false,
     });
 
     const disabledPreset = {
@@ -956,8 +956,8 @@ describe('fullTextSearch can be disabled', () => {
     }
   });
 
-  it('fullTextSearch field does NOT exist when disabled', async () => {
-    // Introspect the filter type to verify fullTextSearch is NOT present.
+  it('unifiedSearch field does NOT exist when disabled', async () => {
+    // Introspect the filter type to verify unifiedSearch is NOT present.
     // NOTE: Grafast silently ignores unknown input fields rather than
     // returning a GraphQL validation error, so we verify via introspection.
     const introspection = await disabledQuery<any>(`
@@ -973,10 +973,10 @@ describe('fullTextSearch can be disabled', () => {
     expect(introspection.errors).toBeUndefined();
     const filterFields = introspection.data?.__type?.inputFields?.map((f: any) => f.name) ?? [];
 
-    // fullTextSearch should NOT be in the filter fields
-    expect(filterFields).not.toContain('fullTextSearch');
+    // unifiedSearch should NOT be in the filter fields
+    expect(filterFields).not.toContain('unifiedSearch');
 
-    // The per-algorithm fields should still exist (only fullTextSearch is disabled)
+    // The per-algorithm fields should still exist (only unifiedSearch is disabled)
     expect(filterFields).toContain('tsvTsv');
     expect(filterFields).toContain('bm25Body');
     expect(filterFields).toContain('trgmTitle');

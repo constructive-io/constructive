@@ -177,7 +177,7 @@ interface AdapterColumnCache {
 export function createUnifiedSearchPlugin(
   options: UnifiedSearchOptions
 ): GraphileConfig.Plugin {
-  const { adapters, enableSearchScore = true, enableFullTextSearch = true } = options;
+  const { adapters, enableSearchScore = true, enableUnifiedSearch = true } = options;
 
   // Per-codec cache of discovered columns, keyed by codec name
   const codecCache = new Map<string, AdapterColumnCache[]>();
@@ -857,18 +857,18 @@ export function createUnifiedSearchPlugin(
             }
           }
 
-          // ── fullTextSearch composite filter ──
-          // Adds a single `fullTextSearch: String` field that fans out the same
+          // ── unifiedSearch composite filter ──
+          // Adds a single `unifiedSearch: String` field that fans out the same
           // text query to all adapters where supportsTextSearch is true.
           // WHERE clauses are combined with OR (match ANY algorithm).
-          if (enableFullTextSearch) {
+          if (enableUnifiedSearch) {
             // Collect text-compatible adapters and their columns for this codec
             const textAdapterColumns = adapterColumns.filter(
               (ac) => ac.adapter.supportsTextSearch && ac.adapter.buildTextSearchInput
             );
 
             if (textAdapterColumns.length > 0) {
-              const fieldName = 'fullTextSearch';
+              const fieldName = 'unifiedSearch';
 
               newFields = build.extend(
                 newFields,
@@ -880,7 +880,7 @@ export function createUnifiedSearchPlugin(
                     } as any,
                     {
                       description: build.wrapDescription(
-                        'Composite full-text search. Provide a search string and it will be dispatched ' +
+                        'Composite unified search. Provide a search string and it will be dispatched ' +
                         'to all text-compatible search algorithms (tsvector, BM25, pg_trgm) simultaneously. ' +
                         'Rows matching ANY algorithm are returned. All matching score fields are populated.',
                         'field'
@@ -956,7 +956,7 @@ export function createUnifiedSearchPlugin(
                     }
                   ),
                 },
-                `UnifiedSearchPlugin adding fullTextSearch composite filter on '${codec.name}'`
+                `UnifiedSearchPlugin adding unifiedSearch composite filter on '${codec.name}'`
               );
             }
           }
