@@ -174,6 +174,15 @@ export interface DataImmutableFieldsParams {
   /* Field names that cannot be modified after INSERT (e.g. ["key", "bucket_id", "owner_id"]) */
   fields: string[];
 }
+/** Creates a derived text field that automatically concatenates multiple source fields via BEFORE INSERT/UPDATE triggers. Used to produce a unified text representation (e.g., embedding_text) from multiple columns on a table. The trigger fires with '_000' prefix to run before Search* triggers alphabetically. */
+export interface DataCompositeFieldParams {
+  /* Name of the derived text field to create (default: 'embedding_text') */
+  target?: string;
+  /* Array of source field names to concatenate into the target field */
+  source_fields: string[];
+  /* Output format: 'labeled' (field_name: value) or 'plain' (values only). Default: 'labeled' */
+  format?: "labeled" | "plain";
+}
 /** Creates a user profiles table with standard profile fields (profile_picture, bio, first_name, last_name, tags, desired). Uses AuthzDirectOwner for edit access and AuthzAllowAll for select. */
 export type TableUserProfilesParams = {};
 /** Creates an organization settings table with standard business fields (legal_name, address fields). Uses AuthzEntityMembership for access control. */
@@ -794,7 +803,7 @@ export interface BlueprintTableUniqueConstraint {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
+export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "DataCompositeField" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: "AuthzDirectOwner";
@@ -916,6 +925,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: "DataImmutableFields";
   data: DataImmutableFieldsParams;
+} | {
+  $type: "DataCompositeField";
+  data: DataCompositeFieldParams;
 } | {
   $type: "TableUserProfiles";
   data?: Record<string, never>;
