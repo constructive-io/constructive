@@ -649,7 +649,7 @@ export interface RelationProvision {
   /** The database this relation belongs to. Required. Must match the database of both source_table_id and target_table_id. */
   databaseId?: string | null;
   /**
-   * The type of relation to create. Uses SuperCase naming matching the node_type_registry:
+   * The type of relation to create. Uses SuperCase naming:
    *      - RelationBelongsTo: creates a FK field on source_table referencing target_table (e.g., tasks belongs to projects -> tasks.project_id). Field name auto-derived from target table.
    *      - RelationHasMany: creates a FK field on target_table referencing source_table (e.g., projects has many tasks -> tasks.project_id). Field name auto-derived from source table. Inverse of BelongsTo — same FK, different perspective.
    *      - RelationHasOne: creates a FK field + unique constraint on source_table referencing target_table (e.g., user_settings has one user -> user_settings.user_id with UNIQUE). Also supports shared-primary-key patterns (e.g., user_profiles.id = users.id) by setting field_name to the existing PK field.
@@ -1764,6 +1764,12 @@ export interface AuditLog {
   /** Timestamp when the audit event was recorded */
   createdAt?: string | null;
 }
+/** Stores the default permission bitmask assigned to new members upon joining */
+export interface AppPermissionDefault {
+  id: string;
+  /** Default permission bitmask applied to new members */
+  permissions?: string | null;
+}
 /** A ref is a data structure for pointing to a commit. */
 export interface Ref {
   /** The primary unique identifier for the ref. */
@@ -1786,15 +1792,14 @@ export interface Store {
   hash?: string | null;
   createdAt?: string | null;
 }
-/** Stores the default permission bitmask assigned to new members upon joining */
-export interface AppPermissionDefault {
-  id: string;
-  /** Default permission bitmask applied to new members */
-  permissions?: string | null;
-}
 export interface RoleType {
   id: number;
   name?: string | null;
+}
+export interface MigrateFile {
+  id: string;
+  databaseId?: string | null;
+  upload?: ConstructiveInternalTypeUpload | null;
 }
 /** Default maximum values for each named limit, applied when no per-actor override exists */
 export interface AppLimitDefault {
@@ -1812,11 +1817,6 @@ export interface OrgLimitDefault {
   /** Default maximum usage allowed for this limit */
   max?: number | null;
 }
-export interface MigrateFile {
-  id: string;
-  databaseId?: string | null;
-  upload?: ConstructiveInternalTypeUpload | null;
-}
 /** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
 export interface MembershipType {
   /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
@@ -1827,6 +1827,18 @@ export interface MembershipType {
   description?: string | null;
   /** Short prefix used to namespace tables and functions for this membership scope */
   prefix?: string | null;
+}
+/** Default membership settings per entity, controlling initial approval and verification state for new members */
+export interface AppMembershipDefault {
+  id: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  /** Whether new members are automatically approved upon joining */
+  isApproved?: boolean | null;
+  /** Whether new members are automatically verified upon joining */
+  isVerified?: boolean | null;
 }
 /** A commit records changes to the repository. */
 export interface Commit {
@@ -1848,54 +1860,6 @@ export interface Commit {
   date?: string | null;
 }
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
-export interface AppMembershipDefault {
-  id: string;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  /** Whether new members are automatically approved upon joining */
-  isApproved?: boolean | null;
-  /** Whether new members are automatically verified upon joining */
-  isVerified?: boolean | null;
-}
-export interface RlsModule {
-  id: string;
-  databaseId?: string | null;
-  schemaId?: string | null;
-  privateSchemaId?: string | null;
-  sessionCredentialsTableId?: string | null;
-  sessionsTableId?: string | null;
-  usersTableId?: string | null;
-  authenticate?: string | null;
-  authenticateStrict?: string | null;
-  currentRole?: string | null;
-  currentRoleId?: string | null;
-}
-/** Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). */
-export interface NodeTypeRegistry {
-  /** PascalCase domain-prefixed node type name (e.g., AuthzDirectOwner, DataTimestamps, DataImmutableFields) */
-  name?: string | null;
-  /** snake_case slug for use in code and configuration (e.g., authz_direct_owner, data_timestamps) */
-  slug?: string | null;
-  /** Node type category: authz (authorization semantics), data (table-level behaviors), view (view query types), relation (relational structure between tables) */
-  category?: string | null;
-  /** Human-readable display name for UI */
-  displayName?: string | null;
-  /** Description of what this node type does */
-  description?: string | null;
-  /** Casual, approachable marketing description for onboarding UIs. Explains what the node type does and when you would use it in plain language. */
-  summary?: string | null;
-  /** JSON Schema defining valid parameters for this node type */
-  parameterSchema?: Record<string, unknown> | null;
-  /** Machine-readable usage guidance: privilege recommendations, combination patterns, warnings, anti-patterns. All fields optional. Keys: recommended_privileges, privilege_note, standalone_ok, suggested_companions, combination_note, typical_pattern, status, status_note, alternatives, warnings, anti_patterns, performance_note, requires, decision_semantics, related_nodes, examples */
-  guidance?: Record<string, unknown> | null;
-  /** Tags for categorization and filtering (e.g., ownership, membership, temporal, rls) */
-  tags?: string[] | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-/** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface OrgMembershipDefault {
   id: string;
   createdAt?: string | null;
@@ -1910,6 +1874,19 @@ export interface OrgMembershipDefault {
   deleteMemberCascadeGroups?: boolean | null;
   /** When a group is created, whether to auto-add existing org members as group members */
   createGroupsCascadeMembers?: boolean | null;
+}
+export interface RlsModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  privateSchemaId?: string | null;
+  sessionCredentialsTableId?: string | null;
+  sessionsTableId?: string | null;
+  usersTableId?: string | null;
+  authenticate?: string | null;
+  authenticateStrict?: string | null;
+  currentRole?: string | null;
+  currentRoleId?: string | null;
 }
 export interface SqlAction {
   id: number;
@@ -2548,16 +2525,19 @@ export interface OrgClaimedInviteRelations {
 export interface AuditLogRelations {
   actor?: User | null;
 }
+export interface AppPermissionDefaultRelations {}
 export interface RefRelations {}
 export interface StoreRelations {}
-export interface AppPermissionDefaultRelations {}
 export interface RoleTypeRelations {}
+export interface MigrateFileRelations {}
 export interface AppLimitDefaultRelations {}
 export interface OrgLimitDefaultRelations {}
-export interface MigrateFileRelations {}
 export interface MembershipTypeRelations {}
-export interface CommitRelations {}
 export interface AppMembershipDefaultRelations {}
+export interface CommitRelations {}
+export interface OrgMembershipDefaultRelations {
+  entity?: User | null;
+}
 export interface RlsModuleRelations {
   database?: Database | null;
   privateSchema?: Schema | null;
@@ -2565,10 +2545,6 @@ export interface RlsModuleRelations {
   sessionCredentialsTable?: Table | null;
   sessionsTable?: Table | null;
   usersTable?: Table | null;
-}
-export interface NodeTypeRegistryRelations {}
-export interface OrgMembershipDefaultRelations {
-  entity?: User | null;
 }
 export interface SqlActionRelations {}
 export interface UserRelations {
@@ -2743,22 +2719,21 @@ export type ClaimedInviteWithRelations = ClaimedInvite & ClaimedInviteRelations;
 export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type OrgClaimedInviteWithRelations = OrgClaimedInvite & OrgClaimedInviteRelations;
 export type AuditLogWithRelations = AuditLog & AuditLogRelations;
-export type RefWithRelations = Ref & RefRelations;
-export type StoreWithRelations = Store & StoreRelations;
 export type AppPermissionDefaultWithRelations = AppPermissionDefault &
   AppPermissionDefaultRelations;
+export type RefWithRelations = Ref & RefRelations;
+export type StoreWithRelations = Store & StoreRelations;
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
+export type MigrateFileWithRelations = MigrateFile & MigrateFileRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
-export type MigrateFileWithRelations = MigrateFile & MigrateFileRelations;
 export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
-export type CommitWithRelations = Commit & CommitRelations;
 export type AppMembershipDefaultWithRelations = AppMembershipDefault &
   AppMembershipDefaultRelations;
-export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
-export type NodeTypeRegistryWithRelations = NodeTypeRegistry & NodeTypeRegistryRelations;
+export type CommitWithRelations = Commit & CommitRelations;
 export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
   OrgMembershipDefaultRelations;
+export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
 export type SqlActionWithRelations = SqlAction & SqlActionRelations;
 export type UserWithRelations = User & UserRelations;
 export type AstMigrationWithRelations = AstMigration & AstMigrationRelations;
@@ -5222,6 +5197,10 @@ export type AuditLogSelect = {
     select: UserSelect;
   };
 };
+export type AppPermissionDefaultSelect = {
+  id?: boolean;
+  permissions?: boolean;
+};
 export type RefSelect = {
   id?: boolean;
   name?: boolean;
@@ -5236,13 +5215,14 @@ export type StoreSelect = {
   hash?: boolean;
   createdAt?: boolean;
 };
-export type AppPermissionDefaultSelect = {
-  id?: boolean;
-  permissions?: boolean;
-};
 export type RoleTypeSelect = {
   id?: boolean;
   name?: boolean;
+};
+export type MigrateFileSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  upload?: boolean;
 };
 export type AppLimitDefaultSelect = {
   id?: boolean;
@@ -5254,16 +5234,20 @@ export type OrgLimitDefaultSelect = {
   name?: boolean;
   max?: boolean;
 };
-export type MigrateFileSelect = {
-  id?: boolean;
-  databaseId?: boolean;
-  upload?: boolean;
-};
 export type MembershipTypeSelect = {
   id?: boolean;
   name?: boolean;
   description?: boolean;
   prefix?: boolean;
+};
+export type AppMembershipDefaultSelect = {
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  createdBy?: boolean;
+  updatedBy?: boolean;
+  isApproved?: boolean;
+  isVerified?: boolean;
 };
 export type CommitSelect = {
   id?: boolean;
@@ -5276,14 +5260,19 @@ export type CommitSelect = {
   treeId?: boolean;
   date?: boolean;
 };
-export type AppMembershipDefaultSelect = {
+export type OrgMembershipDefaultSelect = {
   id?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   createdBy?: boolean;
   updatedBy?: boolean;
   isApproved?: boolean;
-  isVerified?: boolean;
+  entityId?: boolean;
+  deleteMemberCascadeGroups?: boolean;
+  createGroupsCascadeMembers?: boolean;
+  entity?: {
+    select: UserSelect;
+  };
 };
 export type RlsModuleSelect = {
   id?: boolean;
@@ -5314,33 +5303,6 @@ export type RlsModuleSelect = {
   };
   usersTable?: {
     select: TableSelect;
-  };
-};
-export type NodeTypeRegistrySelect = {
-  name?: boolean;
-  slug?: boolean;
-  category?: boolean;
-  displayName?: boolean;
-  description?: boolean;
-  summary?: boolean;
-  parameterSchema?: boolean;
-  guidance?: boolean;
-  tags?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-};
-export type OrgMembershipDefaultSelect = {
-  id?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  createdBy?: boolean;
-  updatedBy?: boolean;
-  isApproved?: boolean;
-  entityId?: boolean;
-  deleteMemberCascadeGroups?: boolean;
-  createGroupsCascadeMembers?: boolean;
-  entity?: {
-    select: UserSelect;
   };
 };
 export type SqlActionSelect = {
@@ -9284,6 +9246,18 @@ export interface AuditLogFilter {
   /** A related `actor` exists. */
   actorExists?: boolean;
 }
+export interface AppPermissionDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppPermissionDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppPermissionDefaultFilter[];
+  /** Negates the expression. */
+  not?: AppPermissionDefaultFilter;
+}
 export interface RefFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -9320,18 +9294,6 @@ export interface StoreFilter {
   /** Negates the expression. */
   not?: StoreFilter;
 }
-export interface AppPermissionDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `permissions` field. */
-  permissions?: BitStringFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppPermissionDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppPermissionDefaultFilter[];
-  /** Negates the expression. */
-  not?: AppPermissionDefaultFilter;
-}
 export interface RoleTypeFilter {
   /** Filter by the object’s `id` field. */
   id?: IntFilter;
@@ -9343,6 +9305,20 @@ export interface RoleTypeFilter {
   or?: RoleTypeFilter[];
   /** Negates the expression. */
   not?: RoleTypeFilter;
+}
+export interface MigrateFileFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `upload` field. */
+  upload?: ConstructiveInternalTypeUploadFilter;
+  /** Checks for all expressions in this list. */
+  and?: MigrateFileFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MigrateFileFilter[];
+  /** Negates the expression. */
+  not?: MigrateFileFilter;
 }
 export interface AppLimitDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -9372,20 +9348,6 @@ export interface OrgLimitDefaultFilter {
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
-export interface MigrateFileFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `databaseId` field. */
-  databaseId?: UUIDFilter;
-  /** Filter by the object’s `upload` field. */
-  upload?: ConstructiveInternalTypeUploadFilter;
-  /** Checks for all expressions in this list. */
-  and?: MigrateFileFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MigrateFileFilter[];
-  /** Negates the expression. */
-  not?: MigrateFileFilter;
-}
 export interface MembershipTypeFilter {
   /** Filter by the object’s `id` field. */
   id?: IntFilter;
@@ -9401,6 +9363,28 @@ export interface MembershipTypeFilter {
   or?: MembershipTypeFilter[];
   /** Negates the expression. */
   not?: MembershipTypeFilter;
+}
+export interface AppMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppMembershipDefaultFilter[];
+  /** Negates the expression. */
+  not?: AppMembershipDefaultFilter;
 }
 export interface CommitFilter {
   /** Filter by the object’s `id` field. */
@@ -9428,7 +9412,7 @@ export interface CommitFilter {
   /** Negates the expression. */
   not?: CommitFilter;
 }
-export interface AppMembershipDefaultFilter {
+export interface OrgMembershipDefaultFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
@@ -9441,14 +9425,20 @@ export interface AppMembershipDefaultFilter {
   updatedBy?: UUIDFilter;
   /** Filter by the object’s `isApproved` field. */
   isApproved?: BooleanFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
+  deleteMemberCascadeGroups?: BooleanFilter;
+  /** Filter by the object’s `createGroupsCascadeMembers` field. */
+  createGroupsCascadeMembers?: BooleanFilter;
   /** Checks for all expressions in this list. */
-  and?: AppMembershipDefaultFilter[];
+  and?: OrgMembershipDefaultFilter[];
   /** Checks for any expressions in this list. */
-  or?: AppMembershipDefaultFilter[];
+  or?: OrgMembershipDefaultFilter[];
   /** Negates the expression. */
-  not?: AppMembershipDefaultFilter;
+  not?: OrgMembershipDefaultFilter;
+  /** Filter by the object’s `entity` relation. */
+  entity?: UserFilter;
 }
 export interface RlsModuleFilter {
   /** Filter by the object’s `id` field. */
@@ -9491,64 +9481,6 @@ export interface RlsModuleFilter {
   sessionsTable?: TableFilter;
   /** Filter by the object’s `usersTable` relation. */
   usersTable?: TableFilter;
-}
-export interface NodeTypeRegistryFilter {
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `slug` field. */
-  slug?: StringFilter;
-  /** Filter by the object’s `category` field. */
-  category?: StringFilter;
-  /** Filter by the object’s `displayName` field. */
-  displayName?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `summary` field. */
-  summary?: StringFilter;
-  /** Filter by the object’s `parameterSchema` field. */
-  parameterSchema?: JSONFilter;
-  /** Filter by the object’s `guidance` field. */
-  guidance?: JSONFilter;
-  /** Filter by the object’s `tags` field. */
-  tags?: StringListFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: NodeTypeRegistryFilter[];
-  /** Checks for any expressions in this list. */
-  or?: NodeTypeRegistryFilter[];
-  /** Negates the expression. */
-  not?: NodeTypeRegistryFilter;
-}
-export interface OrgMembershipDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `isApproved` field. */
-  isApproved?: BooleanFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
-  deleteMemberCascadeGroups?: BooleanFilter;
-  /** Filter by the object’s `createGroupsCascadeMembers` field. */
-  createGroupsCascadeMembers?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgMembershipDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgMembershipDefaultFilter[];
-  /** Negates the expression. */
-  not?: OrgMembershipDefaultFilter;
-  /** Filter by the object’s `entity` relation. */
-  entity?: UserFilter;
 }
 export interface SqlActionFilter {
   /** Filter by the object’s `id` field. */
@@ -9812,12 +9744,12 @@ export interface UserFilter {
   /** TRGM search on the `display_name` column. */
   trgmDisplayName?: TrgmSearchInput;
   /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
    * simultaneously. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
-  fullTextSearch?: string;
+  unifiedSearch?: string;
 }
 export interface AstMigrationFilter {
   /** Filter by the object’s `id` field. */
@@ -12184,6 +12116,14 @@ export type AuditLogOrderBy =
   | 'SUCCESS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
+export type AppPermissionDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'PERMISSIONS_ASC'
+  | 'PERMISSIONS_DESC';
 export type RefOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12212,14 +12152,6 @@ export type StoreOrderBy =
   | 'HASH_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
-export type AppPermissionDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'PERMISSIONS_ASC'
-  | 'PERMISSIONS_DESC';
 export type RoleTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12228,6 +12160,14 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
+export type MigrateFileOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'UPLOAD_ASC'
+  | 'UPLOAD_DESC';
 export type AppLimitDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12248,14 +12188,6 @@ export type OrgLimitDefaultOrderBy =
   | 'NAME_DESC'
   | 'MAX_ASC'
   | 'MAX_DESC';
-export type MigrateFileOrderBy =
-  | 'NATURAL'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'DATABASE_ID_ASC'
-  | 'DATABASE_ID_DESC'
-  | 'UPLOAD_ASC'
-  | 'UPLOAD_DESC';
 export type MembershipTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12268,6 +12200,24 @@ export type MembershipTypeOrderBy =
   | 'DESCRIPTION_DESC'
   | 'PREFIX_ASC'
   | 'PREFIX_DESC';
+export type AppMembershipDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC';
 export type CommitOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12290,7 +12240,7 @@ export type CommitOrderBy =
   | 'TREE_ID_DESC'
   | 'DATE_ASC'
   | 'DATE_DESC';
-export type AppMembershipDefaultOrderBy =
+export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -12306,8 +12256,12 @@ export type AppMembershipDefaultOrderBy =
   | 'UPDATED_BY_DESC'
   | 'IS_APPROVED_ASC'
   | 'IS_APPROVED_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC';
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'DELETE_MEMBER_CASCADE_GROUPS_ASC'
+  | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
+  | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
+  | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
 export type RlsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12334,54 +12288,6 @@ export type RlsModuleOrderBy =
   | 'CURRENT_ROLE_DESC'
   | 'CURRENT_ROLE_ID_ASC'
   | 'CURRENT_ROLE_ID_DESC';
-export type NodeTypeRegistryOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'SLUG_ASC'
-  | 'SLUG_DESC'
-  | 'CATEGORY_ASC'
-  | 'CATEGORY_DESC'
-  | 'DISPLAY_NAME_ASC'
-  | 'DISPLAY_NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'SUMMARY_ASC'
-  | 'SUMMARY_DESC'
-  | 'PARAMETER_SCHEMA_ASC'
-  | 'PARAMETER_SCHEMA_DESC'
-  | 'GUIDANCE_ASC'
-  | 'GUIDANCE_DESC'
-  | 'TAGS_ASC'
-  | 'TAGS_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
-export type OrgMembershipDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_ASC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
 export type SqlActionOrderBy =
   | 'NATURAL'
   | 'ID_ASC'
@@ -15522,6 +15428,24 @@ export interface DeleteAuditLogInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateAppPermissionDefaultInput {
+  clientMutationId?: string;
+  appPermissionDefault: {
+    permissions?: string;
+  };
+}
+export interface AppPermissionDefaultPatch {
+  permissions?: string | null;
+}
+export interface UpdateAppPermissionDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  appPermissionDefaultPatch: AppPermissionDefaultPatch;
+}
+export interface DeleteAppPermissionDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateRefInput {
   clientMutationId?: string;
   ref: {
@@ -15568,24 +15492,6 @@ export interface DeleteStoreInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAppPermissionDefaultInput {
-  clientMutationId?: string;
-  appPermissionDefault: {
-    permissions?: string;
-  };
-}
-export interface AppPermissionDefaultPatch {
-  permissions?: string | null;
-}
-export interface UpdateAppPermissionDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  appPermissionDefaultPatch: AppPermissionDefaultPatch;
-}
-export interface DeleteAppPermissionDefaultInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateRoleTypeInput {
   clientMutationId?: string;
   roleType: {
@@ -15603,6 +15509,26 @@ export interface UpdateRoleTypeInput {
 export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
+}
+export interface CreateMigrateFileInput {
+  clientMutationId?: string;
+  migrateFile: {
+    databaseId?: string;
+    upload?: ConstructiveInternalTypeUpload;
+  };
+}
+export interface MigrateFilePatch {
+  databaseId?: string | null;
+  upload?: ConstructiveInternalTypeUpload | null;
+}
+export interface UpdateMigrateFileInput {
+  clientMutationId?: string;
+  id: string;
+  migrateFilePatch: MigrateFilePatch;
+}
+export interface DeleteMigrateFileInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface CreateAppLimitDefaultInput {
   clientMutationId?: string;
@@ -15644,26 +15570,6 @@ export interface DeleteOrgLimitDefaultInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateMigrateFileInput {
-  clientMutationId?: string;
-  migrateFile: {
-    databaseId?: string;
-    upload?: ConstructiveInternalTypeUpload;
-  };
-}
-export interface MigrateFilePatch {
-  databaseId?: string | null;
-  upload?: ConstructiveInternalTypeUpload | null;
-}
-export interface UpdateMigrateFileInput {
-  clientMutationId?: string;
-  id: string;
-  migrateFilePatch: MigrateFilePatch;
-}
-export interface DeleteMigrateFileInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateMembershipTypeInput {
   clientMutationId?: string;
   membershipType: {
@@ -15685,6 +15591,30 @@ export interface UpdateMembershipTypeInput {
 export interface DeleteMembershipTypeInput {
   clientMutationId?: string;
   id: number;
+}
+export interface CreateAppMembershipDefaultInput {
+  clientMutationId?: string;
+  appMembershipDefault: {
+    createdBy?: string;
+    updatedBy?: string;
+    isApproved?: boolean;
+    isVerified?: boolean;
+  };
+}
+export interface AppMembershipDefaultPatch {
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  isApproved?: boolean | null;
+  isVerified?: boolean | null;
+}
+export interface UpdateAppMembershipDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  appMembershipDefaultPatch: AppMembershipDefaultPatch;
+}
+export interface DeleteAppMembershipDefaultInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface CreateCommitInput {
   clientMutationId?: string;
@@ -15718,27 +15648,31 @@ export interface DeleteCommitInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAppMembershipDefaultInput {
+export interface CreateOrgMembershipDefaultInput {
   clientMutationId?: string;
-  appMembershipDefault: {
+  orgMembershipDefault: {
     createdBy?: string;
     updatedBy?: string;
     isApproved?: boolean;
-    isVerified?: boolean;
+    entityId: string;
+    deleteMemberCascadeGroups?: boolean;
+    createGroupsCascadeMembers?: boolean;
   };
 }
-export interface AppMembershipDefaultPatch {
+export interface OrgMembershipDefaultPatch {
   createdBy?: string | null;
   updatedBy?: string | null;
   isApproved?: boolean | null;
-  isVerified?: boolean | null;
+  entityId?: string | null;
+  deleteMemberCascadeGroups?: boolean | null;
+  createGroupsCascadeMembers?: boolean | null;
 }
-export interface UpdateAppMembershipDefaultInput {
+export interface UpdateOrgMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
-  appMembershipDefaultPatch: AppMembershipDefaultPatch;
+  orgMembershipDefaultPatch: OrgMembershipDefaultPatch;
 }
-export interface DeleteAppMembershipDefaultInput {
+export interface DeleteOrgMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15775,68 +15709,6 @@ export interface UpdateRlsModuleInput {
   rlsModulePatch: RlsModulePatch;
 }
 export interface DeleteRlsModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateNodeTypeRegistryInput {
-  clientMutationId?: string;
-  nodeTypeRegistry: {
-    name: string;
-    slug: string;
-    category: string;
-    displayName?: string;
-    description?: string;
-    summary?: string;
-    parameterSchema?: Record<string, unknown>;
-    guidance?: Record<string, unknown>;
-    tags?: string[];
-  };
-}
-export interface NodeTypeRegistryPatch {
-  name?: string | null;
-  slug?: string | null;
-  category?: string | null;
-  displayName?: string | null;
-  description?: string | null;
-  summary?: string | null;
-  parameterSchema?: Record<string, unknown> | null;
-  guidance?: Record<string, unknown> | null;
-  tags?: string[] | null;
-}
-export interface UpdateNodeTypeRegistryInput {
-  clientMutationId?: string;
-  name: string;
-  nodeTypeRegistryPatch: NodeTypeRegistryPatch;
-}
-export interface DeleteNodeTypeRegistryInput {
-  clientMutationId?: string;
-  name: string;
-}
-export interface CreateOrgMembershipDefaultInput {
-  clientMutationId?: string;
-  orgMembershipDefault: {
-    createdBy?: string;
-    updatedBy?: string;
-    isApproved?: boolean;
-    entityId: string;
-    deleteMemberCascadeGroups?: boolean;
-    createGroupsCascadeMembers?: boolean;
-  };
-}
-export interface OrgMembershipDefaultPatch {
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  isApproved?: boolean | null;
-  entityId?: string | null;
-  deleteMemberCascadeGroups?: boolean | null;
-  createGroupsCascadeMembers?: boolean | null;
-}
-export interface UpdateOrgMembershipDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  orgMembershipDefaultPatch: OrgMembershipDefaultPatch;
-}
-export interface DeleteOrgMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
 }
@@ -22269,12 +22141,12 @@ export interface UserFilter {
   /** TRGM search on the `display_name` column. */
   trgmDisplayName?: TrgmSearchInput;
   /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
    * simultaneously. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
-  fullTextSearch?: string;
+  unifiedSearch?: string;
 }
 /** A filter to be used against `RlsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface RlsModuleFilter {
@@ -26917,6 +26789,51 @@ export type DeleteAuditLogPayloadSelect = {
     select: AuditLogEdgeSelect;
   };
 };
+export interface CreateAppPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `AppPermissionDefault` that was created by this mutation. */
+  appPermissionDefault?: AppPermissionDefault | null;
+  appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
+}
+export type CreateAppPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  appPermissionDefault?: {
+    select: AppPermissionDefaultSelect;
+  };
+  appPermissionDefaultEdge?: {
+    select: AppPermissionDefaultEdgeSelect;
+  };
+};
+export interface UpdateAppPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `AppPermissionDefault` that was updated by this mutation. */
+  appPermissionDefault?: AppPermissionDefault | null;
+  appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
+}
+export type UpdateAppPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  appPermissionDefault?: {
+    select: AppPermissionDefaultSelect;
+  };
+  appPermissionDefaultEdge?: {
+    select: AppPermissionDefaultEdgeSelect;
+  };
+};
+export interface DeleteAppPermissionDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `AppPermissionDefault` that was deleted by this mutation. */
+  appPermissionDefault?: AppPermissionDefault | null;
+  appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
+}
+export type DeleteAppPermissionDefaultPayloadSelect = {
+  clientMutationId?: boolean;
+  appPermissionDefault?: {
+    select: AppPermissionDefaultSelect;
+  };
+  appPermissionDefaultEdge?: {
+    select: AppPermissionDefaultEdgeSelect;
+  };
+};
 export interface CreateRefPayload {
   clientMutationId?: string | null;
   /** The `Ref` that was created by this mutation. */
@@ -27007,51 +26924,6 @@ export type DeleteStorePayloadSelect = {
     select: StoreEdgeSelect;
   };
 };
-export interface CreateAppPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppPermissionDefault` that was created by this mutation. */
-  appPermissionDefault?: AppPermissionDefault | null;
-  appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
-}
-export type CreateAppPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  appPermissionDefault?: {
-    select: AppPermissionDefaultSelect;
-  };
-  appPermissionDefaultEdge?: {
-    select: AppPermissionDefaultEdgeSelect;
-  };
-};
-export interface UpdateAppPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppPermissionDefault` that was updated by this mutation. */
-  appPermissionDefault?: AppPermissionDefault | null;
-  appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
-}
-export type UpdateAppPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  appPermissionDefault?: {
-    select: AppPermissionDefaultSelect;
-  };
-  appPermissionDefaultEdge?: {
-    select: AppPermissionDefaultEdgeSelect;
-  };
-};
-export interface DeleteAppPermissionDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `AppPermissionDefault` that was deleted by this mutation. */
-  appPermissionDefault?: AppPermissionDefault | null;
-  appPermissionDefaultEdge?: AppPermissionDefaultEdge | null;
-}
-export type DeleteAppPermissionDefaultPayloadSelect = {
-  clientMutationId?: boolean;
-  appPermissionDefault?: {
-    select: AppPermissionDefaultSelect;
-  };
-  appPermissionDefaultEdge?: {
-    select: AppPermissionDefaultEdgeSelect;
-  };
-};
 export interface CreateRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was created by this mutation. */
@@ -27095,6 +26967,17 @@ export type DeleteRoleTypePayloadSelect = {
   };
   roleTypeEdge?: {
     select: RoleTypeEdgeSelect;
+  };
+};
+export interface CreateMigrateFilePayload {
+  clientMutationId?: string | null;
+  /** The `MigrateFile` that was created by this mutation. */
+  migrateFile?: MigrateFile | null;
+}
+export type CreateMigrateFilePayloadSelect = {
+  clientMutationId?: boolean;
+  migrateFile?: {
+    select: MigrateFileSelect;
   };
 };
 export interface CreateAppLimitDefaultPayload {
@@ -27187,17 +27070,6 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
     select: OrgLimitDefaultEdgeSelect;
   };
 };
-export interface CreateMigrateFilePayload {
-  clientMutationId?: string | null;
-  /** The `MigrateFile` that was created by this mutation. */
-  migrateFile?: MigrateFile | null;
-}
-export type CreateMigrateFilePayloadSelect = {
-  clientMutationId?: boolean;
-  migrateFile?: {
-    select: MigrateFileSelect;
-  };
-};
 export interface CreateMembershipTypePayload {
   clientMutationId?: string | null;
   /** The `MembershipType` that was created by this mutation. */
@@ -27241,51 +27113,6 @@ export type DeleteMembershipTypePayloadSelect = {
   };
   membershipTypeEdge?: {
     select: MembershipTypeEdgeSelect;
-  };
-};
-export interface CreateCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was created by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
-export type CreateCommitPayloadSelect = {
-  clientMutationId?: boolean;
-  commit?: {
-    select: CommitSelect;
-  };
-  commitEdge?: {
-    select: CommitEdgeSelect;
-  };
-};
-export interface UpdateCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was updated by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
-export type UpdateCommitPayloadSelect = {
-  clientMutationId?: boolean;
-  commit?: {
-    select: CommitSelect;
-  };
-  commitEdge?: {
-    select: CommitEdgeSelect;
-  };
-};
-export interface DeleteCommitPayload {
-  clientMutationId?: string | null;
-  /** The `Commit` that was deleted by this mutation. */
-  commit?: Commit | null;
-  commitEdge?: CommitEdge | null;
-}
-export type DeleteCommitPayloadSelect = {
-  clientMutationId?: boolean;
-  commit?: {
-    select: CommitSelect;
-  };
-  commitEdge?: {
-    select: CommitEdgeSelect;
   };
 };
 export interface CreateAppMembershipDefaultPayload {
@@ -27333,94 +27160,49 @@ export type DeleteAppMembershipDefaultPayloadSelect = {
     select: AppMembershipDefaultEdgeSelect;
   };
 };
-export interface CreateRlsModulePayload {
+export interface CreateCommitPayload {
   clientMutationId?: string | null;
-  /** The `RlsModule` that was created by this mutation. */
-  rlsModule?: RlsModule | null;
-  rlsModuleEdge?: RlsModuleEdge | null;
+  /** The `Commit` that was created by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
 }
-export type CreateRlsModulePayloadSelect = {
+export type CreateCommitPayloadSelect = {
   clientMutationId?: boolean;
-  rlsModule?: {
-    select: RlsModuleSelect;
+  commit?: {
+    select: CommitSelect;
   };
-  rlsModuleEdge?: {
-    select: RlsModuleEdgeSelect;
+  commitEdge?: {
+    select: CommitEdgeSelect;
   };
 };
-export interface UpdateRlsModulePayload {
+export interface UpdateCommitPayload {
   clientMutationId?: string | null;
-  /** The `RlsModule` that was updated by this mutation. */
-  rlsModule?: RlsModule | null;
-  rlsModuleEdge?: RlsModuleEdge | null;
+  /** The `Commit` that was updated by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
 }
-export type UpdateRlsModulePayloadSelect = {
+export type UpdateCommitPayloadSelect = {
   clientMutationId?: boolean;
-  rlsModule?: {
-    select: RlsModuleSelect;
+  commit?: {
+    select: CommitSelect;
   };
-  rlsModuleEdge?: {
-    select: RlsModuleEdgeSelect;
+  commitEdge?: {
+    select: CommitEdgeSelect;
   };
 };
-export interface DeleteRlsModulePayload {
+export interface DeleteCommitPayload {
   clientMutationId?: string | null;
-  /** The `RlsModule` that was deleted by this mutation. */
-  rlsModule?: RlsModule | null;
-  rlsModuleEdge?: RlsModuleEdge | null;
+  /** The `Commit` that was deleted by this mutation. */
+  commit?: Commit | null;
+  commitEdge?: CommitEdge | null;
 }
-export type DeleteRlsModulePayloadSelect = {
+export type DeleteCommitPayloadSelect = {
   clientMutationId?: boolean;
-  rlsModule?: {
-    select: RlsModuleSelect;
+  commit?: {
+    select: CommitSelect;
   };
-  rlsModuleEdge?: {
-    select: RlsModuleEdgeSelect;
-  };
-};
-export interface CreateNodeTypeRegistryPayload {
-  clientMutationId?: string | null;
-  /** The `NodeTypeRegistry` that was created by this mutation. */
-  nodeTypeRegistry?: NodeTypeRegistry | null;
-  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
-}
-export type CreateNodeTypeRegistryPayloadSelect = {
-  clientMutationId?: boolean;
-  nodeTypeRegistry?: {
-    select: NodeTypeRegistrySelect;
-  };
-  nodeTypeRegistryEdge?: {
-    select: NodeTypeRegistryEdgeSelect;
-  };
-};
-export interface UpdateNodeTypeRegistryPayload {
-  clientMutationId?: string | null;
-  /** The `NodeTypeRegistry` that was updated by this mutation. */
-  nodeTypeRegistry?: NodeTypeRegistry | null;
-  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
-}
-export type UpdateNodeTypeRegistryPayloadSelect = {
-  clientMutationId?: boolean;
-  nodeTypeRegistry?: {
-    select: NodeTypeRegistrySelect;
-  };
-  nodeTypeRegistryEdge?: {
-    select: NodeTypeRegistryEdgeSelect;
-  };
-};
-export interface DeleteNodeTypeRegistryPayload {
-  clientMutationId?: string | null;
-  /** The `NodeTypeRegistry` that was deleted by this mutation. */
-  nodeTypeRegistry?: NodeTypeRegistry | null;
-  nodeTypeRegistryEdge?: NodeTypeRegistryEdge | null;
-}
-export type DeleteNodeTypeRegistryPayloadSelect = {
-  clientMutationId?: boolean;
-  nodeTypeRegistry?: {
-    select: NodeTypeRegistrySelect;
-  };
-  nodeTypeRegistryEdge?: {
-    select: NodeTypeRegistryEdgeSelect;
+  commitEdge?: {
+    select: CommitEdgeSelect;
   };
 };
 export interface CreateOrgMembershipDefaultPayload {
@@ -27466,6 +27248,51 @@ export type DeleteOrgMembershipDefaultPayloadSelect = {
   };
   orgMembershipDefaultEdge?: {
     select: OrgMembershipDefaultEdgeSelect;
+  };
+};
+export interface CreateRlsModulePayload {
+  clientMutationId?: string | null;
+  /** The `RlsModule` that was created by this mutation. */
+  rlsModule?: RlsModule | null;
+  rlsModuleEdge?: RlsModuleEdge | null;
+}
+export type CreateRlsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rlsModule?: {
+    select: RlsModuleSelect;
+  };
+  rlsModuleEdge?: {
+    select: RlsModuleEdgeSelect;
+  };
+};
+export interface UpdateRlsModulePayload {
+  clientMutationId?: string | null;
+  /** The `RlsModule` that was updated by this mutation. */
+  rlsModule?: RlsModule | null;
+  rlsModuleEdge?: RlsModuleEdge | null;
+}
+export type UpdateRlsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rlsModule?: {
+    select: RlsModuleSelect;
+  };
+  rlsModuleEdge?: {
+    select: RlsModuleEdgeSelect;
+  };
+};
+export interface DeleteRlsModulePayload {
+  clientMutationId?: string | null;
+  /** The `RlsModule` that was deleted by this mutation. */
+  rlsModule?: RlsModule | null;
+  rlsModuleEdge?: RlsModuleEdge | null;
+}
+export type DeleteRlsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rlsModule?: {
+    select: RlsModuleSelect;
+  };
+  rlsModuleEdge?: {
+    select: RlsModuleEdgeSelect;
   };
 };
 export interface CreateSqlActionPayload {
@@ -28848,6 +28675,18 @@ export type AuditLogEdgeSelect = {
     select: AuditLogSelect;
   };
 };
+/** A `AppPermissionDefault` edge in the connection. */
+export interface AppPermissionDefaultEdge {
+  cursor?: string | null;
+  /** The `AppPermissionDefault` at the end of the edge. */
+  node?: AppPermissionDefault | null;
+}
+export type AppPermissionDefaultEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: AppPermissionDefaultSelect;
+  };
+};
 /** A `Ref` edge in the connection. */
 export interface RefEdge {
   cursor?: string | null;
@@ -28870,18 +28709,6 @@ export type StoreEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: StoreSelect;
-  };
-};
-/** A `AppPermissionDefault` edge in the connection. */
-export interface AppPermissionDefaultEdge {
-  cursor?: string | null;
-  /** The `AppPermissionDefault` at the end of the edge. */
-  node?: AppPermissionDefault | null;
-}
-export type AppPermissionDefaultEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: AppPermissionDefaultSelect;
   };
 };
 /** A `RoleType` edge in the connection. */
@@ -28932,18 +28759,6 @@ export type MembershipTypeEdgeSelect = {
     select: MembershipTypeSelect;
   };
 };
-/** A `Commit` edge in the connection. */
-export interface CommitEdge {
-  cursor?: string | null;
-  /** The `Commit` at the end of the edge. */
-  node?: Commit | null;
-}
-export type CommitEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: CommitSelect;
-  };
-};
 /** A `AppMembershipDefault` edge in the connection. */
 export interface AppMembershipDefaultEdge {
   cursor?: string | null;
@@ -28956,28 +28771,16 @@ export type AppMembershipDefaultEdgeSelect = {
     select: AppMembershipDefaultSelect;
   };
 };
-/** A `RlsModule` edge in the connection. */
-export interface RlsModuleEdge {
+/** A `Commit` edge in the connection. */
+export interface CommitEdge {
   cursor?: string | null;
-  /** The `RlsModule` at the end of the edge. */
-  node?: RlsModule | null;
+  /** The `Commit` at the end of the edge. */
+  node?: Commit | null;
 }
-export type RlsModuleEdgeSelect = {
+export type CommitEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: RlsModuleSelect;
-  };
-};
-/** A `NodeTypeRegistry` edge in the connection. */
-export interface NodeTypeRegistryEdge {
-  cursor?: string | null;
-  /** The `NodeTypeRegistry` at the end of the edge. */
-  node?: NodeTypeRegistry | null;
-}
-export type NodeTypeRegistryEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: NodeTypeRegistrySelect;
+    select: CommitSelect;
   };
 };
 /** A `OrgMembershipDefault` edge in the connection. */
@@ -28990,6 +28793,18 @@ export type OrgMembershipDefaultEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgMembershipDefaultSelect;
+  };
+};
+/** A `RlsModule` edge in the connection. */
+export interface RlsModuleEdge {
+  cursor?: string | null;
+  /** The `RlsModule` at the end of the edge. */
+  node?: RlsModule | null;
+}
+export type RlsModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: RlsModuleSelect;
   };
 };
 /** A `User` edge in the connection. */

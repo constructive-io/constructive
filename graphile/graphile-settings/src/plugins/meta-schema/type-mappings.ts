@@ -44,6 +44,13 @@ export function pgTypeToGqlType(pgTypeName: string): string {
   return PG_TO_GQL_TYPE[pgTypeName] || pgTypeName;
 }
 
+function getGeometrySubtype(
+  attr: PgAttribute | null | undefined,
+): string | null {
+  const subtype = attr?.extensions?.geometrySubtype;
+  return typeof subtype === 'string' ? subtype : null;
+}
+
 function resolveGqlTypeName(
   build: GqlTypeResolverBuild | undefined,
   codec: PgCodec | null | undefined,
@@ -82,6 +89,7 @@ export function buildFieldMeta(
   const pgType = attr?.codec?.name || 'unknown';
   const isNotNull = attr?.notNull || false;
   const hasDefault = attr?.hasDefault || false;
+  const subtype = getGeometrySubtype(attr);
 
   return {
     name,
@@ -91,6 +99,7 @@ export function buildFieldMeta(
       isArray: !!attr?.codec?.arrayOfCodec,
       isNotNull,
       hasDefault,
+      subtype,
     },
     isNotNull,
     hasDefault,

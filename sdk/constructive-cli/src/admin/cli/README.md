@@ -36,27 +36,27 @@ csdk auth set-token <your-token>
 | `org-permission-default` | orgPermissionDefault CRUD operations |
 | `app-admin-grant` | appAdminGrant CRUD operations |
 | `app-owner-grant` | appOwnerGrant CRUD operations |
-| `org-admin-grant` | orgAdminGrant CRUD operations |
-| `org-owner-grant` | orgOwnerGrant CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
-| `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
+| `org-admin-grant` | orgAdminGrant CRUD operations |
+| `org-owner-grant` | orgOwnerGrant CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `app-limit` | appLimit CRUD operations |
 | `app-achievement` | appAchievement CRUD operations |
 | `app-step` | appStep CRUD operations |
 | `claimed-invite` | claimedInvite CRUD operations |
+| `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
+| `org-limit` | orgLimit CRUD operations |
 | `app-grant` | appGrant CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
-| `org-limit` | orgLimit CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
 | `org-grant` | orgGrant CRUD operations |
 | `org-chart-edge` | orgChartEdge CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
+| `app-level` | appLevel CRUD operations |
+| `invite` | invite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
-| `invite` | invite CRUD operations |
-| `app-level` | appLevel CRUD operations |
 | `org-invite` | orgInvite CRUD operations |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
@@ -361,6 +361,54 @@ CRUD operations for AppOwnerGrant records.
 **Required create fields:** `actorId`
 **Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
+### `app-limit-default`
+
+CRUD operations for AppLimitDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLimitDefault records |
+| `find-first` | Find first matching appLimitDefault record |
+| `get` | Get a appLimitDefault by id |
+| `create` | Create a new appLimitDefault |
+| `update` | Update an existing appLimitDefault |
+| `delete` | Delete a appLimitDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `max` | Int |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
+### `org-limit-default`
+
+CRUD operations for OrgLimitDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimitDefault records |
+| `find-first` | Find first matching orgLimitDefault record |
+| `get` | Get a orgLimitDefault by id |
+| `create` | Create a new orgLimitDefault |
+| `update` | Update an existing orgLimitDefault |
+| `delete` | Delete a orgLimitDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `max` | Int |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `max`
+
 ### `org-admin-grant`
 
 CRUD operations for OrgAdminGrant records.
@@ -416,84 +464,6 @@ CRUD operations for OrgOwnerGrant records.
 
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `isGrant`, `grantorId`
-
-### `app-limit-default`
-
-CRUD operations for AppLimitDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLimitDefault records |
-| `find-first` | Find first matching appLimitDefault record |
-| `get` | Get a appLimitDefault by id |
-| `create` | Create a new appLimitDefault |
-| `update` | Update an existing appLimitDefault |
-| `delete` | Delete a appLimitDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `max` | Int |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `max`
-
-### `org-limit-default`
-
-CRUD operations for OrgLimitDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgLimitDefault records |
-| `find-first` | Find first matching orgLimitDefault record |
-| `get` | Get a orgLimitDefault by id |
-| `create` | Create a new orgLimitDefault |
-| `update` | Update an existing orgLimitDefault |
-| `delete` | Delete a orgLimitDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `max` | Int |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `max`
-
-### `org-chart-edge-grant`
-
-CRUD operations for OrgChartEdgeGrant records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgChartEdgeGrant records |
-| `find-first` | Find first matching orgChartEdgeGrant record |
-| `get` | Get a orgChartEdgeGrant by id |
-| `create` | Create a new orgChartEdgeGrant |
-| `update` | Update an existing orgChartEdgeGrant |
-| `delete` | Delete a orgChartEdgeGrant |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `entityId` | UUID |
-| `childId` | UUID |
-| `parentId` | UUID |
-| `grantorId` | UUID |
-| `isGrant` | Boolean |
-| `positionTitle` | String |
-| `positionLevel` | Int |
-| `createdAt` | Datetime |
-
-**Required create fields:** `entityId`, `childId`
-**Optional create fields (backend defaults):** `parentId`, `grantorId`, `isGrant`, `positionTitle`, `positionLevel`
 
 ### `membership-type`
 
@@ -625,6 +595,63 @@ CRUD operations for ClaimedInvite records.
 
 **Optional create fields (backend defaults):** `data`, `senderId`, `receiverId`
 
+### `org-chart-edge-grant`
+
+CRUD operations for OrgChartEdgeGrant records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgChartEdgeGrant records |
+| `find-first` | Find first matching orgChartEdgeGrant record |
+| `get` | Get a orgChartEdgeGrant by id |
+| `create` | Create a new orgChartEdgeGrant |
+| `update` | Update an existing orgChartEdgeGrant |
+| `delete` | Delete a orgChartEdgeGrant |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `entityId` | UUID |
+| `childId` | UUID |
+| `parentId` | UUID |
+| `grantorId` | UUID |
+| `isGrant` | Boolean |
+| `positionTitle` | String |
+| `positionLevel` | Int |
+| `createdAt` | Datetime |
+
+**Required create fields:** `entityId`, `childId`
+**Optional create fields (backend defaults):** `parentId`, `grantorId`, `isGrant`, `positionTitle`, `positionLevel`
+
+### `org-limit`
+
+CRUD operations for OrgLimit records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgLimit records |
+| `find-first` | Find first matching orgLimit record |
+| `get` | Get a orgLimit by id |
+| `create` | Create a new orgLimit |
+| `update` | Update an existing orgLimit |
+| `delete` | Delete a orgLimit |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `actorId` | UUID |
+| `num` | Int |
+| `max` | Int |
+| `entityId` | UUID |
+
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `name`, `num`, `max`
+
 ### `app-grant`
 
 CRUD operations for AppGrant records.
@@ -679,33 +706,6 @@ CRUD operations for AppMembershipDefault records.
 | `isVerified` | Boolean |
 
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
-
-### `org-limit`
-
-CRUD operations for OrgLimit records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgLimit records |
-| `find-first` | Find first matching orgLimit record |
-| `get` | Get a orgLimit by id |
-| `create` | Create a new orgLimit |
-| `update` | Update an existing orgLimit |
-| `delete` | Delete a orgLimit |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `actorId` | UUID |
-| `num` | Int |
-| `max` | Int |
-| `entityId` | UUID |
-
-**Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `name`, `num`, `max`
 
 ### `org-claimed-invite`
 
@@ -823,6 +823,66 @@ CRUD operations for OrgMembershipDefault records.
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
+### `app-level`
+
+CRUD operations for AppLevel records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appLevel records |
+| `find-first` | Find first matching appLevel record |
+| `get` | Get a appLevel by id |
+| `create` | Create a new appLevel |
+| `update` | Update an existing appLevel |
+| `delete` | Delete a appLevel |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `name` | String |
+| `description` | String |
+| `image` | Image |
+| `ownerId` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Required create fields:** `name`
+**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
+
+### `invite`
+
+CRUD operations for Invite records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all invite records |
+| `find-first` | Find first matching invite record |
+| `get` | Get a invite by id |
+| `create` | Create a new invite |
+| `update` | Update an existing invite |
+| `delete` | Delete a invite |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `email` | Email |
+| `senderId` | UUID |
+| `inviteToken` | String |
+| `inviteValid` | Boolean |
+| `inviteLimit` | Int |
+| `inviteCount` | Int |
+| `multiple` | Boolean |
+| `data` | JSON |
+| `expiresAt` | Datetime |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+
 ### `app-membership`
 
 CRUD operations for AppMembership records.
@@ -896,66 +956,6 @@ CRUD operations for OrgMembership records.
 
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
-
-### `invite`
-
-CRUD operations for Invite records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all invite records |
-| `find-first` | Find first matching invite record |
-| `get` | Get a invite by id |
-| `create` | Create a new invite |
-| `update` | Update an existing invite |
-| `delete` | Delete a invite |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `email` | Email |
-| `senderId` | UUID |
-| `inviteToken` | String |
-| `inviteValid` | Boolean |
-| `inviteLimit` | Int |
-| `inviteCount` | Int |
-| `multiple` | Boolean |
-| `data` | JSON |
-| `expiresAt` | Datetime |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
-
-### `app-level`
-
-CRUD operations for AppLevel records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appLevel records |
-| `find-first` | Find first matching appLevel record |
-| `get` | Get a appLevel by id |
-| `create` | Create a new appLevel |
-| `update` | Update an existing appLevel |
-| `delete` | Delete a appLevel |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `name` | String |
-| `description` | String |
-| `image` | Image |
-| `ownerId` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `name`
-**Optional create fields (backend defaults):** `description`, `image`, `ownerId`
 
 ### `org-invite`
 

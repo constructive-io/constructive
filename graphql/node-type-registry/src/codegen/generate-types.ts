@@ -755,7 +755,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   const authzNodes = allNodeTypes.filter((nt) => nt.category === 'authz');
 
   // -- Parameter interfaces grouped by category --
-  const categoryOrder = ['data', 'authz', 'relation', 'view'];
+  const categoryOrder = ['data', 'search', 'authz', 'relation', 'view'];
   for (const cat of categoryOrder) {
     const nts = categories.get(cat);
     if (!nts || nts.length === 0) continue;

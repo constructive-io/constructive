@@ -1,9 +1,9 @@
 import type { NodeTypeDefinition } from '../types';
 
-export const DataSearch: NodeTypeDefinition = {
-  "name": "DataSearch",
-  "slug": "data_search",
-  "category": "data",
+export const SearchUnified: NodeTypeDefinition = {
+  "name": "SearchUnified",
+  "slug": "search_unified",
+  "category": "search",
   "display_name": "Unified Search",
   "description": "Composite node type that orchestrates multiple search modalities (full-text search, BM25, embeddings, trigram) on a single table. Configures per-table search score weights, normalization strategy, and recency boost via the @searchConfig smart tag.",
   "parameter_schema": {
@@ -11,7 +11,7 @@ export const DataSearch: NodeTypeDefinition = {
     "properties": {
       "full_text_search": {
         "type": "object",
-        "description": "DataFullTextSearch parameters. Omit to skip FTS setup.",
+        "description": "SearchFullText parameters. Omit to skip FTS setup.",
         "properties": {
           "field_name": {
             "type": "string",
@@ -51,7 +51,7 @@ export const DataSearch: NodeTypeDefinition = {
       },
       "bm25": {
         "type": "object",
-        "description": "DataBm25 parameters. Omit to skip BM25 setup.",
+        "description": "SearchBm25 parameters. Omit to skip BM25 setup.",
         "properties": {
           "field_name": {
             "type": "string"
@@ -74,7 +74,7 @@ export const DataSearch: NodeTypeDefinition = {
       },
       "embedding": {
         "type": "object",
-        "description": "DataEmbedding parameters. Omit to skip embedding setup.",
+        "description": "SearchVector parameters. Omit to skip embedding setup.",
         "properties": {
           "field_name": {
             "type": "string",

@@ -31,6 +31,7 @@ function createMetaSchemaType(): GraphQLObjectType {
       isArray: { type: nn(GraphQLBoolean) },
       isNotNull: { type: GraphQLBoolean },
       hasDefault: { type: GraphQLBoolean },
+      subtype: { type: GraphQLString },
     }),
   });
 

@@ -18,7 +18,7 @@
  *
  * Suite 2 — Articles (search-seed):
  *   5 articles with tsvector, pg_trgm, optional pgvector columns
- *   Tests: tsvector search, trgm fuzzy matching, composite fullTextSearch,
+ *   Tests: tsvector search, trgm fuzzy matching, composite unifiedSearch,
  *          search+pagination, pgvector error handling, schema introspection
  */
 
@@ -908,17 +908,17 @@ describe('CLI E2E — search commands against real DB', () => {
   });
 
   // =========================================================================
-  // Test 3: composite fullTextSearch via list --where
-  // The fullTextSearch filter dispatches to all text-capable adapters.
+    // Test 3: composite unifiedSearch via list --where
+    // The unifiedSearch filter dispatches to all text-capable adapters.
   // =========================================================================
 
-  it('should filter via fullTextSearch composite filter', async () => {
-    const output = await runCli(
-      distDir,
-      tmpHome,
-      'article',
-      'list',
-      '--where.fullTextSearch',
+    it('should filter via unifiedSearch composite filter', async () => {
+      const output = await runCli(
+        distDir,
+        tmpHome,
+        'article',
+        'list',
+        '--where.unifiedSearch',
       'vector databases',
       '--select',
       'title,searchScore',

@@ -3,7 +3,9 @@ import type { PgCodec } from '@dataplan/pg';
 import type { GraphileConfig } from 'graphile-config';
 import type { SQL } from 'pg-sql2';
 import sql from 'pg-sql2';
+import { GIS_SUBTYPE_NAME } from '../constants';
 import type { GisFieldValue } from '../types';
+import { getGISTypeDetails } from '../utils';
 
 /**
  * Map from PostGIS uppercase geometry type names (from geometrytype()) to
@@ -50,6 +52,12 @@ const GIS_TYPE_NORMALIZE: Record<string, string> = {
  */
 function normalizeGisType(raw: string): string {
   return GIS_TYPE_NORMALIZE[raw] ?? raw;
+}
+
+function getGeometrySubtypeName(typmod: number): string | null {
+  const { subtype } = getGISTypeDetails(typmod);
+  const subtypeName = GIS_SUBTYPE_NAME[subtype];
+  return subtypeName && subtypeName !== 'Geometry' ? subtypeName : null;
 }
 
 /**
@@ -225,6 +233,41 @@ export const PostgisCodecPlugin: GraphileConfig.Plugin = {
             serviceName
           );
           return;
+        }
+      },
+
+      /**
+       * Annotate geometry/geography attributes with their subtype (Point,
+       * Polygon, LineString, etc.) decoded from the PostgreSQL type modifier.
+       *
+       * The atttypmod encodes subtype + SRID + Z/M flags. We decode it with
+       * getGISTypeDetails() and store the human-readable subtype name on
+       * attribute.extensions.geometrySubtype so the _meta plugin can expose it.
+       */
+      async pgCodecs_attribute(_info, event) {
+        const { pgAttribute, attribute } = event;
+        const codecName = attribute.codec?.name;
+        if (codecName !== 'geometry' && codecName !== 'geography') {
+          return;
+        }
+
+        const typmod = pgAttribute.atttypmod;
+        // atttypmod of -1 or null means no modifier (unconstrained geometry)
+        if (typmod == null || typmod === -1) {
+          return;
+        }
+
+        try {
+          const subtypeName = getGeometrySubtypeName(typmod);
+          if (subtypeName) {
+            if (!attribute.extensions) {
+              attribute.extensions = {};
+            }
+            (attribute.extensions as Record<string, unknown>).geometrySubtype = subtypeName;
+          }
+        } catch {
+          // If the modifier can't be decoded, silently skip — the column
+          // will still work, just without subtype info in _meta.
         }
       }
     }

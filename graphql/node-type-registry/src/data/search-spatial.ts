@@ -1,10 +1,10 @@
 import type { NodeTypeDefinition } from '../types';
 
-export const DataPostGIS: NodeTypeDefinition = {
-  "name": "DataPostGIS",
-  "slug": "data_postgis",
-  "category": "data",
-  "display_name": "PostGIS Geometry",
+export const SearchSpatial: NodeTypeDefinition = {
+  "name": "SearchSpatial",
+  "slug": "search_spatial",
+  "category": "search",
+  "display_name": "Spatial Search",
   "description": "Adds a PostGIS geometry or geography column with a spatial index (GiST or SP-GiST). Supports configurable geometry types (Point, Polygon, etc.), SRID, and dimensionality. The graphile-postgis plugin auto-detects geometry/geography columns by codec type for spatial filtering (ST_Contains, ST_DWithin, bbox operators).",
   "parameter_schema": {
     "type": "object",

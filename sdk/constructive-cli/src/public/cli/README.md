@@ -117,19 +117,18 @@ csdk auth set-token <your-token>
 | `org-invite` | orgInvite CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
 | `audit-log` | auditLog CRUD operations |
+| `app-permission-default` | appPermissionDefault CRUD operations |
 | `ref` | ref CRUD operations |
 | `store` | store CRUD operations |
-| `app-permission-default` | appPermissionDefault CRUD operations |
 | `role-type` | roleType CRUD operations |
+| `migrate-file` | migrateFile CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
-| `migrate-file` | migrateFile CRUD operations |
 | `membership-type` | membershipType CRUD operations |
-| `commit` | commit CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
-| `rls-module` | rlsModule CRUD operations |
-| `node-type-registry` | nodeTypeRegistry CRUD operations |
+| `commit` | commit CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
+| `rls-module` | rlsModule CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
 | `user` | user CRUD operations |
 | `ast-migration` | astMigration CRUD operations |
@@ -207,7 +206,7 @@ Example usage:
 | `sign-in` | signIn |
 | `sign-up` | signUp |
 | `one-time-token` | oneTimeToken |
-| `provision-table` | Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
+| `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `send-verification-email` | sendVerificationEmail |
 | `forgot-password` | forgotPassword |
 | `verify-password` | verifyPassword |
@@ -3083,6 +3082,28 @@ CRUD operations for AuditLog records.
 **Required create fields:** `event`, `success`
 **Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
+### `app-permission-default`
+
+CRUD operations for AppPermissionDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appPermissionDefault records |
+| `find-first` | Find first matching appPermissionDefault record |
+| `get` | Get a appPermissionDefault by id |
+| `create` | Create a new appPermissionDefault |
+| `update` | Update an existing appPermissionDefault |
+| `delete` | Delete a appPermissionDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `permissions` | BitString |
+
+**Optional create fields (backend defaults):** `permissions`
+
 ### `ref`
 
 CRUD operations for Ref records.
@@ -3135,28 +3156,6 @@ CRUD operations for Store records.
 **Required create fields:** `name`, `databaseId`
 **Optional create fields (backend defaults):** `hash`
 
-### `app-permission-default`
-
-CRUD operations for AppPermissionDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appPermissionDefault records |
-| `find-first` | Find first matching appPermissionDefault record |
-| `get` | Get a appPermissionDefault by id |
-| `create` | Create a new appPermissionDefault |
-| `update` | Update an existing appPermissionDefault |
-| `delete` | Delete a appPermissionDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `permissions` | BitString |
-
-**Optional create fields (backend defaults):** `permissions`
-
 ### `role-type`
 
 CRUD operations for RoleType records.
@@ -3178,6 +3177,29 @@ CRUD operations for RoleType records.
 | `name` | String |
 
 **Required create fields:** `name`
+
+### `migrate-file`
+
+CRUD operations for MigrateFile records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all migrateFile records |
+| `find-first` | Find first matching migrateFile record |
+| `get` | Get a migrateFile by id |
+| `create` | Create a new migrateFile |
+| `update` | Update an existing migrateFile |
+| `delete` | Delete a migrateFile |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `upload` | Upload |
+
+**Optional create fields (backend defaults):** `databaseId`, `upload`
 
 ### `app-limit-default`
 
@@ -3227,29 +3249,6 @@ CRUD operations for OrgLimitDefault records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`
 
-### `migrate-file`
-
-CRUD operations for MigrateFile records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all migrateFile records |
-| `find-first` | Find first matching migrateFile record |
-| `get` | Get a migrateFile by id |
-| `create` | Create a new migrateFile |
-| `update` | Update an existing migrateFile |
-| `delete` | Delete a migrateFile |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `databaseId` | UUID |
-| `upload` | Upload |
-
-**Optional create fields (backend defaults):** `databaseId`, `upload`
-
 ### `membership-type`
 
 CRUD operations for MembershipType records.
@@ -3273,6 +3272,33 @@ CRUD operations for MembershipType records.
 | `prefix` | String |
 
 **Required create fields:** `name`, `description`, `prefix`
+
+### `app-membership-default`
+
+CRUD operations for AppMembershipDefault records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appMembershipDefault records |
+| `find-first` | Find first matching appMembershipDefault record |
+| `get` | Get a appMembershipDefault by id |
+| `create` | Create a new appMembershipDefault |
+| `update` | Update an existing appMembershipDefault |
+| `delete` | Delete a appMembershipDefault |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `isVerified` | Boolean |
+
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
 
 ### `commit`
 
@@ -3304,18 +3330,18 @@ CRUD operations for Commit records.
 **Required create fields:** `databaseId`, `storeId`
 **Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
-### `app-membership-default`
+### `org-membership-default`
 
-CRUD operations for AppMembershipDefault records.
+CRUD operations for OrgMembershipDefault records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all appMembershipDefault records |
-| `find-first` | Find first matching appMembershipDefault record |
-| `get` | Get a appMembershipDefault by id |
-| `create` | Create a new appMembershipDefault |
-| `update` | Update an existing appMembershipDefault |
-| `delete` | Delete a appMembershipDefault |
+| `list` | List all orgMembershipDefault records |
+| `find-first` | Find first matching orgMembershipDefault record |
+| `get` | Get a orgMembershipDefault by id |
+| `create` | Create a new orgMembershipDefault |
+| `update` | Update an existing orgMembershipDefault |
+| `delete` | Delete a orgMembershipDefault |
 
 **Fields:**
 
@@ -3327,9 +3353,12 @@ CRUD operations for AppMembershipDefault records.
 | `createdBy` | UUID |
 | `updatedBy` | UUID |
 | `isApproved` | Boolean |
-| `isVerified` | Boolean |
+| `entityId` | UUID |
+| `deleteMemberCascadeGroups` | Boolean |
+| `createGroupsCascadeMembers` | Boolean |
 
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isVerified`
+**Required create fields:** `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
 ### `rls-module`
 
@@ -3362,68 +3391,6 @@ CRUD operations for RlsModule records.
 
 **Required create fields:** `databaseId`
 **Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `sessionCredentialsTableId`, `sessionsTableId`, `usersTableId`, `authenticate`, `authenticateStrict`, `currentRole`, `currentRoleId`
-
-### `node-type-registry`
-
-CRUD operations for NodeTypeRegistry records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all nodeTypeRegistry records |
-| `find-first` | Find first matching nodeTypeRegistry record |
-| `get` | Get a nodeTypeRegistry by name |
-| `create` | Create a new nodeTypeRegistry |
-| `update` | Update an existing nodeTypeRegistry |
-| `delete` | Delete a nodeTypeRegistry |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `name` | String |
-| `slug` | String |
-| `category` | String |
-| `displayName` | String |
-| `description` | String |
-| `summary` | String |
-| `parameterSchema` | JSON |
-| `guidance` | JSON |
-| `tags` | String |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `slug`, `category`
-**Optional create fields (backend defaults):** `displayName`, `description`, `summary`, `parameterSchema`, `guidance`, `tags`
-
-### `org-membership-default`
-
-CRUD operations for OrgMembershipDefault records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgMembershipDefault records |
-| `find-first` | Find first matching orgMembershipDefault record |
-| `get` | Get a orgMembershipDefault by id |
-| `create` | Create a new orgMembershipDefault |
-| `update` | Update an existing orgMembershipDefault |
-| `delete` | Delete a orgMembershipDefault |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `entityId` | UUID |
-| `deleteMemberCascadeGroups` | Boolean |
-| `createGroupsCascadeMembers` | Boolean |
-
-**Required create fields:** `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
 ### `sql-action`
 
@@ -3504,14 +3471,14 @@ csdk user list --where.searchTsv "search query" --select title,tsvRank
 csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select title,displayNameTrgmSimilarity
 ```
 
-*Composite search (fullTextSearch dispatches to all text adapters):*
+*Composite search (unifiedSearch dispatches to all text adapters):*
 ```bash
-csdk user list --where.fullTextSearch "search query" --select title,tsvRank,displayNameTrgmSimilarity,searchScore
+csdk user list --where.unifiedSearch "search query" --select title,tsvRank,displayNameTrgmSimilarity,searchScore
 ```
 
 *Search with pagination and field projection:*
 ```bash
-csdk user list --where.fullTextSearch "query" --limit 10 --select id,title,searchScore
+csdk user list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
 csdk user search "query" --limit 10 --select id,title,searchScore
 ```
 
@@ -4409,7 +4376,7 @@ oneTimeToken
 
 ### `provision-table`
 
-Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
 
 - **Type:** mutation
 - **Arguments:**

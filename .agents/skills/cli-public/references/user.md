@@ -71,16 +71,16 @@ csdk user list --where.searchTsv "search query" --select title,tsvRank
 csdk user list --where.trgmDisplayName.value "approximate query" --where.trgmDisplayName.threshold 0.3 --select title,displayNameTrgmSimilarity
 ```
 
-### Composite search (fullTextSearch dispatches to all text adapters)
+### Composite search (unifiedSearch dispatches to all text adapters)
 
 ```bash
-csdk user list --where.fullTextSearch "search query" --select title,tsvRank,displayNameTrgmSimilarity,searchScore
+csdk user list --where.unifiedSearch "search query" --select title,tsvRank,displayNameTrgmSimilarity,searchScore
 ```
 
 ### Search with pagination and field projection
 
 ```bash
-csdk user list --where.fullTextSearch "query" --limit 10 --select id,title,searchScore
+csdk user list --where.unifiedSearch "query" --limit 10 --select id,title,searchScore
 csdk user search "query" --limit 10 --select id,title,searchScore
 ```
 

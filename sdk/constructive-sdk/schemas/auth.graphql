@@ -5,35 +5,6 @@ type Query {
   currentUserId: UUID
   currentUser: User
 
-  """Reads and enables pagination through a set of `CryptoAddress`."""
-  cryptoAddresses(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CryptoAddressFilter
-
-    """The method to use when ordering `CryptoAddress`."""
-    orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CryptoAddressConnection
-
   """Reads and enables pagination through a set of `RoleType`."""
   roleTypes(
     """Only read the first `n` values of the set."""
@@ -62,6 +33,35 @@ type Query {
     """The method to use when ordering `RoleType`."""
     orderBy: [RoleTypeOrderBy!] = [PRIMARY_KEY_ASC]
   ): RoleTypeConnection
+
+  """Reads and enables pagination through a set of `CryptoAddress`."""
+  cryptoAddresses(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CryptoAddressFilter
+
+    """The method to use when ordering `CryptoAddress`."""
+    orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CryptoAddressConnection
 
   """Reads and enables pagination through a set of `PhoneNumber`."""
   phoneNumbers(
@@ -854,12 +854,12 @@ input UserFilter {
   trgmDisplayName: TrgmSearchInput
 
   """
-  Composite full-text search. Provide a search string and it will be dispatched
-  to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+  Composite unified search. Provide a search string and it will be dispatched to
+  all text-compatible search algorithms (tsvector, BM25, pg_trgm)
   simultaneously. Rows matching ANY algorithm are returned. All matching score
   fields are populated.
   """
-  fullTextSearch: String
+  unifiedSearch: String
 }
 
 """
@@ -2242,6 +2242,7 @@ type MetaType {
   isArray: Boolean!
   isNotNull: Boolean
   hasDefault: Boolean
+  subtype: String
 }
 
 """Information about a database index"""
@@ -2454,14 +2455,6 @@ type Mutation {
     input: VerifyTotpInput!
   ): VerifyTotpPayload
 
-  """Creates a single `CryptoAddress`."""
-  createCryptoAddress(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateCryptoAddressInput!
-  ): CreateCryptoAddressPayload
-
   """Creates a single `RoleType`."""
   createRoleType(
     """
@@ -2469,6 +2462,14 @@ type Mutation {
     """
     input: CreateRoleTypeInput!
   ): CreateRoleTypePayload
+
+  """Creates a single `CryptoAddress`."""
+  createCryptoAddress(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCryptoAddressInput!
+  ): CreateCryptoAddressPayload
 
   """Creates a single `PhoneNumber`."""
   createPhoneNumber(
@@ -2510,14 +2511,6 @@ type Mutation {
     input: CreateUserInput!
   ): CreateUserPayload
 
-  """Updates a single `CryptoAddress` using a unique key and a patch."""
-  updateCryptoAddress(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateCryptoAddressInput!
-  ): UpdateCryptoAddressPayload
-
   """Updates a single `RoleType` using a unique key and a patch."""
   updateRoleType(
     """
@@ -2525,6 +2518,14 @@ type Mutation {
     """
     input: UpdateRoleTypeInput!
   ): UpdateRoleTypePayload
+
+  """Updates a single `CryptoAddress` using a unique key and a patch."""
+  updateCryptoAddress(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCryptoAddressInput!
+  ): UpdateCryptoAddressPayload
 
   """Updates a single `PhoneNumber` using a unique key and a patch."""
   updatePhoneNumber(
@@ -2566,14 +2567,6 @@ type Mutation {
     input: UpdateUserInput!
   ): UpdateUserPayload
 
-  """Deletes a single `CryptoAddress` using a unique key."""
-  deleteCryptoAddress(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteCryptoAddressInput!
-  ): DeleteCryptoAddressPayload
-
   """Deletes a single `RoleType` using a unique key."""
   deleteRoleType(
     """
@@ -2581,6 +2574,14 @@ type Mutation {
     """
     input: DeleteRoleTypeInput!
   ): DeleteRoleTypePayload
+
+  """Deletes a single `CryptoAddress` using a unique key."""
+  deleteCryptoAddress(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCryptoAddressInput!
+  ): DeleteCryptoAddressPayload
 
   """Deletes a single `PhoneNumber` using a unique key."""
   deletePhoneNumber(
@@ -3149,6 +3150,47 @@ input VerifyTotpInput {
   totpValue: String!
 }
 
+"""The output of our create `RoleType` mutation."""
+type CreateRoleTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RoleType` that was created by this mutation."""
+  roleType: RoleType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RoleType`. May be used by Relay 1."""
+  roleTypeEdge(
+    """The method to use when ordering `RoleType`."""
+    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RoleTypeEdge
+}
+
+"""All input for the create `RoleType` mutation."""
+input CreateRoleTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RoleType` to be created by this mutation."""
+  roleType: RoleTypeInput!
+}
+
+"""An input for mutations affecting `RoleType`"""
+input RoleTypeInput {
+  id: Int!
+  name: String!
+}
+
 """The output of our create `CryptoAddress` mutation."""
 type CreateCryptoAddressPayload {
   """
@@ -3201,47 +3243,6 @@ input CryptoAddressInput {
   isPrimary: Boolean
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our create `RoleType` mutation."""
-type CreateRoleTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `RoleType` that was created by this mutation."""
-  roleType: RoleType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `RoleType`. May be used by Relay 1."""
-  roleTypeEdge(
-    """The method to use when ordering `RoleType`."""
-    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RoleTypeEdge
-}
-
-"""All input for the create `RoleType` mutation."""
-input CreateRoleTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `RoleType` to be created by this mutation."""
-  roleType: RoleTypeInput!
-}
-
-"""An input for mutations affecting `RoleType`"""
-input RoleTypeInput {
-  id: Int!
-  name: String!
 }
 
 """The output of our create `PhoneNumber` mutation."""
@@ -3515,6 +3516,52 @@ input UserInput {
   updatedAt: Datetime
 }
 
+"""The output of our update `RoleType` mutation."""
+type UpdateRoleTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RoleType` that was updated by this mutation."""
+  roleType: RoleType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RoleType`. May be used by Relay 1."""
+  roleTypeEdge(
+    """The method to use when ordering `RoleType`."""
+    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RoleTypeEdge
+}
+
+"""All input for the `updateRoleType` mutation."""
+input UpdateRoleTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `RoleType` being updated.
+  """
+  roleTypePatch: RoleTypePatch!
+}
+
+"""
+Represents an update to a `RoleType`. Fields that are set will be updated.
+"""
+input RoleTypePatch {
+  id: Int
+  name: String
+}
+
 """The output of our update `CryptoAddress` mutation."""
 type UpdateCryptoAddressPayload {
   """
@@ -3572,52 +3619,6 @@ input CryptoAddressPatch {
   isPrimary: Boolean
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our update `RoleType` mutation."""
-type UpdateRoleTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `RoleType` that was updated by this mutation."""
-  roleType: RoleType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `RoleType`. May be used by Relay 1."""
-  roleTypeEdge(
-    """The method to use when ordering `RoleType`."""
-    orderBy: [RoleTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RoleTypeEdge
-}
-
-"""All input for the `updateRoleType` mutation."""
-input UpdateRoleTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `RoleType` being updated.
-  """
-  roleTypePatch: RoleTypePatch!
-}
-
-"""
-Represents an update to a `RoleType`. Fields that are set will be updated.
-"""
-input RoleTypePatch {
-  id: Int
-  name: String
 }
 
 """The output of our update `PhoneNumber` mutation."""
@@ -3920,39 +3921,6 @@ input UserPatch {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-"""The output of our delete `CryptoAddress` mutation."""
-type DeleteCryptoAddressPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `CryptoAddress` that was deleted by this mutation."""
-  cryptoAddress: CryptoAddress
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `CryptoAddress`. May be used by Relay 1."""
-  cryptoAddressEdge(
-    """The method to use when ordering `CryptoAddress`."""
-    orderBy: [CryptoAddressOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CryptoAddressEdge
-}
-
-"""All input for the `deleteCryptoAddress` mutation."""
-input DeleteCryptoAddressInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `RoleType` mutation."""
 type DeleteRoleTypePayload {
   """
@@ -3984,6 +3952,39 @@ input DeleteRoleTypeInput {
   """
   clientMutationId: String
   id: Int!
+}
+
+"""The output of our delete `CryptoAddress` mutation."""
+type DeleteCryptoAddressPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `CryptoAddress` that was deleted by this mutation."""
+  cryptoAddress: CryptoAddress
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `CryptoAddress`. May be used by Relay 1."""
+  cryptoAddressEdge(
+    """The method to use when ordering `CryptoAddress`."""
+    orderBy: [CryptoAddressOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CryptoAddressEdge
+}
+
+"""All input for the `deleteCryptoAddress` mutation."""
+input DeleteCryptoAddressInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
 }
 
 """The output of our delete `PhoneNumber` mutation."""

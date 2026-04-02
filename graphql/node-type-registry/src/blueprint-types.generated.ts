@@ -64,160 +64,6 @@ export interface DataSoftDeleteParams {
   /* If true, also adds a UUID primary key column with auto-generation */
   include_id?: boolean;
 }
-/** Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), stale tracking strategies (column, null, hash), and automatic job enqueue triggers for embedding generation. */
-export interface DataEmbeddingParams {
-  /* Name of the vector column */
-  field_name?: string;
-  /* Vector dimensions (e.g. 384, 768, 1536, 3072) */
-  dimensions?: number;
-  /* Index type for similarity search */
-  index_method?: "hnsw" | "ivfflat";
-  /* Distance metric (cosine, l2, ip) */
-  metric?: "cosine" | "l2" | "ip";
-  /* Index-specific options. HNSW: {m, ef_construction}. IVFFlat: {lists}. */
-  index_options?: {
-    [key: string]: unknown;
-  };
-  /* When stale_strategy is column, adds an embedding_stale boolean field */
-  include_stale_field?: boolean;
-  /* Column names that feed the embedding. Used by stale trigger to detect content changes. */
-  source_fields?: string[];
-  /* Auto-create trigger that enqueues embedding generation jobs */
-  enqueue_job?: boolean;
-  /* Task identifier for the job queue */
-  job_task_name?: string;
-  /* Strategy for tracking embedding staleness. column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash of source fields. */
-  stale_strategy?: "column" | "null" | "hash";
-  /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */
-  chunks?: {
-    /* Name of the text content column in the chunks table */content_field_name?: string;
-    /* Maximum number of characters per chunk */chunk_size?: number;
-    /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
-    /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
-    /* Metadata fields from parent to copy into chunks */metadata_fields?: {
-      [key: string]: unknown;
-    };
-    /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
-    /* Task identifier for the chunking job queue */chunking_task_name?: string;
-  };
-}
-/** Adds a tsvector column with GIN index and automatic trigger population from source fields. Enables PostgreSQL full-text search with configurable weights and language support. Leverages the existing metaschema full_text_search infrastructure. */
-export interface DataFullTextSearchParams {
-  /* Name of the tsvector column */
-  field_name?: string;
-  /* Source columns that feed the tsvector. Each has a field name, weight (A-D), and language config. */
-  source_fields: {
-    /* Name of the source column */field: string;
-    /* tsvector weight class (A=highest, D=lowest) */weight?: "A" | "B" | "C" | "D";
-    /* PostgreSQL text search configuration */lang?: string;
-  }[];
-  /* Weight for this algorithm in composite searchScore */
-  search_score_weight?: number;
-}
-/** Creates a BM25 index on an existing text column using pg_textsearch. Enables statistical relevance ranking with configurable k1 and b parameters. The BM25 index is auto-detected by graphile-search. */
-export interface DataBm25Params {
-  /* Name of existing text column to index with BM25 */
-  field_name: string;
-  /* PostgreSQL text search configuration for BM25 */
-  text_config?: string;
-  /* BM25 k1 parameter: term frequency saturation (typical: 1.2-2.0) */
-  k1?: number;
-  /* BM25 b parameter: document length normalization (0=none, 1=full, typical: 0.75) */
-  b?: number;
-  /* Weight for this algorithm in composite searchScore */
-  search_score_weight?: number;
-}
-/** Composite node type that orchestrates multiple search modalities (full-text search, BM25, embeddings, trigram) on a single table. Configures per-table search score weights, normalization strategy, and recency boost via the @searchConfig smart tag. */
-export interface DataSearchParams {
-  /* DataFullTextSearch parameters. Omit to skip FTS setup. */
-  full_text_search?: {
-    field_name?: string;
-    source_fields?: {
-      field: string;
-      weight?: "A" | "B" | "C" | "D";
-      lang?: string;
-    }[];
-    search_score_weight?: number;
-  };
-  /* DataBm25 parameters. Omit to skip BM25 setup. */
-  bm25?: {
-    field_name?: string;
-    text_config?: string;
-    k1?: number;
-    b?: number;
-    search_score_weight?: number;
-  };
-  /* DataEmbedding parameters. Omit to skip embedding setup. */
-  embedding?: {
-    field_name?: string;
-    dimensions?: number;
-    index_method?: "hnsw" | "ivfflat";
-    metric?: "cosine" | "l2" | "ip";
-    source_fields?: string[];
-    search_score_weight?: number;
-    /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */chunks?: {
-      /* Name of the text content column in the chunks table */content_field_name?: string;
-      /* Maximum number of characters per chunk */chunk_size?: number;
-      /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
-      /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
-      /* Metadata fields from parent to copy into chunks */metadata_fields?: {
-        [key: string]: unknown;
-      };
-      /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
-      /* Task identifier for the chunking job queue */chunking_task_name?: string;
-    };
-  };
-  /* Field names to tag with @trgmSearch for fuzzy/typo-tolerant matching */
-  trgm_fields?: string[];
-  /* Unified search score configuration written to @searchConfig smart tag */
-  search_config?: {
-    /* Per-algorithm weights: {tsv: 1.5, bm25: 1.0, pgvector: 0.8, trgm: 0.3} */weights?: {
-      [key: string]: unknown;
-    };
-    /* Score normalization strategy */normalization?: "linear" | "sigmoid";
-    /* Enable recency boost for search results */boost_recent?: boolean;
-    /* Timestamp field for recency boost (e.g. created_at, updated_at) */boost_recency_field?: string;
-    /* Decay rate for recency boost (0-1, lower = faster decay) */boost_recency_decay?: number;
-  };
-}
-/** Adds a PostGIS geometry or geography column with a spatial index (GiST or SP-GiST). Supports configurable geometry types (Point, Polygon, etc.), SRID, and dimensionality. The graphile-postgis plugin auto-detects geometry/geography columns by codec type for spatial filtering (ST_Contains, ST_DWithin, bbox operators). */
-export interface DataPostGISParams {
-  /* Name of the geometry/geography column */
-  field_name?: string;
-  /* PostGIS geometry type constraint */
-  geometry_type?: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection" | "Geometry";
-  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
-  srid?: number;
-  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
-  dimension?: 2 | 3 | 4;
-  /* Use geography type instead of geometry (for geodetic calculations on the sphere) */
-  use_geography?: boolean;
-  /* Spatial index method */
-  index_method?: "gist" | "spgist";
-}
-/** Creates a derived/materialized geometry field on the parent table that automatically aggregates geometries from a source (child) table via triggers. When child rows are inserted/updated/deleted, the parent aggregate field is recalculated using the specified PostGIS aggregation function (ST_Union, ST_Collect, ST_ConvexHull, ST_ConcaveHull). Useful for materializing spatial boundaries from collections of points or polygons. */
-export interface DataPostGISAggregateParams {
-  /* Name of the aggregate geometry column on the parent table */
-  field_name?: string;
-  /* UUID of the source (child) table containing individual geometries */
-  source_table_id: string;
-  /* Name of the geometry column on the source table */
-  source_geom_field?: string;
-  /* Name of the foreign key column on the source table pointing to the parent */
-  source_fk_field: string;
-  /* PostGIS aggregation function: union (ST_Union, merges overlapping), collect (ST_Collect, groups without merging), convex_hull (smallest convex polygon), concave_hull (tighter boundary) */
-  aggregate_function?: "union" | "collect" | "convex_hull" | "concave_hull";
-  /* Output geometry type constraint for the aggregate field */
-  geometry_type?: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection" | "Geometry";
-  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
-  srid?: number;
-  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
-  dimension?: 2 | 3 | 4;
-  /* Use geography type instead of geometry */
-  use_geography?: boolean;
-  /* Spatial index method for the aggregate field */
-  index_method?: "gist" | "spgist";
-}
 /** Dynamically creates PostgreSQL triggers that enqueue jobs via app_jobs.add_job() when table rows are inserted, updated, or deleted. Supports configurable payload strategies (full row, row ID, selected fields, or custom mapping), conditional firing via WHEN clauses, watched field changes, and extended job options (queue, priority, delay, max attempts). */
 export interface DataJobTriggerParams {
   /* Job task identifier passed to add_job (e.g., process_invoice, sync_to_stripe) */
@@ -286,11 +132,6 @@ export interface DataJsonbParams {
   /* Whether to create a GIN index */
   create_index?: boolean;
 }
-/** Creates GIN trigram indexes (gin_trgm_ops) on specified text/citext fields for fuzzy LIKE/ILIKE/similarity search. Adds @trgmSearch smart tag for PostGraphile integration. Fields must already exist on the table. */
-export interface DataTrgmParams {
-  /* Field names to create trigram indexes on (fields must already exist on the table) */
-  fields: string[];
-}
 /** Auto-generates URL-friendly slugs from field values on insert/update. Attaches BEFORE INSERT and BEFORE UPDATE triggers that call inflection.slugify() on the target field. References fields by name in data jsonb. */
 export interface DataSlugParams {
   /* Name of the field to slugify */
@@ -333,12 +174,186 @@ export interface DataImmutableFieldsParams {
   /* Field names that cannot be modified after INSERT (e.g. ["key", "bucket_id", "owner_id"]) */
   fields: string[];
 }
+/** Creates a derived text field that automatically concatenates multiple source fields via BEFORE INSERT/UPDATE triggers. Used to produce a unified text representation (e.g., embedding_text) from multiple columns on a table. The trigger fires with '_000' prefix to run before Search* triggers alphabetically. */
+export interface DataCompositeFieldParams {
+  /* Name of the derived text field to create (default: 'embedding_text') */
+  target?: string;
+  /* Array of source field names to concatenate into the target field */
+  source_fields: string[];
+  /* Output format: 'labeled' (field_name: value) or 'plain' (values only). Default: 'labeled' */
+  format?: "labeled" | "plain";
+}
 /** Creates a user profiles table with standard profile fields (profile_picture, bio, first_name, last_name, tags, desired). Uses AuthzDirectOwner for edit access and AuthzAllowAll for select. */
 export type TableUserProfilesParams = {};
 /** Creates an organization settings table with standard business fields (legal_name, address fields). Uses AuthzEntityMembership for access control. */
 export type TableOrganizationSettingsParams = {};
 /** Creates a user settings table for user-specific configuration. Uses AuthzDirectOwner for access control. */
 export type TableUserSettingsParams = {};
+/**
+ * ===========================================================================
+ * Search node type parameters
+ * ===========================================================================
+ */
+;
+/** Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), stale tracking strategies (column, null, hash), and automatic job enqueue triggers for embedding generation. */
+export interface SearchVectorParams {
+  /* Name of the vector column */
+  field_name?: string;
+  /* Vector dimensions (e.g. 384, 768, 1536, 3072) */
+  dimensions?: number;
+  /* Index type for similarity search */
+  index_method?: "hnsw" | "ivfflat";
+  /* Distance metric (cosine, l2, ip) */
+  metric?: "cosine" | "l2" | "ip";
+  /* Index-specific options. HNSW: {m, ef_construction}. IVFFlat: {lists}. */
+  index_options?: {
+    [key: string]: unknown;
+  };
+  /* When stale_strategy is column, adds an embedding_stale boolean field */
+  include_stale_field?: boolean;
+  /* Column names that feed the embedding. Used by stale trigger to detect content changes. */
+  source_fields?: string[];
+  /* Auto-create trigger that enqueues embedding generation jobs */
+  enqueue_job?: boolean;
+  /* Task identifier for the job queue */
+  job_task_name?: string;
+  /* Strategy for tracking embedding staleness. column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash of source fields. */
+  stale_strategy?: "column" | "null" | "hash";
+  /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */
+  chunks?: {
+    /* Name of the text content column in the chunks table */content_field_name?: string;
+    /* Maximum number of characters per chunk */chunk_size?: number;
+    /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
+    /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
+    /* Metadata fields from parent to copy into chunks */metadata_fields?: {
+      [key: string]: unknown;
+    };
+    /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
+    /* Task identifier for the chunking job queue */chunking_task_name?: string;
+  };
+}
+/** Adds a tsvector column with GIN index and automatic trigger population from source fields. Enables PostgreSQL full-text search with configurable weights and language support. Leverages the existing metaschema full_text_search infrastructure. */
+export interface SearchFullTextParams {
+  /* Name of the tsvector column */
+  field_name?: string;
+  /* Source columns that feed the tsvector. Each has a field name, weight (A-D), and language config. */
+  source_fields: {
+    /* Name of the source column */field: string;
+    /* tsvector weight class (A=highest, D=lowest) */weight?: "A" | "B" | "C" | "D";
+    /* PostgreSQL text search configuration */lang?: string;
+  }[];
+  /* Weight for this algorithm in composite searchScore */
+  search_score_weight?: number;
+}
+/** Creates a BM25 index on an existing text column using pg_textsearch. Enables statistical relevance ranking with configurable k1 and b parameters. The BM25 index is auto-detected by graphile-search. */
+export interface SearchBm25Params {
+  /* Name of existing text column to index with BM25 */
+  field_name: string;
+  /* PostgreSQL text search configuration for BM25 */
+  text_config?: string;
+  /* BM25 k1 parameter: term frequency saturation (typical: 1.2-2.0) */
+  k1?: number;
+  /* BM25 b parameter: document length normalization (0=none, 1=full, typical: 0.75) */
+  b?: number;
+  /* Weight for this algorithm in composite searchScore */
+  search_score_weight?: number;
+}
+/** Composite node type that orchestrates multiple search modalities (full-text search, BM25, embeddings, trigram) on a single table. Configures per-table search score weights, normalization strategy, and recency boost via the @searchConfig smart tag. */
+export interface SearchUnifiedParams {
+  /* SearchFullText parameters. Omit to skip FTS setup. */
+  full_text_search?: {
+    field_name?: string;
+    source_fields?: {
+      field: string;
+      weight?: "A" | "B" | "C" | "D";
+      lang?: string;
+    }[];
+    search_score_weight?: number;
+  };
+  /* SearchBm25 parameters. Omit to skip BM25 setup. */
+  bm25?: {
+    field_name?: string;
+    text_config?: string;
+    k1?: number;
+    b?: number;
+    search_score_weight?: number;
+  };
+  /* SearchVector parameters. Omit to skip embedding setup. */
+  embedding?: {
+    field_name?: string;
+    dimensions?: number;
+    index_method?: "hnsw" | "ivfflat";
+    metric?: "cosine" | "l2" | "ip";
+    source_fields?: string[];
+    search_score_weight?: number;
+    /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */chunks?: {
+      /* Name of the text content column in the chunks table */content_field_name?: string;
+      /* Maximum number of characters per chunk */chunk_size?: number;
+      /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
+      /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
+      /* Metadata fields from parent to copy into chunks */metadata_fields?: {
+        [key: string]: unknown;
+      };
+      /* Whether to auto-enqueue a chunking job on insert/update */enqueue_chunking_job?: boolean;
+      /* Task identifier for the chunking job queue */chunking_task_name?: string;
+    };
+  };
+  /* Field names to tag with @trgmSearch for fuzzy/typo-tolerant matching */
+  trgm_fields?: string[];
+  /* Unified search score configuration written to @searchConfig smart tag */
+  search_config?: {
+    /* Per-algorithm weights: {tsv: 1.5, bm25: 1.0, pgvector: 0.8, trgm: 0.3} */weights?: {
+      [key: string]: unknown;
+    };
+    /* Score normalization strategy */normalization?: "linear" | "sigmoid";
+    /* Enable recency boost for search results */boost_recent?: boolean;
+    /* Timestamp field for recency boost (e.g. created_at, updated_at) */boost_recency_field?: string;
+    /* Decay rate for recency boost (0-1, lower = faster decay) */boost_recency_decay?: number;
+  };
+}
+/** Adds a PostGIS geometry or geography column with a spatial index (GiST or SP-GiST). Supports configurable geometry types (Point, Polygon, etc.), SRID, and dimensionality. The graphile-postgis plugin auto-detects geometry/geography columns by codec type for spatial filtering (ST_Contains, ST_DWithin, bbox operators). */
+export interface SearchSpatialParams {
+  /* Name of the geometry/geography column */
+  field_name?: string;
+  /* PostGIS geometry type constraint */
+  geometry_type?: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection" | "Geometry";
+  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
+  srid?: number;
+  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
+  dimension?: 2 | 3 | 4;
+  /* Use geography type instead of geometry (for geodetic calculations on the sphere) */
+  use_geography?: boolean;
+  /* Spatial index method */
+  index_method?: "gist" | "spgist";
+}
+/** Creates a derived/materialized geometry field on the parent table that automatically aggregates geometries from a source (child) table via triggers. When child rows are inserted/updated/deleted, the parent aggregate field is recalculated using the specified PostGIS aggregation function (ST_Union, ST_Collect, ST_ConvexHull, ST_ConcaveHull). Useful for materializing spatial boundaries from collections of points or polygons. */
+export interface SearchSpatialAggregateParams {
+  /* Name of the aggregate geometry column on the parent table */
+  field_name?: string;
+  /* UUID of the source (child) table containing individual geometries */
+  source_table_id: string;
+  /* Name of the geometry column on the source table */
+  source_geom_field?: string;
+  /* Name of the foreign key column on the source table pointing to the parent */
+  source_fk_field: string;
+  /* PostGIS aggregation function: union (ST_Union, merges overlapping), collect (ST_Collect, groups without merging), convex_hull (smallest convex polygon), concave_hull (tighter boundary) */
+  aggregate_function?: "union" | "collect" | "convex_hull" | "concave_hull";
+  /* Output geometry type constraint for the aggregate field */
+  geometry_type?: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection" | "Geometry";
+  /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
+  srid?: number;
+  /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
+  dimension?: 2 | 3 | 4;
+  /* Use geography type instead of geometry */
+  use_geography?: boolean;
+  /* Spatial index method for the aggregate field */
+  index_method?: "gist" | "spgist";
+}
+/** Creates GIN trigram indexes (gin_trgm_ops) on specified text/citext fields for fuzzy LIKE/ILIKE/similarity search. Adds @trgmSearch smart tag for PostGraphile integration. Fields must already exist on the table. */
+export interface SearchTrgmParams {
+  /* Field names to create trigram indexes on (fields must already exist on the table) */
+  fields: string[];
+}
 /**
  * ===========================================================================
  * Authz node type parameters
@@ -788,7 +803,7 @@ export interface BlueprintTableUniqueConstraint {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "DataEmbedding" | "DataFullTextSearch" | "DataBm25" | "DataSearch" | "DataPostGIS" | "DataPostGISAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "DataTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
+export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "DataCompositeField" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: "AuthzDirectOwner";
@@ -860,23 +875,23 @@ export type BlueprintNodeObject = {
   $type: "DataSoftDelete";
   data: DataSoftDeleteParams;
 } | {
-  $type: "DataEmbedding";
-  data: DataEmbeddingParams;
+  $type: "SearchVector";
+  data: SearchVectorParams;
 } | {
-  $type: "DataFullTextSearch";
-  data: DataFullTextSearchParams;
+  $type: "SearchFullText";
+  data: SearchFullTextParams;
 } | {
-  $type: "DataBm25";
-  data: DataBm25Params;
+  $type: "SearchBm25";
+  data: SearchBm25Params;
 } | {
-  $type: "DataSearch";
-  data: DataSearchParams;
+  $type: "SearchUnified";
+  data: SearchUnifiedParams;
 } | {
-  $type: "DataPostGIS";
-  data: DataPostGISParams;
+  $type: "SearchSpatial";
+  data: SearchSpatialParams;
 } | {
-  $type: "DataPostGISAggregate";
-  data: DataPostGISAggregateParams;
+  $type: "SearchSpatialAggregate";
+  data: SearchSpatialAggregateParams;
 } | {
   $type: "DataJobTrigger";
   data: DataJobTriggerParams;
@@ -890,8 +905,8 @@ export type BlueprintNodeObject = {
   $type: "DataJsonb";
   data: DataJsonbParams;
 } | {
-  $type: "DataTrgm";
-  data: DataTrgmParams;
+  $type: "SearchTrgm";
+  data: SearchTrgmParams;
 } | {
   $type: "DataSlug";
   data: DataSlugParams;
@@ -910,6 +925,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: "DataImmutableFields";
   data: DataImmutableFieldsParams;
+} | {
+  $type: "DataCompositeField";
+  data: DataCompositeFieldParams;
 } | {
   $type: "TableUserProfiles";
   data?: Record<string, never>;

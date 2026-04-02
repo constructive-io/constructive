@@ -68,10 +68,10 @@ export interface UnifiedSearchPresetOptions {
   enableSearchScore?: boolean;
 
   /**
-   * Whether to expose the composite `fullTextSearch` filter field.
+   * Whether to expose the composite `unifiedSearch` filter field.
    * @default true
    */
-  enableFullTextSearch?: boolean;
+  enableUnifiedSearch?: boolean;
 
   /**
    * Custom weights for the composite searchScore.
@@ -105,7 +105,7 @@ export function UnifiedSearchPreset(
     trgm = true,
     pgvector = true,
     enableSearchScore = true,
-    enableFullTextSearch = true,
+    enableUnifiedSearch = true,
     searchScoreWeights,
     fullTextScalarName = 'FullText',
     tsConfig = 'english',
@@ -136,7 +136,7 @@ export function UnifiedSearchPreset(
   const pluginOptions: UnifiedSearchOptions = {
     adapters,
     enableSearchScore,
-    enableFullTextSearch,
+    enableUnifiedSearch,
     searchScoreWeights,
   };
 

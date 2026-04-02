@@ -346,7 +346,7 @@ query MetaContract {
       name
       schemaName
       query { all one create update delete }
-      fields { name type { pgType gqlType isArray } }
+      fields { name type { pgType gqlType isArray subtype } }
       indexes { name isUnique isPrimary columns fields { name } }
       constraints {
         primaryKey { name }
@@ -403,6 +403,7 @@ const REQUIRED_META_QUERY_PATHS = [
   'fields.type.pgType',
   'fields.type.gqlType',
   'fields.type.isArray',
+  'fields.type.subtype',
   'indexes.name',
   'indexes.isUnique',
   'indexes.isPrimary',
@@ -804,6 +805,7 @@ describe('MetaSchemaPlugin', () => {
           isArray: false,
           isNotNull: true,
           hasDefault: true,
+          subtype: null,
         },
         isNotNull: true,
         hasDefault: true,
@@ -856,6 +858,28 @@ describe('MetaSchemaPlugin', () => {
       const result = _buildFieldMeta('ids', attr, {});
       expect(result.type.gqlType).toBe('Int');
       expect(result.type.isArray).toBe(true);
+    });
+
+    it('reads geometrySubtype from attribute extensions', () => {
+      const attr = createMockAttribute('geometry', {
+        extensions: { geometrySubtype: 'Polygon' },
+      });
+      const result = _buildFieldMeta('zoneBoundary', attr);
+      expect(result.type.subtype).toBe('Polygon');
+      expect(result.type.gqlType).toBe('GeoJSON');
+    });
+
+    it('returns null subtype when no geometrySubtype extension', () => {
+      const attr = createMockAttribute('geometry');
+      const result = _buildFieldMeta('location', attr);
+      expect(result.type.subtype).toBeNull();
+      expect(result.type.gqlType).toBe('GeoJSON');
+    });
+
+    it('returns null subtype for non-geometry types', () => {
+      const attr = createMockAttribute('text');
+      const result = _buildFieldMeta('name', attr);
+      expect(result.type.subtype).toBeNull();
     });
   });
 

@@ -1455,6 +1455,7 @@ type MetaType {
   isArray: Boolean!
   isNotNull: Boolean
   hasDefault: Boolean
+  subtype: String
 }
 
 """Information about a database index"""

@@ -246,64 +246,6 @@ type Query {
     orderBy: [AppOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppOwnerGrantConnection
 
-  """Reads and enables pagination through a set of `OrgAdminGrant`."""
-  orgAdminGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgAdminGrantFilter
-
-    """The method to use when ordering `OrgAdminGrant`."""
-    orderBy: [OrgAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgAdminGrantConnection
-
-  """Reads and enables pagination through a set of `OrgOwnerGrant`."""
-  orgOwnerGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgOwnerGrantFilter
-
-    """The method to use when ordering `OrgOwnerGrant`."""
-    orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgOwnerGrantConnection
-
   """Reads and enables pagination through a set of `AppLimitDefault`."""
   appLimitDefaults(
     """Only read the first `n` values of the set."""
@@ -362,8 +304,8 @@ type Query {
     orderBy: [OrgLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgLimitDefaultConnection
 
-  """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
-  orgChartEdgeGrants(
+  """Reads and enables pagination through a set of `OrgAdminGrant`."""
+  orgAdminGrants(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -385,11 +327,40 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: OrgChartEdgeGrantFilter
+    where: OrgAdminGrantFilter
 
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantConnection
+    """The method to use when ordering `OrgAdminGrant`."""
+    orderBy: [OrgAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgAdminGrantConnection
+
+  """Reads and enables pagination through a set of `OrgOwnerGrant`."""
+  orgOwnerGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgOwnerGrantFilter
+
+    """The method to use when ordering `OrgOwnerGrant`."""
+    orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgOwnerGrantConnection
 
   """Reads and enables pagination through a set of `MembershipType`."""
   membershipTypes(
@@ -594,6 +565,64 @@ type Query {
     orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
   ): ClaimedInviteConnection
 
+  """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
+  orgChartEdgeGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgChartEdgeGrantFilter
+
+    """The method to use when ordering `OrgChartEdgeGrant`."""
+    orderBy: [OrgChartEdgeGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgChartEdgeGrantConnection
+
+  """Reads and enables pagination through a set of `OrgLimit`."""
+  orgLimits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitFilter
+
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitConnection
+
   """Reads and enables pagination through a set of `AppGrant`."""
   appGrants(
     """Only read the first `n` values of the set."""
@@ -651,35 +680,6 @@ type Query {
     """The method to use when ordering `AppMembershipDefault`."""
     orderBy: [AppMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppMembershipDefaultConnection
-
-  """Reads and enables pagination through a set of `OrgLimit`."""
-  orgLimits(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgLimitFilter
-
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgLimitConnection
 
   """Reads and enables pagination through a set of `OrgClaimedInvite`."""
   orgClaimedInvites(
@@ -768,6 +768,35 @@ type Query {
     orderBy: [OrgChartEdgeOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgChartEdgeConnection
 
+  """Reads and enables pagination through a set of `AppLevelRequirement`."""
+  appLevelRequirements(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLevelRequirementFilter
+
+    """The method to use when ordering `AppLevelRequirement`."""
+    orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLevelRequirementConnection
+
   """Reads and enables pagination through a set of `OrgMembershipDefault`."""
   orgMembershipDefaults(
     """Only read the first `n` values of the set."""
@@ -797,8 +826,8 @@ type Query {
     orderBy: [OrgMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMembershipDefaultConnection
 
-  """Reads and enables pagination through a set of `AppLevelRequirement`."""
-  appLevelRequirements(
+  """Reads and enables pagination through a set of `AppLevel`."""
+  appLevels(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -820,11 +849,40 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: AppLevelRequirementFilter
+    where: AppLevelFilter
 
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementConnection
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLevelConnection
+
+  """Reads and enables pagination through a set of `Invite`."""
+  invites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: InviteFilter
+
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): InviteConnection
 
   """Reads and enables pagination through a set of `AppMembership`."""
   appMemberships(
@@ -883,64 +941,6 @@ type Query {
     """The method to use when ordering `OrgMembership`."""
     orderBy: [OrgMembershipOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMembershipConnection
-
-  """Reads and enables pagination through a set of `Invite`."""
-  invites(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: InviteFilter
-
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): InviteConnection
-
-  """Reads and enables pagination through a set of `AppLevel`."""
-  appLevels(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLevelFilter
-
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelConnection
 
   """Reads and enables pagination through a set of `OrgInvite`."""
   orgInvites(
@@ -1805,204 +1805,6 @@ enum AppOwnerGrantOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `OrgAdminGrant` values."""
-type OrgAdminGrantConnection {
-  """A list of `OrgAdminGrant` objects."""
-  nodes: [OrgAdminGrant]!
-
-  """
-  A list of edges which contains the `OrgAdminGrant` and cursor to aid in pagination.
-  """
-  edges: [OrgAdminGrantEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgAdminGrant` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Records of admin role grants and revocations between members"""
-type OrgAdminGrant {
-  id: UUID!
-
-  """True to grant admin, false to revoke admin"""
-  isGrant: Boolean!
-
-  """The member receiving or losing the admin grant"""
-  actorId: UUID!
-
-  """The entity (org or group) this admin grant applies to"""
-  entityId: UUID!
-  grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `OrgAdminGrant` edge in the connection."""
-type OrgAdminGrantEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgAdminGrant` at the end of the edge."""
-  node: OrgAdminGrant
-}
-
-"""
-A filter to be used against `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgAdminGrantFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isGrant` field."""
-  isGrant: BooleanFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgAdminGrantFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgAdminGrantFilter!]
-
-  """Negates the expression."""
-  not: OrgAdminGrantFilter
-}
-
-"""Methods to use when ordering `OrgAdminGrant`."""
-enum OrgAdminGrantOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  IS_GRANT_ASC
-  IS_GRANT_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `OrgOwnerGrant` values."""
-type OrgOwnerGrantConnection {
-  """A list of `OrgOwnerGrant` objects."""
-  nodes: [OrgOwnerGrant]!
-
-  """
-  A list of edges which contains the `OrgOwnerGrant` and cursor to aid in pagination.
-  """
-  edges: [OrgOwnerGrantEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgOwnerGrant` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Records of ownership transfers and grants between members"""
-type OrgOwnerGrant {
-  id: UUID!
-
-  """True to grant ownership, false to revoke ownership"""
-  isGrant: Boolean!
-
-  """The member receiving or losing the ownership grant"""
-  actorId: UUID!
-
-  """The entity (org or group) this ownership grant applies to"""
-  entityId: UUID!
-  grantorId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""A `OrgOwnerGrant` edge in the connection."""
-type OrgOwnerGrantEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgOwnerGrant` at the end of the edge."""
-  node: OrgOwnerGrant
-}
-
-"""
-A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgOwnerGrantFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `isGrant` field."""
-  isGrant: BooleanFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgOwnerGrantFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgOwnerGrantFilter!]
-
-  """Negates the expression."""
-  not: OrgOwnerGrantFilter
-}
-
-"""Methods to use when ordering `OrgOwnerGrant`."""
-enum OrgOwnerGrantOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  IS_GRANT_ASC
-  IS_GRANT_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
 """A connection to a list of `AppLimitDefault` values."""
 type AppLimitDefaultConnection {
   """A list of `AppLimitDefault` objects."""
@@ -2331,131 +2133,202 @@ enum OrgLimitDefaultOrderBy {
   MAX_DESC
 }
 
-"""A connection to a list of `OrgChartEdgeGrant` values."""
-type OrgChartEdgeGrantConnection {
-  """A list of `OrgChartEdgeGrant` objects."""
-  nodes: [OrgChartEdgeGrant]!
+"""A connection to a list of `OrgAdminGrant` values."""
+type OrgAdminGrantConnection {
+  """A list of `OrgAdminGrant` objects."""
+  nodes: [OrgAdminGrant]!
 
   """
-  A list of edges which contains the `OrgChartEdgeGrant` and cursor to aid in pagination.
+  A list of edges which contains the `OrgAdminGrant` and cursor to aid in pagination.
   """
-  edges: [OrgChartEdgeGrantEdge]!
+  edges: [OrgAdminGrantEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """
-  The count of *all* `OrgChartEdgeGrant` you could get from the connection.
-  """
+  """The count of *all* `OrgAdminGrant` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table
-"""
-type OrgChartEdgeGrant {
+"""Records of admin role grants and revocations between members"""
+type OrgAdminGrant {
   id: UUID!
 
-  """Organization this grant applies to"""
-  entityId: UUID!
-
-  """User ID of the subordinate being placed in the hierarchy"""
-  childId: UUID!
-
-  """User ID of the manager being assigned; NULL for top-level positions"""
-  parentId: UUID
-
-  """
-  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
-  """
-  grantorId: UUID
-
-  """TRUE to add/update the edge, FALSE to remove it"""
+  """True to grant admin, false to revoke admin"""
   isGrant: Boolean!
 
-  """Job title or role name being assigned in this grant"""
-  positionTitle: String
+  """The member receiving or losing the admin grant"""
+  actorId: UUID!
 
-  """Numeric seniority level being assigned in this grant"""
-  positionLevel: Int
-
-  """Timestamp when this grant or revocation was recorded"""
-  createdAt: Datetime!
+  """The entity (org or group) this admin grant applies to"""
+  entityId: UUID!
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
 }
 
-"""A `OrgChartEdgeGrant` edge in the connection."""
-type OrgChartEdgeGrantEdge {
+"""A `OrgAdminGrant` edge in the connection."""
+type OrgAdminGrantEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `OrgChartEdgeGrant` at the end of the edge."""
-  node: OrgChartEdgeGrant
+  """The `OrgAdminGrant` at the end of the edge."""
+  node: OrgAdminGrant
 }
 
 """
-A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `OrgAdminGrant` object types. All fields are combined with a logical ‘and.’
 """
-input OrgChartEdgeGrantFilter {
+input OrgAdminGrantFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `childId` field."""
-  childId: UUIDFilter
-
-  """Filter by the object’s `parentId` field."""
-  parentId: UUIDFilter
-
-  """Filter by the object’s `grantorId` field."""
-  grantorId: UUIDFilter
 
   """Filter by the object’s `isGrant` field."""
   isGrant: BooleanFilter
 
-  """Filter by the object’s `positionTitle` field."""
-  positionTitle: StringFilter
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
 
-  """Filter by the object’s `positionLevel` field."""
-  positionLevel: IntFilter
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
   """Checks for all expressions in this list."""
-  and: [OrgChartEdgeGrantFilter!]
+  and: [OrgAdminGrantFilter!]
 
   """Checks for any expressions in this list."""
-  or: [OrgChartEdgeGrantFilter!]
+  or: [OrgAdminGrantFilter!]
 
   """Negates the expression."""
-  not: OrgChartEdgeGrantFilter
+  not: OrgAdminGrantFilter
 }
 
-"""Methods to use when ordering `OrgChartEdgeGrant`."""
-enum OrgChartEdgeGrantOrderBy {
+"""Methods to use when ordering `OrgAdminGrant`."""
+enum OrgAdminGrantOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  GRANTOR_ID_ASC
-  GRANTOR_ID_DESC
   IS_GRANT_ASC
   IS_GRANT_DESC
-  POSITION_TITLE_ASC
-  POSITION_TITLE_DESC
-  POSITION_LEVEL_ASC
-  POSITION_LEVEL_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `OrgOwnerGrant` values."""
+type OrgOwnerGrantConnection {
+  """A list of `OrgOwnerGrant` objects."""
+  nodes: [OrgOwnerGrant]!
+
+  """
+  A list of edges which contains the `OrgOwnerGrant` and cursor to aid in pagination.
+  """
+  edges: [OrgOwnerGrantEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgOwnerGrant` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Records of ownership transfers and grants between members"""
+type OrgOwnerGrant {
+  id: UUID!
+
+  """True to grant ownership, false to revoke ownership"""
+  isGrant: Boolean!
+
+  """The member receiving or losing the ownership grant"""
+  actorId: UUID!
+
+  """The entity (org or group) this ownership grant applies to"""
+  entityId: UUID!
+  grantorId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A `OrgOwnerGrant` edge in the connection."""
+type OrgOwnerGrantEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgOwnerGrant` at the end of the edge."""
+  node: OrgOwnerGrant
+}
+
+"""
+A filter to be used against `OrgOwnerGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgOwnerGrantFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgOwnerGrantFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgOwnerGrantFilter!]
+
+  """Negates the expression."""
+  not: OrgOwnerGrantFilter
+}
+
+"""Methods to use when ordering `OrgOwnerGrant`."""
+enum OrgOwnerGrantOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """A connection to a list of `MembershipType` values."""
@@ -3010,6 +2883,228 @@ enum ClaimedInviteOrderBy {
   UPDATED_AT_DESC
 }
 
+"""A connection to a list of `OrgChartEdgeGrant` values."""
+type OrgChartEdgeGrantConnection {
+  """A list of `OrgChartEdgeGrant` objects."""
+  nodes: [OrgChartEdgeGrant]!
+
+  """
+  A list of edges which contains the `OrgChartEdgeGrant` and cursor to aid in pagination.
+  """
+  edges: [OrgChartEdgeGrantEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `OrgChartEdgeGrant` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table
+"""
+type OrgChartEdgeGrant {
+  id: UUID!
+
+  """Organization this grant applies to"""
+  entityId: UUID!
+
+  """User ID of the subordinate being placed in the hierarchy"""
+  childId: UUID!
+
+  """User ID of the manager being assigned; NULL for top-level positions"""
+  parentId: UUID
+
+  """
+  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
+  """
+  grantorId: UUID
+
+  """TRUE to add/update the edge, FALSE to remove it"""
+  isGrant: Boolean!
+
+  """Job title or role name being assigned in this grant"""
+  positionTitle: String
+
+  """Numeric seniority level being assigned in this grant"""
+  positionLevel: Int
+
+  """Timestamp when this grant or revocation was recorded"""
+  createdAt: Datetime!
+}
+
+"""A `OrgChartEdgeGrant` edge in the connection."""
+type OrgChartEdgeGrantEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgChartEdgeGrant` at the end of the edge."""
+  node: OrgChartEdgeGrant
+}
+
+"""
+A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgChartEdgeGrantFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `childId` field."""
+  childId: UUIDFilter
+
+  """Filter by the object’s `parentId` field."""
+  parentId: UUIDFilter
+
+  """Filter by the object’s `grantorId` field."""
+  grantorId: UUIDFilter
+
+  """Filter by the object’s `isGrant` field."""
+  isGrant: BooleanFilter
+
+  """Filter by the object’s `positionTitle` field."""
+  positionTitle: StringFilter
+
+  """Filter by the object’s `positionLevel` field."""
+  positionLevel: IntFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgChartEdgeGrantFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgChartEdgeGrantFilter!]
+
+  """Negates the expression."""
+  not: OrgChartEdgeGrantFilter
+}
+
+"""Methods to use when ordering `OrgChartEdgeGrant`."""
+enum OrgChartEdgeGrantOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  GRANTOR_ID_ASC
+  GRANTOR_ID_DESC
+  IS_GRANT_ASC
+  IS_GRANT_DESC
+  POSITION_TITLE_ASC
+  POSITION_TITLE_DESC
+  POSITION_LEVEL_ASC
+  POSITION_LEVEL_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+}
+
+"""A connection to a list of `OrgLimit` values."""
+type OrgLimitConnection {
+  """A list of `OrgLimit` objects."""
+  nodes: [OrgLimit]!
+
+  """
+  A list of edges which contains the `OrgLimit` and cursor to aid in pagination.
+  """
+  edges: [OrgLimitEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgLimit` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""Tracks per-actor usage counts against configurable maximum limits"""
+type OrgLimit {
+  id: UUID!
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID!
+
+  """Current usage count for this actor and limit"""
+  num: Int
+
+  """Maximum allowed usage; NULL means use the default limit value"""
+  max: Int
+  entityId: UUID!
+}
+
+"""A `OrgLimit` edge in the connection."""
+type OrgLimitEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgLimit` at the end of the edge."""
+  node: OrgLimit
+}
+
+"""
+A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgLimitFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `num` field."""
+  num: IntFilter
+
+  """Filter by the object’s `max` field."""
+  max: IntFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgLimitFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgLimitFilter!]
+
+  """Negates the expression."""
+  not: OrgLimitFilter
+}
+
+"""Methods to use when ordering `OrgLimit`."""
+enum OrgLimitOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  NUM_ASC
+  NUM_DESC
+  MAX_ASC
+  MAX_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+}
+
 """A connection to a list of `AppGrant` values."""
 type AppGrantConnection {
   """A list of `AppGrant` objects."""
@@ -3210,101 +3305,6 @@ enum AppMembershipDefaultOrderBy {
   IS_APPROVED_DESC
   IS_VERIFIED_ASC
   IS_VERIFIED_DESC
-}
-
-"""A connection to a list of `OrgLimit` values."""
-type OrgLimitConnection {
-  """A list of `OrgLimit` objects."""
-  nodes: [OrgLimit]!
-
-  """
-  A list of edges which contains the `OrgLimit` and cursor to aid in pagination.
-  """
-  edges: [OrgLimitEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgLimit` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""Tracks per-actor usage counts against configurable maximum limits"""
-type OrgLimit {
-  id: UUID!
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID!
-
-  """Current usage count for this actor and limit"""
-  num: Int
-
-  """Maximum allowed usage; NULL means use the default limit value"""
-  max: Int
-  entityId: UUID!
-}
-
-"""A `OrgLimit` edge in the connection."""
-type OrgLimitEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgLimit` at the end of the edge."""
-  node: OrgLimit
-}
-
-"""
-A filter to be used against `OrgLimit` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgLimitFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `num` field."""
-  num: IntFilter
-
-  """Filter by the object’s `max` field."""
-  max: IntFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgLimitFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgLimitFilter!]
-
-  """Negates the expression."""
-  not: OrgLimitFilter
-}
-
-"""Methods to use when ordering `OrgLimit`."""
-enum OrgLimitOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  NUM_ASC
-  NUM_DESC
-  MAX_ASC
-  MAX_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
 }
 
 """A connection to a list of `OrgClaimedInvite` values."""
@@ -3629,6 +3629,67 @@ enum OrgChartEdgeOrderBy {
   POSITION_LEVEL_DESC
 }
 
+"""
+A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLevelRequirementFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `level` field."""
+  level: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `requiredCount` field."""
+  requiredCount: IntFilter
+
+  """Filter by the object’s `priority` field."""
+  priority: IntFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLevelRequirementFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLevelRequirementFilter!]
+
+  """Negates the expression."""
+  not: AppLevelRequirementFilter
+}
+
+"""Methods to use when ordering `AppLevelRequirement`."""
+enum AppLevelRequirementOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  LEVEL_ASC
+  LEVEL_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  REQUIRED_COUNT_ASC
+  REQUIRED_COUNT_DESC
+  PRIORITY_ASC
+  PRIORITY_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
 """A connection to a list of `OrgMembershipDefault` values."""
 type OrgMembershipDefaultConnection {
   """A list of `OrgMembershipDefault` objects."""
@@ -3750,27 +3811,73 @@ enum OrgMembershipDefaultOrderBy {
   CREATE_GROUPS_CASCADE_MEMBERS_DESC
 }
 
+"""A connection to a list of `AppLevel` values."""
+type AppLevelConnection {
+  """A list of `AppLevel` objects."""
+  nodes: [AppLevel]!
+
+  """
+  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
+  """
+  edges: [AppLevelEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppLevel` you could get from the connection."""
+  totalCount: Int!
+}
+
 """
-A filter to be used against `AppLevelRequirement` object types. All fields are combined with a logical ‘and.’
+Defines available levels that users can achieve by completing requirements
 """
-input AppLevelRequirementFilter {
+type AppLevel {
+  id: UUID!
+
+  """Unique name of the level"""
+  name: String!
+
+  """Human-readable description of what this level represents"""
+  description: String
+
+  """Badge or icon image associated with this level"""
+  image: ConstructiveInternalTypeImage
+
+  """Optional owner (actor) who created or manages this level"""
+  ownerId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+scalar ConstructiveInternalTypeImage
+
+"""A `AppLevel` edge in the connection."""
+type AppLevelEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLevel` at the end of the edge."""
+  node: AppLevel
+}
+
+"""
+A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLevelFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
   """Filter by the object’s `name` field."""
   name: StringFilter
 
-  """Filter by the object’s `level` field."""
-  level: StringFilter
-
   """Filter by the object’s `description` field."""
   description: StringFilter
 
-  """Filter by the object’s `requiredCount` field."""
-  requiredCount: IntFilter
+  """Filter by the object’s `image` field."""
+  image: ConstructiveInternalTypeImageFilter
 
-  """Filter by the object’s `priority` field."""
-  priority: IntFilter
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -3779,17 +3886,74 @@ input AppLevelRequirementFilter {
   updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [AppLevelRequirementFilter!]
+  and: [AppLevelFilter!]
 
   """Checks for any expressions in this list."""
-  or: [AppLevelRequirementFilter!]
+  or: [AppLevelFilter!]
 
   """Negates the expression."""
-  not: AppLevelRequirementFilter
+  not: AppLevelFilter
 }
 
-"""Methods to use when ordering `AppLevelRequirement`."""
-enum AppLevelRequirementOrderBy {
+"""
+A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeImageFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: ConstructiveInternalTypeImage
+
+  """Not equal to the specified value."""
+  notEqualTo: ConstructiveInternalTypeImage
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: ConstructiveInternalTypeImage
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: ConstructiveInternalTypeImage
+
+  """Included in the specified list."""
+  in: [ConstructiveInternalTypeImage!]
+
+  """Not included in the specified list."""
+  notIn: [ConstructiveInternalTypeImage!]
+
+  """Less than the specified value."""
+  lessThan: ConstructiveInternalTypeImage
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Greater than the specified value."""
+  greaterThan: ConstructiveInternalTypeImage
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: ConstructiveInternalTypeImage
+
+  """Contains the specified JSON."""
+  contains: ConstructiveInternalTypeImage
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: ConstructiveInternalTypeImage
+}
+
+"""Methods to use when ordering `AppLevel`."""
+enum AppLevelOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -3797,14 +3961,286 @@ enum AppLevelRequirementOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
-  LEVEL_ASC
-  LEVEL_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
-  REQUIRED_COUNT_ASC
-  REQUIRED_COUNT_DESC
-  PRIORITY_ASC
-  PRIORITY_DESC
+  IMAGE_ASC
+  IMAGE_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `Invite` values."""
+type InviteConnection {
+  """A list of `Invite` objects."""
+  nodes: [Invite]!
+
+  """
+  A list of edges which contains the `Invite` and cursor to aid in pagination.
+  """
+  edges: [InviteEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Invite` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Invitation records sent to prospective members via email, with token-based redemption and expiration
+"""
+type Invite {
+  id: UUID!
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID!
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String!
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean!
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int!
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int!
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean!
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime!
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+scalar ConstructiveInternalTypeEmail
+
+"""A `Invite` edge in the connection."""
+type InviteEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Invite` at the end of the edge."""
+  node: Invite
+}
+
+"""
+A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’
+"""
+input InviteFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `email` field."""
+  email: ConstructiveInternalTypeEmailFilter
+
+  """Filter by the object’s `senderId` field."""
+  senderId: UUIDFilter
+
+  """Filter by the object’s `inviteToken` field."""
+  inviteToken: StringFilter
+
+  """Filter by the object’s `inviteValid` field."""
+  inviteValid: BooleanFilter
+
+  """Filter by the object’s `inviteLimit` field."""
+  inviteLimit: IntFilter
+
+  """Filter by the object’s `inviteCount` field."""
+  inviteCount: IntFilter
+
+  """Filter by the object’s `multiple` field."""
+  multiple: BooleanFilter
+
+  """Filter by the object’s `expiresAt` field."""
+  expiresAt: DatetimeFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [InviteFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [InviteFilter!]
+
+  """Negates the expression."""
+  not: InviteFilter
+}
+
+"""
+A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
+"""
+input ConstructiveInternalTypeEmailFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: ConstructiveInternalTypeEmail
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: ConstructiveInternalTypeEmail
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: ConstructiveInternalTypeEmail
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [ConstructiveInternalTypeEmail!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: ConstructiveInternalTypeEmail
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
+}
+
+"""Methods to use when ordering `Invite`."""
+enum InviteOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  SENDER_ID_ASC
+  SENDER_ID_DESC
+  INVITE_TOKEN_ASC
+  INVITE_TOKEN_DESC
+  INVITE_VALID_ASC
+  INVITE_VALID_DESC
+  INVITE_LIMIT_ASC
+  INVITE_LIMIT_DESC
+  INVITE_COUNT_ASC
+  INVITE_COUNT_DESC
+  MULTIPLE_ASC
+  MULTIPLE_DESC
+  DATA_ASC
+  DATA_DESC
+  EXPIRES_AT_ASC
+  EXPIRES_AT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -4161,442 +4597,6 @@ enum OrgMembershipOrderBy {
   PROFILE_ID_DESC
 }
 
-"""A connection to a list of `Invite` values."""
-type InviteConnection {
-  """A list of `Invite` objects."""
-  nodes: [Invite]!
-
-  """
-  A list of edges which contains the `Invite` and cursor to aid in pagination.
-  """
-  edges: [InviteEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Invite` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Invitation records sent to prospective members via email, with token-based redemption and expiration
-"""
-type Invite {
-  id: UUID!
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID!
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String!
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean!
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int!
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int!
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean!
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime!
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-scalar ConstructiveInternalTypeEmail
-
-"""A `Invite` edge in the connection."""
-type InviteEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Invite` at the end of the edge."""
-  node: Invite
-}
-
-"""
-A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’
-"""
-input InviteFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `email` field."""
-  email: ConstructiveInternalTypeEmailFilter
-
-  """Filter by the object’s `senderId` field."""
-  senderId: UUIDFilter
-
-  """Filter by the object’s `inviteToken` field."""
-  inviteToken: StringFilter
-
-  """Filter by the object’s `inviteValid` field."""
-  inviteValid: BooleanFilter
-
-  """Filter by the object’s `inviteLimit` field."""
-  inviteLimit: IntFilter
-
-  """Filter by the object’s `inviteCount` field."""
-  inviteCount: IntFilter
-
-  """Filter by the object’s `multiple` field."""
-  multiple: BooleanFilter
-
-  """Filter by the object’s `expiresAt` field."""
-  expiresAt: DatetimeFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [InviteFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [InviteFilter!]
-
-  """Negates the expression."""
-  not: InviteFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeEmailFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: ConstructiveInternalTypeEmail
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: ConstructiveInternalTypeEmail
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: ConstructiveInternalTypeEmail
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: ConstructiveInternalTypeEmail
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [ConstructiveInternalTypeEmail!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: ConstructiveInternalTypeEmail
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
-}
-
-"""Methods to use when ordering `Invite`."""
-enum InviteOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  EMAIL_ASC
-  EMAIL_DESC
-  SENDER_ID_ASC
-  SENDER_ID_DESC
-  INVITE_TOKEN_ASC
-  INVITE_TOKEN_DESC
-  INVITE_VALID_ASC
-  INVITE_VALID_DESC
-  INVITE_LIMIT_ASC
-  INVITE_LIMIT_DESC
-  INVITE_COUNT_ASC
-  INVITE_COUNT_DESC
-  MULTIPLE_ASC
-  MULTIPLE_DESC
-  DATA_ASC
-  DATA_DESC
-  EXPIRES_AT_ASC
-  EXPIRES_AT_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
-"""A connection to a list of `AppLevel` values."""
-type AppLevelConnection {
-  """A list of `AppLevel` objects."""
-  nodes: [AppLevel]!
-
-  """
-  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
-  """
-  edges: [AppLevelEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppLevel` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Defines available levels that users can achieve by completing requirements
-"""
-type AppLevel {
-  id: UUID!
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-scalar ConstructiveInternalTypeImage
-
-"""A `AppLevel` edge in the connection."""
-type AppLevelEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppLevel` at the end of the edge."""
-  node: AppLevel
-}
-
-"""
-A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
-"""
-input AppLevelFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `image` field."""
-  image: ConstructiveInternalTypeImageFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppLevelFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppLevelFilter!]
-
-  """Negates the expression."""
-  not: AppLevelFilter
-}
-
-"""
-A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’
-"""
-input ConstructiveInternalTypeImageFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: ConstructiveInternalTypeImage
-
-  """Not equal to the specified value."""
-  notEqualTo: ConstructiveInternalTypeImage
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: ConstructiveInternalTypeImage
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: ConstructiveInternalTypeImage
-
-  """Included in the specified list."""
-  in: [ConstructiveInternalTypeImage!]
-
-  """Not included in the specified list."""
-  notIn: [ConstructiveInternalTypeImage!]
-
-  """Less than the specified value."""
-  lessThan: ConstructiveInternalTypeImage
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Greater than the specified value."""
-  greaterThan: ConstructiveInternalTypeImage
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: ConstructiveInternalTypeImage
-
-  """Contains the specified JSON."""
-  contains: ConstructiveInternalTypeImage
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: ConstructiveInternalTypeImage
-}
-
-"""Methods to use when ordering `AppLevel`."""
-enum AppLevelOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  IMAGE_ASC
-  IMAGE_DESC
-  OWNER_ID_ASC
-  OWNER_ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
 """A connection to a list of `OrgInvite` values."""
 type OrgInviteConnection {
   """A list of `OrgInvite` objects."""
@@ -4789,6 +4789,7 @@ type MetaType {
   isArray: Boolean!
   isNotNull: Boolean
   hasDefault: Boolean
+  subtype: String
 }
 
 """Information about a database index"""
@@ -4957,22 +4958,6 @@ type Mutation {
     input: CreateAppOwnerGrantInput!
   ): CreateAppOwnerGrantPayload
 
-  """Creates a single `OrgAdminGrant`."""
-  createOrgAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgAdminGrantInput!
-  ): CreateOrgAdminGrantPayload
-
-  """Creates a single `OrgOwnerGrant`."""
-  createOrgOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgOwnerGrantInput!
-  ): CreateOrgOwnerGrantPayload
-
   """Creates a single `AppLimitDefault`."""
   createAppLimitDefault(
     """
@@ -4989,13 +4974,21 @@ type Mutation {
     input: CreateOrgLimitDefaultInput!
   ): CreateOrgLimitDefaultPayload
 
-  """Creates a single `OrgChartEdgeGrant`."""
-  createOrgChartEdgeGrant(
+  """Creates a single `OrgAdminGrant`."""
+  createOrgAdminGrant(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateOrgChartEdgeGrantInput!
-  ): CreateOrgChartEdgeGrantPayload
+    input: CreateOrgAdminGrantInput!
+  ): CreateOrgAdminGrantPayload
+
+  """Creates a single `OrgOwnerGrant`."""
+  createOrgOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgOwnerGrantInput!
+  ): CreateOrgOwnerGrantPayload
 
   """Creates a single `MembershipType`."""
   createMembershipType(
@@ -5053,6 +5046,22 @@ type Mutation {
     input: CreateClaimedInviteInput!
   ): CreateClaimedInvitePayload
 
+  """Creates a single `OrgChartEdgeGrant`."""
+  createOrgChartEdgeGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgChartEdgeGrantInput!
+  ): CreateOrgChartEdgeGrantPayload
+
+  """Creates a single `OrgLimit`."""
+  createOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitInput!
+  ): CreateOrgLimitPayload
+
   """Creates a single `AppGrant`."""
   createAppGrant(
     """
@@ -5068,14 +5077,6 @@ type Mutation {
     """
     input: CreateAppMembershipDefaultInput!
   ): CreateAppMembershipDefaultPayload
-
-  """Creates a single `OrgLimit`."""
-  createOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgLimitInput!
-  ): CreateOrgLimitPayload
 
   """Creates a single `OrgClaimedInvite`."""
   createOrgClaimedInvite(
@@ -5101,6 +5102,14 @@ type Mutation {
     input: CreateOrgChartEdgeInput!
   ): CreateOrgChartEdgePayload
 
+  """Creates a single `AppLevelRequirement`."""
+  createAppLevelRequirement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLevelRequirementInput!
+  ): CreateAppLevelRequirementPayload
+
   """Creates a single `OrgMembershipDefault`."""
   createOrgMembershipDefault(
     """
@@ -5109,13 +5118,21 @@ type Mutation {
     input: CreateOrgMembershipDefaultInput!
   ): CreateOrgMembershipDefaultPayload
 
-  """Creates a single `AppLevelRequirement`."""
-  createAppLevelRequirement(
+  """Creates a single `AppLevel`."""
+  createAppLevel(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateAppLevelRequirementInput!
-  ): CreateAppLevelRequirementPayload
+    input: CreateAppLevelInput!
+  ): CreateAppLevelPayload
+
+  """Creates a single `Invite`."""
+  createInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateInviteInput!
+  ): CreateInvitePayload
 
   """Creates a single `AppMembership`."""
   createAppMembership(
@@ -5132,22 +5149,6 @@ type Mutation {
     """
     input: CreateOrgMembershipInput!
   ): CreateOrgMembershipPayload
-
-  """Creates a single `Invite`."""
-  createInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateInviteInput!
-  ): CreateInvitePayload
-
-  """Creates a single `AppLevel`."""
-  createAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLevelInput!
-  ): CreateAppLevelPayload
 
   """Creates a single `OrgInvite`."""
   createOrgInvite(
@@ -5201,22 +5202,6 @@ type Mutation {
     input: UpdateAppOwnerGrantInput!
   ): UpdateAppOwnerGrantPayload
 
-  """Updates a single `OrgAdminGrant` using a unique key and a patch."""
-  updateOrgAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgAdminGrantInput!
-  ): UpdateOrgAdminGrantPayload
-
-  """Updates a single `OrgOwnerGrant` using a unique key and a patch."""
-  updateOrgOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgOwnerGrantInput!
-  ): UpdateOrgOwnerGrantPayload
-
   """Updates a single `AppLimitDefault` using a unique key and a patch."""
   updateAppLimitDefault(
     """
@@ -5233,13 +5218,21 @@ type Mutation {
     input: UpdateOrgLimitDefaultInput!
   ): UpdateOrgLimitDefaultPayload
 
-  """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
-  updateOrgChartEdgeGrant(
+  """Updates a single `OrgAdminGrant` using a unique key and a patch."""
+  updateOrgAdminGrant(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateOrgChartEdgeGrantInput!
-  ): UpdateOrgChartEdgeGrantPayload
+    input: UpdateOrgAdminGrantInput!
+  ): UpdateOrgAdminGrantPayload
+
+  """Updates a single `OrgOwnerGrant` using a unique key and a patch."""
+  updateOrgOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgOwnerGrantInput!
+  ): UpdateOrgOwnerGrantPayload
 
   """Updates a single `MembershipType` using a unique key and a patch."""
   updateMembershipType(
@@ -5297,6 +5290,22 @@ type Mutation {
     input: UpdateClaimedInviteInput!
   ): UpdateClaimedInvitePayload
 
+  """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
+  updateOrgChartEdgeGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgChartEdgeGrantInput!
+  ): UpdateOrgChartEdgeGrantPayload
+
+  """Updates a single `OrgLimit` using a unique key and a patch."""
+  updateOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitInput!
+  ): UpdateOrgLimitPayload
+
   """Updates a single `AppGrant` using a unique key and a patch."""
   updateAppGrant(
     """
@@ -5314,14 +5323,6 @@ type Mutation {
     """
     input: UpdateAppMembershipDefaultInput!
   ): UpdateAppMembershipDefaultPayload
-
-  """Updates a single `OrgLimit` using a unique key and a patch."""
-  updateOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgLimitInput!
-  ): UpdateOrgLimitPayload
 
   """Updates a single `OrgClaimedInvite` using a unique key and a patch."""
   updateOrgClaimedInvite(
@@ -5347,6 +5348,14 @@ type Mutation {
     input: UpdateOrgChartEdgeInput!
   ): UpdateOrgChartEdgePayload
 
+  """Updates a single `AppLevelRequirement` using a unique key and a patch."""
+  updateAppLevelRequirement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLevelRequirementInput!
+  ): UpdateAppLevelRequirementPayload
+
   """
   Updates a single `OrgMembershipDefault` using a unique key and a patch.
   """
@@ -5357,13 +5366,21 @@ type Mutation {
     input: UpdateOrgMembershipDefaultInput!
   ): UpdateOrgMembershipDefaultPayload
 
-  """Updates a single `AppLevelRequirement` using a unique key and a patch."""
-  updateAppLevelRequirement(
+  """Updates a single `AppLevel` using a unique key and a patch."""
+  updateAppLevel(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateAppLevelRequirementInput!
-  ): UpdateAppLevelRequirementPayload
+    input: UpdateAppLevelInput!
+  ): UpdateAppLevelPayload
+
+  """Updates a single `Invite` using a unique key and a patch."""
+  updateInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInviteInput!
+  ): UpdateInvitePayload
 
   """Updates a single `AppMembership` using a unique key and a patch."""
   updateAppMembership(
@@ -5380,22 +5397,6 @@ type Mutation {
     """
     input: UpdateOrgMembershipInput!
   ): UpdateOrgMembershipPayload
-
-  """Updates a single `Invite` using a unique key and a patch."""
-  updateInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateInviteInput!
-  ): UpdateInvitePayload
-
-  """Updates a single `AppLevel` using a unique key and a patch."""
-  updateAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLevelInput!
-  ): UpdateAppLevelPayload
 
   """Updates a single `OrgInvite` using a unique key and a patch."""
   updateOrgInvite(
@@ -5445,22 +5446,6 @@ type Mutation {
     input: DeleteAppOwnerGrantInput!
   ): DeleteAppOwnerGrantPayload
 
-  """Deletes a single `OrgAdminGrant` using a unique key."""
-  deleteOrgAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgAdminGrantInput!
-  ): DeleteOrgAdminGrantPayload
-
-  """Deletes a single `OrgOwnerGrant` using a unique key."""
-  deleteOrgOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgOwnerGrantInput!
-  ): DeleteOrgOwnerGrantPayload
-
   """Deletes a single `AppLimitDefault` using a unique key."""
   deleteAppLimitDefault(
     """
@@ -5477,13 +5462,21 @@ type Mutation {
     input: DeleteOrgLimitDefaultInput!
   ): DeleteOrgLimitDefaultPayload
 
-  """Deletes a single `OrgChartEdgeGrant` using a unique key."""
-  deleteOrgChartEdgeGrant(
+  """Deletes a single `OrgAdminGrant` using a unique key."""
+  deleteOrgAdminGrant(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteOrgChartEdgeGrantInput!
-  ): DeleteOrgChartEdgeGrantPayload
+    input: DeleteOrgAdminGrantInput!
+  ): DeleteOrgAdminGrantPayload
+
+  """Deletes a single `OrgOwnerGrant` using a unique key."""
+  deleteOrgOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgOwnerGrantInput!
+  ): DeleteOrgOwnerGrantPayload
 
   """Deletes a single `MembershipType` using a unique key."""
   deleteMembershipType(
@@ -5541,6 +5534,22 @@ type Mutation {
     input: DeleteClaimedInviteInput!
   ): DeleteClaimedInvitePayload
 
+  """Deletes a single `OrgChartEdgeGrant` using a unique key."""
+  deleteOrgChartEdgeGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgChartEdgeGrantInput!
+  ): DeleteOrgChartEdgeGrantPayload
+
+  """Deletes a single `OrgLimit` using a unique key."""
+  deleteOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitInput!
+  ): DeleteOrgLimitPayload
+
   """Deletes a single `AppGrant` using a unique key."""
   deleteAppGrant(
     """
@@ -5556,14 +5565,6 @@ type Mutation {
     """
     input: DeleteAppMembershipDefaultInput!
   ): DeleteAppMembershipDefaultPayload
-
-  """Deletes a single `OrgLimit` using a unique key."""
-  deleteOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgLimitInput!
-  ): DeleteOrgLimitPayload
 
   """Deletes a single `OrgClaimedInvite` using a unique key."""
   deleteOrgClaimedInvite(
@@ -5589,6 +5590,14 @@ type Mutation {
     input: DeleteOrgChartEdgeInput!
   ): DeleteOrgChartEdgePayload
 
+  """Deletes a single `AppLevelRequirement` using a unique key."""
+  deleteAppLevelRequirement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLevelRequirementInput!
+  ): DeleteAppLevelRequirementPayload
+
   """Deletes a single `OrgMembershipDefault` using a unique key."""
   deleteOrgMembershipDefault(
     """
@@ -5597,13 +5606,21 @@ type Mutation {
     input: DeleteOrgMembershipDefaultInput!
   ): DeleteOrgMembershipDefaultPayload
 
-  """Deletes a single `AppLevelRequirement` using a unique key."""
-  deleteAppLevelRequirement(
+  """Deletes a single `AppLevel` using a unique key."""
+  deleteAppLevel(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteAppLevelRequirementInput!
-  ): DeleteAppLevelRequirementPayload
+    input: DeleteAppLevelInput!
+  ): DeleteAppLevelPayload
+
+  """Deletes a single `Invite` using a unique key."""
+  deleteInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteInviteInput!
+  ): DeleteInvitePayload
 
   """Deletes a single `AppMembership` using a unique key."""
   deleteAppMembership(
@@ -5620,22 +5637,6 @@ type Mutation {
     """
     input: DeleteOrgMembershipInput!
   ): DeleteOrgMembershipPayload
-
-  """Deletes a single `Invite` using a unique key."""
-  deleteInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteInviteInput!
-  ): DeleteInvitePayload
-
-  """Deletes a single `AppLevel` using a unique key."""
-  deleteAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLevelInput!
-  ): DeleteAppLevelPayload
 
   """Deletes a single `OrgInvite` using a unique key."""
   deleteOrgInvite(
@@ -5932,6 +5933,98 @@ input AppOwnerGrantInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `AppLimitDefault` mutation."""
+type CreateAppLimitDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitDefault` that was created by this mutation."""
+  appLimitDefault: AppLimitDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitDefault`. May be used by Relay 1."""
+  appLimitDefaultEdge(
+    """The method to use when ordering `AppLimitDefault`."""
+    orderBy: [AppLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitDefaultEdge
+}
+
+"""All input for the create `AppLimitDefault` mutation."""
+input CreateAppLimitDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLimitDefault` to be created by this mutation."""
+  appLimitDefault: AppLimitDefaultInput!
+}
+
+"""An input for mutations affecting `AppLimitDefault`"""
+input AppLimitDefaultInput {
+  id: UUID
+
+  """Name identifier of the limit this default applies to"""
+  name: String!
+
+  """Default maximum usage allowed for this limit"""
+  max: Int
+}
+
+"""The output of our create `OrgLimitDefault` mutation."""
+type CreateOrgLimitDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitDefault` that was created by this mutation."""
+  orgLimitDefault: OrgLimitDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitDefault`. May be used by Relay 1."""
+  orgLimitDefaultEdge(
+    """The method to use when ordering `OrgLimitDefault`."""
+    orderBy: [OrgLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitDefaultEdge
+}
+
+"""All input for the create `OrgLimitDefault` mutation."""
+input CreateOrgLimitDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitDefault` to be created by this mutation."""
+  orgLimitDefault: OrgLimitDefaultInput!
+}
+
+"""An input for mutations affecting `OrgLimitDefault`"""
+input OrgLimitDefaultInput {
+  id: UUID
+
+  """Name identifier of the limit this default applies to"""
+  name: String!
+
+  """Default maximum usage allowed for this limit"""
+  max: Int
+}
+
 """The output of our create `OrgAdminGrant` mutation."""
 type CreateOrgAdminGrantPayload {
   """
@@ -6034,164 +6127,6 @@ input OrgOwnerGrantInput {
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our create `AppLimitDefault` mutation."""
-type CreateAppLimitDefaultPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLimitDefault` that was created by this mutation."""
-  appLimitDefault: AppLimitDefault
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLimitDefault`. May be used by Relay 1."""
-  appLimitDefaultEdge(
-    """The method to use when ordering `AppLimitDefault`."""
-    orderBy: [AppLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLimitDefaultEdge
-}
-
-"""All input for the create `AppLimitDefault` mutation."""
-input CreateAppLimitDefaultInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppLimitDefault` to be created by this mutation."""
-  appLimitDefault: AppLimitDefaultInput!
-}
-
-"""An input for mutations affecting `AppLimitDefault`"""
-input AppLimitDefaultInput {
-  id: UUID
-
-  """Name identifier of the limit this default applies to"""
-  name: String!
-
-  """Default maximum usage allowed for this limit"""
-  max: Int
-}
-
-"""The output of our create `OrgLimitDefault` mutation."""
-type CreateOrgLimitDefaultPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimitDefault` that was created by this mutation."""
-  orgLimitDefault: OrgLimitDefault
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimitDefault`. May be used by Relay 1."""
-  orgLimitDefaultEdge(
-    """The method to use when ordering `OrgLimitDefault`."""
-    orderBy: [OrgLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitDefaultEdge
-}
-
-"""All input for the create `OrgLimitDefault` mutation."""
-input CreateOrgLimitDefaultInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgLimitDefault` to be created by this mutation."""
-  orgLimitDefault: OrgLimitDefaultInput!
-}
-
-"""An input for mutations affecting `OrgLimitDefault`"""
-input OrgLimitDefaultInput {
-  id: UUID
-
-  """Name identifier of the limit this default applies to"""
-  name: String!
-
-  """Default maximum usage allowed for this limit"""
-  max: Int
-}
-
-"""The output of our create `OrgChartEdgeGrant` mutation."""
-type CreateOrgChartEdgeGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` that was created by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrant
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
-  orgChartEdgeGrantEdge(
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantEdge
-}
-
-"""All input for the create `OrgChartEdgeGrant` mutation."""
-input CreateOrgChartEdgeGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` to be created by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrantInput!
-}
-
-"""An input for mutations affecting `OrgChartEdgeGrant`"""
-input OrgChartEdgeGrantInput {
-  id: UUID
-
-  """Organization this grant applies to"""
-  entityId: UUID!
-
-  """User ID of the subordinate being placed in the hierarchy"""
-  childId: UUID!
-
-  """User ID of the manager being assigned; NULL for top-level positions"""
-  parentId: UUID
-
-  """
-  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
-  """
-  grantorId: UUID
-
-  """TRUE to add/update the edge, FALSE to remove it"""
-  isGrant: Boolean
-
-  """Job title or role name being assigned in this grant"""
-  positionTitle: String
-
-  """Numeric seniority level being assigned in this grant"""
-  positionLevel: Int
-
-  """Timestamp when this grant or revocation was recorded"""
-  createdAt: Datetime
 }
 
 """The output of our create `MembershipType` mutation."""
@@ -6561,6 +6496,125 @@ input ClaimedInviteInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `OrgChartEdgeGrant` mutation."""
+type CreateOrgChartEdgeGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgChartEdgeGrant` that was created by this mutation."""
+  orgChartEdgeGrant: OrgChartEdgeGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
+  orgChartEdgeGrantEdge(
+    """The method to use when ordering `OrgChartEdgeGrant`."""
+    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgChartEdgeGrantEdge
+}
+
+"""All input for the create `OrgChartEdgeGrant` mutation."""
+input CreateOrgChartEdgeGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgChartEdgeGrant` to be created by this mutation."""
+  orgChartEdgeGrant: OrgChartEdgeGrantInput!
+}
+
+"""An input for mutations affecting `OrgChartEdgeGrant`"""
+input OrgChartEdgeGrantInput {
+  id: UUID
+
+  """Organization this grant applies to"""
+  entityId: UUID!
+
+  """User ID of the subordinate being placed in the hierarchy"""
+  childId: UUID!
+
+  """User ID of the manager being assigned; NULL for top-level positions"""
+  parentId: UUID
+
+  """
+  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
+  """
+  grantorId: UUID
+
+  """TRUE to add/update the edge, FALSE to remove it"""
+  isGrant: Boolean
+
+  """Job title or role name being assigned in this grant"""
+  positionTitle: String
+
+  """Numeric seniority level being assigned in this grant"""
+  positionLevel: Int
+
+  """Timestamp when this grant or revocation was recorded"""
+  createdAt: Datetime
+}
+
+"""The output of our create `OrgLimit` mutation."""
+type CreateOrgLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` that was created by this mutation."""
+  orgLimit: OrgLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimit`. May be used by Relay 1."""
+  orgLimitEdge(
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitEdge
+}
+
+"""All input for the create `OrgLimit` mutation."""
+input CreateOrgLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` to be created by this mutation."""
+  orgLimit: OrgLimitInput!
+}
+
+"""An input for mutations affecting `OrgLimit`"""
+input OrgLimitInput {
+  id: UUID
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID!
+
+  """Current usage count for this actor and limit"""
+  num: Int
+
+  """Maximum allowed usage; NULL means use the default limit value"""
+  max: Int
+  entityId: UUID!
+}
+
 """The output of our create `AppGrant` mutation."""
 type CreateAppGrantPayload {
   """
@@ -6661,59 +6715,6 @@ input AppMembershipDefaultInput {
 
   """Whether new members are automatically verified upon joining"""
   isVerified: Boolean
-}
-
-"""The output of our create `OrgLimit` mutation."""
-type CreateOrgLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` that was created by this mutation."""
-  orgLimit: OrgLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimit`. May be used by Relay 1."""
-  orgLimitEdge(
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitEdge
-}
-
-"""All input for the create `OrgLimit` mutation."""
-input CreateOrgLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` to be created by this mutation."""
-  orgLimit: OrgLimitInput!
-}
-
-"""An input for mutations affecting `OrgLimit`"""
-input OrgLimitInput {
-  id: UUID
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID!
-
-  """Current usage count for this actor and limit"""
-  num: Int
-
-  """Maximum allowed usage; NULL means use the default limit value"""
-  max: Int
-  entityId: UUID!
 }
 
 """The output of our create `OrgClaimedInvite` mutation."""
@@ -6882,6 +6883,63 @@ input OrgChartEdgeInput {
   positionLevel: Int
 }
 
+"""The output of our create `AppLevelRequirement` mutation."""
+type CreateAppLevelRequirementPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLevelRequirement` that was created by this mutation."""
+  appLevelRequirement: AppLevelRequirement
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
+  appLevelRequirementEdge(
+    """The method to use when ordering `AppLevelRequirement`."""
+    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelRequirementEdge
+}
+
+"""All input for the create `AppLevelRequirement` mutation."""
+input CreateAppLevelRequirementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `AppLevelRequirement` to be created by this mutation."""
+  appLevelRequirement: AppLevelRequirementInput!
+}
+
+"""An input for mutations affecting `AppLevelRequirement`"""
+input AppLevelRequirementInput {
+  id: UUID
+
+  """Name identifier of the requirement (matches step names)"""
+  name: String!
+
+  """Name of the level this requirement belongs to"""
+  level: String!
+
+  """Human-readable description of what this requirement entails"""
+  description: String
+
+  """Number of steps needed to satisfy this requirement"""
+  requiredCount: Int
+
+  """Display ordering priority; lower values appear first"""
+  priority: Int
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our create `OrgMembershipDefault` mutation."""
 type CreateOrgMembershipDefaultPayload {
   """
@@ -6942,59 +7000,125 @@ input OrgMembershipDefaultInput {
   createGroupsCascadeMembers: Boolean
 }
 
-"""The output of our create `AppLevelRequirement` mutation."""
-type CreateAppLevelRequirementPayload {
+"""The output of our create `AppLevel` mutation."""
+type CreateAppLevelPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` that was created by this mutation."""
-  appLevelRequirement: AppLevelRequirement
+  """The `AppLevel` that was created by this mutation."""
+  appLevel: AppLevel
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
+  """An edge for our `AppLevel`. May be used by Relay 1."""
+  appLevelEdge(
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelEdge
 }
 
-"""All input for the create `AppLevelRequirement` mutation."""
-input CreateAppLevelRequirementInput {
+"""All input for the create `AppLevel` mutation."""
+input CreateAppLevelInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` to be created by this mutation."""
-  appLevelRequirement: AppLevelRequirementInput!
+  """The `AppLevel` to be created by this mutation."""
+  appLevel: AppLevelInput!
 }
 
-"""An input for mutations affecting `AppLevelRequirement`"""
-input AppLevelRequirementInput {
+"""An input for mutations affecting `AppLevel`"""
+input AppLevelInput {
   id: UUID
 
-  """Name identifier of the requirement (matches step names)"""
+  """Unique name of the level"""
   name: String!
 
-  """Name of the level this requirement belongs to"""
-  level: String!
-
-  """Human-readable description of what this requirement entails"""
+  """Human-readable description of what this level represents"""
   description: String
 
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int
+  """Badge or icon image associated with this level"""
+  image: ConstructiveInternalTypeImage
 
-  """Display ordering priority; lower values appear first"""
-  priority: Int
+  """Optional owner (actor) who created or manages this level"""
+  ownerId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `Invite` mutation."""
+type CreateInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Invite` that was created by this mutation."""
+  invite: Invite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Invite`. May be used by Relay 1."""
+  inviteEdge(
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InviteEdge
+}
+
+"""All input for the create `Invite` mutation."""
+input CreateInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Invite` to be created by this mutation."""
+  invite: InviteInput!
+}
+
+"""An input for mutations affecting `Invite`"""
+input InviteInput {
+  id: UUID
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -7159,129 +7283,6 @@ input OrgMembershipInput {
   """References the entity (org or group) this membership belongs to"""
   entityId: UUID!
   profileId: UUID
-}
-
-"""The output of our create `Invite` mutation."""
-type CreateInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Invite` that was created by this mutation."""
-  invite: Invite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
-}
-
-"""All input for the create `Invite` mutation."""
-input CreateInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Invite` to be created by this mutation."""
-  invite: InviteInput!
-}
-
-"""An input for mutations affecting `Invite`"""
-input InviteInput {
-  id: UUID
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our create `AppLevel` mutation."""
-type CreateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was created by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the create `AppLevel` mutation."""
-input CreateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` to be created by this mutation."""
-  appLevel: AppLevelInput!
-}
-
-"""An input for mutations affecting `AppLevel`"""
-input AppLevelInput {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
 }
 
 """The output of our create `OrgInvite` mutation."""
@@ -7618,6 +7619,108 @@ input AppOwnerGrantPatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `AppLimitDefault` mutation."""
+type UpdateAppLimitDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLimitDefault` that was updated by this mutation."""
+  appLimitDefault: AppLimitDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLimitDefault`. May be used by Relay 1."""
+  appLimitDefaultEdge(
+    """The method to use when ordering `AppLimitDefault`."""
+    orderBy: [AppLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLimitDefaultEdge
+}
+
+"""All input for the `updateAppLimitDefault` mutation."""
+input UpdateAppLimitDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLimitDefault` being updated.
+  """
+  appLimitDefaultPatch: AppLimitDefaultPatch!
+}
+
+"""
+Represents an update to a `AppLimitDefault`. Fields that are set will be updated.
+"""
+input AppLimitDefaultPatch {
+  id: UUID
+
+  """Name identifier of the limit this default applies to"""
+  name: String
+
+  """Default maximum usage allowed for this limit"""
+  max: Int
+}
+
+"""The output of our update `OrgLimitDefault` mutation."""
+type UpdateOrgLimitDefaultPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimitDefault` that was updated by this mutation."""
+  orgLimitDefault: OrgLimitDefault
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimitDefault`. May be used by Relay 1."""
+  orgLimitDefaultEdge(
+    """The method to use when ordering `OrgLimitDefault`."""
+    orderBy: [OrgLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitDefaultEdge
+}
+
+"""All input for the `updateOrgLimitDefault` mutation."""
+input UpdateOrgLimitDefaultInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimitDefault` being updated.
+  """
+  orgLimitDefaultPatch: OrgLimitDefaultPatch!
+}
+
+"""
+Represents an update to a `OrgLimitDefault`. Fields that are set will be updated.
+"""
+input OrgLimitDefaultPatch {
+  id: UUID
+
+  """Name identifier of the limit this default applies to"""
+  name: String
+
+  """Default maximum usage allowed for this limit"""
+  max: Int
+}
+
 """The output of our update `OrgAdminGrant` mutation."""
 type UpdateOrgAdminGrantPayload {
   """
@@ -7730,179 +7833,6 @@ input OrgOwnerGrantPatch {
   grantorId: UUID
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our update `AppLimitDefault` mutation."""
-type UpdateAppLimitDefaultPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLimitDefault` that was updated by this mutation."""
-  appLimitDefault: AppLimitDefault
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLimitDefault`. May be used by Relay 1."""
-  appLimitDefaultEdge(
-    """The method to use when ordering `AppLimitDefault`."""
-    orderBy: [AppLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLimitDefaultEdge
-}
-
-"""All input for the `updateAppLimitDefault` mutation."""
-input UpdateAppLimitDefaultInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppLimitDefault` being updated.
-  """
-  appLimitDefaultPatch: AppLimitDefaultPatch!
-}
-
-"""
-Represents an update to a `AppLimitDefault`. Fields that are set will be updated.
-"""
-input AppLimitDefaultPatch {
-  id: UUID
-
-  """Name identifier of the limit this default applies to"""
-  name: String
-
-  """Default maximum usage allowed for this limit"""
-  max: Int
-}
-
-"""The output of our update `OrgLimitDefault` mutation."""
-type UpdateOrgLimitDefaultPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimitDefault` that was updated by this mutation."""
-  orgLimitDefault: OrgLimitDefault
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimitDefault`. May be used by Relay 1."""
-  orgLimitDefaultEdge(
-    """The method to use when ordering `OrgLimitDefault`."""
-    orderBy: [OrgLimitDefaultOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitDefaultEdge
-}
-
-"""All input for the `updateOrgLimitDefault` mutation."""
-input UpdateOrgLimitDefaultInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgLimitDefault` being updated.
-  """
-  orgLimitDefaultPatch: OrgLimitDefaultPatch!
-}
-
-"""
-Represents an update to a `OrgLimitDefault`. Fields that are set will be updated.
-"""
-input OrgLimitDefaultPatch {
-  id: UUID
-
-  """Name identifier of the limit this default applies to"""
-  name: String
-
-  """Default maximum usage allowed for this limit"""
-  max: Int
-}
-
-"""The output of our update `OrgChartEdgeGrant` mutation."""
-type UpdateOrgChartEdgeGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgChartEdgeGrant` that was updated by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrant
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
-  orgChartEdgeGrantEdge(
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantEdge
-}
-
-"""All input for the `updateOrgChartEdgeGrant` mutation."""
-input UpdateOrgChartEdgeGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgChartEdgeGrant` being updated.
-  """
-  orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch!
-}
-
-"""
-Represents an update to a `OrgChartEdgeGrant`. Fields that are set will be updated.
-"""
-input OrgChartEdgeGrantPatch {
-  id: UUID
-
-  """Organization this grant applies to"""
-  entityId: UUID
-
-  """User ID of the subordinate being placed in the hierarchy"""
-  childId: UUID
-
-  """User ID of the manager being assigned; NULL for top-level positions"""
-  parentId: UUID
-
-  """
-  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
-  """
-  grantorId: UUID
-
-  """TRUE to add/update the edge, FALSE to remove it"""
-  isGrant: Boolean
-
-  """Job title or role name being assigned in this grant"""
-  positionTitle: String
-
-  """Numeric seniority level being assigned in this grant"""
-  positionLevel: Int
-
-  """Timestamp when this grant or revocation was recorded"""
-  createdAt: Datetime
 }
 
 """The output of our update `MembershipType` mutation."""
@@ -8311,6 +8241,135 @@ input ClaimedInvitePatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `OrgChartEdgeGrant` mutation."""
+type UpdateOrgChartEdgeGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgChartEdgeGrant` that was updated by this mutation."""
+  orgChartEdgeGrant: OrgChartEdgeGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
+  orgChartEdgeGrantEdge(
+    """The method to use when ordering `OrgChartEdgeGrant`."""
+    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgChartEdgeGrantEdge
+}
+
+"""All input for the `updateOrgChartEdgeGrant` mutation."""
+input UpdateOrgChartEdgeGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgChartEdgeGrant` being updated.
+  """
+  orgChartEdgeGrantPatch: OrgChartEdgeGrantPatch!
+}
+
+"""
+Represents an update to a `OrgChartEdgeGrant`. Fields that are set will be updated.
+"""
+input OrgChartEdgeGrantPatch {
+  id: UUID
+
+  """Organization this grant applies to"""
+  entityId: UUID
+
+  """User ID of the subordinate being placed in the hierarchy"""
+  childId: UUID
+
+  """User ID of the manager being assigned; NULL for top-level positions"""
+  parentId: UUID
+
+  """
+  User ID of the admin who performed this grant or revocation; NULL if grantor was deleted
+  """
+  grantorId: UUID
+
+  """TRUE to add/update the edge, FALSE to remove it"""
+  isGrant: Boolean
+
+  """Job title or role name being assigned in this grant"""
+  positionTitle: String
+
+  """Numeric seniority level being assigned in this grant"""
+  positionLevel: Int
+
+  """Timestamp when this grant or revocation was recorded"""
+  createdAt: Datetime
+}
+
+"""The output of our update `OrgLimit` mutation."""
+type UpdateOrgLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` that was updated by this mutation."""
+  orgLimit: OrgLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimit`. May be used by Relay 1."""
+  orgLimitEdge(
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitEdge
+}
+
+"""All input for the `updateOrgLimit` mutation."""
+input UpdateOrgLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgLimit` being updated.
+  """
+  orgLimitPatch: OrgLimitPatch!
+}
+
+"""
+Represents an update to a `OrgLimit`. Fields that are set will be updated.
+"""
+input OrgLimitPatch {
+  id: UUID
+
+  """Name identifier of the limit being tracked"""
+  name: String
+
+  """User whose usage is being tracked against this limit"""
+  actorId: UUID
+
+  """Current usage count for this actor and limit"""
+  num: Int
+
+  """Maximum allowed usage; NULL means use the default limit value"""
+  max: Int
+  entityId: UUID
+}
+
 """The output of our update `AppGrant` mutation."""
 type UpdateAppGrantPayload {
   """
@@ -8421,64 +8480,6 @@ input AppMembershipDefaultPatch {
 
   """Whether new members are automatically verified upon joining"""
   isVerified: Boolean
-}
-
-"""The output of our update `OrgLimit` mutation."""
-type UpdateOrgLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` that was updated by this mutation."""
-  orgLimit: OrgLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimit`. May be used by Relay 1."""
-  orgLimitEdge(
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitEdge
-}
-
-"""All input for the `updateOrgLimit` mutation."""
-input UpdateOrgLimitInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgLimit` being updated.
-  """
-  orgLimitPatch: OrgLimitPatch!
-}
-
-"""
-Represents an update to a `OrgLimit`. Fields that are set will be updated.
-"""
-input OrgLimitPatch {
-  id: UUID
-
-  """Name identifier of the limit being tracked"""
-  name: String
-
-  """User whose usage is being tracked against this limit"""
-  actorId: UUID
-
-  """Current usage count for this actor and limit"""
-  num: Int
-
-  """Maximum allowed usage; NULL means use the default limit value"""
-  max: Int
-  entityId: UUID
 }
 
 """The output of our update `OrgClaimedInvite` mutation."""
@@ -8662,6 +8663,68 @@ input OrgChartEdgePatch {
   positionLevel: Int
 }
 
+"""The output of our update `AppLevelRequirement` mutation."""
+type UpdateAppLevelRequirementPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLevelRequirement` that was updated by this mutation."""
+  appLevelRequirement: AppLevelRequirement
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
+  appLevelRequirementEdge(
+    """The method to use when ordering `AppLevelRequirement`."""
+    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelRequirementEdge
+}
+
+"""All input for the `updateAppLevelRequirement` mutation."""
+input UpdateAppLevelRequirementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `AppLevelRequirement` being updated.
+  """
+  appLevelRequirementPatch: AppLevelRequirementPatch!
+}
+
+"""
+Represents an update to a `AppLevelRequirement`. Fields that are set will be updated.
+"""
+input AppLevelRequirementPatch {
+  id: UUID
+
+  """Name identifier of the requirement (matches step names)"""
+  name: String
+
+  """Name of the level this requirement belongs to"""
+  level: String
+
+  """Human-readable description of what this requirement entails"""
+  description: String
+
+  """Number of steps needed to satisfy this requirement"""
+  requiredCount: Int
+
+  """Display ordering priority; lower values appear first"""
+  priority: Int
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
 """The output of our update `OrgMembershipDefault` mutation."""
 type UpdateOrgMembershipDefaultPayload {
   """
@@ -8727,31 +8790,31 @@ input OrgMembershipDefaultPatch {
   createGroupsCascadeMembers: Boolean
 }
 
-"""The output of our update `AppLevelRequirement` mutation."""
-type UpdateAppLevelRequirementPayload {
+"""The output of our update `AppLevel` mutation."""
+type UpdateAppLevelPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` that was updated by this mutation."""
-  appLevelRequirement: AppLevelRequirement
+  """The `AppLevel` that was updated by this mutation."""
+  appLevel: AppLevel
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
+  """An edge for our `AppLevel`. May be used by Relay 1."""
+  appLevelEdge(
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelEdge
 }
 
-"""All input for the `updateAppLevelRequirement` mutation."""
-input UpdateAppLevelRequirementInput {
+"""All input for the `updateAppLevel` mutation."""
+input UpdateAppLevelInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -8760,31 +8823,108 @@ input UpdateAppLevelRequirementInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `AppLevelRequirement` being updated.
+  An object where the defined keys will be set on the `AppLevel` being updated.
   """
-  appLevelRequirementPatch: AppLevelRequirementPatch!
+  appLevelPatch: AppLevelPatch!
 }
 
 """
-Represents an update to a `AppLevelRequirement`. Fields that are set will be updated.
+Represents an update to a `AppLevel`. Fields that are set will be updated.
 """
-input AppLevelRequirementPatch {
+input AppLevelPatch {
   id: UUID
 
-  """Name identifier of the requirement (matches step names)"""
+  """Unique name of the level"""
   name: String
 
-  """Name of the level this requirement belongs to"""
-  level: String
-
-  """Human-readable description of what this requirement entails"""
+  """Human-readable description of what this level represents"""
   description: String
 
-  """Number of steps needed to satisfy this requirement"""
-  requiredCount: Int
+  """Badge or icon image associated with this level"""
+  image: ConstructiveInternalTypeImage
 
-  """Display ordering priority; lower values appear first"""
-  priority: Int
+  """Optional owner (actor) who created or manages this level"""
+  ownerId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """Upload for Badge or icon image associated with this level"""
+  imageUpload: Upload
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+"""The output of our update `Invite` mutation."""
+type UpdateInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Invite` that was updated by this mutation."""
+  invite: Invite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Invite`. May be used by Relay 1."""
+  inviteEdge(
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InviteEdge
+}
+
+"""All input for the `updateInvite` mutation."""
+input UpdateInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Invite` being updated.
+  """
+  invitePatch: InvitePatch!
+}
+
+"""
+Represents an update to a `Invite`. Fields that are set will be updated.
+"""
+input InvitePatch {
+  id: UUID
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -8960,145 +9100,6 @@ input OrgMembershipPatch {
   entityId: UUID
   profileId: UUID
 }
-
-"""The output of our update `Invite` mutation."""
-type UpdateInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Invite` that was updated by this mutation."""
-  invite: Invite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
-}
-
-"""All input for the `updateInvite` mutation."""
-input UpdateInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `Invite` being updated.
-  """
-  invitePatch: InvitePatch!
-}
-
-"""
-Represents an update to a `Invite`. Fields that are set will be updated.
-"""
-input InvitePatch {
-  id: UUID
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `AppLevel` mutation."""
-type UpdateAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was updated by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `updateAppLevel` mutation."""
-input UpdateAppLevelInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `AppLevel` being updated.
-  """
-  appLevelPatch: AppLevelPatch!
-}
-
-"""
-Represents an update to a `AppLevel`. Fields that are set will be updated.
-"""
-input AppLevelPatch {
-  id: UUID
-
-  """Unique name of the level"""
-  name: String
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Upload for Badge or icon image associated with this level"""
-  imageUpload: Upload
-}
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
 
 """The output of our update `OrgInvite` mutation."""
 type UpdateOrgInvitePayload {
@@ -9343,72 +9344,6 @@ input DeleteAppOwnerGrantInput {
   id: UUID!
 }
 
-"""The output of our delete `OrgAdminGrant` mutation."""
-type DeleteOrgAdminGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgAdminGrant` that was deleted by this mutation."""
-  orgAdminGrant: OrgAdminGrant
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgAdminGrant`. May be used by Relay 1."""
-  orgAdminGrantEdge(
-    """The method to use when ordering `OrgAdminGrant`."""
-    orderBy: [OrgAdminGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgAdminGrantEdge
-}
-
-"""All input for the `deleteOrgAdminGrant` mutation."""
-input DeleteOrgAdminGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `OrgOwnerGrant` mutation."""
-type DeleteOrgOwnerGrantPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgOwnerGrant` that was deleted by this mutation."""
-  orgOwnerGrant: OrgOwnerGrant
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgOwnerGrant`. May be used by Relay 1."""
-  orgOwnerGrantEdge(
-    """The method to use when ordering `OrgOwnerGrant`."""
-    orderBy: [OrgOwnerGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgOwnerGrantEdge
-}
-
-"""All input for the `deleteOrgOwnerGrant` mutation."""
-input DeleteOrgOwnerGrantInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `AppLimitDefault` mutation."""
 type DeleteAppLimitDefaultPayload {
   """
@@ -9475,31 +9410,64 @@ input DeleteOrgLimitDefaultInput {
   id: UUID!
 }
 
-"""The output of our delete `OrgChartEdgeGrant` mutation."""
-type DeleteOrgChartEdgeGrantPayload {
+"""The output of our delete `OrgAdminGrant` mutation."""
+type DeleteOrgAdminGrantPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `OrgChartEdgeGrant` that was deleted by this mutation."""
-  orgChartEdgeGrant: OrgChartEdgeGrant
+  """The `OrgAdminGrant` that was deleted by this mutation."""
+  orgAdminGrant: OrgAdminGrant
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
-  orgChartEdgeGrantEdge(
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantEdge
+  """An edge for our `OrgAdminGrant`. May be used by Relay 1."""
+  orgAdminGrantEdge(
+    """The method to use when ordering `OrgAdminGrant`."""
+    orderBy: [OrgAdminGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgAdminGrantEdge
 }
 
-"""All input for the `deleteOrgChartEdgeGrant` mutation."""
-input DeleteOrgChartEdgeGrantInput {
+"""All input for the `deleteOrgAdminGrant` mutation."""
+input DeleteOrgAdminGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgOwnerGrant` mutation."""
+type DeleteOrgOwnerGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgOwnerGrant` that was deleted by this mutation."""
+  orgOwnerGrant: OrgOwnerGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgOwnerGrant`. May be used by Relay 1."""
+  orgOwnerGrantEdge(
+    """The method to use when ordering `OrgOwnerGrant`."""
+    orderBy: [OrgOwnerGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgOwnerGrantEdge
+}
+
+"""All input for the `deleteOrgOwnerGrant` mutation."""
+input DeleteOrgOwnerGrantInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -9743,6 +9711,72 @@ input DeleteClaimedInviteInput {
   id: UUID!
 }
 
+"""The output of our delete `OrgChartEdgeGrant` mutation."""
+type DeleteOrgChartEdgeGrantPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgChartEdgeGrant` that was deleted by this mutation."""
+  orgChartEdgeGrant: OrgChartEdgeGrant
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgChartEdgeGrant`. May be used by Relay 1."""
+  orgChartEdgeGrantEdge(
+    """The method to use when ordering `OrgChartEdgeGrant`."""
+    orderBy: [OrgChartEdgeGrantOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgChartEdgeGrantEdge
+}
+
+"""All input for the `deleteOrgChartEdgeGrant` mutation."""
+input DeleteOrgChartEdgeGrantInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `OrgLimit` mutation."""
+type DeleteOrgLimitPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgLimit` that was deleted by this mutation."""
+  orgLimit: OrgLimit
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgLimit`. May be used by Relay 1."""
+  orgLimitEdge(
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgLimitEdge
+}
+
+"""All input for the `deleteOrgLimit` mutation."""
+input DeleteOrgLimitInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `AppGrant` mutation."""
 type DeleteAppGrantPayload {
   """
@@ -9801,39 +9835,6 @@ type DeleteAppMembershipDefaultPayload {
 
 """All input for the `deleteAppMembershipDefault` mutation."""
 input DeleteAppMembershipDefaultInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `OrgLimit` mutation."""
-type DeleteOrgLimitPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgLimit` that was deleted by this mutation."""
-  orgLimit: OrgLimit
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgLimit`. May be used by Relay 1."""
-  orgLimitEdge(
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgLimitEdge
-}
-
-"""All input for the `deleteOrgLimit` mutation."""
-input DeleteOrgLimitInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -9941,6 +9942,39 @@ input DeleteOrgChartEdgeInput {
   id: UUID!
 }
 
+"""The output of our delete `AppLevelRequirement` mutation."""
+type DeleteAppLevelRequirementPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `AppLevelRequirement` that was deleted by this mutation."""
+  appLevelRequirement: AppLevelRequirement
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
+  appLevelRequirementEdge(
+    """The method to use when ordering `AppLevelRequirement`."""
+    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelRequirementEdge
+}
+
+"""All input for the `deleteAppLevelRequirement` mutation."""
+input DeleteAppLevelRequirementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `OrgMembershipDefault` mutation."""
 type DeleteOrgMembershipDefaultPayload {
   """
@@ -9974,31 +10008,64 @@ input DeleteOrgMembershipDefaultInput {
   id: UUID!
 }
 
-"""The output of our delete `AppLevelRequirement` mutation."""
-type DeleteAppLevelRequirementPayload {
+"""The output of our delete `AppLevel` mutation."""
+type DeleteAppLevelPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `AppLevelRequirement` that was deleted by this mutation."""
-  appLevelRequirement: AppLevelRequirement
+  """The `AppLevel` that was deleted by this mutation."""
+  appLevel: AppLevel
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `AppLevelRequirement`. May be used by Relay 1."""
-  appLevelRequirementEdge(
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementEdge
+  """An edge for our `AppLevel`. May be used by Relay 1."""
+  appLevelEdge(
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppLevelEdge
 }
 
-"""All input for the `deleteAppLevelRequirement` mutation."""
-input DeleteAppLevelRequirementInput {
+"""All input for the `deleteAppLevel` mutation."""
+input DeleteAppLevelInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `Invite` mutation."""
+type DeleteInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Invite` that was deleted by this mutation."""
+  invite: Invite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Invite`. May be used by Relay 1."""
+  inviteEdge(
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): InviteEdge
+}
+
+"""All input for the `deleteInvite` mutation."""
+input DeleteInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -10065,72 +10132,6 @@ type DeleteOrgMembershipPayload {
 
 """All input for the `deleteOrgMembership` mutation."""
 input DeleteOrgMembershipInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `Invite` mutation."""
-type DeleteInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Invite` that was deleted by this mutation."""
-  invite: Invite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
-}
-
-"""All input for the `deleteInvite` mutation."""
-input DeleteInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `AppLevel` mutation."""
-type DeleteAppLevelPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `AppLevel` that was deleted by this mutation."""
-  appLevel: AppLevel
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `AppLevel`. May be used by Relay 1."""
-  appLevelEdge(
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): AppLevelEdge
-}
-
-"""All input for the `deleteAppLevel` mutation."""
-input DeleteAppLevelInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
