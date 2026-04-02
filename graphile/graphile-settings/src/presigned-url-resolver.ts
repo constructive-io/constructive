@@ -1,7 +1,7 @@
 /**
  * Presigned URL resolver for the Constructive presigned URL plugin.
  *
- * Reads CDN/S3/MinIO configuration from the standard env system
+ * Reads CDN/S3 configuration from the standard env system
  * (getEnvOptions → pgpmDefaults + config files + env vars) and lazily
  * initializes an S3Client on first use.
  *
@@ -30,31 +30,24 @@ export function getPresignedUrlS3Config(): S3Config {
   const { cdn } = getEnvOptions();
 
   // cdn is guaranteed populated — pgpmDefaults provides all CDN fields
-  const { provider, bucketName, awsRegion, awsAccessKey, awsSecretKey, minioEndpoint } = cdn!;
-  const isMinio = provider === 'minio';
+  const { bucketName, awsRegion, awsAccessKey, awsSecretKey, endpoint, publicUrlPrefix } = cdn!;
 
   log.info(
-    `[presigned-url-resolver] Initializing: provider=${provider} bucket=${bucketName}`,
+    `[presigned-url-resolver] Initializing: bucket=${bucketName} endpoint=${endpoint}`,
   );
 
   const client = new S3Client({
     region: awsRegion,
     credentials: { accessKeyId: awsAccessKey!, secretAccessKey: awsSecretKey! },
-    ...(isMinio ? { endpoint: minioEndpoint, forcePathStyle: true } : {}),
+    ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
   });
-
-  // For MinIO (path-style), public URL prefix is endpoint/bucket.
-  // For S3 (virtual-hosted), it's https://{bucket}.s3.{region}.amazonaws.com
-  const publicUrlPrefix = isMinio
-    ? `${minioEndpoint}/${bucketName}`
-    : `https://${bucketName}.s3.${awsRegion}.amazonaws.com`;
 
   s3Config = {
     client,
     bucket: bucketName!,
     region: awsRegion,
     publicUrlPrefix,
-    ...(isMinio ? { endpoint: minioEndpoint, forcePathStyle: true } : {}),
+    ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
   };
 
   return s3Config;

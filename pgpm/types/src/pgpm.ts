@@ -121,7 +121,13 @@ export interface CDNOptions {
     awsAccessKey?: string;
     /** AWS secret key for S3 */
     awsSecretKey?: string;
-    /** MinIO endpoint URL for local development (only used when provider is 'minio') */
+    /** S3-compatible API endpoint URL (MinIO, R2, DO Spaces, GCS, etc.) */
+    endpoint?: string;
+    /** Public URL prefix for generating download URLs (e.g., CDN domain, S3 public URL) */
+    publicUrlPrefix?: string;
+    /**
+     * @deprecated Use `endpoint` instead. Kept for backwards compatibility.
+     */
     minioEndpoint?: string;
 }
 
@@ -301,6 +307,8 @@ export const pgpmDefaults: PgpmOptions = {
     awsRegion: 'us-east-1',
     awsAccessKey: 'minioadmin',
     awsSecretKey: 'minioadmin',
+    endpoint: 'http://localhost:9000',
+    publicUrlPrefix: 'http://localhost:9000/test-bucket',
     minioEndpoint: 'http://localhost:9000'
   },
   deployment: {
