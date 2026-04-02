@@ -50,7 +50,7 @@ export const PostgisExtensionDetectionPlugin: GraphileConfig.Plugin = {
 
         // PostGIS is detected when at least one of geometry or geography
         // codecs is present. Some databases use only geography columns
-        // (e.g. use_geography: true in DataPostGIS), so PostGraphile may
+        // (e.g. use_geography: true in SearchSpatial), so PostGraphile may
         // introspect geography but not geometry.
         if (!geometryCodec && !geographyCodec) {
           return build;

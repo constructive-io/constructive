@@ -1,9 +1,9 @@
 import type { NodeTypeDefinition } from '../types';
 
-export const DataBm25: NodeTypeDefinition = {
-  "name": "DataBm25",
-  "slug": "data_bm25",
-  "category": "data",
+export const SearchBm25: NodeTypeDefinition = {
+  "name": "SearchBm25",
+  "slug": "search_bm25",
+  "category": "search",
   "display_name": "BM25 Search",
   "description": "Creates a BM25 index on an existing text column using pg_textsearch. Enables statistical relevance ranking with configurable k1 and b parameters. The BM25 index is auto-detected by graphile-search.",
   "parameter_schema": {

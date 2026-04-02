@@ -1,10 +1,10 @@
 import type { NodeTypeDefinition } from '../types';
 
-export const DataPostGISAggregate: NodeTypeDefinition = {
-  "name": "DataPostGISAggregate",
-  "slug": "data_postgis_aggregate",
-  "category": "data",
-  "display_name": "PostGIS Aggregate Geometry",
+export const SearchSpatialAggregate: NodeTypeDefinition = {
+  "name": "SearchSpatialAggregate",
+  "slug": "search_spatial_aggregate",
+  "category": "search",
+  "display_name": "Spatial Aggregate Search",
   "description": "Creates a derived/materialized geometry field on the parent table that automatically aggregates geometries from a source (child) table via triggers. When child rows are inserted/updated/deleted, the parent aggregate field is recalculated using the specified PostGIS aggregation function (ST_Union, ST_Collect, ST_ConvexHull, ST_ConcaveHull). Useful for materializing spatial boundaries from collections of points or polygons.",
   "parameter_schema": {
     "type": "object",

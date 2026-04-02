@@ -68,7 +68,7 @@ interface SearchScoreDetails {
 
 /**
  * Per-table search configuration read from the @searchConfig smart tag.
- * Written by DataFullTextSearch, DataBm25, and DataSearch in constructive-db.
+ * Written by SearchFullText, SearchBm25, and SearchUnified in constructive-db.
  */
 interface SearchConfig {
   weights?: Record<string, number>;
@@ -488,7 +488,7 @@ export function createUnifiedSearchPlugin(
               }
             }
 
-            // Read per-table @searchConfig smart tag (written by DataSearch/DataFullTextSearch/DataBm25)
+            // Read per-table @searchConfig smart tag (written by SearchUnified/SearchFullText/SearchBm25)
             // Per-table config overrides global searchScoreWeights
             const tableSearchConfig = getSearchConfig(codec);
 
