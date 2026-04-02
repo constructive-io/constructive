@@ -1124,6 +1124,10 @@ export interface AuditLog {
   success: boolean | null;
   createdAt: string | null;
 }
+export interface AppPermissionDefault {
+  id: string | null;
+  permissions: string | null;
+}
 export interface Ref {
   id: string | null;
   name: string | null;
@@ -1138,13 +1142,14 @@ export interface Store {
   hash: string | null;
   createdAt: string | null;
 }
-export interface AppPermissionDefault {
-  id: string | null;
-  permissions: string | null;
-}
 export interface RoleType {
   id: number | null;
   name: string | null;
+}
+export interface MigrateFile {
+  id: string | null;
+  databaseId: string | null;
+  upload: ConstructiveInternalTypeUpload | null;
 }
 export interface AppLimitDefault {
   id: string | null;
@@ -1156,16 +1161,20 @@ export interface OrgLimitDefault {
   name: string | null;
   max: number | null;
 }
-export interface MigrateFile {
-  id: string | null;
-  databaseId: string | null;
-  upload: ConstructiveInternalTypeUpload | null;
-}
 export interface MembershipType {
   id: number | null;
   name: string | null;
   description: string | null;
   prefix: string | null;
+}
+export interface AppMembershipDefault {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  isApproved: boolean | null;
+  isVerified: boolean | null;
 }
 export interface Commit {
   id: string | null;
@@ -1178,14 +1187,16 @@ export interface Commit {
   treeId: string | null;
   date: string | null;
 }
-export interface AppMembershipDefault {
+export interface OrgMembershipDefault {
   id: string | null;
   createdAt: string | null;
   updatedAt: string | null;
   createdBy: string | null;
   updatedBy: string | null;
   isApproved: boolean | null;
-  isVerified: boolean | null;
+  entityId: string | null;
+  deleteMemberCascadeGroups: boolean | null;
+  createGroupsCascadeMembers: boolean | null;
 }
 export interface RlsModule {
   id: string | null;
@@ -1199,30 +1210,6 @@ export interface RlsModule {
   authenticateStrict: string | null;
   currentRole: string | null;
   currentRoleId: string | null;
-}
-export interface NodeTypeRegistry {
-  name: string | null;
-  slug: string | null;
-  category: string | null;
-  displayName: string | null;
-  description: string | null;
-  summary: string | null;
-  parameterSchema: unknown | null;
-  guidance: unknown | null;
-  tags: string[] | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-export interface OrgMembershipDefault {
-  id: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-  isApproved: boolean | null;
-  entityId: string | null;
-  deleteMemberCascadeGroups: boolean | null;
-  createGroupsCascadeMembers: boolean | null;
 }
 export interface SqlAction {
   id: number | null;

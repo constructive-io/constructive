@@ -96,19 +96,18 @@ import { ClaimedInviteModel } from './models/claimedInvite';
 import { OrgInviteModel } from './models/orgInvite';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { AuditLogModel } from './models/auditLog';
+import { AppPermissionDefaultModel } from './models/appPermissionDefault';
 import { RefModel } from './models/ref';
 import { StoreModel } from './models/store';
-import { AppPermissionDefaultModel } from './models/appPermissionDefault';
 import { RoleTypeModel } from './models/roleType';
+import { MigrateFileModel } from './models/migrateFile';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
-import { MigrateFileModel } from './models/migrateFile';
 import { MembershipTypeModel } from './models/membershipType';
-import { CommitModel } from './models/commit';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
-import { RlsModuleModel } from './models/rlsModule';
-import { NodeTypeRegistryModel } from './models/nodeTypeRegistry';
+import { CommitModel } from './models/commit';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
+import { RlsModuleModel } from './models/rlsModule';
 import { SqlActionModel } from './models/sqlAction';
 import { UserModel } from './models/user';
 import { AstMigrationModel } from './models/astMigration';
@@ -240,19 +239,18 @@ export function createClient(config: OrmClientConfig) {
     orgInvite: new OrgInviteModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
     auditLog: new AuditLogModel(client),
+    appPermissionDefault: new AppPermissionDefaultModel(client),
     ref: new RefModel(client),
     store: new StoreModel(client),
-    appPermissionDefault: new AppPermissionDefaultModel(client),
     roleType: new RoleTypeModel(client),
+    migrateFile: new MigrateFileModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
-    migrateFile: new MigrateFileModel(client),
     membershipType: new MembershipTypeModel(client),
-    commit: new CommitModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
-    rlsModule: new RlsModuleModel(client),
-    nodeTypeRegistry: new NodeTypeRegistryModel(client),
+    commit: new CommitModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
+    rlsModule: new RlsModuleModel(client),
     sqlAction: new SqlActionModel(client),
     user: new UserModel(client),
     astMigration: new AstMigrationModel(client),

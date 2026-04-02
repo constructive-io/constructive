@@ -31,27 +31,27 @@ const db = createClient({
 | `orgPermissionDefault` | findMany, findOne, create, update, delete |
 | `appAdminGrant` | findMany, findOne, create, update, delete |
 | `appOwnerGrant` | findMany, findOne, create, update, delete |
-| `orgAdminGrant` | findMany, findOne, create, update, delete |
-| `orgOwnerGrant` | findMany, findOne, create, update, delete |
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
-| `orgChartEdgeGrant` | findMany, findOne, create, update, delete |
+| `orgAdminGrant` | findMany, findOne, create, update, delete |
+| `orgOwnerGrant` | findMany, findOne, create, update, delete |
 | `membershipType` | findMany, findOne, create, update, delete |
 | `appLimit` | findMany, findOne, create, update, delete |
 | `appAchievement` | findMany, findOne, create, update, delete |
 | `appStep` | findMany, findOne, create, update, delete |
 | `claimedInvite` | findMany, findOne, create, update, delete |
+| `orgChartEdgeGrant` | findMany, findOne, create, update, delete |
+| `orgLimit` | findMany, findOne, create, update, delete |
 | `appGrant` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
-| `orgLimit` | findMany, findOne, create, update, delete |
 | `orgClaimedInvite` | findMany, findOne, create, update, delete |
 | `orgGrant` | findMany, findOne, create, update, delete |
 | `orgChartEdge` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
+| `appLevel` | findMany, findOne, create, update, delete |
+| `invite` | findMany, findOne, create, update, delete |
 | `appMembership` | findMany, findOne, create, update, delete |
 | `orgMembership` | findMany, findOne, create, update, delete |
-| `invite` | findMany, findOne, create, update, delete |
-| `appLevel` | findMany, findOne, create, update, delete |
 | `orgInvite` | findMany, findOne, create, update, delete |
 
 ## Table Operations
@@ -379,6 +379,68 @@ const updated = await db.appOwnerGrant.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.appOwnerGrant.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.appLimitDefault`
+
+CRUD operations for AppLimitDefault records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `max` | Int | Yes |
+
+**Operations:**
+
+```typescript
+// List all appLimitDefault records
+const items = await db.appLimitDefault.findMany({ select: { id: true, name: true, max: true } }).execute();
+
+// Get one by id
+const item = await db.appLimitDefault.findOne({ id: '<UUID>', select: { id: true, name: true, max: true } }).execute();
+
+// Create
+const created = await db.appLimitDefault.create({ data: { name: '<String>', max: '<Int>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.appLimitDefault.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.appLimitDefault.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.orgLimitDefault`
+
+CRUD operations for OrgLimitDefault records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `max` | Int | Yes |
+
+**Operations:**
+
+```typescript
+// List all orgLimitDefault records
+const items = await db.orgLimitDefault.findMany({ select: { id: true, name: true, max: true } }).execute();
+
+// Get one by id
+const item = await db.orgLimitDefault.findOne({ id: '<UUID>', select: { id: true, name: true, max: true } }).execute();
+
+// Create
+const created = await db.orgLimitDefault.create({ data: { name: '<String>', max: '<Int>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgLimitDefault.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgLimitDefault.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.orgAdminGrant`
 
 CRUD operations for OrgAdminGrant records.
@@ -447,105 +509,6 @@ const updated = await db.orgOwnerGrant.update({ where: { id: '<UUID>' }, data: {
 
 // Delete
 const deleted = await db.orgOwnerGrant.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.appLimitDefault`
-
-CRUD operations for AppLimitDefault records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `max` | Int | Yes |
-
-**Operations:**
-
-```typescript
-// List all appLimitDefault records
-const items = await db.appLimitDefault.findMany({ select: { id: true, name: true, max: true } }).execute();
-
-// Get one by id
-const item = await db.appLimitDefault.findOne({ id: '<UUID>', select: { id: true, name: true, max: true } }).execute();
-
-// Create
-const created = await db.appLimitDefault.create({ data: { name: '<String>', max: '<Int>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.appLimitDefault.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.appLimitDefault.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.orgLimitDefault`
-
-CRUD operations for OrgLimitDefault records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `max` | Int | Yes |
-
-**Operations:**
-
-```typescript
-// List all orgLimitDefault records
-const items = await db.orgLimitDefault.findMany({ select: { id: true, name: true, max: true } }).execute();
-
-// Get one by id
-const item = await db.orgLimitDefault.findOne({ id: '<UUID>', select: { id: true, name: true, max: true } }).execute();
-
-// Create
-const created = await db.orgLimitDefault.create({ data: { name: '<String>', max: '<Int>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.orgLimitDefault.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.orgLimitDefault.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.orgChartEdgeGrant`
-
-CRUD operations for OrgChartEdgeGrant records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `entityId` | UUID | Yes |
-| `childId` | UUID | Yes |
-| `parentId` | UUID | Yes |
-| `grantorId` | UUID | Yes |
-| `isGrant` | Boolean | Yes |
-| `positionTitle` | String | Yes |
-| `positionLevel` | Int | Yes |
-| `createdAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all orgChartEdgeGrant records
-const items = await db.orgChartEdgeGrant.findMany({ select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } }).execute();
-
-// Get one by id
-const item = await db.orgChartEdgeGrant.findOne({ id: '<UUID>', select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } }).execute();
-
-// Create
-const created = await db.orgChartEdgeGrant.create({ data: { entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', positionTitle: '<String>', positionLevel: '<Int>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.orgChartEdgeGrant.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.orgChartEdgeGrant.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.membershipType`
@@ -715,6 +678,77 @@ const updated = await db.claimedInvite.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.claimedInvite.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.orgChartEdgeGrant`
+
+CRUD operations for OrgChartEdgeGrant records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `entityId` | UUID | Yes |
+| `childId` | UUID | Yes |
+| `parentId` | UUID | Yes |
+| `grantorId` | UUID | Yes |
+| `isGrant` | Boolean | Yes |
+| `positionTitle` | String | Yes |
+| `positionLevel` | Int | Yes |
+| `createdAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all orgChartEdgeGrant records
+const items = await db.orgChartEdgeGrant.findMany({ select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } }).execute();
+
+// Get one by id
+const item = await db.orgChartEdgeGrant.findOne({ id: '<UUID>', select: { id: true, entityId: true, childId: true, parentId: true, grantorId: true, isGrant: true, positionTitle: true, positionLevel: true, createdAt: true } }).execute();
+
+// Create
+const created = await db.orgChartEdgeGrant.create({ data: { entityId: '<UUID>', childId: '<UUID>', parentId: '<UUID>', grantorId: '<UUID>', isGrant: '<Boolean>', positionTitle: '<String>', positionLevel: '<Int>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgChartEdgeGrant.update({ where: { id: '<UUID>' }, data: { entityId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgChartEdgeGrant.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.orgLimit`
+
+CRUD operations for OrgLimit records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `actorId` | UUID | Yes |
+| `num` | Int | Yes |
+| `max` | Int | Yes |
+| `entityId` | UUID | Yes |
+
+**Operations:**
+
+```typescript
+// List all orgLimit records
+const items = await db.orgLimit.findMany({ select: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } }).execute();
+
+// Get one by id
+const item = await db.orgLimit.findOne({ id: '<UUID>', select: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } }).execute();
+
+// Create
+const created = await db.orgLimit.create({ data: { name: '<String>', actorId: '<UUID>', num: '<Int>', max: '<Int>', entityId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.orgLimit.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.orgLimit.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.appGrant`
 
 CRUD operations for AppGrant records.
@@ -783,40 +817,6 @@ const updated = await db.appMembershipDefault.update({ where: { id: '<UUID>' }, 
 
 // Delete
 const deleted = await db.appMembershipDefault.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.orgLimit`
-
-CRUD operations for OrgLimit records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `actorId` | UUID | Yes |
-| `num` | Int | Yes |
-| `max` | Int | Yes |
-| `entityId` | UUID | Yes |
-
-**Operations:**
-
-```typescript
-// List all orgLimit records
-const items = await db.orgLimit.findMany({ select: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } }).execute();
-
-// Get one by id
-const item = await db.orgLimit.findOne({ id: '<UUID>', select: { id: true, name: true, actorId: true, num: true, max: true, entityId: true } }).execute();
-
-// Create
-const created = await db.orgLimit.create({ data: { name: '<String>', actorId: '<UUID>', num: '<Int>', max: '<Int>', entityId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.orgLimit.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.orgLimit.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.orgClaimedInvite`
@@ -963,6 +963,81 @@ const updated = await db.orgMembershipDefault.update({ where: { id: '<UUID>' }, 
 const deleted = await db.orgMembershipDefault.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.appLevel`
+
+CRUD operations for AppLevel records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `name` | String | Yes |
+| `description` | String | Yes |
+| `image` | ConstructiveInternalTypeImage | Yes |
+| `ownerId` | UUID | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all appLevel records
+const items = await db.appLevel.findMany({ select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.appLevel.findOne({ id: '<UUID>', select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.appLevel.create({ data: { name: '<String>', description: '<String>', image: '<Image>', ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.appLevel.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.appLevel.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.invite`
+
+CRUD operations for Invite records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `email` | ConstructiveInternalTypeEmail | Yes |
+| `senderId` | UUID | Yes |
+| `inviteToken` | String | Yes |
+| `inviteValid` | Boolean | Yes |
+| `inviteLimit` | Int | Yes |
+| `inviteCount` | Int | Yes |
+| `multiple` | Boolean | Yes |
+| `data` | JSON | Yes |
+| `expiresAt` | Datetime | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all invite records
+const items = await db.invite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.invite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.invite.create({ data: { email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.invite.update({ where: { id: '<UUID>' }, data: { email: '<Email>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.invite.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.appMembership`
 
 CRUD operations for AppMembership records.
@@ -1049,81 +1124,6 @@ const updated = await db.orgMembership.update({ where: { id: '<UUID>' }, data: {
 
 // Delete
 const deleted = await db.orgMembership.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.invite`
-
-CRUD operations for Invite records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `email` | ConstructiveInternalTypeEmail | Yes |
-| `senderId` | UUID | Yes |
-| `inviteToken` | String | Yes |
-| `inviteValid` | Boolean | Yes |
-| `inviteLimit` | Int | Yes |
-| `inviteCount` | Int | Yes |
-| `multiple` | Boolean | Yes |
-| `data` | JSON | Yes |
-| `expiresAt` | Datetime | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all invite records
-const items = await db.invite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.invite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.invite.create({ data: { email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.invite.update({ where: { id: '<UUID>' }, data: { email: '<Email>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.invite.delete({ where: { id: '<UUID>' } }).execute();
-```
-
-### `db.appLevel`
-
-CRUD operations for AppLevel records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `name` | String | Yes |
-| `description` | String | Yes |
-| `image` | ConstructiveInternalTypeImage | Yes |
-| `ownerId` | UUID | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all appLevel records
-const items = await db.appLevel.findMany({ select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.appLevel.findOne({ id: '<UUID>', select: { id: true, name: true, description: true, image: true, ownerId: true, createdAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.appLevel.create({ data: { name: '<String>', description: '<String>', image: '<Image>', ownerId: '<UUID>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.appLevel.update({ where: { id: '<UUID>' }, data: { name: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.appLevel.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.orgInvite`

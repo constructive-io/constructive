@@ -794,6 +794,16 @@ export interface VerifyTotpInput {
   clientMutationId?: string;
   totpValue: string;
 }
+export interface CreateRoleTypeInput {
+  clientMutationId?: string;
+  /** The `RoleType` to be created by this mutation. */
+  roleType: RoleTypeInput;
+}
+/** An input for mutations affecting `RoleType` */
+export interface RoleTypeInput {
+  id: number;
+  name: string;
+}
 export interface CreateCryptoAddressInput {
   clientMutationId?: string;
   /** The `CryptoAddress` to be created by this mutation. */
@@ -811,16 +821,6 @@ export interface CryptoAddressInput {
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateRoleTypeInput {
-  clientMutationId?: string;
-  /** The `RoleType` to be created by this mutation. */
-  roleType: RoleTypeInput;
-}
-/** An input for mutations affecting `RoleType` */
-export interface RoleTypeInput {
-  id: number;
-  name: string;
 }
 export interface CreatePhoneNumberInput {
   clientMutationId?: string;
@@ -918,6 +918,17 @@ export interface UserInput {
   createdAt?: string;
   updatedAt?: string;
 }
+export interface UpdateRoleTypeInput {
+  clientMutationId?: string;
+  id: number;
+  /** An object where the defined keys will be set on the `RoleType` being updated. */
+  roleTypePatch: RoleTypePatch;
+}
+/** Represents an update to a `RoleType`. Fields that are set will be updated. */
+export interface RoleTypePatch {
+  id?: number;
+  name?: string;
+}
 export interface UpdateCryptoAddressInput {
   clientMutationId?: string;
   id: string;
@@ -936,17 +947,6 @@ export interface CryptoAddressPatch {
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface UpdateRoleTypeInput {
-  clientMutationId?: string;
-  id: number;
-  /** An object where the defined keys will be set on the `RoleType` being updated. */
-  roleTypePatch: RoleTypePatch;
-}
-/** Represents an update to a `RoleType`. Fields that are set will be updated. */
-export interface RoleTypePatch {
-  id?: number;
-  name?: string;
 }
 export interface UpdatePhoneNumberInput {
   clientMutationId?: string;
@@ -1051,13 +1051,13 @@ export interface UserPatch {
   /** File upload for the `profilePicture` field. */
   profilePictureUpload?: File;
 }
-export interface DeleteCryptoAddressInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
+}
+export interface DeleteCryptoAddressInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface DeletePhoneNumberInput {
   clientMutationId?: string;
@@ -1079,17 +1079,17 @@ export interface DeleteUserInput {
   clientMutationId?: string;
   id: string;
 }
-/** A connection to a list of `CryptoAddress` values. */
-export interface CryptoAddressConnection {
-  nodes: CryptoAddress[];
-  edges: CryptoAddressEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `RoleType` values. */
 export interface RoleTypeConnection {
   nodes: RoleType[];
   edges: RoleTypeEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `CryptoAddress` values. */
+export interface CryptoAddressConnection {
+  nodes: CryptoAddress[];
+  edges: CryptoAddressEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1193,17 +1193,17 @@ export interface VerifyTotpPayload {
   clientMutationId?: string | null;
   result?: Session | null;
 }
-export interface CreateCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was created by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
 export interface CreateRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was created by this mutation. */
   roleType?: RoleType | null;
   roleTypeEdge?: RoleTypeEdge | null;
+}
+export interface CreateCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was created by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
 }
 export interface CreatePhoneNumberPayload {
   clientMutationId?: string | null;
@@ -1235,17 +1235,17 @@ export interface CreateUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
-export interface UpdateCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was updated by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
 export interface UpdateRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was updated by this mutation. */
   roleType?: RoleType | null;
   roleTypeEdge?: RoleTypeEdge | null;
+}
+export interface UpdateCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was updated by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
 }
 export interface UpdatePhoneNumberPayload {
   clientMutationId?: string | null;
@@ -1277,17 +1277,17 @@ export interface UpdateUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
-export interface DeleteCryptoAddressPayload {
-  clientMutationId?: string | null;
-  /** The `CryptoAddress` that was deleted by this mutation. */
-  cryptoAddress?: CryptoAddress | null;
-  cryptoAddressEdge?: CryptoAddressEdge | null;
-}
 export interface DeleteRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was deleted by this mutation. */
   roleType?: RoleType | null;
   roleTypeEdge?: RoleTypeEdge | null;
+}
+export interface DeleteCryptoAddressPayload {
+  clientMutationId?: string | null;
+  /** The `CryptoAddress` that was deleted by this mutation. */
+  cryptoAddress?: CryptoAddress | null;
+  cryptoAddressEdge?: CryptoAddressEdge | null;
 }
 export interface DeletePhoneNumberPayload {
   clientMutationId?: string | null;
@@ -1319,11 +1319,11 @@ export interface DeleteUserPayload {
   user?: User | null;
   userEdge?: UserEdge | null;
 }
-/** A `CryptoAddress` edge in the connection. */
-export interface CryptoAddressEdge {
+/** A `RoleType` edge in the connection. */
+export interface RoleTypeEdge {
   cursor?: string | null;
-  /** The `CryptoAddress` at the end of the edge. */
-  node?: CryptoAddress | null;
+  /** The `RoleType` at the end of the edge. */
+  node?: RoleType | null;
 }
 /** Information about pagination in a connection. */
 export interface PageInfo {
@@ -1336,11 +1336,11 @@ export interface PageInfo {
   /** When paginating forwards, the cursor to continue. */
   endCursor?: string | null;
 }
-/** A `RoleType` edge in the connection. */
-export interface RoleTypeEdge {
+/** A `CryptoAddress` edge in the connection. */
+export interface CryptoAddressEdge {
   cursor?: string | null;
-  /** The `RoleType` at the end of the edge. */
-  node?: RoleType | null;
+  /** The `CryptoAddress` at the end of the edge. */
+  node?: CryptoAddress | null;
 }
 /** A `PhoneNumber` edge in the connection. */
 export interface PhoneNumberEdge {
@@ -1524,6 +1524,7 @@ export interface MetaType {
   isArray: boolean;
   isNotNull?: boolean | null;
   hasDefault?: boolean | null;
+  subtype?: string | null;
 }
 /** Reference to a related table */
 export interface MetaRefTable {
