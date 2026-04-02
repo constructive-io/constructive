@@ -1,10 +1,10 @@
 import type { NodeTypeDefinition } from '../types';
 
-export const DataEmbedding: NodeTypeDefinition = {
-  "name": "DataEmbedding",
-  "slug": "data_embedding",
-  "category": "data",
-  "display_name": "Embedding",
+export const SearchVector: NodeTypeDefinition = {
+  "name": "SearchVector",
+  "slug": "search_vector",
+  "category": "search",
+  "display_name": "Vector Search",
   "description": "Adds a vector embedding column with HNSW or IVFFlat index for similarity search. Supports configurable dimensions, distance metrics (cosine, l2, ip), stale tracking strategies (column, null, hash), and automatic job enqueue triggers for embedding generation.",
   "parameter_schema": {
     "type": "object",

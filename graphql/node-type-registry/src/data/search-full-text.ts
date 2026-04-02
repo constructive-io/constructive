@@ -1,9 +1,9 @@
 import type { NodeTypeDefinition } from '../types';
 
-export const DataFullTextSearch: NodeTypeDefinition = {
-  "name": "DataFullTextSearch",
-  "slug": "data_full_text_search",
-  "category": "data",
+export const SearchFullText: NodeTypeDefinition = {
+  "name": "SearchFullText",
+  "slug": "search_full_text",
+  "category": "search",
   "display_name": "Full-Text Search",
   "description": "Adds a tsvector column with GIN index and automatic trigger population from source fields. Enables PostgreSQL full-text search with configurable weights and language support. Leverages the existing metaschema full_text_search infrastructure.",
   "parameter_schema": {
