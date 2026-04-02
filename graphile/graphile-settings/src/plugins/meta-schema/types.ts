@@ -28,6 +28,7 @@ export interface TypeMeta {
   isArray: boolean;
   isNotNull?: boolean;
   hasDefault?: boolean;
+  subtype?: string | null;
 }
 
 export interface IndexMeta {
@@ -135,11 +136,16 @@ export interface PgCodec {
   };
 }
 
+export interface PgAttributeExtensions extends Record<string, unknown> {
+  geometrySubtype?: string | null;
+}
+
 export interface PgAttribute {
   codec?: PgCodec | null;
   notNull?: boolean;
   hasDefault?: boolean;
   description?: string | null;
+  extensions?: PgAttributeExtensions | null;
 }
 
 export interface PgUnique {

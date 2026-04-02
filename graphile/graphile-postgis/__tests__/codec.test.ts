@@ -1,6 +1,8 @@
 import type { PgCodec } from '@dataplan/pg';
 import { PostgisCodecPlugin } from '../src/plugins/codec';
 import type { GisFieldValue } from '../src/types';
+import { GisSubtype } from '../src/constants';
+import { getGISTypeModifier } from '../src/utils';
 
 // Test event shape matching the GatherHooks.pgCodecs_findPgCodec event
 interface MockEvent {
@@ -240,6 +242,85 @@ describe('PostgisCodecPlugin', () => {
         expect(codec.castFromPg).toBeDefined();
         expect(typeof codec.castFromPg).toBe('function');
       });
+    });
+  });
+
+  describe('pgCodecs_attribute hook', () => {
+    const attributeHook = (PostgisCodecPlugin as { gather: { hooks: { pgCodecs_attribute: Function } } })
+      .gather.hooks.pgCodecs_attribute;
+
+    async function runAttributeHook({
+      codecName,
+      typmod,
+      withExtensions = true,
+    }: {
+      codecName: string;
+      typmod: number | null;
+      withExtensions?: boolean;
+    }) {
+      const attribute: Record<string, any> = { codec: { name: codecName } };
+      if (withExtensions) {
+        attribute.extensions = {};
+      }
+      const event = { pgAttribute: { atttypmod: typmod }, attribute };
+
+      await attributeHook({}, event);
+      return attribute;
+    }
+
+    it.each([
+      ['geometry', GisSubtype.Polygon, 'Polygon'],
+      ['geometry', GisSubtype.Point, 'Point'],
+      ['geography', GisSubtype.MultiPolygon, 'MultiPolygon'],
+    ])('stores geometrySubtype for %s subtype %s', async (codecName, subtype, expected) => {
+      const attribute = await runAttributeHook({
+        codecName,
+        typmod: getGISTypeModifier(subtype, false, false, 4326),
+      });
+
+      expect(attribute.extensions.geometrySubtype).toBe(expected);
+    });
+
+    it('should skip unconstrained geometry (atttypmod = -1)', async () => {
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: -1,
+      });
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should skip when atttypmod is null', async () => {
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: null,
+      });
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should not store subtype for base Geometry (subtype=0)', async () => {
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: getGISTypeModifier(GisSubtype.Geometry, false, false, 4326),
+      });
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should skip non-geometry codec types', async () => {
+      const attribute = await runAttributeHook({
+        codecName: 'text',
+        typmod: getGISTypeModifier(GisSubtype.Point, false, false, 4326),
+      });
+      expect(attribute.extensions.geometrySubtype).toBeUndefined();
+    });
+
+    it('should create extensions object if not present', async () => {
+      const attribute = await runAttributeHook({
+        codecName: 'geometry',
+        typmod: getGISTypeModifier(GisSubtype.LineString, false, false, 4326),
+        withExtensions: false,
+      });
+      expect(attribute.extensions).toBeDefined();
+      expect(attribute.extensions.geometrySubtype).toBe('LineString');
     });
   });
 });
