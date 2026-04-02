@@ -9744,12 +9744,12 @@ export interface UserFilter {
   /** TRGM search on the `display_name` column. */
   trgmDisplayName?: TrgmSearchInput;
   /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
    * simultaneously. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
-  fullTextSearch?: string;
+  unifiedSearch?: string;
 }
 export interface AstMigrationFilter {
   /** Filter by the object’s `id` field. */
@@ -22141,12 +22141,12 @@ export interface UserFilter {
   /** TRGM search on the `display_name` column. */
   trgmDisplayName?: TrgmSearchInput;
   /**
-   * Composite full-text search. Provide a search string and it will be dispatched
-   * to all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
    * simultaneously. Rows matching ANY algorithm are returned. All matching score
    * fields are populated.
    */
-  fullTextSearch?: string;
+  unifiedSearch?: string;
 }
 /** A filter to be used against `RlsModule` object types. All fields are combined with a logical ‘and.’ */
 export interface RlsModuleFilter {
