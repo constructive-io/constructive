@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.9.0...node-type-registry@0.9.1) (2026-04-02)
+
+### Bug Fixes
+
+- add 'search' to categoryOrder in generate-types.ts + regenerate blueprint types ([02b66f2](https://github.com/constructive-io/constructive/commit/02b66f289f268fcae47ea49c28fdc88e789e2a31))
+
 # [0.9.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.8.0...node-type-registry@0.9.0) (2026-04-01)
 
 ### Features
