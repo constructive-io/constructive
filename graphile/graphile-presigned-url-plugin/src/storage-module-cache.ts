@@ -44,6 +44,9 @@ const STORAGE_MODULE_QUERY = `
     ft.name AS files_table,
     urs.schema_name AS upload_requests_schema,
     urt.name AS upload_requests_table,
+    sm.endpoint,
+    sm.public_url_prefix,
+    sm.provider,
     sm.upload_url_expiry_seconds,
     sm.download_url_expiry_seconds,
     sm.default_max_file_size,
@@ -68,6 +71,9 @@ interface StorageModuleRow {
   files_table: string;
   upload_requests_schema: string;
   upload_requests_table: string;
+  endpoint: string | null;
+  public_url_prefix: string | null;
+  provider: string | null;
   upload_url_expiry_seconds: number | null;
   download_url_expiry_seconds: number | null;
   default_max_file_size: number | null;
@@ -112,6 +118,9 @@ export async function getStorageModuleConfig(
     bucketsTableName: row.buckets_table,
     filesTableName: row.files_table,
     uploadRequestsTableName: row.upload_requests_table,
+    endpoint: row.endpoint,
+    publicUrlPrefix: row.public_url_prefix,
+    provider: row.provider,
     uploadUrlExpirySeconds: row.upload_url_expiry_seconds ?? DEFAULT_UPLOAD_URL_EXPIRY_SECONDS,
     downloadUrlExpirySeconds: row.download_url_expiry_seconds ?? DEFAULT_DOWNLOAD_URL_EXPIRY_SECONDS,
     defaultMaxFileSize: row.default_max_file_size ?? DEFAULT_MAX_FILE_SIZE,

@@ -34,6 +34,15 @@ export interface StorageModuleConfig {
   /** Upload requests table name */
   uploadRequestsTableName: string;
 
+  // --- S3 connection config (NULL in DB = use global env/plugin defaults) ---
+
+  /** S3-compatible API endpoint URL (per-database override) */
+  endpoint: string | null;
+  /** Public URL prefix for generating download URLs (per-database override) */
+  publicUrlPrefix: string | null;
+  /** Storage provider type: 'minio', 's3', 'gcs', etc. (per-database override) */
+  provider: string | null;
+
   // --- Per-database configurable settings ---
 
   /** Presigned PUT URL expiry in seconds (default: 900 = 15 min) */
