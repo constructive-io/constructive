@@ -113,7 +113,7 @@ describe('@searchConfig integration tests', () => {
         createPgvectorAdapter(),
       ],
       enableSearchScore: true,
-      enableFullTextSearch: true,
+      enableUnifiedSearch: true,
     });
 
     // Inject @searchConfig on the articles table with custom weights
@@ -289,7 +289,7 @@ describe('@searchConfig with sigmoid normalization', () => {
         createPgvectorAdapter(),
       ],
       enableSearchScore: true,
-      enableFullTextSearch: true,
+      enableUnifiedSearch: true,
     });
 
     // Inject @searchConfig with sigmoid normalization

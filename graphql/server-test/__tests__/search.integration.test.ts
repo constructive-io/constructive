@@ -298,7 +298,7 @@ describe('Unified Search — server integration', () => {
   });
 
   // ===========================================================================
-  // Composite: searchScore + fullTextSearch
+  // Composite: searchScore + unifiedSearch
   // ===========================================================================
 
   describe('composite search', () => {
@@ -338,10 +338,10 @@ describe('Unified Search — server integration', () => {
       expect(res.body.data.articles.nodes[0].searchScore).toBeNull();
     });
 
-    it('should filter via fullTextSearch composite filter', async () => {
-      const res = await postGraphQL({
-        query: `{
-          articles(where: { fullTextSearch: "vector databases" }) {
+        it('should filter via unifiedSearch composite filter', async () => {
+          const res = await postGraphQL({
+            query: `{
+              articles(where: { unifiedSearch: "vector databases" }) {
             nodes { title tsvRank searchScore }
           }
         }`,
@@ -353,7 +353,7 @@ describe('Unified Search — server integration', () => {
       const nodes = res.body.data.articles.nodes;
       expect(nodes.length).toBeGreaterThanOrEqual(1);
 
-      // fullTextSearch dispatches to all text-capable adapters (tsv + trgm)
+      // unifiedSearch dispatches to all text-capable adapters (tsv + trgm)
       const titles = nodes.map((n: { title: string }) => n.title);
       expect(titles).toContain('Vector Databases and Embeddings');
     });
@@ -362,7 +362,7 @@ describe('Unified Search — server integration', () => {
       const res = await postGraphQL({
         query: `{
           articles(
-            where: { fullTextSearch: "PostgreSQL search" }
+            where: { unifiedSearch: "PostgreSQL search" }
             orderBy: SEARCH_SCORE_DESC
           ) {
             nodes { title searchScore }
@@ -469,15 +469,15 @@ describe('Unified Search — server integration', () => {
   });
 
   // ===========================================================================
-  // Mega Query v2 — fullTextSearch composite + orderBy SEARCH_SCORE_DESC
+  // Mega Query v2 — unifiedSearch composite + orderBy SEARCH_SCORE_DESC
   // ===========================================================================
 
-  describe('Mega Query v2 — fullTextSearch composite', () => {
-    it('should use fullTextSearch + SEARCH_SCORE_DESC', async () => {
-      const res = await postGraphQL({
-        query: `{
-          articles(
-            where: { fullTextSearch: "machine learning" }
+    describe('Mega Query v2 — unifiedSearch composite', () => {
+      it('should use unifiedSearch + SEARCH_SCORE_DESC', async () => {
+        const res = await postGraphQL({
+          query: `{
+            articles(
+              where: { unifiedSearch: "machine learning" }
             orderBy: SEARCH_SCORE_DESC
           ) {
             nodes {
@@ -515,7 +515,7 @@ describe('Unified Search — server integration', () => {
       }
     });
 
-    it('should combine fullTextSearch + vector filter + mixed orderBy', async () => {
+    it('should combine unifiedSearch + vector filter + mixed orderBy', async () => {
       if (!hasVector) {
         console.log('pgvector not available, skipping mega query v2 with vector');
         return;
@@ -525,7 +525,7 @@ describe('Unified Search — server integration', () => {
         query: `{
           articles(
             where: {
-              fullTextSearch: "machine learning"
+              unifiedSearch: "machine learning"
               vectorEmbedding: { vector: [0.1, 0.9, 0.3] }
             }
             orderBy: [SEARCH_SCORE_DESC, EMBEDDING_VECTOR_DISTANCE_ASC]
@@ -621,7 +621,7 @@ describe('Unified Search — server integration', () => {
       expect(fieldNames).toContain('trgmBody');
 
       // composite
-      expect(fieldNames).toContain('fullTextSearch');
+      expect(fieldNames).toContain('unifiedSearch');
 
       // pgvector (conditional)
       if (hasVector) {
