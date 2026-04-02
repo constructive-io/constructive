@@ -23,6 +23,7 @@ export { DataOwnedFields } from './data-owned-fields';
 export { DataInheritFromParent } from './data-inherit-from-parent';
 export { DataForceCurrentUser } from './data-force-current-user';
 export { DataImmutableFields } from './data-immutable-fields';
+export { DataCompositeField } from './data-composite-field';
 export { TableUserProfiles } from './table-user-profiles';
 export { TableOrganizationSettings } from './table-organization-settings';
 export { TableUserSettings } from './table-user-settings';
