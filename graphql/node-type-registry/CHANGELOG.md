@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.9.1...node-type-registry@0.10.0) (2026-04-02)
+
+### Features
+
+- add DataCompositeField to node-type-registry ([e375541](https://github.com/constructive-io/constructive/commit/e3755415ebce0bf97c264ea466cebf77a62f400c))
+
 ## [0.9.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.9.0...node-type-registry@0.9.1) (2026-04-02)
 
 ### Bug Fixes
