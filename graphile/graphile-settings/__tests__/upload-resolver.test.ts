@@ -35,7 +35,7 @@ async function loadUploadResolverModule(opts: {
         awsRegion: 'us-east-1',
         awsAccessKey: 'test',
         awsSecretKey: 'test',
-        minioEndpoint: 'http://localhost:9000',
+        endpoint: 'http://localhost:9000',
       },
     })),
   }));

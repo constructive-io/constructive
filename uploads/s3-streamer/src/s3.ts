@@ -5,14 +5,11 @@ interface S3Options {
   awsAccessKey: string;
   awsSecretKey: string;
   awsRegion: string;
-  minioEndpoint?: string;
+  endpoint?: string;
   provider?: BucketProvider;
 }
 
 export default function getS3(opts: S3Options): S3Client {
-  // Use explicit provider if set, otherwise fall back to checking minioEndpoint for backwards compatibility
-  const isMinio = opts.provider === 'minio' || (opts.provider === undefined && Boolean(opts.minioEndpoint));
-
   const awsConfig: S3ClientConfig = {
     region: opts.awsRegion,
     ...(opts.awsAccessKey && opts.awsSecretKey
@@ -23,9 +20,9 @@ export default function getS3(opts: S3Options): S3Client {
         },
       }
       : {}),
-    ...(isMinio && opts.minioEndpoint
+    ...(opts.endpoint
       ? {
-        endpoint: opts.minioEndpoint,
+        endpoint: opts.endpoint,
         forcePathStyle: true,
       }
       : {}),

@@ -13,7 +13,7 @@
  *   AWS_REGION       - AWS region (default: 'us-east-1')
  *   AWS_ACCESS_KEY   - access key (default: 'minioadmin')
  *   AWS_SECRET_KEY   - secret key (default: 'minioadmin')
- *   MINIO_ENDPOINT   - MinIO endpoint (default: 'http://localhost:9000')
+ *   CDN_ENDPOINT     - S3-compatible endpoint (default: 'http://localhost:9000')
  */
 
 import Streamer from '@constructive-io/s3-streamer';
@@ -45,7 +45,7 @@ function getStreamer(): Streamer {
 	const awsRegion = cdn.awsRegion || 'us-east-1';
 	const awsAccessKey = cdn.awsAccessKey || 'minioadmin';
 	const awsSecretKey = cdn.awsSecretKey || 'minioadmin';
-	const minioEndpoint = cdn.minioEndpoint || 'http://localhost:9000';
+	const endpoint = cdn.endpoint || 'http://localhost:9000';
 
 	if (process.env.NODE_ENV === 'production') {
 		if (!cdn.awsAccessKey || !cdn.awsSecretKey) {
@@ -62,7 +62,7 @@ function getStreamer(): Streamer {
 		awsRegion,
 		awsSecretKey,
 		awsAccessKey,
-		minioEndpoint,
+		endpoint,
 		provider,
 	});
 

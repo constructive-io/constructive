@@ -125,10 +125,6 @@ export interface CDNOptions {
     endpoint?: string;
     /** Public URL prefix for generating download URLs (e.g., CDN domain, S3 public URL) */
     publicUrlPrefix?: string;
-    /**
-     * @deprecated Use `endpoint` instead. Kept for backwards compatibility.
-     */
-    minioEndpoint?: string;
 }
 
 /**
@@ -308,8 +304,7 @@ export const pgpmDefaults: PgpmOptions = {
     awsAccessKey: 'minioadmin',
     awsSecretKey: 'minioadmin',
     endpoint: 'http://localhost:9000',
-    publicUrlPrefix: 'http://localhost:9000/test-bucket',
-    minioEndpoint: 'http://localhost:9000'
+    publicUrlPrefix: 'http://localhost:9000/test-bucket'
   },
   deployment: {
     useTx: true,
