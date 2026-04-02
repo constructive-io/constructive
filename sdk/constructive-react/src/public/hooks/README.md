@@ -513,6 +513,11 @@ function App() {
 | `useCreateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useUpdateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useDeleteAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useAppPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
+| `useAppPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
+| `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useRefsQuery` | Query | A ref is a data structure for pointing to a commit. |
 | `useRefQuery` | Query | A ref is a data structure for pointing to a commit. |
 | `useCreateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
@@ -523,16 +528,16 @@ function App() {
 | `useCreateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
 | `useUpdateStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
 | `useDeleteStoreMutation` | Mutation | A store represents an isolated object repository within a database. |
-| `useAppPermissionDefaultsQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
-| `useAppPermissionDefaultQuery` | Query | Stores the default permission bitmask assigned to new members upon joining |
-| `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
-| `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useRoleTypesQuery` | Query | List all roleTypes |
 | `useRoleTypeQuery` | Query | Get one roleType |
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
 | `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
 | `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
+| `useMigrateFilesQuery` | Query | List all migrateFiles |
+| `useMigrateFileQuery` | Query | Get one migrateFile |
+| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
+| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
+| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
 | `useAppLimitDefaultsQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useAppLimitDefaultQuery` | Query | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useCreateAppLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
@@ -543,41 +548,31 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
-| `useMigrateFilesQuery` | Query | List all migrateFiles |
-| `useMigrateFileQuery` | Query | Get one migrateFile |
-| `useCreateMigrateFileMutation` | Mutation | Create a migrateFile |
-| `useUpdateMigrateFileMutation` | Mutation | Update a migrateFile |
-| `useDeleteMigrateFileMutation` | Mutation | Delete a migrateFile |
 | `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useCommitsQuery` | Query | A commit records changes to the repository. |
-| `useCommitQuery` | Query | A commit records changes to the repository. |
-| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useRlsModulesQuery` | Query | List all rlsModules |
-| `useRlsModuleQuery` | Query | Get one rlsModule |
-| `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
-| `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
-| `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
-| `useNodeTypeRegistriesQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useNodeTypeRegistryQuery` | Query | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useCreateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useUpdateNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
-| `useDeleteNodeTypeRegistryMutation` | Mutation | Registry of high-level semantic AST node types using domain-prefixed naming. These IR nodes compile to multiple targets (Postgres RLS, egress, ingress, etc.). |
+| `useCommitsQuery` | Query | A commit records changes to the repository. |
+| `useCommitQuery` | Query | A commit records changes to the repository. |
+| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useRlsModulesQuery` | Query | List all rlsModules |
+| `useRlsModuleQuery` | Query | Get one rlsModule |
+| `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
+| `useUpdateRlsModuleMutation` | Mutation | Update a rlsModule |
+| `useDeleteRlsModuleMutation` | Mutation | Delete a rlsModule |
 | `useSqlActionsQuery` | Query | List all sqlActions |
 | `useSqlActionQuery` | Query | Get one sqlAction |
 | `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
@@ -675,7 +670,7 @@ Example usage:
 | `useSignInMutation` | Mutation | signIn |
 | `useSignUpMutation` | Mutation | signUp |
 | `useOneTimeTokenMutation` | Mutation | oneTimeToken |
-| `useProvisionTableMutation` | Mutation | Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
+| `useProvisionTableMutation` | Mutation | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
@@ -2576,6 +2571,27 @@ const { mutate: create } = useCreateAuditLogMutation({
 create({ event: '<String>', actorId: '<UUID>', origin: '<Origin>', userAgent: '<String>', ipAddress: '<InternetAddress>', success: '<Boolean>' });
 ```
 
+### AppPermissionDefault
+
+```typescript
+// List all appPermissionDefaults
+const { data, isLoading } = useAppPermissionDefaultsQuery({
+  selection: { fields: { id: true, permissions: true } },
+});
+
+// Get one appPermissionDefault
+const { data: item } = useAppPermissionDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, permissions: true } },
+});
+
+// Create a appPermissionDefault
+const { mutate: create } = useCreateAppPermissionDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ permissions: '<BitString>' });
+```
+
 ### Ref
 
 ```typescript
@@ -2618,27 +2634,6 @@ const { mutate: create } = useCreateStoreMutation({
 create({ name: '<String>', databaseId: '<UUID>', hash: '<UUID>' });
 ```
 
-### AppPermissionDefault
-
-```typescript
-// List all appPermissionDefaults
-const { data, isLoading } = useAppPermissionDefaultsQuery({
-  selection: { fields: { id: true, permissions: true } },
-});
-
-// Get one appPermissionDefault
-const { data: item } = useAppPermissionDefaultQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, permissions: true } },
-});
-
-// Create a appPermissionDefault
-const { mutate: create } = useCreateAppPermissionDefaultMutation({
-  selection: { fields: { id: true } },
-});
-create({ permissions: '<BitString>' });
-```
-
 ### RoleType
 
 ```typescript
@@ -2658,6 +2653,27 @@ const { mutate: create } = useCreateRoleTypeMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>' });
+```
+
+### MigrateFile
+
+```typescript
+// List all migrateFiles
+const { data, isLoading } = useMigrateFilesQuery({
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Get one migrateFile
+const { data: item } = useMigrateFileQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, upload: true } },
+});
+
+// Create a migrateFile
+const { mutate: create } = useCreateMigrateFileMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', upload: '<Upload>' });
 ```
 
 ### AppLimitDefault
@@ -2702,27 +2718,6 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
 create({ name: '<String>', max: '<Int>' });
 ```
 
-### MigrateFile
-
-```typescript
-// List all migrateFiles
-const { data, isLoading } = useMigrateFilesQuery({
-  selection: { fields: { id: true, databaseId: true, upload: true } },
-});
-
-// Get one migrateFile
-const { data: item } = useMigrateFileQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, upload: true } },
-});
-
-// Create a migrateFile
-const { mutate: create } = useCreateMigrateFileMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', upload: '<Upload>' });
-```
-
 ### MembershipType
 
 ```typescript
@@ -2742,27 +2737,6 @@ const { mutate: create } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', description: '<String>', prefix: '<String>' });
-```
-
-### Commit
-
-```typescript
-// List all commits
-const { data, isLoading } = useCommitsQuery({
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
-});
-
-// Get one commit
-const { data: item } = useCommitQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
-});
-
-// Create a commit
-const { mutate: create } = useCreateCommitMutation({
-  selection: { fields: { id: true } },
-});
-create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
 ```
 
 ### AppMembershipDefault
@@ -2786,46 +2760,25 @@ const { mutate: create } = useCreateAppMembershipDefaultMutation({
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' });
 ```
 
-### RlsModule
+### Commit
 
 ```typescript
-// List all rlsModules
-const { data, isLoading } = useRlsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } },
+// List all commits
+const { data, isLoading } = useCommitsQuery({
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
 });
 
-// Get one rlsModule
-const { data: item } = useRlsModuleQuery({
+// Get one commit
+const { data: item } = useCommitQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } },
+  selection: { fields: { id: true, message: true, databaseId: true, storeId: true, parentIds: true, authorId: true, committerId: true, treeId: true, date: true } },
 });
 
-// Create a rlsModule
-const { mutate: create } = useCreateRlsModuleMutation({
+// Create a commit
+const { mutate: create } = useCreateCommitMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>' });
-```
-
-### NodeTypeRegistry
-
-```typescript
-// List all nodeTypeRegistries
-const { data, isLoading } = useNodeTypeRegistriesQuery({
-  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, summary: true, parameterSchema: true, guidance: true, tags: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one nodeTypeRegistry
-const { data: item } = useNodeTypeRegistryQuery({
-  name: '<String>',
-  selection: { fields: { name: true, slug: true, category: true, displayName: true, description: true, summary: true, parameterSchema: true, guidance: true, tags: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a nodeTypeRegistry
-const { mutate: create } = useCreateNodeTypeRegistryMutation({
-  selection: { fields: { name: true } },
-});
-create({ slug: '<String>', category: '<String>', displayName: '<String>', description: '<String>', summary: '<String>', parameterSchema: '<JSON>', guidance: '<JSON>', tags: '<String>' });
+create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
 ```
 
 ### OrgMembershipDefault
@@ -2847,6 +2800,27 @@ const { mutate: create } = useCreateOrgMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' });
+```
+
+### RlsModule
+
+```typescript
+// List all rlsModules
+const { data, isLoading } = useRlsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } },
+});
+
+// Get one rlsModule
+const { data: item } = useRlsModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, sessionCredentialsTableId: true, sessionsTableId: true, usersTableId: true, authenticate: true, authenticateStrict: true, currentRole: true, currentRoleId: true } },
+});
+
+// Create a rlsModule
+const { mutate: create } = useCreateRlsModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionsTableId: '<UUID>', usersTableId: '<UUID>', authenticate: '<String>', authenticateStrict: '<String>', currentRole: '<String>', currentRoleId: '<String>' });
 ```
 
 ### SqlAction
@@ -3606,7 +3580,7 @@ oneTimeToken
 
 ### `useProvisionTableMutation`
 
-Composable table provisioning: creates or finds a table, then applies N nodes (Data* modules), creates fields, enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
+Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).
 
 - **Type:** mutation
 - **Arguments:**

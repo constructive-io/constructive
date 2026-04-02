@@ -1,13 +1,13 @@
 ---
 name: hooks-public
-description: React Query hooks for the public API — provides typed query and mutation hooks for 109 tables and 61 custom operations
+description: React Query hooks for the public API — provides typed query and mutation hooks for 108 tables and 61 custom operations
 ---
 
 # hooks-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the public API — provides typed query and mutation hooks for 109 tables and 61 custom operations
+React Query hooks for the public API — provides typed query and mutation hooks for 108 tables and 61 custom operations
 
 ## Usage
 
@@ -128,19 +128,18 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-invite](references/org-invite.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
 - [audit-log](references/audit-log.md)
+- [app-permission-default](references/app-permission-default.md)
 - [ref](references/ref.md)
 - [store](references/store.md)
-- [app-permission-default](references/app-permission-default.md)
 - [role-type](references/role-type.md)
+- [migrate-file](references/migrate-file.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
-- [migrate-file](references/migrate-file.md)
 - [membership-type](references/membership-type.md)
-- [commit](references/commit.md)
 - [app-membership-default](references/app-membership-default.md)
-- [rls-module](references/rls-module.md)
-- [node-type-registry](references/node-type-registry.md)
+- [commit](references/commit.md)
 - [org-membership-default](references/org-membership-default.md)
+- [rls-module](references/rls-module.md)
 - [sql-action](references/sql-action.md)
 - [user](references/user.md)
 - [ast-migration](references/ast-migration.md)

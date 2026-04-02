@@ -838,6 +838,15 @@ export const auditLogKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...auditLogKeys.details(), id] as const,
 } as const;
+export const appPermissionDefaultKeys = {
+  /** All appPermissionDefault queries */ all: ['apppermissiondefault'] as const,
+  /** List query keys */ lists: () => [...appPermissionDefaultKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...appPermissionDefaultKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...appPermissionDefaultKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...appPermissionDefaultKeys.details(), id] as const,
+} as const;
 export const refKeys = {
   /** All ref queries */ all: ['ref'] as const,
   /** List query keys */ lists: () => [...refKeys.all, 'list'] as const,
@@ -856,15 +865,6 @@ export const storeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...storeKeys.details(), id] as const,
 } as const;
-export const appPermissionDefaultKeys = {
-  /** All appPermissionDefault queries */ all: ['apppermissiondefault'] as const,
-  /** List query keys */ lists: () => [...appPermissionDefaultKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...appPermissionDefaultKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...appPermissionDefaultKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...appPermissionDefaultKeys.details(), id] as const,
-} as const;
 export const roleTypeKeys = {
   /** All roleType queries */ all: ['roletype'] as const,
   /** List query keys */ lists: () => [...roleTypeKeys.all, 'list'] as const,
@@ -873,6 +873,15 @@ export const roleTypeKeys = {
   /** Detail query keys */ details: () => [...roleTypeKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...roleTypeKeys.details(), id] as const,
+} as const;
+export const migrateFileKeys = {
+  /** All migrateFile queries */ all: ['migratefile'] as const,
+  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...migrateFileKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...migrateFileKeys.details(), id] as const,
 } as const;
 export const appLimitDefaultKeys = {
   /** All appLimitDefault queries */ all: ['applimitdefault'] as const,
@@ -892,15 +901,6 @@ export const orgLimitDefaultKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitDefaultKeys.details(), id] as const,
 } as const;
-export const migrateFileKeys = {
-  /** All migrateFile queries */ all: ['migratefile'] as const,
-  /** List query keys */ lists: () => [...migrateFileKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...migrateFileKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...migrateFileKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...migrateFileKeys.details(), id] as const,
-} as const;
 export const membershipTypeKeys = {
   /** All membershipType queries */ all: ['membershiptype'] as const,
   /** List query keys */ lists: () => [...membershipTypeKeys.all, 'list'] as const,
@@ -909,15 +909,6 @@ export const membershipTypeKeys = {
   /** Detail query keys */ details: () => [...membershipTypeKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...membershipTypeKeys.details(), id] as const,
-} as const;
-export const commitKeys = {
-  /** All commit queries */ all: ['commit'] as const,
-  /** List query keys */ lists: () => [...commitKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...commitKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...commitKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...commitKeys.details(), id] as const,
 } as const;
 export const appMembershipDefaultKeys = {
   /** All appMembershipDefault queries */ all: ['appmembershipdefault'] as const,
@@ -928,23 +919,14 @@ export const appMembershipDefaultKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...appMembershipDefaultKeys.details(), id] as const,
 } as const;
-export const rlsModuleKeys = {
-  /** All rlsModule queries */ all: ['rlsmodule'] as const,
-  /** List query keys */ lists: () => [...rlsModuleKeys.all, 'list'] as const,
+export const commitKeys = {
+  /** All commit queries */ all: ['commit'] as const,
+  /** List query keys */ lists: () => [...commitKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...rlsModuleKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...rlsModuleKeys.all, 'detail'] as const,
+    [...commitKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...commitKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...rlsModuleKeys.details(), id] as const,
-} as const;
-export const nodeTypeRegistryKeys = {
-  /** All nodeTypeRegistry queries */ all: ['nodetyperegistry'] as const,
-  /** List query keys */ lists: () => [...nodeTypeRegistryKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...nodeTypeRegistryKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...nodeTypeRegistryKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...nodeTypeRegistryKeys.details(), id] as const,
+    [...commitKeys.details(), id] as const,
 } as const;
 export const orgMembershipDefaultKeys = {
   /** All orgMembershipDefault queries */ all: ['orgmembershipdefault'] as const,
@@ -954,6 +936,15 @@ export const orgMembershipDefaultKeys = {
   /** Detail query keys */ details: () => [...orgMembershipDefaultKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgMembershipDefaultKeys.details(), id] as const,
+} as const;
+export const rlsModuleKeys = {
+  /** All rlsModule queries */ all: ['rlsmodule'] as const,
+  /** List query keys */ lists: () => [...rlsModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...rlsModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...rlsModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...rlsModuleKeys.details(), id] as const,
 } as const;
 export const sqlActionKeys = {
   /** All sqlAction queries */ all: ['sqlaction'] as const,
@@ -1160,19 +1151,18 @@ export const queryKeys = {
   orgInvite: orgInviteKeys,
   orgClaimedInvite: orgClaimedInviteKeys,
   auditLog: auditLogKeys,
+  appPermissionDefault: appPermissionDefaultKeys,
   ref: refKeys,
   store: storeKeys,
-  appPermissionDefault: appPermissionDefaultKeys,
   roleType: roleTypeKeys,
+  migrateFile: migrateFileKeys,
   appLimitDefault: appLimitDefaultKeys,
   orgLimitDefault: orgLimitDefaultKeys,
-  migrateFile: migrateFileKeys,
   membershipType: membershipTypeKeys,
-  commit: commitKeys,
   appMembershipDefault: appMembershipDefaultKeys,
-  rlsModule: rlsModuleKeys,
-  nodeTypeRegistry: nodeTypeRegistryKeys,
+  commit: commitKeys,
   orgMembershipDefault: orgMembershipDefaultKeys,
+  rlsModule: rlsModuleKeys,
   sqlAction: sqlActionKeys,
   user: userKeys,
   astMigration: astMigrationKeys,

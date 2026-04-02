@@ -700,6 +700,7 @@ export interface MetaType {
   isArray: boolean;
   isNotNull?: boolean | null;
   hasDefault?: boolean | null;
+  subtype?: string | null;
 }
 /** Reference to a related table */
 export interface MetaRefTable {
