@@ -1943,6 +1943,13 @@ importers:
         version: 10.9.2(@types/node@25.5.0)(typescript@5.9.3)
     publishDirectory: dist
 
+  packages/upload-client:
+    devDependencies:
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+    publishDirectory: dist
+
   packages/url-domains:
     dependencies:
       express:
