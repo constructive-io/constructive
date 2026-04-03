@@ -67,6 +67,25 @@ export interface CreateBucketOptions {
    * Example: "https://cdn.example.com/public"
    */
   publicUrlPrefix?: string;
+  /**
+   * Per-bucket CORS allowed origins override.
+   * When provided, these origins are used instead of the provisioner's default allowedOrigins.
+   * Use ['*'] for open/CDN mode (wildcard CORS, any origin can fetch).
+   * NULL/undefined = use the provisioner's default allowedOrigins.
+   */
+  allowedOrigins?: string[];
+}
+
+/**
+ * Options for updating CORS on an existing S3 bucket.
+ */
+export interface UpdateCorsOptions {
+  /** The S3 bucket name */
+  bucketName: string;
+  /** Bucket access type — determines which CORS rule set to apply */
+  accessType: BucketAccessType;
+  /** The allowed origins to set. Use ['*'] for open/CDN mode. */
+  allowedOrigins: string[];
 }
 
 // --- CORS configuration ---

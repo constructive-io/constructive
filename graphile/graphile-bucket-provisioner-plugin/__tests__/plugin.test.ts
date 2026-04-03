@@ -4,6 +4,9 @@
  * Covers:
  * - provisionBucket mutation (explicit provisioning)
  * - Auto-provisioning hook on bucket create mutations
+ * - CORS update hook on bucket update mutations
+ * - CORS resolution hierarchy (bucket > storage_module > plugin)
+ * - Wildcard CORS handling (['*'])
  * - Error handling and graceful degradation
  * - Connection config resolution (lazy getter, static)
  * - Bucket name resolution (prefix, custom resolver)
@@ -12,12 +15,13 @@
 
 // Mock @constructive-io/bucket-provisioner before any imports
 const mockProvision = jest.fn();
+const mockUpdateCors = jest.fn();
 const mockBucketProvisionerConstructor = jest.fn();
 
 jest.mock('@constructive-io/bucket-provisioner', () => ({
   BucketProvisioner: jest.fn().mockImplementation((opts: any) => {
     mockBucketProvisionerConstructor(opts);
-    return { provision: mockProvision };
+    return { provision: mockProvision, updateCors: mockUpdateCors };
   }),
 }));
 
@@ -104,6 +108,7 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
         endpoint: null,
         public_url_prefix: null,
         provider: null,
+        allowed_origins: null,
       }],
     },
     'app_public': {
@@ -112,6 +117,7 @@ function createMockPgClient(overrides: Record<string, any> = {}) {
         key: 'public',
         type: 'public',
         is_public: true,
+        allowed_origins: null,
       }],
     },
   };
@@ -613,14 +619,14 @@ describe('createBucketProvisionerPlugin', () => {
       expect(result).toBe(field);
     });
 
-    it('skips non-create mutations (e.g., updateBucket, deleteBucket)', () => {
+    it('skips delete mutations (only wraps create and update)', () => {
       const hook = getFieldsFieldHook();
       const field = { resolve: jest.fn() };
       const build = {};
       const context = {
         scope: {
           isRootMutation: true,
-          fieldName: 'updateBucket',
+          fieldName: 'deleteBucket',
           pgCodec: {
             name: 'Bucket',
             attributes: { key: {} },
@@ -631,6 +637,29 @@ describe('createBucketProvisionerPlugin', () => {
 
       const result = hook(field, build, context);
       expect(result).toBe(field);
+    });
+
+    it('wraps update mutations on @storageBuckets-tagged tables', () => {
+      const hook = getFieldsFieldHook();
+      const originalResolve = jest.fn().mockResolvedValue({ data: { id: 'updated' } });
+      const field = { resolve: originalResolve };
+      const build = {};
+      const context = {
+        scope: {
+          isRootMutation: true,
+          fieldName: 'updateBucket',
+          pgCodec: {
+            name: 'Bucket',
+            attributes: { key: {}, type: {}, allowed_origins: {} },
+            extensions: { tags: { storageBuckets: true } },
+          },
+        },
+      };
+
+      const result = hook(field, build, context);
+      expect(result).not.toBe(field);
+      expect(result.resolve).toBeDefined();
+      expect(typeof result.resolve).toBe('function');
     });
 
     it('wraps create mutations on @storageBuckets-tagged tables', () => {
@@ -828,6 +857,364 @@ describe('createBucketProvisionerPlugin', () => {
       const wrapped = hook(field, build, context);
       expect(wrapped.resolve).toBeDefined();
     });
+
+    it('update mutation skips CORS update when allowed_origins not in input', async () => {
+      const hook = getFieldsFieldHook();
+      const mutationResult = { data: { id: 'updated' } };
+      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
+      const field = { resolve: originalResolve };
+      const build = {};
+      const context = {
+        scope: {
+          isRootMutation: true,
+          fieldName: 'updateBucket',
+          pgCodec: {
+            name: 'Bucket',
+            attributes: { key: {}, type: {}, allowed_origins: {} },
+            extensions: { tags: { storageBuckets: true } },
+          },
+        },
+      };
+
+      const wrapped = hook(field, build, context);
+
+      const result = await wrapped.resolve(
+        null,
+        { input: { bucket: { key: 'public', type: 'public' } } }, // No allowed_origins
+        { withPgClient: jest.fn(), pgSettings: {} },
+        {},
+      );
+
+      expect(result).toBe(mutationResult);
+      expect(mockUpdateCors).not.toHaveBeenCalled();
+    });
+
+    it('update mutation calls updateCors when allowed_origins is in input', async () => {
+      mockUpdateCors.mockResolvedValue([]);
+      const hook = getFieldsFieldHook();
+      const mutationResult = { data: { id: 'updated' } };
+      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
+      const field = { resolve: originalResolve };
+      const build = {};
+      const context = {
+        scope: {
+          isRootMutation: true,
+          fieldName: 'updateBucket',
+          pgCodec: {
+            name: 'Bucket',
+            attributes: { key: {}, type: {}, allowed_origins: {} },
+            extensions: { tags: { storageBuckets: true } },
+          },
+        },
+      };
+
+      const wrapped = hook(field, build, context);
+
+      const pgClient = createMockPgClient({
+        'app_public': {
+          rows: [{
+            id: 'bucket-uuid-789',
+            key: 'public',
+            type: 'public',
+            is_public: true,
+            allowed_origins: ['https://new-origin.example.com'],
+          }],
+        },
+      });
+      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+        callback(pgClient),
+      );
+
+      const result = await wrapped.resolve(
+        null,
+        { input: { bucket: { key: 'public', allowed_origins: ['https://new-origin.example.com'] } } },
+        { withPgClient: mockWithPgClient, pgSettings: {} },
+        {},
+      );
+
+      expect(result).toBe(mutationResult);
+      expect(mockUpdateCors).toHaveBeenCalledWith(
+        expect.objectContaining({
+          bucketName: 'public',
+          accessType: 'public',
+          allowedOrigins: ['https://new-origin.example.com'],
+        }),
+      );
+    });
+
+    it('update mutation returns result even if CORS update fails', async () => {
+      mockUpdateCors.mockRejectedValue(new Error('S3 CORS update failed'));
+      const hook = getFieldsFieldHook();
+      const mutationResult = { data: { id: 'updated' } };
+      const originalResolve = jest.fn().mockResolvedValue(mutationResult);
+      const field = { resolve: originalResolve };
+      const build = {};
+      const context = {
+        scope: {
+          isRootMutation: true,
+          fieldName: 'updateBucket',
+          pgCodec: {
+            name: 'Bucket',
+            attributes: { key: {}, type: {}, allowed_origins: {} },
+            extensions: { tags: { storageBuckets: true } },
+          },
+        },
+      };
+
+      const wrapped = hook(field, build, context);
+
+      const pgClient = createMockPgClient({
+        'app_public': {
+          rows: [{
+            id: 'bucket-uuid-789',
+            key: 'public',
+            type: 'public',
+            is_public: true,
+            allowed_origins: ['https://bad-origin.com'],
+          }],
+        },
+      });
+      const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+        callback(pgClient),
+      );
+
+      // Should NOT throw
+      const result = await wrapped.resolve(
+        null,
+        { input: { bucket: { key: 'public', allowed_origins: ['https://bad-origin.com'] } } },
+        { withPgClient: mockWithPgClient, pgSettings: {} },
+        {},
+      );
+
+      expect(result).toBe(mutationResult);
+    });
+  });
+});
+
+describe('CORS resolution hierarchy', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockProvision.mockReset();
+    mockUpdateCors.mockReset();
+    mockBucketProvisionerConstructor.mockReset();
+    capturedLambdaCallback = null;
+  });
+
+  it('uses bucket-level allowed_origins when set', async () => {
+    mockProvision.mockResolvedValue({
+      bucketName: 'cdn-assets',
+      accessType: 'public',
+      endpoint: 'http://minio:9000',
+      provider: 'minio',
+      region: 'us-east-1',
+      publicUrlPrefix: null,
+      blockPublicAccess: false,
+      versioning: false,
+      corsRules: [],
+      lifecycleRules: [],
+    });
+
+    createBucketProvisionerPlugin(createDefaultOptions());
+
+    const pgClient = createMockPgClient({
+      'app_public': {
+        rows: [{
+          id: 'bucket-uuid-cdn',
+          key: 'cdn-assets',
+          type: 'public',
+          is_public: true,
+          allowed_origins: ['*'],
+        }],
+      },
+      'metaschema_modules_public.storage_module': {
+        rows: [{
+          id: 'sm-uuid-456',
+          buckets_schema: 'app_public',
+          buckets_table: 'buckets',
+          endpoint: null,
+          public_url_prefix: null,
+          provider: null,
+          allowed_origins: ['https://db-default.example.com'],
+        }],
+      },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+      callback(pgClient),
+    );
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'cdn-assets' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    // Bucket-level ['*'] should take precedence over storage_module and plugin defaults
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bucketName: 'cdn-assets',
+        allowedOrigins: ['*'],
+      }),
+    );
+  });
+
+  it('falls back to storage_module allowed_origins when bucket has none', async () => {
+    mockProvision.mockResolvedValue({
+      bucketName: 'uploads',
+      accessType: 'public',
+      endpoint: 'http://minio:9000',
+      provider: 'minio',
+      region: 'us-east-1',
+      publicUrlPrefix: null,
+      blockPublicAccess: false,
+      versioning: false,
+      corsRules: [],
+      lifecycleRules: [],
+    });
+
+    createBucketProvisionerPlugin(createDefaultOptions());
+
+    const pgClient = createMockPgClient({
+      'app_public': {
+        rows: [{
+          id: 'bucket-uuid-uploads',
+          key: 'uploads',
+          type: 'public',
+          is_public: true,
+          allowed_origins: null, // No bucket-level override
+        }],
+      },
+      'metaschema_modules_public.storage_module': {
+        rows: [{
+          id: 'sm-uuid-456',
+          buckets_schema: 'app_public',
+          buckets_table: 'buckets',
+          endpoint: null,
+          public_url_prefix: null,
+          provider: null,
+          allowed_origins: ['https://db-default.example.com'],
+        }],
+      },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+      callback(pgClient),
+    );
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'uploads' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    // Should fall back to storage_module level
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bucketName: 'uploads',
+        allowedOrigins: ['https://db-default.example.com'],
+      }),
+    );
+  });
+
+  it('falls back to plugin config allowedOrigins when both bucket and storage_module are null', async () => {
+    mockProvision.mockResolvedValue({
+      bucketName: 'docs',
+      accessType: 'private',
+      endpoint: 'http://minio:9000',
+      provider: 'minio',
+      region: 'us-east-1',
+      publicUrlPrefix: null,
+      blockPublicAccess: true,
+      versioning: false,
+      corsRules: [],
+      lifecycleRules: [],
+    });
+
+    createBucketProvisionerPlugin(createDefaultOptions({
+      allowedOrigins: ['https://plugin-default.example.com'],
+    }));
+
+    const pgClient = createMockPgClient({
+      'app_public': {
+        rows: [{
+          id: 'bucket-uuid-docs',
+          key: 'docs',
+          type: 'private',
+          is_public: false,
+          allowed_origins: null,
+        }],
+      },
+      'metaschema_modules_public.storage_module': {
+        rows: [{
+          id: 'sm-uuid-456',
+          buckets_schema: 'app_public',
+          buckets_table: 'buckets',
+          endpoint: null,
+          public_url_prefix: null,
+          provider: null,
+          allowed_origins: null,
+        }],
+      },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+      callback(pgClient),
+    );
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'docs' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    // Should fall back to plugin config
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bucketName: 'docs',
+        allowedOrigins: ['https://plugin-default.example.com'],
+      }),
+    );
+  });
+
+  it('wildcard CORS (["*"]) passes through correctly for CDN buckets', async () => {
+    mockProvision.mockResolvedValue({
+      bucketName: 'cdn-public',
+      accessType: 'public',
+      endpoint: 'http://minio:9000',
+      provider: 'minio',
+      region: 'us-east-1',
+      publicUrlPrefix: 'https://cdn.example.com',
+      blockPublicAccess: false,
+      versioning: false,
+      corsRules: [],
+      lifecycleRules: [],
+    });
+
+    createBucketProvisionerPlugin(createDefaultOptions());
+
+    const pgClient = createMockPgClient({
+      'app_public': {
+        rows: [{
+          id: 'bucket-uuid-cdn',
+          key: 'cdn-public',
+          type: 'public',
+          is_public: true,
+          allowed_origins: ['*'],
+        }],
+      },
+    });
+    const mockWithPgClient = jest.fn((_settings: any, callback: any) =>
+      callback(pgClient),
+    );
+
+    await capturedLambdaCallback!({
+      input: { bucketKey: 'cdn-public' },
+      withPgClient: mockWithPgClient,
+      pgSettings: {},
+    });
+
+    expect(mockProvision).toHaveBeenCalledWith(
+      expect.objectContaining({
+        allowedOrigins: ['*'],
+      }),
+    );
   });
 });
 
@@ -835,6 +1222,7 @@ describe('bucket name resolution', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockProvision.mockReset();
+    mockUpdateCors.mockReset();
     mockBucketProvisionerConstructor.mockReset();
     capturedLambdaCallback = null;
   });

@@ -59,6 +59,7 @@ export type {
   StorageConnectionConfig,
   BucketAccessType,
   CreateBucketOptions,
+  UpdateCorsOptions,
   CorsRule,
   LifecycleRule,
   ProvisionResult,

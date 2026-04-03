@@ -30,6 +30,7 @@ import type { S3Client } from '@aws-sdk/client-s3';
 import type {
   StorageConnectionConfig,
   CreateBucketOptions,
+  UpdateCorsOptions,
   CorsRule,
   LifecycleRule,
   ProvisionResult,
@@ -141,10 +142,11 @@ export class BucketProvisioner {
       await this.deleteBucketPolicy(bucketName);
     }
 
-    // 4. Set CORS rules
+    // 4. Set CORS rules (per-bucket override takes precedence over default)
+    const effectiveOrigins = options.allowedOrigins ?? this.allowedOrigins;
     const corsRules = accessType === 'private'
-      ? buildPrivateCorsRules(this.allowedOrigins)
-      : buildUploadCorsRules(this.allowedOrigins);
+      ? buildPrivateCorsRules(effectiveOrigins)
+      : buildUploadCorsRules(effectiveOrigins);
     await this.setCors(bucketName, corsRules);
 
     // 5. Versioning
@@ -378,6 +380,34 @@ export class BucketProvisioner {
         err,
       );
     }
+  }
+
+  /**
+   * Update CORS configuration on an existing S3 bucket.
+   *
+   * Call this when the `allowed_origins` column changes on a bucket row.
+   * Builds the appropriate CORS rule set for the bucket's access type
+   * and applies it to the S3 bucket.
+   *
+   * @param options - Bucket name, access type, and new allowed origins
+   * @returns The CORS rules that were applied
+   */
+  async updateCors(options: UpdateCorsOptions): Promise<CorsRule[]> {
+    const { bucketName, accessType, allowedOrigins } = options;
+
+    if (!allowedOrigins || allowedOrigins.length === 0) {
+      throw new ProvisionerError(
+        'INVALID_CONFIG',
+        'allowedOrigins must contain at least one origin for CORS configuration',
+      );
+    }
+
+    const corsRules = accessType === 'private'
+      ? buildPrivateCorsRules(allowedOrigins)
+      : buildUploadCorsRules(allowedOrigins);
+
+    await this.setCors(bucketName, corsRules);
+    return corsRules;
   }
 
   /**

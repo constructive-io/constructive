@@ -11,6 +11,16 @@
  *    with `@storageBuckets` to automatically provision the S3 bucket after
  *    the database row is created.
  *
+ * 3. CORS update hook — wraps `update*` mutations on `@storageBuckets` tables
+ *    to detect changes to `allowed_origins` and re-apply CORS rules to the
+ *    S3 bucket.
+ *
+ * CORS resolution hierarchy (most specific wins):
+ *   1. Bucket-level `allowed_origins` column (per-bucket override)
+ *   2. Storage-module-level `allowed_origins` column (per-database default)
+ *   3. Plugin config `allowedOrigins` (global fallback)
+ * Supports `['*']` for open/CDN mode (wildcard CORS).
+ *
  * Both pathways use `@constructive-io/bucket-provisioner` for the actual
  * S3 operations (bucket creation, Block Public Access, CORS, policies,
  * versioning, lifecycle rules).
@@ -46,7 +56,8 @@ const STORAGE_MODULE_QUERY = `
     bt.name AS buckets_table,
     sm.endpoint,
     sm.public_url_prefix,
-    sm.provider
+    sm.provider,
+    sm.allowed_origins
   FROM metaschema_modules_public.storage_module sm
   JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
   JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
@@ -61,6 +72,7 @@ interface StorageModuleRow {
   endpoint: string | null;
   public_url_prefix: string | null;
   provider: string | null;
+  allowed_origins: string[] | null;
 }
 
 interface BucketRow {
@@ -68,6 +80,7 @@ interface BucketRow {
   key: string;
   type: string;
   is_public: boolean;
+  allowed_origins: string[] | null;
 }
 
 // --- Helpers ---
@@ -116,6 +129,49 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
 }
 
 /**
+ * Resolve the effective CORS allowed origins using the 3-tier hierarchy:
+ *   1. Bucket-level allowed_origins (per-bucket override)
+ *   2. Storage-module-level allowed_origins (per-database default)
+ *   3. Plugin config allowedOrigins (global fallback)
+ */
+function resolveAllowedOrigins(
+  bucketOrigins: string[] | null | undefined,
+  storageModuleOrigins: string[] | null | undefined,
+  pluginOrigins: string[],
+): string[] {
+  if (bucketOrigins && bucketOrigins.length > 0) {
+    return bucketOrigins;
+  }
+  if (storageModuleOrigins && storageModuleOrigins.length > 0) {
+    return storageModuleOrigins;
+  }
+  return pluginOrigins;
+}
+
+/**
+ * Build a BucketProvisioner with per-database connection overrides.
+ */
+function buildProvisioner(
+  options: BucketProvisionerPluginOptions,
+  storageModule: StorageModuleRow | null,
+  effectiveOrigins: string[],
+): BucketProvisioner {
+  const connection = resolveConnection(options);
+  const effectiveConnection: StorageConnectionConfig = {
+    ...connection,
+    ...(storageModule?.endpoint ? { endpoint: storageModule.endpoint } : {}),
+    ...(storageModule?.provider
+      ? { provider: storageModule.provider as StorageConnectionConfig['provider'] }
+      : {}),
+  };
+
+  return new BucketProvisioner({
+    connection: effectiveConnection,
+    allowedOrigins: effectiveOrigins,
+  });
+}
+
+/**
  * Core provisioning logic shared by both the explicit mutation and the
  * auto-provisioning hook.
  */
@@ -124,35 +180,28 @@ async function provisionBucketForRow(
   databaseId: string,
   bucketKey: string,
   bucketType: string,
+  bucketAllowedOrigins: string[] | null | undefined,
   options: BucketProvisionerPluginOptions,
 ): Promise<ProvisionResult> {
-  const connection = resolveConnection(options);
   const s3BucketName = resolveBucketName(bucketKey, databaseId, options);
   const accessType = bucketType as 'public' | 'private' | 'temp';
 
-  // Read storage module config to check for endpoint/provider overrides
+  // Read storage module config to check for endpoint/provider/CORS overrides
   const smResult = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
   const storageModule: StorageModuleRow | null = smResult.rows[0] ?? null;
 
-  // Build the effective connection config, applying per-database overrides
-  const effectiveConnection: StorageConnectionConfig = {
-    ...connection,
-    // Per-database endpoint override (if set in storage_module table)
-    ...(storageModule?.endpoint ? { endpoint: storageModule.endpoint } : {}),
-    // Per-database provider override (if set in storage_module table)
-    ...(storageModule?.provider
-      ? { provider: storageModule.provider as StorageConnectionConfig['provider'] }
-      : {}),
-  };
+  // Resolve CORS origins using the 3-tier hierarchy
+  const effectiveOrigins = resolveAllowedOrigins(
+    bucketAllowedOrigins,
+    storageModule?.allowed_origins,
+    options.allowedOrigins,
+  );
 
-  const provisioner = new BucketProvisioner({
-    connection: effectiveConnection,
-    allowedOrigins: options.allowedOrigins,
-  });
+  const provisioner = buildProvisioner(options, storageModule, effectiveOrigins);
 
   log.info(
-    `Provisioning S3 bucket "${s3BucketName}" (key="${bucketKey}", type="${accessType}") ` +
-    `for database ${databaseId}`,
+    `Provisioning S3 bucket "${s3BucketName}" (key="${bucketKey}", type="${accessType}", ` +
+    `origins=${JSON.stringify(effectiveOrigins)}) for database ${databaseId}`,
   );
 
   const result = await provisioner.provision({
@@ -160,6 +209,7 @@ async function provisionBucketForRow(
     accessType,
     versioning: options.versioning ?? false,
     publicUrlPrefix: storageModule?.public_url_prefix ?? undefined,
+    allowedOrigins: effectiveOrigins,
   });
 
   log.info(
@@ -168,6 +218,45 @@ async function provisionBucketForRow(
   );
 
   return result;
+}
+
+/**
+ * Update CORS on an existing S3 bucket when allowed_origins changes.
+ */
+async function updateBucketCors(
+  pgClient: any,
+  databaseId: string,
+  bucketKey: string,
+  bucketType: string,
+  bucketAllowedOrigins: string[] | null | undefined,
+  options: BucketProvisionerPluginOptions,
+): Promise<void> {
+  const s3BucketName = resolveBucketName(bucketKey, databaseId, options);
+  const accessType = bucketType as 'public' | 'private' | 'temp';
+
+  const smResult = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
+  const storageModule: StorageModuleRow | null = smResult.rows[0] ?? null;
+
+  const effectiveOrigins = resolveAllowedOrigins(
+    bucketAllowedOrigins,
+    storageModule?.allowed_origins,
+    options.allowedOrigins,
+  );
+
+  const provisioner = buildProvisioner(options, storageModule, effectiveOrigins);
+
+  log.info(
+    `Updating CORS on S3 bucket "${s3BucketName}" ` +
+    `(origins=${JSON.stringify(effectiveOrigins)}) for database ${databaseId}`,
+  );
+
+  await provisioner.updateCors({
+    bucketName: s3BucketName,
+    accessType,
+    allowedOrigins: effectiveOrigins,
+  });
+
+  log.info(`Successfully updated CORS on S3 bucket "${s3BucketName}"`);
 }
 
 // --- Plugin factory ---
@@ -262,7 +351,7 @@ export function createBucketProvisionerPlugin(
 
               // Look up the bucket row (RLS enforced via pgSettings)
               const bucketResult = await pgClient.query(
-                `SELECT id, key, type, is_public
+                `SELECT id, key, type, is_public, allowed_origins
                  FROM "${storageModule.buckets_schema}"."${storageModule.buckets_table}"
                  WHERE key = $1
                  LIMIT 1`,
@@ -281,6 +370,7 @@ export function createBucketProvisionerPlugin(
                   databaseId,
                   bucket.key,
                   bucket.type,
+                  bucket.allowed_origins,
                   options,
                 );
 
@@ -322,8 +412,9 @@ export function createBucketProvisionerPlugin(
     version: '0.1.0',
     description:
       'Auto-provisions S3 buckets when bucket rows are created, ' +
+      'updates CORS when allowed_origins changes on update, ' +
       'and provides a provisionBucket mutation for explicit provisioning',
-    after: ['PgAttributesPlugin', 'PgMutationCreatePlugin'],
+    after: ['PgAttributesPlugin', 'PgMutationCreatePlugin', 'PgMutationUpdateDeletePlugin'],
 
     schema: {
       ...mutationPlugin.schema,
@@ -331,12 +422,13 @@ export function createBucketProvisionerPlugin(
         ...((mutationPlugin.schema as any)?.hooks ?? {}),
 
         /**
-         * Wrap create mutation resolvers on tables tagged with @storageBuckets.
+         * Wrap create and update mutation resolvers on tables tagged with @storageBuckets.
          *
-         * After the original resolver creates the bucket row, we provision
-         * the actual S3 bucket. If provisioning fails, the DB row still
-         * exists (the mutation already committed), and the error is logged.
-         * The admin can retry via the provisionBucket mutation.
+         * - create*: After the row is created, provision the S3 bucket.
+         * - update*: After the row is updated, re-apply CORS if allowed_origins changed.
+         *
+         * If provisioning/CORS update fails, the DB row still exists (the mutation
+         * already committed), and the error is logged. Admin can retry via provisionBucket.
          */
         GraphQLObjectType_fields_field(field: any, build: any, context: any) {
           const {
@@ -354,12 +446,15 @@ export function createBucketProvisionerPlugin(
             return field;
           }
 
-          // Only wrap create mutations (not update/delete)
-          if (!fieldName.startsWith('create')) {
+          const isCreate = fieldName.startsWith('create');
+          const isUpdate = fieldName.startsWith('update');
+
+          // Only wrap create and update mutations (not delete)
+          if (!isCreate && !isUpdate) {
             return field;
           }
 
-          log.debug(`Wrapping mutation "${fieldName}" for auto-provisioning (codec: ${pgCodec.name})`);
+          log.debug(`Wrapping mutation "${fieldName}" for ${isCreate ? 'auto-provisioning' : 'CORS update'} (codec: ${pgCodec.name})`);
 
           const defaultResolver = (obj: any) => obj[fieldName];
           const { resolve: oldResolve = defaultResolver, ...rest } = field;
@@ -367,57 +462,118 @@ export function createBucketProvisionerPlugin(
           return {
             ...rest,
             async resolve(source: any, args: any, graphqlContext: any, info: any) {
-              // Call the original resolver first (creates the DB row)
+              // Call the original resolver first (creates/updates the DB row)
               const result = await oldResolve(source, args, graphqlContext, info);
 
-              // Extract the bucket data from the mutation input
-              // PostGraphile create mutations put the input under `input.{codecName}`
-              // e.g., createBucket → args.input.bucket
               try {
                 const inputKey = Object.keys(args.input || {}).find(
                   (k) => k !== 'clientMutationId',
                 );
                 const bucketInput = inputKey ? args.input[inputKey] : null;
 
-                if (!bucketInput?.key || !bucketInput?.type) {
-                  log.warn(
-                    `Auto-provision skipped for "${fieldName}": ` +
-                    `could not extract key/type from mutation input`,
-                  );
-                  return result;
-                }
-
-                // Use withPgClient to get a DB connection for reading storage config
                 const withPgClient = graphqlContext.withPgClient;
                 const pgSettings = graphqlContext.pgSettings;
 
                 if (!withPgClient) {
-                  log.warn('Auto-provision skipped: withPgClient not available in context');
+                  log.warn(`${isCreate ? 'Auto-provision' : 'CORS update'} skipped: withPgClient not available in context`);
                   return result;
                 }
 
-                await withPgClient(pgSettings, async (pgClient: any) => {
-                  const databaseId = await resolveDatabaseId(pgClient);
-                  if (!databaseId) {
-                    log.warn('Auto-provision skipped: could not resolve database_id');
-                    return;
+                if (isCreate) {
+                  // --- CREATE: full provisioning ---
+                  if (!bucketInput?.key || !bucketInput?.type) {
+                    log.warn(
+                      `Auto-provision skipped for "${fieldName}": ` +
+                      `could not extract key/type from mutation input`,
+                    );
+                    return result;
                   }
 
-                  await provisionBucketForRow(
-                    pgClient,
-                    databaseId,
-                    bucketInput.key,
-                    bucketInput.type,
-                    options,
-                  );
-                });
+                  await withPgClient(pgSettings, async (pgClient: any) => {
+                    const databaseId = await resolveDatabaseId(pgClient);
+                    if (!databaseId) {
+                      log.warn('Auto-provision skipped: could not resolve database_id');
+                      return;
+                    }
+
+                    await provisionBucketForRow(
+                      pgClient,
+                      databaseId,
+                      bucketInput.key,
+                      bucketInput.type,
+                      bucketInput.allowedOrigins ?? bucketInput.allowed_origins ?? null,
+                      options,
+                    );
+                  });
+                } else {
+                  // --- UPDATE: re-apply CORS if allowed_origins is in the patch ---
+                  const hasOriginsUpdate = bucketInput &&
+                    ('allowedOrigins' in bucketInput || 'allowed_origins' in bucketInput);
+
+                  if (!hasOriginsUpdate) {
+                    // allowed_origins not being changed, nothing to do
+                    return result;
+                  }
+
+                  await withPgClient(pgSettings, async (pgClient: any) => {
+                    const databaseId = await resolveDatabaseId(pgClient);
+                    if (!databaseId) {
+                      log.warn('CORS update skipped: could not resolve database_id');
+                      return;
+                    }
+
+                    // Read the updated bucket row to get full state
+                    const smResult = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
+                    if (smResult.rows.length === 0) {
+                      log.warn('CORS update skipped: storage module not provisioned');
+                      return;
+                    }
+                    const storageModule = smResult.rows[0] as StorageModuleRow;
+
+                    // We need the bucket key — it may come from input or patch
+                    // For updates, PostGraphile uses nodeId or the row's PK, so
+                    // we read the bucket from the patch's key or from the nodeId
+                    const patchKey = bucketInput?.key;
+                    if (!patchKey) {
+                      log.warn(
+                        `CORS update skipped for "${fieldName}": ` +
+                        `could not determine bucket key from mutation input`,
+                      );
+                      return;
+                    }
+
+                    // Read the full bucket row (post-update) to get type + origins
+                    const bucketResult = await pgClient.query(
+                      `SELECT id, key, type, is_public, allowed_origins
+                       FROM "${storageModule.buckets_schema}"."${storageModule.buckets_table}"
+                       WHERE key = $1
+                       LIMIT 1`,
+                      [patchKey],
+                    );
+
+                    if (bucketResult.rows.length === 0) {
+                      log.warn(`CORS update skipped: bucket "${patchKey}" not found`);
+                      return;
+                    }
+
+                    const bucket = bucketResult.rows[0] as BucketRow;
+
+                    await updateBucketCors(
+                      pgClient,
+                      databaseId,
+                      bucket.key,
+                      bucket.type,
+                      bucket.allowed_origins,
+                      options,
+                    );
+                  });
+                }
               } catch (err: any) {
-                // Log the error but don't fail the mutation — the DB row was
-                // already created. Admin can retry via provisionBucket mutation.
                 log.error(
-                  `Auto-provision failed for "${fieldName}": ${err.message}. ` +
-                  `The bucket row was created but the S3 bucket was not provisioned. ` +
-                  `Use the provisionBucket mutation to retry.`,
+                  `${isCreate ? 'Auto-provision' : 'CORS update'} failed for "${fieldName}": ${err.message}. ` +
+                  (isCreate
+                    ? `The bucket row was created but the S3 bucket was not provisioned. Use the provisionBucket mutation to retry.`
+                    : `The bucket row was updated but CORS was not applied to the S3 bucket. Use the provisionBucket mutation to retry.`),
                 );
               }
 
