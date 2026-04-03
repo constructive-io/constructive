@@ -36,7 +36,9 @@ export function buildBelongsToRelations(
   const belongsTo: BelongsToRelation[] = [];
 
   for (const [relationName, relation] of Object.entries(relations)) {
-    if (relation.isReferencee !== false) continue;
+    // PostGraphile only sets isReferencee when true (reverse FK);
+    // forward relations have isReferencee undefined, not false.
+    if (relation.isReferencee) continue;
 
     const localAttributes = relation.localAttributes || [];
     const isUnique = uniques.some((unique) =>
