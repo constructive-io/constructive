@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.18.10](https://github.com/constructive-io/constructive/compare/graphile-settings@4.18.9...graphile-settings@4.18.10) (2026-04-03)
+
+### Bug Fixes
+
+- **graphile-settings:** use truthy check for isReferencee in \_meta plugin ([65ac679](https://github.com/constructive-io/constructive/commit/65ac6794e95f6d32146b05c28eedfc7565ca764f))
+
 ## [4.18.9](https://github.com/constructive-io/constructive/compare/graphile-settings@4.18.8...graphile-settings@4.18.9) (2026-04-02)
 
 **Note:** Version bump only for package graphile-settings
