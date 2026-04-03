@@ -20,7 +20,7 @@ const log = new Logger('create-bucket');
     const region = cdn?.awsRegion || 'us-east-1';
     const accessKey = cdn?.awsAccessKey || 'minioadmin';
     const secretKey = cdn?.awsSecretKey || 'minioadmin';
-    const endpoint = cdn?.minioEndpoint || 'http://localhost:9000';
+    const endpoint = cdn?.endpoint || 'http://localhost:9000';
 
     const client: any = new S3Client({
       region,

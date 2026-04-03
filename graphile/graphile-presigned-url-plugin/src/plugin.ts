@@ -22,7 +22,7 @@ import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
 
-import type { PresignedUrlPluginOptions } from './types';
+import type { PresignedUrlPluginOptions, S3Config } from './types';
 import { getStorageModuleConfig, getBucketConfig } from './storage-module-cache';
 import { generatePresignedPutUrl, headObject } from './s3-signer';
 
@@ -67,10 +67,24 @@ async function resolveDatabaseId(pgClient: any): Promise<string | null> {
 
 // --- Plugin factory ---
 
+/**
+ * Resolve the S3 config from the options. If the option is a lazy getter
+ * function, call it (and cache the result). This avoids reading env vars
+ * or constructing an S3Client at module-import time.
+ */
+function resolveS3(options: PresignedUrlPluginOptions): S3Config {
+  if (typeof options.s3 === 'function') {
+    const resolved = options.s3();
+    // Cache so subsequent calls don't re-evaluate
+    options.s3 = resolved;
+    return resolved;
+  }
+  return options.s3;
+}
+
 export function createPresignedUrlPlugin(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Plugin {
-  const { s3 } = options;
 
   return extendSchema(() => ({
     typeDefs: gql`
@@ -272,7 +286,7 @@ export function createPresignedUrlPlugin(
 
                 // --- Generate presigned PUT URL ---
                 const uploadUrl = await generatePresignedPutUrl(
-                  s3,
+                  resolveS3(options),
                   s3Key,
                   contentType,
                   size,
@@ -362,7 +376,7 @@ export function createPresignedUrlPlugin(
                 }
 
                 // --- Verify file exists in S3 ---
-                const s3Head = await headObject(s3, file.key, file.content_type);
+                const s3Head = await headObject(resolveS3(options), file.key, file.content_type);
 
                 if (!s3Head) {
                   throw new Error('FILE_NOT_IN_S3: the file has not been uploaded yet');

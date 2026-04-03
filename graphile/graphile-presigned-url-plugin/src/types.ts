@@ -34,6 +34,15 @@ export interface StorageModuleConfig {
   /** Upload requests table name */
   uploadRequestsTableName: string;
 
+  // --- S3 connection config (NULL in DB = use global env/plugin defaults) ---
+
+  /** S3-compatible API endpoint URL (per-database override) */
+  endpoint: string | null;
+  /** Public URL prefix for generating download URLs (per-database override) */
+  publicUrlPrefix: string | null;
+  /** Storage provider type: 'minio', 's3', 'gcs', etc. (per-database override) */
+  provider: string | null;
+
   // --- Per-database configurable settings ---
 
   /** Presigned PUT URL expiry in seconds (default: 900 = 15 min) */
@@ -119,9 +128,17 @@ export interface S3Config {
 }
 
 /**
+ * S3 configuration or a lazy getter that returns it on first use.
+ * When a function is provided, it will only be called when the first
+ * mutation or resolver actually needs the S3 client — avoiding eager
+ * env-var reads and S3Client creation at module import time.
+ */
+export type S3ConfigOrGetter = S3Config | (() => S3Config);
+
+/**
  * Plugin options for the presigned URL plugin.
  */
 export interface PresignedUrlPluginOptions {
-  /** S3 configuration */
-  s3: S3Config;
+  /** S3 configuration (concrete or lazy getter) */
+  s3: S3ConfigOrGetter;
 }

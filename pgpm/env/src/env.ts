@@ -59,7 +59,8 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
     AWS_ACCESS_KEY_ID,
     AWS_SECRET_KEY,
     AWS_SECRET_ACCESS_KEY,
-    MINIO_ENDPOINT,
+    CDN_ENDPOINT,
+    CDN_PUBLIC_URL_PREFIX,
 
     DEPLOYMENT_USE_TX,
     DEPLOYMENT_FAST,
@@ -151,7 +152,8 @@ export const getEnvVars = (env: NodeJS.ProcessEnv = process.env): PgpmOptions =>
       ...(AWS_REGION && { awsRegion: AWS_REGION }),
       ...((AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID) && { awsAccessKey: AWS_ACCESS_KEY || AWS_ACCESS_KEY_ID }),
       ...((AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY) && { awsSecretKey: AWS_SECRET_KEY || AWS_SECRET_ACCESS_KEY }),
-      ...(MINIO_ENDPOINT && { minioEndpoint: MINIO_ENDPOINT }),
+      ...(CDN_ENDPOINT && { endpoint: CDN_ENDPOINT }),
+      ...(CDN_PUBLIC_URL_PREFIX && { publicUrlPrefix: CDN_PUBLIC_URL_PREFIX }),
     },
     deployment: {
       ...(DEPLOYMENT_USE_TX && { useTx: parseEnvBoolean(DEPLOYMENT_USE_TX) }),

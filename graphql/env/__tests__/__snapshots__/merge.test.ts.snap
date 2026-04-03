@@ -22,8 +22,9 @@ exports[`getEnvOptions merges pgpm defaults, graphql defaults, config, env, and 
     "awsRegion": "us-east-1",
     "awsSecretKey": "minioadmin",
     "bucketName": "test-bucket",
-    "minioEndpoint": "http://localhost:9000",
+    "endpoint": "http://localhost:9000",
     "provider": "minio",
+    "publicUrlPrefix": "http://localhost:9000/test-bucket",
   },
   "db": {
     "connections": {

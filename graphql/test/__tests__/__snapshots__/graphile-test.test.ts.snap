@@ -2941,6 +2941,65 @@ based pagination. May not be used with \`last\`.",
                 "ofType": null,
               },
             },
+            {
+              "args": [
+                {
+                  "defaultValue": null,
+                  "description": "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
+                  "name": "input",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "RequestUploadUrlInput",
+                      "ofType": null,
+                    },
+                  },
+                },
+              ],
+              "deprecationReason": null,
+              "description": "Request a presigned URL for uploading a file directly to S3.
+Client computes SHA-256 of the file content and provides it here.
+If a file with the same hash already exists (dedup), returns the
+existing file ID and deduplicated=true with no uploadUrl.",
+              "isDeprecated": false,
+              "name": "requestUploadUrl",
+              "type": {
+                "kind": "OBJECT",
+                "name": "RequestUploadUrlPayload",
+                "ofType": null,
+              },
+            },
+            {
+              "args": [
+                {
+                  "defaultValue": null,
+                  "description": "The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.",
+                  "name": "input",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "ConfirmUploadInput",
+                      "ofType": null,
+                    },
+                  },
+                },
+              ],
+              "deprecationReason": null,
+              "description": "Confirm that a file has been uploaded to S3.
+Verifies the object exists in S3, checks content-type,
+and transitions the file status from 'pending' to 'ready'.",
+              "isDeprecated": false,
+              "name": "confirmUpload",
+              "type": {
+                "kind": "OBJECT",
+                "name": "ConfirmUploadPayload",
+                "ofType": null,
+              },
+            },
           ],
           "inputFields": null,
           "interfaces": [],
@@ -3383,6 +3442,274 @@ payload verbatim. May be used to track mutations by the client.",
           "interfaces": null,
           "kind": "INPUT_OBJECT",
           "name": "DeleteUserInput",
+          "possibleTypes": null,
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "defaultValue": null,
+              "description": "Bucket key (e.g., "public", "private")",
+              "name": "bucketKey",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "defaultValue": null,
+              "description": "SHA-256 content hash computed by the client (hex-encoded, 64 chars)",
+              "name": "contentHash",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "defaultValue": null,
+              "description": "MIME type of the file (e.g., "image/png")",
+              "name": "contentType",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "defaultValue": null,
+              "description": "File size in bytes",
+              "name": "size",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "defaultValue": null,
+              "description": "Original filename (optional, for display and Content-Disposition)",
+              "name": "filename",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null,
+              },
+            },
+          ],
+          "interfaces": null,
+          "kind": "INPUT_OBJECT",
+          "name": "RequestUploadUrlInput",
+          "possibleTypes": null,
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": [
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "Presigned PUT URL (null if file was deduplicated)",
+              "isDeprecated": false,
+              "name": "uploadUrl",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null,
+              },
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "The file ID (existing if deduplicated, new if fresh upload)",
+              "isDeprecated": false,
+              "name": "fileId",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "UUID",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "The S3 object key",
+              "isDeprecated": false,
+              "name": "key",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "Whether this file was deduplicated (already exists with same hash)",
+              "isDeprecated": false,
+              "name": "deduplicated",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "Presigned URL expiry time (null if deduplicated)",
+              "isDeprecated": false,
+              "name": "expiresAt",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null,
+              },
+            },
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "kind": "OBJECT",
+          "name": "RequestUploadUrlPayload",
+          "possibleTypes": null,
+        },
+        {
+          "description": "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).",
+          "enumValues": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "kind": "SCALAR",
+          "name": "UUID",
+          "possibleTypes": null,
+        },
+        {
+          "description": "A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.",
+          "enumValues": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "kind": "SCALAR",
+          "name": "Datetime",
+          "possibleTypes": null,
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "defaultValue": null,
+              "description": "The file ID returned by requestUploadUrl",
+              "name": "fileId",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "UUID",
+                  "ofType": null,
+                },
+              },
+            },
+          ],
+          "interfaces": null,
+          "kind": "INPUT_OBJECT",
+          "name": "ConfirmUploadInput",
+          "possibleTypes": null,
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": [
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "The confirmed file ID",
+              "isDeprecated": false,
+              "name": "fileId",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "UUID",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "New file status",
+              "isDeprecated": false,
+              "name": "status",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null,
+                },
+              },
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": "Whether confirmation succeeded",
+              "isDeprecated": false,
+              "name": "success",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null,
+                },
+              },
+            },
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "kind": "OBJECT",
+          "name": "ConfirmUploadPayload",
           "possibleTypes": null,
         },
         {

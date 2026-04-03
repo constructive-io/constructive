@@ -1690,6 +1690,31 @@ type Mutation {
     """
     input: DeletePostInput!
   ): DeletePostPayload
+
+  """
+  Request a presigned URL for uploading a file directly to S3.
+  Client computes SHA-256 of the file content and provides it here.
+  If a file with the same hash already exists (dedup), returns the
+  existing file ID and deduplicated=true with no uploadUrl.
+  """
+  requestUploadUrl(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RequestUploadUrlInput!
+  ): RequestUploadUrlPayload
+
+  """
+  Confirm that a file has been uploaded to S3.
+  Verifies the object exists in S3, checks content-type,
+  and transitions the file status from 'pending' to 'ready'.
+  """
+  confirmUpload(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ConfirmUploadInput!
+  ): ConfirmUploadPayload
 }
 
 """The output of our create \`PostTag\` mutation."""
@@ -2342,5 +2367,55 @@ input DeletePostInput {
   """
   clientMutationId: String
   id: UUID!
+}
+
+input RequestUploadUrlInput {
+  """Bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
+  contentHash: String!
+
+  """MIME type of the file (e.g., "image/png")"""
+  contentType: String!
+
+  """File size in bytes"""
+  size: Int!
+
+  """Original filename (optional, for display and Content-Disposition)"""
+  filename: String
+}
+
+type RequestUploadUrlPayload {
+  """Presigned PUT URL (null if file was deduplicated)"""
+  uploadUrl: String
+
+  """The file ID (existing if deduplicated, new if fresh upload)"""
+  fileId: UUID!
+
+  """The S3 object key"""
+  key: String!
+
+  """Whether this file was deduplicated (already exists with same hash)"""
+  deduplicated: Boolean!
+
+  """Presigned URL expiry time (null if deduplicated)"""
+  expiresAt: Datetime
+}
+
+input ConfirmUploadInput {
+  """The file ID returned by requestUploadUrl"""
+  fileId: UUID!
+}
+
+type ConfirmUploadPayload {
+  """The confirmed file ID"""
+  fileId: UUID!
+
+  """New file status"""
+  status: String!
+
+  """Whether confirmation succeeded"""
+  success: Boolean!
 }"
 `;

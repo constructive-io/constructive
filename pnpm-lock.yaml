@@ -450,6 +450,9 @@ importers:
 
   graphile/graphile-settings:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1009.0
+        version: 3.1009.0
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../../graphql/env/dist
@@ -507,6 +510,9 @@ importers:
       graphile-postgis:
         specifier: workspace:^
         version: link:../graphile-postgis/dist
+      graphile-presigned-url-plugin:
+        specifier: workspace:^
+        version: link:../graphile-presigned-url-plugin/dist
       graphile-search:
         specifier: workspace:^
         version: link:../graphile-search/dist

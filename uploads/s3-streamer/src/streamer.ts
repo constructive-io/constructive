@@ -14,7 +14,7 @@ interface StreamerOptions {
   awsRegion: string;
   awsSecretKey: string;
   awsAccessKey: string;
-  minioEndpoint?: string;
+  endpoint?: string;
   provider?: BucketProvider;
   defaultBucket: string;
 }
@@ -42,7 +42,7 @@ export class Streamer {
     awsRegion,
     awsSecretKey,
     awsAccessKey,
-    minioEndpoint,
+    endpoint,
     provider,
     defaultBucket
   }: StreamerOptions) {
@@ -50,7 +50,7 @@ export class Streamer {
       awsRegion,
       awsSecretKey,
       awsAccessKey,
-      minioEndpoint,
+      endpoint,
       provider
     });
     this.defaultBucket = defaultBucket;

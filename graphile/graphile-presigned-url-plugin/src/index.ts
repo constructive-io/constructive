@@ -40,5 +40,6 @@ export type {
   ConfirmUploadInput,
   ConfirmUploadPayload,
   S3Config,
+  S3ConfigOrGetter,
   PresignedUrlPluginOptions,
 } from './types';

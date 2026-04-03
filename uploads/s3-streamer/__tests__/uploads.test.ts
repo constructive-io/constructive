@@ -20,7 +20,7 @@ const {
   awsRegion: AWS_REGION,
   awsSecretKey: AWS_SECRET_KEY,
   awsAccessKey: AWS_ACCESS_KEY,
-  minioEndpoint: MINIO_ENDPOINT
+  endpoint: ENDPOINT
 } = config.cdn;
 
 // Initialize S3 client
@@ -30,7 +30,7 @@ const s3Client = new S3Client({
     secretAccessKey: AWS_SECRET_KEY,
   },
   region: AWS_REGION,
-  endpoint: MINIO_ENDPOINT,
+  endpoint: ENDPOINT,
   forcePathStyle: true
 });
 
@@ -65,7 +65,7 @@ describe('uploads', () => {
       awsRegion: AWS_REGION,
       awsSecretKey: AWS_SECRET_KEY,
       awsAccessKey: AWS_ACCESS_KEY,
-      minioEndpoint: MINIO_ENDPOINT
+      endpoint: ENDPOINT
     });
 
     try {
@@ -98,7 +98,7 @@ describe('uploads', () => {
       awsRegion: AWS_REGION,
       awsSecretKey: AWS_SECRET_KEY,
       awsAccessKey: AWS_ACCESS_KEY,
-      minioEndpoint: MINIO_ENDPOINT
+      endpoint: ENDPOINT
     });
 
     try {

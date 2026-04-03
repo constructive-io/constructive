@@ -16,7 +16,7 @@
 import type { GraphileConfig } from 'graphile-config';
 import { Logger } from '@pgpmjs/logger';
 
-import type { PresignedUrlPluginOptions } from './types';
+import type { PresignedUrlPluginOptions, S3Config } from './types';
 import { generatePresignedGetUrl } from './s3-signer';
 import { getStorageModuleConfig } from './storage-module-cache';
 
@@ -31,10 +31,22 @@ const log = new Logger('graphile-presigned-url:download-url');
  * the storage module's files table, which we discover at schema-build time
  * via the `@storageFiles` smart tag.
  */
+/**
+ * Resolve the S3 config from the options. If the option is a lazy getter
+ * function, call it (and cache the result).
+ */
+function resolveS3(options: PresignedUrlPluginOptions): S3Config {
+  if (typeof options.s3 === 'function') {
+    const resolved = options.s3();
+    options.s3 = resolved;
+    return resolved;
+  }
+  return options.s3;
+}
+
 export function createDownloadUrlPlugin(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Plugin {
-  const { s3 } = options;
 
   return {
     name: 'PresignedUrlDownloadPlugin',
@@ -88,6 +100,8 @@ export function createDownloadUrlPlugin(
                       return null;
                     }
 
+                    const s3 = resolveS3(options);
+
                     if (isPublic && s3.publicUrlPrefix) {
                       // Public file: return direct URL
                       return `${s3.publicUrlPrefix}/${key}`;
@@ -118,7 +132,7 @@ export function createDownloadUrlPlugin(
 
                     // Private file: generate presigned GET URL
                     return generatePresignedGetUrl(
-                      s3,
+                      resolveS3(options),
                       key,
                       downloadUrlExpirySeconds,
                       filename || undefined,
