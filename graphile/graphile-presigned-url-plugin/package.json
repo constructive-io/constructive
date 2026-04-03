@@ -14,7 +14,7 @@
     "build": "makage build",
     "build:dev": "makage build --dev",
     "lint": "eslint . --fix",
-    "test": "jest --passWithNoTests",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "publishConfig": {
@@ -55,6 +55,7 @@
     "postgraphile": "5.0.0"
   },
   "devDependencies": {
+    "@constructive-io/s3-utils": "workspace:^",
     "@types/node": "^22.19.11",
     "makage": "^0.1.10"
   }
