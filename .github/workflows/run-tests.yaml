@@ -111,6 +111,10 @@ jobs:
             env: {}
           - package: graphile/graphile-presigned-url-plugin
             env: {}
+          - package: packages/bucket-provisioner
+            env: {}
+          - package: packages/upload-client
+            env: {}
 
     env:
       PGHOST: localhost
