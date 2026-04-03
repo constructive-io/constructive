@@ -50,7 +50,7 @@ function buildTableMeta(
     }
   }
   for (const relation of Object.values(relations)) {
-    if (relation.isReferencee !== false) continue;
+    if (relation.isReferencee) continue;
     for (const attrName of relation.localAttributes || []) fkAttrNames.add(attrName);
   }
 
