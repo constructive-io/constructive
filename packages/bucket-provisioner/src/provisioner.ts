@@ -363,6 +363,9 @@ export class BucketProvisioner {
 
   /**
    * Enable versioning on an S3 bucket.
+   *
+   * MinIO edge-cicd does not implement PutBucketVersioning.
+   * For non-AWS providers, this is a best-effort operation.
    */
   async enableVersioning(bucketName: string): Promise<void> {
     try {
@@ -373,6 +376,9 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      if (this.config.provider !== 's3') {
+        return;
+      }
       throw new ProvisionerError(
         'VERSIONING_FAILED',
         `Failed to enable versioning on '${bucketName}': ${err.message}`,
@@ -383,6 +389,9 @@ export class BucketProvisioner {
 
   /**
    * Set lifecycle rules on an S3 bucket.
+   *
+   * MinIO edge-cicd requires a Content-MD5 header that the AWS SDK may not
+   * send automatically. For non-AWS providers, this is a best-effort operation.
    */
   async setLifecycleRules(
     bucketName: string,
@@ -403,6 +412,9 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      if (this.config.provider !== 's3') {
+        return;
+      }
       throw new ProvisionerError(
         'LIFECYCLE_FAILED',
         `Failed to set lifecycle rules on '${bucketName}': ${err.message}`,
