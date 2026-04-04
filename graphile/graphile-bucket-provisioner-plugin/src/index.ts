@@ -12,17 +12,24 @@
  * @example
  * ```typescript
  * import { BucketProvisionerPreset } from 'graphile-bucket-provisioner-plugin';
+ * import { getEnvOptions } from '@constructive-io/graphql-env';
+ *
+ * // Use a lazy getter so env vars are read at runtime, not import time
+ * function getConnection() {
+ *   const { cdn } = getEnvOptions();
+ *   return {
+ *     provider: cdn?.provider || 'minio',
+ *     region: cdn?.awsRegion || 'us-east-1',
+ *     endpoint: cdn?.endpoint || 'http://minio:9000',
+ *     accessKeyId: cdn?.awsAccessKey!,
+ *     secretAccessKey: cdn?.awsSecretKey!,
+ *   };
+ * }
  *
  * const preset = {
  *   extends: [
  *     BucketProvisionerPreset({
- *       connection: {
- *         provider: 'minio',
- *         region: 'us-east-1',
- *         endpoint: 'http://minio:9000',
- *         accessKeyId: process.env.MINIO_ACCESS_KEY!,
- *         secretAccessKey: process.env.MINIO_SECRET_KEY!,
- *       },
+ *       connection: getConnection, // pass function ref, NOT getConnection()
  *       allowedOrigins: ['https://app.example.com'],
  *       bucketNamePrefix: 'myapp',
  *     }),
