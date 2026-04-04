@@ -17,10 +17,13 @@ PostGraphile v5 plugin that automatically provisions S3-compatible buckets when 
 ## Features
 
 - **Auto-provisioning hook** — Wraps `create*` mutations on tables tagged with `@storageBuckets` to automatically provision S3 buckets after row creation
+- **CORS update hook** — Wraps `update*` mutations to detect `allowed_origins` changes and re-apply CORS rules to the S3 bucket
+- **3-tier CORS resolution** — Bucket-level `allowed_origins` → storage module-level `allowed_origins` → plugin config `allowedOrigins`
+- **Wildcard CORS** — Set `allowed_origins = ['*']` on a bucket for fully open CDN/public deployments
 - **Explicit `provisionBucket` mutation** — GraphQL mutation for manual/retry provisioning of any bucket
-- **Per-database overrides** — Reads `endpoint`, `provider`, and `public_url_prefix` from the `storage_module` table for multi-tenant setups
+- **Per-database overrides** — Reads `endpoint`, `provider`, `public_url_prefix`, and `allowed_origins` from the `storage_module` table for multi-tenant setups
 - **Lazy S3 config** — Connection config can be a function (evaluated once, cached) to avoid eager env-var reads at import time
-- **Graceful error handling** — Provisioning failures are logged but never fail the mutation (admin can retry via `provisionBucket`)
+- **Graceful error handling** — Provisioning and CORS update failures are logged but never fail the mutation (admin can retry via `provisionBucket`)
 - **Custom bucket naming** — Supports prefix-based naming or a fully custom `resolveBucketName` function
 
 ## Installation
@@ -146,7 +149,7 @@ The plugin detects tables tagged with `@storageBuckets` (set by the storage modu
 COMMENT ON TABLE app_public.buckets IS E'@storageBuckets\nStorage buckets table';
 ```
 
-Only `create*` mutations on tagged tables trigger auto-provisioning. Update and delete mutations are not wrapped.
+The plugin wraps `create*` mutations for auto-provisioning and `update*` mutations for CORS change detection. Delete mutations are not wrapped.
 
 ## Error Handling
 
