@@ -29,8 +29,29 @@ export function getPresignedUrlS3Config(): S3Config {
 
   const { cdn } = getEnvOptions();
 
-  // cdn is guaranteed populated — pgpmDefaults provides all CDN fields
-  const { bucketName, awsRegion, awsAccessKey, awsSecretKey, endpoint, publicUrlPrefix } = cdn!;
+  if (!cdn) {
+    throw new Error(
+      '[presigned-url-resolver] CDN config not found. ' +
+      'Ensure CDN environment variables (AWS_ACCESS_KEY, AWS_SECRET_KEY, etc.) ' +
+      'are set or that pgpmDefaults provides CDN fields.',
+    );
+  }
+
+  const { bucketName, awsRegion, awsAccessKey, awsSecretKey, endpoint, publicUrlPrefix } = cdn;
+
+  if (!awsAccessKey || !awsSecretKey) {
+    throw new Error(
+      '[presigned-url-resolver] Missing S3 credentials. ' +
+      'Set AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.',
+    );
+  }
+
+  if (!bucketName) {
+    throw new Error(
+      '[presigned-url-resolver] Missing CDN bucket name. ' +
+      'Set CDN_BUCKET_NAME environment variable.',
+    );
+  }
 
   log.info(
     `[presigned-url-resolver] Initializing: bucket=${bucketName} endpoint=${endpoint}`,
@@ -38,13 +59,13 @@ export function getPresignedUrlS3Config(): S3Config {
 
   const client = new S3Client({
     region: awsRegion,
-    credentials: { accessKeyId: awsAccessKey!, secretAccessKey: awsSecretKey! },
+    credentials: { accessKeyId: awsAccessKey, secretAccessKey: awsSecretKey },
     ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
   });
 
   s3Config = {
     client,
-    bucket: bucketName!,
+    bucket: bucketName,
     region: awsRegion,
     publicUrlPrefix,
     ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
