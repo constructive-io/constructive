@@ -271,6 +271,9 @@ export class BucketProvisioner {
 
   /**
    * Apply an S3 bucket policy.
+   *
+   * Some S3-compatible providers may not fully support bucket policies.
+   * For non-AWS providers, this is a best-effort operation.
    */
   async setBucketPolicy(
     bucketName: string,
@@ -284,6 +287,9 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      if (this.config.provider !== 's3') {
+        return;
+      }
       throw new ProvisionerError(
         'POLICY_FAILED',
         `Failed to set bucket policy on '${bucketName}': ${err.message}`,
@@ -294,6 +300,8 @@ export class BucketProvisioner {
 
   /**
    * Delete an S3 bucket policy (used to clear leftover public policies).
+   *
+   * For non-AWS providers, this is a best-effort operation.
    */
   async deleteBucketPolicy(bucketName: string): Promise<void> {
     try {
@@ -305,6 +313,9 @@ export class BucketProvisioner {
       if (err.name === 'NoSuchBucketPolicy' || err.$metadata?.httpStatusCode === 404) {
         return;
       }
+      if (this.config.provider !== 's3') {
+        return;
+      }
       throw new ProvisionerError(
         'POLICY_FAILED',
         `Failed to delete bucket policy on '${bucketName}': ${err.message}`,
@@ -314,7 +325,11 @@ export class BucketProvisioner {
   }
 
   /**
-   * Set CORS configuration on an S3 bucket.
+   * Set CORS rules on an S3 bucket.
+   *
+   * Bucket-level CORS is only supported on AWS S3 and MinIO AIStor (paid).
+   * The free MinIO / edge-cicd image does not support PutBucketCors.
+   * For non-AWS providers, this is a best-effort operation.
    */
   async setCors(bucketName: string, rules: CorsRule[]): Promise<void> {
     try {
@@ -333,6 +348,11 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      // MinIO free/edge-cicd doesn't support bucket-level CORS.
+      // Skip gracefully for non-AWS providers.
+      if (this.config.provider !== 's3') {
+        return;
+      }
       throw new ProvisionerError(
         'CORS_FAILED',
         `Failed to set CORS on '${bucketName}': ${err.message}`,

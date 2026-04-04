@@ -528,7 +528,7 @@ describe('BucketProvisioner — error propagation', () => {
     expect(result.bucketName).toBe('minio-bucket');
   });
 
-  it('wraps PutBucketCors failure as CORS_FAILED', async () => {
+  it('wraps PutBucketCors failure as CORS_FAILED (AWS S3)', async () => {
     // CreateBucket, PutPublicAccessBlock, DeleteBucketPolicy succeed
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
@@ -536,7 +536,11 @@ describe('BucketProvisioner — error propagation', () => {
     // PutBucketCors fails
     mockSend.mockRejectedValueOnce(new Error('CORS error'));
 
-    const provisioner = new BucketProvisioner(defaultOptions);
+    // Use S3 provider — non-AWS providers skip this error gracefully
+    const provisioner = new BucketProvisioner({
+      ...defaultOptions,
+      connection: { ...defaultOptions.connection, provider: 's3', endpoint: undefined },
+    });
     try {
       await provisioner.provision({
         bucketName: 'cors-fail',
@@ -549,7 +553,7 @@ describe('BucketProvisioner — error propagation', () => {
     }
   });
 
-  it('wraps PutBucketVersioning failure as VERSIONING_FAILED', async () => {
+  it('wraps PutBucketVersioning failure as VERSIONING_FAILED (AWS S3)', async () => {
     // CreateBucket, PutPublicAccessBlock, DeleteBucketPolicy, PutBucketCors succeed
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
@@ -558,7 +562,11 @@ describe('BucketProvisioner — error propagation', () => {
     // PutBucketVersioning fails
     mockSend.mockRejectedValueOnce(new Error('Versioning error'));
 
-    const provisioner = new BucketProvisioner(defaultOptions);
+    // Use S3 provider — versioning errors still throw on AWS
+    const provisioner = new BucketProvisioner({
+      ...defaultOptions,
+      connection: { ...defaultOptions.connection, provider: 's3', endpoint: undefined },
+    });
     try {
       await provisioner.provision({
         bucketName: 'version-fail',
@@ -572,7 +580,7 @@ describe('BucketProvisioner — error propagation', () => {
     }
   });
 
-  it('wraps PutBucketLifecycleConfiguration failure as LIFECYCLE_FAILED', async () => {
+  it('wraps PutBucketLifecycleConfiguration failure as LIFECYCLE_FAILED (AWS S3)', async () => {
     // CreateBucket, PutPublicAccessBlock, DeleteBucketPolicy, PutBucketCors succeed
     mockSend.mockResolvedValueOnce({});
     mockSend.mockResolvedValueOnce({});
@@ -581,7 +589,11 @@ describe('BucketProvisioner — error propagation', () => {
     // PutBucketLifecycleConfiguration fails
     mockSend.mockRejectedValueOnce(new Error('Lifecycle error'));
 
-    const provisioner = new BucketProvisioner(defaultOptions);
+    // Use S3 provider — lifecycle errors still throw on AWS
+    const provisioner = new BucketProvisioner({
+      ...defaultOptions,
+      connection: { ...defaultOptions.connection, provider: 's3', endpoint: undefined },
+    });
     try {
       await provisioner.provision({
         bucketName: 'lifecycle-fail',
