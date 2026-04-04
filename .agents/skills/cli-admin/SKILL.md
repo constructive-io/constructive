@@ -1,13 +1,13 @@
 ---
 name: cli-admin
-description: CLI tool (csdk) for the admin API — provides CRUD commands for 32 tables and 13 custom operations
+description: CLI tool (csdk) for the admin API — provides CRUD commands for 32 tables and 16 custom operations
 ---
 
 # cli-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the admin API — provides CRUD commands for 32 tables and 13 custom operations
+CLI tool (csdk) for the admin API — provides CRUD commands for 32 tables and 16 custom operations
 
 ## Usage
 
@@ -101,3 +101,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [steps-required](references/steps-required.md)
 - [submit-invite-code](references/submit-invite-code.md)
 - [submit-org-invite-code](references/submit-org-invite-code.md)
+- [request-upload-url](references/request-upload-url.md)
+- [confirm-upload](references/confirm-upload.md)
+- [provision-bucket](references/provision-bucket.md)

@@ -1079,6 +1079,26 @@ export interface VerifyTotpInput {
   clientMutationId?: string;
   totpValue: string;
 }
+export interface RequestUploadUrlInput {
+  /** Bucket key (e.g., "public", "private") */
+  bucketKey: string;
+  /** SHA-256 content hash computed by the client (hex-encoded, 64 chars) */
+  contentHash: string;
+  /** MIME type of the file (e.g., "image/png") */
+  contentType: string;
+  /** File size in bytes */
+  size: number;
+  /** Original filename (optional, for display and Content-Disposition) */
+  filename?: string;
+}
+export interface ConfirmUploadInput {
+  /** The file ID returned by requestUploadUrl */
+  fileId: string;
+}
+export interface ProvisionBucketInput {
+  /** The logical bucket key (e.g., "public", "private") */
+  bucketKey: string;
+}
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
@@ -2024,6 +2044,60 @@ export type VerifyTotpPayloadSelect = {
   result?: {
     select: SessionSelect;
   };
+};
+export interface RequestUploadUrlPayload {
+  /** Presigned PUT URL (null if file was deduplicated) */
+  uploadUrl?: string | null;
+  /** The file ID (existing if deduplicated, new if fresh upload) */
+  fileId: string;
+  /** The S3 object key */
+  key: string;
+  /** Whether this file was deduplicated (already exists with same hash) */
+  deduplicated: boolean;
+  /** Presigned URL expiry time (null if deduplicated) */
+  expiresAt?: string | null;
+}
+export type RequestUploadUrlPayloadSelect = {
+  uploadUrl?: boolean;
+  fileId?: boolean;
+  key?: boolean;
+  deduplicated?: boolean;
+  expiresAt?: boolean;
+};
+export interface ConfirmUploadPayload {
+  /** The confirmed file ID */
+  fileId: string;
+  /** New file status */
+  status: string;
+  /** Whether confirmation succeeded */
+  success: boolean;
+}
+export type ConfirmUploadPayloadSelect = {
+  fileId?: boolean;
+  status?: boolean;
+  success?: boolean;
+};
+export interface ProvisionBucketPayload {
+  /** Whether provisioning succeeded */
+  success: boolean;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
+  /** The access type applied */
+  accessType: string;
+  /** The storage provider used */
+  provider: string;
+  /** The S3 endpoint (null for AWS S3 default) */
+  endpoint?: string | null;
+  /** Error message if provisioning failed */
+  error?: string | null;
+}
+export type ProvisionBucketPayloadSelect = {
+  success?: boolean;
+  bucketName?: boolean;
+  accessType?: boolean;
+  provider?: boolean;
+  endpoint?: boolean;
+  error?: boolean;
 };
 export interface CreateEmailPayload {
   clientMutationId?: string | null;

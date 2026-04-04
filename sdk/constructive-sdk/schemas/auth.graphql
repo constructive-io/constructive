@@ -1,219 +1,3 @@
-"""The root query type which gives access points into the data universe."""
-type Query {
-  currentIpAddress: InternetAddress
-  currentUserAgent: String
-  currentUserId: UUID
-  currentUser: User
-
-  """Reads and enables pagination through a set of `RoleType`."""
-  roleTypes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: RoleTypeFilter
-
-    """The method to use when ordering `RoleType`."""
-    orderBy: [RoleTypeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RoleTypeConnection
-
-  """Reads and enables pagination through a set of `CryptoAddress`."""
-  cryptoAddresses(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: CryptoAddressFilter
-
-    """The method to use when ordering `CryptoAddress`."""
-    orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CryptoAddressConnection
-
-  """Reads and enables pagination through a set of `PhoneNumber`."""
-  phoneNumbers(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: PhoneNumberFilter
-
-    """The method to use when ordering `PhoneNumber`."""
-    orderBy: [PhoneNumberOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PhoneNumberConnection
-
-  """Reads and enables pagination through a set of `ConnectedAccount`."""
-  connectedAccounts(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ConnectedAccountFilter
-
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountConnection
-
-  """Reads and enables pagination through a set of `AuditLog`."""
-  auditLogs(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AuditLogFilter
-
-    """The method to use when ordering `AuditLog`."""
-    orderBy: [AuditLogOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AuditLogConnection
-
-  """Reads and enables pagination through a set of `Email`."""
-  emails(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: EmailFilter
-
-    """The method to use when ordering `Email`."""
-    orderBy: [EmailOrderBy!] = [PRIMARY_KEY_ASC]
-  ): EmailConnection
-
-  """Reads and enables pagination through a set of `User`."""
-  users(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: UserFilter
-
-    """The method to use when ordering `User`."""
-    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
-  ): UserConnection
-
-  """
-  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
-  """
-  _meta: MetaSchema
-}
-
 """An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
 
@@ -2354,276 +2138,6 @@ type MetaQuery {
   delete: String
 }
 
-"""
-The root mutation type which contains root level fields which mutate data.
-"""
-type Mutation {
-  signOut(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SignOutInput!
-  ): SignOutPayload
-  sendAccountDeletionEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SendAccountDeletionEmailInput!
-  ): SendAccountDeletionEmailPayload
-  checkPassword(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CheckPasswordInput!
-  ): CheckPasswordPayload
-  confirmDeleteAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ConfirmDeleteAccountInput!
-  ): ConfirmDeleteAccountPayload
-  setPassword(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SetPasswordInput!
-  ): SetPasswordPayload
-  verifyEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyEmailInput!
-  ): VerifyEmailPayload
-  resetPassword(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ResetPasswordInput!
-  ): ResetPasswordPayload
-  signInOneTimeToken(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SignInOneTimeTokenInput!
-  ): SignInOneTimeTokenPayload
-  signIn(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SignInInput!
-  ): SignInPayload
-  signUp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SignUpInput!
-  ): SignUpPayload
-  oneTimeToken(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: OneTimeTokenInput!
-  ): OneTimeTokenPayload
-  extendTokenExpires(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ExtendTokenExpiresInput!
-  ): ExtendTokenExpiresPayload
-  forgotPassword(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ForgotPasswordInput!
-  ): ForgotPasswordPayload
-  sendVerificationEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SendVerificationEmailInput!
-  ): SendVerificationEmailPayload
-  verifyPassword(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyPasswordInput!
-  ): VerifyPasswordPayload
-  verifyTotp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyTotpInput!
-  ): VerifyTotpPayload
-
-  """Creates a single `RoleType`."""
-  createRoleType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateRoleTypeInput!
-  ): CreateRoleTypePayload
-
-  """Creates a single `CryptoAddress`."""
-  createCryptoAddress(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateCryptoAddressInput!
-  ): CreateCryptoAddressPayload
-
-  """Creates a single `PhoneNumber`."""
-  createPhoneNumber(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePhoneNumberInput!
-  ): CreatePhoneNumberPayload
-
-  """Creates a single `ConnectedAccount`."""
-  createConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateConnectedAccountInput!
-  ): CreateConnectedAccountPayload
-
-  """Creates a single `AuditLog`."""
-  createAuditLog(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAuditLogInput!
-  ): CreateAuditLogPayload
-
-  """Creates a single `Email`."""
-  createEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateEmailInput!
-  ): CreateEmailPayload
-
-  """Creates a single `User`."""
-  createUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateUserInput!
-  ): CreateUserPayload
-
-  """Updates a single `RoleType` using a unique key and a patch."""
-  updateRoleType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateRoleTypeInput!
-  ): UpdateRoleTypePayload
-
-  """Updates a single `CryptoAddress` using a unique key and a patch."""
-  updateCryptoAddress(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateCryptoAddressInput!
-  ): UpdateCryptoAddressPayload
-
-  """Updates a single `PhoneNumber` using a unique key and a patch."""
-  updatePhoneNumber(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePhoneNumberInput!
-  ): UpdatePhoneNumberPayload
-
-  """Updates a single `ConnectedAccount` using a unique key and a patch."""
-  updateConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateConnectedAccountInput!
-  ): UpdateConnectedAccountPayload
-
-  """Updates a single `AuditLog` using a unique key and a patch."""
-  updateAuditLog(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAuditLogInput!
-  ): UpdateAuditLogPayload
-
-  """Updates a single `Email` using a unique key and a patch."""
-  updateEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateEmailInput!
-  ): UpdateEmailPayload
-
-  """Updates a single `User` using a unique key and a patch."""
-  updateUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateUserInput!
-  ): UpdateUserPayload
-
-  """Deletes a single `RoleType` using a unique key."""
-  deleteRoleType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteRoleTypeInput!
-  ): DeleteRoleTypePayload
-
-  """Deletes a single `CryptoAddress` using a unique key."""
-  deleteCryptoAddress(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteCryptoAddressInput!
-  ): DeleteCryptoAddressPayload
-
-  """Deletes a single `PhoneNumber` using a unique key."""
-  deletePhoneNumber(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePhoneNumberInput!
-  ): DeletePhoneNumberPayload
-
-  """Deletes a single `ConnectedAccount` using a unique key."""
-  deleteConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteConnectedAccountInput!
-  ): DeleteConnectedAccountPayload
-
-  """Deletes a single `AuditLog` using a unique key."""
-  deleteAuditLog(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAuditLogInput!
-  ): DeleteAuditLogPayload
-
-  """Deletes a single `Email` using a unique key."""
-  deleteEmail(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteEmailInput!
-  ): DeleteEmailPayload
-
-  """Deletes a single `User` using a unique key."""
-  deleteUser(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteUserInput!
-  ): DeleteUserPayload
-}
-
 """The output of our `signOut` mutation."""
 type SignOutPayload {
   """
@@ -4150,4 +3664,603 @@ input DeleteUserInput {
   """
   clientMutationId: String
   id: UUID!
+}
+
+input RequestUploadUrlInput {
+  """Bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
+  contentHash: String!
+
+  """MIME type of the file (e.g., "image/png")"""
+  contentType: String!
+
+  """File size in bytes"""
+  size: Int!
+
+  """Original filename (optional, for display and Content-Disposition)"""
+  filename: String
+}
+
+type RequestUploadUrlPayload {
+  """Presigned PUT URL (null if file was deduplicated)"""
+  uploadUrl: String
+
+  """The file ID (existing if deduplicated, new if fresh upload)"""
+  fileId: UUID!
+
+  """The S3 object key"""
+  key: String!
+
+  """Whether this file was deduplicated (already exists with same hash)"""
+  deduplicated: Boolean!
+
+  """Presigned URL expiry time (null if deduplicated)"""
+  expiresAt: Datetime
+}
+
+input ConfirmUploadInput {
+  """The file ID returned by requestUploadUrl"""
+  fileId: UUID!
+}
+
+type ConfirmUploadPayload {
+  """The confirmed file ID"""
+  fileId: UUID!
+
+  """New file status"""
+  status: String!
+
+  """Whether confirmation succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  currentIpAddress: InternetAddress
+  currentUserAgent: String
+  currentUserId: UUID
+  currentUser: User
+
+  """Reads and enables pagination through a set of `RoleType`."""
+  roleTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RoleTypeFilter
+
+    """The method to use when ordering `RoleType`."""
+    orderBy: [RoleTypeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RoleTypeConnection
+
+  """Reads and enables pagination through a set of `CryptoAddress`."""
+  cryptoAddresses(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: CryptoAddressFilter
+
+    """The method to use when ordering `CryptoAddress`."""
+    orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CryptoAddressConnection
+
+  """Reads and enables pagination through a set of `PhoneNumber`."""
+  phoneNumbers(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: PhoneNumberFilter
+
+    """The method to use when ordering `PhoneNumber`."""
+    orderBy: [PhoneNumberOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhoneNumberConnection
+
+  """Reads and enables pagination through a set of `ConnectedAccount`."""
+  connectedAccounts(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ConnectedAccountFilter
+
+    """The method to use when ordering `ConnectedAccount`."""
+    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ConnectedAccountConnection
+
+  """Reads and enables pagination through a set of `AuditLog`."""
+  auditLogs(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AuditLogFilter
+
+    """The method to use when ordering `AuditLog`."""
+    orderBy: [AuditLogOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AuditLogConnection
+
+  """Reads and enables pagination through a set of `Email`."""
+  emails(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: EmailFilter
+
+    """The method to use when ordering `Email`."""
+    orderBy: [EmailOrderBy!] = [PRIMARY_KEY_ASC]
+  ): EmailConnection
+
+  """Reads and enables pagination through a set of `User`."""
+  users(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: UserFilter
+
+    """The method to use when ordering `User`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
+  ): UserConnection
+
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  signOut(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignOutInput!
+  ): SignOutPayload
+  sendAccountDeletionEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SendAccountDeletionEmailInput!
+  ): SendAccountDeletionEmailPayload
+  checkPassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CheckPasswordInput!
+  ): CheckPasswordPayload
+  confirmDeleteAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ConfirmDeleteAccountInput!
+  ): ConfirmDeleteAccountPayload
+  setPassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SetPasswordInput!
+  ): SetPasswordPayload
+  verifyEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyEmailInput!
+  ): VerifyEmailPayload
+  resetPassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ResetPasswordInput!
+  ): ResetPasswordPayload
+  signInOneTimeToken(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignInOneTimeTokenInput!
+  ): SignInOneTimeTokenPayload
+  signIn(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignInInput!
+  ): SignInPayload
+  signUp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignUpInput!
+  ): SignUpPayload
+  oneTimeToken(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: OneTimeTokenInput!
+  ): OneTimeTokenPayload
+  extendTokenExpires(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ExtendTokenExpiresInput!
+  ): ExtendTokenExpiresPayload
+  forgotPassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ForgotPasswordInput!
+  ): ForgotPasswordPayload
+  sendVerificationEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SendVerificationEmailInput!
+  ): SendVerificationEmailPayload
+  verifyPassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyPasswordInput!
+  ): VerifyPasswordPayload
+  verifyTotp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyTotpInput!
+  ): VerifyTotpPayload
+
+  """Creates a single `RoleType`."""
+  createRoleType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRoleTypeInput!
+  ): CreateRoleTypePayload
+
+  """Creates a single `CryptoAddress`."""
+  createCryptoAddress(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCryptoAddressInput!
+  ): CreateCryptoAddressPayload
+
+  """Creates a single `PhoneNumber`."""
+  createPhoneNumber(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePhoneNumberInput!
+  ): CreatePhoneNumberPayload
+
+  """Creates a single `ConnectedAccount`."""
+  createConnectedAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateConnectedAccountInput!
+  ): CreateConnectedAccountPayload
+
+  """Creates a single `AuditLog`."""
+  createAuditLog(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAuditLogInput!
+  ): CreateAuditLogPayload
+
+  """Creates a single `Email`."""
+  createEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateEmailInput!
+  ): CreateEmailPayload
+
+  """Creates a single `User`."""
+  createUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserInput!
+  ): CreateUserPayload
+
+  """Updates a single `RoleType` using a unique key and a patch."""
+  updateRoleType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRoleTypeInput!
+  ): UpdateRoleTypePayload
+
+  """Updates a single `CryptoAddress` using a unique key and a patch."""
+  updateCryptoAddress(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCryptoAddressInput!
+  ): UpdateCryptoAddressPayload
+
+  """Updates a single `PhoneNumber` using a unique key and a patch."""
+  updatePhoneNumber(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhoneNumberInput!
+  ): UpdatePhoneNumberPayload
+
+  """Updates a single `ConnectedAccount` using a unique key and a patch."""
+  updateConnectedAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateConnectedAccountInput!
+  ): UpdateConnectedAccountPayload
+
+  """Updates a single `AuditLog` using a unique key and a patch."""
+  updateAuditLog(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAuditLogInput!
+  ): UpdateAuditLogPayload
+
+  """Updates a single `Email` using a unique key and a patch."""
+  updateEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateEmailInput!
+  ): UpdateEmailPayload
+
+  """Updates a single `User` using a unique key and a patch."""
+  updateUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserInput!
+  ): UpdateUserPayload
+
+  """Deletes a single `RoleType` using a unique key."""
+  deleteRoleType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRoleTypeInput!
+  ): DeleteRoleTypePayload
+
+  """Deletes a single `CryptoAddress` using a unique key."""
+  deleteCryptoAddress(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCryptoAddressInput!
+  ): DeleteCryptoAddressPayload
+
+  """Deletes a single `PhoneNumber` using a unique key."""
+  deletePhoneNumber(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhoneNumberInput!
+  ): DeletePhoneNumberPayload
+
+  """Deletes a single `ConnectedAccount` using a unique key."""
+  deleteConnectedAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteConnectedAccountInput!
+  ): DeleteConnectedAccountPayload
+
+  """Deletes a single `AuditLog` using a unique key."""
+  deleteAuditLog(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAuditLogInput!
+  ): DeleteAuditLogPayload
+
+  """Deletes a single `Email` using a unique key."""
+  deleteEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteEmailInput!
+  ): DeleteEmailPayload
+
+  """Deletes a single `User` using a unique key."""
+  deleteUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserInput!
+  ): DeleteUserPayload
+
+  """
+  Request a presigned URL for uploading a file directly to S3.
+  Client computes SHA-256 of the file content and provides it here.
+  If a file with the same hash already exists (dedup), returns the
+  existing file ID and deduplicated=true with no uploadUrl.
+  """
+  requestUploadUrl(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RequestUploadUrlInput!
+  ): RequestUploadUrlPayload
+
+  """
+  Confirm that a file has been uploaded to S3.
+  Verifies the object exists in S3, checks content-type,
+  and transitions the file status from 'pending' to 'ready'.
+  """
+  confirmUpload(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ConfirmUploadInput!
+  ): ConfirmUploadPayload
+
+  """
+  Provision an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then creates and configures
+  the S3 bucket with the appropriate privacy policies, CORS rules,
+  and lifecycle settings.
+  """
+  provisionBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionBucketInput!
+  ): ProvisionBucketPayload
+}
+
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+}
+
+type ProvisionBucketPayload {
+  """Whether provisioning succeeded"""
+  success: Boolean!
+
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The access type applied"""
+  accessType: String!
+
+  """The storage provider used"""
+  provider: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
 }

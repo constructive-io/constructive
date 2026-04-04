@@ -145,6 +145,18 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'verifyTotp', identifier] as const)
       : (['mutation', 'verifyTotp'] as const),
+  /** Mutation key for requestUploadUrl */ requestUploadUrl: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'requestUploadUrl', identifier] as const)
+      : (['mutation', 'requestUploadUrl'] as const),
+  /** Mutation key for confirmUpload */ confirmUpload: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'confirmUpload', identifier] as const)
+      : (['mutation', 'confirmUpload'] as const),
+  /** Mutation key for provisionBucket */ provisionBucket: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'provisionBucket', identifier] as const)
+      : (['mutation', 'provisionBucket'] as const),
 } as const;
 /**
 

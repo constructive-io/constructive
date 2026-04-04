@@ -1,982 +1,3 @@
-"""The root query type which gives access points into the data universe."""
-type Query {
-  appPermissionsGetPaddedMask(mask: BitString): BitString
-  orgPermissionsGetPaddedMask(mask: BitString): BitString
-  orgIsManagerOf(pEntityId: UUID, pManagerId: UUID, pUserId: UUID, pMaxDepth: Int): Boolean
-
-  """Reads and enables pagination through a set of `OrgGetManagersRecord`."""
-  orgGetManagers(
-    pEntityId: UUID
-    pUserId: UUID
-    pMaxDepth: Int
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): OrgGetManagersConnection
-
-  """
-  Reads and enables pagination through a set of `OrgGetSubordinatesRecord`.
-  """
-  orgGetSubordinates(
-    pEntityId: UUID
-    pUserId: UUID
-    pMaxDepth: Int
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): OrgGetSubordinatesConnection
-  appPermissionsGetMask(ids: [UUID]): BitString
-  orgPermissionsGetMask(ids: [UUID]): BitString
-  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
-  appPermissionsGetMaskByNames(names: [String]): BitString
-  orgPermissionsGetMaskByNames(names: [String]): BitString
-
-  """Reads and enables pagination through a set of `AppPermission`."""
-  appPermissionsGetByMask(
-    mask: BitString
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): AppPermissionConnection
-
-  """Reads and enables pagination through a set of `OrgPermission`."""
-  orgPermissionsGetByMask(
-    mask: BitString
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): OrgPermissionConnection
-
-  """Reads and enables pagination through a set of `AppLevelRequirement`."""
-  stepsRequired(
-    vlevel: String
-    vroleId: UUID
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): AppLevelRequirementConnection
-
-  """Reads and enables pagination through a set of `OrgMember`."""
-  orgMembers(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgMemberFilter
-
-    """The method to use when ordering `OrgMember`."""
-    orderBy: [OrgMemberOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgMemberConnection
-
-  """Reads and enables pagination through a set of `AppPermissionDefault`."""
-  appPermissionDefaults(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppPermissionDefaultFilter
-
-    """The method to use when ordering `AppPermissionDefault`."""
-    orderBy: [AppPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppPermissionDefaultConnection
-
-  """Reads and enables pagination through a set of `OrgPermissionDefault`."""
-  orgPermissionDefaults(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgPermissionDefaultFilter
-
-    """The method to use when ordering `OrgPermissionDefault`."""
-    orderBy: [OrgPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgPermissionDefaultConnection
-
-  """Reads and enables pagination through a set of `AppAdminGrant`."""
-  appAdminGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppAdminGrantFilter
-
-    """The method to use when ordering `AppAdminGrant`."""
-    orderBy: [AppAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppAdminGrantConnection
-
-  """Reads and enables pagination through a set of `AppOwnerGrant`."""
-  appOwnerGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppOwnerGrantFilter
-
-    """The method to use when ordering `AppOwnerGrant`."""
-    orderBy: [AppOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppOwnerGrantConnection
-
-  """Reads and enables pagination through a set of `AppLimitDefault`."""
-  appLimitDefaults(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLimitDefaultFilter
-
-    """The method to use when ordering `AppLimitDefault`."""
-    orderBy: [AppLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLimitDefaultConnection
-
-  """Reads and enables pagination through a set of `OrgLimitDefault`."""
-  orgLimitDefaults(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgLimitDefaultFilter
-
-    """The method to use when ordering `OrgLimitDefault`."""
-    orderBy: [OrgLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgLimitDefaultConnection
-
-  """Reads and enables pagination through a set of `OrgAdminGrant`."""
-  orgAdminGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgAdminGrantFilter
-
-    """The method to use when ordering `OrgAdminGrant`."""
-    orderBy: [OrgAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgAdminGrantConnection
-
-  """Reads and enables pagination through a set of `OrgOwnerGrant`."""
-  orgOwnerGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgOwnerGrantFilter
-
-    """The method to use when ordering `OrgOwnerGrant`."""
-    orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgOwnerGrantConnection
-
-  """Reads and enables pagination through a set of `MembershipType`."""
-  membershipTypes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: MembershipTypeFilter
-
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MembershipTypeConnection
-
-  """Reads and enables pagination through a set of `AppPermission`."""
-  appPermissions(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppPermissionFilter
-
-    """The method to use when ordering `AppPermission`."""
-    orderBy: [AppPermissionOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppPermissionConnection
-
-  """Reads and enables pagination through a set of `OrgPermission`."""
-  orgPermissions(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgPermissionFilter
-
-    """The method to use when ordering `OrgPermission`."""
-    orderBy: [OrgPermissionOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgPermissionConnection
-
-  """Reads and enables pagination through a set of `AppLimit`."""
-  appLimits(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLimitFilter
-
-    """The method to use when ordering `AppLimit`."""
-    orderBy: [AppLimitOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLimitConnection
-
-  """Reads and enables pagination through a set of `AppAchievement`."""
-  appAchievements(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppAchievementFilter
-
-    """The method to use when ordering `AppAchievement`."""
-    orderBy: [AppAchievementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppAchievementConnection
-
-  """Reads and enables pagination through a set of `AppStep`."""
-  appSteps(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppStepFilter
-
-    """The method to use when ordering `AppStep`."""
-    orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppStepConnection
-
-  """Reads and enables pagination through a set of `ClaimedInvite`."""
-  claimedInvites(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ClaimedInviteFilter
-
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteConnection
-
-  """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
-  orgChartEdgeGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgChartEdgeGrantFilter
-
-    """The method to use when ordering `OrgChartEdgeGrant`."""
-    orderBy: [OrgChartEdgeGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeGrantConnection
-
-  """Reads and enables pagination through a set of `OrgLimit`."""
-  orgLimits(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgLimitFilter
-
-    """The method to use when ordering `OrgLimit`."""
-    orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgLimitConnection
-
-  """Reads and enables pagination through a set of `AppGrant`."""
-  appGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppGrantFilter
-
-    """The method to use when ordering `AppGrant`."""
-    orderBy: [AppGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppGrantConnection
-
-  """Reads and enables pagination through a set of `AppMembershipDefault`."""
-  appMembershipDefaults(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppMembershipDefaultFilter
-
-    """The method to use when ordering `AppMembershipDefault`."""
-    orderBy: [AppMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppMembershipDefaultConnection
-
-  """Reads and enables pagination through a set of `OrgClaimedInvite`."""
-  orgClaimedInvites(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgClaimedInviteFilter
-
-    """The method to use when ordering `OrgClaimedInvite`."""
-    orderBy: [OrgClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgClaimedInviteConnection
-
-  """Reads and enables pagination through a set of `OrgGrant`."""
-  orgGrants(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgGrantFilter
-
-    """The method to use when ordering `OrgGrant`."""
-    orderBy: [OrgGrantOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgGrantConnection
-
-  """Reads and enables pagination through a set of `OrgChartEdge`."""
-  orgChartEdges(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgChartEdgeFilter
-
-    """The method to use when ordering `OrgChartEdge`."""
-    orderBy: [OrgChartEdgeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgChartEdgeConnection
-
-  """Reads and enables pagination through a set of `AppLevelRequirement`."""
-  appLevelRequirements(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLevelRequirementFilter
-
-    """The method to use when ordering `AppLevelRequirement`."""
-    orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelRequirementConnection
-
-  """Reads and enables pagination through a set of `OrgMembershipDefault`."""
-  orgMembershipDefaults(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgMembershipDefaultFilter
-
-    """The method to use when ordering `OrgMembershipDefault`."""
-    orderBy: [OrgMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgMembershipDefaultConnection
-
-  """Reads and enables pagination through a set of `AppLevel`."""
-  appLevels(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppLevelFilter
-
-    """The method to use when ordering `AppLevel`."""
-    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppLevelConnection
-
-  """Reads and enables pagination through a set of `Invite`."""
-  invites(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: InviteFilter
-
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): InviteConnection
-
-  """Reads and enables pagination through a set of `AppMembership`."""
-  appMemberships(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: AppMembershipFilter
-
-    """The method to use when ordering `AppMembership`."""
-    orderBy: [AppMembershipOrderBy!] = [PRIMARY_KEY_ASC]
-  ): AppMembershipConnection
-
-  """Reads and enables pagination through a set of `OrgMembership`."""
-  orgMemberships(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgMembershipFilter
-
-    """The method to use when ordering `OrgMembership`."""
-    orderBy: [OrgMembershipOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgMembershipConnection
-
-  """Reads and enables pagination through a set of `OrgInvite`."""
-  orgInvites(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgInviteFilter
-
-    """The method to use when ordering `OrgInvite`."""
-    orderBy: [OrgInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgInviteConnection
-
-  """
-  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
-  """
-  _meta: MetaSchema
-}
-
 """A string representing a series of binary bits"""
 scalar BitString
 
@@ -4899,752 +3920,6 @@ type MetaQuery {
   create: String
   update: String
   delete: String
-}
-
-"""
-The root mutation type which contains root level fields which mutate data.
-"""
-type Mutation {
-  submitInviteCode(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SubmitInviteCodeInput!
-  ): SubmitInviteCodePayload
-  submitOrgInviteCode(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SubmitOrgInviteCodeInput!
-  ): SubmitOrgInviteCodePayload
-
-  """Creates a single `OrgMember`."""
-  createOrgMember(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgMemberInput!
-  ): CreateOrgMemberPayload
-
-  """Creates a single `AppPermissionDefault`."""
-  createAppPermissionDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppPermissionDefaultInput!
-  ): CreateAppPermissionDefaultPayload
-
-  """Creates a single `OrgPermissionDefault`."""
-  createOrgPermissionDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgPermissionDefaultInput!
-  ): CreateOrgPermissionDefaultPayload
-
-  """Creates a single `AppAdminGrant`."""
-  createAppAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppAdminGrantInput!
-  ): CreateAppAdminGrantPayload
-
-  """Creates a single `AppOwnerGrant`."""
-  createAppOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppOwnerGrantInput!
-  ): CreateAppOwnerGrantPayload
-
-  """Creates a single `AppLimitDefault`."""
-  createAppLimitDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLimitDefaultInput!
-  ): CreateAppLimitDefaultPayload
-
-  """Creates a single `OrgLimitDefault`."""
-  createOrgLimitDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgLimitDefaultInput!
-  ): CreateOrgLimitDefaultPayload
-
-  """Creates a single `OrgAdminGrant`."""
-  createOrgAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgAdminGrantInput!
-  ): CreateOrgAdminGrantPayload
-
-  """Creates a single `OrgOwnerGrant`."""
-  createOrgOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgOwnerGrantInput!
-  ): CreateOrgOwnerGrantPayload
-
-  """Creates a single `MembershipType`."""
-  createMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMembershipTypeInput!
-  ): CreateMembershipTypePayload
-
-  """Creates a single `AppPermission`."""
-  createAppPermission(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppPermissionInput!
-  ): CreateAppPermissionPayload
-
-  """Creates a single `OrgPermission`."""
-  createOrgPermission(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgPermissionInput!
-  ): CreateOrgPermissionPayload
-
-  """Creates a single `AppLimit`."""
-  createAppLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLimitInput!
-  ): CreateAppLimitPayload
-
-  """Creates a single `AppAchievement`."""
-  createAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppAchievementInput!
-  ): CreateAppAchievementPayload
-
-  """Creates a single `AppStep`."""
-  createAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppStepInput!
-  ): CreateAppStepPayload
-
-  """Creates a single `ClaimedInvite`."""
-  createClaimedInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateClaimedInviteInput!
-  ): CreateClaimedInvitePayload
-
-  """Creates a single `OrgChartEdgeGrant`."""
-  createOrgChartEdgeGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgChartEdgeGrantInput!
-  ): CreateOrgChartEdgeGrantPayload
-
-  """Creates a single `OrgLimit`."""
-  createOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgLimitInput!
-  ): CreateOrgLimitPayload
-
-  """Creates a single `AppGrant`."""
-  createAppGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppGrantInput!
-  ): CreateAppGrantPayload
-
-  """Creates a single `AppMembershipDefault`."""
-  createAppMembershipDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppMembershipDefaultInput!
-  ): CreateAppMembershipDefaultPayload
-
-  """Creates a single `OrgClaimedInvite`."""
-  createOrgClaimedInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgClaimedInviteInput!
-  ): CreateOrgClaimedInvitePayload
-
-  """Creates a single `OrgGrant`."""
-  createOrgGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgGrantInput!
-  ): CreateOrgGrantPayload
-
-  """Creates a single `OrgChartEdge`."""
-  createOrgChartEdge(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgChartEdgeInput!
-  ): CreateOrgChartEdgePayload
-
-  """Creates a single `AppLevelRequirement`."""
-  createAppLevelRequirement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLevelRequirementInput!
-  ): CreateAppLevelRequirementPayload
-
-  """Creates a single `OrgMembershipDefault`."""
-  createOrgMembershipDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgMembershipDefaultInput!
-  ): CreateOrgMembershipDefaultPayload
-
-  """Creates a single `AppLevel`."""
-  createAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppLevelInput!
-  ): CreateAppLevelPayload
-
-  """Creates a single `Invite`."""
-  createInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateInviteInput!
-  ): CreateInvitePayload
-
-  """Creates a single `AppMembership`."""
-  createAppMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateAppMembershipInput!
-  ): CreateAppMembershipPayload
-
-  """Creates a single `OrgMembership`."""
-  createOrgMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgMembershipInput!
-  ): CreateOrgMembershipPayload
-
-  """Creates a single `OrgInvite`."""
-  createOrgInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgInviteInput!
-  ): CreateOrgInvitePayload
-
-  """Updates a single `OrgMember` using a unique key and a patch."""
-  updateOrgMember(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgMemberInput!
-  ): UpdateOrgMemberPayload
-
-  """
-  Updates a single `AppPermissionDefault` using a unique key and a patch.
-  """
-  updateAppPermissionDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppPermissionDefaultInput!
-  ): UpdateAppPermissionDefaultPayload
-
-  """
-  Updates a single `OrgPermissionDefault` using a unique key and a patch.
-  """
-  updateOrgPermissionDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgPermissionDefaultInput!
-  ): UpdateOrgPermissionDefaultPayload
-
-  """Updates a single `AppAdminGrant` using a unique key and a patch."""
-  updateAppAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppAdminGrantInput!
-  ): UpdateAppAdminGrantPayload
-
-  """Updates a single `AppOwnerGrant` using a unique key and a patch."""
-  updateAppOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppOwnerGrantInput!
-  ): UpdateAppOwnerGrantPayload
-
-  """Updates a single `AppLimitDefault` using a unique key and a patch."""
-  updateAppLimitDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLimitDefaultInput!
-  ): UpdateAppLimitDefaultPayload
-
-  """Updates a single `OrgLimitDefault` using a unique key and a patch."""
-  updateOrgLimitDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgLimitDefaultInput!
-  ): UpdateOrgLimitDefaultPayload
-
-  """Updates a single `OrgAdminGrant` using a unique key and a patch."""
-  updateOrgAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgAdminGrantInput!
-  ): UpdateOrgAdminGrantPayload
-
-  """Updates a single `OrgOwnerGrant` using a unique key and a patch."""
-  updateOrgOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgOwnerGrantInput!
-  ): UpdateOrgOwnerGrantPayload
-
-  """Updates a single `MembershipType` using a unique key and a patch."""
-  updateMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMembershipTypeInput!
-  ): UpdateMembershipTypePayload
-
-  """Updates a single `AppPermission` using a unique key and a patch."""
-  updateAppPermission(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppPermissionInput!
-  ): UpdateAppPermissionPayload
-
-  """Updates a single `OrgPermission` using a unique key and a patch."""
-  updateOrgPermission(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgPermissionInput!
-  ): UpdateOrgPermissionPayload
-
-  """Updates a single `AppLimit` using a unique key and a patch."""
-  updateAppLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLimitInput!
-  ): UpdateAppLimitPayload
-
-  """Updates a single `AppAchievement` using a unique key and a patch."""
-  updateAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppAchievementInput!
-  ): UpdateAppAchievementPayload
-
-  """Updates a single `AppStep` using a unique key and a patch."""
-  updateAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppStepInput!
-  ): UpdateAppStepPayload
-
-  """Updates a single `ClaimedInvite` using a unique key and a patch."""
-  updateClaimedInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateClaimedInviteInput!
-  ): UpdateClaimedInvitePayload
-
-  """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
-  updateOrgChartEdgeGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgChartEdgeGrantInput!
-  ): UpdateOrgChartEdgeGrantPayload
-
-  """Updates a single `OrgLimit` using a unique key and a patch."""
-  updateOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgLimitInput!
-  ): UpdateOrgLimitPayload
-
-  """Updates a single `AppGrant` using a unique key and a patch."""
-  updateAppGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppGrantInput!
-  ): UpdateAppGrantPayload
-
-  """
-  Updates a single `AppMembershipDefault` using a unique key and a patch.
-  """
-  updateAppMembershipDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppMembershipDefaultInput!
-  ): UpdateAppMembershipDefaultPayload
-
-  """Updates a single `OrgClaimedInvite` using a unique key and a patch."""
-  updateOrgClaimedInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgClaimedInviteInput!
-  ): UpdateOrgClaimedInvitePayload
-
-  """Updates a single `OrgGrant` using a unique key and a patch."""
-  updateOrgGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgGrantInput!
-  ): UpdateOrgGrantPayload
-
-  """Updates a single `OrgChartEdge` using a unique key and a patch."""
-  updateOrgChartEdge(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgChartEdgeInput!
-  ): UpdateOrgChartEdgePayload
-
-  """Updates a single `AppLevelRequirement` using a unique key and a patch."""
-  updateAppLevelRequirement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLevelRequirementInput!
-  ): UpdateAppLevelRequirementPayload
-
-  """
-  Updates a single `OrgMembershipDefault` using a unique key and a patch.
-  """
-  updateOrgMembershipDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgMembershipDefaultInput!
-  ): UpdateOrgMembershipDefaultPayload
-
-  """Updates a single `AppLevel` using a unique key and a patch."""
-  updateAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppLevelInput!
-  ): UpdateAppLevelPayload
-
-  """Updates a single `Invite` using a unique key and a patch."""
-  updateInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateInviteInput!
-  ): UpdateInvitePayload
-
-  """Updates a single `AppMembership` using a unique key and a patch."""
-  updateAppMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateAppMembershipInput!
-  ): UpdateAppMembershipPayload
-
-  """Updates a single `OrgMembership` using a unique key and a patch."""
-  updateOrgMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgMembershipInput!
-  ): UpdateOrgMembershipPayload
-
-  """Updates a single `OrgInvite` using a unique key and a patch."""
-  updateOrgInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgInviteInput!
-  ): UpdateOrgInvitePayload
-
-  """Deletes a single `OrgMember` using a unique key."""
-  deleteOrgMember(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgMemberInput!
-  ): DeleteOrgMemberPayload
-
-  """Deletes a single `AppPermissionDefault` using a unique key."""
-  deleteAppPermissionDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppPermissionDefaultInput!
-  ): DeleteAppPermissionDefaultPayload
-
-  """Deletes a single `OrgPermissionDefault` using a unique key."""
-  deleteOrgPermissionDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgPermissionDefaultInput!
-  ): DeleteOrgPermissionDefaultPayload
-
-  """Deletes a single `AppAdminGrant` using a unique key."""
-  deleteAppAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppAdminGrantInput!
-  ): DeleteAppAdminGrantPayload
-
-  """Deletes a single `AppOwnerGrant` using a unique key."""
-  deleteAppOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppOwnerGrantInput!
-  ): DeleteAppOwnerGrantPayload
-
-  """Deletes a single `AppLimitDefault` using a unique key."""
-  deleteAppLimitDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLimitDefaultInput!
-  ): DeleteAppLimitDefaultPayload
-
-  """Deletes a single `OrgLimitDefault` using a unique key."""
-  deleteOrgLimitDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgLimitDefaultInput!
-  ): DeleteOrgLimitDefaultPayload
-
-  """Deletes a single `OrgAdminGrant` using a unique key."""
-  deleteOrgAdminGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgAdminGrantInput!
-  ): DeleteOrgAdminGrantPayload
-
-  """Deletes a single `OrgOwnerGrant` using a unique key."""
-  deleteOrgOwnerGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgOwnerGrantInput!
-  ): DeleteOrgOwnerGrantPayload
-
-  """Deletes a single `MembershipType` using a unique key."""
-  deleteMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMembershipTypeInput!
-  ): DeleteMembershipTypePayload
-
-  """Deletes a single `AppPermission` using a unique key."""
-  deleteAppPermission(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppPermissionInput!
-  ): DeleteAppPermissionPayload
-
-  """Deletes a single `OrgPermission` using a unique key."""
-  deleteOrgPermission(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgPermissionInput!
-  ): DeleteOrgPermissionPayload
-
-  """Deletes a single `AppLimit` using a unique key."""
-  deleteAppLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLimitInput!
-  ): DeleteAppLimitPayload
-
-  """Deletes a single `AppAchievement` using a unique key."""
-  deleteAppAchievement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppAchievementInput!
-  ): DeleteAppAchievementPayload
-
-  """Deletes a single `AppStep` using a unique key."""
-  deleteAppStep(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppStepInput!
-  ): DeleteAppStepPayload
-
-  """Deletes a single `ClaimedInvite` using a unique key."""
-  deleteClaimedInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteClaimedInviteInput!
-  ): DeleteClaimedInvitePayload
-
-  """Deletes a single `OrgChartEdgeGrant` using a unique key."""
-  deleteOrgChartEdgeGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgChartEdgeGrantInput!
-  ): DeleteOrgChartEdgeGrantPayload
-
-  """Deletes a single `OrgLimit` using a unique key."""
-  deleteOrgLimit(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgLimitInput!
-  ): DeleteOrgLimitPayload
-
-  """Deletes a single `AppGrant` using a unique key."""
-  deleteAppGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppGrantInput!
-  ): DeleteAppGrantPayload
-
-  """Deletes a single `AppMembershipDefault` using a unique key."""
-  deleteAppMembershipDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppMembershipDefaultInput!
-  ): DeleteAppMembershipDefaultPayload
-
-  """Deletes a single `OrgClaimedInvite` using a unique key."""
-  deleteOrgClaimedInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgClaimedInviteInput!
-  ): DeleteOrgClaimedInvitePayload
-
-  """Deletes a single `OrgGrant` using a unique key."""
-  deleteOrgGrant(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgGrantInput!
-  ): DeleteOrgGrantPayload
-
-  """Deletes a single `OrgChartEdge` using a unique key."""
-  deleteOrgChartEdge(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgChartEdgeInput!
-  ): DeleteOrgChartEdgePayload
-
-  """Deletes a single `AppLevelRequirement` using a unique key."""
-  deleteAppLevelRequirement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLevelRequirementInput!
-  ): DeleteAppLevelRequirementPayload
-
-  """Deletes a single `OrgMembershipDefault` using a unique key."""
-  deleteOrgMembershipDefault(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgMembershipDefaultInput!
-  ): DeleteOrgMembershipDefaultPayload
-
-  """Deletes a single `AppLevel` using a unique key."""
-  deleteAppLevel(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppLevelInput!
-  ): DeleteAppLevelPayload
-
-  """Deletes a single `Invite` using a unique key."""
-  deleteInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteInviteInput!
-  ): DeleteInvitePayload
-
-  """Deletes a single `AppMembership` using a unique key."""
-  deleteAppMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteAppMembershipInput!
-  ): DeleteAppMembershipPayload
-
-  """Deletes a single `OrgMembership` using a unique key."""
-  deleteOrgMembership(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgMembershipInput!
-  ): DeleteOrgMembershipPayload
-
-  """Deletes a single `OrgInvite` using a unique key."""
-  deleteOrgInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgInviteInput!
-  ): DeleteOrgInvitePayload
 }
 
 """The output of our `submitInviteCode` mutation."""
@@ -10171,4 +8446,1842 @@ input DeleteOrgInviteInput {
   """
   clientMutationId: String
   id: UUID!
+}
+
+input RequestUploadUrlInput {
+  """Bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+
+  """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
+  contentHash: String!
+
+  """MIME type of the file (e.g., "image/png")"""
+  contentType: String!
+
+  """File size in bytes"""
+  size: Int!
+
+  """Original filename (optional, for display and Content-Disposition)"""
+  filename: String
+}
+
+type RequestUploadUrlPayload {
+  """Presigned PUT URL (null if file was deduplicated)"""
+  uploadUrl: String
+
+  """The file ID (existing if deduplicated, new if fresh upload)"""
+  fileId: UUID!
+
+  """The S3 object key"""
+  key: String!
+
+  """Whether this file was deduplicated (already exists with same hash)"""
+  deduplicated: Boolean!
+
+  """Presigned URL expiry time (null if deduplicated)"""
+  expiresAt: Datetime
+}
+
+input ConfirmUploadInput {
+  """The file ID returned by requestUploadUrl"""
+  fileId: UUID!
+}
+
+type ConfirmUploadPayload {
+  """The confirmed file ID"""
+  fileId: UUID!
+
+  """New file status"""
+  status: String!
+
+  """Whether confirmation succeeded"""
+  success: Boolean!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  appPermissionsGetPaddedMask(mask: BitString): BitString
+  orgPermissionsGetPaddedMask(mask: BitString): BitString
+  orgIsManagerOf(pEntityId: UUID, pManagerId: UUID, pUserId: UUID, pMaxDepth: Int): Boolean
+
+  """Reads and enables pagination through a set of `OrgGetManagersRecord`."""
+  orgGetManagers(
+    pEntityId: UUID
+    pUserId: UUID
+    pMaxDepth: Int
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): OrgGetManagersConnection
+
+  """
+  Reads and enables pagination through a set of `OrgGetSubordinatesRecord`.
+  """
+  orgGetSubordinates(
+    pEntityId: UUID
+    pUserId: UUID
+    pMaxDepth: Int
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): OrgGetSubordinatesConnection
+  appPermissionsGetMask(ids: [UUID]): BitString
+  orgPermissionsGetMask(ids: [UUID]): BitString
+  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
+  appPermissionsGetMaskByNames(names: [String]): BitString
+  orgPermissionsGetMaskByNames(names: [String]): BitString
+
+  """Reads and enables pagination through a set of `AppPermission`."""
+  appPermissionsGetByMask(
+    mask: BitString
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): AppPermissionConnection
+
+  """Reads and enables pagination through a set of `OrgPermission`."""
+  orgPermissionsGetByMask(
+    mask: BitString
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): OrgPermissionConnection
+
+  """Reads and enables pagination through a set of `AppLevelRequirement`."""
+  stepsRequired(
+    vlevel: String
+    vroleId: UUID
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): AppLevelRequirementConnection
+
+  """Reads and enables pagination through a set of `OrgMember`."""
+  orgMembers(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgMemberFilter
+
+    """The method to use when ordering `OrgMember`."""
+    orderBy: [OrgMemberOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgMemberConnection
+
+  """Reads and enables pagination through a set of `AppPermissionDefault`."""
+  appPermissionDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppPermissionDefaultFilter
+
+    """The method to use when ordering `AppPermissionDefault`."""
+    orderBy: [AppPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppPermissionDefaultConnection
+
+  """Reads and enables pagination through a set of `OrgPermissionDefault`."""
+  orgPermissionDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgPermissionDefaultFilter
+
+    """The method to use when ordering `OrgPermissionDefault`."""
+    orderBy: [OrgPermissionDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgPermissionDefaultConnection
+
+  """Reads and enables pagination through a set of `AppAdminGrant`."""
+  appAdminGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppAdminGrantFilter
+
+    """The method to use when ordering `AppAdminGrant`."""
+    orderBy: [AppAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppAdminGrantConnection
+
+  """Reads and enables pagination through a set of `AppOwnerGrant`."""
+  appOwnerGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppOwnerGrantFilter
+
+    """The method to use when ordering `AppOwnerGrant`."""
+    orderBy: [AppOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppOwnerGrantConnection
+
+  """Reads and enables pagination through a set of `AppLimitDefault`."""
+  appLimitDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitDefaultFilter
+
+    """The method to use when ordering `AppLimitDefault`."""
+    orderBy: [AppLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitDefaultConnection
+
+  """Reads and enables pagination through a set of `OrgLimitDefault`."""
+  orgLimitDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitDefaultFilter
+
+    """The method to use when ordering `OrgLimitDefault`."""
+    orderBy: [OrgLimitDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitDefaultConnection
+
+  """Reads and enables pagination through a set of `OrgAdminGrant`."""
+  orgAdminGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgAdminGrantFilter
+
+    """The method to use when ordering `OrgAdminGrant`."""
+    orderBy: [OrgAdminGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgAdminGrantConnection
+
+  """Reads and enables pagination through a set of `OrgOwnerGrant`."""
+  orgOwnerGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgOwnerGrantFilter
+
+    """The method to use when ordering `OrgOwnerGrant`."""
+    orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgOwnerGrantConnection
+
+  """Reads and enables pagination through a set of `MembershipType`."""
+  membershipTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MembershipTypeFilter
+
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MembershipTypeConnection
+
+  """Reads and enables pagination through a set of `AppPermission`."""
+  appPermissions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppPermissionFilter
+
+    """The method to use when ordering `AppPermission`."""
+    orderBy: [AppPermissionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppPermissionConnection
+
+  """Reads and enables pagination through a set of `OrgPermission`."""
+  orgPermissions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgPermissionFilter
+
+    """The method to use when ordering `OrgPermission`."""
+    orderBy: [OrgPermissionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgPermissionConnection
+
+  """Reads and enables pagination through a set of `AppLimit`."""
+  appLimits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLimitFilter
+
+    """The method to use when ordering `AppLimit`."""
+    orderBy: [AppLimitOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLimitConnection
+
+  """Reads and enables pagination through a set of `AppAchievement`."""
+  appAchievements(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppAchievementFilter
+
+    """The method to use when ordering `AppAchievement`."""
+    orderBy: [AppAchievementOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppAchievementConnection
+
+  """Reads and enables pagination through a set of `AppStep`."""
+  appSteps(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppStepFilter
+
+    """The method to use when ordering `AppStep`."""
+    orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppStepConnection
+
+  """Reads and enables pagination through a set of `ClaimedInvite`."""
+  claimedInvites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: ClaimedInviteFilter
+
+    """The method to use when ordering `ClaimedInvite`."""
+    orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ClaimedInviteConnection
+
+  """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
+  orgChartEdgeGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgChartEdgeGrantFilter
+
+    """The method to use when ordering `OrgChartEdgeGrant`."""
+    orderBy: [OrgChartEdgeGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgChartEdgeGrantConnection
+
+  """Reads and enables pagination through a set of `OrgLimit`."""
+  orgLimits(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgLimitFilter
+
+    """The method to use when ordering `OrgLimit`."""
+    orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgLimitConnection
+
+  """Reads and enables pagination through a set of `AppGrant`."""
+  appGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppGrantFilter
+
+    """The method to use when ordering `AppGrant`."""
+    orderBy: [AppGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppGrantConnection
+
+  """Reads and enables pagination through a set of `AppMembershipDefault`."""
+  appMembershipDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppMembershipDefaultFilter
+
+    """The method to use when ordering `AppMembershipDefault`."""
+    orderBy: [AppMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppMembershipDefaultConnection
+
+  """Reads and enables pagination through a set of `OrgClaimedInvite`."""
+  orgClaimedInvites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgClaimedInviteFilter
+
+    """The method to use when ordering `OrgClaimedInvite`."""
+    orderBy: [OrgClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgClaimedInviteConnection
+
+  """Reads and enables pagination through a set of `OrgGrant`."""
+  orgGrants(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgGrantFilter
+
+    """The method to use when ordering `OrgGrant`."""
+    orderBy: [OrgGrantOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgGrantConnection
+
+  """Reads and enables pagination through a set of `OrgChartEdge`."""
+  orgChartEdges(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgChartEdgeFilter
+
+    """The method to use when ordering `OrgChartEdge`."""
+    orderBy: [OrgChartEdgeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgChartEdgeConnection
+
+  """Reads and enables pagination through a set of `AppLevelRequirement`."""
+  appLevelRequirements(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLevelRequirementFilter
+
+    """The method to use when ordering `AppLevelRequirement`."""
+    orderBy: [AppLevelRequirementOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLevelRequirementConnection
+
+  """Reads and enables pagination through a set of `OrgMembershipDefault`."""
+  orgMembershipDefaults(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgMembershipDefaultFilter
+
+    """The method to use when ordering `OrgMembershipDefault`."""
+    orderBy: [OrgMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgMembershipDefaultConnection
+
+  """Reads and enables pagination through a set of `AppLevel`."""
+  appLevels(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppLevelFilter
+
+    """The method to use when ordering `AppLevel`."""
+    orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppLevelConnection
+
+  """Reads and enables pagination through a set of `Invite`."""
+  invites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: InviteFilter
+
+    """The method to use when ordering `Invite`."""
+    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): InviteConnection
+
+  """Reads and enables pagination through a set of `AppMembership`."""
+  appMemberships(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: AppMembershipFilter
+
+    """The method to use when ordering `AppMembership`."""
+    orderBy: [AppMembershipOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppMembershipConnection
+
+  """Reads and enables pagination through a set of `OrgMembership`."""
+  orgMemberships(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgMembershipFilter
+
+    """The method to use when ordering `OrgMembership`."""
+    orderBy: [OrgMembershipOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgMembershipConnection
+
+  """Reads and enables pagination through a set of `OrgInvite`."""
+  orgInvites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgInviteFilter
+
+    """The method to use when ordering `OrgInvite`."""
+    orderBy: [OrgInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgInviteConnection
+
+  """
+  Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
+  """
+  _meta: MetaSchema
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  submitInviteCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SubmitInviteCodeInput!
+  ): SubmitInviteCodePayload
+  submitOrgInviteCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SubmitOrgInviteCodeInput!
+  ): SubmitOrgInviteCodePayload
+
+  """Creates a single `OrgMember`."""
+  createOrgMember(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgMemberInput!
+  ): CreateOrgMemberPayload
+
+  """Creates a single `AppPermissionDefault`."""
+  createAppPermissionDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppPermissionDefaultInput!
+  ): CreateAppPermissionDefaultPayload
+
+  """Creates a single `OrgPermissionDefault`."""
+  createOrgPermissionDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgPermissionDefaultInput!
+  ): CreateOrgPermissionDefaultPayload
+
+  """Creates a single `AppAdminGrant`."""
+  createAppAdminGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppAdminGrantInput!
+  ): CreateAppAdminGrantPayload
+
+  """Creates a single `AppOwnerGrant`."""
+  createAppOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppOwnerGrantInput!
+  ): CreateAppOwnerGrantPayload
+
+  """Creates a single `AppLimitDefault`."""
+  createAppLimitDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitDefaultInput!
+  ): CreateAppLimitDefaultPayload
+
+  """Creates a single `OrgLimitDefault`."""
+  createOrgLimitDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitDefaultInput!
+  ): CreateOrgLimitDefaultPayload
+
+  """Creates a single `OrgAdminGrant`."""
+  createOrgAdminGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgAdminGrantInput!
+  ): CreateOrgAdminGrantPayload
+
+  """Creates a single `OrgOwnerGrant`."""
+  createOrgOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgOwnerGrantInput!
+  ): CreateOrgOwnerGrantPayload
+
+  """Creates a single `MembershipType`."""
+  createMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMembershipTypeInput!
+  ): CreateMembershipTypePayload
+
+  """Creates a single `AppPermission`."""
+  createAppPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppPermissionInput!
+  ): CreateAppPermissionPayload
+
+  """Creates a single `OrgPermission`."""
+  createOrgPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgPermissionInput!
+  ): CreateOrgPermissionPayload
+
+  """Creates a single `AppLimit`."""
+  createAppLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLimitInput!
+  ): CreateAppLimitPayload
+
+  """Creates a single `AppAchievement`."""
+  createAppAchievement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppAchievementInput!
+  ): CreateAppAchievementPayload
+
+  """Creates a single `AppStep`."""
+  createAppStep(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppStepInput!
+  ): CreateAppStepPayload
+
+  """Creates a single `ClaimedInvite`."""
+  createClaimedInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateClaimedInviteInput!
+  ): CreateClaimedInvitePayload
+
+  """Creates a single `OrgChartEdgeGrant`."""
+  createOrgChartEdgeGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgChartEdgeGrantInput!
+  ): CreateOrgChartEdgeGrantPayload
+
+  """Creates a single `OrgLimit`."""
+  createOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgLimitInput!
+  ): CreateOrgLimitPayload
+
+  """Creates a single `AppGrant`."""
+  createAppGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppGrantInput!
+  ): CreateAppGrantPayload
+
+  """Creates a single `AppMembershipDefault`."""
+  createAppMembershipDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppMembershipDefaultInput!
+  ): CreateAppMembershipDefaultPayload
+
+  """Creates a single `OrgClaimedInvite`."""
+  createOrgClaimedInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgClaimedInviteInput!
+  ): CreateOrgClaimedInvitePayload
+
+  """Creates a single `OrgGrant`."""
+  createOrgGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgGrantInput!
+  ): CreateOrgGrantPayload
+
+  """Creates a single `OrgChartEdge`."""
+  createOrgChartEdge(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgChartEdgeInput!
+  ): CreateOrgChartEdgePayload
+
+  """Creates a single `AppLevelRequirement`."""
+  createAppLevelRequirement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLevelRequirementInput!
+  ): CreateAppLevelRequirementPayload
+
+  """Creates a single `OrgMembershipDefault`."""
+  createOrgMembershipDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgMembershipDefaultInput!
+  ): CreateOrgMembershipDefaultPayload
+
+  """Creates a single `AppLevel`."""
+  createAppLevel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppLevelInput!
+  ): CreateAppLevelPayload
+
+  """Creates a single `Invite`."""
+  createInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateInviteInput!
+  ): CreateInvitePayload
+
+  """Creates a single `AppMembership`."""
+  createAppMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAppMembershipInput!
+  ): CreateAppMembershipPayload
+
+  """Creates a single `OrgMembership`."""
+  createOrgMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgMembershipInput!
+  ): CreateOrgMembershipPayload
+
+  """Creates a single `OrgInvite`."""
+  createOrgInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgInviteInput!
+  ): CreateOrgInvitePayload
+
+  """Updates a single `OrgMember` using a unique key and a patch."""
+  updateOrgMember(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgMemberInput!
+  ): UpdateOrgMemberPayload
+
+  """
+  Updates a single `AppPermissionDefault` using a unique key and a patch.
+  """
+  updateAppPermissionDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppPermissionDefaultInput!
+  ): UpdateAppPermissionDefaultPayload
+
+  """
+  Updates a single `OrgPermissionDefault` using a unique key and a patch.
+  """
+  updateOrgPermissionDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgPermissionDefaultInput!
+  ): UpdateOrgPermissionDefaultPayload
+
+  """Updates a single `AppAdminGrant` using a unique key and a patch."""
+  updateAppAdminGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppAdminGrantInput!
+  ): UpdateAppAdminGrantPayload
+
+  """Updates a single `AppOwnerGrant` using a unique key and a patch."""
+  updateAppOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppOwnerGrantInput!
+  ): UpdateAppOwnerGrantPayload
+
+  """Updates a single `AppLimitDefault` using a unique key and a patch."""
+  updateAppLimitDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitDefaultInput!
+  ): UpdateAppLimitDefaultPayload
+
+  """Updates a single `OrgLimitDefault` using a unique key and a patch."""
+  updateOrgLimitDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitDefaultInput!
+  ): UpdateOrgLimitDefaultPayload
+
+  """Updates a single `OrgAdminGrant` using a unique key and a patch."""
+  updateOrgAdminGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgAdminGrantInput!
+  ): UpdateOrgAdminGrantPayload
+
+  """Updates a single `OrgOwnerGrant` using a unique key and a patch."""
+  updateOrgOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgOwnerGrantInput!
+  ): UpdateOrgOwnerGrantPayload
+
+  """Updates a single `MembershipType` using a unique key and a patch."""
+  updateMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMembershipTypeInput!
+  ): UpdateMembershipTypePayload
+
+  """Updates a single `AppPermission` using a unique key and a patch."""
+  updateAppPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppPermissionInput!
+  ): UpdateAppPermissionPayload
+
+  """Updates a single `OrgPermission` using a unique key and a patch."""
+  updateOrgPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgPermissionInput!
+  ): UpdateOrgPermissionPayload
+
+  """Updates a single `AppLimit` using a unique key and a patch."""
+  updateAppLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLimitInput!
+  ): UpdateAppLimitPayload
+
+  """Updates a single `AppAchievement` using a unique key and a patch."""
+  updateAppAchievement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppAchievementInput!
+  ): UpdateAppAchievementPayload
+
+  """Updates a single `AppStep` using a unique key and a patch."""
+  updateAppStep(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppStepInput!
+  ): UpdateAppStepPayload
+
+  """Updates a single `ClaimedInvite` using a unique key and a patch."""
+  updateClaimedInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateClaimedInviteInput!
+  ): UpdateClaimedInvitePayload
+
+  """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
+  updateOrgChartEdgeGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgChartEdgeGrantInput!
+  ): UpdateOrgChartEdgeGrantPayload
+
+  """Updates a single `OrgLimit` using a unique key and a patch."""
+  updateOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgLimitInput!
+  ): UpdateOrgLimitPayload
+
+  """Updates a single `AppGrant` using a unique key and a patch."""
+  updateAppGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppGrantInput!
+  ): UpdateAppGrantPayload
+
+  """
+  Updates a single `AppMembershipDefault` using a unique key and a patch.
+  """
+  updateAppMembershipDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppMembershipDefaultInput!
+  ): UpdateAppMembershipDefaultPayload
+
+  """Updates a single `OrgClaimedInvite` using a unique key and a patch."""
+  updateOrgClaimedInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgClaimedInviteInput!
+  ): UpdateOrgClaimedInvitePayload
+
+  """Updates a single `OrgGrant` using a unique key and a patch."""
+  updateOrgGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgGrantInput!
+  ): UpdateOrgGrantPayload
+
+  """Updates a single `OrgChartEdge` using a unique key and a patch."""
+  updateOrgChartEdge(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgChartEdgeInput!
+  ): UpdateOrgChartEdgePayload
+
+  """Updates a single `AppLevelRequirement` using a unique key and a patch."""
+  updateAppLevelRequirement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLevelRequirementInput!
+  ): UpdateAppLevelRequirementPayload
+
+  """
+  Updates a single `OrgMembershipDefault` using a unique key and a patch.
+  """
+  updateOrgMembershipDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgMembershipDefaultInput!
+  ): UpdateOrgMembershipDefaultPayload
+
+  """Updates a single `AppLevel` using a unique key and a patch."""
+  updateAppLevel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppLevelInput!
+  ): UpdateAppLevelPayload
+
+  """Updates a single `Invite` using a unique key and a patch."""
+  updateInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateInviteInput!
+  ): UpdateInvitePayload
+
+  """Updates a single `AppMembership` using a unique key and a patch."""
+  updateAppMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAppMembershipInput!
+  ): UpdateAppMembershipPayload
+
+  """Updates a single `OrgMembership` using a unique key and a patch."""
+  updateOrgMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgMembershipInput!
+  ): UpdateOrgMembershipPayload
+
+  """Updates a single `OrgInvite` using a unique key and a patch."""
+  updateOrgInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgInviteInput!
+  ): UpdateOrgInvitePayload
+
+  """Deletes a single `OrgMember` using a unique key."""
+  deleteOrgMember(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgMemberInput!
+  ): DeleteOrgMemberPayload
+
+  """Deletes a single `AppPermissionDefault` using a unique key."""
+  deleteAppPermissionDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppPermissionDefaultInput!
+  ): DeleteAppPermissionDefaultPayload
+
+  """Deletes a single `OrgPermissionDefault` using a unique key."""
+  deleteOrgPermissionDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgPermissionDefaultInput!
+  ): DeleteOrgPermissionDefaultPayload
+
+  """Deletes a single `AppAdminGrant` using a unique key."""
+  deleteAppAdminGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppAdminGrantInput!
+  ): DeleteAppAdminGrantPayload
+
+  """Deletes a single `AppOwnerGrant` using a unique key."""
+  deleteAppOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppOwnerGrantInput!
+  ): DeleteAppOwnerGrantPayload
+
+  """Deletes a single `AppLimitDefault` using a unique key."""
+  deleteAppLimitDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitDefaultInput!
+  ): DeleteAppLimitDefaultPayload
+
+  """Deletes a single `OrgLimitDefault` using a unique key."""
+  deleteOrgLimitDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitDefaultInput!
+  ): DeleteOrgLimitDefaultPayload
+
+  """Deletes a single `OrgAdminGrant` using a unique key."""
+  deleteOrgAdminGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgAdminGrantInput!
+  ): DeleteOrgAdminGrantPayload
+
+  """Deletes a single `OrgOwnerGrant` using a unique key."""
+  deleteOrgOwnerGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgOwnerGrantInput!
+  ): DeleteOrgOwnerGrantPayload
+
+  """Deletes a single `MembershipType` using a unique key."""
+  deleteMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMembershipTypeInput!
+  ): DeleteMembershipTypePayload
+
+  """Deletes a single `AppPermission` using a unique key."""
+  deleteAppPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppPermissionInput!
+  ): DeleteAppPermissionPayload
+
+  """Deletes a single `OrgPermission` using a unique key."""
+  deleteOrgPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgPermissionInput!
+  ): DeleteOrgPermissionPayload
+
+  """Deletes a single `AppLimit` using a unique key."""
+  deleteAppLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLimitInput!
+  ): DeleteAppLimitPayload
+
+  """Deletes a single `AppAchievement` using a unique key."""
+  deleteAppAchievement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppAchievementInput!
+  ): DeleteAppAchievementPayload
+
+  """Deletes a single `AppStep` using a unique key."""
+  deleteAppStep(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppStepInput!
+  ): DeleteAppStepPayload
+
+  """Deletes a single `ClaimedInvite` using a unique key."""
+  deleteClaimedInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteClaimedInviteInput!
+  ): DeleteClaimedInvitePayload
+
+  """Deletes a single `OrgChartEdgeGrant` using a unique key."""
+  deleteOrgChartEdgeGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgChartEdgeGrantInput!
+  ): DeleteOrgChartEdgeGrantPayload
+
+  """Deletes a single `OrgLimit` using a unique key."""
+  deleteOrgLimit(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgLimitInput!
+  ): DeleteOrgLimitPayload
+
+  """Deletes a single `AppGrant` using a unique key."""
+  deleteAppGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppGrantInput!
+  ): DeleteAppGrantPayload
+
+  """Deletes a single `AppMembershipDefault` using a unique key."""
+  deleteAppMembershipDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppMembershipDefaultInput!
+  ): DeleteAppMembershipDefaultPayload
+
+  """Deletes a single `OrgClaimedInvite` using a unique key."""
+  deleteOrgClaimedInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgClaimedInviteInput!
+  ): DeleteOrgClaimedInvitePayload
+
+  """Deletes a single `OrgGrant` using a unique key."""
+  deleteOrgGrant(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgGrantInput!
+  ): DeleteOrgGrantPayload
+
+  """Deletes a single `OrgChartEdge` using a unique key."""
+  deleteOrgChartEdge(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgChartEdgeInput!
+  ): DeleteOrgChartEdgePayload
+
+  """Deletes a single `AppLevelRequirement` using a unique key."""
+  deleteAppLevelRequirement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLevelRequirementInput!
+  ): DeleteAppLevelRequirementPayload
+
+  """Deletes a single `OrgMembershipDefault` using a unique key."""
+  deleteOrgMembershipDefault(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgMembershipDefaultInput!
+  ): DeleteOrgMembershipDefaultPayload
+
+  """Deletes a single `AppLevel` using a unique key."""
+  deleteAppLevel(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppLevelInput!
+  ): DeleteAppLevelPayload
+
+  """Deletes a single `Invite` using a unique key."""
+  deleteInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteInviteInput!
+  ): DeleteInvitePayload
+
+  """Deletes a single `AppMembership` using a unique key."""
+  deleteAppMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAppMembershipInput!
+  ): DeleteAppMembershipPayload
+
+  """Deletes a single `OrgMembership` using a unique key."""
+  deleteOrgMembership(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgMembershipInput!
+  ): DeleteOrgMembershipPayload
+
+  """Deletes a single `OrgInvite` using a unique key."""
+  deleteOrgInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgInviteInput!
+  ): DeleteOrgInvitePayload
+
+  """
+  Request a presigned URL for uploading a file directly to S3.
+  Client computes SHA-256 of the file content and provides it here.
+  If a file with the same hash already exists (dedup), returns the
+  existing file ID and deduplicated=true with no uploadUrl.
+  """
+  requestUploadUrl(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RequestUploadUrlInput!
+  ): RequestUploadUrlPayload
+
+  """
+  Confirm that a file has been uploaded to S3.
+  Verifies the object exists in S3, checks content-type,
+  and transitions the file status from 'pending' to 'ready'.
+  """
+  confirmUpload(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ConfirmUploadInput!
+  ): ConfirmUploadPayload
+
+  """
+  Provision an S3 bucket for a logical bucket in the database.
+  Reads the bucket config via RLS, then creates and configures
+  the S3 bucket with the appropriate privacy policies, CORS rules,
+  and lifecycle settings.
+  """
+  provisionBucket(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionBucketInput!
+  ): ProvisionBucketPayload
+}
+
+input ProvisionBucketInput {
+  """The logical bucket key (e.g., "public", "private")"""
+  bucketKey: String!
+}
+
+type ProvisionBucketPayload {
+  """Whether provisioning succeeded"""
+  success: Boolean!
+
+  """The S3 bucket name that was provisioned"""
+  bucketName: String!
+
+  """The access type applied"""
+  accessType: String!
+
+  """The storage provider used"""
+  provider: String!
+
+  """The S3 endpoint (null for AWS S3 default)"""
+  endpoint: String
+
+  """Error message if provisioning failed"""
+  error: String
 }

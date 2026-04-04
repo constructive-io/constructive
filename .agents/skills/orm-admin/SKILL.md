@@ -1,13 +1,13 @@
 ---
 name: orm-admin
-description: ORM client for the admin API — provides typed CRUD operations for 32 tables and 13 custom operations
+description: ORM client for the admin API — provides typed CRUD operations for 32 tables and 16 custom operations
 ---
 
 # orm-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the admin API — provides typed CRUD operations for 32 tables and 13 custom operations
+ORM client for the admin API — provides typed CRUD operations for 32 tables and 16 custom operations
 
 ## Usage
 
@@ -82,3 +82,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [steps-required](references/steps-required.md)
 - [submit-invite-code](references/submit-invite-code.md)
 - [submit-org-invite-code](references/submit-org-invite-code.md)
+- [request-upload-url](references/request-upload-url.md)
+- [confirm-upload](references/confirm-upload.md)
+- [provision-bucket](references/provision-bucket.md)

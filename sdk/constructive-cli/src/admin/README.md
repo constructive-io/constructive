@@ -10,7 +10,7 @@
 
 - **Tables:** 32
 - **Custom queries:** 11
-- **Custom mutations:** 2
+- **Custom mutations:** 5
 
 **Generators:** ORM, CLI
 

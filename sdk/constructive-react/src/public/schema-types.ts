@@ -1792,6 +1792,14 @@ export type StorageModuleOrderBy =
   | 'UPLOAD_REQUESTS_TABLE_NAME_DESC'
   | 'ENTITY_TABLE_ID_ASC'
   | 'ENTITY_TABLE_ID_DESC'
+  | 'ENDPOINT_ASC'
+  | 'ENDPOINT_DESC'
+  | 'PUBLIC_URL_PREFIX_ASC'
+  | 'PUBLIC_URL_PREFIX_DESC'
+  | 'PROVIDER_ASC'
+  | 'PROVIDER_DESC'
+  | 'ALLOWED_ORIGINS_ASC'
+  | 'ALLOWED_ORIGINS_DESC'
   | 'UPLOAD_URL_EXPIRY_SECONDS_ASC'
   | 'UPLOAD_URL_EXPIRY_SECONDS_DESC'
   | 'DOWNLOAD_URL_EXPIRY_SECONDS_ASC'
@@ -8318,6 +8326,14 @@ export interface StorageModuleFilter {
   uploadRequestsTableName?: StringFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
+  /** Filter by the object’s `endpoint` field. */
+  endpoint?: StringFilter;
+  /** Filter by the object’s `publicUrlPrefix` field. */
+  publicUrlPrefix?: StringFilter;
+  /** Filter by the object’s `provider` field. */
+  provider?: StringFilter;
+  /** Filter by the object’s `allowedOrigins` field. */
+  allowedOrigins?: StringListFilter;
   /** Filter by the object’s `uploadUrlExpirySeconds` field. */
   uploadUrlExpirySeconds?: IntFilter;
   /** Filter by the object’s `downloadUrlExpirySeconds` field. */
@@ -10772,30 +10788,6 @@ export interface ProfilesModuleInput {
   membershipsTableId?: string;
   prefix?: string;
 }
-export interface CreateStorageModuleInput {
-  clientMutationId?: string;
-  /** The `StorageModule` to be created by this mutation. */
-  storageModule: StorageModuleInput;
-}
-/** An input for mutations affecting `StorageModule` */
-export interface StorageModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  uploadRequestsTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  uploadRequestsTableName?: string;
-  entityTableId?: string;
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
-}
 export interface CreateIndexInput {
   clientMutationId?: string;
   /** The `Index` to be created by this mutation. */
@@ -10998,6 +10990,34 @@ export interface ForeignKeyConstraintInput {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateStorageModuleInput {
+  clientMutationId?: string;
+  /** The `StorageModule` to be created by this mutation. */
+  storageModule: StorageModuleInput;
+}
+/** An input for mutations affecting `StorageModule` */
+export interface StorageModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  uploadRequestsTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  uploadRequestsTableName?: string;
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
 }
 export interface CreateTableInput {
   clientMutationId?: string;
@@ -13133,31 +13153,6 @@ export interface ProfilesModulePatch {
   membershipsTableId?: string;
   prefix?: string;
 }
-export interface UpdateStorageModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `StorageModule` being updated. */
-  storageModulePatch: StorageModulePatch;
-}
-/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
-export interface StorageModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  bucketsTableId?: string;
-  filesTableId?: string;
-  uploadRequestsTableId?: string;
-  bucketsTableName?: string;
-  filesTableName?: string;
-  uploadRequestsTableName?: string;
-  entityTableId?: string;
-  uploadUrlExpirySeconds?: number;
-  downloadUrlExpirySeconds?: number;
-  defaultMaxFileSize?: string;
-  maxFilenameLength?: number;
-  cacheTtlSeconds?: number;
-}
 export interface UpdateIndexInput {
   clientMutationId?: string;
   id: string;
@@ -13368,6 +13363,35 @@ export interface ForeignKeyConstraintPatch {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateStorageModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `StorageModule` being updated. */
+  storageModulePatch: StorageModulePatch;
+}
+/** Represents an update to a `StorageModule`. Fields that are set will be updated. */
+export interface StorageModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  bucketsTableId?: string;
+  filesTableId?: string;
+  uploadRequestsTableId?: string;
+  bucketsTableName?: string;
+  filesTableName?: string;
+  uploadRequestsTableName?: string;
+  entityTableId?: string;
+  endpoint?: string;
+  publicUrlPrefix?: string;
+  provider?: string;
+  allowedOrigins?: string[];
+  uploadUrlExpirySeconds?: number;
+  downloadUrlExpirySeconds?: number;
+  defaultMaxFileSize?: string;
+  maxFilenameLength?: number;
+  cacheTtlSeconds?: number;
 }
 export interface UpdateTableInput {
   clientMutationId?: string;
@@ -14065,10 +14089,6 @@ export interface DeleteProfilesModuleInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteStorageModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteIndexInput {
   clientMutationId?: string;
   id: string;
@@ -14092,6 +14112,10 @@ export interface DeleteHierarchyModuleInput {
   id: string;
 }
 export interface DeleteForeignKeyConstraintInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteStorageModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -14119,6 +14143,26 @@ export interface DeleteRelationProvisionInput {
 export interface DeleteMembershipsModuleInput {
   clientMutationId?: string;
   id: string;
+}
+export interface RequestUploadUrlInput {
+  /** Bucket key (e.g., "public", "private") */
+  bucketKey: string;
+  /** SHA-256 content hash computed by the client (hex-encoded, 64 chars) */
+  contentHash: string;
+  /** MIME type of the file (e.g., "image/png") */
+  contentType: string;
+  /** File size in bytes */
+  size: number;
+  /** Original filename (optional, for display and Content-Disposition) */
+  filename?: string;
+}
+export interface ConfirmUploadInput {
+  /** The file ID returned by requestUploadUrl */
+  fileId: string;
+}
+export interface ProvisionBucketInput {
+  /** The logical bucket key (e.g., "public", "private") */
+  bucketKey: string;
 }
 /** A connection to a list of `OrgGetManagersRecord` values. */
 export interface OrgGetManagersConnection {
@@ -14785,13 +14829,6 @@ export interface ProfilesModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `StorageModule` values. */
-export interface StorageModuleConnection {
-  nodes: StorageModule[];
-  edges: StorageModuleEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `Index` values. */
 export interface IndexConnection {
   nodes: Index[];
@@ -14831,6 +14868,13 @@ export interface HierarchyModuleConnection {
 export interface ForeignKeyConstraintConnection {
   nodes: ForeignKeyConstraint[];
   edges: ForeignKeyConstraintEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `StorageModule` values. */
+export interface StorageModuleConnection {
+  nodes: StorageModule[];
+  edges: StorageModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -15585,12 +15629,6 @@ export interface CreateProfilesModulePayload {
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
-export interface CreateStorageModulePayload {
-  clientMutationId?: string | null;
-  /** The `StorageModule` that was created by this mutation. */
-  storageModule?: StorageModule | null;
-  storageModuleEdge?: StorageModuleEdge | null;
-}
 export interface CreateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was created by this mutation. */
@@ -15626,6 +15664,12 @@ export interface CreateForeignKeyConstraintPayload {
   /** The `ForeignKeyConstraint` that was created by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
+}
+export interface CreateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was created by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
 }
 export interface CreateTablePayload {
   clientMutationId?: string | null;
@@ -16197,12 +16241,6 @@ export interface UpdateProfilesModulePayload {
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
-export interface UpdateStorageModulePayload {
-  clientMutationId?: string | null;
-  /** The `StorageModule` that was updated by this mutation. */
-  storageModule?: StorageModule | null;
-  storageModuleEdge?: StorageModuleEdge | null;
-}
 export interface UpdateIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was updated by this mutation. */
@@ -16238,6 +16276,12 @@ export interface UpdateForeignKeyConstraintPayload {
   /** The `ForeignKeyConstraint` that was updated by this mutation. */
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
+}
+export interface UpdateStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was updated by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
 }
 export interface UpdateTablePayload {
   clientMutationId?: string | null;
@@ -16809,12 +16853,6 @@ export interface DeleteProfilesModulePayload {
   profilesModule?: ProfilesModule | null;
   profilesModuleEdge?: ProfilesModuleEdge | null;
 }
-export interface DeleteStorageModulePayload {
-  clientMutationId?: string | null;
-  /** The `StorageModule` that was deleted by this mutation. */
-  storageModule?: StorageModule | null;
-  storageModuleEdge?: StorageModuleEdge | null;
-}
 export interface DeleteIndexPayload {
   clientMutationId?: string | null;
   /** The `Index` that was deleted by this mutation. */
@@ -16851,6 +16889,12 @@ export interface DeleteForeignKeyConstraintPayload {
   foreignKeyConstraint?: ForeignKeyConstraint | null;
   foreignKeyConstraintEdge?: ForeignKeyConstraintEdge | null;
 }
+export interface DeleteStorageModulePayload {
+  clientMutationId?: string | null;
+  /** The `StorageModule` that was deleted by this mutation. */
+  storageModule?: StorageModule | null;
+  storageModuleEdge?: StorageModuleEdge | null;
+}
 export interface DeleteTablePayload {
   clientMutationId?: string | null;
   /** The `Table` that was deleted by this mutation. */
@@ -16886,6 +16930,40 @@ export interface DeleteMembershipsModulePayload {
   /** The `MembershipsModule` that was deleted by this mutation. */
   membershipsModule?: MembershipsModule | null;
   membershipsModuleEdge?: MembershipsModuleEdge | null;
+}
+export interface RequestUploadUrlPayload {
+  /** Presigned PUT URL (null if file was deduplicated) */
+  uploadUrl?: string | null;
+  /** The file ID (existing if deduplicated, new if fresh upload) */
+  fileId: string;
+  /** The S3 object key */
+  key: string;
+  /** Whether this file was deduplicated (already exists with same hash) */
+  deduplicated: boolean;
+  /** Presigned URL expiry time (null if deduplicated) */
+  expiresAt?: string | null;
+}
+export interface ConfirmUploadPayload {
+  /** The confirmed file ID */
+  fileId: string;
+  /** New file status */
+  status: string;
+  /** Whether confirmation succeeded */
+  success: boolean;
+}
+export interface ProvisionBucketPayload {
+  /** Whether provisioning succeeded */
+  success: boolean;
+  /** The S3 bucket name that was provisioned */
+  bucketName: string;
+  /** The access type applied */
+  accessType: string;
+  /** The storage provider used */
+  provider: string;
+  /** The S3 endpoint (null for AWS S3 default) */
+  endpoint?: string | null;
+  /** Error message if provisioning failed */
+  error?: string | null;
 }
 /** A `OrgGetManagersRecord` edge in the connection. */
 export interface OrgGetManagersEdge {
@@ -17468,12 +17546,6 @@ export interface ProfilesModuleEdge {
   /** The `ProfilesModule` at the end of the edge. */
   node?: ProfilesModule | null;
 }
-/** A `StorageModule` edge in the connection. */
-export interface StorageModuleEdge {
-  cursor?: string | null;
-  /** The `StorageModule` at the end of the edge. */
-  node?: StorageModule | null;
-}
 /** A `Index` edge in the connection. */
 export interface IndexEdge {
   cursor?: string | null;
@@ -17509,6 +17581,12 @@ export interface ForeignKeyConstraintEdge {
   cursor?: string | null;
   /** The `ForeignKeyConstraint` at the end of the edge. */
   node?: ForeignKeyConstraint | null;
+}
+/** A `StorageModule` edge in the connection. */
+export interface StorageModuleEdge {
+  cursor?: string | null;
+  /** The `StorageModule` at the end of the edge. */
+  node?: StorageModule | null;
 }
 /** A `Table` edge in the connection. */
 export interface TableEdge {

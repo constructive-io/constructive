@@ -1,13 +1,13 @@
 ---
 name: orm-public
-description: ORM client for the public API — provides typed CRUD operations for 108 tables and 61 custom operations
+description: ORM client for the public API — provides typed CRUD operations for 108 tables and 64 custom operations
 ---
 
 # orm-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the public API — provides typed CRUD operations for 108 tables and 61 custom operations
+ORM client for the public API — provides typed CRUD operations for 108 tables and 64 custom operations
 
 ## Usage
 
@@ -206,3 +206,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [forgot-password](references/forgot-password.md)
 - [verify-password](references/verify-password.md)
 - [verify-totp](references/verify-totp.md)
+- [request-upload-url](references/request-upload-url.md)
+- [confirm-upload](references/confirm-upload.md)
+- [provision-bucket](references/provision-bucket.md)

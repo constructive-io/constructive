@@ -1,13 +1,13 @@
 ---
 name: cli-auth
-description: CLI tool (csdk) for the auth API — provides CRUD commands for 7 tables and 20 custom operations
+description: CLI tool (csdk) for the auth API — provides CRUD commands for 7 tables and 23 custom operations
 ---
 
 # cli-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the auth API — provides CRUD commands for 7 tables and 20 custom operations
+CLI tool (csdk) for the auth API — provides CRUD commands for 7 tables and 23 custom operations
 
 ## Usage
 
@@ -83,3 +83,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [send-verification-email](references/send-verification-email.md)
 - [verify-password](references/verify-password.md)
 - [verify-totp](references/verify-totp.md)
+- [request-upload-url](references/request-upload-url.md)
+- [confirm-upload](references/confirm-upload.md)
+- [provision-bucket](references/provision-bucket.md)

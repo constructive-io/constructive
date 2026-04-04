@@ -864,6 +864,10 @@ export interface StorageModule {
   filesTableName: string | null;
   uploadRequestsTableName: string | null;
   entityTableId: string | null;
+  endpoint: string | null;
+  publicUrlPrefix: string | null;
+  provider: string | null;
+  allowedOrigins: string[] | null;
   uploadUrlExpirySeconds: number | null;
   downloadUrlExpirySeconds: number | null;
   defaultMaxFileSize: string | null;

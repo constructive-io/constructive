@@ -23,6 +23,9 @@ import type {
   SendVerificationEmailInput,
   VerifyPasswordInput,
   VerifyTotpInput,
+  RequestUploadUrlInput,
+  ConfirmUploadInput,
+  ProvisionBucketInput,
   SignOutPayload,
   SendAccountDeletionEmailPayload,
   CheckPasswordPayload,
@@ -39,6 +42,9 @@ import type {
   SendVerificationEmailPayload,
   VerifyPasswordPayload,
   VerifyTotpPayload,
+  RequestUploadUrlPayload,
+  ConfirmUploadPayload,
+  ProvisionBucketPayload,
   SignOutPayloadSelect,
   SendAccountDeletionEmailPayloadSelect,
   CheckPasswordPayloadSelect,
@@ -55,6 +61,9 @@ import type {
   SendVerificationEmailPayloadSelect,
   VerifyPasswordPayloadSelect,
   VerifyTotpPayloadSelect,
+  RequestUploadUrlPayloadSelect,
+  ConfirmUploadPayloadSelect,
+  ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
 export interface SignOutVariables {
@@ -104,6 +113,35 @@ export interface VerifyPasswordVariables {
 }
 export interface VerifyTotpVariables {
   input: VerifyTotpInput;
+}
+/**
+ * Variables for requestUploadUrl
+ * Request a presigned URL for uploading a file directly to S3.
+Client computes SHA-256 of the file content and provides it here.
+If a file with the same hash already exists (dedup), returns the
+existing file ID and deduplicated=true with no uploadUrl.
+ */
+export interface RequestUploadUrlVariables {
+  input: RequestUploadUrlInput;
+}
+/**
+ * Variables for confirmUpload
+ * Confirm that a file has been uploaded to S3.
+Verifies the object exists in S3, checks content-type,
+and transitions the file status from 'pending' to 'ready'.
+ */
+export interface ConfirmUploadVariables {
+  input: ConfirmUploadInput;
+}
+/**
+ * Variables for provisionBucket
+ * Provision an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then creates and configures
+the S3 bucket with the appropriate privacy policies, CORS rules,
+and lifecycle settings.
+ */
+export interface ProvisionBucketVariables {
+  input: ProvisionBucketInput;
 }
 export function createMutationOperations(client: OrmClient) {
   return {
@@ -569,6 +607,93 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'VerifyTotpPayload'
+        ),
+      }),
+    requestUploadUrl: <S extends RequestUploadUrlPayloadSelect>(
+      args: RequestUploadUrlVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RequestUploadUrlPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        requestUploadUrl: InferSelectResult<RequestUploadUrlPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RequestUploadUrl',
+        fieldName: 'requestUploadUrl',
+        ...buildCustomDocument(
+          'mutation',
+          'RequestUploadUrl',
+          'requestUploadUrl',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RequestUploadUrlInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RequestUploadUrlPayload'
+        ),
+      }),
+    confirmUpload: <S extends ConfirmUploadPayloadSelect>(
+      args: ConfirmUploadVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ConfirmUploadPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        confirmUpload: InferSelectResult<ConfirmUploadPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ConfirmUpload',
+        fieldName: 'confirmUpload',
+        ...buildCustomDocument(
+          'mutation',
+          'ConfirmUpload',
+          'confirmUpload',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ConfirmUploadInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ConfirmUploadPayload'
+        ),
+      }),
+    provisionBucket: <S extends ProvisionBucketPayloadSelect>(
+      args: ProvisionBucketVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionBucketPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionBucket: InferSelectResult<ProvisionBucketPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionBucket',
+        fieldName: 'provisionBucket',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionBucket',
+          'provisionBucket',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionBucketInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionBucketPayload'
         ),
       }),
   };
