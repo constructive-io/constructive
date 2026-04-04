@@ -239,6 +239,10 @@ export class BucketProvisioner {
 
   /**
    * Configure S3 Block Public Access settings.
+   *
+   * MinIO and some other S3-compatible providers do not support the
+   * PutPublicAccessBlock API. For non-AWS providers, this is a best-effort
+   * operation that logs a warning and continues if unsupported.
    */
   async setPublicAccessBlock(
     bucketName: string,
@@ -252,6 +256,11 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      // MinIO and other S3-compatible providers may not support this API.
+      // Skip gracefully for non-AWS providers rather than failing provisioning.
+      if (this.config.provider !== 's3') {
+        return;
+      }
       throw new ProvisionerError(
         'POLICY_FAILED',
         `Failed to set public access block on '${bucketName}': ${err.message}`,

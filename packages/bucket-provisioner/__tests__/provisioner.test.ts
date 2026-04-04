@@ -486,13 +486,17 @@ describe('BucketProvisioner — S3 provider', () => {
 });
 
 describe('BucketProvisioner — error propagation', () => {
-  it('wraps PutPublicAccessBlock failure as POLICY_FAILED', async () => {
+  it('wraps PutPublicAccessBlock failure as POLICY_FAILED (AWS S3)', async () => {
     // CreateBucket succeeds
     mockSend.mockResolvedValueOnce({});
     // PutPublicAccessBlock fails
     mockSend.mockRejectedValueOnce(new Error('Access denied'));
 
-    const provisioner = new BucketProvisioner(defaultOptions);
+    // Use S3 provider — non-AWS providers skip this error gracefully
+    const provisioner = new BucketProvisioner({
+      ...defaultOptions,
+      connection: { ...defaultOptions.connection, provider: 's3', endpoint: undefined },
+    });
     try {
       await provisioner.provision({
         bucketName: 'fail-bucket',
@@ -503,6 +507,25 @@ describe('BucketProvisioner — error propagation', () => {
       expect(err).toBeInstanceOf(ProvisionerError);
       expect((err as ProvisionerError).code).toBe('POLICY_FAILED');
     }
+  });
+
+  it('skips PutPublicAccessBlock failure for non-AWS providers (MinIO)', async () => {
+    // CreateBucket succeeds
+    mockSend.mockResolvedValueOnce({});
+    // PutPublicAccessBlock fails (MinIO doesn't support it)
+    mockSend.mockRejectedValueOnce(new Error('Not supported'));
+    // DeleteBucketPolicy succeeds
+    mockSend.mockResolvedValueOnce({});
+    // PutBucketCors succeeds
+    mockSend.mockResolvedValueOnce({});
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    // Should NOT throw — MinIO provider skips unsupported PutPublicAccessBlock
+    const result = await provisioner.provision({
+      bucketName: 'minio-bucket',
+      accessType: 'private',
+    });
+    expect(result.bucketName).toBe('minio-bucket');
   });
 
   it('wraps PutBucketCors failure as CORS_FAILED', async () => {
