@@ -115,6 +115,8 @@ jobs:
             env: {}
           - package: packages/upload-client
             env: {}
+          - package: graphile/graphile-bucket-provisioner-plugin
+            env: {}
 
     env:
       PGHOST: localhost
