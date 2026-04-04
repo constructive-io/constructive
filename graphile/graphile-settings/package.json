@@ -44,6 +44,7 @@
     "express": "^5.2.1",
     "grafast": "1.0.0",
     "grafserv": "1.0.0",
+    "graphile-bucket-provisioner-plugin": "workspace:*",
     "graphile-build": "5.0.0",
     "graphile-build-pg": "5.0.0",
     "graphile-config": "1.0.0",
