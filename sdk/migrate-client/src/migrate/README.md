@@ -10,7 +10,7 @@
 
 - **Tables:** 2
 - **Custom queries:** 0
-- **Custom mutations:** 2
+- **Custom mutations:** 5
 
 **Generators:** ORM
 

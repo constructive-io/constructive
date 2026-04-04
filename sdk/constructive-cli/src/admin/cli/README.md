@@ -71,6 +71,17 @@ csdk auth set-token <your-token>
 | `steps-required` | Reads and enables pagination through a set of `AppLevelRequirement`. |
 | `submit-invite-code` | submitInviteCode |
 | `submit-org-invite-code` | submitOrgInviteCode |
+| `request-upload-url` | Request a presigned URL for uploading a file directly to S3.
+Client computes SHA-256 of the file content and provides it here.
+If a file with the same hash already exists (dedup), returns the
+existing file ID and deduplicated=true with no uploadUrl. |
+| `confirm-upload` | Confirm that a file has been uploaded to S3.
+Verifies the object exists in S3, checks content-type,
+and transitions the file status from 'pending' to 'ready'. |
+| `provision-bucket` | Provision an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then creates and configures
+the S3 bucket with the appropriate privacy policies, CORS rules,
+and lifecycle settings. |
 
 ## Infrastructure Commands
 
@@ -1152,6 +1163,51 @@ submitOrgInviteCode
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.token` | String |
+
+### `request-upload-url`
+
+Request a presigned URL for uploading a file directly to S3.
+Client computes SHA-256 of the file content and provides it here.
+If a file with the same hash already exists (dedup), returns the
+existing file ID and deduplicated=true with no uploadUrl.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.bucketKey` | String (required) |
+  | `--input.contentHash` | String (required) |
+  | `--input.contentType` | String (required) |
+  | `--input.size` | Int (required) |
+  | `--input.filename` | String |
+
+### `confirm-upload`
+
+Confirm that a file has been uploaded to S3.
+Verifies the object exists in S3, checks content-type,
+and transitions the file status from 'pending' to 'ready'.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.fileId` | UUID (required) |
+
+### `provision-bucket`
+
+Provision an S3 bucket for a logical bucket in the database.
+Reads the bucket config via RLS, then creates and configures
+the S3 bucket with the appropriate privacy policies, CORS rules,
+and lifecycle settings.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.bucketKey` | String (required) |
 
 ## Output
 

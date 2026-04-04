@@ -1,13 +1,13 @@
 ---
 name: cli-public
-description: CLI tool (csdk) for the public API — provides CRUD commands for 108 tables and 61 custom operations
+description: CLI tool (csdk) for the public API — provides CRUD commands for 108 tables and 64 custom operations
 ---
 
 # cli-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the public API — provides CRUD commands for 108 tables and 61 custom operations
+CLI tool (csdk) for the public API — provides CRUD commands for 108 tables and 64 custom operations
 
 ## Usage
 
@@ -225,3 +225,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [forgot-password](references/forgot-password.md)
 - [verify-password](references/verify-password.md)
 - [verify-totp](references/verify-totp.md)
+- [request-upload-url](references/request-upload-url.md)
+- [confirm-upload](references/confirm-upload.md)
+- [provision-bucket](references/provision-bucket.md)

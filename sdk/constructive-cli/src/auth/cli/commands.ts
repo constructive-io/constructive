@@ -33,6 +33,9 @@ import forgotPasswordCmd from './commands/forgot-password';
 import sendVerificationEmailCmd from './commands/send-verification-email';
 import verifyPasswordCmd from './commands/verify-password';
 import verifyTotpCmd from './commands/verify-totp';
+import requestUploadUrlCmd from './commands/request-upload-url';
+import confirmUploadCmd from './commands/confirm-upload';
+import provisionBucketCmd from './commands/provision-bucket';
 const createCommandMap: () => Record<
   string,
   (
@@ -70,9 +73,12 @@ const createCommandMap: () => Record<
   'send-verification-email': sendVerificationEmailCmd,
   'verify-password': verifyPasswordCmd,
   'verify-totp': verifyTotpCmd,
+  'request-upload-url': requestUploadUrlCmd,
+  'confirm-upload': confirmUploadCmd,
+  'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  '\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  connected-account    connectedAccount CRUD operations\n  audit-log            auditLog CRUD operations\n  role-type            roleType CRUD operations\n  user                 user CRUD operations\n  current-ip-address   currentIpAddress\n  current-user-agent   currentUserAgent\n  current-user-id      currentUserId\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  reset-password       resetPassword\n  sign-in-one-time-token signInOneTimeToken\n  sign-in              signIn\n  sign-up              signUp\n  one-time-token       oneTimeToken\n  extend-token-expires extendTokenExpires\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n';
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  connected-account    connectedAccount CRUD operations\n  audit-log            auditLog CRUD operations\n  role-type            roleType CRUD operations\n  user                 user CRUD operations\n  current-ip-address   currentIpAddress\n  current-user-agent   currentUserAgent\n  current-user-id      currentUserId\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  reset-password       resetPassword\n  sign-in-one-time-token signInOneTimeToken\n  sign-in              signIn\n  sign-up              signUp\n  one-time-token       oneTimeToken\n  extend-token-expires extendTokenExpires\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  confirm-upload       Confirm that a file has been uploaded to S3.\nVerifies the object exists in S3, checks content-type,\nand transitions the file status from 'pending' to 'ready'.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
