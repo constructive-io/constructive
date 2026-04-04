@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.21.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.20.3...@pgpmjs/types@2.21.0) (2026-04-04)
+
+### Features
+
+- add endpoint + publicUrlPrefix to CDNOptions, deprecate minioEndpoint ([70105cd](https://github.com/constructive-io/constructive/commit/70105cd2b34dfcbe2fbfbb4c4f704c5a1ef60f9b))
+
 ## [2.20.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/types@2.20.2...@pgpmjs/types@2.20.3) (2026-03-31)
 
 **Note:** Version bump only for package @pgpmjs/types

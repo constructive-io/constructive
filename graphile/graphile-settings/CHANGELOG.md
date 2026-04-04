@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.19.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.18.10...graphile-settings@4.19.0) (2026-04-04)
+
+### Bug Fixes
+
+- make S3Config lazy — resolve on first use, not at import time ([4194c45](https://github.com/constructive-io/constructive/commit/4194c45d53c58a8f6a03637cce68e72c049cf430))
+
+### Features
+
+- add endpoint + publicUrlPrefix to CDNOptions, deprecate minioEndpoint ([70105cd](https://github.com/constructive-io/constructive/commit/70105cd2b34dfcbe2fbfbb4c4f704c5a1ef60f9b))
+- wire BucketProvisionerPreset into ConstructivePreset via getEnvOptions ([d6c7685](https://github.com/constructive-io/constructive/commit/d6c7685feb6c4152e70161780ea8a058f077d58a))
+- wire PresignedUrlPreset into ConstructivePreset (Step 2g) ([9da95b7](https://github.com/constructive-io/constructive/commit/9da95b71c8ffb57c93138e4500738a4002b6b8df))
+
 ## [4.18.10](https://github.com/constructive-io/constructive/compare/graphile-settings@4.18.9...graphile-settings@4.18.10) (2026-04-03)
 
 ### Bug Fixes

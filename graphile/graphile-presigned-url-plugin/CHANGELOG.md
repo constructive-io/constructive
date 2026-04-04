@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.2.0...graphile-presigned-url-plugin@0.3.0) (2026-04-04)
+
+### Bug Fixes
+
+- make S3Config lazy — resolve on first use, not at import time ([4194c45](https://github.com/constructive-io/constructive/commit/4194c45d53c58a8f6a03637cce68e72c049cf430))
+- remove --experimental-vm-modules, rely on @smithy/node-http-handler pin from PR [#951](https://github.com/constructive-io/constructive/issues/951) ([84daae9](https://github.com/constructive-io/constructive/commit/84daae924f6e18f3e1570dcfdde72086ba6073c1))
+
+### Features
+
+- read endpoint, public_url_prefix, provider from storage_module ([122eb8e](https://github.com/constructive-io/constructive/commit/122eb8e4ff0765c521395bc67634044805164e8e))
+
 # 0.2.0 (2026-04-01)
 
 ### Bug Fixes
