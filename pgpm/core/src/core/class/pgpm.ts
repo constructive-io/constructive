@@ -284,16 +284,29 @@ export class PgpmPackage {
     if (!this.workspacePath || !this.config) return [];
 
     const dirs = this.loadAllowedDirs();
-    const results: PgpmPackage[] = [];
+    const seen = new Map<string, PgpmPackage[]>();
 
     for (const dir of dirs) {
       const proj = new PgpmPackage(dir);
       if (proj.isInModule()) {
-        results.push(proj);
+        const name = proj.getModuleName();
+        if (!seen.has(name)) {
+          seen.set(name, []);
+        }
+        seen.get(name)!.push(proj);
       }
     }
 
-    return results;
+    // Error on duplicate module names, similar to pnpm/yarn workspace duplicate package errors
+    const duplicates = Array.from(seen.entries()).filter(([, projs]) => projs.length > 1);
+    if (duplicates.length > 0) {
+      for (const [name, projs] of duplicates) {
+        const paths = projs.map(p => `    - ${p.cwd}`).join('\n');
+        throw errors.DUPLICATE_MODULE({ name, paths });
+      }
+    }
+
+    return Array.from(seen.values()).map(projs => projs[0]);
   }
 
   /**
@@ -318,17 +331,14 @@ export class PgpmPackage {
       filesByName.get(moduleName)!.push(file);
     });
 
-    // For each module name, pick the shortest path in case of collisions
+    // Error on duplicate module names, similar to pnpm/yarn workspace duplicate package errors
     const selectedFiles = new Map<string, string>();
     filesByName.forEach((files, moduleName) => {
       if (files.length === 1) {
         selectedFiles.set(moduleName, files[0]);
       } else {
-        // Multiple files with same name - pick shortest path
-        const shortestFile = files.reduce((shortest, current) => 
-          current.length < shortest.length ? current : shortest
-        );
-        selectedFiles.set(moduleName, shortestFile);
+        const paths = files.map(f => `    - ${path.dirname(f)}`).join('\n');
+        throw errors.DUPLICATE_MODULE({ name: moduleName, paths });
       }
     });
 
