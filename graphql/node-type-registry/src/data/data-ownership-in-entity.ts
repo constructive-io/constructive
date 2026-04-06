@@ -9,11 +9,6 @@ export const DataOwnershipInEntity: NodeTypeDefinition = {
   "parameter_schema": {
     "type": "object",
     "properties": {
-      "include_id": {
-        "type": "boolean",
-        "description": "If true, also adds a UUID primary key column with auto-generation",
-        "default": true
-      },
       "include_user_fk": {
         "type": "boolean",
         "description": "If true, adds foreign key constraints from owner_id and entity_id to the users table",
