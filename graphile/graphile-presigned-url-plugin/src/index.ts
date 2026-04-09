@@ -42,4 +42,5 @@ export type {
   S3Config,
   S3ConfigOrGetter,
   PresignedUrlPluginOptions,
+  BucketNameResolver,
 } from './types';

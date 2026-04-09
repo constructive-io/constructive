@@ -22,7 +22,7 @@ import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
 
-import type { PresignedUrlPluginOptions, S3Config } from './types';
+import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 import { getStorageModuleConfig, getBucketConfig } from './storage-module-cache';
 import { generatePresignedPutUrl, headObject } from './s3-signer';
 
@@ -80,6 +80,36 @@ function resolveS3(options: PresignedUrlPluginOptions): S3Config {
     return resolved;
   }
   return options.s3;
+}
+
+/**
+ * Build a per-database S3Config by overlaying storage_module overrides
+ * onto the global S3Config.
+ *
+ * - Bucket name: from resolveBucketName(databaseId) if provided, else global
+ * - publicUrlPrefix: from storageConfig.publicUrlPrefix if set, else global
+ * - S3 client (credentials, endpoint): always global (shared IAM key)
+ */
+function resolveS3ForDatabase(
+  options: PresignedUrlPluginOptions,
+  storageConfig: StorageModuleConfig,
+  databaseId: string,
+): S3Config {
+  const globalS3 = resolveS3(options);
+  const bucket = options.resolveBucketName
+    ? options.resolveBucketName(databaseId)
+    : globalS3.bucket;
+  const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
+
+  if (bucket === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
+    return globalS3;
+  }
+
+  return {
+    ...globalS3,
+    bucket,
+    ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
+  };
 }
 
 export function createPresignedUrlPlugin(
@@ -284,9 +314,10 @@ export function createPresignedUrlPlugin(
 
                 const fileId = fileResult.rows[0].id;
 
-                // --- Generate presigned PUT URL ---
+                // --- Generate presigned PUT URL (per-database bucket) ---
+                const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
                 const uploadUrl = await generatePresignedPutUrl(
-                  resolveS3(options),
+                  s3ForDb,
                   s3Key,
                   contentType,
                   size,
@@ -375,8 +406,9 @@ export function createPresignedUrlPlugin(
                   };
                 }
 
-                // --- Verify file exists in S3 ---
-                const s3Head = await headObject(resolveS3(options), file.key, file.content_type);
+                // --- Verify file exists in S3 (per-database bucket) ---
+                const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
+                const s3Head = await headObject(s3ForDb, file.key, file.content_type);
 
                 if (!s3Head) {
                   throw new Error('FILE_NOT_IN_S3: the file has not been uploaded yet');

@@ -16,7 +16,7 @@
 import type { GraphileConfig } from 'graphile-config';
 import { Logger } from '@pgpmjs/logger';
 
-import type { PresignedUrlPluginOptions, S3Config } from './types';
+import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 import { generatePresignedGetUrl } from './s3-signer';
 import { getStorageModuleConfig } from './storage-module-cache';
 
@@ -42,6 +42,32 @@ function resolveS3(options: PresignedUrlPluginOptions): S3Config {
     return resolved;
   }
   return options.s3;
+}
+
+/**
+ * Build a per-database S3Config by overlaying storage_module overrides
+ * onto the global S3Config. Same logic as plugin.ts resolveS3ForDatabase.
+ */
+function resolveS3ForDatabase(
+  options: PresignedUrlPluginOptions,
+  storageConfig: StorageModuleConfig,
+  databaseId: string,
+): S3Config {
+  const globalS3 = resolveS3(options);
+  const bucket = options.resolveBucketName
+    ? options.resolveBucketName(databaseId)
+    : globalS3.bucket;
+  const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
+
+  if (bucket === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
+    return globalS3;
+  }
+
+  return {
+    ...globalS3,
+    bucket,
+    ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
+  };
 }
 
 export function createDownloadUrlPlugin(
@@ -100,39 +126,41 @@ export function createDownloadUrlPlugin(
                       return null;
                     }
 
-                    const s3 = resolveS3(options);
-
-                    if (isPublic && s3.publicUrlPrefix) {
-                      // Public file: return direct URL
-                      return `${s3.publicUrlPrefix}/${key}`;
-                    }
-
-                    // Resolve download URL expiry from storage module config (per-database)
+                    // Resolve per-database config (bucket, publicUrlPrefix, expiry)
+                    let s3ForDb = resolveS3(options); // fallback to global
                     let downloadUrlExpirySeconds = 3600; // fallback default
                     try {
                       const withPgClient = context.pgSettings
                         ? context.withPgClient
                         : null;
                       if (withPgClient) {
-                        const config = await withPgClient(null, async (pgClient: any) => {
+                        const resolved = await withPgClient(null, async (pgClient: any) => {
                           const dbResult = await pgClient.query(
                             `SELECT jwt_private.current_database_id() AS id`,
                           );
                           const databaseId = dbResult.rows[0]?.id;
                           if (!databaseId) return null;
-                          return getStorageModuleConfig(pgClient, databaseId);
+                          const config = await getStorageModuleConfig(pgClient, databaseId);
+                          if (!config) return null;
+                          return { config, databaseId };
                         });
-                        if (config) {
-                          downloadUrlExpirySeconds = config.downloadUrlExpirySeconds;
+                        if (resolved) {
+                          downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;
+                          s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId);
                         }
                       }
                     } catch {
-                      // Fall back to default if config lookup fails
+                      // Fall back to global config if lookup fails
                     }
 
-                    // Private file: generate presigned GET URL
+                    if (isPublic && s3ForDb.publicUrlPrefix) {
+                      // Public file: return direct CDN URL (per-database prefix)
+                      return `${s3ForDb.publicUrlPrefix}/${key}`;
+                    }
+
+                    // Private file: generate presigned GET URL (per-database bucket)
                     return generatePresignedGetUrl(
-                      resolveS3(options),
+                      s3ForDb,
                       key,
                       downloadUrlExpirySeconds,
                       filename || undefined,
