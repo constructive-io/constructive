@@ -42,6 +42,8 @@ export interface StorageModuleConfig {
   publicUrlPrefix: string | null;
   /** Storage provider type: 'minio', 's3', 'gcs', etc. (per-database override) */
   provider: string | null;
+  /** CORS allowed origins (per-database override, NULL = use global fallback) */
+  allowedOrigins: string[] | null;
 
   // --- Per-database configurable settings ---
 
@@ -159,11 +161,13 @@ export type BucketNameResolver = (databaseId: string) => string;
  * @param bucketName - The S3 bucket name to provision
  * @param accessType - The logical bucket type ('public', 'private', 'temp')
  * @param databaseId - The metaschema database UUID
+ * @param allowedOrigins - Per-database CORS origins (from storage_module), or null to use global fallback
  */
 export type EnsureBucketProvisioned = (
   bucketName: string,
   accessType: 'public' | 'private' | 'temp',
   databaseId: string,
+  allowedOrigins: string[] | null,
 ) => Promise<void>;
 
 /**

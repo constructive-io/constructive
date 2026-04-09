@@ -115,11 +115,17 @@ export function createEnsureBucketProvisioned(): EnsureBucketProvisioned {
     bucketName: string,
     accessType: 'public' | 'private' | 'temp',
     databaseId: string,
+    allowedOrigins: string[] | null,
   ): Promise<void> => {
+    // Per-database origins from storage_module, falling back to global SERVER_ORIGIN
+    const effectiveOrigins = (allowedOrigins && allowedOrigins.length > 0)
+      ? allowedOrigins
+      : getAllowedOrigins();
+
     if (!provisioner) {
       provisioner = new BucketProvisioner({
         connection: getBucketProvisionerConnection(),
-        allowedOrigins: getAllowedOrigins(),
+        allowedOrigins: effectiveOrigins,
       });
     }
 
@@ -132,6 +138,7 @@ export function createEnsureBucketProvisioned(): EnsureBucketProvisioned {
       bucketName,
       accessType,
       versioning: false,
+      allowedOrigins: effectiveOrigins,
     });
 
     log.info(`[lazy-provision] S3 bucket "${bucketName}" provisioned successfully`);

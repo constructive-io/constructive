@@ -127,12 +127,13 @@ async function ensureS3BucketExists(
   s3BucketName: string,
   bucket: BucketConfig,
   databaseId: string,
+  allowedOrigins: string[] | null,
 ): Promise<void> {
   if (!options.ensureBucketProvisioned) return;
   if (isS3BucketProvisioned(s3BucketName)) return;
 
   log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
-  await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId);
+  await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
   markS3BucketProvisioned(s3BucketName);
   log.info(`Lazy-provisioned S3 bucket "${s3BucketName}" successfully`);
 }
@@ -341,7 +342,7 @@ export function createPresignedUrlPlugin(
 
                 // --- Ensure the S3 bucket exists (lazy provisioning) ---
                 const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
-                await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId);
+                await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId, storageConfig.allowedOrigins);
 
                 // --- Generate presigned PUT URL (per-database bucket) ---
                 const uploadUrl = await generatePresignedPutUrl(
