@@ -19,7 +19,7 @@ import { PresignedUrlPreset } from 'graphile-presigned-url-plugin';
 import { BucketProvisionerPreset } from 'graphile-bucket-provisioner-plugin';
 import { SqlExpressionValidatorPreset } from 'graphile-sql-expression-validator';
 import { constructiveUploadFieldDefinitions } from '../upload-resolver';
-import { getPresignedUrlS3Config, createBucketNameResolver } from '../presigned-url-resolver';
+import { getPresignedUrlS3Config, createBucketNameResolver, createEnsureBucketProvisioned } from '../presigned-url-resolver';
 import { getBucketProvisionerConnection } from '../bucket-provisioner-resolver';
 
 /**
@@ -90,7 +90,11 @@ export const ConstructivePreset: GraphileConfig.Preset = {
       uploadFieldDefinitions: constructiveUploadFieldDefinitions,
       maxFileSize: 10 * 1024 * 1024, // 10MB
     }),
-    PresignedUrlPreset({ s3: getPresignedUrlS3Config, resolveBucketName: createBucketNameResolver() }),
+    PresignedUrlPreset({
+      s3: getPresignedUrlS3Config,
+      resolveBucketName: createBucketNameResolver(),
+      ensureBucketProvisioned: createEnsureBucketProvisioned(['http://localhost:3000']),
+    }),
     BucketProvisionerPreset({
       connection: getBucketProvisionerConnection,
       allowedOrigins: ['http://localhost:3000'],

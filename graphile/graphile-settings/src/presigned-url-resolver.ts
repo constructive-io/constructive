@@ -14,7 +14,9 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import type { S3Config, BucketNameResolver } from 'graphile-presigned-url-plugin';
+import type { S3Config, BucketNameResolver, EnsureBucketProvisioned } from 'graphile-presigned-url-plugin';
+import { BucketProvisioner } from '@constructive-io/bucket-provisioner';
+import { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
 
 const log = new Logger('presigned-url-resolver');
 
@@ -79,5 +81,49 @@ export function createBucketNameResolver(): BucketNameResolver {
 
   return (databaseId: string): string => {
     return `${prefix}-${databaseId}`;
+  };
+}
+
+/**
+ * Create a lazy bucket provisioner callback for the presigned URL plugin.
+ *
+ * On the first upload to an S3 bucket that doesn't exist yet, this callback
+ * uses the BucketProvisioner to create and fully configure the bucket
+ * (Block Public Access, CORS, policies, lifecycle rules for temp buckets).
+ *
+ * Uses the same S3 connection config as the bucket provisioner plugin
+ * (getBucketProvisionerConnection) and the same CORS origins.
+ *
+ * @param allowedOrigins - CORS origins for presigned URL uploads
+ */
+export function createEnsureBucketProvisioned(
+  allowedOrigins: string[],
+): EnsureBucketProvisioned {
+  let provisioner: BucketProvisioner | null = null;
+
+  return async (
+    bucketName: string,
+    accessType: 'public' | 'private' | 'temp',
+    databaseId: string,
+  ): Promise<void> => {
+    if (!provisioner) {
+      provisioner = new BucketProvisioner({
+        connection: getBucketProvisionerConnection(),
+        allowedOrigins,
+      });
+    }
+
+    log.info(
+      `[lazy-provision] Provisioning S3 bucket "${bucketName}" ` +
+      `(type=${accessType}) for database ${databaseId}`,
+    );
+
+    await provisioner.provision({
+      bucketName,
+      accessType,
+      versioning: false,
+    });
+
+    log.info(`[lazy-provision] S3 bucket "${bucketName}" provisioned successfully`);
   };
 }
