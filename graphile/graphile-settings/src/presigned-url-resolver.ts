@@ -85,6 +85,19 @@ export function createBucketNameResolver(): BucketNameResolver {
 }
 
 /**
+ * Resolve CORS allowed origins from the env/config system.
+ *
+ * Reads SERVER_ORIGIN from the standard env hierarchy
+ * (pgpmDefaults → config file → env vars) and wraps it in an array.
+ * Falls back to ['http://localhost:3000'] for local development.
+ */
+export function getAllowedOrigins(): string[] {
+  const { server } = getEnvOptions();
+  if (server?.origin) return [server.origin];
+  return ['http://localhost:3000'];
+}
+
+/**
  * Create a lazy bucket provisioner callback for the presigned URL plugin.
  *
  * On the first upload to an S3 bucket that doesn't exist yet, this callback
@@ -92,13 +105,10 @@ export function createBucketNameResolver(): BucketNameResolver {
  * (Block Public Access, CORS, policies, lifecycle rules for temp buckets).
  *
  * Uses the same S3 connection config as the bucket provisioner plugin
- * (getBucketProvisionerConnection) and the same CORS origins.
- *
- * @param allowedOrigins - CORS origins for presigned URL uploads
+ * (getBucketProvisionerConnection) and reads CORS origins from
+ * SERVER_ORIGIN env var (falls back to localhost for local dev).
  */
-export function createEnsureBucketProvisioned(
-  allowedOrigins: string[],
-): EnsureBucketProvisioned {
+export function createEnsureBucketProvisioned(): EnsureBucketProvisioned {
   let provisioner: BucketProvisioner | null = null;
 
   return async (
@@ -109,7 +119,7 @@ export function createEnsureBucketProvisioned(
     if (!provisioner) {
       provisioner = new BucketProvisioner({
         connection: getBucketProvisionerConnection(),
-        allowedOrigins,
+        allowedOrigins: getAllowedOrigins(),
       });
     }
 
