@@ -42,6 +42,8 @@ export interface StorageModuleConfig {
   publicUrlPrefix: string | null;
   /** Storage provider type: 'minio', 's3', 'gcs', etc. (per-database override) */
   provider: string | null;
+  /** CORS allowed origins (per-database override, NULL = use global fallback) */
+  allowedOrigins: string[] | null;
 
   // --- Per-database configurable settings ---
 
@@ -148,6 +150,27 @@ export type S3ConfigOrGetter = S3Config | (() => S3Config);
 export type BucketNameResolver = (databaseId: string) => string;
 
 /**
+ * Callback to lazily provision an S3 bucket on first use.
+ *
+ * Called by the presigned URL plugin before generating a presigned PUT URL
+ * when the bucket has not been seen before (tracked in an in-memory cache).
+ * The implementation should create and fully configure the S3 bucket
+ * (privacy policies, CORS, lifecycle rules, etc.) — or no-op if the
+ * bucket already exists.
+ *
+ * @param bucketName - The S3 bucket name to provision
+ * @param accessType - The logical bucket type ('public', 'private', 'temp')
+ * @param databaseId - The metaschema database UUID
+ * @param allowedOrigins - Per-database CORS origins (from storage_module), or null to use global fallback
+ */
+export type EnsureBucketProvisioned = (
+  bucketName: string,
+  accessType: 'public' | 'private' | 'temp',
+  databaseId: string,
+  allowedOrigins: string[] | null,
+) => Promise<void>;
+
+/**
  * Plugin options for the presigned URL plugin.
  */
 export interface PresignedUrlPluginOptions {
@@ -160,4 +183,13 @@ export interface PresignedUrlPluginOptions {
    * the global `s3Config.bucket`. The S3 credentials (client) remain shared.
    */
   resolveBucketName?: BucketNameResolver;
+
+  /**
+   * Optional callback to lazily provision an S3 bucket on first upload.
+   * When set, the plugin calls this before generating a presigned PUT URL
+   * for any S3 bucket it hasn't seen yet (tracked in an in-memory cache).
+   * This enables graceful bucket creation without requiring buckets to
+   * exist at database provisioning time.
+   */
+  ensureBucketProvisioned?: EnsureBucketProvisioned;
 }

@@ -22,8 +22,8 @@ import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
 
-import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
-import { getStorageModuleConfig, getBucketConfig } from './storage-module-cache';
+import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig, BucketConfig } from './types';
+import { getStorageModuleConfig, getBucketConfig, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
 import { generatePresignedPutUrl, headObject } from './s3-signer';
 
 const log = new Logger('graphile-presigned-url:plugin');
@@ -110,6 +110,32 @@ function resolveS3ForDatabase(
     bucket,
     ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
   };
+}
+
+/**
+ * Ensure the S3 bucket for a database exists, provisioning it lazily if needed.
+ *
+ * Checks an in-memory Set of known-provisioned bucket names. On the first
+ * request for an unseen bucket, calls the `ensureBucketProvisioned` callback
+ * (which creates the bucket with correct CORS, policies, etc.), then marks
+ * it as provisioned so subsequent requests skip the check entirely.
+ *
+ * If no `ensureBucketProvisioned` callback is configured, this is a no-op.
+ */
+async function ensureS3BucketExists(
+  options: PresignedUrlPluginOptions,
+  s3BucketName: string,
+  bucket: BucketConfig,
+  databaseId: string,
+  allowedOrigins: string[] | null,
+): Promise<void> {
+  if (!options.ensureBucketProvisioned) return;
+  if (isS3BucketProvisioned(s3BucketName)) return;
+
+  log.info(`Lazy-provisioning S3 bucket "${s3BucketName}" for database ${databaseId}`);
+  await options.ensureBucketProvisioned(s3BucketName, bucket.type, databaseId, allowedOrigins);
+  markS3BucketProvisioned(s3BucketName);
+  log.info(`Lazy-provisioned S3 bucket "${s3BucketName}" successfully`);
 }
 
 export function createPresignedUrlPlugin(
@@ -314,8 +340,11 @@ export function createPresignedUrlPlugin(
 
                 const fileId = fileResult.rows[0].id;
 
-                // --- Generate presigned PUT URL (per-database bucket) ---
+                // --- Ensure the S3 bucket exists (lazy provisioning) ---
                 const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
+                await ensureS3BucketExists(options, s3ForDb.bucket, bucket, databaseId, storageConfig.allowedOrigins);
+
+                // --- Generate presigned PUT URL (per-database bucket) ---
                 const uploadUrl = await generatePresignedPutUrl(
                   s3ForDb,
                   s3Key,

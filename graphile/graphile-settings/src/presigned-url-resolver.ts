@@ -14,7 +14,9 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
-import type { S3Config, BucketNameResolver } from 'graphile-presigned-url-plugin';
+import type { S3Config, BucketNameResolver, EnsureBucketProvisioned } from 'graphile-presigned-url-plugin';
+import { BucketProvisioner } from '@constructive-io/bucket-provisioner';
+import { getBucketProvisionerConnection } from './bucket-provisioner-resolver';
 
 const log = new Logger('presigned-url-resolver');
 
@@ -79,5 +81,66 @@ export function createBucketNameResolver(): BucketNameResolver {
 
   return (databaseId: string): string => {
     return `${prefix}-${databaseId}`;
+  };
+}
+
+/**
+ * Resolve CORS allowed origins from the env/config system.
+ *
+ * Reads SERVER_ORIGIN from the standard env hierarchy
+ * (pgpmDefaults → config file → env vars) and wraps it in an array.
+ * Falls back to ['http://localhost:3000'] for local development.
+ */
+export function getAllowedOrigins(): string[] {
+  const { server } = getEnvOptions();
+  if (server?.origin) return [server.origin];
+  return ['*'];
+}
+
+/**
+ * Create a lazy bucket provisioner callback for the presigned URL plugin.
+ *
+ * On the first upload to an S3 bucket that doesn't exist yet, this callback
+ * uses the BucketProvisioner to create and fully configure the bucket
+ * (Block Public Access, CORS, policies, lifecycle rules for temp buckets).
+ *
+ * Uses the same S3 connection config as the bucket provisioner plugin
+ * (getBucketProvisionerConnection) and reads CORS origins from
+ * SERVER_ORIGIN env var (falls back to localhost for local dev).
+ */
+export function createEnsureBucketProvisioned(): EnsureBucketProvisioned {
+  let provisioner: BucketProvisioner | null = null;
+
+  return async (
+    bucketName: string,
+    accessType: 'public' | 'private' | 'temp',
+    databaseId: string,
+    allowedOrigins: string[] | null,
+  ): Promise<void> => {
+    // Per-database origins from storage_module, falling back to global SERVER_ORIGIN
+    const effectiveOrigins = (allowedOrigins && allowedOrigins.length > 0)
+      ? allowedOrigins
+      : getAllowedOrigins();
+
+    if (!provisioner) {
+      provisioner = new BucketProvisioner({
+        connection: getBucketProvisionerConnection(),
+        allowedOrigins: effectiveOrigins,
+      });
+    }
+
+    log.info(
+      `[lazy-provision] Provisioning S3 bucket "${bucketName}" ` +
+      `(type=${accessType}) for database ${databaseId}`,
+    );
+
+    await provisioner.provision({
+      bucketName,
+      accessType,
+      versioning: false,
+      allowedOrigins: effectiveOrigins,
+    });
+
+    log.info(`[lazy-provision] S3 bucket "${bucketName}" provisioned successfully`);
   };
 }

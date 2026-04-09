@@ -47,6 +47,7 @@ const STORAGE_MODULE_QUERY = `
     sm.endpoint,
     sm.public_url_prefix,
     sm.provider,
+    sm.allowed_origins,
     sm.upload_url_expiry_seconds,
     sm.download_url_expiry_seconds,
     sm.default_max_file_size,
@@ -74,6 +75,7 @@ interface StorageModuleRow {
   endpoint: string | null;
   public_url_prefix: string | null;
   provider: string | null;
+  allowed_origins: string[] | null;
   upload_url_expiry_seconds: number | null;
   download_url_expiry_seconds: number | null;
   default_max_file_size: number | null;
@@ -121,6 +123,7 @@ export async function getStorageModuleConfig(
     endpoint: row.endpoint,
     publicUrlPrefix: row.public_url_prefix,
     provider: row.provider,
+    allowedOrigins: row.allowed_origins,
     uploadUrlExpirySeconds: row.upload_url_expiry_seconds ?? DEFAULT_UPLOAD_URL_EXPIRY_SECONDS,
     downloadUrlExpirySeconds: row.download_url_expiry_seconds ?? DEFAULT_DOWNLOAD_URL_EXPIRY_SECONDS,
     defaultMaxFileSize: row.default_max_file_size ?? DEFAULT_MAX_FILE_SIZE,
@@ -220,6 +223,38 @@ export async function getBucketConfig(
   return config;
 }
 
+// --- S3 bucket existence cache ---
+
+/**
+ * In-memory set of S3 bucket names that are known to exist.
+ *
+ * Used by the lazy provisioning logic in the presigned URL plugin:
+ * before generating a presigned PUT URL, the plugin checks this set.
+ * If the bucket name is absent, it calls `ensureBucketProvisioned`
+ * to create the S3 bucket, then adds the name here. Subsequent
+ * requests for the same bucket skip the provisioning entirely.
+ *
+ * No TTL needed — S3 buckets are never deleted during normal operation.
+ * The set resets on server restart, which is fine because the
+ * provisioner's createBucket is idempotent (handles "already exists").
+ */
+const provisionedBuckets = new Set<string>();
+
+/**
+ * Check whether an S3 bucket has already been provisioned (cached).
+ */
+export function isS3BucketProvisioned(s3BucketName: string): boolean {
+  return provisionedBuckets.has(s3BucketName);
+}
+
+/**
+ * Mark an S3 bucket as provisioned in the in-memory cache.
+ */
+export function markS3BucketProvisioned(s3BucketName: string): void {
+  provisionedBuckets.add(s3BucketName);
+  log.debug(`Marked S3 bucket "${s3BucketName}" as provisioned`);
+}
+
 /**
  * Clear the storage module cache AND bucket cache.
  * Useful for testing or schema changes.
@@ -227,6 +262,7 @@ export async function getBucketConfig(
 export function clearStorageModuleCache(): void {
   storageModuleCache.clear();
   bucketCache.clear();
+  provisionedBuckets.clear();
 }
 
 /**
