@@ -94,7 +94,7 @@ export function createBucketNameResolver(): BucketNameResolver {
 export function getAllowedOrigins(): string[] {
   const { server } = getEnvOptions();
   if (server?.origin) return [server.origin];
-  return ['http://localhost:3000'];
+  return ['*'];
 }
 
 /**
