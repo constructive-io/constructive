@@ -136,9 +136,28 @@ export interface S3Config {
 export type S3ConfigOrGetter = S3Config | (() => S3Config);
 
 /**
+ * Function to derive the actual S3 bucket name for a given database.
+ *
+ * When provided, the presigned URL plugin calls this on every request
+ * to determine which S3 bucket to use — enabling per-database bucket
+ * isolation. If not provided, falls back to `s3Config.bucket` (global).
+ *
+ * @param databaseId - The metaschema database UUID
+ * @returns The S3 bucket name for this database
+ */
+export type BucketNameResolver = (databaseId: string) => string;
+
+/**
  * Plugin options for the presigned URL plugin.
  */
 export interface PresignedUrlPluginOptions {
   /** S3 configuration (concrete or lazy getter) */
   s3: S3ConfigOrGetter;
+
+  /**
+   * Optional function to resolve S3 bucket name per-database.
+   * When set, each database gets its own S3 bucket instead of sharing
+   * the global `s3Config.bucket`. The S3 credentials (client) remain shared.
+   */
+  resolveBucketName?: BucketNameResolver;
 }
