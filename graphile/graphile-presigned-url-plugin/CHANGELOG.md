@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.3.0...graphile-presigned-url-plugin@0.4.0) (2026-04-09)
+
+### Bug Fixes
+
+- wire per-database allowed_origins into lazy bucket provisioner ([eea70d2](https://github.com/constructive-io/constructive/commit/eea70d23c64a4ee063348700acaa5f5e4bbebb00))
+
+### Features
+
+- lazy S3 bucket provisioning on first upload ([a03ee0f](https://github.com/constructive-io/constructive/commit/a03ee0faa28d4dd63f3781e3e8c453d263ee8a1a))
+- wire per-database S3 bucket name and publicUrlPrefix into presigned URL plugin ([526d676](https://github.com/constructive-io/constructive/commit/526d676a10b25b5bbdf653cd114fc31263435c3b))
+
 # [0.3.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.2.0...graphile-presigned-url-plugin@0.3.0) (2026-04-04)
 
 ### Bug Fixes

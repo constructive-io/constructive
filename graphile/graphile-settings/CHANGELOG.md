@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.20.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.19.0...graphile-settings@4.20.0) (2026-04-09)
+
+### Bug Fixes
+
+- read CORS allowedOrigins from SERVER_ORIGIN env var instead of hardcoding ([d13d08c](https://github.com/constructive-io/constructive/commit/d13d08cde89b67bcde9749ff9fef58bf03cf222b))
+- use wildcard CORS fallback instead of localhost ([784ada1](https://github.com/constructive-io/constructive/commit/784ada16aa3a05505dd4bb847c7c9c01e7dcea9d))
+- wire per-database allowed_origins into lazy bucket provisioner ([eea70d2](https://github.com/constructive-io/constructive/commit/eea70d23c64a4ee063348700acaa5f5e4bbebb00))
+
+### Features
+
+- lazy S3 bucket provisioning on first upload ([a03ee0f](https://github.com/constructive-io/constructive/commit/a03ee0faa28d4dd63f3781e3e8c453d263ee8a1a))
+- wire per-database S3 bucket name and publicUrlPrefix into presigned URL plugin ([526d676](https://github.com/constructive-io/constructive/commit/526d676a10b25b5bbdf653cd114fc31263435c3b))
+
 # [4.19.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.18.10...graphile-settings@4.19.0) (2026-04-04)
 
 ### Bug Fixes
