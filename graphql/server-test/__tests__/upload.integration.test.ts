@@ -14,7 +14,6 @@
 import crypto from 'crypto';
 import path from 'path';
 import { getConnections, seed } from '../src';
-import type { ServerInfo } from '../src/types';
 import type supertest from 'supertest';
 
 jest.setTimeout(60000);
@@ -32,6 +31,9 @@ const metaSchemas = [
 const schemas = ['simple-storage-public'];
 
 const seedFiles = [
+  // Reuse the shared metaschema / services infrastructure
+  sql('simple-seed-services', 'setup.sql'),
+  // Storage-specific additions (jwt_private + storage_module table)
   sql('simple-seed-storage', 'setup.sql'),
   sql('simple-seed-storage', 'schema.sql'),
   sql('simple-seed-storage', 'test-data.sql'),
@@ -91,7 +93,6 @@ async function putToPresignedUrl(
 // --- Tests ---
 
 describe('Upload integration (presigned URL flow)', () => {
-  let server: ServerInfo;
   let request: supertest.Agent;
   let teardown: () => Promise<void>;
 
@@ -107,7 +108,7 @@ describe('Upload integration (presigned URL flow)', () => {
   };
 
   beforeAll(async () => {
-    ({ server, request, teardown } = await getConnections(
+    ({ request, teardown } = await getConnections(
       {
         schemas,
         authRole: 'anonymous',
