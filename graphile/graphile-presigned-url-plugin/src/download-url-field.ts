@@ -135,9 +135,9 @@ export function createDownloadUrlPlugin(
                         : null;
                       if (withPgClient) {
                         const resolved = await withPgClient(null, async (pgClient: any) => {
-                          const dbResult = await pgClient.query(
-                            `SELECT jwt_private.current_database_id() AS id`,
-                          );
+                          const dbResult = await pgClient.query({
+                            text: `SELECT jwt_private.current_database_id() AS id`,
+                          });
                           const databaseId = dbResult.rows[0]?.id;
                           if (!databaseId) return null;
                           const config = await getStorageModuleConfig(pgClient, databaseId);

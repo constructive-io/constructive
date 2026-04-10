@@ -59,9 +59,9 @@ function buildS3Key(contentHash: string): string {
  * metaschema query needed.
  */
 async function resolveDatabaseId(pgClient: any): Promise<string | null> {
-  const result = await pgClient.query(
-    `SELECT jwt_private.current_database_id() AS id`,
-  );
+  const result = await pgClient.query({
+    text: `SELECT jwt_private.current_database_id() AS id`,
+  });
   return result.rows[0]?.id ?? null;
 }
 
@@ -235,15 +235,14 @@ export function createPresignedUrlPlugin(
             }
 
             return withPgClient(pgSettings, async (pgClient: any) => {
-              await pgClient.query('BEGIN');
-              try {
+              return pgClient.withTransaction(async (txClient: any) => {
                 // --- Resolve storage module config (all limits come from here) ---
-                const databaseId = await resolveDatabaseId(pgClient);
+                const databaseId = await resolveDatabaseId(txClient);
                 if (!databaseId) {
                   throw new Error('DATABASE_NOT_FOUND');
                 }
 
-                const storageConfig = await getStorageModuleConfig(pgClient, databaseId);
+                const storageConfig = await getStorageModuleConfig(txClient, databaseId);
                 if (!storageConfig) {
                   throw new Error('STORAGE_MODULE_NOT_PROVISIONED');
                 }
@@ -259,7 +258,7 @@ export function createPresignedUrlPlugin(
                 }
 
                 // --- Look up the bucket (cached; first miss queries via RLS) ---
-                const bucket = await getBucketConfig(pgClient, storageConfig, databaseId, bucketKey);
+                const bucket = await getBucketConfig(txClient, storageConfig, databaseId, bucketKey);
                 if (!bucket) {
                   throw new Error('BUCKET_NOT_FOUND');
                 }
@@ -288,29 +287,28 @@ export function createPresignedUrlPlugin(
                 const s3Key = buildS3Key(contentHash);
 
                 // --- Dedup check: look for existing file with same content_hash in this bucket ---
-                const dedupResult = await pgClient.query(
-                  `SELECT id, status
+                const dedupResult = await txClient.query({
+                  text: `SELECT id, status
                    FROM ${storageConfig.filesQualifiedName}
                    WHERE content_hash = $1
                      AND bucket_id = $2
                      AND status IN ('ready', 'processed')
                    LIMIT 1`,
-                  [contentHash, bucket.id],
-                );
+                  values: [contentHash, bucket.id],
+                });
 
                 if (dedupResult.rows.length > 0) {
                   const existingFile = dedupResult.rows[0];
                   log.info(`Dedup hit: file ${existingFile.id} for hash ${contentHash}`);
 
                   // Track the dedup request
-                  await pgClient.query(
-                    `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
+                  await txClient.query({
+                    text: `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
                      (file_id, bucket_id, key, content_type, content_hash, size, status, expires_at)
                      VALUES ($1, $2, $3, $4, $5, $6, 'confirmed', NOW())`,
-                    [existingFile.id, bucket.id, s3Key, contentType, contentHash, size],
-                  );
+                    values: [existingFile.id, bucket.id, s3Key, contentType, contentHash, size],
+                  });
 
-                  await pgClient.query('COMMIT');
                   return {
                     uploadUrl: null,
                     fileId: existingFile.id,
@@ -321,12 +319,12 @@ export function createPresignedUrlPlugin(
                 }
 
                 // --- Create file record (status=pending) ---
-                const fileResult = await pgClient.query(
-                  `INSERT INTO ${storageConfig.filesQualifiedName}
+                const fileResult = await txClient.query({
+                  text: `INSERT INTO ${storageConfig.filesQualifiedName}
                    (bucket_id, key, content_type, content_hash, size, filename, owner_id, is_public, status)
                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
                    RETURNING id`,
-                  [
+                  values: [
                     bucket.id,
                     s3Key,
                     contentType,
@@ -336,7 +334,7 @@ export function createPresignedUrlPlugin(
                     bucket.owner_id,
                     bucket.is_public,
                   ],
-                );
+                });
 
                 const fileId = fileResult.rows[0].id;
 
@@ -356,14 +354,13 @@ export function createPresignedUrlPlugin(
                 const expiresAt = new Date(Date.now() + storageConfig.uploadUrlExpirySeconds * 1000).toISOString();
 
                 // --- Track the upload request ---
-                await pgClient.query(
-                  `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
+                await txClient.query({
+                  text: `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
                    (file_id, bucket_id, key, content_type, content_hash, size, status, expires_at)
                    VALUES ($1, $2, $3, $4, $5, $6, 'issued', $7)`,
-                  [fileId, bucket.id, s3Key, contentType, contentHash, size, expiresAt],
-                );
+                  values: [fileId, bucket.id, s3Key, contentType, contentHash, size, expiresAt],
+                });
 
-                await pgClient.query('COMMIT');
                 return {
                   uploadUrl,
                   fileId,
@@ -371,10 +368,7 @@ export function createPresignedUrlPlugin(
                   deduplicated: false,
                   expiresAt,
                 };
-              } catch (err) {
-                await pgClient.query('ROLLBACK');
-                throw err;
-              }
+              });
             });
           });
         },
@@ -397,27 +391,26 @@ export function createPresignedUrlPlugin(
             }
 
             return withPgClient(pgSettings, async (pgClient: any) => {
-              await pgClient.query('BEGIN');
-              try {
+              return pgClient.withTransaction(async (txClient: any) => {
                 // --- Resolve storage module config ---
-                const databaseId = await resolveDatabaseId(pgClient);
+                const databaseId = await resolveDatabaseId(txClient);
                 if (!databaseId) {
                   throw new Error('DATABASE_NOT_FOUND');
                 }
 
-                const storageConfig = await getStorageModuleConfig(pgClient, databaseId);
+                const storageConfig = await getStorageModuleConfig(txClient, databaseId);
                 if (!storageConfig) {
                   throw new Error('STORAGE_MODULE_NOT_PROVISIONED');
                 }
 
                 // --- Look up the file (RLS enforced) ---
-                const fileResult = await pgClient.query(
-                  `SELECT id, key, content_type, status, bucket_id
+                const fileResult = await txClient.query({
+                  text: `SELECT id, key, content_type, status, bucket_id
                    FROM ${storageConfig.filesQualifiedName}
                    WHERE id = $1
                    LIMIT 1`,
-                  [fileId],
-                );
+                  values: [fileId],
+                });
 
                 if (fileResult.rows.length === 0) {
                   throw new Error('FILE_NOT_FOUND');
@@ -427,7 +420,6 @@ export function createPresignedUrlPlugin(
 
                 if (file.status !== 'pending') {
                   // File is already confirmed or processed — idempotent success
-                  await pgClient.query('COMMIT');
                   return {
                     fileId: file.id,
                     status: file.status,
@@ -446,45 +438,40 @@ export function createPresignedUrlPlugin(
                 // --- Content-type verification ---
                 if (s3Head.contentType && s3Head.contentType !== file.content_type) {
                   // Mark upload_request as rejected
-                  await pgClient.query(
-                    `UPDATE ${storageConfig.uploadRequestsQualifiedName}
+                  await txClient.query({
+                    text: `UPDATE ${storageConfig.uploadRequestsQualifiedName}
                      SET status = 'rejected'
                      WHERE file_id = $1 AND status = 'issued'`,
-                    [fileId],
-                  );
+                    values: [fileId],
+                  });
 
-                  await pgClient.query('COMMIT');
                   throw new Error(
                     `CONTENT_TYPE_MISMATCH: expected ${file.content_type}, got ${s3Head.contentType}`,
                   );
                 }
 
                 // --- Transition file to 'ready' ---
-                await pgClient.query(
-                  `UPDATE ${storageConfig.filesQualifiedName}
+                await txClient.query({
+                  text: `UPDATE ${storageConfig.filesQualifiedName}
                    SET status = 'ready'
                    WHERE id = $1`,
-                  [fileId],
-                );
+                  values: [fileId],
+                });
 
                 // --- Update upload_request to 'confirmed' ---
-                await pgClient.query(
-                  `UPDATE ${storageConfig.uploadRequestsQualifiedName}
+                await txClient.query({
+                  text: `UPDATE ${storageConfig.uploadRequestsQualifiedName}
                    SET status = 'confirmed', confirmed_at = NOW()
                    WHERE file_id = $1 AND status = 'issued'`,
-                  [fileId],
-                );
+                  values: [fileId],
+                });
 
-                await pgClient.query('COMMIT');
                 return {
                   fileId: file.id,
                   status: 'ready',
                   success: true,
                 };
-              } catch (err) {
-                await pgClient.query('ROLLBACK');
-                throw err;
-              }
+              });
             });
           });
         },

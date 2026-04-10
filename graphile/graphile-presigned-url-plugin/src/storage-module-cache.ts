@@ -91,7 +91,7 @@ interface StorageModuleRow {
  * @returns StorageModuleConfig or null if no storage module is provisioned
  */
 export async function getStorageModuleConfig(
-  pgClient: { query: (sql: string, params: unknown[]) => Promise<{ rows: unknown[] }> },
+  pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
   databaseId: string,
 ): Promise<StorageModuleConfig | null> {
   const cacheKey = `storage:${databaseId}`;
@@ -102,7 +102,7 @@ export async function getStorageModuleConfig(
 
   log.debug(`Cache miss for database ${databaseId}, querying metaschema...`);
 
-  const result = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
+  const result = await pgClient.query({ text: STORAGE_MODULE_QUERY, values: [databaseId] });
   if (result.rows.length === 0) {
     log.warn(`No storage module found for database ${databaseId}`);
     return null;
@@ -172,7 +172,7 @@ const bucketCache = new LRUCache<string, BucketConfig>({
  * @returns BucketConfig or null if the bucket doesn't exist / isn't accessible
  */
 export async function getBucketConfig(
-  pgClient: { query: (sql: string, params: unknown[]) => Promise<{ rows: unknown[] }> },
+  pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
   storageConfig: StorageModuleConfig,
   databaseId: string,
   bucketKey: string,
@@ -185,13 +185,13 @@ export async function getBucketConfig(
 
   log.debug(`Bucket cache miss for ${databaseId}:${bucketKey}, querying DB...`);
 
-  const result = await pgClient.query(
-    `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size
+  const result = await pgClient.query({
+    text: `SELECT id, key, type, is_public, owner_id, allowed_mime_types, max_file_size
      FROM ${storageConfig.bucketsQualifiedName}
      WHERE key = $1
      LIMIT 1`,
-    [bucketKey],
-  );
+    values: [bucketKey],
+  });
 
   if (result.rows.length === 0) {
     return null;
