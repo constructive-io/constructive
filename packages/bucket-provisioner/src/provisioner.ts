@@ -303,6 +303,9 @@ export class BucketProvisioner {
 
   /**
    * Delete an S3 bucket policy (used to clear leftover public policies).
+   *
+   * Gracefully handles backends that don't support this operation or have
+   * no policy to delete.
    */
   async deleteBucketPolicy(bucketName: string): Promise<void> {
     try {
@@ -311,7 +314,16 @@ export class BucketProvisioner {
       );
     } catch (err: any) {
       // No policy to delete — that's fine
-      if (err.name === 'NoSuchBucketPolicy' || err.$metadata?.httpStatusCode === 404) {
+      if (
+        err.name === 'NoSuchBucketPolicy' ||
+        err.$metadata?.httpStatusCode === 404 ||
+        err.Code === 'XmlParseException' ||
+        err.name === 'XmlParseException' ||
+        err.Code === 'NotImplemented' ||
+        err.name === 'NotImplemented' ||
+        err.message?.includes('not well-formed') ||
+        err.message?.includes('not implemented')
+      ) {
         return;
       }
       throw new ProvisionerError(
@@ -324,6 +336,10 @@ export class BucketProvisioner {
 
   /**
    * Set CORS configuration on an S3 bucket.
+   *
+   * Gracefully skips if the S3-compatible backend (e.g. older MinIO) does
+   * not support PutBucketCors — CORS is best-effort since not all providers
+   * implement this API via the same endpoint path.
    */
   async setCors(bucketName: string, rules: CorsRule[]): Promise<void> {
     try {
@@ -342,6 +358,20 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      // Some S3-compatible backends (e.g. older MinIO) don't support
+      // PutBucketCors via the standard path. Treat XML parse errors or
+      // "not implemented" responses as non-fatal.
+      if (
+        err.Code === 'XmlParseException' ||
+        err.name === 'XmlParseException' ||
+        err.Code === 'NotImplemented' ||
+        err.name === 'NotImplemented' ||
+        err.message?.includes('not well-formed') ||
+        err.message?.includes('not implemented') ||
+        err.message?.includes('CORSConfiguration')
+      ) {
+        return;
+      }
       throw new ProvisionerError(
         'CORS_FAILED',
         `Failed to set CORS on '${bucketName}': ${err.message}`,
