@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.29.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.29.0...@constructive-io/graphql-codegen@4.29.1) (2026-04-10)
+
+### Bug Fixes
+
+- **codegen:** remove condition generation from ORM codegen ([28ad7e9](https://github.com/constructive-io/constructive/commit/28ad7e9b58853db5d623a8a23369de94e663c783))
+
 # [4.29.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.28.6...@constructive-io/graphql-codegen@4.29.0) (2026-04-09)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
