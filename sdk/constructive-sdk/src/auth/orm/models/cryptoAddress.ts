@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class CryptoAddressModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CryptoAddressSelect>(
-    args: FindManyArgs<S, CryptoAddressFilter, never, CryptoAddressOrderBy> & {
+    args: FindManyArgs<S, CryptoAddressFilter, CryptoAddressOrderBy> & {
       select: S;
     } & StrictSelect<S, CryptoAddressSelect>
   ): QueryBuilder<{

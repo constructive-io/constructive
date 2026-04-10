@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class PrimaryKeyConstraintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends PrimaryKeyConstraintSelect>(
-    args: FindManyArgs<S, PrimaryKeyConstraintFilter, never, PrimaryKeyConstraintOrderBy> & {
+    args: FindManyArgs<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, PrimaryKeyConstraintSelect>
   ): QueryBuilder<{

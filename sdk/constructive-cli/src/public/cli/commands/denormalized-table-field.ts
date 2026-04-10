@@ -97,7 +97,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         DenormalizedTableFieldSelect,
         DenormalizedTableFieldFilter,
-        never,
         DenormalizedTableFieldOrderBy
       > & {
         select: DenormalizedTableFieldSelect;
@@ -131,7 +130,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       funcOrder: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter, never> & {
+      FindFirstArgs<DenormalizedTableFieldSelect, DenormalizedTableFieldFilter> & {
         select: DenormalizedTableFieldSelect;
       }
     >(argv, defaultSelect);

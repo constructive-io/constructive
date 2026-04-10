@@ -80,7 +80,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       tableName: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<SecretsModuleSelect, SecretsModuleFilter, never, SecretsModuleOrderBy> & {
+      FindManyArgs<SecretsModuleSelect, SecretsModuleFilter, SecretsModuleOrderBy> & {
         select: SecretsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -105,7 +105,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tableName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<SecretsModuleSelect, SecretsModuleFilter, never> & {
+      FindFirstArgs<SecretsModuleSelect, SecretsModuleFilter> & {
         select: SecretsModuleSelect;
       }
     >(argv, defaultSelect);

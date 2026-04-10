@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgLimitDefaultModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgLimitDefaultSelect>(
-    args: FindManyArgs<S, OrgLimitDefaultFilter, never, OrgLimitDefaultOrderBy> & {
+    args: FindManyArgs<S, OrgLimitDefaultFilter, OrgLimitDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgLimitDefaultSelect>
   ): QueryBuilder<{

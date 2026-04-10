@@ -86,7 +86,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<AuditLogSelect, AuditLogFilter, never, AuditLogOrderBy> & {
+      FindManyArgs<AuditLogSelect, AuditLogFilter, AuditLogOrderBy> & {
         select: AuditLogSelect;
       }
     >(argv, defaultSelect);
@@ -114,7 +114,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<AuditLogSelect, AuditLogFilter, never> & {
+      FindFirstArgs<AuditLogSelect, AuditLogFilter> & {
         select: AuditLogSelect;
       }
     >(argv, defaultSelect);

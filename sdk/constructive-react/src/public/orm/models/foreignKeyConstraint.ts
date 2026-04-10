@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ForeignKeyConstraintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ForeignKeyConstraintSelect>(
-    args: FindManyArgs<S, ForeignKeyConstraintFilter, never, ForeignKeyConstraintOrderBy> & {
+    args: FindManyArgs<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, ForeignKeyConstraintSelect>
   ): QueryBuilder<{

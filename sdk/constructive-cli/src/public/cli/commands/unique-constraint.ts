@@ -98,12 +98,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        UniqueConstraintSelect,
-        UniqueConstraintFilter,
-        never,
-        UniqueConstraintOrderBy
-      > & {
+      FindManyArgs<UniqueConstraintSelect, UniqueConstraintFilter, UniqueConstraintOrderBy> & {
         select: UniqueConstraintSelect;
       }
     >(argv, defaultSelect);
@@ -137,7 +132,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<UniqueConstraintSelect, UniqueConstraintFilter, never> & {
+      FindFirstArgs<UniqueConstraintSelect, UniqueConstraintFilter> & {
         select: UniqueConstraintSelect;
       }
     >(argv, defaultSelect);

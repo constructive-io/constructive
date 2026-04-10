@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppLevelRequirementModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppLevelRequirementSelect>(
-    args: FindManyArgs<S, AppLevelRequirementFilter, never, AppLevelRequirementOrderBy> & {
+    args: FindManyArgs<S, AppLevelRequirementFilter, AppLevelRequirementOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLevelRequirementSelect>
   ): QueryBuilder<{

@@ -79,7 +79,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         OrgPermissionDefaultSelect,
         OrgPermissionDefaultFilter,
-        never,
         OrgPermissionDefaultOrderBy
       > & {
         select: OrgPermissionDefaultSelect;
@@ -104,7 +103,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       entityId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter, never> & {
+      FindFirstArgs<OrgPermissionDefaultSelect, OrgPermissionDefaultFilter> & {
         select: OrgPermissionDefaultSelect;
       }
     >(argv, defaultSelect);

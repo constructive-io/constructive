@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SiteThemeModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SiteThemeSelect>(
-    args: FindManyArgs<S, SiteThemeFilter, never, SiteThemeOrderBy> & {
+    args: FindManyArgs<S, SiteThemeFilter, SiteThemeOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteThemeSelect>
   ): QueryBuilder<{

@@ -98,7 +98,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<SchemaSelect, SchemaFilter, never, SchemaOrderBy> & {
+      FindManyArgs<SchemaSelect, SchemaFilter, SchemaOrderBy> & {
         select: SchemaSelect;
       }
     >(argv, defaultSelect);
@@ -132,7 +132,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<SchemaSelect, SchemaFilter, never> & {
+      FindFirstArgs<SchemaSelect, SchemaFilter> & {
         select: SchemaSelect;
       }
     >(argv, defaultSelect);

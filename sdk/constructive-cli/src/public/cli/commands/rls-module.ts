@@ -92,7 +92,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       currentRoleId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<RlsModuleSelect, RlsModuleFilter, never, RlsModuleOrderBy> & {
+      FindManyArgs<RlsModuleSelect, RlsModuleFilter, RlsModuleOrderBy> & {
         select: RlsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -123,7 +123,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       currentRoleId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<RlsModuleSelect, RlsModuleFilter, never> & {
+      FindFirstArgs<RlsModuleSelect, RlsModuleFilter> & {
         select: RlsModuleSelect;
       }
     >(argv, defaultSelect);

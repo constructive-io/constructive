@@ -92,7 +92,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       authSettingsTable: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<SessionsModuleSelect, SessionsModuleFilter, never, SessionsModuleOrderBy> & {
+      FindManyArgs<SessionsModuleSelect, SessionsModuleFilter, SessionsModuleOrderBy> & {
         select: SessionsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -123,7 +123,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       authSettingsTable: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<SessionsModuleSelect, SessionsModuleFilter, never> & {
+      FindFirstArgs<SessionsModuleSelect, SessionsModuleFilter> & {
         select: SessionsModuleSelect;
       }
     >(argv, defaultSelect);

@@ -89,7 +89,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         AppLevelRequirementSelect,
         AppLevelRequirementFilter,
-        never,
         AppLevelRequirementOrderBy
       > & {
         select: AppLevelRequirementSelect;
@@ -119,7 +118,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<AppLevelRequirementSelect, AppLevelRequirementFilter, never> & {
+      FindFirstArgs<AppLevelRequirementSelect, AppLevelRequirementFilter> & {
         select: AppLevelRequirementSelect;
       }
     >(argv, defaultSelect);

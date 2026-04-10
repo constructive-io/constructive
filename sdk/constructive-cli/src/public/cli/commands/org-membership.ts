@@ -102,7 +102,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       profileId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<OrgMembershipSelect, OrgMembershipFilter, never, OrgMembershipOrderBy> & {
+      FindManyArgs<OrgMembershipSelect, OrgMembershipFilter, OrgMembershipOrderBy> & {
         select: OrgMembershipSelect;
       }
     >(argv, defaultSelect);
@@ -138,7 +138,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       profileId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgMembershipSelect, OrgMembershipFilter, never> & {
+      FindFirstArgs<OrgMembershipSelect, OrgMembershipFilter> & {
         select: OrgMembershipSelect;
       }
     >(argv, defaultSelect);

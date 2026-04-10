@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DenormalizedTableFieldModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DenormalizedTableFieldSelect>(
-    args: FindManyArgs<S, DenormalizedTableFieldFilter, never, DenormalizedTableFieldOrderBy> & {
+    args: FindManyArgs<S, DenormalizedTableFieldFilter, DenormalizedTableFieldOrderBy> & {
       select: S;
     } & StrictSelect<S, DenormalizedTableFieldSelect>
   ): QueryBuilder<{

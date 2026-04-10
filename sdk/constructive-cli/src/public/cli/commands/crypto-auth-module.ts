@@ -98,12 +98,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       signInWithChallenge: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        CryptoAuthModuleSelect,
-        CryptoAuthModuleFilter,
-        never,
-        CryptoAuthModuleOrderBy
-      > & {
+      FindManyArgs<CryptoAuthModuleSelect, CryptoAuthModuleFilter, CryptoAuthModuleOrderBy> & {
         select: CryptoAuthModuleSelect;
       }
     >(argv, defaultSelect);
@@ -137,7 +132,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       signInWithChallenge: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<CryptoAuthModuleSelect, CryptoAuthModuleFilter, never> & {
+      FindFirstArgs<CryptoAuthModuleSelect, CryptoAuthModuleFilter> & {
         select: CryptoAuthModuleSelect;
       }
     >(argv, defaultSelect);

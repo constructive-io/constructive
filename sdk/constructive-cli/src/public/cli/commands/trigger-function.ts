@@ -82,7 +82,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<TriggerFunctionSelect, TriggerFunctionFilter, never, TriggerFunctionOrderBy> & {
+      FindManyArgs<TriggerFunctionSelect, TriggerFunctionFilter, TriggerFunctionOrderBy> & {
         select: TriggerFunctionSelect;
       }
     >(argv, defaultSelect);
@@ -108,7 +108,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<TriggerFunctionSelect, TriggerFunctionFilter, never> & {
+      FindFirstArgs<TriggerFunctionSelect, TriggerFunctionFilter> & {
         select: TriggerFunctionSelect;
       }
     >(argv, defaultSelect);

@@ -86,7 +86,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       positionLevel: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, never, OrgChartEdgeOrderBy> & {
+      FindManyArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, OrgChartEdgeOrderBy> & {
         select: OrgChartEdgeSelect;
       }
     >(argv, defaultSelect);
@@ -114,7 +114,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       positionLevel: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgChartEdgeSelect, OrgChartEdgeFilter, never> & {
+      FindFirstArgs<OrgChartEdgeSelect, OrgChartEdgeFilter> & {
         select: OrgChartEdgeSelect;
       }
     >(argv, defaultSelect);

@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class OrgOwnerGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends OrgOwnerGrantSelect>(
-    args: FindManyArgs<S, OrgOwnerGrantFilter, never, OrgOwnerGrantOrderBy> & {
+    args: FindManyArgs<S, OrgOwnerGrantFilter, OrgOwnerGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgOwnerGrantSelect>
   ): QueryBuilder<{

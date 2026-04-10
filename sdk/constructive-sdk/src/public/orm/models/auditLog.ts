@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AuditLogModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AuditLogSelect>(
-    args: FindManyArgs<S, AuditLogFilter, never, AuditLogOrderBy> & {
+    args: FindManyArgs<S, AuditLogFilter, AuditLogOrderBy> & {
       select: S;
     } & StrictSelect<S, AuditLogSelect>
   ): QueryBuilder<{

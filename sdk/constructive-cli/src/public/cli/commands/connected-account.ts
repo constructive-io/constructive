@@ -86,12 +86,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        ConnectedAccountSelect,
-        ConnectedAccountFilter,
-        never,
-        ConnectedAccountOrderBy
-      > & {
+      FindManyArgs<ConnectedAccountSelect, ConnectedAccountFilter, ConnectedAccountOrderBy> & {
         select: ConnectedAccountSelect;
       }
     >(argv, defaultSelect);
@@ -119,7 +114,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<ConnectedAccountSelect, ConnectedAccountFilter, never> & {
+      FindFirstArgs<ConnectedAccountSelect, ConnectedAccountFilter> & {
         select: ConnectedAccountSelect;
       }
     >(argv, defaultSelect);

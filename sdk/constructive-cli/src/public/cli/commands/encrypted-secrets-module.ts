@@ -83,7 +83,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         EncryptedSecretsModuleSelect,
         EncryptedSecretsModuleFilter,
-        never,
         EncryptedSecretsModuleOrderBy
       > & {
         select: EncryptedSecretsModuleSelect;
@@ -110,7 +109,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tableName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<EncryptedSecretsModuleSelect, EncryptedSecretsModuleFilter, never> & {
+      FindFirstArgs<EncryptedSecretsModuleSelect, EncryptedSecretsModuleFilter> & {
         select: EncryptedSecretsModuleSelect;
       }
     >(argv, defaultSelect);

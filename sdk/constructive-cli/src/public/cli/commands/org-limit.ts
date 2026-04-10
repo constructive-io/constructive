@@ -82,7 +82,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       entityId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<OrgLimitSelect, OrgLimitFilter, never, OrgLimitOrderBy> & {
+      FindManyArgs<OrgLimitSelect, OrgLimitFilter, OrgLimitOrderBy> & {
         select: OrgLimitSelect;
       }
     >(argv, defaultSelect);
@@ -108,7 +108,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       entityId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgLimitSelect, OrgLimitFilter, never> & {
+      FindFirstArgs<OrgLimitSelect, OrgLimitFilter> & {
         select: OrgLimitSelect;
       }
     >(argv, defaultSelect);

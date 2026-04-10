@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class IndexModel {
   constructor(private client: OrmClient) {}
   findMany<S extends IndexSelect>(
-    args: FindManyArgs<S, IndexFilter, never, IndexOrderBy> & {
+    args: FindManyArgs<S, IndexFilter, IndexOrderBy> & {
       select: S;
     } & StrictSelect<S, IndexSelect>
   ): QueryBuilder<{

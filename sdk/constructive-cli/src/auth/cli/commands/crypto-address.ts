@@ -84,7 +84,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<CryptoAddressSelect, CryptoAddressFilter, never, CryptoAddressOrderBy> & {
+      FindManyArgs<CryptoAddressSelect, CryptoAddressFilter, CryptoAddressOrderBy> & {
         select: CryptoAddressSelect;
       }
     >(argv, defaultSelect);
@@ -111,7 +111,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<CryptoAddressSelect, CryptoAddressFilter, never> & {
+      FindFirstArgs<CryptoAddressSelect, CryptoAddressFilter> & {
         select: CryptoAddressSelect;
       }
     >(argv, defaultSelect);

@@ -78,7 +78,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       joinOrder: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<ViewTableSelect, ViewTableFilter, never, ViewTableOrderBy> & {
+      FindManyArgs<ViewTableSelect, ViewTableFilter, ViewTableOrderBy> & {
         select: ViewTableSelect;
       }
     >(argv, defaultSelect);
@@ -102,7 +102,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       joinOrder: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<ViewTableSelect, ViewTableFilter, never> & {
+      FindFirstArgs<ViewTableSelect, ViewTableFilter> & {
         select: ViewTableSelect;
       }
     >(argv, defaultSelect);

@@ -84,12 +84,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isGrant: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        DefaultPrivilegeSelect,
-        DefaultPrivilegeFilter,
-        never,
-        DefaultPrivilegeOrderBy
-      > & {
+      FindManyArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, DefaultPrivilegeOrderBy> & {
         select: DefaultPrivilegeSelect;
       }
     >(argv, defaultSelect);
@@ -116,7 +111,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isGrant: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter, never> & {
+      FindFirstArgs<DefaultPrivilegeSelect, DefaultPrivilegeFilter> & {
         select: DefaultPrivilegeSelect;
       }
     >(argv, defaultSelect);

@@ -110,7 +110,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       cacheTtlSeconds: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<StorageModuleSelect, StorageModuleFilter, never, StorageModuleOrderBy> & {
+      FindManyArgs<StorageModuleSelect, StorageModuleFilter, StorageModuleOrderBy> & {
         select: StorageModuleSelect;
       }
     >(argv, defaultSelect);
@@ -150,7 +150,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       cacheTtlSeconds: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<StorageModuleSelect, StorageModuleFilter, never> & {
+      FindFirstArgs<StorageModuleSelect, StorageModuleFilter> & {
         select: StorageModuleSelect;
       }
     >(argv, defaultSelect);

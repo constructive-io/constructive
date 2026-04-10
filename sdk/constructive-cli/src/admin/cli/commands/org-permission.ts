@@ -80,7 +80,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       description: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<OrgPermissionSelect, OrgPermissionFilter, never, OrgPermissionOrderBy> & {
+      FindManyArgs<OrgPermissionSelect, OrgPermissionFilter, OrgPermissionOrderBy> & {
         select: OrgPermissionSelect;
       }
     >(argv, defaultSelect);
@@ -105,7 +105,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       description: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgPermissionSelect, OrgPermissionFilter, never> & {
+      FindFirstArgs<OrgPermissionSelect, OrgPermissionFilter> & {
         select: OrgPermissionSelect;
       }
     >(argv, defaultSelect);

@@ -80,7 +80,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<StoreSelect, StoreFilter, never, StoreOrderBy> & {
+      FindManyArgs<StoreSelect, StoreFilter, StoreOrderBy> & {
         select: StoreSelect;
       }
     >(argv, defaultSelect);
@@ -105,7 +105,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<StoreSelect, StoreFilter, never> & {
+      FindFirstArgs<StoreSelect, StoreFilter> & {
         select: StoreSelect;
       }
     >(argv, defaultSelect);
