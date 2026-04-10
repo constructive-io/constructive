@@ -83,7 +83,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         MembershipTypesModuleSelect,
         MembershipTypesModuleFilter,
-        never,
         MembershipTypesModuleOrderBy
       > & {
         select: MembershipTypesModuleSelect;
@@ -110,7 +109,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tableName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<MembershipTypesModuleSelect, MembershipTypesModuleFilter, never> & {
+      FindFirstArgs<MembershipTypesModuleSelect, MembershipTypesModuleFilter> & {
         select: MembershipTypesModuleSelect;
       }
     >(argv, defaultSelect);

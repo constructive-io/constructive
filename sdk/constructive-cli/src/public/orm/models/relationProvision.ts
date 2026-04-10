@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RelationProvisionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RelationProvisionSelect>(
-    args: FindManyArgs<S, RelationProvisionFilter, never, RelationProvisionOrderBy> & {
+    args: FindManyArgs<S, RelationProvisionFilter, RelationProvisionOrderBy> & {
       select: S;
     } & StrictSelect<S, RelationProvisionSelect>
   ): QueryBuilder<{

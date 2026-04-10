@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class RlsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends RlsModuleSelect>(
-    args: FindManyArgs<S, RlsModuleFilter, never, RlsModuleOrderBy> & {
+    args: FindManyArgs<S, RlsModuleFilter, RlsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, RlsModuleSelect>
   ): QueryBuilder<{

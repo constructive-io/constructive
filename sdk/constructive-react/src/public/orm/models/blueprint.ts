@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class BlueprintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends BlueprintSelect>(
-    args: FindManyArgs<S, BlueprintFilter, never, BlueprintOrderBy> & {
+    args: FindManyArgs<S, BlueprintFilter, BlueprintOrderBy> & {
       select: S;
     } & StrictSelect<S, BlueprintSelect>
   ): QueryBuilder<{

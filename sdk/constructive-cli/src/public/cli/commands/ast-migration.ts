@@ -90,7 +90,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       actorId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<AstMigrationSelect, AstMigrationFilter, never, AstMigrationOrderBy> & {
+      FindManyArgs<AstMigrationSelect, AstMigrationFilter, AstMigrationOrderBy> & {
         select: AstMigrationSelect;
       }
     >(argv, defaultSelect);
@@ -123,7 +123,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       actorId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<AstMigrationSelect, AstMigrationFilter, never> & {
+      FindFirstArgs<AstMigrationSelect, AstMigrationFilter> & {
         select: AstMigrationSelect;
       }
     >(argv, defaultSelect);

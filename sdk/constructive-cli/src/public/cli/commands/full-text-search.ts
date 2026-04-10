@@ -88,7 +88,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<FullTextSearchSelect, FullTextSearchFilter, never, FullTextSearchOrderBy> & {
+      FindManyArgs<FullTextSearchSelect, FullTextSearchFilter, FullTextSearchOrderBy> & {
         select: FullTextSearchSelect;
       }
     >(argv, defaultSelect);
@@ -117,7 +117,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<FullTextSearchSelect, FullTextSearchFilter, never> & {
+      FindFirstArgs<FullTextSearchSelect, FullTextSearchFilter> & {
         select: FullTextSearchSelect;
       }
     >(argv, defaultSelect);

@@ -104,12 +104,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       getMaskByName: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        PermissionsModuleSelect,
-        PermissionsModuleFilter,
-        never,
-        PermissionsModuleOrderBy
-      > & {
+      FindManyArgs<PermissionsModuleSelect, PermissionsModuleFilter, PermissionsModuleOrderBy> & {
         select: PermissionsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -146,7 +141,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       getMaskByName: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<PermissionsModuleSelect, PermissionsModuleFilter, never> & {
+      FindFirstArgs<PermissionsModuleSelect, PermissionsModuleFilter> & {
         select: PermissionsModuleSelect;
       }
     >(argv, defaultSelect);

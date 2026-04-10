@@ -98,7 +98,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<CheckConstraintSelect, CheckConstraintFilter, never, CheckConstraintOrderBy> & {
+      FindManyArgs<CheckConstraintSelect, CheckConstraintFilter, CheckConstraintOrderBy> & {
         select: CheckConstraintSelect;
       }
     >(argv, defaultSelect);
@@ -132,7 +132,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<CheckConstraintSelect, CheckConstraintFilter, never> & {
+      FindFirstArgs<CheckConstraintSelect, CheckConstraintFilter> & {
         select: CheckConstraintSelect;
       }
     >(argv, defaultSelect);

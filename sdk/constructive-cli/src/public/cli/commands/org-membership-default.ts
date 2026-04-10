@@ -91,7 +91,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         OrgMembershipDefaultSelect,
         OrgMembershipDefaultFilter,
-        never,
         OrgMembershipDefaultOrderBy
       > & {
         select: OrgMembershipDefaultSelect;
@@ -122,7 +121,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createGroupsCascadeMembers: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgMembershipDefaultSelect, OrgMembershipDefaultFilter, never> & {
+      FindFirstArgs<OrgMembershipDefaultSelect, OrgMembershipDefaultFilter> & {
         select: OrgMembershipDefaultSelect;
       }
     >(argv, defaultSelect);

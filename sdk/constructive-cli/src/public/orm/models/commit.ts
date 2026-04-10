@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class CommitModel {
   constructor(private client: OrmClient) {}
   findMany<S extends CommitSelect>(
-    args: FindManyArgs<S, CommitFilter, never, CommitOrderBy> & {
+    args: FindManyArgs<S, CommitFilter, CommitOrderBy> & {
       select: S;
     } & StrictSelect<S, CommitSelect>
   ): QueryBuilder<{

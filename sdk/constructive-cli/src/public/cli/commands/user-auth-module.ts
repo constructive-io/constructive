@@ -122,7 +122,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       extendTokenExpires: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<UserAuthModuleSelect, UserAuthModuleFilter, never, UserAuthModuleOrderBy> & {
+      FindManyArgs<UserAuthModuleSelect, UserAuthModuleFilter, UserAuthModuleOrderBy> & {
         select: UserAuthModuleSelect;
       }
     >(argv, defaultSelect);
@@ -168,7 +168,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       extendTokenExpires: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<UserAuthModuleSelect, UserAuthModuleFilter, never> & {
+      FindFirstArgs<UserAuthModuleSelect, UserAuthModuleFilter> & {
         select: UserAuthModuleSelect;
       }
     >(argv, defaultSelect);

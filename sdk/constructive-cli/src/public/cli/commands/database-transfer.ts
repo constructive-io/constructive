@@ -98,12 +98,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       completedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        DatabaseTransferSelect,
-        DatabaseTransferFilter,
-        never,
-        DatabaseTransferOrderBy
-      > & {
+      FindManyArgs<DatabaseTransferSelect, DatabaseTransferFilter, DatabaseTransferOrderBy> & {
         select: DatabaseTransferSelect;
       }
     >(argv, defaultSelect);
@@ -137,7 +132,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       completedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<DatabaseTransferSelect, DatabaseTransferFilter, never> & {
+      FindFirstArgs<DatabaseTransferSelect, DatabaseTransferFilter> & {
         select: DatabaseTransferSelect;
       }
     >(argv, defaultSelect);

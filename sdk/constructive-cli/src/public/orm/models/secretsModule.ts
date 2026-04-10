@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SecretsModuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SecretsModuleSelect>(
-    args: FindManyArgs<S, SecretsModuleFilter, never, SecretsModuleOrderBy> & {
+    args: FindManyArgs<S, SecretsModuleFilter, SecretsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, SecretsModuleSelect>
   ): QueryBuilder<{

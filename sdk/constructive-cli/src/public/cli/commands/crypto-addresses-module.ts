@@ -89,7 +89,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         CryptoAddressesModuleSelect,
         CryptoAddressesModuleFilter,
-        never,
         CryptoAddressesModuleOrderBy
       > & {
         select: CryptoAddressesModuleSelect;
@@ -119,7 +118,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       cryptoNetwork: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter, never> & {
+      FindFirstArgs<CryptoAddressesModuleSelect, CryptoAddressesModuleFilter> & {
         select: CryptoAddressesModuleSelect;
       }
     >(argv, defaultSelect);

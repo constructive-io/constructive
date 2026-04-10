@@ -80,7 +80,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       commitId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<RefSelect, RefFilter, never, RefOrderBy> & {
+      FindManyArgs<RefSelect, RefFilter, RefOrderBy> & {
         select: RefSelect;
       }
     >(argv, defaultSelect);
@@ -105,7 +105,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       commitId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<RefSelect, RefFilter, never> & {
+      FindFirstArgs<RefSelect, RefFilter> & {
         select: RefSelect;
       }
     >(argv, defaultSelect);

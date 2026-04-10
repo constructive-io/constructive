@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class SqlActionModel {
   constructor(private client: OrmClient) {}
   findMany<S extends SqlActionSelect>(
-    args: FindManyArgs<S, SqlActionFilter, never, SqlActionOrderBy> & {
+    args: FindManyArgs<S, SqlActionFilter, SqlActionOrderBy> & {
       select: S;
     } & StrictSelect<S, SqlActionSelect>
   ): QueryBuilder<{

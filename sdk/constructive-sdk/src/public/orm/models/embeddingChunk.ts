@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class EmbeddingChunkModel {
   constructor(private client: OrmClient) {}
   findMany<S extends EmbeddingChunkSelect>(
-    args: FindManyArgs<S, EmbeddingChunkFilter, never, EmbeddingChunkOrderBy> & {
+    args: FindManyArgs<S, EmbeddingChunkFilter, EmbeddingChunkOrderBy> & {
       select: S;
     } & StrictSelect<S, EmbeddingChunkSelect>
   ): QueryBuilder<{

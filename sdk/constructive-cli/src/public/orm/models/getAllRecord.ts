@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class GetAllRecordModel {
   constructor(private client: OrmClient) {}
   findMany<S extends GetAllRecordSelect>(
-    args: FindManyArgs<S, GetAllRecordFilter, never, GetAllRecordsOrderBy> & {
+    args: FindManyArgs<S, GetAllRecordFilter, GetAllRecordsOrderBy> & {
       select: S;
     } & StrictSelect<S, GetAllRecordSelect>
   ): QueryBuilder<{

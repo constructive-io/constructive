@@ -80,7 +80,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       max: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<AppLimitSelect, AppLimitFilter, never, AppLimitOrderBy> & {
+      FindManyArgs<AppLimitSelect, AppLimitFilter, AppLimitOrderBy> & {
         select: AppLimitSelect;
       }
     >(argv, defaultSelect);
@@ -105,7 +105,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       max: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<AppLimitSelect, AppLimitFilter, never> & {
+      FindFirstArgs<AppLimitSelect, AppLimitFilter> & {
         select: AppLimitSelect;
       }
     >(argv, defaultSelect);

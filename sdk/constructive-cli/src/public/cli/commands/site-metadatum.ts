@@ -82,7 +82,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       ogImage: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<SiteMetadatumSelect, SiteMetadatumFilter, never, SiteMetadatumOrderBy> & {
+      FindManyArgs<SiteMetadatumSelect, SiteMetadatumFilter, SiteMetadatumOrderBy> & {
         select: SiteMetadatumSelect;
       }
     >(argv, defaultSelect);
@@ -108,7 +108,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       ogImage: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<SiteMetadatumSelect, SiteMetadatumFilter, never> & {
+      FindFirstArgs<SiteMetadatumSelect, SiteMetadatumFilter> & {
         select: SiteMetadatumSelect;
       }
     >(argv, defaultSelect);

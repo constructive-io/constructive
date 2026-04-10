@@ -107,7 +107,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         SecureTableProvisionSelect,
         SecureTableProvisionFilter,
-        never,
         SecureTableProvisionOrderBy
       > & {
         select: SecureTableProvisionSelect;
@@ -146,7 +145,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       outFields: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<SecureTableProvisionSelect, SecureTableProvisionFilter, never> & {
+      FindFirstArgs<SecureTableProvisionSelect, SecureTableProvisionFilter> & {
         select: SecureTableProvisionSelect;
       }
     >(argv, defaultSelect);

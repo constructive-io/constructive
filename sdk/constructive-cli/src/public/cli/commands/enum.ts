@@ -94,7 +94,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       tags: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<EnumSelect, EnumFilter, never, EnumOrderBy> & {
+      FindManyArgs<EnumSelect, EnumFilter, EnumOrderBy> & {
         select: EnumSelect;
       }
     >(argv, defaultSelect);
@@ -126,7 +126,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       tags: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<EnumSelect, EnumFilter, never> & {
+      FindFirstArgs<EnumSelect, EnumFilter> & {
         select: EnumSelect;
       }
     >(argv, defaultSelect);

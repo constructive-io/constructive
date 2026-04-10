@@ -130,12 +130,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       outTargetFieldId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        RelationProvisionSelect,
-        RelationProvisionFilter,
-        never,
-        RelationProvisionOrderBy
-      > & {
+      FindManyArgs<RelationProvisionSelect, RelationProvisionFilter, RelationProvisionOrderBy> & {
         select: RelationProvisionSelect;
       }
     >(argv, defaultSelect);
@@ -185,7 +180,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       outTargetFieldId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<RelationProvisionSelect, RelationProvisionFilter, never> & {
+      FindFirstArgs<RelationProvisionSelect, RelationProvisionFilter> & {
         select: RelationProvisionSelect;
       }
     >(argv, defaultSelect);
