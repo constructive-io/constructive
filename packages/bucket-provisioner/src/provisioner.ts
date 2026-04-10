@@ -239,6 +239,10 @@ export class BucketProvisioner {
 
   /**
    * Configure S3 Block Public Access settings.
+   *
+   * Gracefully skips if the S3-compatible backend (e.g. MinIO) does not
+   * support PutPublicAccessBlock — the operation is best-effort since
+   * not all providers implement this AWS-specific API.
    */
   async setPublicAccessBlock(
     bucketName: string,
@@ -252,6 +256,20 @@ export class BucketProvisioner {
         }),
       );
     } catch (err: any) {
+      // Some S3-compatible backends (e.g. older MinIO) don't support
+      // PutPublicAccessBlock. Treat XML parse errors or "not implemented"
+      // responses as non-fatal — the bucket is still usable.
+      if (
+        err.Code === 'XmlParseException' ||
+        err.name === 'XmlParseException' ||
+        err.Code === 'NotImplemented' ||
+        err.name === 'NotImplemented' ||
+        err.message?.includes('not well-formed') ||
+        err.message?.includes('not implemented') ||
+        err.message?.includes('PublicAccessBlockConfiguration')
+      ) {
+        return;
+      }
       throw new ProvisionerError(
         'POLICY_FAILED',
         `Failed to set public access block on '${bucketName}': ${err.message}`,
