@@ -1672,7 +1672,7 @@ import type { ListSelectionConfig } from "../selection";
 import type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
 import type { FindManyArgs, InferSelectResult, ConnectionResult, HookStrictSelect } from "../../orm/select-types";
 export type { UserSelect, UserWithRelations, UserFilter, UsersOrderBy } from "../../orm/input-types";
-export const usersQueryKey = (variables?: FindManyArgs<unknown, UserFilter, never, UsersOrderBy>) => ["user", "list", variables] as const;
+export const usersQueryKey = (variables?: FindManyArgs<unknown, UserFilter, UsersOrderBy>) => ["user", "list", variables] as const;
 /**
  * Query hook for fetching User list
  * 

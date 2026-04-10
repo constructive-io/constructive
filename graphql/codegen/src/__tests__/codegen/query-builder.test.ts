@@ -123,15 +123,14 @@ function buildSelections(
   return fields;
 }
 
-function buildFindManyDocument<TSelect, TWhere, TCondition>(
+function buildFindManyDocument<TSelect, TWhere>(
   operationName: string,
   queryField: string,
   select: TSelect,
-  args: { where?: TWhere; condition?: TCondition; first?: number; orderBy?: string[] },
+  args: { where?: TWhere; first?: number; orderBy?: string[] },
   filterTypeName: string,
   orderByTypeName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
-  conditionTypeName?: string,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(
@@ -144,16 +143,6 @@ function buildFindManyDocument<TSelect, TWhere, TCondition>(
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
 
-  addVariable(
-    {
-      varName: 'condition',
-      typeName: conditionTypeName,
-      value: args.condition,
-    },
-    variableDefinitions,
-    queryArgs,
-    variables,
-  );
   addVariable(
     {
       varName: 'where',
@@ -568,36 +557,7 @@ describe('query-builder', () => {
       });
     });
 
-    it('includes condition variable when conditionTypeName is provided', () => {
-      const { document, variables } = buildFindManyDocument(
-        'Contacts',
-        'contacts',
-        { id: true, name: true },
-        {
-          condition: { embeddingNearby: { vector: [0.1, 0.2], metric: 'COSINE' } },
-          where: { name: { equalTo: 'test' } },
-          first: 5,
-        },
-        'ContactFilter',
-        'ContactsOrderBy',
-        undefined,
-        'ContactCondition',
-      );
-
-      // condition variable should appear in the query
-      expect(document).toContain('$condition: ContactCondition');
-      expect(document).toContain('condition: $condition');
-      // where should still work alongside condition
-      expect(document).toContain('$where: ContactFilter');
-      expect(document).toContain('where: $where');
-      // variables should include both
-      expect(variables.condition).toEqual({
-        embeddingNearby: { vector: [0.1, 0.2], metric: 'COSINE' },
-      });
-      expect(variables.where).toEqual({ name: { equalTo: 'test' } });
-    });
-
-    it('omits condition variable when not provided', () => {
+    it('does not include condition variable in generated queries', () => {
       const { document } = buildFindManyDocument(
         'Users',
         'users',
@@ -605,11 +565,9 @@ describe('query-builder', () => {
         { first: 10 },
         'UserFilter',
         'UsersOrderBy',
-        undefined,
-        'UserCondition',
       );
 
-      // condition should NOT appear since no value was provided
+      // condition should NOT appear in generated queries
       expect(document).not.toContain('$condition');
       expect(document).not.toContain('condition:');
     });

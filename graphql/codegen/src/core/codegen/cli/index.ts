@@ -78,12 +78,9 @@ export function generateCli(options: GenerateCliOptions): GenerateCliResult {
   const authFile = generateAuthCommand(toolName);
   files.push(authFile);
 
-  const conditionEnabled = config.codegen?.condition === true;
-
   for (const table of tables) {
     const tableFile = generateTableCommand(table, {
       typeRegistry: options.typeRegistry,
-      condition: conditionEnabled,
     });
     files.push(tableFile);
   }
@@ -146,8 +143,6 @@ export interface GenerateMultiTargetCliOptions {
   nodeHttpAdapter?: boolean;
   /** Generate a runnable index.ts entry point */
   entryPoint?: boolean;
-  /** Whether PostGraphile condition types are enabled (default: true) */
-  condition?: boolean;
 }
 
 export function resolveBuiltinNames(
@@ -175,7 +170,6 @@ export function generateMultiTargetCli(
   options: GenerateMultiTargetCliOptions,
 ): GenerateCliResult {
   const { toolName, targets } = options;
-  const conditionEnabled = options.condition === true;
   const files: GeneratedFile[] = [];
 
   const targetNames = targets.map((t) => t.name);
@@ -250,7 +244,6 @@ export function generateMultiTargetCli(
         targetName: target.name,
         executorImportPath: '../../executor',
         typeRegistry: target.typeRegistry,
-        condition: conditionEnabled,
       });
       files.push(tableFile);
     }

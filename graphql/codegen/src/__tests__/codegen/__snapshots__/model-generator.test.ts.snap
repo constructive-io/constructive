@@ -13,7 +13,7 @@ import type { User, UserWithRelations, UserSelect, UserFilter, UsersOrderBy, Cre
 import { connectionFieldsMap } from "../input-types";
 export class UserModel {
   constructor(private client: OrmClient) {}
-  findMany<S extends UserSelect>(args: FindManyArgs<S, UserFilter, never, UsersOrderBy> & {
+  findMany<S extends UserSelect>(args: FindManyArgs<S, UserFilter, UsersOrderBy> & {
     select: S;
   } & StrictSelect<S, UserSelect>): QueryBuilder<{
     users: ConnectionResult<InferSelectResult<UserWithRelations, S>>;
@@ -162,7 +162,7 @@ import type { AuditLog, AuditLogWithRelations, AuditLogSelect, AuditLogFilter, A
 import { connectionFieldsMap } from "../input-types";
 export class AuditLogModel {
   constructor(private client: OrmClient) {}
-  findMany<S extends AuditLogSelect>(args: FindManyArgs<S, AuditLogFilter, never, AuditLogsOrderBy> & {
+  findMany<S extends AuditLogSelect>(args: FindManyArgs<S, AuditLogFilter, AuditLogsOrderBy> & {
     select: S;
   } & StrictSelect<S, AuditLogSelect>): QueryBuilder<{
     auditLogs: ConnectionResult<InferSelectResult<AuditLogWithRelations, S>>;
@@ -265,7 +265,7 @@ import type { Organization, OrganizationWithRelations, OrganizationSelect, Organ
 import { connectionFieldsMap } from "../input-types";
 export class OrganizationModel {
   constructor(private client: OrmClient) {}
-  findMany<S extends OrganizationSelect>(args: FindManyArgs<S, OrganizationFilter, never, OrganizationsOrderBy> & {
+  findMany<S extends OrganizationSelect>(args: FindManyArgs<S, OrganizationFilter, OrganizationsOrderBy> & {
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
     allOrganizations: ConnectionResult<InferSelectResult<OrganizationWithRelations, S>>;

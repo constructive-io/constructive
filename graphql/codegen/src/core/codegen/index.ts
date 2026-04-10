@@ -190,15 +190,11 @@ export function generate(options: GenerateOptions): GenerateResult {
     hasInvalidation = true;
   }
 
-  // Condition types (PostGraphile simple equality filters)
-  const conditionEnabled = config.codegen?.condition === true;
-
   // 4. Generate table-based query hooks (queries/*.ts)
   const queryHooks = generateAllQueryHooks(tables, {
     reactQueryEnabled,
     useCentralizedKeys,
     hasRelationships,
-    condition: conditionEnabled,
   });
   for (const hook of queryHooks) {
     files.push({
