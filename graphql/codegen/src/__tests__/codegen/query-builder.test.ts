@@ -123,6 +123,35 @@ function buildSelections(
   return fields;
 }
 
+function conditionToFilter(
+  condition: Record<string, unknown>,
+): Record<string, unknown> {
+  const filter: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(condition)) {
+    if (value === undefined) continue;
+    if (value === null) {
+      filter[key] = { isNull: true };
+    } else {
+      filter[key] = { equalTo: value };
+    }
+  }
+  return filter;
+}
+
+function mergeConditionIntoWhere(
+  where: Record<string, unknown> | undefined,
+  condition: Record<string, unknown> | undefined,
+): Record<string, unknown> | undefined {
+  if (!condition || Object.keys(condition).length === 0) {
+    return where;
+  }
+  const converted = conditionToFilter(condition);
+  if (!where || Object.keys(where).length === 0) {
+    return converted;
+  }
+  return { ...where, ...converted };
+}
+
 function buildFindManyDocument<TSelect, TWhere, TCondition>(
   operationName: string,
   queryField: string,
@@ -144,21 +173,15 @@ function buildFindManyDocument<TSelect, TWhere, TCondition>(
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
 
-  addVariable(
-    {
-      varName: 'condition',
-      typeName: conditionTypeName,
-      value: args.condition,
-    },
-    variableDefinitions,
-    queryArgs,
-    variables,
+  const mergedWhere = mergeConditionIntoWhere(
+    args.where as Record<string, unknown> | undefined,
+    args.condition as Record<string, unknown> | undefined,
   );
   addVariable(
     {
       varName: 'where',
       typeName: filterTypeName,
-      value: args.where,
+      value: mergedWhere,
     },
     variableDefinitions,
     queryArgs,
@@ -568,14 +591,41 @@ describe('query-builder', () => {
       });
     });
 
-    it('includes condition variable when conditionTypeName is provided', () => {
+    it('merges condition into where as equality filters', () => {
+      const { document, variables } = buildFindManyDocument(
+        'Documents',
+        'documents',
+        { id: true, title: true },
+        {
+          condition: { title: 'Financial', category: 'legal' },
+          first: 5,
+        },
+        'DocumentFilter',
+        'DocumentsOrderBy',
+        undefined,
+        'DocumentCondition',
+      );
+
+      // condition should NOT appear as a separate variable
+      expect(document).not.toContain('$condition');
+      expect(document).not.toContain('DocumentCondition');
+      // should be merged into where
+      expect(document).toContain('$where: DocumentFilter');
+      expect(document).toContain('where: $where');
+      expect(variables.where).toEqual({
+        title: { equalTo: 'Financial' },
+        category: { equalTo: 'legal' },
+      });
+    });
+
+    it('merges condition with existing where filters', () => {
       const { document, variables } = buildFindManyDocument(
         'Contacts',
         'contacts',
         { id: true, name: true },
         {
-          condition: { embeddingNearby: { vector: [0.1, 0.2], metric: 'COSINE' } },
-          where: { name: { equalTo: 'test' } },
+          condition: { status: 'active' },
+          where: { name: { startsWith: 'Acme' } },
           first: 5,
         },
         'ContactFilter',
@@ -584,17 +634,34 @@ describe('query-builder', () => {
         'ContactCondition',
       );
 
-      // condition variable should appear in the query
-      expect(document).toContain('$condition: ContactCondition');
-      expect(document).toContain('condition: $condition');
-      // where should still work alongside condition
+      // condition should NOT appear as a separate variable
+      expect(document).not.toContain('$condition');
+      expect(document).not.toContain('ContactCondition');
+      // merged where should contain both
       expect(document).toContain('$where: ContactFilter');
-      expect(document).toContain('where: $where');
-      // variables should include both
-      expect(variables.condition).toEqual({
-        embeddingNearby: { vector: [0.1, 0.2], metric: 'COSINE' },
+      expect(variables.where).toEqual({
+        name: { startsWith: 'Acme' },
+        status: { equalTo: 'active' },
       });
-      expect(variables.where).toEqual({ name: { equalTo: 'test' } });
+    });
+
+    it('converts null condition values to isNull filters', () => {
+      const { variables } = buildFindManyDocument(
+        'Users',
+        'users',
+        { id: true },
+        {
+          condition: { deletedAt: null },
+        },
+        'UserFilter',
+        'UsersOrderBy',
+        undefined,
+        'UserCondition',
+      );
+
+      expect(variables.where).toEqual({
+        deletedAt: { isNull: true },
+      });
     });
 
     it('omits condition variable when not provided', () => {
@@ -612,6 +679,8 @@ describe('query-builder', () => {
       // condition should NOT appear since no value was provided
       expect(document).not.toContain('$condition');
       expect(document).not.toContain('condition:');
+      // where should also not appear since no where was provided
+      expect(document).not.toContain('$where');
     });
   });
 

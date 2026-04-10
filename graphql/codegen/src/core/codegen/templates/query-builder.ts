@@ -232,21 +232,19 @@ export function buildFindManyDocument<TSelect, TWhere, TCondition = never>(
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
 
-  addVariable(
-    {
-      varName: 'condition',
-      typeName: conditionTypeName,
-      value: args.condition,
-    },
-    variableDefinitions,
-    queryArgs,
-    variables,
+  // Merge condition values into where as equality filters.
+  // This avoids depending on PgConditionArgumentPlugin (which generates
+  // *Condition input types) and routes everything through the
+  // always-available connection-filter `where` argument instead.
+  const mergedWhere = mergeConditionIntoWhere(
+    args.where as Record<string, unknown> | undefined,
+    args.condition as Record<string, unknown> | undefined,
   );
   addVariable(
     {
       varName: 'where',
       typeName: filterTypeName,
-      value: args.where,
+      value: mergedWhere,
     },
     variableDefinitions,
     queryArgs,
@@ -347,21 +345,16 @@ export function buildFindFirstDocument<TSelect, TWhere, TCondition = never>(
     queryArgs,
     variables,
   );
-  addVariable(
-    {
-      varName: 'condition',
-      typeName: conditionTypeName,
-      value: args.condition,
-    },
-    variableDefinitions,
-    queryArgs,
-    variables,
+  // Merge condition values into where as equality filters
+  const mergedWhere = mergeConditionIntoWhere(
+    args.where as Record<string, unknown> | undefined,
+    args.condition as Record<string, unknown> | undefined,
   );
   addVariable(
     {
       varName: 'where',
       typeName: filterTypeName,
-      value: args.where,
+      value: mergedWhere,
     },
     variableDefinitions,
     queryArgs,
@@ -838,6 +831,53 @@ interface VariableSpec {
   argName?: string;
   typeName?: string;
   value: unknown;
+}
+
+/**
+ * Convert condition (exact equality) values to connection-filter format.
+ *
+ * The ORM exposes a simple `condition` API for equality matching:
+ *   condition: { title: "Financial", status: null }
+ *
+ * This converts each field to the filter operator format used by
+ * graphile-connection-filter's `where` argument:
+ *   { title: { equalTo: "Financial" }, status: { isNull: true } }
+ *
+ * This allows `condition` to work regardless of whether PostGraphile's
+ * PgConditionArgumentPlugin is enabled, since the values are routed
+ * through the always-available `where` (filter) argument instead.
+ */
+function conditionToFilter(
+  condition: Record<string, unknown>,
+): Record<string, unknown> {
+  const filter: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(condition)) {
+    if (value === undefined) continue;
+    if (value === null) {
+      filter[key] = { isNull: true };
+    } else {
+      filter[key] = { equalTo: value };
+    }
+  }
+  return filter;
+}
+
+/**
+ * Merge condition values (converted to filter equality format) into
+ * the existing where/filter object.
+ */
+function mergeConditionIntoWhere(
+  where: Record<string, unknown> | undefined,
+  condition: Record<string, unknown> | undefined,
+): Record<string, unknown> | undefined {
+  if (!condition || Object.keys(condition).length === 0) {
+    return where;
+  }
+  const converted = conditionToFilter(condition);
+  if (!where || Object.keys(where).length === 0) {
+    return converted;
+  }
+  return { ...where, ...converted };
 }
 
 interface InputMutationConfig {
