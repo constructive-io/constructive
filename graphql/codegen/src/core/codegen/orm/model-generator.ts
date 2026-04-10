@@ -171,10 +171,9 @@ function strictSelectGuard(selectTypeName: string): t.TSType {
 export function generateModelFile(
   table: Table,
   _useSharedTypes: boolean,
-  options?: { condition?: boolean },
+  options?: Record<string, never>,
   allTables?: Table[],
 ): GeneratedModelFile {
-  const conditionEnabled = options?.condition === true;
   const { typeName, singularName, pluralName } = getTableNames(table);
   const modelName = `${typeName}Model`;
   const baseFileName = lcFirst(typeName);
@@ -185,7 +184,6 @@ export function generateModelFile(
   const selectTypeName = `${typeName}Select`;
   const relationTypeName = `${typeName}WithRelations`;
   const whereTypeName = getFilterTypeName(table);
-  const conditionTypeName = conditionEnabled ? `${typeName}Condition` : undefined;
   const orderByTypeName = getOrderByTypeName(table);
   const createInputTypeName = `Create${typeName}Input`;
   const updateInputTypeName = `Update${typeName}Input`;
@@ -248,7 +246,6 @@ export function generateModelFile(
     relationTypeName,
     selectTypeName,
     whereTypeName,
-    ...(conditionTypeName ? [conditionTypeName] : []),
     orderByTypeName,
     createInputTypeName,
     updateInputTypeName,
@@ -292,9 +289,6 @@ export function generateModelFile(
     const findManyTypeArgs: Array<(sel: t.TSType) => t.TSType> = [
       (sel: t.TSType) => sel,
       () => t.tsTypeReference(t.identifier(whereTypeName)),
-      conditionTypeName
-        ? () => t.tsTypeReference(t.identifier(conditionTypeName))
-        : () => t.tsNeverKeyword(),
       () => t.tsTypeReference(t.identifier(orderByTypeName)),
     ];
     const argsType = (sel: t.TSType) =>
@@ -354,19 +348,6 @@ export function generateModelFile(
           true,
         ),
       ),
-      ...(conditionTypeName
-        ? [
-            t.objectProperty(
-              t.identifier('condition'),
-              t.optionalMemberExpression(
-                t.identifier('args'),
-                t.identifier('condition'),
-                false,
-                true,
-              ),
-            ),
-          ]
-        : []),
       t.objectProperty(
         t.identifier('orderBy'),
           t.tsAsExpression(
@@ -436,9 +417,6 @@ export function generateModelFile(
       t.stringLiteral(whereTypeName),
       t.stringLiteral(orderByTypeName),
       t.identifier('connectionFieldsMap'),
-      ...(conditionTypeName
-        ? [t.stringLiteral(conditionTypeName)]
-        : []),
     ];
     classBody.push(
       createClassMethod(
@@ -462,9 +440,6 @@ export function generateModelFile(
     const findFirstTypeArgs: Array<(sel: t.TSType) => t.TSType> = [
       (sel: t.TSType) => sel,
       () => t.tsTypeReference(t.identifier(whereTypeName)),
-      ...(conditionTypeName
-        ? [() => t.tsTypeReference(t.identifier(conditionTypeName))]
-        : []),
     ];
     const argsType = (sel: t.TSType) =>
       t.tsTypeReference(
@@ -527,19 +502,6 @@ export function generateModelFile(
           true,
         ),
       ),
-      ...(conditionTypeName
-        ? [
-            t.objectProperty(
-              t.identifier('condition'),
-              t.optionalMemberExpression(
-                t.identifier('args'),
-                t.identifier('condition'),
-                false,
-                true,
-              ),
-            ),
-          ]
-        : []),
     ];
     const bodyArgs = [
       t.stringLiteral(typeName),
@@ -548,9 +510,6 @@ export function generateModelFile(
       t.objectExpression(findFirstObjProps),
       t.stringLiteral(whereTypeName),
       t.identifier('connectionFieldsMap'),
-      ...(conditionTypeName
-        ? [t.stringLiteral(conditionTypeName)]
-        : []),
     ];
     classBody.push(
       createClassMethod(
@@ -1203,7 +1162,6 @@ export function generateModelFile(
 export function generateAllModelFiles(
   tables: Table[],
   useSharedTypes: boolean,
-  options?: { condition?: boolean },
 ): GeneratedModelFile[] {
-  return tables.map((table) => generateModelFile(table, useSharedTypes, options, tables));
+  return tables.map((table) => generateModelFile(table, useSharedTypes, undefined, tables));
 }
