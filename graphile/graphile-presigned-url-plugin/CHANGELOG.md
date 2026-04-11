@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.4.0...graphile-presigned-url-plugin@0.4.1) (2026-04-11)
+
+### Bug Fixes
+
+- use @dataplan/pg query object format and withTransaction for presigned URL plugin ([1a55e6a](https://github.com/constructive-io/constructive/commit/1a55e6aa0856c589c7d6e0ca8c8b339736e029da))
+
 # [0.4.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.3.0...graphile-presigned-url-plugin@0.4.0) (2026-04-09)
 
 ### Bug Fixes
