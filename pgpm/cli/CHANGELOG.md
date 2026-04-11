@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.14.0](https://github.com/constructive-io/constructive/compare/pgpm@4.13.0...pgpm@4.14.0) (2026-04-11)
+
+### Bug Fixes
+
+- **pgpm:** update display.ts docker help text to use --minio instead of --include ([3b405cb](https://github.com/constructive-io/constructive/commit/3b405cbfac7cddb0b73ee3adc1276098acaa5e05))
+
+### Features
+
+- **pgpm:** replace --include with --minio flag for docker command ([44c1507](https://github.com/constructive-io/constructive/commit/44c1507e0241997d31d4845c104cac7e98d708c2))
+
 # [4.13.0](https://github.com/constructive-io/constructive/compare/pgpm@4.12.0...pgpm@4.13.0) (2026-04-11)
 
 ### Features
