@@ -40,7 +40,7 @@ export const usageText = `
   
   Development Tools:
     docker             Manage Docker containers (start/stop/ls, --include for additional services)
-    env                Manage PostgreSQL environment variables
+    env                Manage environment variables (--supabase, --minio)
     test-packages      Run integration tests on workspace packages
   
   Global Options:

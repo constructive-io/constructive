@@ -7,11 +7,14 @@ Environment Command:
 
   pgpm env [OPTIONS] [COMMAND...]
 
-  Manage PostgreSQL environment variables with profile support.
+  Manage environment variables for local development with profile support.
 
-Profiles:
+Database Profiles:
   (default)          Use local Postgres development profile
   --supabase         Use Supabase local development profile
+
+Additional Services:
+  --minio            Include MinIO/S3 environment variables
 
 Modes:
   No command         Print export statements for shell evaluation
@@ -20,16 +23,18 @@ Modes:
 Options:
   --help, -h         Show this help message
   --supabase         Use Supabase profile instead of default Postgres
+  --minio            Include CDN_ENDPOINT, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
 
 Examples:
   pgpm env                                    Print default Postgres env exports
   pgpm env --supabase                         Print Supabase env exports
+  pgpm env --minio                            Print Postgres + MinIO env exports
+  pgpm env --supabase --minio                 Print Supabase + MinIO env exports
   eval "$(pgpm env)"                          Load default Postgres env into shell
-  eval "$(pgpm env --supabase)"               Load Supabase env into shell
+  eval "$(pgpm env --minio)"                  Load Postgres + MinIO env into shell
+  eval "$(pgpm env --supabase --minio)"       Load Supabase + MinIO env into shell
   pgpm env pgpm deploy --database db1         Run command with default Postgres env
-  pgpm env createdb mydb                      Run command with default Postgres env
-  pgpm env --supabase pgpm deploy --database db1 Run command with Supabase env
-  pgpm env --supabase createdb mydb           Run command with Supabase env
+  pgpm env --minio pgpm deploy --database db1 Run command with Postgres + MinIO env
 `;
 
 const SUPABASE_PROFILE: PgConfig = {
@@ -44,26 +49,49 @@ const DEFAULT_PROFILE: PgConfig = {
   ...defaultPgConfig
 };
 
-function configToEnvVars(config: PgConfig): Record<string, string> {
-  return {
+interface MinioConfig {
+  endpoint: string;
+  accessKey: string;
+  secretKey: string;
+  region: string;
+}
+
+const MINIO_PROFILE: MinioConfig = {
+  endpoint: 'http://localhost:9000',
+  accessKey: 'minioadmin',
+  secretKey: 'minioadmin',
+  region: 'us-east-1',
+};
+
+function configToEnvVars(config: PgConfig, minio?: MinioConfig): Record<string, string> {
+  const vars: Record<string, string> = {
     PGHOST: config.host,
     PGPORT: String(config.port),
     PGUSER: config.user,
     PGPASSWORD: config.password,
     PGDATABASE: config.database
   };
+
+  if (minio) {
+    vars.CDN_ENDPOINT = minio.endpoint;
+    vars.AWS_ACCESS_KEY = minio.accessKey;
+    vars.AWS_SECRET_KEY = minio.secretKey;
+    vars.AWS_REGION = minio.region;
+  }
+
+  return vars;
 }
 
-function printExports(config: PgConfig): void {
-  const envVars = configToEnvVars(config);
+function printExports(config: PgConfig, minio?: MinioConfig): void {
+  const envVars = configToEnvVars(config, minio);
   for (const [key, value] of Object.entries(envVars)) {
     console.log(`export ${key}=${value}`);
   }
 }
 
-function executeCommand(config: PgConfig, command: string, args: string[]): Promise<number> {
+function executeCommand(config: PgConfig, command: string, args: string[], minio?: MinioConfig): Promise<number> {
   return new Promise((resolve, reject) => {
-    const envVars = configToEnvVars(config);
+    const envVars = configToEnvVars(config, minio);
     const env = {
       ...process.env,
       ...envVars
@@ -95,7 +123,11 @@ export default async (
   }
 
   const useSupabase = argv.supabase === true || typeof argv.supabase === 'string';
+  const useMinio = argv.minio === true || typeof argv.minio === 'string';
   const profile = useSupabase ? SUPABASE_PROFILE : DEFAULT_PROFILE;
+  const minioProfile = useMinio ? MINIO_PROFILE : undefined;
+
+  const knownFlags = ['--supabase', '--minio'];
 
   const rawArgs = process.argv.slice(2);
   
@@ -106,14 +138,7 @@ export default async (
   
   const argsAfterEnv = rawArgs.slice(envIndex + 1);
   
-  const supabaseIndex = argsAfterEnv.findIndex(arg => arg === '--supabase');
-  
-  let commandArgs: string[];
-  if (supabaseIndex !== -1) {
-    commandArgs = argsAfterEnv.slice(supabaseIndex + 1);
-  } else {
-    commandArgs = argsAfterEnv;
-  }
+  let commandArgs = argsAfterEnv.filter(arg => !knownFlags.includes(arg));
   
   commandArgs = commandArgs.filter(arg => arg !== '--cwd' && !arg.startsWith('--cwd='));
   
@@ -123,14 +148,14 @@ export default async (
   }
 
   if (commandArgs.length === 0) {
-    printExports(profile);
+    printExports(profile, minioProfile);
     return;
   }
 
   const [command, ...args] = commandArgs;
   
   try {
-    const exitCode = await executeCommand(profile, command, args);
+    const exitCode = await executeCommand(profile, command, args, minioProfile);
     process.exit(exitCode);
   } catch (error) {
     if (error instanceof Error) {
