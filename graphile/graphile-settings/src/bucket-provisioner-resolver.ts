@@ -29,8 +29,22 @@ export function getBucketProvisionerConnection(): StorageConnectionConfig {
 
   const { cdn } = getEnvOptions();
 
-  // cdn is guaranteed populated — pgpmDefaults provides all CDN fields
-  const { provider, awsRegion, awsAccessKey, awsSecretKey, endpoint } = cdn!;
+  if (!cdn) {
+    throw new Error(
+      '[bucket-provisioner-resolver] CDN config not found. ' +
+      'Ensure CDN environment variables (AWS_ACCESS_KEY, AWS_SECRET_KEY, etc.) ' +
+      'are set or that pgpmDefaults provides CDN fields.',
+    );
+  }
+
+  const { provider, awsRegion, awsAccessKey, awsSecretKey, endpoint } = cdn;
+
+  if (!awsAccessKey || !awsSecretKey) {
+    throw new Error(
+      '[bucket-provisioner-resolver] Missing S3 credentials. ' +
+      'Set AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.',
+    );
+  }
 
   log.info(
     `[bucket-provisioner-resolver] Initializing: provider=${provider} endpoint=${endpoint}`,
@@ -39,8 +53,8 @@ export function getBucketProvisionerConnection(): StorageConnectionConfig {
   connectionConfig = {
     provider: (provider as StorageConnectionConfig['provider']) || 'minio',
     region: awsRegion || 'us-east-1',
-    accessKeyId: awsAccessKey!,
-    secretAccessKey: awsSecretKey!,
+    accessKeyId: awsAccessKey,
+    secretAccessKey: awsSecretKey,
     ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
   };
 
