@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.13.0](https://github.com/constructive-io/constructive/compare/pgpm@4.12.0...pgpm@4.13.0) (2026-04-11)
+
+### Features
+
+- **pgpm:** add --minio flag to pgpm env for CDN/S3 environment variables ([ddeae21](https://github.com/constructive-io/constructive/commit/ddeae21d8fddca8b31f1f3bdca1b29078131077a))
+
 # [4.12.0](https://github.com/constructive-io/constructive/compare/pgpm@4.11.1...pgpm@4.12.0) (2026-04-11)
 
 ### Features
