@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.12.0](https://github.com/constructive-io/constructive/compare/pgpm@4.11.1...pgpm@4.12.0) (2026-04-11)
+
+### Features
+
+- **pgpm:** add --include flag for additional Docker services (minio) ([693c26a](https://github.com/constructive-io/constructive/commit/693c26a4b0d015aacf9073f17306cd8c72efcef8))
+- **pgpm:** add named volume support for additional services ([46961a2](https://github.com/constructive-io/constructive/commit/46961a266b28271e6bbe17ff4f5c01bf6b53e15a))
+
 ## [4.11.1](https://github.com/constructive-io/constructive/compare/pgpm@4.11.0...pgpm@4.11.1) (2026-04-11)
 
 **Note:** Version bump only for package pgpm
