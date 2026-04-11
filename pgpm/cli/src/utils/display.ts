@@ -39,7 +39,7 @@ export const usageText = `
       deps             Show change dependencies
   
   Development Tools:
-    docker             Manage Docker containers (start/stop/ls, --include for additional services)
+    docker             Manage Docker containers (start/stop/ls, --minio)
     env                Manage environment variables (--supabase, --minio)
     test-packages      Run integration tests on workspace packages
   
