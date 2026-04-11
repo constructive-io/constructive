@@ -6,28 +6,41 @@ Docker Command:
 
   pgpm docker <subcommand> [OPTIONS]
 
-  Manage PostgreSQL Docker containers for local development.
+  Manage Docker containers for local development.
+  PostgreSQL is always started by default. Additional services can be
+  included with the --include flag.
 
 Subcommands:
-  start              Start PostgreSQL container
-  stop               Stop PostgreSQL container
+  start              Start containers
+  stop               Stop containers
+  ls                 List available services and their status
 
-Options:
-  --help, -h         Show this help message
+PostgreSQL Options:
   --name <name>      Container name (default: postgres)
   --image <image>    Docker image (default: constructiveio/postgres-plus:18)
   --port <port>      Host port mapping (default: 5432)
   --user <user>      PostgreSQL user (default: postgres)
   --password <pass>  PostgreSQL password (default: password)
   --shm-size <size>  Shared memory size for container (default: 2g)
-  --recreate         Remove and recreate container on start
+
+General Options:
+  --help, -h         Show this help message
+  --recreate         Remove and recreate containers on start
+  --include <svc>    Include additional service (can be repeated)
+
+Available Additional Services:
+  minio              MinIO S3-compatible object storage (port 9000)
 
 Examples:
-  pgpm docker start                           Start default PostgreSQL container
+  pgpm docker start                           Start PostgreSQL only
+  pgpm docker start --include minio           Start PostgreSQL + MinIO
   pgpm docker start --port 5433               Start on custom port
   pgpm docker start --shm-size 4g             Start with 4GB shared memory
-  pgpm docker start --recreate                Remove and recreate container
-  pgpm docker stop                            Stop PostgreSQL container
+  pgpm docker start --recreate                Remove and recreate containers
+  pgpm docker start --recreate --include minio Recreate PostgreSQL + MinIO
+  pgpm docker stop                            Stop PostgreSQL
+  pgpm docker stop --include minio            Stop PostgreSQL + MinIO
+  pgpm docker ls                              List services and status
 `;
 
 interface DockerRunOptions {
@@ -39,6 +52,39 @@ interface DockerRunOptions {
   shmSize: string;
   recreate?: boolean;
 }
+
+interface PortMapping {
+  host: number;
+  container: number;
+}
+
+interface VolumeMapping {
+  name: string;
+  containerPath: string;
+}
+
+interface ServiceDefinition {
+  name: string;
+  image: string;
+  ports: PortMapping[];
+  env: Record<string, string>;
+  command?: string[];
+  volumes?: VolumeMapping[];
+}
+
+const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
+  minio: {
+    name: 'minio',
+    image: 'minio/minio',
+    ports: [{ host: 9000, container: 9000 }],
+    env: {
+      MINIO_ACCESS_KEY: 'minioadmin',
+      MINIO_SECRET_KEY: 'minioadmin',
+    },
+    command: ['server', '/data'],
+    volumes: [{ name: 'minio-data', containerPath: '/data' }],
+  },
+};
 
 interface SpawnResult {
   code: number;
@@ -196,6 +242,131 @@ async function stopContainer(name: string): Promise<void> {
   }
 }
 
+async function startService(service: ServiceDefinition, recreate: boolean): Promise<void> {
+  const { name, image, ports, env: serviceEnv, command } = service;
+
+  const exists = await containerExists(name);
+  const running = await isContainerRunning(name);
+
+  if (running === true) {
+    console.log(`✅ Container "${name}" is already running`);
+    return;
+  }
+
+  if (recreate && exists) {
+    console.log(`🗑️  Removing existing container "${name}"...`);
+    const removeResult = await run('docker', ['rm', '-f', name], { stdio: 'inherit' });
+    if (removeResult.code !== 0) {
+      await cliExitWithError(`Failed to remove container "${name}"`);
+      return;
+    }
+  }
+
+  if (exists && running === false) {
+    console.log(`🔄 Starting existing container "${name}"...`);
+    const startResult = await run('docker', ['start', name], { stdio: 'inherit' });
+    if (startResult.code === 0) {
+      console.log(`✅ Container "${name}" started successfully`);
+    } else {
+      await cliExitWithError(`Failed to start container "${name}"`);
+    }
+    return;
+  }
+
+  console.log(`🚀 Creating and starting new container "${name}"...`);
+  const runArgs = [
+    'run',
+    '-d',
+    '--name', name,
+  ];
+
+  for (const [key, value] of Object.entries(serviceEnv)) {
+    runArgs.push('-e', `${key}=${value}`);
+  }
+
+  for (const portMapping of ports) {
+    runArgs.push('-p', `${portMapping.host}:${portMapping.container}`);
+  }
+
+  if (service.volumes) {
+    for (const vol of service.volumes) {
+      runArgs.push('-v', `${vol.name}:${vol.containerPath}`);
+    }
+  }
+
+  runArgs.push(image);
+
+  if (command) {
+    runArgs.push(...command);
+  }
+
+  const runResult = await run('docker', runArgs, { stdio: 'inherit' });
+  if (runResult.code === 0) {
+    console.log(`✅ Container "${name}" created and started successfully`);
+    const portInfo = ports.map(p => `localhost:${p.host}`).join(', ');
+    console.log(`📌 ${name} is available at ${portInfo}`);
+  } else {
+    const portInfo = ports.map(p => String(p.host)).join(', ');
+    await cliExitWithError(`Failed to create container "${name}". Check if port ${portInfo} is already in use.`);
+  }
+}
+
+async function stopService(service: ServiceDefinition): Promise<void> {
+  await stopContainer(service.name);
+}
+
+function parseInclude(args: Partial<Record<string, any>>): string[] {
+  const include = args.include;
+  if (!include) return [];
+  if (Array.isArray(include)) return include as string[];
+  if (typeof include === 'string') return [include];
+  return [];
+}
+
+function resolveIncludedServices(includeNames: string[]): ServiceDefinition[] {
+  const services: ServiceDefinition[] = [];
+  for (const name of includeNames) {
+    const service = ADDITIONAL_SERVICES[name];
+    if (!service) {
+      console.warn(`⚠️  Unknown service: "${name}". Available: ${Object.keys(ADDITIONAL_SERVICES).join(', ')}`);
+    } else {
+      services.push(service);
+    }
+  }
+  return services;
+}
+
+async function listServices(): Promise<void> {
+  const dockerAvailable = await checkDockerAvailable();
+
+  console.log('\nAvailable services:\n');
+  console.log('  Primary:');
+
+  if (dockerAvailable) {
+    const pgRunning = await isContainerRunning('postgres');
+    const pgStatus = pgRunning === true ? '\x1b[32mrunning\x1b[0m' : pgRunning === false ? '\x1b[33mstopped\x1b[0m' : '\x1b[90mnot created\x1b[0m';
+    console.log(`    postgres    constructiveio/postgres-plus:18    ${pgStatus}`);
+  } else {
+    console.log('    postgres    constructiveio/postgres-plus:18    \x1b[90m(docker not available)\x1b[0m');
+  }
+
+  console.log('\n  Additional (use --include <name>):');
+
+  for (const [key, service] of Object.entries(ADDITIONAL_SERVICES)) {
+    if (dockerAvailable) {
+      const running = await isContainerRunning(service.name);
+      const status = running === true ? '\x1b[32mrunning\x1b[0m' : running === false ? '\x1b[33mstopped\x1b[0m' : '\x1b[90mnot created\x1b[0m';
+      const portInfo = service.ports.map(p => String(p.host)).join(', ');
+      console.log(`    ${key.padEnd(12)}${service.image.padEnd(36)}${status}    port ${portInfo}`);
+    } else {
+      const portInfo = service.ports.map(p => String(p.host)).join(', ');
+      console.log(`    ${key.padEnd(12)}${service.image.padEnd(36)}\x1b[90m(docker not available)\x1b[0m    port ${portInfo}`);
+    }
+  }
+
+  console.log('');
+}
+
 export default async (
   argv: Partial<Record<string, any>>,
   _prompter: Inquirerer,
@@ -211,7 +382,7 @@ export default async (
 
   if (!subcommand) {
     console.log(dockerUsageText);
-    await cliExitWithError('No subcommand provided. Use "start" or "stop".');
+    await cliExitWithError('No subcommand provided. Use "start", "stop", or "ls".');
     return;
   }
   const name = (args.name as string) || 'postgres';
@@ -221,18 +392,30 @@ export default async (
   const password = (args.password as string) || 'password';
   const shmSize = (args['shm-size'] as string) || (args.shmSize as string) || '2g';
   const recreate = args.recreate === true;
+  const includeNames = parseInclude(args);
+  const includedServices = resolveIncludedServices(includeNames);
 
   switch (subcommand) {
   case 'start':
     await startContainer({ name, image, port, user, password, shmSize, recreate });
+    for (const service of includedServices) {
+      await startService(service, recreate);
+    }
     break;
 
   case 'stop':
     await stopContainer(name);
+    for (const service of includedServices) {
+      await stopService(service);
+    }
+    break;
+
+  case 'ls':
+    await listServices();
     break;
 
   default:
     console.log(dockerUsageText);
-    await cliExitWithError(`Unknown subcommand: ${subcommand}. Use "start" or "stop".`);
+    await cliExitWithError(`Unknown subcommand: ${subcommand}. Use "start", "stop", or "ls".`);
   }
 };
