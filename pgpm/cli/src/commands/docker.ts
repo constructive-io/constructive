@@ -7,8 +7,7 @@ Docker Command:
   pgpm docker <subcommand> [OPTIONS]
 
   Manage Docker containers for local development.
-  PostgreSQL is always started by default. Additional services can be
-  included with the --include flag.
+  PostgreSQL is always started by default.
 
 Subcommands:
   start              Start containers
@@ -23,23 +22,22 @@ PostgreSQL Options:
   --password <pass>  PostgreSQL password (default: password)
   --shm-size <size>  Shared memory size for container (default: 2g)
 
+Additional Services:
+  --minio            Include MinIO S3-compatible object storage (port 9000)
+
 General Options:
   --help, -h         Show this help message
   --recreate         Remove and recreate containers on start
-  --include <svc>    Include additional service (can be repeated)
-
-Available Additional Services:
-  minio              MinIO S3-compatible object storage (port 9000)
 
 Examples:
   pgpm docker start                           Start PostgreSQL only
-  pgpm docker start --include minio           Start PostgreSQL + MinIO
+  pgpm docker start --minio                   Start PostgreSQL + MinIO
   pgpm docker start --port 5433               Start on custom port
   pgpm docker start --shm-size 4g             Start with 4GB shared memory
   pgpm docker start --recreate                Remove and recreate containers
-  pgpm docker start --recreate --include minio Recreate PostgreSQL + MinIO
+  pgpm docker start --recreate --minio        Recreate PostgreSQL + MinIO
   pgpm docker stop                            Stop PostgreSQL
-  pgpm docker stop --include minio            Stop PostgreSQL + MinIO
+  pgpm docker stop --minio                    Stop PostgreSQL + MinIO
   pgpm docker ls                              List services and status
 `;
 
@@ -315,21 +313,10 @@ async function stopService(service: ServiceDefinition): Promise<void> {
   await stopContainer(service.name);
 }
 
-function parseInclude(args: Partial<Record<string, any>>): string[] {
-  const include = args.include;
-  if (!include) return [];
-  if (Array.isArray(include)) return include as string[];
-  if (typeof include === 'string') return [include];
-  return [];
-}
-
-function resolveIncludedServices(includeNames: string[]): ServiceDefinition[] {
+function resolveServiceFlags(args: Partial<Record<string, any>>): ServiceDefinition[] {
   const services: ServiceDefinition[] = [];
-  for (const name of includeNames) {
-    const service = ADDITIONAL_SERVICES[name];
-    if (!service) {
-      console.warn(`⚠️  Unknown service: "${name}". Available: ${Object.keys(ADDITIONAL_SERVICES).join(', ')}`);
-    } else {
+  for (const [key, service] of Object.entries(ADDITIONAL_SERVICES)) {
+    if (args[key] === true || typeof args[key] === 'string') {
       services.push(service);
     }
   }
@@ -350,7 +337,7 @@ async function listServices(): Promise<void> {
     console.log('    postgres    constructiveio/postgres-plus:18    \x1b[90m(docker not available)\x1b[0m');
   }
 
-  console.log('\n  Additional (use --include <name>):');
+  console.log('\n  Additional (use --<name> flag):');
 
   for (const [key, service] of Object.entries(ADDITIONAL_SERVICES)) {
     if (dockerAvailable) {
@@ -392,8 +379,7 @@ export default async (
   const password = (args.password as string) || 'password';
   const shmSize = (args['shm-size'] as string) || (args.shmSize as string) || '2g';
   const recreate = args.recreate === true;
-  const includeNames = parseInclude(args);
-  const includedServices = resolveIncludedServices(includeNames);
+  const includedServices = resolveServiceFlags(args);
 
   switch (subcommand) {
   case 'start':
