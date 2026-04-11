@@ -590,6 +590,17 @@ describe('BucketProvisioner — graceful degradation (error-code matching)', () 
     ]);
   });
 
+  it('setLifecycleRules tolerates MissingContentMD5 (MinIO edge-cicd)', async () => {
+    const err = new Error('Missing required header for this request: Content-Md5.');
+    (err as any).name = 'MissingContentMD5';
+    mockSend.mockRejectedValueOnce(err);
+
+    const provisioner = new BucketProvisioner(defaultOptions);
+    await provisioner.setLifecycleRules('test-bucket', [
+      { id: 'test', prefix: '', expirationDays: 1, enabled: true },
+    ]);
+  });
+
   it('setLifecycleRules throws on genuine errors', async () => {
     mockSend.mockRejectedValueOnce(new Error('Network failure'));
 

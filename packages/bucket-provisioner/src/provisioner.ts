@@ -463,15 +463,18 @@ export class BucketProvisioner {
     } catch (err: any) {
       // Some S3-compatible backends (e.g. MinIO edge-cicd) don't support
       // PutBucketLifecycleConfiguration (may require Content-MD5 header
-      // the SDK doesn't send). Treat XML parse errors or "not implemented"
-      // responses as non-fatal.
+      // the SDK doesn't send). Treat XML parse errors, "not implemented",
+      // or missing-header responses as non-fatal.
       if (
         err.Code === 'XmlParseException' ||
         err.name === 'XmlParseException' ||
         err.Code === 'NotImplemented' ||
         err.name === 'NotImplemented' ||
+        err.Code === 'MissingContentMD5' ||
+        err.name === 'MissingContentMD5' ||
         err.message?.includes('not well-formed') ||
         err.message?.includes('not implemented') ||
+        err.message?.includes('Content-Md5') ||
         err.message?.includes('LifecycleConfiguration')
       ) {
         return;
