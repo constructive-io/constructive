@@ -58,12 +58,18 @@ interface PortMapping {
   container: number;
 }
 
+interface VolumeMapping {
+  name: string;
+  containerPath: string;
+}
+
 interface ServiceDefinition {
   name: string;
   image: string;
   ports: PortMapping[];
   env: Record<string, string>;
   command?: string[];
+  volumes?: VolumeMapping[];
 }
 
 const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
@@ -76,6 +82,7 @@ const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
       MINIO_SECRET_KEY: 'minioadmin',
     },
     command: ['server', '/data'],
+    volumes: [{ name: 'minio-data', containerPath: '/data' }],
   },
 };
 
@@ -279,6 +286,12 @@ async function startService(service: ServiceDefinition, recreate: boolean): Prom
 
   for (const portMapping of ports) {
     runArgs.push('-p', `${portMapping.host}:${portMapping.container}`);
+  }
+
+  if (service.volumes) {
+    for (const vol of service.volumes) {
+      runArgs.push('-v', `${vol.name}:${vol.containerPath}`);
+    }
   }
 
   runArgs.push(image);
