@@ -39,7 +39,7 @@ export const usageText = `
       deps             Show change dependencies
   
   Development Tools:
-    docker             Manage PostgreSQL Docker containers (start/stop)
+    docker             Manage Docker containers (start/stop/ls, --include for additional services)
     env                Manage PostgreSQL environment variables
     test-packages      Run integration tests on workspace packages
   
