@@ -16,13 +16,15 @@ services:
     container_name: minio
     image: minio/minio
     environment:
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
     ports:
       - "9000:9000"
+      - "9001:9001"
     expose:
       - "9000"
-    command: server /data
+      - "9001"
+    command: server /data --console-address ":9001"
     networks:
       - constructive-net
 
