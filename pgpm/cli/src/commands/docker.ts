@@ -23,7 +23,7 @@ PostgreSQL Options:
   --shm-size <size>  Shared memory size for container (default: 2g)
 
 Additional Services:
-  --minio            Include MinIO S3-compatible object storage (port 9000)
+  --minio            Include MinIO S3-compatible object storage (API: 9000, Console: 9001)
 
 General Options:
   --help, -h         Show this help message
@@ -74,12 +74,15 @@ const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
   minio: {
     name: 'minio',
     image: 'minio/minio',
-    ports: [{ host: 9000, container: 9000 }],
+    ports: [
+      { host: 9000, container: 9000 },
+      { host: 9001, container: 9001 },
+    ],
     env: {
-      MINIO_ACCESS_KEY: 'minioadmin',
-      MINIO_SECRET_KEY: 'minioadmin',
+      MINIO_ROOT_USER: 'minioadmin',
+      MINIO_ROOT_PASSWORD: 'minioadmin',
     },
-    command: ['server', '/data'],
+    command: ['server', '/data', '--console-address', ':9001'],
     volumes: [{ name: 'minio-data', containerPath: '/data' }],
   },
 };
