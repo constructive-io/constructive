@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.14.1](https://github.com/constructive-io/constructive/compare/pgpm@4.14.0...pgpm@4.14.1) (2026-04-14)
+
+### Bug Fixes
+
+- expose MinIO console UI on port 9001 ([1867f1d](https://github.com/constructive-io/constructive/commit/1867f1db6e8489e927cae315d97496107e7d40dd))
+
 # [4.14.0](https://github.com/constructive-io/constructive/compare/pgpm@4.13.0...pgpm@4.14.0) (2026-04-11)
 
 ### Bug Fixes
