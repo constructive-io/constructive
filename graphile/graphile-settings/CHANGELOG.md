@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.20.2](https://github.com/constructive-io/constructive/compare/graphile-settings@4.20.1...graphile-settings@4.20.2) (2026-04-14)
+
+### Bug Fixes
+
+- add defensive checks in storage resolvers instead of non-null assertions ([80a88bf](https://github.com/constructive-io/constructive/commit/80a88bf076735a5170d101ce7603da069d2c4ab9))
+
 ## [4.20.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.20.0...graphile-settings@4.20.1) (2026-04-11)
 
 **Note:** Version bump only for package graphile-settings
