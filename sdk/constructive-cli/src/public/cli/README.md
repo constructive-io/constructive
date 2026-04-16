@@ -112,8 +112,8 @@ csdk auth set-token <your-token>
 | `phone-number` | phoneNumber CRUD operations |
 | `crypto-address` | cryptoAddress CRUD operations |
 | `connected-account` | connectedAccount CRUD operations |
-| `invite` | invite CRUD operations |
-| `claimed-invite` | claimedInvite CRUD operations |
+| `app-invite` | appInvite CRUD operations |
+| `app-claimed-invite` | appClaimedInvite CRUD operations |
 | `org-invite` | orgInvite CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
 | `audit-log` | auditLog CRUD operations |
@@ -127,6 +127,7 @@ csdk auth set-token <your-token>
 | `membership-type` | membershipType CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `commit` | commit CRUD operations |
+| `rate-limits-module` | rateLimitsModule CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `rls-module` | rlsModule CRUD operations |
 | `sql-action` | sqlAction CRUD operations |
@@ -159,7 +160,9 @@ csdk auth set-token <your-token>
 | `accept-database-transfer` | acceptDatabaseTransfer |
 | `cancel-database-transfer` | cancelDatabaseTransfer |
 | `reject-database-transfer` | rejectDatabaseTransfer |
-| `submit-invite-code` | submitInviteCode |
+| `verify-password` | verifyPassword |
+| `verify-totp` | verifyTotp |
+| `submit-app-invite-code` | submitAppInviteCode |
 | `submit-org-invite-code` | submitOrgInviteCode |
 | `check-password` | checkPassword |
 | `confirm-delete-account` | confirmDeleteAccount |
@@ -209,8 +212,6 @@ Example usage:
 | `provision-table` | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `send-verification-email` | sendVerificationEmail |
 | `forgot-password` | forgotPassword |
-| `verify-password` | verifyPassword |
-| `verify-totp` | verifyTotp |
 | `request-upload-url` | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
@@ -2947,18 +2948,18 @@ CRUD operations for ConnectedAccount records.
 **Required create fields:** `service`, `identifier`, `details`
 **Optional create fields (backend defaults):** `ownerId`, `isVerified`
 
-### `invite`
+### `app-invite`
 
-CRUD operations for Invite records.
+CRUD operations for AppInvite records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all invite records |
-| `find-first` | Find first matching invite record |
-| `get` | Get a invite by id |
-| `create` | Create a new invite |
-| `update` | Update an existing invite |
-| `delete` | Delete a invite |
+| `list` | List all appInvite records |
+| `find-first` | Find first matching appInvite record |
+| `get` | Get a appInvite by id |
+| `create` | Create a new appInvite |
+| `update` | Update an existing appInvite |
+| `delete` | Delete a appInvite |
 
 **Fields:**
 
@@ -2979,18 +2980,18 @@ CRUD operations for Invite records.
 
 **Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
-### `claimed-invite`
+### `app-claimed-invite`
 
-CRUD operations for ClaimedInvite records.
+CRUD operations for AppClaimedInvite records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all claimedInvite records |
-| `find-first` | Find first matching claimedInvite record |
-| `get` | Get a claimedInvite by id |
-| `create` | Create a new claimedInvite |
-| `update` | Update an existing claimedInvite |
-| `delete` | Delete a claimedInvite |
+| `list` | List all appClaimedInvite records |
+| `find-first` | Find first matching appClaimedInvite record |
+| `get` | Get a appClaimedInvite by id |
+| `create` | Create a new appClaimedInvite |
+| `update` | Update an existing appClaimedInvite |
+| `delete` | Delete a appClaimedInvite |
 
 **Fields:**
 
@@ -3345,6 +3346,36 @@ CRUD operations for Commit records.
 **Required create fields:** `databaseId`, `storeId`
 **Optional create fields (backend defaults):** `message`, `parentIds`, `authorId`, `committerId`, `treeId`, `date`
 
+### `rate-limits-module`
+
+CRUD operations for RateLimitsModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all rateLimitsModule records |
+| `find-first` | Find first matching rateLimitsModule record |
+| `get` | Get a rateLimitsModule by id |
+| `create` | Create a new rateLimitsModule |
+| `update` | Update an existing rateLimitsModule |
+| `delete` | Delete a rateLimitsModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `rateLimitSettingsTableId` | UUID |
+| `ipRateLimitsTableId` | UUID |
+| `rateLimitsTableId` | UUID |
+| `rateLimitSettingsTable` | String |
+| `ipRateLimitsTable` | String |
+| `rateLimitsTable` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `rateLimitSettingsTableId`, `ipRateLimitsTableId`, `rateLimitsTableId`, `rateLimitSettingsTable`, `ipRateLimitsTable`, `rateLimitsTable`
+
 ### `org-membership-default`
 
 CRUD operations for OrgMembershipDefault records.
@@ -3663,8 +3694,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `--vlevel` | String |
-  | `--vroleId` | UUID |
+  | `--level` | String |
+  | `--roleId` | UUID |
 
 ### `rev-parse`
 
@@ -3834,8 +3865,8 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `--vlevel` | String |
-  | `--vroleId` | UUID |
+  | `--level` | String |
+  | `--roleId` | UUID |
   | `--first` | Int |
   | `--offset` | Int |
   | `--after` | Cursor |
@@ -3905,9 +3936,33 @@ rejectDatabaseTransfer
   | `--input.clientMutationId` | String |
   | `--input.transferId` | UUID |
 
-### `submit-invite-code`
+### `verify-password`
 
-submitInviteCode
+verifyPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String (required) |
+
+### `verify-totp`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
+
+### `submit-app-invite-code`
+
+submitAppInviteCode
 
 - **Type:** mutation
 - **Arguments:**
@@ -4436,30 +4491,6 @@ forgotPassword
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.email` | Email |
-
-### `verify-password`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.password` | String (required) |
-
-### `verify-totp`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.totpValue` | String (required) |
 
 ### `request-upload-url`
 

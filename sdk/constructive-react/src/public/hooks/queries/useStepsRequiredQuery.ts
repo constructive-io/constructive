@@ -20,7 +20,7 @@ export const stepsRequiredQueryKey = customQueryKeys.stepsRequired;
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useStepsRequiredQuery({ variables: { vlevel, vroleId, first, offset, after } });
+ * const { data, isLoading } = useStepsRequiredQuery({ variables: { level, roleId, first, offset, after } });
  *
  * if (data?.stepsRequired) {
  *   console.log(data.stepsRequired);
@@ -77,7 +77,7 @@ export function useStepsRequiredQuery<
  *
  * @example
  * ```ts
- * const data = await fetchStepsRequiredQuery({ variables: { vlevel, vroleId, first, offset, after } });
+ * const data = await fetchStepsRequiredQuery({ variables: { level, roleId, first, offset, after } });
  * ```
  */
 export async function fetchStepsRequiredQuery(params?: { variables?: StepsRequiredVariables }) {
@@ -89,7 +89,7 @@ export async function fetchStepsRequiredQuery(params?: { variables?: StepsRequir
  *
  * @example
  * ```ts
- * await prefetchStepsRequiredQuery(queryClient, { variables: { vlevel, vroleId, first, offset, after } });
+ * await prefetchStepsRequiredQuery(queryClient, { variables: { level, roleId, first, offset, after } });
  * ```
  */
 export async function prefetchStepsRequiredQuery(

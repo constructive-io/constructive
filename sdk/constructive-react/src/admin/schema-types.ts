@@ -7,7 +7,9 @@
 import type {
   AppAchievement,
   AppAdminGrant,
+  AppClaimedInvite,
   AppGrant,
+  AppInvite,
   AppLevel,
   AppLevelRequirement,
   AppLimit,
@@ -18,8 +20,6 @@ import type {
   AppPermission,
   AppPermissionDefault,
   AppStep,
-  ClaimedInvite,
-  Invite,
   MembershipType,
   OrgAdminGrant,
   OrgChartEdge,
@@ -276,8 +276,8 @@ export type AppStepOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `ClaimedInvite`. */
-export type ClaimedInviteOrderBy =
+/** Methods to use when ordering `AppClaimedInvite`. */
+export type AppClaimedInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -495,8 +495,8 @@ export type AppLevelOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `Invite`. */
-export type InviteOrderBy =
+/** Methods to use when ordering `AppInvite`. */
+export type AppInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -910,8 +910,8 @@ export interface AppStepFilter {
   /** Negates the expression. */
   not?: AppStepFilter;
 }
-/** A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
-export interface ClaimedInviteFilter {
+/** A filter to be used against `AppClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface AppClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `senderId` field. */
@@ -923,11 +923,11 @@ export interface ClaimedInviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: ClaimedInviteFilter[];
+  and?: AppClaimedInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: ClaimedInviteFilter[];
+  or?: AppClaimedInviteFilter[];
   /** Negates the expression. */
-  not?: ClaimedInviteFilter;
+  not?: AppClaimedInviteFilter;
 }
 /** A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgChartEdgeGrantFilter {
@@ -1204,8 +1204,8 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Contained by the specified JSON. */
   containedBy?: ConstructiveInternalTypeImage;
 }
-/** A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’ */
-export interface InviteFilter {
+/** A filter to be used against `AppInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface AppInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `email` field. */
@@ -1229,11 +1229,11 @@ export interface InviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: InviteFilter[];
+  and?: AppInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: InviteFilter[];
+  or?: AppInviteFilter[];
   /** Negates the expression. */
-  not?: InviteFilter;
+  not?: AppInviteFilter;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -1429,7 +1429,7 @@ export interface OrgInviteFilter {
   /** Negates the expression. */
   not?: OrgInviteFilter;
 }
-export interface SubmitInviteCodeInput {
+export interface SubmitAppInviteCodeInput {
   clientMutationId?: string;
   token?: string;
 }
@@ -1669,13 +1669,13 @@ export interface AppStepInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateClaimedInviteInput {
+export interface CreateAppClaimedInviteInput {
   clientMutationId?: string;
-  /** The `ClaimedInvite` to be created by this mutation. */
-  claimedInvite: ClaimedInviteInput;
+  /** The `AppClaimedInvite` to be created by this mutation. */
+  appClaimedInvite: AppClaimedInviteInput;
 }
-/** An input for mutations affecting `ClaimedInvite` */
-export interface ClaimedInviteInput {
+/** An input for mutations affecting `AppClaimedInvite` */
+export interface AppClaimedInviteInput {
   id?: string;
   /** Optional JSON payload captured at the time the invite was claimed */
   data?: unknown;
@@ -1884,13 +1884,13 @@ export interface AppLevelInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateInviteInput {
+export interface CreateAppInviteInput {
   clientMutationId?: string;
-  /** The `Invite` to be created by this mutation. */
-  invite: InviteInput;
+  /** The `AppInvite` to be created by this mutation. */
+  appInvite: AppInviteInput;
 }
-/** An input for mutations affecting `Invite` */
-export interface InviteInput {
+/** An input for mutations affecting `AppInvite` */
+export interface AppInviteInput {
   id?: string;
   /** Email address of the invited recipient */
   email?: ConstructiveInternalTypeEmail;
@@ -2261,14 +2261,14 @@ export interface AppStepPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateClaimedInviteInput {
+export interface UpdateAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `ClaimedInvite` being updated. */
-  claimedInvitePatch: ClaimedInvitePatch;
+  /** An object where the defined keys will be set on the `AppClaimedInvite` being updated. */
+  appClaimedInvitePatch: AppClaimedInvitePatch;
 }
-/** Represents an update to a `ClaimedInvite`. Fields that are set will be updated. */
-export interface ClaimedInvitePatch {
+/** Represents an update to a `AppClaimedInvite`. Fields that are set will be updated. */
+export interface AppClaimedInvitePatch {
   id?: string;
   /** Optional JSON payload captured at the time the invite was claimed */
   data?: unknown;
@@ -2489,14 +2489,14 @@ export interface AppLevelPatch {
   /** Upload for Badge or icon image associated with this level */
   imageUpload?: File;
 }
-export interface UpdateInviteInput {
+export interface UpdateAppInviteInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `Invite` being updated. */
-  invitePatch: InvitePatch;
+  /** An object where the defined keys will be set on the `AppInvite` being updated. */
+  appInvitePatch: AppInvitePatch;
 }
-/** Represents an update to a `Invite`. Fields that are set will be updated. */
-export interface InvitePatch {
+/** Represents an update to a `AppInvite`. Fields that are set will be updated. */
+export interface AppInvitePatch {
   id?: string;
   /** Email address of the invited recipient */
   email?: ConstructiveInternalTypeEmail;
@@ -2683,7 +2683,7 @@ export interface DeleteAppStepInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteClaimedInviteInput {
+export interface DeleteAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2727,7 +2727,7 @@ export interface DeleteAppLevelInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteInviteInput {
+export interface DeleteAppInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2889,10 +2889,10 @@ export interface AppStepConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `ClaimedInvite` values. */
-export interface ClaimedInviteConnection {
-  nodes: ClaimedInvite[];
-  edges: ClaimedInviteEdge[];
+/** A connection to a list of `AppClaimedInvite` values. */
+export interface AppClaimedInviteConnection {
+  nodes: AppClaimedInvite[];
+  edges: AppClaimedInviteEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2959,10 +2959,10 @@ export interface AppLevelConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Invite` values. */
-export interface InviteConnection {
-  nodes: Invite[];
-  edges: InviteEdge[];
+/** A connection to a list of `AppInvite` values. */
+export interface AppInviteConnection {
+  nodes: AppInvite[];
+  edges: AppInviteEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2991,7 +2991,7 @@ export interface OrgInviteConnection {
 export interface MetaSchema {
   tables: MetaTable[];
 }
-export interface SubmitInviteCodePayload {
+export interface SubmitAppInviteCodePayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -3089,11 +3089,11 @@ export interface CreateAppStepPayload {
   appStep?: AppStep | null;
   appStepEdge?: AppStepEdge | null;
 }
-export interface CreateClaimedInvitePayload {
+export interface CreateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was created by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was created by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
 export interface CreateOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
@@ -3155,11 +3155,11 @@ export interface CreateAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface CreateInvitePayload {
+export interface CreateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was created by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was created by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
 export interface CreateAppMembershipPayload {
   clientMutationId?: string | null;
@@ -3269,11 +3269,11 @@ export interface UpdateAppStepPayload {
   appStep?: AppStep | null;
   appStepEdge?: AppStepEdge | null;
 }
-export interface UpdateClaimedInvitePayload {
+export interface UpdateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was updated by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was updated by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
 export interface UpdateOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
@@ -3335,11 +3335,11 @@ export interface UpdateAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface UpdateInvitePayload {
+export interface UpdateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was updated by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was updated by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
 export interface UpdateAppMembershipPayload {
   clientMutationId?: string | null;
@@ -3449,11 +3449,11 @@ export interface DeleteAppStepPayload {
   appStep?: AppStep | null;
   appStepEdge?: AppStepEdge | null;
 }
-export interface DeleteClaimedInvitePayload {
+export interface DeleteAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was deleted by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was deleted by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
 export interface DeleteOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
@@ -3515,11 +3515,11 @@ export interface DeleteAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface DeleteInvitePayload {
+export interface DeleteAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was deleted by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was deleted by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
 export interface DeleteAppMembershipPayload {
   clientMutationId?: string | null;
@@ -3692,11 +3692,11 @@ export interface AppStepEdge {
   /** The `AppStep` at the end of the edge. */
   node?: AppStep | null;
 }
-/** A `ClaimedInvite` edge in the connection. */
-export interface ClaimedInviteEdge {
+/** A `AppClaimedInvite` edge in the connection. */
+export interface AppClaimedInviteEdge {
   cursor?: string | null;
-  /** The `ClaimedInvite` at the end of the edge. */
-  node?: ClaimedInvite | null;
+  /** The `AppClaimedInvite` at the end of the edge. */
+  node?: AppClaimedInvite | null;
 }
 /** A `OrgChartEdgeGrant` edge in the connection. */
 export interface OrgChartEdgeGrantEdge {
@@ -3752,11 +3752,11 @@ export interface AppLevelEdge {
   /** The `AppLevel` at the end of the edge. */
   node?: AppLevel | null;
 }
-/** A `Invite` edge in the connection. */
-export interface InviteEdge {
+/** A `AppInvite` edge in the connection. */
+export interface AppInviteEdge {
   cursor?: string | null;
-  /** The `Invite` at the end of the edge. */
-  node?: Invite | null;
+  /** The `AppInvite` at the end of the edge. */
+  node?: AppInvite | null;
 }
 /** A `AppMembership` edge in the connection. */
 export interface AppMembershipEdge {

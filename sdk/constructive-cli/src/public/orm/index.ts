@@ -91,8 +91,8 @@ import { EmailModel } from './models/email';
 import { PhoneNumberModel } from './models/phoneNumber';
 import { CryptoAddressModel } from './models/cryptoAddress';
 import { ConnectedAccountModel } from './models/connectedAccount';
-import { InviteModel } from './models/invite';
-import { ClaimedInviteModel } from './models/claimedInvite';
+import { AppInviteModel } from './models/appInvite';
+import { AppClaimedInviteModel } from './models/appClaimedInvite';
 import { OrgInviteModel } from './models/orgInvite';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { AuditLogModel } from './models/auditLog';
@@ -106,6 +106,7 @@ import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { MembershipTypeModel } from './models/membershipType';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { CommitModel } from './models/commit';
+import { RateLimitsModuleModel } from './models/rateLimitsModule';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { RlsModuleModel } from './models/rlsModule';
 import { SqlActionModel } from './models/sqlAction';
@@ -235,8 +236,8 @@ export function createClient(config: OrmClientConfig) {
     phoneNumber: new PhoneNumberModel(client),
     cryptoAddress: new CryptoAddressModel(client),
     connectedAccount: new ConnectedAccountModel(client),
-    invite: new InviteModel(client),
-    claimedInvite: new ClaimedInviteModel(client),
+    appInvite: new AppInviteModel(client),
+    appClaimedInvite: new AppClaimedInviteModel(client),
     orgInvite: new OrgInviteModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
     auditLog: new AuditLogModel(client),
@@ -250,6 +251,7 @@ export function createClient(config: OrmClientConfig) {
     membershipType: new MembershipTypeModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     commit: new CommitModel(client),
+    rateLimitsModule: new RateLimitsModuleModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     rlsModule: new RlsModuleModel(client),
     sqlAction: new SqlActionModel(client),

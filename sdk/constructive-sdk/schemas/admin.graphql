@@ -1807,27 +1807,29 @@ enum AppStepOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `ClaimedInvite` values."""
-type ClaimedInviteConnection {
-  """A list of `ClaimedInvite` objects."""
-  nodes: [ClaimedInvite]!
+"""A connection to a list of `AppClaimedInvite` values."""
+type AppClaimedInviteConnection {
+  """A list of `AppClaimedInvite` objects."""
+  nodes: [AppClaimedInvite]!
 
   """
-  A list of edges which contains the `ClaimedInvite` and cursor to aid in pagination.
+  A list of edges which contains the `AppClaimedInvite` and cursor to aid in pagination.
   """
-  edges: [ClaimedInviteEdge]!
+  edges: [AppClaimedInviteEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `ClaimedInvite` you could get from the connection."""
+  """
+  The count of *all* `AppClaimedInvite` you could get from the connection.
+  """
   totalCount: Int!
 }
 
 """
 Records of successfully claimed invitations, linking senders to receivers
 """
-type ClaimedInvite {
+type AppClaimedInvite {
   id: UUID!
 
   """Optional JSON payload captured at the time the invite was claimed"""
@@ -1847,19 +1849,19 @@ Represents JSON values as specified by [ECMA-404](http://www.ecma-international.
 """
 scalar JSON
 
-"""A `ClaimedInvite` edge in the connection."""
-type ClaimedInviteEdge {
+"""A `AppClaimedInvite` edge in the connection."""
+type AppClaimedInviteEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `ClaimedInvite` at the end of the edge."""
-  node: ClaimedInvite
+  """The `AppClaimedInvite` at the end of the edge."""
+  node: AppClaimedInvite
 }
 
 """
-A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `AppClaimedInvite` object types. All fields are combined with a logical ‘and.’
 """
-input ClaimedInviteFilter {
+input AppClaimedInviteFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -1876,17 +1878,17 @@ input ClaimedInviteFilter {
   updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [ClaimedInviteFilter!]
+  and: [AppClaimedInviteFilter!]
 
   """Checks for any expressions in this list."""
-  or: [ClaimedInviteFilter!]
+  or: [AppClaimedInviteFilter!]
 
   """Negates the expression."""
-  not: ClaimedInviteFilter
+  not: AppClaimedInviteFilter
 }
 
-"""Methods to use when ordering `ClaimedInvite`."""
-enum ClaimedInviteOrderBy {
+"""Methods to use when ordering `AppClaimedInvite`."""
+enum AppClaimedInviteOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -2994,27 +2996,27 @@ enum AppLevelOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `Invite` values."""
-type InviteConnection {
-  """A list of `Invite` objects."""
-  nodes: [Invite]!
+"""A connection to a list of `AppInvite` values."""
+type AppInviteConnection {
+  """A list of `AppInvite` objects."""
+  nodes: [AppInvite]!
 
   """
-  A list of edges which contains the `Invite` and cursor to aid in pagination.
+  A list of edges which contains the `AppInvite` and cursor to aid in pagination.
   """
-  edges: [InviteEdge]!
+  edges: [AppInviteEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `Invite` you could get from the connection."""
+  """The count of *all* `AppInvite` you could get from the connection."""
   totalCount: Int!
 }
 
 """
 Invitation records sent to prospective members via email, with token-based redemption and expiration
 """
-type Invite {
+type AppInvite {
   id: UUID!
 
   """Email address of the invited recipient"""
@@ -3049,19 +3051,19 @@ type Invite {
 
 scalar ConstructiveInternalTypeEmail
 
-"""A `Invite` edge in the connection."""
-type InviteEdge {
+"""A `AppInvite` edge in the connection."""
+type AppInviteEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `Invite` at the end of the edge."""
-  node: Invite
+  """The `AppInvite` at the end of the edge."""
+  node: AppInvite
 }
 
 """
-A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `AppInvite` object types. All fields are combined with a logical ‘and.’
 """
-input InviteFilter {
+input AppInviteFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -3096,13 +3098,13 @@ input InviteFilter {
   updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [InviteFilter!]
+  and: [AppInviteFilter!]
 
   """Checks for any expressions in this list."""
-  or: [InviteFilter!]
+  or: [AppInviteFilter!]
 
   """Negates the expression."""
-  not: InviteFilter
+  not: AppInviteFilter
 }
 
 """
@@ -3237,8 +3239,8 @@ input ConstructiveInternalTypeEmailFilter {
   greaterThanOrEqualToInsensitive: ConstructiveInternalTypeEmail
 }
 
-"""Methods to use when ordering `Invite`."""
-enum InviteOrderBy {
+"""Methods to use when ordering `AppInvite`."""
+enum AppInviteOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -3922,8 +3924,8 @@ type MetaQuery {
   delete: String
 }
 
-"""The output of our `submitInviteCode` mutation."""
-type SubmitInviteCodePayload {
+"""The output of our `submitAppInviteCode` mutation."""
+type SubmitAppInviteCodePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -3937,8 +3939,8 @@ type SubmitInviteCodePayload {
   query: Query
 }
 
-"""All input for the `submitInviteCode` mutation."""
-input SubmitInviteCodeInput {
+"""All input for the `submitAppInviteCode` mutation."""
+input SubmitAppInviteCodeInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -4720,43 +4722,43 @@ input AppStepInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `ClaimedInvite` mutation."""
-type CreateClaimedInvitePayload {
+"""The output of our create `AppClaimedInvite` mutation."""
+type CreateAppClaimedInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` that was created by this mutation."""
-  claimedInvite: ClaimedInvite
+  """The `AppClaimedInvite` that was created by this mutation."""
+  appClaimedInvite: AppClaimedInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `ClaimedInvite`. May be used by Relay 1."""
-  claimedInviteEdge(
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteEdge
+  """An edge for our `AppClaimedInvite`. May be used by Relay 1."""
+  appClaimedInviteEdge(
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteEdge
 }
 
-"""All input for the create `ClaimedInvite` mutation."""
-input CreateClaimedInviteInput {
+"""All input for the create `AppClaimedInvite` mutation."""
+input CreateAppClaimedInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` to be created by this mutation."""
-  claimedInvite: ClaimedInviteInput!
+  """The `AppClaimedInvite` to be created by this mutation."""
+  appClaimedInvite: AppClaimedInviteInput!
 }
 
-"""An input for mutations affecting `ClaimedInvite`"""
-input ClaimedInviteInput {
+"""An input for mutations affecting `AppClaimedInvite`"""
+input AppClaimedInviteInput {
   id: UUID
 
   """Optional JSON payload captured at the time the invite was claimed"""
@@ -5329,43 +5331,43 @@ input AppLevelInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `Invite` mutation."""
-type CreateInvitePayload {
+"""The output of our create `AppInvite` mutation."""
+type CreateAppInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Invite` that was created by this mutation."""
-  invite: Invite
+  """The `AppInvite` that was created by this mutation."""
+  appInvite: AppInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
+  """An edge for our `AppInvite`. May be used by Relay 1."""
+  appInviteEdge(
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppInviteEdge
 }
 
-"""All input for the create `Invite` mutation."""
-input CreateInviteInput {
+"""All input for the create `AppInvite` mutation."""
+input CreateAppInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `Invite` to be created by this mutation."""
-  invite: InviteInput!
+  """The `AppInvite` to be created by this mutation."""
+  appInvite: AppInviteInput!
 }
 
-"""An input for mutations affecting `Invite`"""
-input InviteInput {
+"""An input for mutations affecting `AppInvite`"""
+input AppInviteInput {
   id: UUID
 
   """Email address of the invited recipient"""
@@ -6460,31 +6462,31 @@ input AppStepPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `ClaimedInvite` mutation."""
-type UpdateClaimedInvitePayload {
+"""The output of our update `AppClaimedInvite` mutation."""
+type UpdateAppClaimedInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` that was updated by this mutation."""
-  claimedInvite: ClaimedInvite
+  """The `AppClaimedInvite` that was updated by this mutation."""
+  appClaimedInvite: AppClaimedInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `ClaimedInvite`. May be used by Relay 1."""
-  claimedInviteEdge(
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteEdge
+  """An edge for our `AppClaimedInvite`. May be used by Relay 1."""
+  appClaimedInviteEdge(
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteEdge
 }
 
-"""All input for the `updateClaimedInvite` mutation."""
-input UpdateClaimedInviteInput {
+"""All input for the `updateAppClaimedInvite` mutation."""
+input UpdateAppClaimedInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -6493,15 +6495,15 @@ input UpdateClaimedInviteInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `ClaimedInvite` being updated.
+  An object where the defined keys will be set on the `AppClaimedInvite` being updated.
   """
-  claimedInvitePatch: ClaimedInvitePatch!
+  appClaimedInvitePatch: AppClaimedInvitePatch!
 }
 
 """
-Represents an update to a `ClaimedInvite`. Fields that are set will be updated.
+Represents an update to a `AppClaimedInvite`. Fields that are set will be updated.
 """
-input ClaimedInvitePatch {
+input AppClaimedInvitePatch {
   id: UUID
 
   """Optional JSON payload captured at the time the invite was claimed"""
@@ -7130,31 +7132,31 @@ input AppLevelPatch {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-"""The output of our update `Invite` mutation."""
-type UpdateInvitePayload {
+"""The output of our update `AppInvite` mutation."""
+type UpdateAppInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Invite` that was updated by this mutation."""
-  invite: Invite
+  """The `AppInvite` that was updated by this mutation."""
+  appInvite: AppInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
+  """An edge for our `AppInvite`. May be used by Relay 1."""
+  appInviteEdge(
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppInviteEdge
 }
 
-"""All input for the `updateInvite` mutation."""
-input UpdateInviteInput {
+"""All input for the `updateAppInvite` mutation."""
+input UpdateAppInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -7163,15 +7165,15 @@ input UpdateInviteInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `Invite` being updated.
+  An object where the defined keys will be set on the `AppInvite` being updated.
   """
-  invitePatch: InvitePatch!
+  appInvitePatch: AppInvitePatch!
 }
 
 """
-Represents an update to a `Invite`. Fields that are set will be updated.
+Represents an update to a `AppInvite`. Fields that are set will be updated.
 """
-input InvitePatch {
+input AppInvitePatch {
   id: UUID
 
   """Email address of the invited recipient"""
@@ -7953,31 +7955,31 @@ input DeleteAppStepInput {
   id: UUID!
 }
 
-"""The output of our delete `ClaimedInvite` mutation."""
-type DeleteClaimedInvitePayload {
+"""The output of our delete `AppClaimedInvite` mutation."""
+type DeleteAppClaimedInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` that was deleted by this mutation."""
-  claimedInvite: ClaimedInvite
+  """The `AppClaimedInvite` that was deleted by this mutation."""
+  appClaimedInvite: AppClaimedInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `ClaimedInvite`. May be used by Relay 1."""
-  claimedInviteEdge(
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteEdge
+  """An edge for our `AppClaimedInvite`. May be used by Relay 1."""
+  appClaimedInviteEdge(
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteEdge
 }
 
-"""All input for the `deleteClaimedInvite` mutation."""
-input DeleteClaimedInviteInput {
+"""All input for the `deleteAppClaimedInvite` mutation."""
+input DeleteAppClaimedInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -8316,31 +8318,31 @@ input DeleteAppLevelInput {
   id: UUID!
 }
 
-"""The output of our delete `Invite` mutation."""
-type DeleteInvitePayload {
+"""The output of our delete `AppInvite` mutation."""
+type DeleteAppInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Invite` that was deleted by this mutation."""
-  invite: Invite
+  """The `AppInvite` that was deleted by this mutation."""
+  appInvite: AppInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
+  """An edge for our `AppInvite`. May be used by Relay 1."""
+  appInviteEdge(
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppInviteEdge
 }
 
-"""All input for the `deleteInvite` mutation."""
-input DeleteInviteInput {
+"""All input for the `deleteAppInvite` mutation."""
+input DeleteAppInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -8545,7 +8547,7 @@ type Query {
   ): OrgGetSubordinatesConnection
   appPermissionsGetMask(ids: [UUID]): BitString
   orgPermissionsGetMask(ids: [UUID]): BitString
-  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
+  stepsAchieved(level: String, roleId: UUID): Boolean
   appPermissionsGetMaskByNames(names: [String]): BitString
   orgPermissionsGetMaskByNames(names: [String]): BitString
 
@@ -8585,8 +8587,8 @@ type Query {
 
   """Reads and enables pagination through a set of `AppLevelRequirement`."""
   stepsRequired(
-    vlevel: String
-    vroleId: UUID
+    level: String
+    roleId: UUID
 
     """Only read the first `n` values of the set."""
     first: Int
@@ -9036,8 +9038,8 @@ type Query {
     orderBy: [AppStepOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppStepConnection
 
-  """Reads and enables pagination through a set of `ClaimedInvite`."""
-  claimedInvites(
+  """Reads and enables pagination through a set of `AppClaimedInvite`."""
+  appClaimedInvites(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -9059,11 +9061,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ClaimedInviteFilter
+    where: AppClaimedInviteFilter
 
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteConnection
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteConnection
 
   """Reads and enables pagination through a set of `OrgChartEdgeGrant`."""
   orgChartEdgeGrants(
@@ -9355,8 +9357,8 @@ type Query {
     orderBy: [AppLevelOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLevelConnection
 
-  """Reads and enables pagination through a set of `Invite`."""
-  invites(
+  """Reads and enables pagination through a set of `AppInvite`."""
+  appInvites(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -9378,11 +9380,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: InviteFilter
+    where: AppInviteFilter
 
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): InviteConnection
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppInviteConnection
 
   """Reads and enables pagination through a set of `AppMembership`."""
   appMemberships(
@@ -9481,12 +9483,12 @@ type Query {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
-  submitInviteCode(
+  submitAppInviteCode(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: SubmitInviteCodeInput!
-  ): SubmitInviteCodePayload
+    input: SubmitAppInviteCodeInput!
+  ): SubmitAppInviteCodePayload
   submitOrgInviteCode(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -9614,13 +9616,13 @@ type Mutation {
     input: CreateAppStepInput!
   ): CreateAppStepPayload
 
-  """Creates a single `ClaimedInvite`."""
-  createClaimedInvite(
+  """Creates a single `AppClaimedInvite`."""
+  createAppClaimedInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateClaimedInviteInput!
-  ): CreateClaimedInvitePayload
+    input: CreateAppClaimedInviteInput!
+  ): CreateAppClaimedInvitePayload
 
   """Creates a single `OrgChartEdgeGrant`."""
   createOrgChartEdgeGrant(
@@ -9702,13 +9704,13 @@ type Mutation {
     input: CreateAppLevelInput!
   ): CreateAppLevelPayload
 
-  """Creates a single `Invite`."""
-  createInvite(
+  """Creates a single `AppInvite`."""
+  createAppInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateInviteInput!
-  ): CreateInvitePayload
+    input: CreateAppInviteInput!
+  ): CreateAppInvitePayload
 
   """Creates a single `AppMembership`."""
   createAppMembership(
@@ -9858,13 +9860,13 @@ type Mutation {
     input: UpdateAppStepInput!
   ): UpdateAppStepPayload
 
-  """Updates a single `ClaimedInvite` using a unique key and a patch."""
-  updateClaimedInvite(
+  """Updates a single `AppClaimedInvite` using a unique key and a patch."""
+  updateAppClaimedInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateClaimedInviteInput!
-  ): UpdateClaimedInvitePayload
+    input: UpdateAppClaimedInviteInput!
+  ): UpdateAppClaimedInvitePayload
 
   """Updates a single `OrgChartEdgeGrant` using a unique key and a patch."""
   updateOrgChartEdgeGrant(
@@ -9950,13 +9952,13 @@ type Mutation {
     input: UpdateAppLevelInput!
   ): UpdateAppLevelPayload
 
-  """Updates a single `Invite` using a unique key and a patch."""
-  updateInvite(
+  """Updates a single `AppInvite` using a unique key and a patch."""
+  updateAppInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateInviteInput!
-  ): UpdateInvitePayload
+    input: UpdateAppInviteInput!
+  ): UpdateAppInvitePayload
 
   """Updates a single `AppMembership` using a unique key and a patch."""
   updateAppMembership(
@@ -10102,13 +10104,13 @@ type Mutation {
     input: DeleteAppStepInput!
   ): DeleteAppStepPayload
 
-  """Deletes a single `ClaimedInvite` using a unique key."""
-  deleteClaimedInvite(
+  """Deletes a single `AppClaimedInvite` using a unique key."""
+  deleteAppClaimedInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteClaimedInviteInput!
-  ): DeleteClaimedInvitePayload
+    input: DeleteAppClaimedInviteInput!
+  ): DeleteAppClaimedInvitePayload
 
   """Deletes a single `OrgChartEdgeGrant` using a unique key."""
   deleteOrgChartEdgeGrant(
@@ -10190,13 +10192,13 @@ type Mutation {
     input: DeleteAppLevelInput!
   ): DeleteAppLevelPayload
 
-  """Deletes a single `Invite` using a unique key."""
-  deleteInvite(
+  """Deletes a single `AppInvite` using a unique key."""
+  deleteAppInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteInviteInput!
-  ): DeleteInvitePayload
+    input: DeleteAppInviteInput!
+  ): DeleteAppInvitePayload
 
   """Deletes a single `AppMembership` using a unique key."""
   deleteAppMembership(

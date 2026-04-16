@@ -7,7 +7,7 @@ Execute the stepsAchieved query
 ## Usage
 
 ```typescript
-db.query.stepsAchieved({ vlevel: '<String>', vroleId: '<UUID>' }).execute()
+db.query.stepsAchieved({ level: '<String>', roleId: '<UUID>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.stepsAchieved({ vlevel: '<String>', vroleId: '<UUID>' }).execute()
 ### Run stepsAchieved
 
 ```typescript
-const result = await db.query.stepsAchieved({ vlevel: '<String>', vroleId: '<UUID>' }).execute();
+const result = await db.query.stepsAchieved({ level: '<String>', roleId: '<UUID>' }).execute();
 ```

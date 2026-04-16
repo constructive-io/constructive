@@ -1675,7 +1675,7 @@ export interface ConnectedAccount {
   updatedAt?: string | null;
 }
 /** Invitation records sent to prospective members via email, with token-based redemption and expiration */
-export interface Invite {
+export interface AppInvite {
   id: string;
   /** Email address of the invited recipient */
   email?: ConstructiveInternalTypeEmail | null;
@@ -1699,7 +1699,7 @@ export interface Invite {
   updatedAt?: string | null;
 }
 /** Records of successfully claimed invitations, linking senders to receivers */
-export interface ClaimedInvite {
+export interface AppClaimedInvite {
   id: string;
   /** Optional JSON payload captured at the time the invite was claimed */
   data?: Record<string, unknown> | null;
@@ -1863,6 +1863,17 @@ export interface Commit {
   treeId?: string | null;
   date?: string | null;
 }
+export interface RateLimitsModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  rateLimitSettingsTableId?: string | null;
+  ipRateLimitsTableId?: string | null;
+  rateLimitsTableId?: string | null;
+  rateLimitSettingsTable?: string | null;
+  ipRateLimitsTable?: string | null;
+  rateLimitsTable?: string | null;
+}
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface OrgMembershipDefault {
   id: string;
@@ -2013,6 +2024,7 @@ export interface DatabaseRelations {
   owner?: User | null;
   rlsModule?: RlsModule | null;
   hierarchyModule?: HierarchyModule | null;
+  rateLimitsModule?: RateLimitsModule | null;
   schemas?: ConnectionResult<Schema>;
   tables?: ConnectionResult<Table>;
   checkConstraints?: ConnectionResult<CheckConstraint>;
@@ -2509,10 +2521,10 @@ export interface CryptoAddressRelations {
 export interface ConnectedAccountRelations {
   owner?: User | null;
 }
-export interface InviteRelations {
+export interface AppInviteRelations {
   sender?: User | null;
 }
-export interface ClaimedInviteRelations {
+export interface AppClaimedInviteRelations {
   receiver?: User | null;
   sender?: User | null;
 }
@@ -2539,6 +2551,13 @@ export interface OrgLimitDefaultRelations {}
 export interface MembershipTypeRelations {}
 export interface AppMembershipDefaultRelations {}
 export interface CommitRelations {}
+export interface RateLimitsModuleRelations {
+  database?: Database | null;
+  ipRateLimitsTableByIpRateLimitsTableId?: Table | null;
+  rateLimitSettingsTableByRateLimitSettingsTableId?: Table | null;
+  rateLimitsTableByRateLimitsTableId?: Table | null;
+  schema?: Schema | null;
+}
 export interface OrgMembershipDefaultRelations {
   entity?: User | null;
 }
@@ -2593,9 +2612,9 @@ export interface UserRelations {
   ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
   ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
   ownedConnectedAccounts?: ConnectionResult<ConnectedAccount>;
-  invitesBySenderId?: ConnectionResult<Invite>;
-  claimedInvitesByReceiverId?: ConnectionResult<ClaimedInvite>;
-  claimedInvitesBySenderId?: ConnectionResult<ClaimedInvite>;
+  appInvitesBySenderId?: ConnectionResult<AppInvite>;
+  appClaimedInvitesByReceiverId?: ConnectionResult<AppClaimedInvite>;
+  appClaimedInvitesBySenderId?: ConnectionResult<AppClaimedInvite>;
   orgInvitesByEntityId?: ConnectionResult<OrgInvite>;
   orgInvitesByReceiverId?: ConnectionResult<OrgInvite>;
   orgInvitesBySenderId?: ConnectionResult<OrgInvite>;
@@ -2718,8 +2737,8 @@ export type EmailWithRelations = Email & EmailRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
 export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
-export type InviteWithRelations = Invite & InviteRelations;
-export type ClaimedInviteWithRelations = ClaimedInvite & ClaimedInviteRelations;
+export type AppInviteWithRelations = AppInvite & AppInviteRelations;
+export type AppClaimedInviteWithRelations = AppClaimedInvite & AppClaimedInviteRelations;
 export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type OrgClaimedInviteWithRelations = OrgClaimedInvite & OrgClaimedInviteRelations;
 export type AuditLogWithRelations = AuditLog & AuditLogRelations;
@@ -2735,6 +2754,7 @@ export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelatio
 export type AppMembershipDefaultWithRelations = AppMembershipDefault &
   AppMembershipDefaultRelations;
 export type CommitWithRelations = Commit & CommitRelations;
+export type RateLimitsModuleWithRelations = RateLimitsModule & RateLimitsModuleRelations;
 export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
   OrgMembershipDefaultRelations;
 export type RlsModuleWithRelations = RlsModule & RlsModuleRelations;
@@ -2807,6 +2827,9 @@ export type DatabaseSelect = {
   };
   hierarchyModule?: {
     select: HierarchyModuleSelect;
+  };
+  rateLimitsModule?: {
+    select: RateLimitsModuleSelect;
   };
   schemas?: {
     select: SchemaSelect;
@@ -5118,7 +5141,7 @@ export type ConnectedAccountSelect = {
     select: UserSelect;
   };
 };
-export type InviteSelect = {
+export type AppInviteSelect = {
   id?: boolean;
   email?: boolean;
   senderId?: boolean;
@@ -5135,7 +5158,7 @@ export type InviteSelect = {
     select: UserSelect;
   };
 };
-export type ClaimedInviteSelect = {
+export type AppClaimedInviteSelect = {
   id?: boolean;
   data?: boolean;
   senderId?: boolean;
@@ -5267,6 +5290,32 @@ export type CommitSelect = {
   committerId?: boolean;
   treeId?: boolean;
   date?: boolean;
+};
+export type RateLimitsModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  rateLimitSettingsTableId?: boolean;
+  ipRateLimitsTableId?: boolean;
+  rateLimitsTableId?: boolean;
+  rateLimitSettingsTable?: boolean;
+  ipRateLimitsTable?: boolean;
+  rateLimitsTable?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  ipRateLimitsTableByIpRateLimitsTableId?: {
+    select: TableSelect;
+  };
+  rateLimitSettingsTableByRateLimitSettingsTableId?: {
+    select: TableSelect;
+  };
+  rateLimitsTableByRateLimitsTableId?: {
+    select: TableSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
+  };
 };
 export type OrgMembershipDefaultSelect = {
   id?: boolean;
@@ -5577,23 +5626,23 @@ export type UserSelect = {
     filter?: ConnectedAccountFilter;
     orderBy?: ConnectedAccountOrderBy[];
   };
-  invitesBySenderId?: {
-    select: InviteSelect;
+  appInvitesBySenderId?: {
+    select: AppInviteSelect;
     first?: number;
-    filter?: InviteFilter;
-    orderBy?: InviteOrderBy[];
+    filter?: AppInviteFilter;
+    orderBy?: AppInviteOrderBy[];
   };
-  claimedInvitesByReceiverId?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvitesByReceiverId?: {
+    select: AppClaimedInviteSelect;
     first?: number;
-    filter?: ClaimedInviteFilter;
-    orderBy?: ClaimedInviteOrderBy[];
+    filter?: AppClaimedInviteFilter;
+    orderBy?: AppClaimedInviteOrderBy[];
   };
-  claimedInvitesBySenderId?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvitesBySenderId?: {
+    select: AppClaimedInviteSelect;
     first?: number;
-    filter?: ClaimedInviteFilter;
-    orderBy?: ClaimedInviteOrderBy[];
+    filter?: AppClaimedInviteFilter;
+    orderBy?: AppClaimedInviteOrderBy[];
   };
   orgInvitesByEntityId?: {
     select: OrgInviteSelect;
@@ -6079,6 +6128,10 @@ export interface DatabaseFilter {
   storageModules?: DatabaseToManyStorageModuleFilter;
   /** `storageModules` exist. */
   storageModulesExist?: boolean;
+  /** Filter by the object’s `rateLimitsModule` relation. */
+  rateLimitsModule?: RateLimitsModuleFilter;
+  /** A related `rateLimitsModule` exists. */
+  rateLimitsModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -9104,7 +9157,7 @@ export interface ConnectedAccountFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-export interface InviteFilter {
+export interface AppInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `email` field. */
@@ -9128,15 +9181,15 @@ export interface InviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: InviteFilter[];
+  and?: AppInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: InviteFilter[];
+  or?: AppInviteFilter[];
   /** Negates the expression. */
-  not?: InviteFilter;
+  not?: AppInviteFilter;
   /** Filter by the object’s `sender` relation. */
   sender?: UserFilter;
 }
-export interface ClaimedInviteFilter {
+export interface AppClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `senderId` field. */
@@ -9148,11 +9201,11 @@ export interface ClaimedInviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: ClaimedInviteFilter[];
+  and?: AppClaimedInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: ClaimedInviteFilter[];
+  or?: AppClaimedInviteFilter[];
   /** Negates the expression. */
-  not?: ClaimedInviteFilter;
+  not?: AppClaimedInviteFilter;
   /** Filter by the object’s `receiver` relation. */
   receiver?: UserFilter;
   /** A related `receiver` exists. */
@@ -9427,6 +9480,42 @@ export interface CommitFilter {
   or?: CommitFilter[];
   /** Negates the expression. */
   not?: CommitFilter;
+}
+export interface RateLimitsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitSettingsTableId` field. */
+  rateLimitSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `ipRateLimitsTableId` field. */
+  ipRateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitsTableId` field. */
+  rateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitSettingsTable` field. */
+  rateLimitSettingsTable?: StringFilter;
+  /** Filter by the object’s `ipRateLimitsTable` field. */
+  ipRateLimitsTable?: StringFilter;
+  /** Filter by the object’s `rateLimitsTable` field. */
+  rateLimitsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RateLimitsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RateLimitsModuleFilter[];
+  /** Negates the expression. */
+  not?: RateLimitsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ipRateLimitsTableByIpRateLimitsTableId` relation. */
+  ipRateLimitsTableByIpRateLimitsTableId?: TableFilter;
+  /** Filter by the object’s `rateLimitSettingsTableByRateLimitSettingsTableId` relation. */
+  rateLimitSettingsTableByRateLimitSettingsTableId?: TableFilter;
+  /** Filter by the object’s `rateLimitsTableByRateLimitsTableId` relation. */
+  rateLimitsTableByRateLimitsTableId?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 export interface OrgMembershipDefaultFilter {
   /** Filter by the object’s `id` field. */
@@ -9715,18 +9804,18 @@ export interface UserFilter {
   ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
   /** `ownedConnectedAccounts` exist. */
   ownedConnectedAccountsExist?: boolean;
-  /** Filter by the object’s `invitesBySenderId` relation. */
-  invitesBySenderId?: UserToManyInviteFilter;
-  /** `invitesBySenderId` exist. */
-  invitesBySenderIdExist?: boolean;
-  /** Filter by the object’s `claimedInvitesByReceiverId` relation. */
-  claimedInvitesByReceiverId?: UserToManyClaimedInviteFilter;
-  /** `claimedInvitesByReceiverId` exist. */
-  claimedInvitesByReceiverIdExist?: boolean;
-  /** Filter by the object’s `claimedInvitesBySenderId` relation. */
-  claimedInvitesBySenderId?: UserToManyClaimedInviteFilter;
-  /** `claimedInvitesBySenderId` exist. */
-  claimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `appInvitesBySenderId` relation. */
+  appInvitesBySenderId?: UserToManyAppInviteFilter;
+  /** `appInvitesBySenderId` exist. */
+  appInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `appClaimedInvitesByReceiverId` relation. */
+  appClaimedInvitesByReceiverId?: UserToManyAppClaimedInviteFilter;
+  /** `appClaimedInvitesByReceiverId` exist. */
+  appClaimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `appClaimedInvitesBySenderId` relation. */
+  appClaimedInvitesBySenderId?: UserToManyAppClaimedInviteFilter;
+  /** `appClaimedInvitesBySenderId` exist. */
+  appClaimedInvitesBySenderIdExist?: boolean;
   /** Filter by the object’s `orgInvitesByEntityId` relation. */
   orgInvitesByEntityId?: UserToManyOrgInviteFilter;
   /** `orgInvitesByEntityId` exist. */
@@ -12026,7 +12115,7 @@ export type ConnectedAccountOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type InviteOrderBy =
+export type AppInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -12054,7 +12143,7 @@ export type InviteOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type ClaimedInviteOrderBy =
+export type AppClaimedInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -12264,6 +12353,28 @@ export type CommitOrderBy =
   | 'TREE_ID_DESC'
   | 'DATE_ASC'
   | 'DATE_DESC';
+export type RateLimitsModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_ID_ASC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_ID_DESC'
+  | 'IP_RATE_LIMITS_TABLE_ID_ASC'
+  | 'IP_RATE_LIMITS_TABLE_ID_DESC'
+  | 'RATE_LIMITS_TABLE_ID_ASC'
+  | 'RATE_LIMITS_TABLE_ID_DESC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_ASC'
+  | 'RATE_LIMIT_SETTINGS_TABLE_DESC'
+  | 'IP_RATE_LIMITS_TABLE_ASC'
+  | 'IP_RATE_LIMITS_TABLE_DESC'
+  | 'RATE_LIMITS_TABLE_ASC'
+  | 'RATE_LIMITS_TABLE_DESC';
 export type OrgMembershipDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -15314,9 +15425,9 @@ export interface DeleteConnectedAccountInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateInviteInput {
+export interface CreateAppInviteInput {
   clientMutationId?: string;
-  invite: {
+  appInvite: {
     email?: ConstructiveInternalTypeEmail;
     senderId?: string;
     inviteToken?: string;
@@ -15328,7 +15439,7 @@ export interface CreateInviteInput {
     expiresAt?: string;
   };
 }
-export interface InvitePatch {
+export interface AppInvitePatch {
   email?: ConstructiveInternalTypeEmail | null;
   senderId?: string | null;
   inviteToken?: string | null;
@@ -15339,34 +15450,34 @@ export interface InvitePatch {
   data?: Record<string, unknown> | null;
   expiresAt?: string | null;
 }
-export interface UpdateInviteInput {
+export interface UpdateAppInviteInput {
   clientMutationId?: string;
   id: string;
-  invitePatch: InvitePatch;
+  appInvitePatch: AppInvitePatch;
 }
-export interface DeleteInviteInput {
+export interface DeleteAppInviteInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateClaimedInviteInput {
+export interface CreateAppClaimedInviteInput {
   clientMutationId?: string;
-  claimedInvite: {
+  appClaimedInvite: {
     data?: Record<string, unknown>;
     senderId?: string;
     receiverId?: string;
   };
 }
-export interface ClaimedInvitePatch {
+export interface AppClaimedInvitePatch {
   data?: Record<string, unknown> | null;
   senderId?: string | null;
   receiverId?: string | null;
 }
-export interface UpdateClaimedInviteInput {
+export interface UpdateAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
-  claimedInvitePatch: ClaimedInvitePatch;
+  appClaimedInvitePatch: AppClaimedInvitePatch;
 }
-export interface DeleteClaimedInviteInput {
+export interface DeleteAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -15677,6 +15788,38 @@ export interface UpdateCommitInput {
   commitPatch: CommitPatch;
 }
 export interface DeleteCommitInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateRateLimitsModuleInput {
+  clientMutationId?: string;
+  rateLimitsModule: {
+    databaseId: string;
+    schemaId?: string;
+    rateLimitSettingsTableId?: string;
+    ipRateLimitsTableId?: string;
+    rateLimitsTableId?: string;
+    rateLimitSettingsTable?: string;
+    ipRateLimitsTable?: string;
+    rateLimitsTable?: string;
+  };
+}
+export interface RateLimitsModulePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  rateLimitSettingsTableId?: string | null;
+  ipRateLimitsTableId?: string | null;
+  rateLimitsTableId?: string | null;
+  rateLimitSettingsTable?: string | null;
+  ipRateLimitsTable?: string | null;
+  rateLimitsTable?: string | null;
+}
+export interface UpdateRateLimitsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  rateLimitsModulePatch: RateLimitsModulePatch;
+}
+export interface DeleteRateLimitsModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -16092,9 +16235,9 @@ export const connectionFieldsMap = {
     ownedPhoneNumbers: 'PhoneNumber',
     ownedCryptoAddresses: 'CryptoAddress',
     ownedConnectedAccounts: 'ConnectedAccount',
-    invitesBySenderId: 'Invite',
-    claimedInvitesByReceiverId: 'ClaimedInvite',
-    claimedInvitesBySenderId: 'ClaimedInvite',
+    appInvitesBySenderId: 'AppInvite',
+    appClaimedInvitesByReceiverId: 'AppClaimedInvite',
+    appClaimedInvitesBySenderId: 'AppClaimedInvite',
     orgInvitesByEntityId: 'OrgInvite',
     orgInvitesByReceiverId: 'OrgInvite',
     orgInvitesBySenderId: 'OrgInvite',
@@ -16123,7 +16266,15 @@ export interface RejectDatabaseTransferInput {
   clientMutationId?: string;
   transferId?: string;
 }
-export interface SubmitInviteCodeInput {
+export interface VerifyPasswordInput {
+  clientMutationId?: string;
+  password: string;
+}
+export interface VerifyTotpInput {
+  clientMutationId?: string;
+  totpValue: string;
+}
+export interface SubmitAppInviteCodeInput {
   clientMutationId?: string;
   token?: string;
 }
@@ -16366,14 +16517,6 @@ export interface SendVerificationEmailInput {
 export interface ForgotPasswordInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
-}
-export interface VerifyPasswordInput {
-  clientMutationId?: string;
-  password: string;
-}
-export interface VerifyTotpInput {
-  clientMutationId?: string;
-  totpValue: string;
 }
 export interface RequestUploadUrlInput {
   /** Bucket key (e.g., "public", "private") */
@@ -18037,23 +18180,23 @@ export interface UserToManyConnectedAccountFilter {
   /** Filters to entities where no related entity matches. */
   none?: ConnectedAccountFilter;
 }
-/** A filter to be used against many `Invite` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyInviteFilter {
+/** A filter to be used against many `AppInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppInviteFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: InviteFilter;
+  some?: AppInviteFilter;
   /** Filters to entities where every related entity matches. */
-  every?: InviteFilter;
+  every?: AppInviteFilter;
   /** Filters to entities where no related entity matches. */
-  none?: InviteFilter;
+  none?: AppInviteFilter;
 }
-/** A filter to be used against many `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyClaimedInviteFilter {
+/** A filter to be used against many `AppClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyAppClaimedInviteFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: ClaimedInviteFilter;
+  some?: AppClaimedInviteFilter;
   /** Filters to entities where every related entity matches. */
-  every?: ClaimedInviteFilter;
+  every?: AppClaimedInviteFilter;
   /** Filters to entities where no related entity matches. */
-  none?: ClaimedInviteFilter;
+  none?: AppClaimedInviteFilter;
 }
 /** A filter to be used against many `OrgInvite` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyOrgInviteFilter {
@@ -20906,6 +21049,10 @@ export interface DatabaseFilter {
   storageModules?: DatabaseToManyStorageModuleFilter;
   /** `storageModules` exist. */
   storageModulesExist?: boolean;
+  /** Filter by the object’s `rateLimitsModule` relation. */
+  rateLimitsModule?: RateLimitsModuleFilter;
+  /** A related `rateLimitsModule` exists. */
+  rateLimitsModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -21467,8 +21614,8 @@ export interface ConnectedAccountFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-/** A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’ */
-export interface InviteFilter {
+/** A filter to be used against `AppInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface AppInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `email` field. */
@@ -21492,16 +21639,16 @@ export interface InviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: InviteFilter[];
+  and?: AppInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: InviteFilter[];
+  or?: AppInviteFilter[];
   /** Negates the expression. */
-  not?: InviteFilter;
+  not?: AppInviteFilter;
   /** Filter by the object’s `sender` relation. */
   sender?: UserFilter;
 }
-/** A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
-export interface ClaimedInviteFilter {
+/** A filter to be used against `AppClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface AppClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `senderId` field. */
@@ -21513,11 +21660,11 @@ export interface ClaimedInviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: ClaimedInviteFilter[];
+  and?: AppClaimedInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: ClaimedInviteFilter[];
+  or?: AppClaimedInviteFilter[];
   /** Negates the expression. */
-  not?: ClaimedInviteFilter;
+  not?: AppClaimedInviteFilter;
   /** Filter by the object’s `receiver` relation. */
   receiver?: UserFilter;
   /** A related `receiver` exists. */
@@ -22156,18 +22303,18 @@ export interface UserFilter {
   ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
   /** `ownedConnectedAccounts` exist. */
   ownedConnectedAccountsExist?: boolean;
-  /** Filter by the object’s `invitesBySenderId` relation. */
-  invitesBySenderId?: UserToManyInviteFilter;
-  /** `invitesBySenderId` exist. */
-  invitesBySenderIdExist?: boolean;
-  /** Filter by the object’s `claimedInvitesByReceiverId` relation. */
-  claimedInvitesByReceiverId?: UserToManyClaimedInviteFilter;
-  /** `claimedInvitesByReceiverId` exist. */
-  claimedInvitesByReceiverIdExist?: boolean;
-  /** Filter by the object’s `claimedInvitesBySenderId` relation. */
-  claimedInvitesBySenderId?: UserToManyClaimedInviteFilter;
-  /** `claimedInvitesBySenderId` exist. */
-  claimedInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `appInvitesBySenderId` relation. */
+  appInvitesBySenderId?: UserToManyAppInviteFilter;
+  /** `appInvitesBySenderId` exist. */
+  appInvitesBySenderIdExist?: boolean;
+  /** Filter by the object’s `appClaimedInvitesByReceiverId` relation. */
+  appClaimedInvitesByReceiverId?: UserToManyAppClaimedInviteFilter;
+  /** `appClaimedInvitesByReceiverId` exist. */
+  appClaimedInvitesByReceiverIdExist?: boolean;
+  /** Filter by the object’s `appClaimedInvitesBySenderId` relation. */
+  appClaimedInvitesBySenderId?: UserToManyAppClaimedInviteFilter;
+  /** `appClaimedInvitesBySenderId` exist. */
+  appClaimedInvitesBySenderIdExist?: boolean;
   /** Filter by the object’s `orgInvitesByEntityId` relation. */
   orgInvitesByEntityId?: UserToManyOrgInviteFilter;
   /** `orgInvitesByEntityId` exist. */
@@ -22315,6 +22462,43 @@ export interface HierarchyModuleFilter {
   schema?: SchemaFilter;
   /** Filter by the object’s `usersTable` relation. */
   usersTable?: TableFilter;
+}
+/** A filter to be used against `RateLimitsModule` object types. All fields are combined with a logical ‘and.’ */
+export interface RateLimitsModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitSettingsTableId` field. */
+  rateLimitSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `ipRateLimitsTableId` field. */
+  ipRateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitsTableId` field. */
+  rateLimitsTableId?: UUIDFilter;
+  /** Filter by the object’s `rateLimitSettingsTable` field. */
+  rateLimitSettingsTable?: StringFilter;
+  /** Filter by the object’s `ipRateLimitsTable` field. */
+  ipRateLimitsTable?: StringFilter;
+  /** Filter by the object’s `rateLimitsTable` field. */
+  rateLimitsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: RateLimitsModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: RateLimitsModuleFilter[];
+  /** Negates the expression. */
+  not?: RateLimitsModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `ipRateLimitsTableByIpRateLimitsTableId` relation. */
+  ipRateLimitsTableByIpRateLimitsTableId?: TableFilter;
+  /** Filter by the object’s `rateLimitSettingsTableByRateLimitSettingsTableId` relation. */
+  rateLimitSettingsTableByRateLimitSettingsTableId?: TableFilter;
+  /** Filter by the object’s `rateLimitsTableByRateLimitsTableId` relation. */
+  rateLimitsTableByRateLimitsTableId?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
 }
 /** A filter to be used against BitString fields. All fields are combined with a logical ‘and.’ */
 export interface BitStringFilter {
@@ -22595,11 +22779,27 @@ export type RejectDatabaseTransferPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface SubmitInviteCodePayload {
+export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
-export type SubmitInviteCodePayloadSelect = {
+export type VerifyPasswordPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface VerifyTotpPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type VerifyTotpPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface SubmitAppInviteCodePayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type SubmitAppInviteCodePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -22868,26 +23068,6 @@ export interface ForgotPasswordPayload {
 }
 export type ForgotPasswordPayloadSelect = {
   clientMutationId?: boolean;
-};
-export interface VerifyPasswordPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
-}
-export type VerifyPasswordPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: SessionSelect;
-  };
-};
-export interface VerifyTotpPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
-}
-export type VerifyTotpPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: SessionSelect;
-  };
 };
 export interface RequestUploadUrlPayload {
   /** Presigned PUT URL (null if file was deduplicated) */
@@ -26678,94 +26858,94 @@ export type DeleteConnectedAccountPayloadSelect = {
     select: ConnectedAccountEdgeSelect;
   };
 };
-export interface CreateInvitePayload {
+export interface CreateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was created by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was created by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
-export type CreateInvitePayloadSelect = {
+export type CreateAppInvitePayloadSelect = {
   clientMutationId?: boolean;
-  invite?: {
-    select: InviteSelect;
+  appInvite?: {
+    select: AppInviteSelect;
   };
-  inviteEdge?: {
-    select: InviteEdgeSelect;
+  appInviteEdge?: {
+    select: AppInviteEdgeSelect;
   };
 };
-export interface UpdateInvitePayload {
+export interface UpdateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was updated by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was updated by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
-export type UpdateInvitePayloadSelect = {
+export type UpdateAppInvitePayloadSelect = {
   clientMutationId?: boolean;
-  invite?: {
-    select: InviteSelect;
+  appInvite?: {
+    select: AppInviteSelect;
   };
-  inviteEdge?: {
-    select: InviteEdgeSelect;
+  appInviteEdge?: {
+    select: AppInviteEdgeSelect;
   };
 };
-export interface DeleteInvitePayload {
+export interface DeleteAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was deleted by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was deleted by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
-export type DeleteInvitePayloadSelect = {
+export type DeleteAppInvitePayloadSelect = {
   clientMutationId?: boolean;
-  invite?: {
-    select: InviteSelect;
+  appInvite?: {
+    select: AppInviteSelect;
   };
-  inviteEdge?: {
-    select: InviteEdgeSelect;
+  appInviteEdge?: {
+    select: AppInviteEdgeSelect;
   };
 };
-export interface CreateClaimedInvitePayload {
+export interface CreateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was created by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was created by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
-export type CreateClaimedInvitePayloadSelect = {
+export type CreateAppClaimedInvitePayloadSelect = {
   clientMutationId?: boolean;
-  claimedInvite?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvite?: {
+    select: AppClaimedInviteSelect;
   };
-  claimedInviteEdge?: {
-    select: ClaimedInviteEdgeSelect;
+  appClaimedInviteEdge?: {
+    select: AppClaimedInviteEdgeSelect;
   };
 };
-export interface UpdateClaimedInvitePayload {
+export interface UpdateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was updated by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was updated by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
-export type UpdateClaimedInvitePayloadSelect = {
+export type UpdateAppClaimedInvitePayloadSelect = {
   clientMutationId?: boolean;
-  claimedInvite?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvite?: {
+    select: AppClaimedInviteSelect;
   };
-  claimedInviteEdge?: {
-    select: ClaimedInviteEdgeSelect;
+  appClaimedInviteEdge?: {
+    select: AppClaimedInviteEdgeSelect;
   };
 };
-export interface DeleteClaimedInvitePayload {
+export interface DeleteAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was deleted by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was deleted by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
-export type DeleteClaimedInvitePayloadSelect = {
+export type DeleteAppClaimedInvitePayloadSelect = {
   clientMutationId?: boolean;
-  claimedInvite?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvite?: {
+    select: AppClaimedInviteSelect;
   };
-  claimedInviteEdge?: {
-    select: ClaimedInviteEdgeSelect;
+  appClaimedInviteEdge?: {
+    select: AppClaimedInviteEdgeSelect;
   };
 };
 export interface CreateOrgInvitePayload {
@@ -27319,6 +27499,51 @@ export type DeleteCommitPayloadSelect = {
     select: CommitEdgeSelect;
   };
 };
+export interface CreateRateLimitsModulePayload {
+  clientMutationId?: string | null;
+  /** The `RateLimitsModule` that was created by this mutation. */
+  rateLimitsModule?: RateLimitsModule | null;
+  rateLimitsModuleEdge?: RateLimitsModuleEdge | null;
+}
+export type CreateRateLimitsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rateLimitsModule?: {
+    select: RateLimitsModuleSelect;
+  };
+  rateLimitsModuleEdge?: {
+    select: RateLimitsModuleEdgeSelect;
+  };
+};
+export interface UpdateRateLimitsModulePayload {
+  clientMutationId?: string | null;
+  /** The `RateLimitsModule` that was updated by this mutation. */
+  rateLimitsModule?: RateLimitsModule | null;
+  rateLimitsModuleEdge?: RateLimitsModuleEdge | null;
+}
+export type UpdateRateLimitsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rateLimitsModule?: {
+    select: RateLimitsModuleSelect;
+  };
+  rateLimitsModuleEdge?: {
+    select: RateLimitsModuleEdgeSelect;
+  };
+};
+export interface DeleteRateLimitsModulePayload {
+  clientMutationId?: string | null;
+  /** The `RateLimitsModule` that was deleted by this mutation. */
+  rateLimitsModule?: RateLimitsModule | null;
+  rateLimitsModuleEdge?: RateLimitsModuleEdge | null;
+}
+export type DeleteRateLimitsModulePayloadSelect = {
+  clientMutationId?: boolean;
+  rateLimitsModule?: {
+    select: RateLimitsModuleSelect;
+  };
+  rateLimitsModuleEdge?: {
+    select: RateLimitsModuleEdgeSelect;
+  };
+};
 export interface CreateOrgMembershipDefaultPayload {
   clientMutationId?: string | null;
   /** The `OrgMembershipDefault` that was created by this mutation. */
@@ -27736,50 +27961,6 @@ export interface ProvisionTableRecord {
 export type ProvisionTableRecordSelect = {
   outTableId?: boolean;
   outFields?: boolean;
-};
-/** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
-export interface Session {
-  id: string;
-  /** References the authenticated user; NULL for anonymous sessions */
-  userId?: string | null;
-  /** Whether this is an anonymous session (no authenticated user) */
-  isAnonymous: boolean;
-  /** When this session expires and can no longer be used for authentication */
-  expiresAt: string;
-  /** When this session was explicitly revoked (soft delete); NULL means active */
-  revokedAt?: string | null;
-  /** The origin (protocol + host) from which the session was created, used for fingerprint validation */
-  origin?: ConstructiveInternalTypeOrigin | null;
-  /** IP address from which the session was created, used for strict fingerprint validation */
-  ip?: string | null;
-  /** User-Agent string from the client, used for strict fingerprint validation */
-  uagent?: string | null;
-  /** Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation) */
-  fingerprintMode: string;
-  /** Timestamp of last password re-verification for step-up authentication */
-  lastPasswordVerified?: string | null;
-  /** Timestamp of last MFA verification for step-up authentication */
-  lastMfaVerified?: string | null;
-  /** Secret used to generate and validate CSRF tokens for cookie-based sessions */
-  csrfSecret?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-export type SessionSelect = {
-  id?: boolean;
-  userId?: boolean;
-  isAnonymous?: boolean;
-  expiresAt?: boolean;
-  revokedAt?: boolean;
-  origin?: boolean;
-  ip?: boolean;
-  uagent?: boolean;
-  fingerprintMode?: boolean;
-  lastPasswordVerified?: boolean;
-  lastMfaVerified?: boolean;
-  csrfSecret?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
 };
 /** A `Database` edge in the connection. */
 export interface DatabaseEdge {
@@ -28729,28 +28910,28 @@ export type ConnectedAccountEdgeSelect = {
     select: ConnectedAccountSelect;
   };
 };
-/** A `Invite` edge in the connection. */
-export interface InviteEdge {
+/** A `AppInvite` edge in the connection. */
+export interface AppInviteEdge {
   cursor?: string | null;
-  /** The `Invite` at the end of the edge. */
-  node?: Invite | null;
+  /** The `AppInvite` at the end of the edge. */
+  node?: AppInvite | null;
 }
-export type InviteEdgeSelect = {
+export type AppInviteEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: InviteSelect;
+    select: AppInviteSelect;
   };
 };
-/** A `ClaimedInvite` edge in the connection. */
-export interface ClaimedInviteEdge {
+/** A `AppClaimedInvite` edge in the connection. */
+export interface AppClaimedInviteEdge {
   cursor?: string | null;
-  /** The `ClaimedInvite` at the end of the edge. */
-  node?: ClaimedInvite | null;
+  /** The `AppClaimedInvite` at the end of the edge. */
+  node?: AppClaimedInvite | null;
 }
-export type ClaimedInviteEdgeSelect = {
+export type AppClaimedInviteEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: ClaimedInviteSelect;
+    select: AppClaimedInviteSelect;
   };
 };
 /** A `OrgInvite` edge in the connection. */
@@ -28895,6 +29076,18 @@ export type CommitEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: CommitSelect;
+  };
+};
+/** A `RateLimitsModule` edge in the connection. */
+export interface RateLimitsModuleEdge {
+  cursor?: string | null;
+  /** The `RateLimitsModule` at the end of the edge. */
+  node?: RateLimitsModule | null;
+}
+export type RateLimitsModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: RateLimitsModuleSelect;
   };
 };
 /** A `OrgMembershipDefault` edge in the connection. */

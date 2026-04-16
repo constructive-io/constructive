@@ -24,8 +24,8 @@ export interface OrgPermissionsGetPaddedMaskVariables {
   mask?: string;
 }
 export interface StepsAchievedVariables {
-  vlevel?: string;
-  vroleId?: string;
+  level?: string;
+  roleId?: string;
 }
 export interface RevParseVariables {
   dbId?: string;
@@ -119,8 +119,8 @@ export interface OrgPermissionsGetByMaskVariables {
   after?: string;
 }
 export interface StepsRequiredVariables {
-  vlevel?: string;
-  vroleId?: string;
+  level?: string;
+  roleId?: string;
   /** Only read the first `n` values of the set. */
   first?: number;
   /**
@@ -269,11 +269,11 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'vlevel',
+              name: 'level',
               type: 'String',
             },
             {
-              name: 'vroleId',
+              name: 'roleId',
               type: 'UUID',
             },
           ],
@@ -758,11 +758,11 @@ export function createQueryOperations(client: OrmClient) {
           args,
           [
             {
-              name: 'vlevel',
+              name: 'level',
               type: 'String',
             },
             {
-              name: 'vroleId',
+              name: 'roleId',
               type: 'UUID',
             },
             {

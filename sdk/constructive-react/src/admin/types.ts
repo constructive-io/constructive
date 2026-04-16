@@ -125,7 +125,7 @@ export interface AppStep {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface ClaimedInvite {
+export interface AppClaimedInvite {
   id: string | null;
   data: unknown | null;
   senderId: string | null;
@@ -219,7 +219,7 @@ export interface AppLevel {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface Invite {
+export interface AppInvite {
   id: string | null;
   email: ConstructiveInternalTypeEmail | null;
   senderId: string | null;

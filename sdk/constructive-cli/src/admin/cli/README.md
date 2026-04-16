@@ -44,7 +44,7 @@ csdk auth set-token <your-token>
 | `app-limit` | appLimit CRUD operations |
 | `app-achievement` | appAchievement CRUD operations |
 | `app-step` | appStep CRUD operations |
-| `claimed-invite` | claimedInvite CRUD operations |
+| `app-claimed-invite` | appClaimedInvite CRUD operations |
 | `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
 | `org-limit` | orgLimit CRUD operations |
 | `app-grant` | appGrant CRUD operations |
@@ -54,7 +54,7 @@ csdk auth set-token <your-token>
 | `org-chart-edge` | orgChartEdge CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
 | `app-level` | appLevel CRUD operations |
-| `invite` | invite CRUD operations |
+| `app-invite` | appInvite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
 | `org-invite` | orgInvite CRUD operations |
@@ -69,7 +69,7 @@ csdk auth set-token <your-token>
 | `app-permissions-get-by-mask` | Reads and enables pagination through a set of `AppPermission`. |
 | `org-permissions-get-by-mask` | Reads and enables pagination through a set of `OrgPermission`. |
 | `steps-required` | Reads and enables pagination through a set of `AppLevelRequirement`. |
-| `submit-invite-code` | submitInviteCode |
+| `submit-app-invite-code` | submitAppInviteCode |
 | `submit-org-invite-code` | submitOrgInviteCode |
 | `request-upload-url` | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
@@ -580,18 +580,18 @@ CRUD operations for AppStep records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `actorId`, `count`
 
-### `claimed-invite`
+### `app-claimed-invite`
 
-CRUD operations for ClaimedInvite records.
+CRUD operations for AppClaimedInvite records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all claimedInvite records |
-| `find-first` | Find first matching claimedInvite record |
-| `get` | Get a claimedInvite by id |
-| `create` | Create a new claimedInvite |
-| `update` | Update an existing claimedInvite |
-| `delete` | Delete a claimedInvite |
+| `list` | List all appClaimedInvite records |
+| `find-first` | Find first matching appClaimedInvite record |
+| `get` | Get a appClaimedInvite by id |
+| `create` | Create a new appClaimedInvite |
+| `update` | Update an existing appClaimedInvite |
+| `delete` | Delete a appClaimedInvite |
 
 **Fields:**
 
@@ -862,18 +862,18 @@ CRUD operations for AppLevel records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `description`, `image`, `ownerId`
 
-### `invite`
+### `app-invite`
 
-CRUD operations for Invite records.
+CRUD operations for AppInvite records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all invite records |
-| `find-first` | Find first matching invite record |
-| `get` | Get a invite by id |
-| `create` | Create a new invite |
-| `update` | Update an existing invite |
-| `delete` | Delete a invite |
+| `list` | List all appInvite records |
+| `find-first` | Find first matching appInvite record |
+| `get` | Get a appInvite by id |
+| `create` | Create a new appInvite |
+| `update` | Update an existing appInvite |
+| `delete` | Delete a appInvite |
 
 **Fields:**
 
@@ -1072,8 +1072,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `--vlevel` | String |
-  | `--vroleId` | UUID |
+  | `--level` | String |
+  | `--roleId` | UUID |
 
 ### `app-permissions-get-mask-by-names`
 
@@ -1134,15 +1134,15 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `--vlevel` | String |
-  | `--vroleId` | UUID |
+  | `--level` | String |
+  | `--roleId` | UUID |
   | `--first` | Int |
   | `--offset` | Int |
   | `--after` | Cursor |
 
-### `submit-invite-code`
+### `submit-app-invite-code`
 
-submitInviteCode
+submitAppInviteCode
 
 - **Type:** mutation
 - **Arguments:**

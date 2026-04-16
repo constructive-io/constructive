@@ -12,7 +12,9 @@ import type {
   AcceptDatabaseTransferInput,
   CancelDatabaseTransferInput,
   RejectDatabaseTransferInput,
-  SubmitInviteCodeInput,
+  VerifyPasswordInput,
+  VerifyTotpInput,
+  SubmitAppInviteCodeInput,
   SubmitOrgInviteCodeInput,
   CheckPasswordInput,
   ConfirmDeleteAccountInput,
@@ -46,8 +48,6 @@ import type {
   ProvisionTableInput,
   SendVerificationEmailInput,
   ForgotPasswordInput,
-  VerifyPasswordInput,
-  VerifyTotpInput,
   RequestUploadUrlInput,
   ConfirmUploadInput,
   ProvisionBucketInput,
@@ -56,7 +56,9 @@ import type {
   AcceptDatabaseTransferPayload,
   CancelDatabaseTransferPayload,
   RejectDatabaseTransferPayload,
-  SubmitInviteCodePayload,
+  VerifyPasswordPayload,
+  VerifyTotpPayload,
+  SubmitAppInviteCodePayload,
   SubmitOrgInviteCodePayload,
   CheckPasswordPayload,
   ConfirmDeleteAccountPayload,
@@ -90,8 +92,6 @@ import type {
   ProvisionTablePayload,
   SendVerificationEmailPayload,
   ForgotPasswordPayload,
-  VerifyPasswordPayload,
-  VerifyTotpPayload,
   RequestUploadUrlPayload,
   ConfirmUploadPayload,
   ProvisionBucketPayload,
@@ -100,7 +100,9 @@ import type {
   AcceptDatabaseTransferPayloadSelect,
   CancelDatabaseTransferPayloadSelect,
   RejectDatabaseTransferPayloadSelect,
-  SubmitInviteCodePayloadSelect,
+  VerifyPasswordPayloadSelect,
+  VerifyTotpPayloadSelect,
+  SubmitAppInviteCodePayloadSelect,
   SubmitOrgInviteCodePayloadSelect,
   CheckPasswordPayloadSelect,
   ConfirmDeleteAccountPayloadSelect,
@@ -134,8 +136,6 @@ import type {
   ProvisionTablePayloadSelect,
   SendVerificationEmailPayloadSelect,
   ForgotPasswordPayloadSelect,
-  VerifyPasswordPayloadSelect,
-  VerifyTotpPayloadSelect,
   RequestUploadUrlPayloadSelect,
   ConfirmUploadPayloadSelect,
   ProvisionBucketPayloadSelect,
@@ -156,8 +156,14 @@ export interface CancelDatabaseTransferVariables {
 export interface RejectDatabaseTransferVariables {
   input: RejectDatabaseTransferInput;
 }
-export interface SubmitInviteCodeVariables {
-  input: SubmitInviteCodeInput;
+export interface VerifyPasswordVariables {
+  input: VerifyPasswordInput;
+}
+export interface VerifyTotpVariables {
+  input: VerifyTotpInput;
+}
+export interface SubmitAppInviteCodeVariables {
+  input: SubmitAppInviteCodeInput;
 }
 export interface SubmitOrgInviteCodeVariables {
   input: SubmitOrgInviteCodeInput;
@@ -304,12 +310,6 @@ export interface SendVerificationEmailVariables {
 }
 export interface ForgotPasswordVariables {
   input: ForgotPasswordInput;
-}
-export interface VerifyPasswordVariables {
-  input: VerifyPasswordInput;
-}
-export interface VerifyTotpVariables {
-  input: VerifyTotpInput;
 }
 /**
  * Variables for requestUploadUrl
@@ -487,33 +487,91 @@ export function createMutationOperations(client: OrmClient) {
           'RejectDatabaseTransferPayload'
         ),
       }),
-    submitInviteCode: <S extends SubmitInviteCodePayloadSelect>(
-      args: SubmitInviteCodeVariables,
+    verifyPassword: <S extends VerifyPasswordPayloadSelect>(
+      args: VerifyPasswordVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SubmitInviteCodePayloadSelect>
+      } & StrictSelect<S, VerifyPasswordPayloadSelect>
     ) =>
       new QueryBuilder<{
-        submitInviteCode: InferSelectResult<SubmitInviteCodePayload, S> | null;
+        verifyPassword: InferSelectResult<VerifyPasswordPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SubmitInviteCode',
-        fieldName: 'submitInviteCode',
+        operationName: 'VerifyPassword',
+        fieldName: 'verifyPassword',
         ...buildCustomDocument(
           'mutation',
-          'SubmitInviteCode',
-          'submitInviteCode',
+          'VerifyPassword',
+          'verifyPassword',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SubmitInviteCodeInput!',
+              type: 'VerifyPasswordInput!',
             },
           ],
           connectionFieldsMap,
-          'SubmitInviteCodePayload'
+          'VerifyPasswordPayload'
+        ),
+      }),
+    verifyTotp: <S extends VerifyTotpPayloadSelect>(
+      args: VerifyTotpVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, VerifyTotpPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        verifyTotp: InferSelectResult<VerifyTotpPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'VerifyTotp',
+        fieldName: 'verifyTotp',
+        ...buildCustomDocument(
+          'mutation',
+          'VerifyTotp',
+          'verifyTotp',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'VerifyTotpInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'VerifyTotpPayload'
+        ),
+      }),
+    submitAppInviteCode: <S extends SubmitAppInviteCodePayloadSelect>(
+      args: SubmitAppInviteCodeVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SubmitAppInviteCodePayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        submitAppInviteCode: InferSelectResult<SubmitAppInviteCodePayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SubmitAppInviteCode',
+        fieldName: 'submitAppInviteCode',
+        ...buildCustomDocument(
+          'mutation',
+          'SubmitAppInviteCode',
+          'submitAppInviteCode',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SubmitAppInviteCodeInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SubmitAppInviteCodePayload'
         ),
       }),
     submitOrgInviteCode: <S extends SubmitOrgInviteCodePayloadSelect>(
@@ -1471,64 +1529,6 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ForgotPasswordPayload'
-        ),
-      }),
-    verifyPassword: <S extends VerifyPasswordPayloadSelect>(
-      args: VerifyPasswordVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, VerifyPasswordPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        verifyPassword: InferSelectResult<VerifyPasswordPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'VerifyPassword',
-        fieldName: 'verifyPassword',
-        ...buildCustomDocument(
-          'mutation',
-          'VerifyPassword',
-          'verifyPassword',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'VerifyPasswordInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'VerifyPasswordPayload'
-        ),
-      }),
-    verifyTotp: <S extends VerifyTotpPayloadSelect>(
-      args: VerifyTotpVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, VerifyTotpPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        verifyTotp: InferSelectResult<VerifyTotpPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'VerifyTotp',
-        fieldName: 'verifyTotp',
-        ...buildCustomDocument(
-          'mutation',
-          'VerifyTotp',
-          'verifyTotp',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'VerifyTotpInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'VerifyTotpPayload'
         ),
       }),
     requestUploadUrl: <S extends RequestUploadUrlPayloadSelect>(

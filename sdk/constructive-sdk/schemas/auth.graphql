@@ -2209,6 +2209,56 @@ input CheckPasswordInput {
   password: String
 }
 
+"""The output of our `verifyPassword` mutation."""
+type VerifyPasswordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `verifyPassword` mutation."""
+input VerifyPasswordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  password: String!
+}
+
+"""The output of our `verifyTotp` mutation."""
+type VerifyTotpPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `verifyTotp` mutation."""
+input VerifyTotpInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  totpValue: String!
+}
+
 """The output of our `confirmDeleteAccount` mutation."""
 type ConfirmDeleteAccountPayload {
   """
@@ -2558,110 +2608,6 @@ input SendVerificationEmailInput {
   """
   clientMutationId: String
   email: ConstructiveInternalTypeEmail
-}
-
-"""The output of our `verifyPassword` mutation."""
-type VerifyPasswordPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: Session
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""
-Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state
-"""
-type Session {
-  id: UUID!
-
-  """References the authenticated user; NULL for anonymous sessions"""
-  userId: UUID
-
-  """Whether this is an anonymous session (no authenticated user)"""
-  isAnonymous: Boolean!
-
-  """When this session expires and can no longer be used for authentication"""
-  expiresAt: Datetime!
-
-  """
-  When this session was explicitly revoked (soft delete); NULL means active
-  """
-  revokedAt: Datetime
-
-  """
-  The origin (protocol + host) from which the session was created, used for fingerprint validation
-  """
-  origin: ConstructiveInternalTypeOrigin
-
-  """
-  IP address from which the session was created, used for strict fingerprint validation
-  """
-  ip: InternetAddress
-
-  """
-  User-Agent string from the client, used for strict fingerprint validation
-  """
-  uagent: String
-
-  """
-  Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation)
-  """
-  fingerprintMode: String!
-
-  """Timestamp of last password re-verification for step-up authentication"""
-  lastPasswordVerified: Datetime
-
-  """Timestamp of last MFA verification for step-up authentication"""
-  lastMfaVerified: Datetime
-
-  """
-  Secret used to generate and validate CSRF tokens for cookie-based sessions
-  """
-  csrfSecret: String
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""All input for the `verifyPassword` mutation."""
-input VerifyPasswordInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  password: String!
-}
-
-"""The output of our `verifyTotp` mutation."""
-type VerifyTotpPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: Session
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `verifyTotp` mutation."""
-input VerifyTotpInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  totpValue: String!
 }
 
 """The output of our create `RoleType` mutation."""
@@ -3954,6 +3900,18 @@ type Mutation {
     """
     input: CheckPasswordInput!
   ): CheckPasswordPayload
+  verifyPassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyPasswordInput!
+  ): VerifyPasswordPayload
+  verifyTotp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyTotpInput!
+  ): VerifyTotpPayload
   confirmDeleteAccount(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4020,18 +3978,6 @@ type Mutation {
     """
     input: SendVerificationEmailInput!
   ): SendVerificationEmailPayload
-  verifyPassword(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyPasswordInput!
-  ): VerifyPasswordPayload
-  verifyTotp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyTotpInput!
-  ): VerifyTotpPayload
 
   """Creates a single `RoleType`."""
   createRoleType(

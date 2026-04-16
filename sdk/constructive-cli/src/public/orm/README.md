@@ -107,8 +107,8 @@ const db = createClient({
 | `phoneNumber` | findMany, findOne, create, update, delete |
 | `cryptoAddress` | findMany, findOne, create, update, delete |
 | `connectedAccount` | findMany, findOne, create, update, delete |
-| `invite` | findMany, findOne, create, update, delete |
-| `claimedInvite` | findMany, findOne, create, update, delete |
+| `appInvite` | findMany, findOne, create, update, delete |
+| `appClaimedInvite` | findMany, findOne, create, update, delete |
 | `orgInvite` | findMany, findOne, create, update, delete |
 | `orgClaimedInvite` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
@@ -122,6 +122,7 @@ const db = createClient({
 | `membershipType` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `commit` | findMany, findOne, create, update, delete |
+| `rateLimitsModule` | findMany, findOne, create, update, delete |
 | `orgMembershipDefault` | findMany, findOne, create, update, delete |
 | `rlsModule` | findMany, findOne, create, update, delete |
 | `sqlAction` | findMany, findOne, create, update, delete |
@@ -3428,9 +3429,9 @@ const updated = await db.connectedAccount.update({ where: { id: '<UUID>' }, data
 const deleted = await db.connectedAccount.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.invite`
+### `db.appInvite`
 
-CRUD operations for Invite records.
+CRUD operations for AppInvite records.
 
 **Fields:**
 
@@ -3452,25 +3453,25 @@ CRUD operations for Invite records.
 **Operations:**
 
 ```typescript
-// List all invite records
-const items = await db.invite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+// List all appInvite records
+const items = await db.appInvite.findMany({ select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.invite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appInvite.findOne({ id: '<UUID>', select: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.invite.create({ data: { email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
+const created = await db.appInvite.create({ data: { email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.invite.update({ where: { id: '<UUID>' }, data: { email: '<Email>' }, select: { id: true } }).execute();
+const updated = await db.appInvite.update({ where: { id: '<UUID>' }, data: { email: '<Email>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.invite.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.appInvite.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.claimedInvite`
+### `db.appClaimedInvite`
 
-CRUD operations for ClaimedInvite records.
+CRUD operations for AppClaimedInvite records.
 
 **Fields:**
 
@@ -3486,20 +3487,20 @@ CRUD operations for ClaimedInvite records.
 **Operations:**
 
 ```typescript
-// List all claimedInvite records
-const items = await db.claimedInvite.findMany({ select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } }).execute();
+// List all appClaimedInvite records
+const items = await db.appClaimedInvite.findMany({ select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.claimedInvite.findOne({ id: '<UUID>', select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.appClaimedInvite.findOne({ id: '<UUID>', select: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.claimedInvite.create({ data: { data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.appClaimedInvite.create({ data: { data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>' }, select: { id: true } }).execute();
 
 // Update
-const updated = await db.claimedInvite.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
+const updated = await db.appClaimedInvite.update({ where: { id: '<UUID>' }, data: { data: '<JSON>' }, select: { id: true } }).execute();
 
 // Delete
-const deleted = await db.claimedInvite.delete({ where: { id: '<UUID>' } }).execute();
+const deleted = await db.appClaimedInvite.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.orgInvite`
@@ -3938,6 +3939,43 @@ const updated = await db.commit.update({ where: { id: '<UUID>' }, data: { messag
 const deleted = await db.commit.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.rateLimitsModule`
+
+CRUD operations for RateLimitsModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `rateLimitSettingsTableId` | UUID | Yes |
+| `ipRateLimitsTableId` | UUID | Yes |
+| `rateLimitsTableId` | UUID | Yes |
+| `rateLimitSettingsTable` | String | Yes |
+| `ipRateLimitsTable` | String | Yes |
+| `rateLimitsTable` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all rateLimitsModule records
+const items = await db.rateLimitsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } }).execute();
+
+// Get one by id
+const item = await db.rateLimitsModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } }).execute();
+
+// Create
+const created = await db.rateLimitsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', rateLimitSettingsTableId: '<UUID>', ipRateLimitsTableId: '<UUID>', rateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', ipRateLimitsTable: '<String>', rateLimitsTable: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.rateLimitsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.rateLimitsModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.orgMembershipDefault`
 
 CRUD operations for OrgMembershipDefault records.
@@ -4304,11 +4342,11 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
 
 ```typescript
-const result = await db.query.stepsAchieved({ vlevel: '<String>', vroleId: '<UUID>' }).execute();
+const result = await db.query.stepsAchieved({ level: '<String>', roleId: '<UUID>' }).execute();
 ```
 
 ### `db.query.revParse`
@@ -4527,14 +4565,14 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
   | `first` | Int |
   | `offset` | Int |
   | `after` | Cursor |
 
 ```typescript
-const result = await db.query.stepsRequired({ vlevel: '<String>', vroleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
+const result = await db.query.stepsRequired({ level: '<String>', roleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
 ```
 
 ### `db.query.currentUser`
@@ -4623,19 +4661,49 @@ rejectDatabaseTransfer
 const result = await db.mutation.rejectDatabaseTransfer({ input: { transferId: '<UUID>' } }).execute();
 ```
 
-### `db.mutation.submitInviteCode`
+### `db.mutation.verifyPassword`
 
-submitInviteCode
+verifyPassword
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `input` | VerifyPasswordInput (required) |
 
 ```typescript
-const result = await db.mutation.submitInviteCode({ input: { token: '<String>' } }).execute();
+const result = await db.mutation.verifyPassword({ input: { password: '<String>' } }).execute();
+```
+
+### `db.mutation.verifyTotp`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyTotpInput (required) |
+
+```typescript
+const result = await db.mutation.verifyTotp({ input: { totpValue: '<String>' } }).execute();
+```
+
+### `db.mutation.submitAppInviteCode`
+
+submitAppInviteCode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SubmitAppInviteCodeInput (required) |
+
+```typescript
+const result = await db.mutation.submitAppInviteCode({ input: { token: '<String>' } }).execute();
 ```
 
 ### `db.mutation.submitOrgInviteCode`
@@ -5147,36 +5215,6 @@ forgotPassword
 
 ```typescript
 const result = await db.mutation.forgotPassword({ input: { email: '<Email>' } }).execute();
-```
-
-### `db.mutation.verifyPassword`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyPasswordInput (required) |
-
-```typescript
-const result = await db.mutation.verifyPassword({ input: { password: '<String>' } }).execute();
-```
-
-### `db.mutation.verifyTotp`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyTotpInput (required) |
-
-```typescript
-const result = await db.mutation.verifyTotp({ input: { totpValue: '<String>' } }).execute();
 ```
 
 ### `db.mutation.requestUploadUrl`

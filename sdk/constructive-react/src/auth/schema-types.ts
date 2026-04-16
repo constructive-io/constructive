@@ -706,6 +706,14 @@ export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
 }
+export interface VerifyPasswordInput {
+  clientMutationId?: string;
+  password: string;
+}
+export interface VerifyTotpInput {
+  clientMutationId?: string;
+  totpValue: string;
+}
 export interface ConfirmDeleteAccountInput {
   clientMutationId?: string;
   userId?: string;
@@ -785,14 +793,6 @@ export interface ForgotPasswordInput {
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
-}
-export interface VerifyPasswordInput {
-  clientMutationId?: string;
-  password: string;
-}
-export interface VerifyTotpInput {
-  clientMutationId?: string;
-  totpValue: string;
 }
 export interface CreateRoleTypeInput {
   clientMutationId?: string;
@@ -1162,6 +1162,14 @@ export interface SendAccountDeletionEmailPayload {
 export interface CheckPasswordPayload {
   clientMutationId?: string | null;
 }
+export interface VerifyPasswordPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface VerifyTotpPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
 export interface ConfirmDeleteAccountPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -1204,14 +1212,6 @@ export interface ForgotPasswordPayload {
 export interface SendVerificationEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
-}
-export interface VerifyPasswordPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
-}
-export interface VerifyTotpPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
 }
 export interface CreateRoleTypePayload {
   clientMutationId?: string | null;
@@ -1468,34 +1468,6 @@ export interface ExtendTokenExpiresRecord {
   id?: string | null;
   sessionId?: string | null;
   expiresAt?: string | null;
-}
-/** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
-export interface Session {
-  id: string;
-  /** References the authenticated user; NULL for anonymous sessions */
-  userId?: string | null;
-  /** Whether this is an anonymous session (no authenticated user) */
-  isAnonymous: boolean;
-  /** When this session expires and can no longer be used for authentication */
-  expiresAt: string;
-  /** When this session was explicitly revoked (soft delete); NULL means active */
-  revokedAt?: string | null;
-  /** The origin (protocol + host) from which the session was created, used for fingerprint validation */
-  origin?: ConstructiveInternalTypeOrigin | null;
-  /** IP address from which the session was created, used for strict fingerprint validation */
-  ip?: string | null;
-  /** User-Agent string from the client, used for strict fingerprint validation */
-  uagent?: string | null;
-  /** Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation) */
-  fingerprintMode: string;
-  /** Timestamp of last password re-verification for step-up authentication */
-  lastPasswordVerified?: string | null;
-  /** Timestamp of last MFA verification for step-up authentication */
-  lastMfaVerified?: string | null;
-  /** Secret used to generate and validate CSRF tokens for cookie-based sessions */
-  csrfSecret?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
 }
 /** Information about a table field/column */
 export interface MetaField {

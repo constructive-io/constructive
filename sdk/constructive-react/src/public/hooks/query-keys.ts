@@ -793,23 +793,23 @@ export const connectedAccountKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...connectedAccountKeys.details(), id] as const,
 } as const;
-export const inviteKeys = {
-  /** All invite queries */ all: ['invite'] as const,
-  /** List query keys */ lists: () => [...inviteKeys.all, 'list'] as const,
+export const appInviteKeys = {
+  /** All appInvite queries */ all: ['appinvite'] as const,
+  /** List query keys */ lists: () => [...appInviteKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...inviteKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...inviteKeys.all, 'detail'] as const,
+    [...appInviteKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...appInviteKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...inviteKeys.details(), id] as const,
+    [...appInviteKeys.details(), id] as const,
 } as const;
-export const claimedInviteKeys = {
-  /** All claimedInvite queries */ all: ['claimedinvite'] as const,
-  /** List query keys */ lists: () => [...claimedInviteKeys.all, 'list'] as const,
+export const appClaimedInviteKeys = {
+  /** All appClaimedInvite queries */ all: ['appclaimedinvite'] as const,
+  /** List query keys */ lists: () => [...appClaimedInviteKeys.all, 'list'] as const,
   /** List query key with variables */ list: (variables?: object) =>
-    [...claimedInviteKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...claimedInviteKeys.all, 'detail'] as const,
+    [...appClaimedInviteKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...appClaimedInviteKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...claimedInviteKeys.details(), id] as const,
+    [...appClaimedInviteKeys.details(), id] as const,
 } as const;
 export const orgInviteKeys = {
   /** All orgInvite queries */ all: ['orginvite'] as const,
@@ -927,6 +927,15 @@ export const commitKeys = {
   /** Detail query keys */ details: () => [...commitKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...commitKeys.details(), id] as const,
+} as const;
+export const rateLimitsModuleKeys = {
+  /** All rateLimitsModule queries */ all: ['ratelimitsmodule'] as const,
+  /** List query keys */ lists: () => [...rateLimitsModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...rateLimitsModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...rateLimitsModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...rateLimitsModuleKeys.details(), id] as const,
 } as const;
 export const orgMembershipDefaultKeys = {
   /** All orgMembershipDefault queries */ all: ['orgmembershipdefault'] as const,
@@ -1146,8 +1155,8 @@ export const queryKeys = {
   phoneNumber: phoneNumberKeys,
   cryptoAddress: cryptoAddressKeys,
   connectedAccount: connectedAccountKeys,
-  invite: inviteKeys,
-  claimedInvite: claimedInviteKeys,
+  appInvite: appInviteKeys,
+  appClaimedInvite: appClaimedInviteKeys,
   orgInvite: orgInviteKeys,
   orgClaimedInvite: orgClaimedInviteKeys,
   auditLog: auditLogKeys,
@@ -1161,6 +1170,7 @@ export const queryKeys = {
   membershipType: membershipTypeKeys,
   appMembershipDefault: appMembershipDefaultKeys,
   commit: commitKeys,
+  rateLimitsModule: rateLimitsModuleKeys,
   orgMembershipDefault: orgMembershipDefaultKeys,
   rlsModule: rlsModuleKeys,
   sqlAction: sqlActionKeys,

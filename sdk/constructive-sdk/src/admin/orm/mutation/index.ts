@@ -7,25 +7,25 @@ import { OrmClient } from '../client';
 import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type {
-  SubmitInviteCodeInput,
+  SubmitAppInviteCodeInput,
   SubmitOrgInviteCodeInput,
   RequestUploadUrlInput,
   ConfirmUploadInput,
   ProvisionBucketInput,
-  SubmitInviteCodePayload,
+  SubmitAppInviteCodePayload,
   SubmitOrgInviteCodePayload,
   RequestUploadUrlPayload,
   ConfirmUploadPayload,
   ProvisionBucketPayload,
-  SubmitInviteCodePayloadSelect,
+  SubmitAppInviteCodePayloadSelect,
   SubmitOrgInviteCodePayloadSelect,
   RequestUploadUrlPayloadSelect,
   ConfirmUploadPayloadSelect,
   ProvisionBucketPayloadSelect,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
-export interface SubmitInviteCodeVariables {
-  input: SubmitInviteCodeInput;
+export interface SubmitAppInviteCodeVariables {
+  input: SubmitAppInviteCodeInput;
 }
 export interface SubmitOrgInviteCodeVariables {
   input: SubmitOrgInviteCodeInput;
@@ -61,33 +61,33 @@ export interface ProvisionBucketVariables {
 }
 export function createMutationOperations(client: OrmClient) {
   return {
-    submitInviteCode: <S extends SubmitInviteCodePayloadSelect>(
-      args: SubmitInviteCodeVariables,
+    submitAppInviteCode: <S extends SubmitAppInviteCodePayloadSelect>(
+      args: SubmitAppInviteCodeVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SubmitInviteCodePayloadSelect>
+      } & StrictSelect<S, SubmitAppInviteCodePayloadSelect>
     ) =>
       new QueryBuilder<{
-        submitInviteCode: InferSelectResult<SubmitInviteCodePayload, S> | null;
+        submitAppInviteCode: InferSelectResult<SubmitAppInviteCodePayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SubmitInviteCode',
-        fieldName: 'submitInviteCode',
+        operationName: 'SubmitAppInviteCode',
+        fieldName: 'submitAppInviteCode',
         ...buildCustomDocument(
           'mutation',
-          'SubmitInviteCode',
-          'submitInviteCode',
+          'SubmitAppInviteCode',
+          'submitAppInviteCode',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SubmitInviteCodeInput!',
+              type: 'SubmitAppInviteCodeInput!',
             },
           ],
           connectionFieldsMap,
-          'SubmitInviteCodePayload'
+          'SubmitAppInviteCodePayload'
         ),
       }),
     submitOrgInviteCode: <S extends SubmitOrgInviteCodePayloadSelect>(

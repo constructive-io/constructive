@@ -416,7 +416,7 @@ export interface AppStep {
   updatedAt?: string | null;
 }
 /** Records of successfully claimed invitations, linking senders to receivers */
-export interface ClaimedInvite {
+export interface AppClaimedInvite {
   id: string;
   /** Optional JSON payload captured at the time the invite was claimed */
   data?: Record<string, unknown> | null;
@@ -560,7 +560,7 @@ export interface AppLevel {
   updatedAt?: string | null;
 }
 /** Invitation records sent to prospective members via email, with token-based redemption and expiration */
-export interface Invite {
+export interface AppInvite {
   id: string;
   /** Email address of the invited recipient */
   email?: ConstructiveInternalTypeEmail | null;
@@ -699,7 +699,7 @@ export interface MembershipTypeRelations {}
 export interface AppLimitRelations {}
 export interface AppAchievementRelations {}
 export interface AppStepRelations {}
-export interface ClaimedInviteRelations {}
+export interface AppClaimedInviteRelations {}
 export interface OrgChartEdgeGrantRelations {}
 export interface OrgLimitRelations {}
 export interface AppGrantRelations {}
@@ -709,7 +709,7 @@ export interface OrgGrantRelations {}
 export interface OrgChartEdgeRelations {}
 export interface OrgMembershipDefaultRelations {}
 export interface AppLevelRelations {}
-export interface InviteRelations {}
+export interface AppInviteRelations {}
 export interface AppMembershipRelations {}
 export interface OrgMembershipRelations {}
 export interface OrgInviteRelations {}
@@ -736,7 +736,7 @@ export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelatio
 export type AppLimitWithRelations = AppLimit & AppLimitRelations;
 export type AppAchievementWithRelations = AppAchievement & AppAchievementRelations;
 export type AppStepWithRelations = AppStep & AppStepRelations;
-export type ClaimedInviteWithRelations = ClaimedInvite & ClaimedInviteRelations;
+export type AppClaimedInviteWithRelations = AppClaimedInvite & AppClaimedInviteRelations;
 export type OrgChartEdgeGrantWithRelations = OrgChartEdgeGrant & OrgChartEdgeGrantRelations;
 export type OrgLimitWithRelations = OrgLimit & OrgLimitRelations;
 export type AppGrantWithRelations = AppGrant & AppGrantRelations;
@@ -748,7 +748,7 @@ export type OrgChartEdgeWithRelations = OrgChartEdge & OrgChartEdgeRelations;
 export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
   OrgMembershipDefaultRelations;
 export type AppLevelWithRelations = AppLevel & AppLevelRelations;
-export type InviteWithRelations = Invite & InviteRelations;
+export type AppInviteWithRelations = AppInvite & AppInviteRelations;
 export type AppMembershipWithRelations = AppMembership & AppMembershipRelations;
 export type OrgMembershipWithRelations = OrgMembership & OrgMembershipRelations;
 export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
@@ -873,7 +873,7 @@ export type AppStepSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
 };
-export type ClaimedInviteSelect = {
+export type AppClaimedInviteSelect = {
   id?: boolean;
   data?: boolean;
   senderId?: boolean;
@@ -967,7 +967,7 @@ export type AppLevelSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
 };
-export type InviteSelect = {
+export type AppInviteSelect = {
   id?: boolean;
   email?: boolean;
   senderId?: boolean;
@@ -1336,7 +1336,7 @@ export interface AppStepFilter {
   /** Negates the expression. */
   not?: AppStepFilter;
 }
-export interface ClaimedInviteFilter {
+export interface AppClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `senderId` field. */
@@ -1348,11 +1348,11 @@ export interface ClaimedInviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: ClaimedInviteFilter[];
+  and?: AppClaimedInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: ClaimedInviteFilter[];
+  or?: AppClaimedInviteFilter[];
   /** Negates the expression. */
-  not?: ClaimedInviteFilter;
+  not?: AppClaimedInviteFilter;
 }
 export interface OrgChartEdgeGrantFilter {
   /** Filter by the object’s `id` field. */
@@ -1560,7 +1560,7 @@ export interface AppLevelFilter {
   /** Negates the expression. */
   not?: AppLevelFilter;
 }
-export interface InviteFilter {
+export interface AppInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `email` field. */
@@ -1584,11 +1584,11 @@ export interface InviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: InviteFilter[];
+  and?: AppInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: InviteFilter[];
+  or?: AppInviteFilter[];
   /** Negates the expression. */
-  not?: InviteFilter;
+  not?: AppInviteFilter;
 }
 export interface AppMembershipFilter {
   /** Filter by the object’s `id` field. */
@@ -1945,7 +1945,7 @@ export type AppStepOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type ClaimedInviteOrderBy =
+export type AppClaimedInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -2133,7 +2133,7 @@ export type AppLevelOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type InviteOrderBy =
+export type AppInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -2662,25 +2662,25 @@ export interface DeleteAppStepInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateClaimedInviteInput {
+export interface CreateAppClaimedInviteInput {
   clientMutationId?: string;
-  claimedInvite: {
+  appClaimedInvite: {
     data?: Record<string, unknown>;
     senderId?: string;
     receiverId?: string;
   };
 }
-export interface ClaimedInvitePatch {
+export interface AppClaimedInvitePatch {
   data?: Record<string, unknown> | null;
   senderId?: string | null;
   receiverId?: string | null;
 }
-export interface UpdateClaimedInviteInput {
+export interface UpdateAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
-  claimedInvitePatch: ClaimedInvitePatch;
+  appClaimedInvitePatch: AppClaimedInvitePatch;
 }
-export interface DeleteClaimedInviteInput {
+export interface DeleteAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2917,9 +2917,9 @@ export interface DeleteAppLevelInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateInviteInput {
+export interface CreateAppInviteInput {
   clientMutationId?: string;
-  invite: {
+  appInvite: {
     email?: ConstructiveInternalTypeEmail;
     senderId?: string;
     inviteToken?: string;
@@ -2931,7 +2931,7 @@ export interface CreateInviteInput {
     expiresAt?: string;
   };
 }
-export interface InvitePatch {
+export interface AppInvitePatch {
   email?: ConstructiveInternalTypeEmail | null;
   senderId?: string | null;
   inviteToken?: string | null;
@@ -2942,12 +2942,12 @@ export interface InvitePatch {
   data?: Record<string, unknown> | null;
   expiresAt?: string | null;
 }
-export interface UpdateInviteInput {
+export interface UpdateAppInviteInput {
   clientMutationId?: string;
   id: string;
-  invitePatch: InvitePatch;
+  appInvitePatch: AppInvitePatch;
 }
-export interface DeleteInviteInput {
+export interface DeleteAppInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -3076,7 +3076,7 @@ export interface DeleteOrgInviteInput {
 // ============ Connection Fields Map ============
 export const connectionFieldsMap = {} as Record<string, Record<string, string>>;
 // ============ Custom Input Types (from schema) ============
-export interface SubmitInviteCodeInput {
+export interface SubmitAppInviteCodeInput {
   clientMutationId?: string;
   token?: string;
 }
@@ -3274,11 +3274,11 @@ export type AppLevelRequirementConnectionSelect = {
   };
   totalCount?: boolean;
 };
-export interface SubmitInviteCodePayload {
+export interface SubmitAppInviteCodePayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
-export type SubmitInviteCodePayloadSelect = {
+export type SubmitAppInviteCodePayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
@@ -4064,49 +4064,49 @@ export type DeleteAppStepPayloadSelect = {
     select: AppStepEdgeSelect;
   };
 };
-export interface CreateClaimedInvitePayload {
+export interface CreateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was created by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was created by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
-export type CreateClaimedInvitePayloadSelect = {
+export type CreateAppClaimedInvitePayloadSelect = {
   clientMutationId?: boolean;
-  claimedInvite?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvite?: {
+    select: AppClaimedInviteSelect;
   };
-  claimedInviteEdge?: {
-    select: ClaimedInviteEdgeSelect;
+  appClaimedInviteEdge?: {
+    select: AppClaimedInviteEdgeSelect;
   };
 };
-export interface UpdateClaimedInvitePayload {
+export interface UpdateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was updated by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was updated by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
-export type UpdateClaimedInvitePayloadSelect = {
+export type UpdateAppClaimedInvitePayloadSelect = {
   clientMutationId?: boolean;
-  claimedInvite?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvite?: {
+    select: AppClaimedInviteSelect;
   };
-  claimedInviteEdge?: {
-    select: ClaimedInviteEdgeSelect;
+  appClaimedInviteEdge?: {
+    select: AppClaimedInviteEdgeSelect;
   };
 };
-export interface DeleteClaimedInvitePayload {
+export interface DeleteAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was deleted by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was deleted by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
-export type DeleteClaimedInvitePayloadSelect = {
+export type DeleteAppClaimedInvitePayloadSelect = {
   clientMutationId?: boolean;
-  claimedInvite?: {
-    select: ClaimedInviteSelect;
+  appClaimedInvite?: {
+    select: AppClaimedInviteSelect;
   };
-  claimedInviteEdge?: {
-    select: ClaimedInviteEdgeSelect;
+  appClaimedInviteEdge?: {
+    select: AppClaimedInviteEdgeSelect;
   };
 };
 export interface CreateOrgChartEdgeGrantPayload {
@@ -4514,49 +4514,49 @@ export type DeleteAppLevelPayloadSelect = {
     select: AppLevelEdgeSelect;
   };
 };
-export interface CreateInvitePayload {
+export interface CreateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was created by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was created by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
-export type CreateInvitePayloadSelect = {
+export type CreateAppInvitePayloadSelect = {
   clientMutationId?: boolean;
-  invite?: {
-    select: InviteSelect;
+  appInvite?: {
+    select: AppInviteSelect;
   };
-  inviteEdge?: {
-    select: InviteEdgeSelect;
+  appInviteEdge?: {
+    select: AppInviteEdgeSelect;
   };
 };
-export interface UpdateInvitePayload {
+export interface UpdateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was updated by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was updated by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
-export type UpdateInvitePayloadSelect = {
+export type UpdateAppInvitePayloadSelect = {
   clientMutationId?: boolean;
-  invite?: {
-    select: InviteSelect;
+  appInvite?: {
+    select: AppInviteSelect;
   };
-  inviteEdge?: {
-    select: InviteEdgeSelect;
+  appInviteEdge?: {
+    select: AppInviteEdgeSelect;
   };
 };
-export interface DeleteInvitePayload {
+export interface DeleteAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was deleted by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was deleted by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
 }
-export type DeleteInvitePayloadSelect = {
+export type DeleteAppInvitePayloadSelect = {
   clientMutationId?: boolean;
-  invite?: {
-    select: InviteSelect;
+  appInvite?: {
+    select: AppInviteSelect;
   };
-  inviteEdge?: {
-    select: InviteEdgeSelect;
+  appInviteEdge?: {
+    select: AppInviteEdgeSelect;
   };
 };
 export interface CreateAppMembershipPayload {
@@ -4903,16 +4903,16 @@ export type AppStepEdgeSelect = {
     select: AppStepSelect;
   };
 };
-/** A `ClaimedInvite` edge in the connection. */
-export interface ClaimedInviteEdge {
+/** A `AppClaimedInvite` edge in the connection. */
+export interface AppClaimedInviteEdge {
   cursor?: string | null;
-  /** The `ClaimedInvite` at the end of the edge. */
-  node?: ClaimedInvite | null;
+  /** The `AppClaimedInvite` at the end of the edge. */
+  node?: AppClaimedInvite | null;
 }
-export type ClaimedInviteEdgeSelect = {
+export type AppClaimedInviteEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: ClaimedInviteSelect;
+    select: AppClaimedInviteSelect;
   };
 };
 /** A `OrgChartEdgeGrant` edge in the connection. */
@@ -5023,16 +5023,16 @@ export type AppLevelEdgeSelect = {
     select: AppLevelSelect;
   };
 };
-/** A `Invite` edge in the connection. */
-export interface InviteEdge {
+/** A `AppInvite` edge in the connection. */
+export interface AppInviteEdge {
   cursor?: string | null;
-  /** The `Invite` at the end of the edge. */
-  node?: Invite | null;
+  /** The `AppInvite` at the end of the edge. */
+  node?: AppInvite | null;
 }
-export type InviteEdgeSelect = {
+export type AppInviteEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: InviteSelect;
+    select: AppInviteSelect;
   };
 };
 /** A `AppMembership` edge in the connection. */

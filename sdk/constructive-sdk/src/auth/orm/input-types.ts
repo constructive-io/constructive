@@ -1010,6 +1010,14 @@ export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
 }
+export interface VerifyPasswordInput {
+  clientMutationId?: string;
+  password: string;
+}
+export interface VerifyTotpInput {
+  clientMutationId?: string;
+  totpValue: string;
+}
 export interface ConfirmDeleteAccountInput {
   clientMutationId?: string;
   userId?: string;
@@ -1070,14 +1078,6 @@ export interface ForgotPasswordInput {
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
-}
-export interface VerifyPasswordInput {
-  clientMutationId?: string;
-  password: string;
-}
-export interface VerifyTotpInput {
-  clientMutationId?: string;
-  totpValue: string;
 }
 export interface RequestUploadUrlInput {
   /** Bucket key (e.g., "public", "private") */
@@ -1931,6 +1931,22 @@ export interface CheckPasswordPayload {
 export type CheckPasswordPayloadSelect = {
   clientMutationId?: boolean;
 };
+export interface VerifyPasswordPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type VerifyPasswordPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface VerifyTotpPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type VerifyTotpPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ConfirmDeleteAccountPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -2024,26 +2040,6 @@ export interface SendVerificationEmailPayload {
 export type SendVerificationEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
-};
-export interface VerifyPasswordPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
-}
-export type VerifyPasswordPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: SessionSelect;
-  };
-};
-export interface VerifyTotpPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
-}
-export type VerifyTotpPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: SessionSelect;
-  };
 };
 export interface RequestUploadUrlPayload {
   /** Presigned PUT URL (null if file was deduplicated) */
@@ -2471,50 +2467,6 @@ export type ExtendTokenExpiresRecordSelect = {
   id?: boolean;
   sessionId?: boolean;
   expiresAt?: boolean;
-};
-/** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
-export interface Session {
-  id: string;
-  /** References the authenticated user; NULL for anonymous sessions */
-  userId?: string | null;
-  /** Whether this is an anonymous session (no authenticated user) */
-  isAnonymous: boolean;
-  /** When this session expires and can no longer be used for authentication */
-  expiresAt: string;
-  /** When this session was explicitly revoked (soft delete); NULL means active */
-  revokedAt?: string | null;
-  /** The origin (protocol + host) from which the session was created, used for fingerprint validation */
-  origin?: ConstructiveInternalTypeOrigin | null;
-  /** IP address from which the session was created, used for strict fingerprint validation */
-  ip?: string | null;
-  /** User-Agent string from the client, used for strict fingerprint validation */
-  uagent?: string | null;
-  /** Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation) */
-  fingerprintMode: string;
-  /** Timestamp of last password re-verification for step-up authentication */
-  lastPasswordVerified?: string | null;
-  /** Timestamp of last MFA verification for step-up authentication */
-  lastMfaVerified?: string | null;
-  /** Secret used to generate and validate CSRF tokens for cookie-based sessions */
-  csrfSecret?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
-export type SessionSelect = {
-  id?: boolean;
-  userId?: boolean;
-  isAnonymous?: boolean;
-  expiresAt?: boolean;
-  revokedAt?: boolean;
-  origin?: boolean;
-  ip?: boolean;
-  uagent?: boolean;
-  fingerprintMode?: boolean;
-  lastPasswordVerified?: boolean;
-  lastMfaVerified?: boolean;
-  csrfSecret?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
 };
 /** A `Email` edge in the connection. */
 export interface EmailEdge {

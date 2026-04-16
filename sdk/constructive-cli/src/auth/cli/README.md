@@ -40,6 +40,8 @@ csdk auth set-token <your-token>
 | `sign-out` | signOut |
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `check-password` | checkPassword |
+| `verify-password` | verifyPassword |
+| `verify-totp` | verifyTotp |
 | `confirm-delete-account` | confirmDeleteAccount |
 | `set-password` | setPassword |
 | `verify-email` | verifyEmail |
@@ -51,8 +53,6 @@ csdk auth set-token <your-token>
 | `extend-token-expires` | extendTokenExpires |
 | `forgot-password` | forgotPassword |
 | `send-verification-email` | sendVerificationEmail |
-| `verify-password` | verifyPassword |
-| `verify-totp` | verifyTotp |
 | `request-upload-url` | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
@@ -393,6 +393,30 @@ checkPassword
   | `--input.clientMutationId` | String |
   | `--input.password` | String |
 
+### `verify-password`
+
+verifyPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String (required) |
+
+### `verify-totp`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
+
 ### `confirm-delete-account`
 
 confirmDeleteAccount
@@ -541,30 +565,6 @@ sendVerificationEmail
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.email` | Email |
-
-### `verify-password`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.password` | String (required) |
-
-### `verify-totp`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.totpValue` | String (required) |
 
 ### `request-upload-url`
 

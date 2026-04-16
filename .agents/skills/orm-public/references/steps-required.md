@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 ## Usage
 
 ```typescript
-db.query.stepsRequired({ vlevel: '<String>', vroleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute()
+db.query.stepsRequired({ level: '<String>', roleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.query.stepsRequired({ vlevel: '<String>', vroleId: '<UUID>', first: '<Int>', 
 ### Run stepsRequired
 
 ```typescript
-const result = await db.query.stepsRequired({ vlevel: '<String>', vroleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
+const result = await db.query.stepsRequired({ level: '<String>', roleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' }).execute();
 ```

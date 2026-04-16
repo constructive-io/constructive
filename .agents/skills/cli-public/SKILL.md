@@ -1,13 +1,13 @@
 ---
 name: cli-public
-description: CLI tool (csdk) for the public API — provides CRUD commands for 108 tables and 64 custom operations
+description: CLI tool (csdk) for the public API — provides CRUD commands for 109 tables and 64 custom operations
 ---
 
 # cli-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the public API — provides CRUD commands for 108 tables and 64 custom operations
+CLI tool (csdk) for the public API — provides CRUD commands for 109 tables and 64 custom operations
 
 ## Usage
 
@@ -142,8 +142,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [phone-number](references/phone-number.md)
 - [crypto-address](references/crypto-address.md)
 - [connected-account](references/connected-account.md)
-- [invite](references/invite.md)
-- [claimed-invite](references/claimed-invite.md)
+- [app-invite](references/app-invite.md)
+- [app-claimed-invite](references/app-claimed-invite.md)
 - [org-invite](references/org-invite.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
 - [audit-log](references/audit-log.md)
@@ -157,6 +157,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [membership-type](references/membership-type.md)
 - [app-membership-default](references/app-membership-default.md)
 - [commit](references/commit.md)
+- [rate-limits-module](references/rate-limits-module.md)
 - [org-membership-default](references/org-membership-default.md)
 - [rls-module](references/rls-module.md)
 - [sql-action](references/sql-action.md)
@@ -189,7 +190,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)
 - [reject-database-transfer](references/reject-database-transfer.md)
-- [submit-invite-code](references/submit-invite-code.md)
+- [verify-password](references/verify-password.md)
+- [verify-totp](references/verify-totp.md)
+- [submit-app-invite-code](references/submit-app-invite-code.md)
 - [submit-org-invite-code](references/submit-org-invite-code.md)
 - [check-password](references/check-password.md)
 - [confirm-delete-account](references/confirm-delete-account.md)
@@ -223,8 +226,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [provision-table](references/provision-table.md)
 - [send-verification-email](references/send-verification-email.md)
 - [forgot-password](references/forgot-password.md)
-- [verify-password](references/verify-password.md)
-- [verify-totp](references/verify-totp.md)
 - [request-upload-url](references/request-upload-url.md)
 - [confirm-upload](references/confirm-upload.md)
 - [provision-bucket](references/provision-bucket.md)

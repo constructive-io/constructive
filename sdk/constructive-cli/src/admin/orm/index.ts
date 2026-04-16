@@ -23,7 +23,7 @@ import { MembershipTypeModel } from './models/membershipType';
 import { AppLimitModel } from './models/appLimit';
 import { AppAchievementModel } from './models/appAchievement';
 import { AppStepModel } from './models/appStep';
-import { ClaimedInviteModel } from './models/claimedInvite';
+import { AppClaimedInviteModel } from './models/appClaimedInvite';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { OrgLimitModel } from './models/orgLimit';
 import { AppGrantModel } from './models/appGrant';
@@ -33,7 +33,7 @@ import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { AppLevelModel } from './models/appLevel';
-import { InviteModel } from './models/invite';
+import { AppInviteModel } from './models/appInvite';
 import { AppMembershipModel } from './models/appMembership';
 import { OrgMembershipModel } from './models/orgMembership';
 import { OrgInviteModel } from './models/orgInvite';
@@ -91,7 +91,7 @@ export function createClient(config: OrmClientConfig) {
     appLimit: new AppLimitModel(client),
     appAchievement: new AppAchievementModel(client),
     appStep: new AppStepModel(client),
-    claimedInvite: new ClaimedInviteModel(client),
+    appClaimedInvite: new AppClaimedInviteModel(client),
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     orgLimit: new OrgLimitModel(client),
     appGrant: new AppGrantModel(client),
@@ -101,7 +101,7 @@ export function createClient(config: OrmClientConfig) {
     orgChartEdge: new OrgChartEdgeModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     appLevel: new AppLevelModel(client),
-    invite: new InviteModel(client),
+    appInvite: new AppInviteModel(client),
     appMembership: new AppMembershipModel(client),
     orgMembership: new OrgMembershipModel(client),
     orgInvite: new OrgInviteModel(client),

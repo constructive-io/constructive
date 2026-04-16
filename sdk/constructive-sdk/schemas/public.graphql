@@ -1444,8 +1444,8 @@ type User {
     orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
   ): ConnectedAccountConnection!
 
-  """Reads and enables pagination through a set of `Invite`."""
-  invitesBySenderId(
+  """Reads and enables pagination through a set of `AppInvite`."""
+  appInvitesBySenderId(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1467,14 +1467,14 @@ type User {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: InviteFilter
+    where: AppInviteFilter
 
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): InviteConnection!
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppInviteConnection!
 
-  """Reads and enables pagination through a set of `ClaimedInvite`."""
-  claimedInvitesByReceiverId(
+  """Reads and enables pagination through a set of `AppClaimedInvite`."""
+  appClaimedInvitesByReceiverId(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1496,14 +1496,14 @@ type User {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ClaimedInviteFilter
+    where: AppClaimedInviteFilter
 
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteConnection!
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteConnection!
 
-  """Reads and enables pagination through a set of `ClaimedInvite`."""
-  claimedInvitesBySenderId(
+  """Reads and enables pagination through a set of `AppClaimedInvite`."""
+  appClaimedInvitesBySenderId(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -1525,11 +1525,11 @@ type User {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ClaimedInviteFilter
+    where: AppClaimedInviteFilter
 
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteConnection!
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteConnection!
 
   """Reads and enables pagination through a set of `OrgInvite`."""
   orgInvitesByEntityId(
@@ -3396,6 +3396,9 @@ type Database {
     """The method to use when ordering `StorageModule`."""
     orderBy: [StorageModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): StorageModuleConnection!
+
+  """Reads a single `RateLimitsModule` that is related to this `Database`."""
+  rateLimitsModule: RateLimitsModule
 
   """
   Reads and enables pagination through a set of `DatabaseProvisionModule`.
@@ -5284,6 +5287,12 @@ input DatabaseFilter {
   """`storageModules` exist."""
   storageModulesExist: Boolean
 
+  """Filter by the object’s `rateLimitsModule` relation."""
+  rateLimitsModule: RateLimitsModuleFilter
+
+  """A related `rateLimitsModule` exists."""
+  rateLimitsModuleExists: Boolean
+
   """Filter by the object’s `databaseProvisionModules` relation."""
   databaseProvisionModules: DatabaseToManyDatabaseProvisionModuleFilter
 
@@ -5571,23 +5580,23 @@ input UserFilter {
   """`ownedConnectedAccounts` exist."""
   ownedConnectedAccountsExist: Boolean
 
-  """Filter by the object’s `invitesBySenderId` relation."""
-  invitesBySenderId: UserToManyInviteFilter
+  """Filter by the object’s `appInvitesBySenderId` relation."""
+  appInvitesBySenderId: UserToManyAppInviteFilter
 
-  """`invitesBySenderId` exist."""
-  invitesBySenderIdExist: Boolean
+  """`appInvitesBySenderId` exist."""
+  appInvitesBySenderIdExist: Boolean
 
-  """Filter by the object’s `claimedInvitesByReceiverId` relation."""
-  claimedInvitesByReceiverId: UserToManyClaimedInviteFilter
+  """Filter by the object’s `appClaimedInvitesByReceiverId` relation."""
+  appClaimedInvitesByReceiverId: UserToManyAppClaimedInviteFilter
 
-  """`claimedInvitesByReceiverId` exist."""
-  claimedInvitesByReceiverIdExist: Boolean
+  """`appClaimedInvitesByReceiverId` exist."""
+  appClaimedInvitesByReceiverIdExist: Boolean
 
-  """Filter by the object’s `claimedInvitesBySenderId` relation."""
-  claimedInvitesBySenderId: UserToManyClaimedInviteFilter
+  """Filter by the object’s `appClaimedInvitesBySenderId` relation."""
+  appClaimedInvitesBySenderId: UserToManyAppClaimedInviteFilter
 
-  """`claimedInvitesBySenderId` exist."""
-  claimedInvitesBySenderIdExist: Boolean
+  """`appClaimedInvitesBySenderId` exist."""
+  appClaimedInvitesBySenderIdExist: Boolean
 
   """Filter by the object’s `orgInvitesByEntityId` relation."""
   orgInvitesByEntityId: UserToManyOrgInviteFilter
@@ -7377,23 +7386,23 @@ input ConnectedAccountFilter {
 }
 
 """
-A filter to be used against many `Invite` object types. All fields are combined with a logical ‘and.’
+A filter to be used against many `AppInvite` object types. All fields are combined with a logical ‘and.’
 """
-input UserToManyInviteFilter {
+input UserToManyAppInviteFilter {
   """Filters to entities where at least one related entity matches."""
-  some: InviteFilter
+  some: AppInviteFilter
 
   """Filters to entities where every related entity matches."""
-  every: InviteFilter
+  every: AppInviteFilter
 
   """Filters to entities where no related entity matches."""
-  none: InviteFilter
+  none: AppInviteFilter
 }
 
 """
-A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `AppInvite` object types. All fields are combined with a logical ‘and.’
 """
-input InviteFilter {
+input AppInviteFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -7428,36 +7437,36 @@ input InviteFilter {
   updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [InviteFilter!]
+  and: [AppInviteFilter!]
 
   """Checks for any expressions in this list."""
-  or: [InviteFilter!]
+  or: [AppInviteFilter!]
 
   """Negates the expression."""
-  not: InviteFilter
+  not: AppInviteFilter
 
   """Filter by the object’s `sender` relation."""
   sender: UserFilter
 }
 
 """
-A filter to be used against many `ClaimedInvite` object types. All fields are combined with a logical ‘and.’
+A filter to be used against many `AppClaimedInvite` object types. All fields are combined with a logical ‘and.’
 """
-input UserToManyClaimedInviteFilter {
+input UserToManyAppClaimedInviteFilter {
   """Filters to entities where at least one related entity matches."""
-  some: ClaimedInviteFilter
+  some: AppClaimedInviteFilter
 
   """Filters to entities where every related entity matches."""
-  every: ClaimedInviteFilter
+  every: AppClaimedInviteFilter
 
   """Filters to entities where no related entity matches."""
-  none: ClaimedInviteFilter
+  none: AppClaimedInviteFilter
 }
 
 """
-A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `AppClaimedInvite` object types. All fields are combined with a logical ‘and.’
 """
-input ClaimedInviteFilter {
+input AppClaimedInviteFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
@@ -7474,13 +7483,13 @@ input ClaimedInviteFilter {
   updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [ClaimedInviteFilter!]
+  and: [AppClaimedInviteFilter!]
 
   """Checks for any expressions in this list."""
-  or: [ClaimedInviteFilter!]
+  or: [AppClaimedInviteFilter!]
 
   """Negates the expression."""
-  not: ClaimedInviteFilter
+  not: AppClaimedInviteFilter
 
   """Filter by the object’s `receiver` relation."""
   receiver: UserFilter
@@ -13671,6 +13680,66 @@ strings and not numbers.
 scalar BigInt
 
 """
+A filter to be used against `RateLimitsModule` object types. All fields are combined with a logical ‘and.’
+"""
+input RateLimitsModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `rateLimitSettingsTableId` field."""
+  rateLimitSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `ipRateLimitsTableId` field."""
+  ipRateLimitsTableId: UUIDFilter
+
+  """Filter by the object’s `rateLimitsTableId` field."""
+  rateLimitsTableId: UUIDFilter
+
+  """Filter by the object’s `rateLimitSettingsTable` field."""
+  rateLimitSettingsTable: StringFilter
+
+  """Filter by the object’s `ipRateLimitsTable` field."""
+  ipRateLimitsTable: StringFilter
+
+  """Filter by the object’s `rateLimitsTable` field."""
+  rateLimitsTable: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [RateLimitsModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [RateLimitsModuleFilter!]
+
+  """Negates the expression."""
+  not: RateLimitsModuleFilter
+
+  """Filter by the object’s `database` relation."""
+  database: DatabaseFilter
+
+  """
+  Filter by the object’s `ipRateLimitsTableByIpRateLimitsTableId` relation.
+  """
+  ipRateLimitsTableByIpRateLimitsTableId: TableFilter
+
+  """
+  Filter by the object’s `rateLimitSettingsTableByRateLimitSettingsTableId` relation.
+  """
+  rateLimitSettingsTableByRateLimitSettingsTableId: TableFilter
+
+  """Filter by the object’s `rateLimitsTableByRateLimitsTableId` relation."""
+  rateLimitsTableByRateLimitsTableId: TableFilter
+
+  """Filter by the object’s `schema` relation."""
+  schema: SchemaFilter
+}
+
+"""
 A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’
 """
 input DatabaseToManyDatabaseProvisionModuleFilter {
@@ -19472,6 +19541,33 @@ enum StorageModuleOrderBy {
   CACHE_TTL_SECONDS_DESC
 }
 
+type RateLimitsModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  rateLimitSettingsTableId: UUID!
+  ipRateLimitsTableId: UUID!
+  rateLimitsTableId: UUID!
+  rateLimitSettingsTable: String!
+  ipRateLimitsTable: String!
+  rateLimitsTable: String!
+
+  """Reads a single `Database` that is related to this `RateLimitsModule`."""
+  database: Database
+
+  """Reads a single `Table` that is related to this `RateLimitsModule`."""
+  ipRateLimitsTableByIpRateLimitsTableId: Table
+
+  """Reads a single `Table` that is related to this `RateLimitsModule`."""
+  rateLimitSettingsTableByRateLimitSettingsTableId: Table
+
+  """Reads a single `Table` that is related to this `RateLimitsModule`."""
+  rateLimitsTableByRateLimitsTableId: Table
+
+  """Reads a single `Schema` that is related to this `RateLimitsModule`."""
+  schema: Schema
+}
+
 """A connection to a list of `DatabaseProvisionModule` values."""
 type DatabaseProvisionModuleConnection {
   """A list of `DatabaseProvisionModule` objects."""
@@ -21163,27 +21259,27 @@ enum ConnectedAccountOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `Invite` values."""
-type InviteConnection {
-  """A list of `Invite` objects."""
-  nodes: [Invite]!
+"""A connection to a list of `AppInvite` values."""
+type AppInviteConnection {
+  """A list of `AppInvite` objects."""
+  nodes: [AppInvite]!
 
   """
-  A list of edges which contains the `Invite` and cursor to aid in pagination.
+  A list of edges which contains the `AppInvite` and cursor to aid in pagination.
   """
-  edges: [InviteEdge]!
+  edges: [AppInviteEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `Invite` you could get from the connection."""
+  """The count of *all* `AppInvite` you could get from the connection."""
   totalCount: Int!
 }
 
 """
 Invitation records sent to prospective members via email, with token-based redemption and expiration
 """
-type Invite {
+type AppInvite {
   id: UUID!
 
   """Email address of the invited recipient"""
@@ -21215,21 +21311,21 @@ type Invite {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """Reads a single `User` that is related to this `Invite`."""
+  """Reads a single `User` that is related to this `AppInvite`."""
   sender: User
 }
 
-"""A `Invite` edge in the connection."""
-type InviteEdge {
+"""A `AppInvite` edge in the connection."""
+type AppInviteEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `Invite` at the end of the edge."""
-  node: Invite
+  """The `AppInvite` at the end of the edge."""
+  node: AppInvite
 }
 
-"""Methods to use when ordering `Invite`."""
-enum InviteOrderBy {
+"""Methods to use when ordering `AppInvite`."""
+enum AppInviteOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -21259,27 +21355,29 @@ enum InviteOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `ClaimedInvite` values."""
-type ClaimedInviteConnection {
-  """A list of `ClaimedInvite` objects."""
-  nodes: [ClaimedInvite]!
+"""A connection to a list of `AppClaimedInvite` values."""
+type AppClaimedInviteConnection {
+  """A list of `AppClaimedInvite` objects."""
+  nodes: [AppClaimedInvite]!
 
   """
-  A list of edges which contains the `ClaimedInvite` and cursor to aid in pagination.
+  A list of edges which contains the `AppClaimedInvite` and cursor to aid in pagination.
   """
-  edges: [ClaimedInviteEdge]!
+  edges: [AppClaimedInviteEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `ClaimedInvite` you could get from the connection."""
+  """
+  The count of *all* `AppClaimedInvite` you could get from the connection.
+  """
   totalCount: Int!
 }
 
 """
 Records of successfully claimed invitations, linking senders to receivers
 """
-type ClaimedInvite {
+type AppClaimedInvite {
   id: UUID!
 
   """Optional JSON payload captured at the time the invite was claimed"""
@@ -21293,24 +21391,24 @@ type ClaimedInvite {
   createdAt: Datetime
   updatedAt: Datetime
 
-  """Reads a single `User` that is related to this `ClaimedInvite`."""
+  """Reads a single `User` that is related to this `AppClaimedInvite`."""
   receiver: User
 
-  """Reads a single `User` that is related to this `ClaimedInvite`."""
+  """Reads a single `User` that is related to this `AppClaimedInvite`."""
   sender: User
 }
 
-"""A `ClaimedInvite` edge in the connection."""
-type ClaimedInviteEdge {
+"""A `AppClaimedInvite` edge in the connection."""
+type AppClaimedInviteEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `ClaimedInvite` at the end of the edge."""
-  node: ClaimedInvite
+  """The `AppClaimedInvite` at the end of the edge."""
+  node: AppClaimedInvite
 }
 
-"""Methods to use when ordering `ClaimedInvite`."""
-enum ClaimedInviteOrderBy {
+"""Methods to use when ordering `AppClaimedInvite`."""
+enum AppClaimedInviteOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -22609,6 +22707,59 @@ enum CommitOrderBy {
   DATE_DESC
 }
 
+"""A connection to a list of `RateLimitsModule` values."""
+type RateLimitsModuleConnection {
+  """A list of `RateLimitsModule` objects."""
+  nodes: [RateLimitsModule]!
+
+  """
+  A list of edges which contains the `RateLimitsModule` and cursor to aid in pagination.
+  """
+  edges: [RateLimitsModuleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RateLimitsModule` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RateLimitsModule` edge in the connection."""
+type RateLimitsModuleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RateLimitsModule` at the end of the edge."""
+  node: RateLimitsModule
+}
+
+"""Methods to use when ordering `RateLimitsModule`."""
+enum RateLimitsModuleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  RATE_LIMIT_SETTINGS_TABLE_ID_ASC
+  RATE_LIMIT_SETTINGS_TABLE_ID_DESC
+  IP_RATE_LIMITS_TABLE_ID_ASC
+  IP_RATE_LIMITS_TABLE_ID_DESC
+  RATE_LIMITS_TABLE_ID_ASC
+  RATE_LIMITS_TABLE_ID_DESC
+  RATE_LIMIT_SETTINGS_TABLE_ASC
+  RATE_LIMIT_SETTINGS_TABLE_DESC
+  IP_RATE_LIMITS_TABLE_ASC
+  IP_RATE_LIMITS_TABLE_DESC
+  RATE_LIMITS_TABLE_ASC
+  RATE_LIMITS_TABLE_DESC
+}
+
 """A connection to a list of `OrgMembershipDefault` values."""
 type OrgMembershipDefaultConnection {
   """A list of `OrgMembershipDefault` objects."""
@@ -23494,8 +23645,8 @@ input RejectDatabaseTransferInput {
   transferId: UUID
 }
 
-"""The output of our `submitInviteCode` mutation."""
-type SubmitInviteCodePayload {
+"""The output of our `verifyPassword` mutation."""
+type VerifyPasswordPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -23509,8 +23660,58 @@ type SubmitInviteCodePayload {
   query: Query
 }
 
-"""All input for the `submitInviteCode` mutation."""
-input SubmitInviteCodeInput {
+"""All input for the `verifyPassword` mutation."""
+input VerifyPasswordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  password: String!
+}
+
+"""The output of our `verifyTotp` mutation."""
+type VerifyTotpPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `verifyTotp` mutation."""
+input VerifyTotpInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  totpValue: String!
+}
+
+"""The output of our `submitAppInviteCode` mutation."""
+type SubmitAppInviteCodePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `submitAppInviteCode` mutation."""
+input SubmitAppInviteCodeInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -24504,110 +24705,6 @@ input ForgotPasswordInput {
   """
   clientMutationId: String
   email: ConstructiveInternalTypeEmail
-}
-
-"""The output of our `verifyPassword` mutation."""
-type VerifyPasswordPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: Session
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""
-Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state
-"""
-type Session {
-  id: UUID!
-
-  """References the authenticated user; NULL for anonymous sessions"""
-  userId: UUID
-
-  """Whether this is an anonymous session (no authenticated user)"""
-  isAnonymous: Boolean!
-
-  """When this session expires and can no longer be used for authentication"""
-  expiresAt: Datetime!
-
-  """
-  When this session was explicitly revoked (soft delete); NULL means active
-  """
-  revokedAt: Datetime
-
-  """
-  The origin (protocol + host) from which the session was created, used for fingerprint validation
-  """
-  origin: ConstructiveInternalTypeOrigin
-
-  """
-  IP address from which the session was created, used for strict fingerprint validation
-  """
-  ip: InternetAddress
-
-  """
-  User-Agent string from the client, used for strict fingerprint validation
-  """
-  uagent: String
-
-  """
-  Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation)
-  """
-  fingerprintMode: String!
-
-  """Timestamp of last password re-verification for step-up authentication"""
-  lastPasswordVerified: Datetime
-
-  """Timestamp of last MFA verification for step-up authentication"""
-  lastMfaVerified: Datetime
-
-  """
-  Secret used to generate and validate CSRF tokens for cookie-based sessions
-  """
-  csrfSecret: String
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""All input for the `verifyPassword` mutation."""
-input VerifyPasswordInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  password: String!
-}
-
-"""The output of our `verifyTotp` mutation."""
-type VerifyTotpPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: Session
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `verifyTotp` mutation."""
-input VerifyTotpInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  totpValue: String!
 }
 
 """The output of our create `DefaultIdsModule` mutation."""
@@ -26791,43 +26888,43 @@ input SiteMetadatumInput {
   ogImage: ConstructiveInternalTypeImage
 }
 
-"""The output of our create `ClaimedInvite` mutation."""
-type CreateClaimedInvitePayload {
+"""The output of our create `AppClaimedInvite` mutation."""
+type CreateAppClaimedInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` that was created by this mutation."""
-  claimedInvite: ClaimedInvite
+  """The `AppClaimedInvite` that was created by this mutation."""
+  appClaimedInvite: AppClaimedInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `ClaimedInvite`. May be used by Relay 1."""
-  claimedInviteEdge(
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteEdge
+  """An edge for our `AppClaimedInvite`. May be used by Relay 1."""
+  appClaimedInviteEdge(
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteEdge
 }
 
-"""All input for the create `ClaimedInvite` mutation."""
-input CreateClaimedInviteInput {
+"""All input for the create `AppClaimedInvite` mutation."""
+input CreateAppClaimedInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` to be created by this mutation."""
-  claimedInvite: ClaimedInviteInput!
+  """The `AppClaimedInvite` to be created by this mutation."""
+  appClaimedInvite: AppClaimedInviteInput!
 }
 
-"""An input for mutations affecting `ClaimedInvite`"""
-input ClaimedInviteInput {
+"""An input for mutations affecting `AppClaimedInvite`"""
+input AppClaimedInviteInput {
   id: UUID
 
   """Optional JSON payload captured at the time the invite was claimed"""
@@ -27047,6 +27144,54 @@ input CommitInput {
   """The root of the tree"""
   treeId: UUID
   date: Datetime
+}
+
+"""The output of our create `RateLimitsModule` mutation."""
+type CreateRateLimitsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RateLimitsModule` that was created by this mutation."""
+  rateLimitsModule: RateLimitsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RateLimitsModule`. May be used by Relay 1."""
+  rateLimitsModuleEdge(
+    """The method to use when ordering `RateLimitsModule`."""
+    orderBy: [RateLimitsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RateLimitsModuleEdge
+}
+
+"""All input for the create `RateLimitsModule` mutation."""
+input CreateRateLimitsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RateLimitsModule` to be created by this mutation."""
+  rateLimitsModule: RateLimitsModuleInput!
+}
+
+"""An input for mutations affecting `RateLimitsModule`"""
+input RateLimitsModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  rateLimitSettingsTableId: UUID
+  ipRateLimitsTableId: UUID
+  rateLimitsTableId: UUID
+  rateLimitSettingsTable: String
+  ipRateLimitsTable: String
+  rateLimitsTable: String
 }
 
 """The output of our create `TableTemplateModule` mutation."""
@@ -29026,43 +29171,43 @@ input PermissionsModuleInput {
   getMaskByName: String
 }
 
-"""The output of our create `Invite` mutation."""
-type CreateInvitePayload {
+"""The output of our create `AppInvite` mutation."""
+type CreateAppInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Invite` that was created by this mutation."""
-  invite: Invite
+  """The `AppInvite` that was created by this mutation."""
+  appInvite: AppInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
+  """An edge for our `AppInvite`. May be used by Relay 1."""
+  appInviteEdge(
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppInviteEdge
 }
 
-"""All input for the create `Invite` mutation."""
-input CreateInviteInput {
+"""All input for the create `AppInvite` mutation."""
+input CreateAppInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `Invite` to be created by this mutation."""
-  invite: InviteInput!
+  """The `AppInvite` to be created by this mutation."""
+  appInvite: AppInviteInput!
 }
 
-"""An input for mutations affecting `Invite`"""
-input InviteInput {
+"""An input for mutations affecting `AppInvite`"""
+input AppInviteInput {
   id: UUID
 
   """Email address of the invited recipient"""
@@ -32980,31 +33125,31 @@ input SiteMetadatumPatch {
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-"""The output of our update `ClaimedInvite` mutation."""
-type UpdateClaimedInvitePayload {
+"""The output of our update `AppClaimedInvite` mutation."""
+type UpdateAppClaimedInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` that was updated by this mutation."""
-  claimedInvite: ClaimedInvite
+  """The `AppClaimedInvite` that was updated by this mutation."""
+  appClaimedInvite: AppClaimedInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `ClaimedInvite`. May be used by Relay 1."""
-  claimedInviteEdge(
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteEdge
+  """An edge for our `AppClaimedInvite`. May be used by Relay 1."""
+  appClaimedInviteEdge(
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteEdge
 }
 
-"""All input for the `updateClaimedInvite` mutation."""
-input UpdateClaimedInviteInput {
+"""All input for the `updateAppClaimedInvite` mutation."""
+input UpdateAppClaimedInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -33013,15 +33158,15 @@ input UpdateClaimedInviteInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `ClaimedInvite` being updated.
+  An object where the defined keys will be set on the `AppClaimedInvite` being updated.
   """
-  claimedInvitePatch: ClaimedInvitePatch!
+  appClaimedInvitePatch: AppClaimedInvitePatch!
 }
 
 """
-Represents an update to a `ClaimedInvite`. Fields that are set will be updated.
+Represents an update to a `AppClaimedInvite`. Fields that are set will be updated.
 """
-input ClaimedInvitePatch {
+input AppClaimedInvitePatch {
   id: UUID
 
   """Optional JSON payload captured at the time the invite was claimed"""
@@ -33266,6 +33411,59 @@ input CommitPatch {
   """The root of the tree"""
   treeId: UUID
   date: Datetime
+}
+
+"""The output of our update `RateLimitsModule` mutation."""
+type UpdateRateLimitsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RateLimitsModule` that was updated by this mutation."""
+  rateLimitsModule: RateLimitsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RateLimitsModule`. May be used by Relay 1."""
+  rateLimitsModuleEdge(
+    """The method to use when ordering `RateLimitsModule`."""
+    orderBy: [RateLimitsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RateLimitsModuleEdge
+}
+
+"""All input for the `updateRateLimitsModule` mutation."""
+input UpdateRateLimitsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `RateLimitsModule` being updated.
+  """
+  rateLimitsModulePatch: RateLimitsModulePatch!
+}
+
+"""
+Represents an update to a `RateLimitsModule`. Fields that are set will be updated.
+"""
+input RateLimitsModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  rateLimitSettingsTableId: UUID
+  ipRateLimitsTableId: UUID
+  rateLimitsTableId: UUID
+  rateLimitSettingsTable: String
+  ipRateLimitsTable: String
+  rateLimitsTable: String
 }
 
 """The output of our update `TableTemplateModule` mutation."""
@@ -35339,31 +35537,31 @@ input PermissionsModulePatch {
   getMaskByName: String
 }
 
-"""The output of our update `Invite` mutation."""
-type UpdateInvitePayload {
+"""The output of our update `AppInvite` mutation."""
+type UpdateAppInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Invite` that was updated by this mutation."""
-  invite: Invite
+  """The `AppInvite` that was updated by this mutation."""
+  appInvite: AppInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
+  """An edge for our `AppInvite`. May be used by Relay 1."""
+  appInviteEdge(
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppInviteEdge
 }
 
-"""All input for the `updateInvite` mutation."""
-input UpdateInviteInput {
+"""All input for the `updateAppInvite` mutation."""
+input UpdateAppInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -35372,15 +35570,15 @@ input UpdateInviteInput {
   id: UUID!
 
   """
-  An object where the defined keys will be set on the `Invite` being updated.
+  An object where the defined keys will be set on the `AppInvite` being updated.
   """
-  invitePatch: InvitePatch!
+  appInvitePatch: AppInvitePatch!
 }
 
 """
-Represents an update to a `Invite`. Fields that are set will be updated.
+Represents an update to a `AppInvite`. Fields that are set will be updated.
 """
-input InvitePatch {
+input AppInvitePatch {
   id: UUID
 
   """Email address of the invited recipient"""
@@ -38484,31 +38682,31 @@ input DeleteSiteMetadatumInput {
   id: UUID!
 }
 
-"""The output of our delete `ClaimedInvite` mutation."""
-type DeleteClaimedInvitePayload {
+"""The output of our delete `AppClaimedInvite` mutation."""
+type DeleteAppClaimedInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ClaimedInvite` that was deleted by this mutation."""
-  claimedInvite: ClaimedInvite
+  """The `AppClaimedInvite` that was deleted by this mutation."""
+  appClaimedInvite: AppClaimedInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `ClaimedInvite`. May be used by Relay 1."""
-  claimedInviteEdge(
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteEdge
+  """An edge for our `AppClaimedInvite`. May be used by Relay 1."""
+  appClaimedInviteEdge(
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteEdge
 }
 
-"""All input for the `deleteClaimedInvite` mutation."""
-input DeleteClaimedInviteInput {
+"""All input for the `deleteAppClaimedInvite` mutation."""
+input DeleteAppClaimedInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -38652,6 +38850,39 @@ input DeleteCommitInput {
 
   """The repository identifier"""
   databaseId: UUID!
+}
+
+"""The output of our delete `RateLimitsModule` mutation."""
+type DeleteRateLimitsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `RateLimitsModule` that was deleted by this mutation."""
+  rateLimitsModule: RateLimitsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `RateLimitsModule`. May be used by Relay 1."""
+  rateLimitsModuleEdge(
+    """The method to use when ordering `RateLimitsModule`."""
+    orderBy: [RateLimitsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RateLimitsModuleEdge
+}
+
+"""All input for the `deleteRateLimitsModule` mutation."""
+input DeleteRateLimitsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
 }
 
 """The output of our delete `TableTemplateModule` mutation."""
@@ -39753,31 +39984,31 @@ input DeletePermissionsModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `Invite` mutation."""
-type DeleteInvitePayload {
+"""The output of our delete `AppInvite` mutation."""
+type DeleteAppInvitePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Invite` that was deleted by this mutation."""
-  invite: Invite
+  """The `AppInvite` that was deleted by this mutation."""
+  appInvite: AppInvite
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Invite`. May be used by Relay 1."""
-  inviteEdge(
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): InviteEdge
+  """An edge for our `AppInvite`. May be used by Relay 1."""
+  appInviteEdge(
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AppInviteEdge
 }
 
-"""All input for the `deleteInvite` mutation."""
-input DeleteInviteInput {
+"""All input for the `deleteAppInvite` mutation."""
+input DeleteAppInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -40476,7 +40707,7 @@ type Query {
   currentUserAgent: String
   appPermissionsGetPaddedMask(mask: BitString): BitString
   orgPermissionsGetPaddedMask(mask: BitString): BitString
-  stepsAchieved(vlevel: String, vroleId: UUID): Boolean
+  stepsAchieved(level: String, roleId: UUID): Boolean
   revParse(dbId: UUID, storeId: UUID, refname: String): UUID
   orgIsManagerOf(pEntityId: UUID, pManagerId: UUID, pUserId: UUID, pMaxDepth: Int): Boolean
 
@@ -40622,8 +40853,8 @@ type Query {
 
   """Reads and enables pagination through a set of `AppLevelRequirement`."""
   stepsRequired(
-    vlevel: String
-    vroleId: UUID
+    level: String
+    roleId: UUID
 
     """Only read the first `n` values of the set."""
     first: Int
@@ -41948,8 +42179,8 @@ type Query {
     orderBy: [SiteMetadatumOrderBy!] = [PRIMARY_KEY_ASC]
   ): SiteMetadatumConnection
 
-  """Reads and enables pagination through a set of `ClaimedInvite`."""
-  claimedInvites(
+  """Reads and enables pagination through a set of `AppClaimedInvite`."""
+  appClaimedInvites(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -41971,11 +42202,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ClaimedInviteFilter
+    where: AppClaimedInviteFilter
 
-    """The method to use when ordering `ClaimedInvite`."""
-    orderBy: [ClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ClaimedInviteConnection
+    """The method to use when ordering `AppClaimedInvite`."""
+    orderBy: [AppClaimedInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppClaimedInviteConnection
 
   """Reads and enables pagination through a set of `AppMembershipDefault`."""
   appMembershipDefaults(
@@ -42092,6 +42323,35 @@ type Query {
     """The method to use when ordering `Commit`."""
     orderBy: [CommitOrderBy!] = [PRIMARY_KEY_ASC]
   ): CommitConnection
+
+  """Reads and enables pagination through a set of `RateLimitsModule`."""
+  rateLimitsModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: RateLimitsModuleFilter
+
+    """The method to use when ordering `RateLimitsModule`."""
+    orderBy: [RateLimitsModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RateLimitsModuleConnection
 
   """Reads and enables pagination through a set of `TableTemplateModule`."""
   tableTemplateModules(
@@ -43112,8 +43372,8 @@ type Query {
     orderBy: [PermissionsModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PermissionsModuleConnection
 
-  """Reads and enables pagination through a set of `Invite`."""
-  invites(
+  """Reads and enables pagination through a set of `AppInvite`."""
+  appInvites(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -43135,11 +43395,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: InviteFilter
+    where: AppInviteFilter
 
-    """The method to use when ordering `Invite`."""
-    orderBy: [InviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): InviteConnection
+    """The method to use when ordering `AppInvite`."""
+    orderBy: [AppInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AppInviteConnection
 
   """Reads and enables pagination through a set of `AppMembership`."""
   appMemberships(
@@ -43732,12 +43992,24 @@ type Mutation {
     """
     input: RejectDatabaseTransferInput!
   ): RejectDatabaseTransferPayload
-  submitInviteCode(
+  verifyPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: SubmitInviteCodeInput!
-  ): SubmitInviteCodePayload
+    input: VerifyPasswordInput!
+  ): VerifyPasswordPayload
+  verifyTotp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyTotpInput!
+  ): VerifyTotpPayload
+  submitAppInviteCode(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SubmitAppInviteCodeInput!
+  ): SubmitAppInviteCodePayload
   submitOrgInviteCode(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -43966,18 +44238,6 @@ type Mutation {
     """
     input: ForgotPasswordInput!
   ): ForgotPasswordPayload
-  verifyPassword(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyPasswordInput!
-  ): VerifyPasswordPayload
-  verifyTotp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyTotpInput!
-  ): VerifyTotpPayload
 
   """Creates a single `DefaultIdsModule`."""
   createDefaultIdsModule(
@@ -44339,13 +44599,13 @@ type Mutation {
     input: CreateSiteMetadatumInput!
   ): CreateSiteMetadatumPayload
 
-  """Creates a single `ClaimedInvite`."""
-  createClaimedInvite(
+  """Creates a single `AppClaimedInvite`."""
+  createAppClaimedInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateClaimedInviteInput!
-  ): CreateClaimedInvitePayload
+    input: CreateAppClaimedInviteInput!
+  ): CreateAppClaimedInvitePayload
 
   """Creates a single `AppMembershipDefault`."""
   createAppMembershipDefault(
@@ -44378,6 +44638,14 @@ type Mutation {
     """
     input: CreateCommitInput!
   ): CreateCommitPayload
+
+  """Creates a single `RateLimitsModule`."""
+  createRateLimitsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRateLimitsModuleInput!
+  ): CreateRateLimitsModulePayload
 
   """Creates a single `TableTemplateModule`."""
   createTableTemplateModule(
@@ -44659,13 +44927,13 @@ type Mutation {
     input: CreatePermissionsModuleInput!
   ): CreatePermissionsModulePayload
 
-  """Creates a single `Invite`."""
-  createInvite(
+  """Creates a single `AppInvite`."""
+  createAppInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateInviteInput!
-  ): CreateInvitePayload
+    input: CreateAppInviteInput!
+  ): CreateAppInvitePayload
 
   """Creates a single `AppMembership`."""
   createAppMembership(
@@ -45183,13 +45451,13 @@ type Mutation {
     input: UpdateSiteMetadatumInput!
   ): UpdateSiteMetadatumPayload
 
-  """Updates a single `ClaimedInvite` using a unique key and a patch."""
-  updateClaimedInvite(
+  """Updates a single `AppClaimedInvite` using a unique key and a patch."""
+  updateAppClaimedInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateClaimedInviteInput!
-  ): UpdateClaimedInvitePayload
+    input: UpdateAppClaimedInviteInput!
+  ): UpdateAppClaimedInvitePayload
 
   """
   Updates a single `AppMembershipDefault` using a unique key and a patch.
@@ -45224,6 +45492,14 @@ type Mutation {
     """
     input: UpdateCommitInput!
   ): UpdateCommitPayload
+
+  """Updates a single `RateLimitsModule` using a unique key and a patch."""
+  updateRateLimitsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRateLimitsModuleInput!
+  ): UpdateRateLimitsModulePayload
 
   """Updates a single `TableTemplateModule` using a unique key and a patch."""
   updateTableTemplateModule(
@@ -45499,13 +45775,13 @@ type Mutation {
     input: UpdatePermissionsModuleInput!
   ): UpdatePermissionsModulePayload
 
-  """Updates a single `Invite` using a unique key and a patch."""
-  updateInvite(
+  """Updates a single `AppInvite` using a unique key and a patch."""
+  updateAppInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateInviteInput!
-  ): UpdateInvitePayload
+    input: UpdateAppInviteInput!
+  ): UpdateAppInvitePayload
 
   """Updates a single `AppMembership` using a unique key and a patch."""
   updateAppMembership(
@@ -46015,13 +46291,13 @@ type Mutation {
     input: DeleteSiteMetadatumInput!
   ): DeleteSiteMetadatumPayload
 
-  """Deletes a single `ClaimedInvite` using a unique key."""
-  deleteClaimedInvite(
+  """Deletes a single `AppClaimedInvite` using a unique key."""
+  deleteAppClaimedInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteClaimedInviteInput!
-  ): DeleteClaimedInvitePayload
+    input: DeleteAppClaimedInviteInput!
+  ): DeleteAppClaimedInvitePayload
 
   """Deletes a single `AppMembershipDefault` using a unique key."""
   deleteAppMembershipDefault(
@@ -46054,6 +46330,14 @@ type Mutation {
     """
     input: DeleteCommitInput!
   ): DeleteCommitPayload
+
+  """Deletes a single `RateLimitsModule` using a unique key."""
+  deleteRateLimitsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRateLimitsModuleInput!
+  ): DeleteRateLimitsModulePayload
 
   """Deletes a single `TableTemplateModule` using a unique key."""
   deleteTableTemplateModule(
@@ -46319,13 +46603,13 @@ type Mutation {
     input: DeletePermissionsModuleInput!
   ): DeletePermissionsModulePayload
 
-  """Deletes a single `Invite` using a unique key."""
-  deleteInvite(
+  """Deletes a single `AppInvite` using a unique key."""
+  deleteAppInvite(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteInviteInput!
-  ): DeleteInvitePayload
+    input: DeleteAppInviteInput!
+  ): DeleteAppInvitePayload
 
   """Deletes a single `AppMembership` using a unique key."""
   deleteAppMembership(
