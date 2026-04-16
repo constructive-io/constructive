@@ -373,7 +373,9 @@ export interface AuthzDirectOwnerAnyParams {
 /** Membership check that verifies the user has membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. */
 export interface AuthzMembershipParams {
   /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
-  membership_type: number | string;
+  membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check (ORed together into mask) */
@@ -389,6 +391,8 @@ export interface AuthzEntityMembershipParams {
   entity_field: string;
   /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check (ORed together into mask) */
@@ -404,6 +408,8 @@ export interface AuthzRelatedEntityMembershipParams {
   entity_field: string;
   /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* UUID of the join table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
   /* Schema of the join table (or use obj_table_id) */
@@ -486,12 +492,21 @@ export interface AuthzCompositeParams {
     }[];
   };
 }
+/** Restrictive policy that blocks read-only members from mutations. Checks actor_id + is_read_only IS NOT TRUE on the SPRT. Designed to run as a restrictive counterpart after a permissive AuthzEntityMembership policy has already verified membership. */
+export interface AuthzNotReadOnlyParams {
+  /* Column name referencing the entity (e.g., entity_id, org_id) */
+  entity_field: string;
+  /* Scope: 2=org, 3+=dynamic entity types. Must be >= 2 (entity-scoped). */
+  membership_type?: number | string;
+}
 /** Peer visibility through shared entity membership. Authorizes access to user-owned rows when the owner and current user are both members of the same entity. Self-joins the SPRT table to find peers. */
 export interface AuthzPeerOwnershipParams {
   /* Column name on protected table referencing the owning user (e.g., owner_id) */
   owner_field: string;
   /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* Single permission name to check on the current user membership (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check on the current user membership (ORed together into mask) */
@@ -507,6 +522,8 @@ export interface AuthzRelatedPeerOwnershipParams {
   entity_field: string;
   /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* UUID of the related table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
   /* Schema of the related table (or use obj_table_id) */
@@ -699,7 +716,7 @@ export interface BlueprintField {
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzNotReadOnly" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -826,7 +843,7 @@ export interface BlueprintMembershipType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "DataCompositeField" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
+export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzNotReadOnly" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "DataCompositeField" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: "AuthzDirectOwner";
@@ -867,6 +884,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: "AuthzComposite";
   data: AuthzCompositeParams;
+} | {
+  $type: "AuthzNotReadOnly";
+  data: AuthzNotReadOnlyParams;
 } | {
   $type: "AuthzPeerOwnership";
   data: AuthzPeerOwnershipParams;
