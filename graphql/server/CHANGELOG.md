@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.16.2...@constructive-io/graphql-server@4.17.0) (2026-04-16)
+
+### Features
+
+- add missing SAFE_ERROR_CODES for rate limiting and auth errors ([1ca4712](https://github.com/constructive-io/constructive/commit/1ca4712cafe095755d430386e94b6d6048fd9c50))
+
 ## [4.16.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.16.1...@constructive-io/graphql-server@4.16.2) (2026-04-14)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

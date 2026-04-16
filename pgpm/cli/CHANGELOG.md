@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.15.0](https://github.com/constructive-io/constructive/compare/pgpm@4.14.1...pgpm@4.15.0) (2026-04-16)
+
+### Features
+
+- **pgpm:** add --ollama and --gpu flags to pgpm docker ([822a015](https://github.com/constructive-io/constructive/commit/822a0151cec9107454e086517947ad3573ae4aa0))
+
 ## [4.14.1](https://github.com/constructive-io/constructive/compare/pgpm@4.14.0...pgpm@4.14.1) (2026-04-14)
 
 ### Bug Fixes
