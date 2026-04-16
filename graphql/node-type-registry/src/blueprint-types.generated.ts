@@ -372,7 +372,7 @@ export interface AuthzDirectOwnerAnyParams {
 }
 /** Membership check that verifies the user has membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. */
 export interface AuthzMembershipParams {
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type: number | string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
@@ -387,7 +387,7 @@ export interface AuthzMembershipParams {
 export interface AuthzEntityMembershipParams {
   /* Column name referencing the entity (e.g., entity_id, org_id) */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
@@ -402,7 +402,7 @@ export interface AuthzEntityMembershipParams {
 export interface AuthzRelatedEntityMembershipParams {
   /* Column name on protected table referencing the join table */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* UUID of the join table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
@@ -490,7 +490,7 @@ export interface AuthzCompositeParams {
 export interface AuthzPeerOwnershipParams {
   /* Column name on protected table referencing the owning user (e.g., owner_id) */
   owner_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* Single permission name to check on the current user membership (resolved to bitstring mask) */
   permission?: string;
@@ -505,7 +505,7 @@ export interface AuthzPeerOwnershipParams {
 export interface AuthzRelatedPeerOwnershipParams {
   /* Column name on protected table referencing the related table (e.g., message_id) */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* UUID of the related table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
