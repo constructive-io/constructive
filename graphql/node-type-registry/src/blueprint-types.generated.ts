@@ -372,7 +372,7 @@ export interface AuthzDirectOwnerAnyParams {
 }
 /** Membership check that verifies the user has membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. */
 export interface AuthzMembershipParams {
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type: number | string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
@@ -387,7 +387,7 @@ export interface AuthzMembershipParams {
 export interface AuthzEntityMembershipParams {
   /* Column name referencing the entity (e.g., entity_id, org_id) */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
@@ -402,7 +402,7 @@ export interface AuthzEntityMembershipParams {
 export interface AuthzRelatedEntityMembershipParams {
   /* Column name on protected table referencing the join table */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* UUID of the join table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
@@ -490,7 +490,7 @@ export interface AuthzCompositeParams {
 export interface AuthzPeerOwnershipParams {
   /* Column name on protected table referencing the owning user (e.g., owner_id) */
   owner_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* Single permission name to check on the current user membership (resolved to bitstring mask) */
   permission?: string;
@@ -505,7 +505,7 @@ export interface AuthzPeerOwnershipParams {
 export interface AuthzRelatedPeerOwnershipParams {
   /* Column name on protected table referencing the related table (e.g., message_id) */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
   /* UUID of the related table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
@@ -796,6 +796,29 @@ export interface BlueprintTableUniqueConstraint {
   /** Optional schema name override. */
   schema_name?: string;
 }
+/** A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision. */
+export interface BlueprintMembershipType {
+  /** Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database. */
+  name: string;
+  /** Short prefix for generated objects (e.g., "dr", "ch", "dept"). Used in table/trigger naming. */
+  prefix: string;
+  /** Human-readable description of this entity type. */
+  description?: string;
+  /** Parent entity type name. Defaults to "org". */
+  parent_entity?: string;
+  /** Custom table name for the entity table. Defaults to name-derived convention. */
+  table_name?: string;
+  /** Whether this entity type is visible in the API. Defaults to true. */
+  is_visible?: boolean;
+  /** Whether to provision a limits module for this entity type. Defaults to false. */
+  has_limits?: boolean;
+  /** Whether to provision a profiles module for this entity type. Defaults to false. */
+  has_profiles?: boolean;
+  /** Whether to provision a levels module for this entity type. Defaults to false. */
+  has_levels?: boolean;
+  /** Whether to skip creating default RLS policies on the entity table. Defaults to false. */
+  skip_entity_policies?: boolean;
+}
 /**
  * ===========================================================================
  * Node types -- discriminated union for nodes[] entries
@@ -1015,4 +1038,6 @@ export interface BlueprintDefinition {
   full_text_searches?: BlueprintFullTextSearch[];
   /** Unique constraints on table columns. */
   unique_constraints?: BlueprintUniqueConstraint[];
+  /** Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security. */
+  membership_types?: BlueprintMembershipType[];
 }

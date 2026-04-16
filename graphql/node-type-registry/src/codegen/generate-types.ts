@@ -599,6 +599,54 @@ function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
   );
 }
 
+function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintMembershipType', [
+      addJSDoc(
+        requiredProp('name', t.tsStringKeyword()),
+        'Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database.'
+      ),
+      addJSDoc(
+        requiredProp('prefix', t.tsStringKeyword()),
+        'Short prefix for generated objects (e.g., "dr", "ch", "dept"). Used in table/trigger naming.'
+      ),
+      addJSDoc(
+        optionalProp('description', t.tsStringKeyword()),
+        'Human-readable description of this entity type.'
+      ),
+      addJSDoc(
+        optionalProp('parent_entity', t.tsStringKeyword()),
+        'Parent entity type name. Defaults to "org".'
+      ),
+      addJSDoc(
+        optionalProp('table_name', t.tsStringKeyword()),
+        'Custom table name for the entity table. Defaults to name-derived convention.'
+      ),
+      addJSDoc(
+        optionalProp('is_visible', t.tsBooleanKeyword()),
+        'Whether this entity type is visible in the API. Defaults to true.'
+      ),
+      addJSDoc(
+        optionalProp('has_limits', t.tsBooleanKeyword()),
+        'Whether to provision a limits module for this entity type. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('has_profiles', t.tsBooleanKeyword()),
+        'Whether to provision a profiles module for this entity type. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('has_levels', t.tsBooleanKeyword()),
+        'Whether to provision a levels module for this entity type. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('skip_entity_policies', t.tsBooleanKeyword()),
+        'Whether to skip creating default RLS policies on the entity table. Defaults to false.'
+      ),
+    ]),
+    'A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
+  );
+}
+
 function buildBlueprintTable(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintTable', [
@@ -711,6 +759,15 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
         ),
         'Unique constraints on table columns.'
       ),
+      addJSDoc(
+        optionalProp(
+          'membership_types',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintMembershipType'))
+          )
+        ),
+        'Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security.'
+      ),
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
   );
@@ -782,6 +839,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintTableIndex());
   statements.push(buildBlueprintUniqueConstraint());
   statements.push(buildBlueprintTableUniqueConstraint());
+  statements.push(buildBlueprintMembershipType());
 
   // -- Node types discriminated union --
   statements.push(
