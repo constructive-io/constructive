@@ -16,6 +16,10 @@ export const AuthzMembership: NodeTypeDefinition = {
         ],
         "description": "Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module)"
       },
+      "entity_type": {
+        "type": "string",
+        "description": "Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability."
+      },
       "permission": {
         "type": "string",
         "description": "Single permission name to check (resolved to bitstring mask)"
@@ -36,9 +40,7 @@ export const AuthzMembership: NodeTypeDefinition = {
         "description": "If true, require is_owner flag"
       }
     },
-    "required": [
-      "membership_type"
-    ]
+    "required": []
   },
   "tags": [
     "membership",
