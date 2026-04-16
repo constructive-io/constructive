@@ -96,18 +96,19 @@ export interface OrgOwnerGrant {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface MembershipType {
-  id: number | null;
-  name: string | null;
-  description: string | null;
-  prefix: string | null;
-}
 export interface AppLimit {
   id: string | null;
   name: string | null;
   actorId: string | null;
   num: number | null;
   max: number | null;
+}
+export interface MembershipType {
+  id: number | null;
+  name: string | null;
+  description: string | null;
+  prefix: string | null;
+  hasUsersTableEntry: boolean | null;
 }
 export interface AppAchievement {
   id: string | null;

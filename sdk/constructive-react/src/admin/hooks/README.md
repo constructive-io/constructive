@@ -96,16 +96,16 @@ function App() {
 | `useCreateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
-| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useAppLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useAppLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useUpdateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useDeleteAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useAppAchievementsQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
 | `useAppAchievementQuery` | Query | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
 | `useCreateAppAchievementMutation` | Mutation | Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually |
@@ -495,27 +495,6 @@ const { mutate: create } = useCreateOrgOwnerGrantMutation({
 create({ isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
 ```
 
-### MembershipType
-
-```typescript
-// List all membershipTypes
-const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Get one membershipType
-const { data: item } = useMembershipTypeQuery({
-  id: '<Int>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Create a membershipType
-const { mutate: create } = useCreateMembershipTypeMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', description: '<String>', prefix: '<String>' });
-```
-
 ### AppLimit
 
 ```typescript
@@ -535,6 +514,27 @@ const { mutate: create } = useCreateAppLimitMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', actorId: '<UUID>', num: '<Int>', max: '<Int>' });
+```
+
+### MembershipType
+
+```typescript
+// List all membershipTypes
+const { data, isLoading } = useMembershipTypesQuery({
+  selection: { fields: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } },
+});
+
+// Get one membershipType
+const { data: item } = useMembershipTypeQuery({
+  id: '<Int>',
+  selection: { fields: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } },
+});
+
+// Create a membershipType
+const { mutate: create } = useCreateMembershipTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', description: '<String>', prefix: '<String>', hasUsersTableEntry: '<Boolean>' });
 ```
 
 ### AppAchievement

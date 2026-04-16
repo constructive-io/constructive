@@ -887,6 +887,15 @@ export const orgLimitDefaultMutationKeys = {
   /** Delete orgLimitDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitdefault', 'delete', id] as const,
 } as const;
+export const devicesModuleMutationKeys = {
+  /** All devicesModule mutation keys */ all: ['mutation', 'devicesmodule'] as const,
+  /** Create devicesModule mutation key */ create: () =>
+    ['mutation', 'devicesmodule', 'create'] as const,
+  /** Update devicesModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'devicesmodule', 'update', id] as const,
+  /** Delete devicesModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'devicesmodule', 'delete', id] as const,
+} as const;
 export const membershipTypeMutationKeys = {
   /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
   /** Create membershipType mutation key */ create: () =>
@@ -1288,6 +1297,7 @@ export const mutationKeys = {
   migrateFile: migrateFileMutationKeys,
   appLimitDefault: appLimitDefaultMutationKeys,
   orgLimitDefault: orgLimitDefaultMutationKeys,
+  devicesModule: devicesModuleMutationKeys,
   membershipType: membershipTypeMutationKeys,
   appMembershipDefault: appMembershipDefaultMutationKeys,
   commit: commitMutationKeys,

@@ -196,6 +196,8 @@ export * from './useAppLimitDefaultsQuery';
 export * from './useAppLimitDefaultQuery';
 export * from './useOrgLimitDefaultsQuery';
 export * from './useOrgLimitDefaultQuery';
+export * from './useDevicesModulesQuery';
+export * from './useDevicesModuleQuery';
 export * from './useMembershipTypesQuery';
 export * from './useMembershipTypeQuery';
 export * from './useAppMembershipDefaultsQuery';

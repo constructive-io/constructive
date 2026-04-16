@@ -370,17 +370,6 @@ export interface OrgOwnerGrant {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
-/** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
-export interface MembershipType {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** Human-readable name of the membership type */
-  name?: string | null;
-  /** Description of what this membership type represents */
-  description?: string | null;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix?: string | null;
-}
 /** Tracks per-actor usage counts against configurable maximum limits */
 export interface AppLimit {
   id: string;
@@ -392,6 +381,19 @@ export interface AppLimit {
   num?: number | null;
   /** Maximum allowed usage; NULL means use the default limit value */
   max?: number | null;
+}
+/** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
+export interface MembershipType {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** Human-readable name of the membership type */
+  name?: string | null;
+  /** Description of what this membership type represents */
+  description?: string | null;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix?: string | null;
+  /** When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs */
+  hasUsersTableEntry?: boolean | null;
 }
 /** Aggregated user progress for level requirements, tallying the total count; updated via triggers and should not be modified manually */
 export interface AppAchievement {
@@ -695,8 +697,8 @@ export interface AppLimitDefaultRelations {}
 export interface OrgLimitDefaultRelations {}
 export interface OrgAdminGrantRelations {}
 export interface OrgOwnerGrantRelations {}
-export interface MembershipTypeRelations {}
 export interface AppLimitRelations {}
+export interface MembershipTypeRelations {}
 export interface AppAchievementRelations {}
 export interface AppStepRelations {}
 export interface AppClaimedInviteRelations {}
@@ -732,8 +734,8 @@ export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRela
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
 export type OrgAdminGrantWithRelations = OrgAdminGrant & OrgAdminGrantRelations;
 export type OrgOwnerGrantWithRelations = OrgOwnerGrant & OrgOwnerGrantRelations;
-export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type AppLimitWithRelations = AppLimit & AppLimitRelations;
+export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type AppAchievementWithRelations = AppAchievement & AppAchievementRelations;
 export type AppStepWithRelations = AppStep & AppStepRelations;
 export type AppClaimedInviteWithRelations = AppClaimedInvite & AppClaimedInviteRelations;
@@ -844,18 +846,19 @@ export type OrgOwnerGrantSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
 };
-export type MembershipTypeSelect = {
-  id?: boolean;
-  name?: boolean;
-  description?: boolean;
-  prefix?: boolean;
-};
 export type AppLimitSelect = {
   id?: boolean;
   name?: boolean;
   actorId?: boolean;
   num?: boolean;
   max?: boolean;
+};
+export type MembershipTypeSelect = {
+  id?: boolean;
+  name?: boolean;
+  description?: boolean;
+  prefix?: boolean;
+  hasUsersTableEntry?: boolean;
 };
 export type AppAchievementSelect = {
   id?: boolean;
@@ -1262,22 +1265,6 @@ export interface OrgOwnerGrantFilter {
   /** Negates the expression. */
   not?: OrgOwnerGrantFilter;
 }
-export interface MembershipTypeFilter {
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: MembershipTypeFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MembershipTypeFilter[];
-  /** Negates the expression. */
-  not?: MembershipTypeFilter;
-}
 export interface AppLimitFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -1295,6 +1282,24 @@ export interface AppLimitFilter {
   or?: AppLimitFilter[];
   /** Negates the expression. */
   not?: AppLimitFilter;
+}
+export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `hasUsersTableEntry` field. */
+  hasUsersTableEntry?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipTypeFilter[];
+  /** Negates the expression. */
+  not?: MembershipTypeFilter;
 }
 export interface AppAchievementFilter {
   /** Filter by the object’s `id` field. */
@@ -1887,18 +1892,6 @@ export type OrgOwnerGrantOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type MembershipTypeOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC';
 export type AppLimitOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1913,6 +1906,20 @@ export type AppLimitOrderBy =
   | 'NUM_DESC'
   | 'MAX_ASC'
   | 'MAX_DESC';
+export type MembershipTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'HAS_USERS_TABLE_ENTRY_ASC'
+  | 'HAS_USERS_TABLE_ENTRY_DESC';
 export type AppAchievementOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -2572,28 +2579,6 @@ export interface DeleteOrgOwnerGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateMembershipTypeInput {
-  clientMutationId?: string;
-  membershipType: {
-    name: string;
-    description: string;
-    prefix: string;
-  };
-}
-export interface MembershipTypePatch {
-  name?: string | null;
-  description?: string | null;
-  prefix?: string | null;
-}
-export interface UpdateMembershipTypeInput {
-  clientMutationId?: string;
-  id: number;
-  membershipTypePatch: MembershipTypePatch;
-}
-export interface DeleteMembershipTypeInput {
-  clientMutationId?: string;
-  id: number;
-}
 export interface CreateAppLimitInput {
   clientMutationId?: string;
   appLimit: {
@@ -2617,6 +2602,30 @@ export interface UpdateAppLimitInput {
 export interface DeleteAppLimitInput {
   clientMutationId?: string;
   id: string;
+}
+export interface CreateMembershipTypeInput {
+  clientMutationId?: string;
+  membershipType: {
+    name: string;
+    description: string;
+    prefix: string;
+    hasUsersTableEntry?: boolean;
+  };
+}
+export interface MembershipTypePatch {
+  name?: string | null;
+  description?: string | null;
+  prefix?: string | null;
+  hasUsersTableEntry?: boolean | null;
+}
+export interface UpdateMembershipTypeInput {
+  clientMutationId?: string;
+  id: number;
+  membershipTypePatch: MembershipTypePatch;
+}
+export interface DeleteMembershipTypeInput {
+  clientMutationId?: string;
+  id: number;
 }
 export interface CreateAppAchievementInput {
   clientMutationId?: string;
@@ -3884,51 +3893,6 @@ export type DeleteOrgOwnerGrantPayloadSelect = {
     select: OrgOwnerGrantEdgeSelect;
   };
 };
-export interface CreateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was created by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
-export type CreateMembershipTypePayloadSelect = {
-  clientMutationId?: boolean;
-  membershipType?: {
-    select: MembershipTypeSelect;
-  };
-  membershipTypeEdge?: {
-    select: MembershipTypeEdgeSelect;
-  };
-};
-export interface UpdateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was updated by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
-export type UpdateMembershipTypePayloadSelect = {
-  clientMutationId?: boolean;
-  membershipType?: {
-    select: MembershipTypeSelect;
-  };
-  membershipTypeEdge?: {
-    select: MembershipTypeEdgeSelect;
-  };
-};
-export interface DeleteMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was deleted by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
-export type DeleteMembershipTypePayloadSelect = {
-  clientMutationId?: boolean;
-  membershipType?: {
-    select: MembershipTypeSelect;
-  };
-  membershipTypeEdge?: {
-    select: MembershipTypeEdgeSelect;
-  };
-};
 export interface CreateAppLimitPayload {
   clientMutationId?: string | null;
   /** The `AppLimit` that was created by this mutation. */
@@ -3972,6 +3936,51 @@ export type DeleteAppLimitPayloadSelect = {
   };
   appLimitEdge?: {
     select: AppLimitEdgeSelect;
+  };
+};
+export interface CreateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was created by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
+export type CreateMembershipTypePayloadSelect = {
+  clientMutationId?: boolean;
+  membershipType?: {
+    select: MembershipTypeSelect;
+  };
+  membershipTypeEdge?: {
+    select: MembershipTypeEdgeSelect;
+  };
+};
+export interface UpdateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was updated by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
+export type UpdateMembershipTypePayloadSelect = {
+  clientMutationId?: boolean;
+  membershipType?: {
+    select: MembershipTypeSelect;
+  };
+  membershipTypeEdge?: {
+    select: MembershipTypeEdgeSelect;
+  };
+};
+export interface DeleteMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was deleted by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
+export type DeleteMembershipTypePayloadSelect = {
+  clientMutationId?: boolean;
+  membershipType?: {
+    select: MembershipTypeSelect;
+  };
+  membershipTypeEdge?: {
+    select: MembershipTypeEdgeSelect;
   };
 };
 export interface CreateAppAchievementPayload {
@@ -4855,18 +4864,6 @@ export type OrgOwnerGrantEdgeSelect = {
     select: OrgOwnerGrantSelect;
   };
 };
-/** A `MembershipType` edge in the connection. */
-export interface MembershipTypeEdge {
-  cursor?: string | null;
-  /** The `MembershipType` at the end of the edge. */
-  node?: MembershipType | null;
-}
-export type MembershipTypeEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: MembershipTypeSelect;
-  };
-};
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
   cursor?: string | null;
@@ -4877,6 +4874,18 @@ export type AppLimitEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: AppLimitSelect;
+  };
+};
+/** A `MembershipType` edge in the connection. */
+export interface MembershipTypeEdge {
+  cursor?: string | null;
+  /** The `MembershipType` at the end of the edge. */
+  node?: MembershipType | null;
+}
+export type MembershipTypeEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: MembershipTypeSelect;
   };
 };
 /** A `AppAchievement` edge in the connection. */

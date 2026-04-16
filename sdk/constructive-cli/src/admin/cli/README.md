@@ -40,8 +40,8 @@ csdk auth set-token <your-token>
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `org-admin-grant` | orgAdminGrant CRUD operations |
 | `org-owner-grant` | orgOwnerGrant CRUD operations |
-| `membership-type` | membershipType CRUD operations |
 | `app-limit` | appLimit CRUD operations |
+| `membership-type` | membershipType CRUD operations |
 | `app-achievement` | appAchievement CRUD operations |
 | `app-step` | appStep CRUD operations |
 | `app-claimed-invite` | appClaimedInvite CRUD operations |
@@ -476,30 +476,6 @@ CRUD operations for OrgOwnerGrant records.
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
-### `membership-type`
-
-CRUD operations for MembershipType records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all membershipType records |
-| `find-first` | Find first matching membershipType record |
-| `get` | Get a membershipType by id |
-| `create` | Create a new membershipType |
-| `update` | Update an existing membershipType |
-| `delete` | Delete a membershipType |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-| `description` | String |
-| `prefix` | String |
-
-**Required create fields:** `name`, `description`, `prefix`
-
 ### `app-limit`
 
 CRUD operations for AppLimit records.
@@ -525,6 +501,32 @@ CRUD operations for AppLimit records.
 
 **Required create fields:** `actorId`
 **Optional create fields (backend defaults):** `name`, `num`, `max`
+
+### `membership-type`
+
+CRUD operations for MembershipType records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all membershipType records |
+| `find-first` | Find first matching membershipType record |
+| `get` | Get a membershipType by id |
+| `create` | Create a new membershipType |
+| `update` | Update an existing membershipType |
+| `delete` | Delete a membershipType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | Int |
+| `name` | String |
+| `description` | String |
+| `prefix` | String |
+| `hasUsersTableEntry` | Boolean |
+
+**Required create fields:** `name`, `description`, `prefix`
+**Optional create fields (backend defaults):** `hasUsersTableEntry`
 
 ### `app-achievement`
 

@@ -1165,11 +1165,21 @@ export interface OrgLimitDefault {
   name: string | null;
   max: number | null;
 }
+export interface DevicesModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  userDevicesTableId: string | null;
+  deviceSettingsTableId: string | null;
+  userDevicesTable: string | null;
+  deviceSettingsTable: string | null;
+}
 export interface MembershipType {
   id: number | null;
   name: string | null;
   description: string | null;
   prefix: string | null;
+  hasUsersTableEntry: boolean | null;
 }
 export interface AppMembershipDefault {
   id: string | null;

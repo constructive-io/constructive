@@ -103,6 +103,7 @@ import { RoleTypeModel } from './models/roleType';
 import { MigrateFileModel } from './models/migrateFile';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
+import { DevicesModuleModel } from './models/devicesModule';
 import { MembershipTypeModel } from './models/membershipType';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { CommitModel } from './models/commit';
@@ -247,6 +248,7 @@ export function createClient(config: OrmClientConfig) {
     migrateFile: new MigrateFileModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
+    devicesModule: new DevicesModuleModel(client),
     membershipType: new MembershipTypeModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     commit: new CommitModel(client),

@@ -1,13 +1,13 @@
 ---
 name: hooks-public
-description: React Query hooks for the public API — provides typed query and mutation hooks for 109 tables and 64 custom operations
+description: React Query hooks for the public API — provides typed query and mutation hooks for 110 tables and 64 custom operations
 ---
 
 # hooks-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the public API — provides typed query and mutation hooks for 109 tables and 64 custom operations
+React Query hooks for the public API — provides typed query and mutation hooks for 110 tables and 64 custom operations
 
 ## Usage
 
@@ -135,6 +135,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [migrate-file](references/migrate-file.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
+- [devices-module](references/devices-module.md)
 - [membership-type](references/membership-type.md)
 - [app-membership-default](references/app-membership-default.md)
 - [commit](references/commit.md)

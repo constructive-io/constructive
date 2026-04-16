@@ -7,8 +7,8 @@ Defines the different scopes of membership (e.g. App Member, Organization Member
 ## Usage
 
 ```typescript
-useMembershipTypesQuery({ selection: { fields: { id: true, name: true, description: true, prefix: true } } })
-useMembershipTypeQuery({ id: '<Int>', selection: { fields: { id: true, name: true, description: true, prefix: true } } })
+useMembershipTypesQuery({ selection: { fields: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } } })
+useMembershipTypeQuery({ id: '<Int>', selection: { fields: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } } })
 useCreateMembershipTypeMutation({ selection: { fields: { id: true } } })
 useUpdateMembershipTypeMutation({ selection: { fields: { id: true } } })
 useDeleteMembershipTypeMutation({})
@@ -20,7 +20,7 @@ useDeleteMembershipTypeMutation({})
 
 ```typescript
 const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
+  selection: { fields: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useMembershipTypesQuery({
 const { mutate } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
-mutate({ name: '<String>', description: '<String>', prefix: '<String>' });
+mutate({ name: '<String>', description: '<String>', prefix: '<String>', hasUsersTableEntry: '<Boolean>' });
 ```

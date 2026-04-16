@@ -101,6 +101,7 @@ export { RoleTypeModel } from './roleType';
 export { MigrateFileModel } from './migrateFile';
 export { AppLimitDefaultModel } from './appLimitDefault';
 export { OrgLimitDefaultModel } from './orgLimitDefault';
+export { DevicesModuleModel } from './devicesModule';
 export { MembershipTypeModel } from './membershipType';
 export { AppMembershipDefaultModel } from './appMembershipDefault';
 export { CommitModel } from './commit';

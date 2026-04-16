@@ -145,15 +145,6 @@ export const orgOwnerGrantKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgOwnerGrantKeys.details(), id] as const,
 } as const;
-export const membershipTypeKeys = {
-  /** All membershipType queries */ all: ['membershiptype'] as const,
-  /** List query keys */ lists: () => [...membershipTypeKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...membershipTypeKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...membershipTypeKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...membershipTypeKeys.details(), id] as const,
-} as const;
 export const appLimitKeys = {
   /** All appLimit queries */ all: ['applimit'] as const,
   /** List query keys */ lists: () => [...appLimitKeys.all, 'list'] as const,
@@ -162,6 +153,15 @@ export const appLimitKeys = {
   /** Detail query keys */ details: () => [...appLimitKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...appLimitKeys.details(), id] as const,
+} as const;
+export const membershipTypeKeys = {
+  /** All membershipType queries */ all: ['membershiptype'] as const,
+  /** List query keys */ lists: () => [...membershipTypeKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...membershipTypeKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...membershipTypeKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...membershipTypeKeys.details(), id] as const,
 } as const;
 export const appAchievementKeys = {
   /** All appAchievement queries */ all: ['appachievement'] as const,
@@ -377,8 +377,8 @@ export const queryKeys = {
   orgLimitDefault: orgLimitDefaultKeys,
   orgAdminGrant: orgAdminGrantKeys,
   orgOwnerGrant: orgOwnerGrantKeys,
-  membershipType: membershipTypeKeys,
   appLimit: appLimitKeys,
+  membershipType: membershipTypeKeys,
   appAchievement: appAchievementKeys,
   appStep: appStepKeys,
   appClaimedInvite: appClaimedInviteKeys,

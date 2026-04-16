@@ -12,8 +12,8 @@ csdk membership-type list --where.<field>.<op> <value> --orderBy <values>
 csdk membership-type list --limit 10 --after <cursor>
 csdk membership-type find-first --where.<field>.<op> <value>
 csdk membership-type get --id <Int>
-csdk membership-type create --name <String> --description <String> --prefix <String>
-csdk membership-type update --id <Int> [--name <String>] [--description <String>] [--prefix <String>]
+csdk membership-type create --name <String> --description <String> --prefix <String> [--hasUsersTableEntry <Boolean>]
+csdk membership-type update --id <Int> [--name <String>] [--description <String>] [--prefix <String>] [--hasUsersTableEntry <Boolean>]
 csdk membership-type delete --id <Int>
 ```
 
@@ -58,7 +58,7 @@ csdk membership-type list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a membershipType
 
 ```bash
-csdk membership-type create --name <String> --description <String> --prefix <String>
+csdk membership-type create --name <String> --description <String> --prefix <String> [--hasUsersTableEntry <Boolean>]
 ```
 
 ### Get a membershipType by id

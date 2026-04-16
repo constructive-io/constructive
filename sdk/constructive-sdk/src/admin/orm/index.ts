@@ -19,8 +19,8 @@ import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
 import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
-import { MembershipTypeModel } from './models/membershipType';
 import { AppLimitModel } from './models/appLimit';
+import { MembershipTypeModel } from './models/membershipType';
 import { AppAchievementModel } from './models/appAchievement';
 import { AppStepModel } from './models/appStep';
 import { AppClaimedInviteModel } from './models/appClaimedInvite';
@@ -86,8 +86,8 @@ export function createClient(config: OrmClientConfig) {
     orgLimitDefault: new OrgLimitDefaultModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),
     orgOwnerGrant: new OrgOwnerGrantModel(client),
-    membershipType: new MembershipTypeModel(client),
     appLimit: new AppLimitModel(client),
+    membershipType: new MembershipTypeModel(client),
     appAchievement: new AppAchievementModel(client),
     appStep: new AppStepModel(client),
     appClaimedInvite: new AppClaimedInviteModel(client),

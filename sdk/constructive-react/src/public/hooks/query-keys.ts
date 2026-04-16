@@ -901,6 +901,15 @@ export const orgLimitDefaultKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...orgLimitDefaultKeys.details(), id] as const,
 } as const;
+export const devicesModuleKeys = {
+  /** All devicesModule queries */ all: ['devicesmodule'] as const,
+  /** List query keys */ lists: () => [...devicesModuleKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...devicesModuleKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...devicesModuleKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...devicesModuleKeys.details(), id] as const,
+} as const;
 export const membershipTypeKeys = {
   /** All membershipType queries */ all: ['membershiptype'] as const,
   /** List query keys */ lists: () => [...membershipTypeKeys.all, 'list'] as const,
@@ -1167,6 +1176,7 @@ export const queryKeys = {
   migrateFile: migrateFileKeys,
   appLimitDefault: appLimitDefaultKeys,
   orgLimitDefault: orgLimitDefaultKeys,
+  devicesModule: devicesModuleKeys,
   membershipType: membershipTypeKeys,
   appMembershipDefault: appMembershipDefaultKeys,
   commit: commitKeys,

@@ -35,8 +35,8 @@ const db = createClient({
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
 | `orgAdminGrant` | findMany, findOne, create, update, delete |
 | `orgOwnerGrant` | findMany, findOne, create, update, delete |
-| `membershipType` | findMany, findOne, create, update, delete |
 | `appLimit` | findMany, findOne, create, update, delete |
+| `membershipType` | findMany, findOne, create, update, delete |
 | `appAchievement` | findMany, findOne, create, update, delete |
 | `appStep` | findMany, findOne, create, update, delete |
 | `appClaimedInvite` | findMany, findOne, create, update, delete |
@@ -511,38 +511,6 @@ const updated = await db.orgOwnerGrant.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.orgOwnerGrant.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.membershipType`
-
-CRUD operations for MembershipType records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | Int | No |
-| `name` | String | Yes |
-| `description` | String | Yes |
-| `prefix` | String | Yes |
-
-**Operations:**
-
-```typescript
-// List all membershipType records
-const items = await db.membershipType.findMany({ select: { id: true, name: true, description: true, prefix: true } }).execute();
-
-// Get one by id
-const item = await db.membershipType.findOne({ id: '<Int>', select: { id: true, name: true, description: true, prefix: true } }).execute();
-
-// Create
-const created = await db.membershipType.create({ data: { name: '<String>', description: '<String>', prefix: '<String>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.membershipType.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.membershipType.delete({ where: { id: '<Int>' } }).execute();
-```
-
 ### `db.appLimit`
 
 CRUD operations for AppLimit records.
@@ -574,6 +542,39 @@ const updated = await db.appLimit.update({ where: { id: '<UUID>' }, data: { name
 
 // Delete
 const deleted = await db.appLimit.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.membershipType`
+
+CRUD operations for MembershipType records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | Int | No |
+| `name` | String | Yes |
+| `description` | String | Yes |
+| `prefix` | String | Yes |
+| `hasUsersTableEntry` | Boolean | Yes |
+
+**Operations:**
+
+```typescript
+// List all membershipType records
+const items = await db.membershipType.findMany({ select: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } }).execute();
+
+// Get one by id
+const item = await db.membershipType.findOne({ id: '<Int>', select: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } }).execute();
+
+// Create
+const created = await db.membershipType.create({ data: { name: '<String>', description: '<String>', prefix: '<String>', hasUsersTableEntry: '<Boolean>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.membershipType.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.membershipType.delete({ where: { id: '<Int>' } }).execute();
 ```
 
 ### `db.appAchievement`

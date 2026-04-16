@@ -124,6 +124,7 @@ csdk auth set-token <your-token>
 | `migrate-file` | migrateFile CRUD operations |
 | `app-limit-default` | appLimitDefault CRUD operations |
 | `org-limit-default` | orgLimitDefault CRUD operations |
+| `devices-module` | devicesModule CRUD operations |
 | `membership-type` | membershipType CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `commit` | commit CRUD operations |
@@ -3265,6 +3266,34 @@ CRUD operations for OrgLimitDefault records.
 **Required create fields:** `name`
 **Optional create fields (backend defaults):** `max`
 
+### `devices-module`
+
+CRUD operations for DevicesModule records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all devicesModule records |
+| `find-first` | Find first matching devicesModule record |
+| `get` | Get a devicesModule by id |
+| `create` | Create a new devicesModule |
+| `update` | Update an existing devicesModule |
+| `delete` | Delete a devicesModule |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `databaseId` | UUID |
+| `schemaId` | UUID |
+| `userDevicesTableId` | UUID |
+| `deviceSettingsTableId` | UUID |
+| `userDevicesTable` | String |
+| `deviceSettingsTable` | String |
+
+**Required create fields:** `databaseId`
+**Optional create fields (backend defaults):** `schemaId`, `userDevicesTableId`, `deviceSettingsTableId`, `userDevicesTable`, `deviceSettingsTable`
+
 ### `membership-type`
 
 CRUD operations for MembershipType records.
@@ -3286,8 +3315,10 @@ CRUD operations for MembershipType records.
 | `name` | String |
 | `description` | String |
 | `prefix` | String |
+| `hasUsersTableEntry` | Boolean |
 
 **Required create fields:** `name`, `description`, `prefix`
+**Optional create fields (backend defaults):** `hasUsersTableEntry`
 
 ### `app-membership-default`
 

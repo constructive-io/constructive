@@ -29,8 +29,8 @@ import {
   orgLimitDefaultKeys,
   orgAdminGrantKeys,
   orgOwnerGrantKeys,
-  membershipTypeKeys,
   appLimitKeys,
+  membershipTypeKeys,
   appAchievementKeys,
   appStepKeys,
   appClaimedInviteKeys,
@@ -306,6 +306,20 @@ export const invalidate = {
         queryKey: orgOwnerGrantKeys.detail(id),
       }),
   },
+  /** Invalidate appLimit queries */ appLimit: {
+    /** Invalidate all appLimit queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: appLimitKeys.all,
+      }),
+    /** Invalidate appLimit list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: appLimitKeys.lists(),
+      }),
+    /** Invalidate a specific appLimit */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: appLimitKeys.detail(id),
+      }),
+  },
   /** Invalidate membershipType queries */ membershipType: {
     /** Invalidate all membershipType queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -321,20 +335,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: membershipTypeKeys.detail(id),
-      }),
-  },
-  /** Invalidate appLimit queries */ appLimit: {
-    /** Invalidate all appLimit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLimitKeys.all,
-      }),
-    /** Invalidate appLimit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: appLimitKeys.lists(),
-      }),
-    /** Invalidate a specific appLimit */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: appLimitKeys.detail(id),
       }),
   },
   /** Invalidate appAchievement queries */ appAchievement: {
@@ -716,17 +716,17 @@ export const remove = {
       queryKey: orgOwnerGrantKeys.detail(id),
     });
   },
+  /** Remove appLimit from cache */ appLimit: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: appLimitKeys.detail(id),
+    });
+  },
   /** Remove membershipType from cache */ membershipType: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: membershipTypeKeys.detail(id),
-    });
-  },
-  /** Remove appLimit from cache */ appLimit: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: appLimitKeys.detail(id),
     });
   },
   /** Remove appAchievement from cache */ appAchievement: (

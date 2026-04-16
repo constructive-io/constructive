@@ -20,6 +20,7 @@ const fieldSchema: FieldSchema = {
   name: 'string',
   description: 'string',
   prefix: 'string',
+  hasUsersTableEntry: 'boolean',
 };
 const usage =
   '\nmembership-type <command>\n\nCommands:\n  list                  List membershipType records\n  find-first            Find first matching membershipType record\n  get                   Get a membershipType by ID\n  create                Create a new membershipType\n  update                Update an existing membershipType\n  delete                Delete a membershipType\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
@@ -76,6 +77,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       name: true,
       description: true,
       prefix: true,
+      hasUsersTableEntry: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<MembershipTypeSelect, MembershipTypeFilter, MembershipTypeOrderBy> & {
@@ -100,6 +102,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       name: true,
       description: true,
       prefix: true,
+      hasUsersTableEntry: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<MembershipTypeSelect, MembershipTypeFilter> & {
@@ -136,6 +139,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           name: true,
           description: true,
           prefix: true,
+          hasUsersTableEntry: true,
         },
       })
       .execute();
@@ -169,6 +173,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'prefix',
         required: true,
       },
+      {
+        type: 'boolean',
+        name: 'hasUsersTableEntry',
+        message: 'hasUsersTableEntry',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -182,12 +193,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           description: cleanedData.description,
           prefix: cleanedData.prefix,
+          hasUsersTableEntry: cleanedData.hasUsersTableEntry,
         },
         select: {
           id: true,
           name: true,
           description: true,
           prefix: true,
+          hasUsersTableEntry: true,
         },
       })
       .execute();
@@ -227,6 +240,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'prefix',
         required: false,
       },
+      {
+        type: 'boolean',
+        name: 'hasUsersTableEntry',
+        message: 'hasUsersTableEntry',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as MembershipTypePatch;
@@ -240,12 +260,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           name: cleanedData.name,
           description: cleanedData.description,
           prefix: cleanedData.prefix,
+          hasUsersTableEntry: cleanedData.hasUsersTableEntry,
         },
         select: {
           id: true,
           name: true,
           description: true,
           prefix: true,
+          hasUsersTableEntry: true,
         },
       })
       .execute();

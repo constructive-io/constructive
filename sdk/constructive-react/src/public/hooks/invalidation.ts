@@ -113,6 +113,7 @@ import {
   migrateFileKeys,
   appLimitDefaultKeys,
   orgLimitDefaultKeys,
+  devicesModuleKeys,
   membershipTypeKeys,
   appMembershipDefaultKeys,
   commitKeys,
@@ -1733,6 +1734,23 @@ export const invalidate = {
         queryKey: orgLimitDefaultKeys.detail(id),
       }),
   },
+  /** Invalidate devicesModule queries */ devicesModule: {
+    /** Invalidate all devicesModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: devicesModuleKeys.all,
+      }),
+    /** Invalidate devicesModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: devicesModuleKeys.lists(),
+      }),
+    /** Invalidate a specific devicesModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: devicesModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate membershipType queries */ membershipType: {
     /** Invalidate all membershipType queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -2604,6 +2622,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgLimitDefaultKeys.detail(id),
+    });
+  },
+  /** Remove devicesModule from cache */ devicesModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: devicesModuleKeys.detail(id),
     });
   },
   /** Remove membershipType from cache */ membershipType: (

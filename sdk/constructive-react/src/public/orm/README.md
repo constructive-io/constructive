@@ -119,6 +119,7 @@ const db = createClient({
 | `migrateFile` | findMany, findOne, create, update, delete |
 | `appLimitDefault` | findMany, findOne, create, update, delete |
 | `orgLimitDefault` | findMany, findOne, create, update, delete |
+| `devicesModule` | findMany, findOne, create, update, delete |
 | `membershipType` | findMany, findOne, create, update, delete |
 | `appMembershipDefault` | findMany, findOne, create, update, delete |
 | `commit` | findMany, findOne, create, update, delete |
@@ -3835,6 +3836,41 @@ const updated = await db.orgLimitDefault.update({ where: { id: '<UUID>' }, data:
 const deleted = await db.orgLimitDefault.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
+### `db.devicesModule`
+
+CRUD operations for DevicesModule records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `databaseId` | UUID | Yes |
+| `schemaId` | UUID | Yes |
+| `userDevicesTableId` | UUID | Yes |
+| `deviceSettingsTableId` | UUID | Yes |
+| `userDevicesTable` | String | Yes |
+| `deviceSettingsTable` | String | Yes |
+
+**Operations:**
+
+```typescript
+// List all devicesModule records
+const items = await db.devicesModule.findMany({ select: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } }).execute();
+
+// Get one by id
+const item = await db.devicesModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } }).execute();
+
+// Create
+const created = await db.devicesModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', deviceSettingsTableId: '<UUID>', userDevicesTable: '<String>', deviceSettingsTable: '<String>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.devicesModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.devicesModule.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.membershipType`
 
 CRUD operations for MembershipType records.
@@ -3847,18 +3883,19 @@ CRUD operations for MembershipType records.
 | `name` | String | Yes |
 | `description` | String | Yes |
 | `prefix` | String | Yes |
+| `hasUsersTableEntry` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all membershipType records
-const items = await db.membershipType.findMany({ select: { id: true, name: true, description: true, prefix: true } }).execute();
+const items = await db.membershipType.findMany({ select: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } }).execute();
 
 // Get one by id
-const item = await db.membershipType.findOne({ id: '<Int>', select: { id: true, name: true, description: true, prefix: true } }).execute();
+const item = await db.membershipType.findOne({ id: '<Int>', select: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } }).execute();
 
 // Create
-const created = await db.membershipType.create({ data: { name: '<String>', description: '<String>', prefix: '<String>' }, select: { id: true } }).execute();
+const created = await db.membershipType.create({ data: { name: '<String>', description: '<String>', prefix: '<String>', hasUsersTableEntry: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.membershipType.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute();

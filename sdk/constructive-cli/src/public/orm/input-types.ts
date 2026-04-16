@@ -1821,6 +1821,15 @@ export interface OrgLimitDefault {
   /** Default maximum usage allowed for this limit */
   max?: number | null;
 }
+export interface DevicesModule {
+  id: string;
+  databaseId?: string | null;
+  schemaId?: string | null;
+  userDevicesTableId?: string | null;
+  deviceSettingsTableId?: string | null;
+  userDevicesTable?: string | null;
+  deviceSettingsTable?: string | null;
+}
 /** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
 export interface MembershipType {
   /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
@@ -1831,6 +1840,8 @@ export interface MembershipType {
   description?: string | null;
   /** Short prefix used to namespace tables and functions for this membership scope */
   prefix?: string | null;
+  /** When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs */
+  hasUsersTableEntry?: boolean | null;
 }
 /** Default membership settings per entity, controlling initial approval and verification state for new members */
 export interface AppMembershipDefault {
@@ -2025,6 +2036,7 @@ export interface DatabaseRelations {
   rlsModule?: RlsModule | null;
   hierarchyModule?: HierarchyModule | null;
   rateLimitsModule?: RateLimitsModule | null;
+  devicesModule?: DevicesModule | null;
   schemas?: ConnectionResult<Schema>;
   tables?: ConnectionResult<Table>;
   checkConstraints?: ConnectionResult<CheckConstraint>;
@@ -2548,6 +2560,12 @@ export interface RoleTypeRelations {}
 export interface MigrateFileRelations {}
 export interface AppLimitDefaultRelations {}
 export interface OrgLimitDefaultRelations {}
+export interface DevicesModuleRelations {
+  database?: Database | null;
+  deviceSettingsTableByDeviceSettingsTableId?: Table | null;
+  schema?: Schema | null;
+  userDevicesTableByUserDevicesTableId?: Table | null;
+}
 export interface MembershipTypeRelations {}
 export interface AppMembershipDefaultRelations {}
 export interface CommitRelations {}
@@ -2750,6 +2768,7 @@ export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
 export type MigrateFileWithRelations = MigrateFile & MigrateFileRelations;
 export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRelations;
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
+export type DevicesModuleWithRelations = DevicesModule & DevicesModuleRelations;
 export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type AppMembershipDefaultWithRelations = AppMembershipDefault &
   AppMembershipDefaultRelations;
@@ -2830,6 +2849,9 @@ export type DatabaseSelect = {
   };
   rateLimitsModule?: {
     select: RateLimitsModuleSelect;
+  };
+  devicesModule?: {
+    select: DevicesModuleSelect;
   };
   schemas?: {
     select: SchemaSelect;
@@ -5265,11 +5287,33 @@ export type OrgLimitDefaultSelect = {
   name?: boolean;
   max?: boolean;
 };
+export type DevicesModuleSelect = {
+  id?: boolean;
+  databaseId?: boolean;
+  schemaId?: boolean;
+  userDevicesTableId?: boolean;
+  deviceSettingsTableId?: boolean;
+  userDevicesTable?: boolean;
+  deviceSettingsTable?: boolean;
+  database?: {
+    select: DatabaseSelect;
+  };
+  deviceSettingsTableByDeviceSettingsTableId?: {
+    select: TableSelect;
+  };
+  schema?: {
+    select: SchemaSelect;
+  };
+  userDevicesTableByUserDevicesTableId?: {
+    select: TableSelect;
+  };
+};
 export type MembershipTypeSelect = {
   id?: boolean;
   name?: boolean;
   description?: boolean;
   prefix?: boolean;
+  hasUsersTableEntry?: boolean;
 };
 export type AppMembershipDefaultSelect = {
   id?: boolean;
@@ -6132,6 +6176,10 @@ export interface DatabaseFilter {
   rateLimitsModule?: RateLimitsModuleFilter;
   /** A related `rateLimitsModule` exists. */
   rateLimitsModuleExists?: boolean;
+  /** Filter by the object’s `devicesModule` relation. */
+  devicesModule?: DevicesModuleFilter;
+  /** A related `devicesModule` exists. */
+  devicesModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -9417,6 +9465,36 @@ export interface OrgLimitDefaultFilter {
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
+export interface DevicesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTableId` field. */
+  userDevicesTableId?: UUIDFilter;
+  /** Filter by the object’s `deviceSettingsTableId` field. */
+  deviceSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTable` field. */
+  userDevicesTable?: StringFilter;
+  /** Filter by the object’s `deviceSettingsTable` field. */
+  deviceSettingsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: DevicesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DevicesModuleFilter[];
+  /** Negates the expression. */
+  not?: DevicesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `deviceSettingsTableByDeviceSettingsTableId` relation. */
+  deviceSettingsTableByDeviceSettingsTableId?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `userDevicesTableByUserDevicesTableId` relation. */
+  userDevicesTableByUserDevicesTableId?: TableFilter;
+}
 export interface MembershipTypeFilter {
   /** Filter by the object’s `id` field. */
   id?: IntFilter;
@@ -9426,6 +9504,8 @@ export interface MembershipTypeFilter {
   description?: StringFilter;
   /** Filter by the object’s `prefix` field. */
   prefix?: StringFilter;
+  /** Filter by the object’s `hasUsersTableEntry` field. */
+  hasUsersTableEntry?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: MembershipTypeFilter[];
   /** Checks for any expressions in this list. */
@@ -12301,6 +12381,24 @@ export type OrgLimitDefaultOrderBy =
   | 'NAME_DESC'
   | 'MAX_ASC'
   | 'MAX_DESC';
+export type DevicesModuleOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'USER_DEVICES_TABLE_ID_ASC'
+  | 'USER_DEVICES_TABLE_ID_DESC'
+  | 'DEVICE_SETTINGS_TABLE_ID_ASC'
+  | 'DEVICE_SETTINGS_TABLE_ID_DESC'
+  | 'USER_DEVICES_TABLE_ASC'
+  | 'USER_DEVICES_TABLE_DESC'
+  | 'DEVICE_SETTINGS_TABLE_ASC'
+  | 'DEVICE_SETTINGS_TABLE_DESC';
 export type MembershipTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -12312,7 +12410,9 @@ export type MembershipTypeOrderBy =
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC'
   | 'PREFIX_ASC'
-  | 'PREFIX_DESC';
+  | 'PREFIX_DESC'
+  | 'HAS_USERS_TABLE_ENTRY_ASC'
+  | 'HAS_USERS_TABLE_ENTRY_DESC';
 export type AppMembershipDefaultOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -15713,18 +15813,48 @@ export interface DeleteOrgLimitDefaultInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateDevicesModuleInput {
+  clientMutationId?: string;
+  devicesModule: {
+    databaseId: string;
+    schemaId?: string;
+    userDevicesTableId?: string;
+    deviceSettingsTableId?: string;
+    userDevicesTable?: string;
+    deviceSettingsTable?: string;
+  };
+}
+export interface DevicesModulePatch {
+  databaseId?: string | null;
+  schemaId?: string | null;
+  userDevicesTableId?: string | null;
+  deviceSettingsTableId?: string | null;
+  userDevicesTable?: string | null;
+  deviceSettingsTable?: string | null;
+}
+export interface UpdateDevicesModuleInput {
+  clientMutationId?: string;
+  id: string;
+  devicesModulePatch: DevicesModulePatch;
+}
+export interface DeleteDevicesModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateMembershipTypeInput {
   clientMutationId?: string;
   membershipType: {
     name: string;
     description: string;
     prefix: string;
+    hasUsersTableEntry?: boolean;
   };
 }
 export interface MembershipTypePatch {
   name?: string | null;
   description?: string | null;
   prefix?: string | null;
+  hasUsersTableEntry?: boolean | null;
 }
 export interface UpdateMembershipTypeInput {
   clientMutationId?: string;
@@ -21053,6 +21183,10 @@ export interface DatabaseFilter {
   rateLimitsModule?: RateLimitsModuleFilter;
   /** A related `rateLimitsModule` exists. */
   rateLimitsModuleExists?: boolean;
+  /** Filter by the object’s `devicesModule` relation. */
+  devicesModule?: DevicesModuleFilter;
+  /** A related `devicesModule` exists. */
+  devicesModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -22499,6 +22633,37 @@ export interface RateLimitsModuleFilter {
   rateLimitsTableByRateLimitsTableId?: TableFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
+}
+/** A filter to be used against `DevicesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DevicesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTableId` field. */
+  userDevicesTableId?: UUIDFilter;
+  /** Filter by the object’s `deviceSettingsTableId` field. */
+  deviceSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTable` field. */
+  userDevicesTable?: StringFilter;
+  /** Filter by the object’s `deviceSettingsTable` field. */
+  deviceSettingsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: DevicesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DevicesModuleFilter[];
+  /** Negates the expression. */
+  not?: DevicesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `deviceSettingsTableByDeviceSettingsTableId` relation. */
+  deviceSettingsTableByDeviceSettingsTableId?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `userDevicesTableByUserDevicesTableId` relation. */
+  userDevicesTableByUserDevicesTableId?: TableFilter;
 }
 /** A filter to be used against BitString fields. All fields are combined with a logical ‘and.’ */
 export interface BitStringFilter {
@@ -27364,6 +27529,51 @@ export type DeleteOrgLimitDefaultPayloadSelect = {
     select: OrgLimitDefaultEdgeSelect;
   };
 };
+export interface CreateDevicesModulePayload {
+  clientMutationId?: string | null;
+  /** The `DevicesModule` that was created by this mutation. */
+  devicesModule?: DevicesModule | null;
+  devicesModuleEdge?: DevicesModuleEdge | null;
+}
+export type CreateDevicesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  devicesModule?: {
+    select: DevicesModuleSelect;
+  };
+  devicesModuleEdge?: {
+    select: DevicesModuleEdgeSelect;
+  };
+};
+export interface UpdateDevicesModulePayload {
+  clientMutationId?: string | null;
+  /** The `DevicesModule` that was updated by this mutation. */
+  devicesModule?: DevicesModule | null;
+  devicesModuleEdge?: DevicesModuleEdge | null;
+}
+export type UpdateDevicesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  devicesModule?: {
+    select: DevicesModuleSelect;
+  };
+  devicesModuleEdge?: {
+    select: DevicesModuleEdgeSelect;
+  };
+};
+export interface DeleteDevicesModulePayload {
+  clientMutationId?: string | null;
+  /** The `DevicesModule` that was deleted by this mutation. */
+  devicesModule?: DevicesModule | null;
+  devicesModuleEdge?: DevicesModuleEdge | null;
+}
+export type DeleteDevicesModulePayloadSelect = {
+  clientMutationId?: boolean;
+  devicesModule?: {
+    select: DevicesModuleSelect;
+  };
+  devicesModuleEdge?: {
+    select: DevicesModuleEdgeSelect;
+  };
+};
 export interface CreateMembershipTypePayload {
   clientMutationId?: string | null;
   /** The `MembershipType` that was created by this mutation. */
@@ -29040,6 +29250,18 @@ export type OrgLimitDefaultEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgLimitDefaultSelect;
+  };
+};
+/** A `DevicesModule` edge in the connection. */
+export interface DevicesModuleEdge {
+  cursor?: string | null;
+  /** The `DevicesModule` at the end of the edge. */
+  node?: DevicesModule | null;
+}
+export type DevicesModuleEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: DevicesModuleSelect;
   };
 };
 /** A `MembershipType` edge in the connection. */

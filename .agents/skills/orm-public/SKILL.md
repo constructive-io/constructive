@@ -1,13 +1,13 @@
 ---
 name: orm-public
-description: ORM client for the public API — provides typed CRUD operations for 109 tables and 64 custom operations
+description: ORM client for the public API — provides typed CRUD operations for 110 tables and 64 custom operations
 ---
 
 # orm-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the public API — provides typed CRUD operations for 109 tables and 64 custom operations
+ORM client for the public API — provides typed CRUD operations for 110 tables and 64 custom operations
 
 ## Usage
 
@@ -135,6 +135,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [migrate-file](references/migrate-file.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
+- [devices-module](references/devices-module.md)
 - [membership-type](references/membership-type.md)
 - [app-membership-default](references/app-membership-default.md)
 - [commit](references/commit.md)

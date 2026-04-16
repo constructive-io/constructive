@@ -42,6 +42,7 @@ import type {
   DefaultIdsModule,
   DefaultPrivilege,
   DenormalizedTableField,
+  DevicesModule,
   Domain,
   Email,
   EmailsModule,
@@ -2445,19 +2446,25 @@ export type OrgLimitDefaultOrderBy =
   | 'NAME_DESC'
   | 'MAX_ASC'
   | 'MAX_DESC';
-/** Methods to use when ordering `MembershipType`. */
-export type MembershipTypeOrderBy =
+/** Methods to use when ordering `DevicesModule`. */
+export type DevicesModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
   | 'ID_ASC'
   | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC';
+  | 'DATABASE_ID_ASC'
+  | 'DATABASE_ID_DESC'
+  | 'SCHEMA_ID_ASC'
+  | 'SCHEMA_ID_DESC'
+  | 'USER_DEVICES_TABLE_ID_ASC'
+  | 'USER_DEVICES_TABLE_ID_DESC'
+  | 'DEVICE_SETTINGS_TABLE_ID_ASC'
+  | 'DEVICE_SETTINGS_TABLE_ID_DESC'
+  | 'USER_DEVICES_TABLE_ASC'
+  | 'USER_DEVICES_TABLE_DESC'
+  | 'DEVICE_SETTINGS_TABLE_ASC'
+  | 'DEVICE_SETTINGS_TABLE_DESC';
 /** Methods to use when ordering `Object`. */
 export type ObjectOrderBy =
   | 'NATURAL'
@@ -2507,6 +2514,21 @@ export type OrgPermissionOrderBy =
   | 'BITSTR_DESC'
   | 'DESCRIPTION_ASC'
   | 'DESCRIPTION_DESC';
+/** Methods to use when ordering `MembershipType`. */
+export type MembershipTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'HAS_USERS_TABLE_ENTRY_ASC'
+  | 'HAS_USERS_TABLE_ENTRY_DESC';
 /** Methods to use when ordering `AppMembershipDefault`. */
 export type AppMembershipDefaultOrderBy =
   | 'NATURAL'
@@ -3136,6 +3158,10 @@ export interface DatabaseFilter {
   rateLimitsModule?: RateLimitsModuleFilter;
   /** A related `rateLimitsModule` exists. */
   rateLimitsModuleExists?: boolean;
+  /** Filter by the object’s `devicesModule` relation. */
+  devicesModule?: DevicesModuleFilter;
+  /** A related `devicesModule` exists. */
+  devicesModuleExists?: boolean;
   /** Filter by the object’s `databaseProvisionModules` relation. */
   databaseProvisionModules?: DatabaseToManyDatabaseProvisionModuleFilter;
   /** `databaseProvisionModules` exist. */
@@ -8432,6 +8458,37 @@ export interface RateLimitsModuleFilter {
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
 }
+/** A filter to be used against `DevicesModule` object types. All fields are combined with a logical ‘and.’ */
+export interface DevicesModuleFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `databaseId` field. */
+  databaseId?: UUIDFilter;
+  /** Filter by the object’s `schemaId` field. */
+  schemaId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTableId` field. */
+  userDevicesTableId?: UUIDFilter;
+  /** Filter by the object’s `deviceSettingsTableId` field. */
+  deviceSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `userDevicesTable` field. */
+  userDevicesTable?: StringFilter;
+  /** Filter by the object’s `deviceSettingsTable` field. */
+  deviceSettingsTable?: StringFilter;
+  /** Checks for all expressions in this list. */
+  and?: DevicesModuleFilter[];
+  /** Checks for any expressions in this list. */
+  or?: DevicesModuleFilter[];
+  /** Negates the expression. */
+  not?: DevicesModuleFilter;
+  /** Filter by the object’s `database` relation. */
+  database?: DatabaseFilter;
+  /** Filter by the object’s `deviceSettingsTableByDeviceSettingsTableId` relation. */
+  deviceSettingsTableByDeviceSettingsTableId?: TableFilter;
+  /** Filter by the object’s `schema` relation. */
+  schema?: SchemaFilter;
+  /** Filter by the object’s `userDevicesTableByUserDevicesTableId` relation. */
+  userDevicesTableByUserDevicesTableId?: TableFilter;
+}
 /** A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’ */
 export interface DatabaseToManyDatabaseProvisionModuleFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -8613,23 +8670,6 @@ export interface OrgLimitDefaultFilter {
   /** Negates the expression. */
   not?: OrgLimitDefaultFilter;
 }
-/** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
-export interface MembershipTypeFilter {
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: MembershipTypeFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MembershipTypeFilter[];
-  /** Negates the expression. */
-  not?: MembershipTypeFilter;
-}
 /** A filter to be used against `Object` object types. All fields are combined with a logical ‘and.’ */
 export interface ObjectFilter {
   /** Filter by the object’s `id` field. */
@@ -8690,6 +8730,25 @@ export interface OrgPermissionFilter {
   or?: OrgPermissionFilter[];
   /** Negates the expression. */
   not?: OrgPermissionFilter;
+}
+/** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
+export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `hasUsersTableEntry` field. */
+  hasUsersTableEntry?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipTypeFilter[];
+  /** Negates the expression. */
+  not?: MembershipTypeFilter;
 }
 /** A filter to be used against `AppMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
 export interface AppMembershipDefaultFilter {
@@ -9494,6 +9553,21 @@ export interface ConnectedAccountsModuleInput {
   ownerTableId?: string;
   tableName: string;
 }
+export interface CreateDevicesModuleInput {
+  clientMutationId?: string;
+  /** The `DevicesModule` to be created by this mutation. */
+  devicesModule: DevicesModuleInput;
+}
+/** An input for mutations affecting `DevicesModule` */
+export interface DevicesModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  userDevicesTableId?: string;
+  deviceSettingsTableId?: string;
+  userDevicesTable?: string;
+  deviceSettingsTable?: string;
+}
 export interface CreateEmailsModuleInput {
   clientMutationId?: string;
   /** The `EmailsModule` to be created by this mutation. */
@@ -9592,22 +9666,6 @@ export interface CryptoAddressInput {
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateMembershipTypeInput {
-  clientMutationId?: string;
-  /** The `MembershipType` to be created by this mutation. */
-  membershipType: MembershipTypeInput;
-}
-/** An input for mutations affecting `MembershipType` */
-export interface MembershipTypeInput {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** Human-readable name of the membership type */
-  name: string;
-  /** Description of what this membership type represents */
-  description: string;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix: string;
 }
 export interface CreateObjectInput {
   clientMutationId?: string;
@@ -9746,6 +9804,24 @@ export interface AppLimitInput {
   num?: number;
   /** Maximum allowed usage; NULL means use the default limit value */
   max?: number;
+}
+export interface CreateMembershipTypeInput {
+  clientMutationId?: string;
+  /** The `MembershipType` to be created by this mutation. */
+  membershipType: MembershipTypeInput;
+}
+/** An input for mutations affecting `MembershipType` */
+export interface MembershipTypeInput {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** Human-readable name of the membership type */
+  name: string;
+  /** Description of what this membership type represents */
+  description: string;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix: string;
+  /** When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs */
+  hasUsersTableEntry?: boolean;
 }
 export interface CreateAppAchievementInput {
   clientMutationId?: string;
@@ -11828,6 +11904,22 @@ export interface ConnectedAccountsModulePatch {
   ownerTableId?: string;
   tableName?: string;
 }
+export interface UpdateDevicesModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `DevicesModule` being updated. */
+  devicesModulePatch: DevicesModulePatch;
+}
+/** Represents an update to a `DevicesModule`. Fields that are set will be updated. */
+export interface DevicesModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  userDevicesTableId?: string;
+  deviceSettingsTableId?: string;
+  userDevicesTable?: string;
+  deviceSettingsTable?: string;
+}
 export interface UpdateEmailsModuleInput {
   clientMutationId?: string;
   id: string;
@@ -11932,24 +12024,6 @@ export interface CryptoAddressPatch {
   isPrimary?: boolean;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface UpdateMembershipTypeInput {
-  clientMutationId?: string;
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** An object where the defined keys will be set on the `MembershipType` being updated. */
-  membershipTypePatch: MembershipTypePatch;
-}
-/** Represents an update to a `MembershipType`. Fields that are set will be updated. */
-export interface MembershipTypePatch {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id?: number;
-  /** Human-readable name of the membership type */
-  name?: string;
-  /** Description of what this membership type represents */
-  description?: string;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix?: string;
 }
 export interface UpdateObjectInput {
   clientMutationId?: string;
@@ -12097,6 +12171,26 @@ export interface AppLimitPatch {
   num?: number;
   /** Maximum allowed usage; NULL means use the default limit value */
   max?: number;
+}
+export interface UpdateMembershipTypeInput {
+  clientMutationId?: string;
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** An object where the defined keys will be set on the `MembershipType` being updated. */
+  membershipTypePatch: MembershipTypePatch;
+}
+/** Represents an update to a `MembershipType`. Fields that are set will be updated. */
+export interface MembershipTypePatch {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id?: number;
+  /** Human-readable name of the membership type */
+  name?: string;
+  /** Description of what this membership type represents */
+  description?: string;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix?: string;
+  /** When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs */
+  hasUsersTableEntry?: boolean;
 }
 export interface UpdateAppAchievementInput {
   clientMutationId?: string;
@@ -13926,6 +14020,10 @@ export interface DeleteConnectedAccountsModuleInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteDevicesModuleInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteEmailsModuleInput {
   clientMutationId?: string;
   id: string;
@@ -13949,11 +14047,6 @@ export interface DeleteOrgOwnerGrantInput {
 export interface DeleteCryptoAddressInput {
   clientMutationId?: string;
   id: string;
-}
-export interface DeleteMembershipTypeInput {
-  clientMutationId?: string;
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
 }
 export interface DeleteObjectInput {
   clientMutationId?: string;
@@ -13987,6 +14080,11 @@ export interface DeleteOrgPermissionInput {
 export interface DeleteAppLimitInput {
   clientMutationId?: string;
   id: string;
+}
+export interface DeleteMembershipTypeInput {
+  clientMutationId?: string;
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
 }
 export interface DeleteAppAchievementInput {
   clientMutationId?: string;
@@ -14506,6 +14604,13 @@ export interface ConnectedAccountsModuleConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `DevicesModule` values. */
+export interface DevicesModuleConnection {
+  nodes: DevicesModule[];
+  edges: DevicesModuleEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `EmailsModule` values. */
 export interface EmailsModuleConnection {
   nodes: EmailsModule[];
@@ -14548,13 +14653,6 @@ export interface CryptoAddressConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `MembershipType` values. */
-export interface MembershipTypeConnection {
-  nodes: MembershipType[];
-  edges: MembershipTypeEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `Database` values. */
 export interface DatabaseConnection {
   nodes: Database[];
@@ -14587,6 +14685,13 @@ export interface PhoneNumberConnection {
 export interface AppLimitConnection {
   nodes: AppLimit[];
   edges: AppLimitEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `MembershipType` values. */
+export interface MembershipTypeConnection {
+  nodes: MembershipType[];
+  edges: MembershipTypeEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -15352,6 +15457,12 @@ export interface CreateConnectedAccountsModulePayload {
   connectedAccountsModule?: ConnectedAccountsModule | null;
   connectedAccountsModuleEdge?: ConnectedAccountsModuleEdge | null;
 }
+export interface CreateDevicesModulePayload {
+  clientMutationId?: string | null;
+  /** The `DevicesModule` that was created by this mutation. */
+  devicesModule?: DevicesModule | null;
+  devicesModuleEdge?: DevicesModuleEdge | null;
+}
 export interface CreateEmailsModulePayload {
   clientMutationId?: string | null;
   /** The `EmailsModule` that was created by this mutation. */
@@ -15387,12 +15498,6 @@ export interface CreateCryptoAddressPayload {
   /** The `CryptoAddress` that was created by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export interface CreateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was created by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface CreateObjectPayload {
   clientMutationId?: string | null;
@@ -15441,6 +15546,12 @@ export interface CreateAppLimitPayload {
   /** The `AppLimit` that was created by this mutation. */
   appLimit?: AppLimit | null;
   appLimitEdge?: AppLimitEdge | null;
+}
+export interface CreateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was created by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface CreateAppAchievementPayload {
   clientMutationId?: string | null;
@@ -15980,6 +16091,12 @@ export interface UpdateConnectedAccountsModulePayload {
   connectedAccountsModule?: ConnectedAccountsModule | null;
   connectedAccountsModuleEdge?: ConnectedAccountsModuleEdge | null;
 }
+export interface UpdateDevicesModulePayload {
+  clientMutationId?: string | null;
+  /** The `DevicesModule` that was updated by this mutation. */
+  devicesModule?: DevicesModule | null;
+  devicesModuleEdge?: DevicesModuleEdge | null;
+}
 export interface UpdateEmailsModulePayload {
   clientMutationId?: string | null;
   /** The `EmailsModule` that was updated by this mutation. */
@@ -16015,12 +16132,6 @@ export interface UpdateCryptoAddressPayload {
   /** The `CryptoAddress` that was updated by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export interface UpdateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was updated by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface UpdateObjectPayload {
   clientMutationId?: string | null;
@@ -16069,6 +16180,12 @@ export interface UpdateAppLimitPayload {
   /** The `AppLimit` that was updated by this mutation. */
   appLimit?: AppLimit | null;
   appLimitEdge?: AppLimitEdge | null;
+}
+export interface UpdateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was updated by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface UpdateAppAchievementPayload {
   clientMutationId?: string | null;
@@ -16598,6 +16715,12 @@ export interface DeleteConnectedAccountsModulePayload {
   connectedAccountsModule?: ConnectedAccountsModule | null;
   connectedAccountsModuleEdge?: ConnectedAccountsModuleEdge | null;
 }
+export interface DeleteDevicesModulePayload {
+  clientMutationId?: string | null;
+  /** The `DevicesModule` that was deleted by this mutation. */
+  devicesModule?: DevicesModule | null;
+  devicesModuleEdge?: DevicesModuleEdge | null;
+}
 export interface DeleteEmailsModulePayload {
   clientMutationId?: string | null;
   /** The `EmailsModule` that was deleted by this mutation. */
@@ -16633,12 +16756,6 @@ export interface DeleteCryptoAddressPayload {
   /** The `CryptoAddress` that was deleted by this mutation. */
   cryptoAddress?: CryptoAddress | null;
   cryptoAddressEdge?: CryptoAddressEdge | null;
-}
-export interface DeleteMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was deleted by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface DeleteObjectPayload {
   clientMutationId?: string | null;
@@ -16687,6 +16804,12 @@ export interface DeleteAppLimitPayload {
   /** The `AppLimit` that was deleted by this mutation. */
   appLimit?: AppLimit | null;
   appLimitEdge?: AppLimitEdge | null;
+}
+export interface DeleteMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was deleted by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
 }
 export interface DeleteAppAchievementPayload {
   clientMutationId?: string | null;
@@ -17309,6 +17432,12 @@ export interface ConnectedAccountsModuleEdge {
   /** The `ConnectedAccountsModule` at the end of the edge. */
   node?: ConnectedAccountsModule | null;
 }
+/** A `DevicesModule` edge in the connection. */
+export interface DevicesModuleEdge {
+  cursor?: string | null;
+  /** The `DevicesModule` at the end of the edge. */
+  node?: DevicesModule | null;
+}
 /** A `EmailsModule` edge in the connection. */
 export interface EmailsModuleEdge {
   cursor?: string | null;
@@ -17345,12 +17474,6 @@ export interface CryptoAddressEdge {
   /** The `CryptoAddress` at the end of the edge. */
   node?: CryptoAddress | null;
 }
-/** A `MembershipType` edge in the connection. */
-export interface MembershipTypeEdge {
-  cursor?: string | null;
-  /** The `MembershipType` at the end of the edge. */
-  node?: MembershipType | null;
-}
 /** A `Database` edge in the connection. */
 export interface DatabaseEdge {
   cursor?: string | null;
@@ -17380,6 +17503,12 @@ export interface AppLimitEdge {
   cursor?: string | null;
   /** The `AppLimit` at the end of the edge. */
   node?: AppLimit | null;
+}
+/** A `MembershipType` edge in the connection. */
+export interface MembershipTypeEdge {
+  cursor?: string | null;
+  /** The `MembershipType` at the end of the edge. */
+  node?: MembershipType | null;
 }
 /** A `AppAchievement` edge in the connection. */
 export interface AppAchievementEdge {

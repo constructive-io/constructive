@@ -548,6 +548,11 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
+| `useDevicesModulesQuery` | Query | List all devicesModules |
+| `useDevicesModuleQuery` | Query | Get one devicesModule |
+| `useCreateDevicesModuleMutation` | Mutation | Create a devicesModule |
+| `useUpdateDevicesModuleMutation` | Mutation | Update a devicesModule |
+| `useDeleteDevicesModuleMutation` | Mutation | Delete a devicesModule |
 | `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
@@ -2734,25 +2739,46 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
 create({ name: '<String>', max: '<Int>' });
 ```
 
+### DevicesModule
+
+```typescript
+// List all devicesModules
+const { data, isLoading } = useDevicesModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } },
+});
+
+// Get one devicesModule
+const { data: item } = useDevicesModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } },
+});
+
+// Create a devicesModule
+const { mutate: create } = useCreateDevicesModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', deviceSettingsTableId: '<UUID>', userDevicesTable: '<String>', deviceSettingsTable: '<String>' });
+```
+
 ### MembershipType
 
 ```typescript
 // List all membershipTypes
 const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
+  selection: { fields: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } },
 });
 
 // Get one membershipType
 const { data: item } = useMembershipTypeQuery({
   id: '<Int>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
+  selection: { fields: { id: true, name: true, description: true, prefix: true, hasUsersTableEntry: true } },
 });
 
 // Create a membershipType
 const { mutate: create } = useCreateMembershipTypeMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', description: '<String>', prefix: '<String>' });
+create({ name: '<String>', description: '<String>', prefix: '<String>', hasUsersTableEntry: '<Boolean>' });
 ```
 
 ### AppMembershipDefault

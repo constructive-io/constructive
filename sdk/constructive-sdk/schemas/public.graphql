@@ -3400,6 +3400,9 @@ type Database {
   """Reads a single `RateLimitsModule` that is related to this `Database`."""
   rateLimitsModule: RateLimitsModule
 
+  """Reads a single `DevicesModule` that is related to this `Database`."""
+  devicesModule: DevicesModule
+
   """
   Reads and enables pagination through a set of `DatabaseProvisionModule`.
   """
@@ -5292,6 +5295,12 @@ input DatabaseFilter {
 
   """A related `rateLimitsModule` exists."""
   rateLimitsModuleExists: Boolean
+
+  """Filter by the object’s `devicesModule` relation."""
+  devicesModule: DevicesModuleFilter
+
+  """A related `devicesModule` exists."""
+  devicesModuleExists: Boolean
 
   """Filter by the object’s `databaseProvisionModules` relation."""
   databaseProvisionModules: DatabaseToManyDatabaseProvisionModuleFilter
@@ -13740,6 +13749,57 @@ input RateLimitsModuleFilter {
 }
 
 """
+A filter to be used against `DevicesModule` object types. All fields are combined with a logical ‘and.’
+"""
+input DevicesModuleFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `databaseId` field."""
+  databaseId: UUIDFilter
+
+  """Filter by the object’s `schemaId` field."""
+  schemaId: UUIDFilter
+
+  """Filter by the object’s `userDevicesTableId` field."""
+  userDevicesTableId: UUIDFilter
+
+  """Filter by the object’s `deviceSettingsTableId` field."""
+  deviceSettingsTableId: UUIDFilter
+
+  """Filter by the object’s `userDevicesTable` field."""
+  userDevicesTable: StringFilter
+
+  """Filter by the object’s `deviceSettingsTable` field."""
+  deviceSettingsTable: StringFilter
+
+  """Checks for all expressions in this list."""
+  and: [DevicesModuleFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [DevicesModuleFilter!]
+
+  """Negates the expression."""
+  not: DevicesModuleFilter
+
+  """Filter by the object’s `database` relation."""
+  database: DatabaseFilter
+
+  """
+  Filter by the object’s `deviceSettingsTableByDeviceSettingsTableId` relation.
+  """
+  deviceSettingsTableByDeviceSettingsTableId: TableFilter
+
+  """Filter by the object’s `schema` relation."""
+  schema: SchemaFilter
+
+  """
+  Filter by the object’s `userDevicesTableByUserDevicesTableId` relation.
+  """
+  userDevicesTableByUserDevicesTableId: TableFilter
+}
+
+"""
 A filter to be used against many `DatabaseProvisionModule` object types. All fields are combined with a logical ‘and.’
 """
 input DatabaseToManyDatabaseProvisionModuleFilter {
@@ -19568,6 +19628,28 @@ type RateLimitsModule {
   schema: Schema
 }
 
+type DevicesModule {
+  id: UUID!
+  databaseId: UUID!
+  schemaId: UUID!
+  userDevicesTableId: UUID!
+  deviceSettingsTableId: UUID!
+  userDevicesTable: String!
+  deviceSettingsTable: String!
+
+  """Reads a single `Database` that is related to this `DevicesModule`."""
+  database: Database
+
+  """Reads a single `Table` that is related to this `DevicesModule`."""
+  deviceSettingsTableByDeviceSettingsTableId: Table
+
+  """Reads a single `Schema` that is related to this `DevicesModule`."""
+  schema: Schema
+
+  """Reads a single `Table` that is related to this `DevicesModule`."""
+  userDevicesTableByUserDevicesTableId: Table
+}
+
 """A connection to a list of `DatabaseProvisionModule` values."""
 type DatabaseProvisionModuleConnection {
   """A list of `DatabaseProvisionModule` objects."""
@@ -22252,92 +22334,51 @@ enum OrgLimitDefaultOrderBy {
   MAX_DESC
 }
 
-"""A connection to a list of `MembershipType` values."""
-type MembershipTypeConnection {
-  """A list of `MembershipType` objects."""
-  nodes: [MembershipType]!
+"""A connection to a list of `DevicesModule` values."""
+type DevicesModuleConnection {
+  """A list of `DevicesModule` objects."""
+  nodes: [DevicesModule]!
 
   """
-  A list of edges which contains the `MembershipType` and cursor to aid in pagination.
+  A list of edges which contains the `DevicesModule` and cursor to aid in pagination.
   """
-  edges: [MembershipTypeEdge]!
+  edges: [DevicesModuleEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `MembershipType` you could get from the connection."""
+  """The count of *all* `DevicesModule` you could get from the connection."""
   totalCount: Int!
 }
 
-"""
-Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member)
-"""
-type MembershipType {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """Human-readable name of the membership type"""
-  name: String!
-
-  """Description of what this membership type represents"""
-  description: String!
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String!
-}
-
-"""A `MembershipType` edge in the connection."""
-type MembershipTypeEdge {
+"""A `DevicesModule` edge in the connection."""
+type DevicesModuleEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `MembershipType` at the end of the edge."""
-  node: MembershipType
+  """The `DevicesModule` at the end of the edge."""
+  node: DevicesModule
 }
 
-"""
-A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’
-"""
-input MembershipTypeFilter {
-  """Filter by the object’s `id` field."""
-  id: IntFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `prefix` field."""
-  prefix: StringFilter
-
-  """Checks for all expressions in this list."""
-  and: [MembershipTypeFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [MembershipTypeFilter!]
-
-  """Negates the expression."""
-  not: MembershipTypeFilter
-}
-
-"""Methods to use when ordering `MembershipType`."""
-enum MembershipTypeOrderBy {
+"""Methods to use when ordering `DevicesModule`."""
+enum DevicesModuleOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  PREFIX_ASC
-  PREFIX_DESC
+  DATABASE_ID_ASC
+  DATABASE_ID_DESC
+  SCHEMA_ID_ASC
+  SCHEMA_ID_DESC
+  USER_DEVICES_TABLE_ID_ASC
+  USER_DEVICES_TABLE_ID_DESC
+  DEVICE_SETTINGS_TABLE_ID_ASC
+  DEVICE_SETTINGS_TABLE_ID_DESC
+  USER_DEVICES_TABLE_ASC
+  USER_DEVICES_TABLE_DESC
+  DEVICE_SETTINGS_TABLE_ASC
+  DEVICE_SETTINGS_TABLE_DESC
 }
 
 """
@@ -22486,6 +22527,104 @@ enum OrgPermissionOrderBy {
   BITSTR_DESC
   DESCRIPTION_ASC
   DESCRIPTION_DESC
+}
+
+"""A connection to a list of `MembershipType` values."""
+type MembershipTypeConnection {
+  """A list of `MembershipType` objects."""
+  nodes: [MembershipType]!
+
+  """
+  A list of edges which contains the `MembershipType` and cursor to aid in pagination.
+  """
+  edges: [MembershipTypeEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MembershipType` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member)
+"""
+type MembershipType {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """Human-readable name of the membership type"""
+  name: String!
+
+  """Description of what this membership type represents"""
+  description: String!
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String!
+
+  """
+  When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs
+  """
+  hasUsersTableEntry: Boolean!
+}
+
+"""A `MembershipType` edge in the connection."""
+type MembershipTypeEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MembershipType` at the end of the edge."""
+  node: MembershipType
+}
+
+"""
+A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’
+"""
+input MembershipTypeFilter {
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `hasUsersTableEntry` field."""
+  hasUsersTableEntry: BooleanFilter
+
+  """Checks for all expressions in this list."""
+  and: [MembershipTypeFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [MembershipTypeFilter!]
+
+  """Negates the expression."""
+  not: MembershipTypeFilter
+}
+
+"""Methods to use when ordering `MembershipType`."""
+enum MembershipTypeOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  HAS_USERS_TABLE_ENTRY_ASC
+  HAS_USERS_TABLE_ENTRY_DESC
 }
 
 """A connection to a list of `AppMembershipDefault` values."""
@@ -25970,6 +26109,52 @@ input ConnectedAccountsModuleInput {
   tableName: String!
 }
 
+"""The output of our create `DevicesModule` mutation."""
+type CreateDevicesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DevicesModule` that was created by this mutation."""
+  devicesModule: DevicesModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DevicesModule`. May be used by Relay 1."""
+  devicesModuleEdge(
+    """The method to use when ordering `DevicesModule`."""
+    orderBy: [DevicesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DevicesModuleEdge
+}
+
+"""All input for the create `DevicesModule` mutation."""
+input CreateDevicesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `DevicesModule` to be created by this mutation."""
+  devicesModule: DevicesModuleInput!
+}
+
+"""An input for mutations affecting `DevicesModule`"""
+input DevicesModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  userDevicesTableId: UUID
+  deviceSettingsTableId: UUID
+  userDevicesTable: String
+  deviceSettingsTable: String
+}
+
 """The output of our create `EmailsModule` mutation."""
 type CreateEmailsModulePayload {
   """
@@ -26264,60 +26449,6 @@ input CryptoAddressInput {
   isPrimary: Boolean
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our create `MembershipType` mutation."""
-type CreateMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was created by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the create `MembershipType` mutation."""
-input CreateMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` to be created by this mutation."""
-  membershipType: MembershipTypeInput!
-}
-
-"""An input for mutations affecting `MembershipType`"""
-input MembershipTypeInput {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """Human-readable name of the membership type"""
-  name: String!
-
-  """Description of what this membership type represents"""
-  description: String!
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String!
 }
 
 """The output of our create `Object` mutation."""
@@ -26732,6 +26863,65 @@ input AppLimitInput {
 
   """Maximum allowed usage; NULL means use the default limit value"""
   max: Int
+}
+
+"""The output of our create `MembershipType` mutation."""
+type CreateMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was created by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the create `MembershipType` mutation."""
+input CreateMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` to be created by this mutation."""
+  membershipType: MembershipTypeInput!
+}
+
+"""An input for mutations affecting `MembershipType`"""
+input MembershipTypeInput {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """Human-readable name of the membership type"""
+  name: String!
+
+  """Description of what this membership type represents"""
+  description: String!
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String!
+
+  """
+  When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs
+  """
+  hasUsersTableEntry: Boolean
 }
 
 """The output of our create `AppAchievement` mutation."""
@@ -32104,6 +32294,57 @@ input ConnectedAccountsModulePatch {
   tableName: String
 }
 
+"""The output of our update `DevicesModule` mutation."""
+type UpdateDevicesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DevicesModule` that was updated by this mutation."""
+  devicesModule: DevicesModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DevicesModule`. May be used by Relay 1."""
+  devicesModuleEdge(
+    """The method to use when ordering `DevicesModule`."""
+    orderBy: [DevicesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DevicesModuleEdge
+}
+
+"""All input for the `updateDevicesModule` mutation."""
+input UpdateDevicesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `DevicesModule` being updated.
+  """
+  devicesModulePatch: DevicesModulePatch!
+}
+
+"""
+Represents an update to a `DevicesModule`. Fields that are set will be updated.
+"""
+input DevicesModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  userDevicesTableId: UUID
+  deviceSettingsTableId: UUID
+  userDevicesTable: String
+  deviceSettingsTable: String
+}
+
 """The output of our update `EmailsModule` mutation."""
 type UpdateEmailsModulePayload {
   """
@@ -32428,69 +32669,6 @@ input CryptoAddressPatch {
   isPrimary: Boolean
   createdAt: Datetime
   updatedAt: Datetime
-}
-
-"""The output of our update `MembershipType` mutation."""
-type UpdateMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was updated by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the `updateMembershipType` mutation."""
-input UpdateMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `MembershipType` being updated.
-  """
-  membershipTypePatch: MembershipTypePatch!
-}
-
-"""
-Represents an update to a `MembershipType`. Fields that are set will be updated.
-"""
-input MembershipTypePatch {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int
-
-  """Human-readable name of the membership type"""
-  name: String
-
-  """Description of what this membership type represents"""
-  description: String
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String
 }
 
 """The output of our update `Object` mutation."""
@@ -32946,6 +33124,74 @@ input AppLimitPatch {
 
   """Maximum allowed usage; NULL means use the default limit value"""
   max: Int
+}
+
+"""The output of our update `MembershipType` mutation."""
+type UpdateMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was updated by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the `updateMembershipType` mutation."""
+input UpdateMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `MembershipType` being updated.
+  """
+  membershipTypePatch: MembershipTypePatch!
+}
+
+"""
+Represents an update to a `MembershipType`. Fields that are set will be updated.
+"""
+input MembershipTypePatch {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int
+
+  """Human-readable name of the membership type"""
+  name: String
+
+  """Description of what this membership type represents"""
+  description: String
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String
+
+  """
+  When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs
+  """
+  hasUsersTableEntry: Boolean
 }
 
 """The output of our update `AppAchievement` mutation."""
@@ -38081,6 +38327,39 @@ input DeleteConnectedAccountsModuleInput {
   id: UUID!
 }
 
+"""The output of our delete `DevicesModule` mutation."""
+type DeleteDevicesModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `DevicesModule` that was deleted by this mutation."""
+  devicesModule: DevicesModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `DevicesModule`. May be used by Relay 1."""
+  devicesModuleEdge(
+    """The method to use when ordering `DevicesModule`."""
+    orderBy: [DevicesModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): DevicesModuleEdge
+}
+
+"""All input for the `deleteDevicesModule` mutation."""
+input DeleteDevicesModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `EmailsModule` mutation."""
 type DeleteEmailsModulePayload {
   """
@@ -38277,43 +38556,6 @@ input DeleteCryptoAddressInput {
   """
   clientMutationId: String
   id: UUID!
-}
-
-"""The output of our delete `MembershipType` mutation."""
-type DeleteMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was deleted by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the `deleteMembershipType` mutation."""
-input DeleteMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
 }
 
 """The output of our delete `Object` mutation."""
@@ -38579,6 +38821,43 @@ input DeleteAppLimitInput {
   """
   clientMutationId: String
   id: UUID!
+}
+
+"""The output of our delete `MembershipType` mutation."""
+type DeleteMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was deleted by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the `deleteMembershipType` mutation."""
+input DeleteMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
 }
 
 """The output of our delete `AppAchievement` mutation."""
@@ -41657,6 +41936,35 @@ type Query {
     orderBy: [ConnectedAccountsModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): ConnectedAccountsModuleConnection
 
+  """Reads and enables pagination through a set of `DevicesModule`."""
+  devicesModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: DevicesModuleFilter
+
+    """The method to use when ordering `DevicesModule`."""
+    orderBy: [DevicesModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): DevicesModuleConnection
+
   """Reads and enables pagination through a set of `EmailsModule`."""
   emailsModules(
     """Only read the first `n` values of the set."""
@@ -41830,35 +42138,6 @@ type Query {
     """The method to use when ordering `CryptoAddress`."""
     orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
   ): CryptoAddressConnection
-
-  """Reads and enables pagination through a set of `MembershipType`."""
-  membershipTypes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: MembershipTypeFilter
-
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MembershipTypeConnection
 
   """Reads and enables pagination through a set of `Object`."""
   objects(
@@ -42091,6 +42370,35 @@ type Query {
     """The method to use when ordering `AppLimit`."""
     orderBy: [AppLimitOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppLimitConnection
+
+  """Reads and enables pagination through a set of `MembershipType`."""
+  membershipTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MembershipTypeFilter
+
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MembershipTypeConnection
 
   """Reads and enables pagination through a set of `AppAchievement`."""
   appAchievements(
@@ -44455,6 +44763,14 @@ type Mutation {
     input: CreateConnectedAccountsModuleInput!
   ): CreateConnectedAccountsModulePayload
 
+  """Creates a single `DevicesModule`."""
+  createDevicesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateDevicesModuleInput!
+  ): CreateDevicesModulePayload
+
   """Creates a single `EmailsModule`."""
   createEmailsModule(
     """
@@ -44502,14 +44818,6 @@ type Mutation {
     """
     input: CreateCryptoAddressInput!
   ): CreateCryptoAddressPayload
-
-  """Creates a single `MembershipType`."""
-  createMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMembershipTypeInput!
-  ): CreateMembershipTypePayload
 
   """Creates a single `Object`."""
   createObject(
@@ -44574,6 +44882,14 @@ type Mutation {
     """
     input: CreateAppLimitInput!
   ): CreateAppLimitPayload
+
+  """Creates a single `MembershipType`."""
+  createMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMembershipTypeInput!
+  ): CreateMembershipTypePayload
 
   """Creates a single `AppAchievement`."""
   createAppAchievement(
@@ -45305,6 +45621,14 @@ type Mutation {
     input: UpdateConnectedAccountsModuleInput!
   ): UpdateConnectedAccountsModulePayload
 
+  """Updates a single `DevicesModule` using a unique key and a patch."""
+  updateDevicesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateDevicesModuleInput!
+  ): UpdateDevicesModulePayload
+
   """Updates a single `EmailsModule` using a unique key and a patch."""
   updateEmailsModule(
     """
@@ -45352,14 +45676,6 @@ type Mutation {
     """
     input: UpdateCryptoAddressInput!
   ): UpdateCryptoAddressPayload
-
-  """Updates a single `MembershipType` using a unique key and a patch."""
-  updateMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMembershipTypeInput!
-  ): UpdateMembershipTypePayload
 
   """Updates a single `Object` using a unique key and a patch."""
   updateObject(
@@ -45426,6 +45742,14 @@ type Mutation {
     """
     input: UpdateAppLimitInput!
   ): UpdateAppLimitPayload
+
+  """Updates a single `MembershipType` using a unique key and a patch."""
+  updateMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMembershipTypeInput!
+  ): UpdateMembershipTypePayload
 
   """Updates a single `AppAchievement` using a unique key and a patch."""
   updateAppAchievement(
@@ -46147,6 +46471,14 @@ type Mutation {
     input: DeleteConnectedAccountsModuleInput!
   ): DeleteConnectedAccountsModulePayload
 
+  """Deletes a single `DevicesModule` using a unique key."""
+  deleteDevicesModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteDevicesModuleInput!
+  ): DeleteDevicesModulePayload
+
   """Deletes a single `EmailsModule` using a unique key."""
   deleteEmailsModule(
     """
@@ -46194,14 +46526,6 @@ type Mutation {
     """
     input: DeleteCryptoAddressInput!
   ): DeleteCryptoAddressPayload
-
-  """Deletes a single `MembershipType` using a unique key."""
-  deleteMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMembershipTypeInput!
-  ): DeleteMembershipTypePayload
 
   """Deletes a single `Object` using a unique key."""
   deleteObject(
@@ -46266,6 +46590,14 @@ type Mutation {
     """
     input: DeleteAppLimitInput!
   ): DeleteAppLimitPayload
+
+  """Deletes a single `MembershipType` using a unique key."""
+  deleteMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMembershipTypeInput!
+  ): DeleteMembershipTypePayload
 
   """Deletes a single `AppAchievement` using a unique key."""
   deleteAppAchievement(

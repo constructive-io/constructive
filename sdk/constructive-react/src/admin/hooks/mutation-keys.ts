@@ -146,6 +146,14 @@ export const orgOwnerGrantMutationKeys = {
   /** Delete orgOwnerGrant mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgownergrant', 'delete', id] as const,
 } as const;
+export const appLimitMutationKeys = {
+  /** All appLimit mutation keys */ all: ['mutation', 'applimit'] as const,
+  /** Create appLimit mutation key */ create: () => ['mutation', 'applimit', 'create'] as const,
+  /** Update appLimit mutation key */ update: (id: string | number) =>
+    ['mutation', 'applimit', 'update', id] as const,
+  /** Delete appLimit mutation key */ delete: (id: string | number) =>
+    ['mutation', 'applimit', 'delete', id] as const,
+} as const;
 export const membershipTypeMutationKeys = {
   /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
   /** Create membershipType mutation key */ create: () =>
@@ -154,14 +162,6 @@ export const membershipTypeMutationKeys = {
     ['mutation', 'membershiptype', 'update', id] as const,
   /** Delete membershipType mutation key */ delete: (id: string | number) =>
     ['mutation', 'membershiptype', 'delete', id] as const,
-} as const;
-export const appLimitMutationKeys = {
-  /** All appLimit mutation keys */ all: ['mutation', 'applimit'] as const,
-  /** Create appLimit mutation key */ create: () => ['mutation', 'applimit', 'create'] as const,
-  /** Update appLimit mutation key */ update: (id: string | number) =>
-    ['mutation', 'applimit', 'update', id] as const,
-  /** Delete appLimit mutation key */ delete: (id: string | number) =>
-    ['mutation', 'applimit', 'delete', id] as const,
 } as const;
 export const appAchievementMutationKeys = {
   /** All appAchievement mutation keys */ all: ['mutation', 'appachievement'] as const,
@@ -364,8 +364,8 @@ export const mutationKeys = {
   orgLimitDefault: orgLimitDefaultMutationKeys,
   orgAdminGrant: orgAdminGrantMutationKeys,
   orgOwnerGrant: orgOwnerGrantMutationKeys,
-  membershipType: membershipTypeMutationKeys,
   appLimit: appLimitMutationKeys,
+  membershipType: membershipTypeMutationKeys,
   appAchievement: appAchievementMutationKeys,
   appStep: appStepMutationKeys,
   appClaimedInvite: appClaimedInviteMutationKeys,
