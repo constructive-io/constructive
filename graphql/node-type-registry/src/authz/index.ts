@@ -11,5 +11,6 @@ export { AuthzRelatedMemberList } from './authz-related-member-list';
 export { AuthzAllowAll } from './authz-allow-all';
 export { AuthzDenyAll } from './authz-deny-all';
 export { AuthzComposite } from './authz-composite';
+export { AuthzNotReadOnly } from './authz-not-read-only';
 export { AuthzPeerOwnership } from './authz-peer-ownership';
 export { AuthzRelatedPeerOwnership } from './authz-related-peer-ownership';
