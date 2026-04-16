@@ -24,6 +24,8 @@ PostgreSQL Options:
 
 Additional Services:
   --minio            Include MinIO S3-compatible object storage (API: 9000, Console: 9001)
+  --ollama           Include Ollama LLM inference server (API: 11434)
+  --gpu              Enable NVIDIA GPU passthrough for Ollama (requires NVIDIA Container Toolkit)
 
 General Options:
   --help, -h         Show this help message
@@ -32,12 +34,15 @@ General Options:
 Examples:
   pgpm docker start                           Start PostgreSQL only
   pgpm docker start --minio                   Start PostgreSQL + MinIO
+  pgpm docker start --ollama                  Start PostgreSQL + Ollama (CPU)
+  pgpm docker start --ollama --gpu            Start PostgreSQL + Ollama (NVIDIA GPU)
   pgpm docker start --port 5433               Start on custom port
   pgpm docker start --shm-size 4g             Start with 4GB shared memory
   pgpm docker start --recreate                Remove and recreate containers
   pgpm docker start --recreate --minio        Recreate PostgreSQL + MinIO
   pgpm docker stop                            Stop PostgreSQL
   pgpm docker stop --minio                    Stop PostgreSQL + MinIO
+  pgpm docker stop --ollama                   Stop PostgreSQL + Ollama
   pgpm docker ls                              List services and status
 `;
 
@@ -68,6 +73,7 @@ interface ServiceDefinition {
   env: Record<string, string>;
   command?: string[];
   volumes?: VolumeMapping[];
+  gpuCapable?: boolean;
 }
 
 const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
@@ -84,6 +90,16 @@ const ADDITIONAL_SERVICES: Record<string, ServiceDefinition> = {
     },
     command: ['server', '/data', '--console-address', ':9001'],
     volumes: [{ name: 'minio-data', containerPath: '/data' }],
+  },
+  ollama: {
+    name: 'ollama',
+    image: 'ollama/ollama',
+    ports: [
+      { host: 11434, container: 11434 },
+    ],
+    env: {},
+    volumes: [{ name: 'ollama-data', containerPath: '/root/.ollama' }],
+    gpuCapable: true,
   },
 };
 
@@ -243,7 +259,7 @@ async function stopContainer(name: string): Promise<void> {
   }
 }
 
-async function startService(service: ServiceDefinition, recreate: boolean): Promise<void> {
+async function startService(service: ServiceDefinition, recreate: boolean, gpu: boolean = false): Promise<void> {
   const { name, image, ports, env: serviceEnv, command } = service;
 
   const exists = await containerExists(name);
@@ -293,6 +309,10 @@ async function startService(service: ServiceDefinition, recreate: boolean): Prom
     for (const vol of service.volumes) {
       runArgs.push('-v', `${vol.name}:${vol.containerPath}`);
     }
+  }
+
+  if (gpu && service.gpuCapable) {
+    runArgs.push('--gpus', 'all');
   }
 
   runArgs.push(image);
@@ -382,13 +402,14 @@ export default async (
   const password = (args.password as string) || 'password';
   const shmSize = (args['shm-size'] as string) || (args.shmSize as string) || '2g';
   const recreate = args.recreate === true;
+  const gpu = args.gpu === true;
   const includedServices = resolveServiceFlags(args);
 
   switch (subcommand) {
   case 'start':
     await startContainer({ name, image, port, user, password, shmSize, recreate });
     for (const service of includedServices) {
-      await startService(service, recreate);
+      await startService(service, recreate, gpu);
     }
     break;
 
