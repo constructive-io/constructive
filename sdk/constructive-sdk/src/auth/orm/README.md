@@ -372,6 +372,36 @@ checkPassword
 const result = await db.mutation.checkPassword({ input: { password: '<String>' } }).execute();
 ```
 
+### `db.mutation.verifyPassword`
+
+verifyPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyPasswordInput (required) |
+
+```typescript
+const result = await db.mutation.verifyPassword({ input: { password: '<String>' } }).execute();
+```
+
+### `db.mutation.verifyTotp`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyTotpInput (required) |
+
+```typescript
+const result = await db.mutation.verifyTotp({ input: { totpValue: '<String>' } }).execute();
+```
+
 ### `db.mutation.confirmDeleteAccount`
 
 confirmDeleteAccount
@@ -535,36 +565,6 @@ sendVerificationEmail
 
 ```typescript
 const result = await db.mutation.sendVerificationEmail({ input: { email: '<Email>' } }).execute();
-```
-
-### `db.mutation.verifyPassword`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyPasswordInput (required) |
-
-```typescript
-const result = await db.mutation.verifyPassword({ input: { password: '<String>' } }).execute();
-```
-
-### `db.mutation.verifyTotp`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyTotpInput (required) |
-
-```typescript
-const result = await db.mutation.verifyTotp({ input: { totpValue: '<String>' } }).execute();
 ```
 
 ### `db.mutation.requestUploadUrl`

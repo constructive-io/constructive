@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 ## Usage
 
 ```typescript
-useStepsRequiredQuery({ vlevel: '<String>', vroleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
+useStepsRequiredQuery({ level: '<String>', roleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useStepsRequiredQuery({ vlevel: '<String>', vroleId: '<UUID>', first: '<Int>', o
 ### Use useStepsRequiredQuery
 
 ```typescript
-const { data, isLoading } = useStepsRequiredQuery({ vlevel: '<String>', vroleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
+const { data, isLoading } = useStepsRequiredQuery({ level: '<String>', roleId: '<UUID>', first: '<Int>', offset: '<Int>', after: '<Cursor>' });
 ```

@@ -1071,7 +1071,7 @@ export interface ConnectedAccount {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface Invite {
+export interface AppInvite {
   id: string | null;
   email: ConstructiveInternalTypeEmail | null;
   senderId: string | null;
@@ -1085,7 +1085,7 @@ export interface Invite {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface ClaimedInvite {
+export interface AppClaimedInvite {
   id: string | null;
   data: unknown | null;
   senderId: string | null;
@@ -1190,6 +1190,17 @@ export interface Commit {
   committerId: string | null;
   treeId: string | null;
   date: string | null;
+}
+export interface RateLimitsModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  rateLimitSettingsTableId: string | null;
+  ipRateLimitsTableId: string | null;
+  rateLimitsTableId: string | null;
+  rateLimitSettingsTable: string | null;
+  ipRateLimitsTable: string | null;
+  rateLimitsTable: string | null;
 }
 export interface OrgMembershipDefault {
   id: string | null;

@@ -116,11 +116,11 @@ function App() {
 | `useCreateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
 | `useUpdateAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
 | `useDeleteAppStepMutation` | Mutation | Log of individual user actions toward level requirements; every single step ever taken is recorded here |
-| `useClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
-| `useClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
-| `useCreateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useUpdateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useDeleteClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useAppClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useAppClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useCreateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useUpdateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useDeleteAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useOrgChartEdgeGrantsQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useOrgChartEdgeGrantQuery` | Query | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
 | `useCreateOrgChartEdgeGrantMutation` | Mutation | Append-only log of hierarchy edge grants and revocations; triggers apply changes to the edges table |
@@ -166,11 +166,11 @@ function App() {
 | `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useUpdateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
 | `useDeleteAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
-| `useInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useCreateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useUpdateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useDeleteInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useAppInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useAppInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useCreateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useUpdateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useDeleteAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
@@ -197,7 +197,7 @@ function App() {
 | `useAppPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `AppPermission`. |
 | `useOrgPermissionsGetByMaskQuery` | Query | Reads and enables pagination through a set of `OrgPermission`. |
 | `useStepsRequiredQuery` | Query | Reads and enables pagination through a set of `AppLevelRequirement`. |
-| `useSubmitInviteCodeMutation` | Mutation | submitInviteCode |
+| `useSubmitAppInviteCodeMutation` | Mutation | submitAppInviteCode |
 | `useSubmitOrgInviteCodeMutation` | Mutation | submitOrgInviteCode |
 | `useRequestUploadUrlMutation` | Mutation | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
@@ -579,22 +579,22 @@ const { mutate: create } = useCreateAppStepMutation({
 create({ actorId: '<UUID>', name: '<String>', count: '<Int>' });
 ```
 
-### ClaimedInvite
+### AppClaimedInvite
 
 ```typescript
-// List all claimedInvites
-const { data, isLoading } = useClaimedInvitesQuery({
+// List all appClaimedInvites
+const { data, isLoading } = useAppClaimedInvitesQuery({
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } },
 });
 
-// Get one claimedInvite
-const { data: item } = useClaimedInviteQuery({
+// Get one appClaimedInvite
+const { data: item } = useAppClaimedInviteQuery({
   id: '<UUID>',
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } },
 });
 
-// Create a claimedInvite
-const { mutate: create } = useCreateClaimedInviteMutation({
+// Create a appClaimedInvite
+const { mutate: create } = useCreateAppClaimedInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>' });
@@ -789,22 +789,22 @@ const { mutate: create } = useCreateAppLevelMutation({
 create({ name: '<String>', description: '<String>', image: '<Image>', ownerId: '<UUID>' });
 ```
 
-### Invite
+### AppInvite
 
 ```typescript
-// List all invites
-const { data, isLoading } = useInvitesQuery({
+// List all appInvites
+const { data, isLoading } = useAppInvitesQuery({
   selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Get one invite
-const { data: item } = useInviteQuery({
+// Get one appInvite
+const { data: item } = useAppInviteQuery({
   id: '<UUID>',
   selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Create a invite
-const { mutate: create } = useCreateInviteMutation({
+// Create a appInvite
+const { mutate: create } = useCreateAppInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' });
@@ -942,8 +942,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
 
 ### `useAppPermissionsGetMaskByNamesQuery`
 
@@ -1004,22 +1004,22 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
   | `first` | Int |
   | `offset` | Int |
   | `after` | Cursor |
 
-### `useSubmitInviteCodeMutation`
+### `useSubmitAppInviteCodeMutation`
 
-submitInviteCode
+submitAppInviteCode
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `input` | SubmitAppInviteCodeInput (required) |
 
 ### `useSubmitOrgInviteCodeMutation`
 

@@ -24,7 +24,7 @@ import membershipTypeCmd from './commands/membership-type';
 import appLimitCmd from './commands/app-limit';
 import appAchievementCmd from './commands/app-achievement';
 import appStepCmd from './commands/app-step';
-import claimedInviteCmd from './commands/claimed-invite';
+import appClaimedInviteCmd from './commands/app-claimed-invite';
 import orgChartEdgeGrantCmd from './commands/org-chart-edge-grant';
 import orgLimitCmd from './commands/org-limit';
 import appGrantCmd from './commands/app-grant';
@@ -34,7 +34,7 @@ import orgGrantCmd from './commands/org-grant';
 import orgChartEdgeCmd from './commands/org-chart-edge';
 import orgMembershipDefaultCmd from './commands/org-membership-default';
 import appLevelCmd from './commands/app-level';
-import inviteCmd from './commands/invite';
+import appInviteCmd from './commands/app-invite';
 import appMembershipCmd from './commands/app-membership';
 import orgMembershipCmd from './commands/org-membership';
 import orgInviteCmd from './commands/org-invite';
@@ -49,7 +49,7 @@ import orgPermissionsGetMaskByNamesCmd from './commands/org-permissions-get-mask
 import appPermissionsGetByMaskCmd from './commands/app-permissions-get-by-mask';
 import orgPermissionsGetByMaskCmd from './commands/org-permissions-get-by-mask';
 import stepsRequiredCmd from './commands/steps-required';
-import submitInviteCodeCmd from './commands/submit-invite-code';
+import submitAppInviteCodeCmd from './commands/submit-app-invite-code';
 import submitOrgInviteCodeCmd from './commands/submit-org-invite-code';
 import requestUploadUrlCmd from './commands/request-upload-url';
 import confirmUploadCmd from './commands/confirm-upload';
@@ -82,7 +82,7 @@ const createCommandMap: () => Record<
   'app-limit': appLimitCmd,
   'app-achievement': appAchievementCmd,
   'app-step': appStepCmd,
-  'claimed-invite': claimedInviteCmd,
+  'app-claimed-invite': appClaimedInviteCmd,
   'org-chart-edge-grant': orgChartEdgeGrantCmd,
   'org-limit': orgLimitCmd,
   'app-grant': appGrantCmd,
@@ -92,7 +92,7 @@ const createCommandMap: () => Record<
   'org-chart-edge': orgChartEdgeCmd,
   'org-membership-default': orgMembershipDefaultCmd,
   'app-level': appLevelCmd,
-  invite: inviteCmd,
+  'app-invite': appInviteCmd,
   'app-membership': appMembershipCmd,
   'org-membership': orgMembershipCmd,
   'org-invite': orgInviteCmd,
@@ -107,14 +107,14 @@ const createCommandMap: () => Record<
   'app-permissions-get-by-mask': appPermissionsGetByMaskCmd,
   'org-permissions-get-by-mask': orgPermissionsGetByMaskCmd,
   'steps-required': stepsRequiredCmd,
-  'submit-invite-code': submitInviteCodeCmd,
+  'submit-app-invite-code': submitAppInviteCodeCmd,
   'submit-org-invite-code': submitOrgInviteCodeCmd,
   'request-upload-url': requestUploadUrlCmd,
   'confirm-upload': confirmUploadCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  org-member           orgMember CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  membership-type      membershipType CRUD operations\n  app-limit            appLimit CRUD operations\n  app-achievement      appAchievement CRUD operations\n  app-step             appStep CRUD operations\n  claimed-invite       claimedInvite CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  org-limit            orgLimit CRUD operations\n  app-grant            appGrant CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  app-level            appLevel CRUD operations\n  invite               invite CRUD operations\n  app-membership       appMembership CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-invite           orgInvite CRUD operations\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  steps-achieved       stepsAchieved\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  submit-invite-code   submitInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  confirm-upload       Confirm that a file has been uploaded to S3.\nVerifies the object exists in S3, checks content-type,\nand transitions the file status from 'pending' to 'ready'.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  org-member           orgMember CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  membership-type      membershipType CRUD operations\n  app-limit            appLimit CRUD operations\n  app-achievement      appAchievement CRUD operations\n  app-step             appStep CRUD operations\n  app-claimed-invite   appClaimedInvite CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  org-limit            orgLimit CRUD operations\n  app-grant            appGrant CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  app-level            appLevel CRUD operations\n  app-invite           appInvite CRUD operations\n  app-membership       appMembership CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-invite           orgInvite CRUD operations\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  steps-achieved       stepsAchieved\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  submit-app-invite-code submitAppInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  confirm-upload       Confirm that a file has been uploaded to S3.\nVerifies the object exists in S3, checks content-type,\nand transitions the file status from 'pending' to 'ready'.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

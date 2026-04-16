@@ -74,6 +74,8 @@ function App() {
 | `useSignOutMutation` | Mutation | signOut |
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
+| `useVerifyPasswordMutation` | Mutation | verifyPassword |
+| `useVerifyTotpMutation` | Mutation | verifyTotp |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
 | `useSetPasswordMutation` | Mutation | setPassword |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
@@ -85,8 +87,6 @@ function App() {
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
-| `useVerifyPasswordMutation` | Mutation | verifyPassword |
-| `useVerifyTotpMutation` | Mutation | verifyTotp |
 | `useRequestUploadUrlMutation` | Mutation | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
@@ -311,6 +311,28 @@ checkPassword
   |----------|------|
   | `input` | CheckPasswordInput (required) |
 
+### `useVerifyPasswordMutation`
+
+verifyPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyPasswordInput (required) |
+
+### `useVerifyTotpMutation`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyTotpInput (required) |
+
 ### `useConfirmDeleteAccountMutation`
 
 confirmDeleteAccount
@@ -431,28 +453,6 @@ sendVerificationEmail
   | Argument | Type |
   |----------|------|
   | `input` | SendVerificationEmailInput (required) |
-
-### `useVerifyPasswordMutation`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyPasswordInput (required) |
-
-### `useVerifyTotpMutation`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyTotpInput (required) |
 
 ### `useRequestUploadUrlMutation`
 

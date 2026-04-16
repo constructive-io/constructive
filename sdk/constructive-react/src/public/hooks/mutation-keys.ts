@@ -785,22 +785,22 @@ export const connectedAccountMutationKeys = {
   /** Delete connectedAccount mutation key */ delete: (id: string | number) =>
     ['mutation', 'connectedaccount', 'delete', id] as const,
 } as const;
-export const inviteMutationKeys = {
-  /** All invite mutation keys */ all: ['mutation', 'invite'] as const,
-  /** Create invite mutation key */ create: () => ['mutation', 'invite', 'create'] as const,
-  /** Update invite mutation key */ update: (id: string | number) =>
-    ['mutation', 'invite', 'update', id] as const,
-  /** Delete invite mutation key */ delete: (id: string | number) =>
-    ['mutation', 'invite', 'delete', id] as const,
+export const appInviteMutationKeys = {
+  /** All appInvite mutation keys */ all: ['mutation', 'appinvite'] as const,
+  /** Create appInvite mutation key */ create: () => ['mutation', 'appinvite', 'create'] as const,
+  /** Update appInvite mutation key */ update: (id: string | number) =>
+    ['mutation', 'appinvite', 'update', id] as const,
+  /** Delete appInvite mutation key */ delete: (id: string | number) =>
+    ['mutation', 'appinvite', 'delete', id] as const,
 } as const;
-export const claimedInviteMutationKeys = {
-  /** All claimedInvite mutation keys */ all: ['mutation', 'claimedinvite'] as const,
-  /** Create claimedInvite mutation key */ create: () =>
-    ['mutation', 'claimedinvite', 'create'] as const,
-  /** Update claimedInvite mutation key */ update: (id: string | number) =>
-    ['mutation', 'claimedinvite', 'update', id] as const,
-  /** Delete claimedInvite mutation key */ delete: (id: string | number) =>
-    ['mutation', 'claimedinvite', 'delete', id] as const,
+export const appClaimedInviteMutationKeys = {
+  /** All appClaimedInvite mutation keys */ all: ['mutation', 'appclaimedinvite'] as const,
+  /** Create appClaimedInvite mutation key */ create: () =>
+    ['mutation', 'appclaimedinvite', 'create'] as const,
+  /** Update appClaimedInvite mutation key */ update: (id: string | number) =>
+    ['mutation', 'appclaimedinvite', 'update', id] as const,
+  /** Delete appClaimedInvite mutation key */ delete: (id: string | number) =>
+    ['mutation', 'appclaimedinvite', 'delete', id] as const,
 } as const;
 export const orgInviteMutationKeys = {
   /** All orgInvite mutation keys */ all: ['mutation', 'orginvite'] as const,
@@ -913,6 +913,15 @@ export const commitMutationKeys = {
   /** Delete commit mutation key */ delete: (id: string | number) =>
     ['mutation', 'commit', 'delete', id] as const,
 } as const;
+export const rateLimitsModuleMutationKeys = {
+  /** All rateLimitsModule mutation keys */ all: ['mutation', 'ratelimitsmodule'] as const,
+  /** Create rateLimitsModule mutation key */ create: () =>
+    ['mutation', 'ratelimitsmodule', 'create'] as const,
+  /** Update rateLimitsModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'ratelimitsmodule', 'update', id] as const,
+  /** Delete rateLimitsModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'ratelimitsmodule', 'delete', id] as const,
+} as const;
 export const orgMembershipDefaultMutationKeys = {
   /** All orgMembershipDefault mutation keys */ all: ['mutation', 'orgmembershipdefault'] as const,
   /** Create orgMembershipDefault mutation key */ create: () =>
@@ -1001,10 +1010,18 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'rejectDatabaseTransfer', identifier] as const)
       : (['mutation', 'rejectDatabaseTransfer'] as const),
-  /** Mutation key for submitInviteCode */ submitInviteCode: (identifier?: string) =>
+  /** Mutation key for verifyPassword */ verifyPassword: (identifier?: string) =>
     identifier
-      ? (['mutation', 'submitInviteCode', identifier] as const)
-      : (['mutation', 'submitInviteCode'] as const),
+      ? (['mutation', 'verifyPassword', identifier] as const)
+      : (['mutation', 'verifyPassword'] as const),
+  /** Mutation key for verifyTotp */ verifyTotp: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'verifyTotp', identifier] as const)
+      : (['mutation', 'verifyTotp'] as const),
+  /** Mutation key for submitAppInviteCode */ submitAppInviteCode: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'submitAppInviteCode', identifier] as const)
+      : (['mutation', 'submitAppInviteCode'] as const),
   /** Mutation key for submitOrgInviteCode */ submitOrgInviteCode: (identifier?: string) =>
     identifier
       ? (['mutation', 'submitOrgInviteCode', identifier] as const)
@@ -1137,14 +1154,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'forgotPassword', identifier] as const)
       : (['mutation', 'forgotPassword'] as const),
-  /** Mutation key for verifyPassword */ verifyPassword: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'verifyPassword', identifier] as const)
-      : (['mutation', 'verifyPassword'] as const),
-  /** Mutation key for verifyTotp */ verifyTotp: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'verifyTotp', identifier] as const)
-      : (['mutation', 'verifyTotp'] as const),
   /** Mutation key for requestUploadUrl */ requestUploadUrl: (identifier?: string) =>
     identifier
       ? (['mutation', 'requestUploadUrl', identifier] as const)
@@ -1267,8 +1276,8 @@ export const mutationKeys = {
   phoneNumber: phoneNumberMutationKeys,
   cryptoAddress: cryptoAddressMutationKeys,
   connectedAccount: connectedAccountMutationKeys,
-  invite: inviteMutationKeys,
-  claimedInvite: claimedInviteMutationKeys,
+  appInvite: appInviteMutationKeys,
+  appClaimedInvite: appClaimedInviteMutationKeys,
   orgInvite: orgInviteMutationKeys,
   orgClaimedInvite: orgClaimedInviteMutationKeys,
   auditLog: auditLogMutationKeys,
@@ -1282,6 +1291,7 @@ export const mutationKeys = {
   membershipType: membershipTypeMutationKeys,
   appMembershipDefault: appMembershipDefaultMutationKeys,
   commit: commitMutationKeys,
+  rateLimitsModule: rateLimitsModuleMutationKeys,
   orgMembershipDefault: orgMembershipDefaultMutationKeys,
   rlsModule: rlsModuleMutationKeys,
   sqlAction: sqlActionMutationKeys,

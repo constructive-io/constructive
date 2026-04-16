@@ -97,6 +97,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'checkPassword', identifier] as const)
       : (['mutation', 'checkPassword'] as const),
+  /** Mutation key for verifyPassword */ verifyPassword: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'verifyPassword', identifier] as const)
+      : (['mutation', 'verifyPassword'] as const),
+  /** Mutation key for verifyTotp */ verifyTotp: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'verifyTotp', identifier] as const)
+      : (['mutation', 'verifyTotp'] as const),
   /** Mutation key for confirmDeleteAccount */ confirmDeleteAccount: (identifier?: string) =>
     identifier
       ? (['mutation', 'confirmDeleteAccount', identifier] as const)
@@ -137,14 +145,6 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'sendVerificationEmail', identifier] as const)
       : (['mutation', 'sendVerificationEmail'] as const),
-  /** Mutation key for verifyPassword */ verifyPassword: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'verifyPassword', identifier] as const)
-      : (['mutation', 'verifyPassword'] as const),
-  /** Mutation key for verifyTotp */ verifyTotp: (identifier?: string) =>
-    identifier
-      ? (['mutation', 'verifyTotp', identifier] as const)
-      : (['mutation', 'verifyTotp'] as const),
   /** Mutation key for requestUploadUrl */ requestUploadUrl: (identifier?: string) =>
     identifier
       ? (['mutation', 'requestUploadUrl', identifier] as const)

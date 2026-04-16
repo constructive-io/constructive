@@ -488,16 +488,16 @@ function App() {
 | `useCreateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
 | `useUpdateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
 | `useDeleteConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
-| `useInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useCreateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useUpdateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useDeleteInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
-| `useClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
-| `useCreateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useUpdateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useDeleteClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useAppInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useAppInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useCreateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useUpdateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useDeleteAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useAppClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useAppClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useCreateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useUpdateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useDeleteAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
@@ -563,6 +563,11 @@ function App() {
 | `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useRateLimitsModulesQuery` | Query | List all rateLimitsModules |
+| `useRateLimitsModuleQuery` | Query | Get one rateLimitsModule |
+| `useCreateRateLimitsModuleMutation` | Mutation | Create a rateLimitsModule |
+| `useUpdateRateLimitsModuleMutation` | Mutation | Update a rateLimitsModule |
+| `useDeleteRateLimitsModuleMutation` | Mutation | Delete a rateLimitsModule |
 | `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
@@ -623,7 +628,9 @@ function App() {
 | `useAcceptDatabaseTransferMutation` | Mutation | acceptDatabaseTransfer |
 | `useCancelDatabaseTransferMutation` | Mutation | cancelDatabaseTransfer |
 | `useRejectDatabaseTransferMutation` | Mutation | rejectDatabaseTransfer |
-| `useSubmitInviteCodeMutation` | Mutation | submitInviteCode |
+| `useVerifyPasswordMutation` | Mutation | verifyPassword |
+| `useVerifyTotpMutation` | Mutation | verifyTotp |
+| `useSubmitAppInviteCodeMutation` | Mutation | submitAppInviteCode |
 | `useSubmitOrgInviteCodeMutation` | Mutation | submitOrgInviteCode |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
@@ -673,8 +680,6 @@ Example usage:
 | `useProvisionTableMutation` | Mutation | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
-| `useVerifyPasswordMutation` | Mutation | verifyPassword |
-| `useVerifyTotpMutation` | Mutation | verifyTotp |
 | `useRequestUploadUrlMutation` | Mutation | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
@@ -2477,43 +2482,43 @@ const { mutate: create } = useCreateConnectedAccountMutation({
 create({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
 ```
 
-### Invite
+### AppInvite
 
 ```typescript
-// List all invites
-const { data, isLoading } = useInvitesQuery({
+// List all appInvites
+const { data, isLoading } = useAppInvitesQuery({
   selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Get one invite
-const { data: item } = useInviteQuery({
+// Get one appInvite
+const { data: item } = useAppInviteQuery({
   id: '<UUID>',
   selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Create a invite
-const { mutate: create } = useCreateInviteMutation({
+// Create a appInvite
+const { mutate: create } = useCreateAppInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' });
 ```
 
-### ClaimedInvite
+### AppClaimedInvite
 
 ```typescript
-// List all claimedInvites
-const { data, isLoading } = useClaimedInvitesQuery({
+// List all appClaimedInvites
+const { data, isLoading } = useAppClaimedInvitesQuery({
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } },
 });
 
-// Get one claimedInvite
-const { data: item } = useClaimedInviteQuery({
+// Get one appClaimedInvite
+const { data: item } = useAppClaimedInviteQuery({
   id: '<UUID>',
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } },
 });
 
-// Create a claimedInvite
-const { mutate: create } = useCreateClaimedInviteMutation({
+// Create a appClaimedInvite
+const { mutate: create } = useCreateAppClaimedInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>' });
@@ -2792,6 +2797,27 @@ const { mutate: create } = useCreateCommitMutation({
 create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
 ```
 
+### RateLimitsModule
+
+```typescript
+// List all rateLimitsModules
+const { data, isLoading } = useRateLimitsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } },
+});
+
+// Get one rateLimitsModule
+const { data: item } = useRateLimitsModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } },
+});
+
+// Create a rateLimitsModule
+const { mutate: create } = useCreateRateLimitsModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', rateLimitSettingsTableId: '<UUID>', ipRateLimitsTableId: '<UUID>', rateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', ipRateLimitsTable: '<String>', rateLimitsTable: '<String>' });
+```
+
 ### OrgMembershipDefault
 
 ```typescript
@@ -2993,8 +3019,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
 
 ### `useRevParseQuery`
 
@@ -3164,8 +3190,8 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
   | `first` | Int |
   | `offset` | Int |
   | `after` | Cursor |
@@ -3232,16 +3258,38 @@ rejectDatabaseTransfer
   |----------|------|
   | `input` | RejectDatabaseTransferInput (required) |
 
-### `useSubmitInviteCodeMutation`
+### `useVerifyPasswordMutation`
 
-submitInviteCode
+verifyPassword
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `input` | VerifyPasswordInput (required) |
+
+### `useVerifyTotpMutation`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyTotpInput (required) |
+
+### `useSubmitAppInviteCodeMutation`
+
+submitAppInviteCode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SubmitAppInviteCodeInput (required) |
 
 ### `useSubmitOrgInviteCodeMutation`
 
@@ -3621,28 +3669,6 @@ forgotPassword
   | Argument | Type |
   |----------|------|
   | `input` | ForgotPasswordInput (required) |
-
-### `useVerifyPasswordMutation`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyPasswordInput (required) |
-
-### `useVerifyTotpMutation`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyTotpInput (required) |
 
 ### `useRequestUploadUrlMutation`
 
