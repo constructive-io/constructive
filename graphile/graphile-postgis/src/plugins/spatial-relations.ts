@@ -572,7 +572,11 @@ export const PostgisSpatialRelationsPlugin: GraphileConfig.Plugin = {
             build.registerInputObjectType(
               typeName,
               {
-                isPgConnectionFilterMany: true,
+                // NOTE: intentionally NOT setting `isPgConnectionFilterMany`.
+                // That flag triggers ConnectionFilterBackwardRelationsPlugin
+                // (and friends) to auto-register `some`/`every`/`none` fields
+                // with FK-join semantics, which would collide with — and
+                // semantically differ from — ours. We own those fields here.
                 foreignTable: rel.targetResource,
                 isPgGISSpatialFilter: true,
                 pgGISSpatialRelation: rel,
