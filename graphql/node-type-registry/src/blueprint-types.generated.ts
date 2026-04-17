@@ -813,6 +813,21 @@ export interface BlueprintTableUniqueConstraint {
   /** Optional schema name override. */
   schema_name?: string;
 }
+/** Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
+export interface BlueprintEntityTableProvision {
+  /** Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true. */
+  use_rls?: boolean;
+  /** Node objects applied to the entity table for field creation (e.g., DataTimestamps, DataPeoplestamps). Forwarded to secure_table_provision as-is. */
+  nodes?: BlueprintNode[];
+  /** Custom fields (columns) to add to the entity table. Forwarded to secure_table_provision as-is. */
+  fields?: BlueprintField[];
+  /** Privilege grants for the entity table as [verb, columns] tuples (e.g. [["select","*"],["insert","*"]]). Forwarded to secure_table_provision as-is. */
+  grant_privileges?: unknown[];
+  /** Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Defaults to ["authenticated"]. */
+  grant_roles?: string[];
+  /** RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op). */
+  policies?: BlueprintPolicy[];
+}
 /** A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision. */
 export interface BlueprintMembershipType {
   /** Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database. */
@@ -825,7 +840,7 @@ export interface BlueprintMembershipType {
   parent_entity?: string;
   /** Custom table name for the entity table. Defaults to name-derived convention. */
   table_name?: string;
-  /** Whether this entity type is visible in the API. Defaults to true. */
+  /** Whether parent-entity members can see child entities via the default parent_member SELECT policy. Gates one of the five default policies. No-op when table_provision is supplied. Defaults to true. */
   is_visible?: boolean;
   /** Whether to provision a limits module for this entity type. Defaults to false. */
   has_limits?: boolean;
@@ -833,8 +848,10 @@ export interface BlueprintMembershipType {
   has_profiles?: boolean;
   /** Whether to provision a levels module for this entity type. Defaults to false. */
   has_levels?: boolean;
-  /** Whether to skip creating default RLS policies on the entity table. Defaults to false. */
+  /** Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false. */
   skip_entity_policies?: boolean;
+  /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
+  table_provision?: BlueprintEntityTableProvision;
 }
 /**
  * ===========================================================================

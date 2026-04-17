@@ -599,6 +599,47 @@ function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
   );
 }
 
+function buildBlueprintEntityTableProvision(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintEntityTableProvision', [
+      addJSDoc(
+        optionalProp('use_rls', t.tsBooleanKeyword()),
+        'Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'nodes',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintNode')))
+        ),
+        'Node objects applied to the entity table for field creation (e.g., DataTimestamps, DataPeoplestamps). Forwarded to secure_table_provision as-is.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'fields',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintField')))
+        ),
+        'Custom fields (columns) to add to the entity table. Forwarded to secure_table_provision as-is.'
+      ),
+      addJSDoc(
+        optionalProp('grant_privileges', t.tsArrayType(t.tsUnknownKeyword())),
+        'Privilege grants for the entity table as [verb, columns] tuples (e.g. [["select","*"],["insert","*"]]). Forwarded to secure_table_provision as-is.'
+      ),
+      addJSDoc(
+        optionalProp('grant_roles', t.tsArrayType(t.tsStringKeyword())),
+        'Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Defaults to ["authenticated"].'
+      ),
+      addJSDoc(
+        optionalProp(
+          'policies',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
+        ),
+        'RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op).'
+      ),
+    ]),
+    'Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely.'
+  );
+}
+
 function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintMembershipType', [
@@ -624,7 +665,7 @@ function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp('is_visible', t.tsBooleanKeyword()),
-        'Whether this entity type is visible in the API. Defaults to true.'
+        'Whether parent-entity members can see child entities via the default parent_member SELECT policy. Gates one of the five default policies. No-op when table_provision is supplied. Defaults to true.'
       ),
       addJSDoc(
         optionalProp('has_limits', t.tsBooleanKeyword()),
@@ -640,7 +681,14 @@ function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp('skip_entity_policies', t.tsBooleanKeyword()),
-        'Whether to skip creating default RLS policies on the entity table. Defaults to false.'
+        'Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'table_provision',
+          t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+        ),
+        'Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible).'
       ),
     ]),
     'A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
@@ -839,6 +887,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintTableIndex());
   statements.push(buildBlueprintUniqueConstraint());
   statements.push(buildBlueprintTableUniqueConstraint());
+  statements.push(buildBlueprintEntityTableProvision());
   statements.push(buildBlueprintMembershipType());
 
   // -- Node types discriminated union --
