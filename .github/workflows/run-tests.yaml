@@ -75,6 +75,8 @@ jobs:
             env: {}
           - package: graphile/graphile-postgis
             env: {}
+          - package: graphql/orm-test
+            env: {}
           - package: graphql/server-test
             env: {}
           - package: graphql/env
