@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.11.0...node-type-registry@0.12.0) (2026-04-17)
+
+### Features
+
+- register AuthzNotReadOnly policy type in node-type-registry ([4b7ef34](https://github.com/constructive-io/constructive/commit/4b7ef3429393a5877365cb99f29bc8173fe33f05)), closes [#814](https://github.com/constructive-io/constructive/issues/814)
+
 # [0.11.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.10.1...node-type-registry@0.11.0) (2026-04-16)
 
 ### Features
