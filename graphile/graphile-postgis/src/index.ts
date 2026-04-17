@@ -25,6 +25,16 @@ export { PostgisGeometryFieldsPlugin } from './plugins/geometry-fields';
 export { PostgisMeasurementFieldsPlugin } from './plugins/measurement-fields';
 export { PostgisTransformationFieldsPlugin } from './plugins/transformation-functions';
 export { PostgisAggregatePlugin } from './plugins/aggregate-functions';
+export {
+  PostgisSpatialRelationsPlugin,
+  OPERATOR_REGISTRY,
+  parseSpatialRelationTag,
+  collectSpatialRelations,
+} from './plugins/spatial-relations';
+export type {
+  SpatialOperatorRegistration,
+  SpatialRelationInfo,
+} from './plugins/spatial-relations';
 
 // Connection filter operator factories (spatial operators for graphile-connection-filter)
 export { createPostgisOperatorFactory } from './plugins/connection-filter-operators';

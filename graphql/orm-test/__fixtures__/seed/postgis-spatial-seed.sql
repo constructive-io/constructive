@@ -212,3 +212,67 @@ SELECT setval('postgis_test.swarms_geom_id_seq',       2);
 SELECT setval('postgis_test.networks_geom_id_seq',     2);
 SELECT setval('postgis_test.collections_geom_id_seq',  2);
 SELECT setval('postgis_test.towers_geom_id_seq',       2);
+
+-- ============================================================================
+-- SPATIAL RELATIONS FIXTURE — counties + telemedicine_clinics
+--
+-- Exercises the PostgisSpatialRelationsPlugin end-to-end. `@spatialRelation`
+-- smart tags on the owner column synthesise virtual relation + filter fields
+-- whose join predicate is a PostGIS spatial function.
+--
+-- Tag grammar:
+--   @spatialRelation <relationName> <targetTable>.<targetCol> <operator> [param]
+--
+-- All operators here are PG-native snake_case (st_contains, st_intersects,
+-- st_within, st_dwithin, ...) so the plugin can resolve them in pg_proc.
+-- ============================================================================
+
+-- Counties: polygonal regions. Target of cross-table spatial relations.
+CREATE TABLE postgis_test.counties (
+  id serial PRIMARY KEY,
+  name text NOT NULL,
+  geom geometry(Polygon, 4326) NOT NULL
+);
+CREATE INDEX idx_counties_geom ON postgis_test.counties USING gist(geom);
+
+-- Telemedicine clinics: points. Owner of three cross-table relations to
+-- counties and one self-relation for "other clinics within distance".
+CREATE TABLE postgis_test.telemedicine_clinics (
+  id serial PRIMARY KEY,
+  name text NOT NULL,
+  specialty text NOT NULL,
+  location geometry(Point, 4326) NOT NULL
+);
+CREATE INDEX idx_telemedicine_clinics_location
+  ON postgis_test.telemedicine_clinics USING gist(location);
+
+-- Three cross-table relations (clinics -> counties) exercising the three
+-- most common 2-arg spatial predicates, and one parametric self-relation
+-- exercising st_dwithin with a distance argument.
+COMMENT ON COLUMN postgis_test.telemedicine_clinics.location IS
+  E'@spatialRelation county counties.geom st_within\n'
+  '@spatialRelation intersectingCounty counties.geom st_intersects\n'
+  '@spatialRelation coveringCounty counties.geom st_coveredby\n'
+  '@spatialRelation nearbyClinic telemedicine_clinics.location st_dwithin distance';
+
+-- Counties — three polygons with known containment relationships.
+-- Bay County covers SF + Oakland, LA County covers LA, NYC County covers NY.
+INSERT INTO postgis_test.counties (id, name, geom) VALUES
+  (1, 'Bay County',
+     ST_GeomFromText('POLYGON((-122.55 37.70, -122.20 37.70, -122.20 37.85, -122.55 37.85, -122.55 37.70))', 4326)),
+  (2, 'LA County',
+     ST_GeomFromText('POLYGON((-118.70 33.70, -117.60 33.70, -117.60 34.40, -118.70 34.40, -118.70 33.70))', 4326)),
+  (3, 'NYC County',
+     ST_GeomFromText('POLYGON((-74.15 40.60, -73.70 40.60, -73.70 40.90, -74.15 40.90, -74.15 40.60))', 4326));
+
+-- Telemedicine clinics — one per major city plus two extras in the Bay.
+INSERT INTO postgis_test.telemedicine_clinics (id, name, specialty, location) VALUES
+  (1, 'SF Pediatrics',       'pediatrics',  ST_SetSRID(ST_MakePoint(-122.4194, 37.7749), 4326)),
+  (2, 'Oakland General',     'general',     ST_SetSRID(ST_MakePoint(-122.2712, 37.8044), 4326)),
+  (3, 'SF Cardio',            'cardiology', ST_SetSRID(ST_MakePoint(-122.4000, 37.7800), 4326)),
+  (4, 'LA Pediatrics',       'pediatrics',  ST_SetSRID(ST_MakePoint(-118.2437, 34.0522), 4326)),
+  (5, 'NYC Cardio',           'cardiology', ST_SetSRID(ST_MakePoint( -74.0060, 40.7128), 4326)),
+  (6, 'Seattle Uncovered',    'general',    ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326));
+
+SELECT setval('postgis_test.counties_id_seq',               3);
+SELECT setval('postgis_test.telemedicine_clinics_id_seq',   6);
