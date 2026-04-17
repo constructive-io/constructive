@@ -8,7 +8,7 @@ import { getPgPool } from 'pg-cache';
 
 import errorPage50x from '../errors/50x';
 import errorPage404Message from '../errors/404-message';
-import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, RlsModule } from '../types';
+import { ApiConfigResult, ApiError, ApiOptions, ApiStructure, AuthSettings, RlsModule } from '../types';
 import './types';
 
 const log = new Logger('api');
@@ -86,6 +86,26 @@ const RLS_MODULE_SQL = `
   LIMIT 1
 `;
 
+/**
+ * Query auth settings from the tenant DB private schema.
+ * The table name follows the pattern: {privateSchema}.app_settings_auth
+ * We select only the server-relevant columns.
+ */
+const AUTH_SETTINGS_SQL = (privateSchema: string) => `
+  SELECT
+    allowed_origins,
+    cookie_secure,
+    cookie_samesite,
+    cookie_domain,
+    cookie_httponly,
+    cookie_max_age,
+    cookie_path,
+    enable_captcha,
+    captcha_site_key
+  FROM "${privateSchema}".app_settings_auth
+  LIMIT 1
+`;
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -109,6 +129,18 @@ interface RlsModuleData {
   current_role_id: string;
   current_ip_address: string;
   current_user_agent: string;
+}
+
+interface AuthSettingsRow {
+  allowed_origins: string[] | null;
+  cookie_secure: boolean;
+  cookie_samesite: string;
+  cookie_domain: string | null;
+  cookie_httponly: boolean;
+  cookie_max_age: string | null;
+  cookie_path: string;
+  enable_captcha: boolean;
+  captcha_site_key: string | null;
 }
 
 interface RlsModuleRow {
@@ -208,7 +240,22 @@ const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
   };
 };
 
-const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleRow | null): ApiStructure => ({
+const toAuthSettings = (row: AuthSettingsRow | null): AuthSettings | undefined => {
+  if (!row) return undefined;
+  return {
+    allowedOrigins: row.allowed_origins,
+    cookieSecure: row.cookie_secure,
+    cookieSamesite: row.cookie_samesite,
+    cookieDomain: row.cookie_domain,
+    cookieHttponly: row.cookie_httponly,
+    cookieMaxAge: row.cookie_max_age,
+    cookiePath: row.cookie_path,
+    enableCaptcha: row.enable_captcha,
+    captchaSiteKey: row.captcha_site_key,
+  };
+};
+
+const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleRow | null, authSettingsRow?: AuthSettingsRow | null): ApiStructure => ({
   apiId: row.api_id,
   dbname: row.dbname || opts.pg?.database || '',
   anonRole: row.anon_role || 'anon',
@@ -219,6 +266,7 @@ const toApiStructure = (row: ApiRow, opts: ApiOptions, rlsModuleRow?: RlsModuleR
   domains: [],
   databaseId: row.database_id,
   isPublic: row.is_public,
+  authSettings: toAuthSettings(authSettingsRow ?? null),
 });
 
 const createAdminStructure = (
@@ -276,6 +324,28 @@ const queryApiList = async (pool: Pool, isPublic: boolean): Promise<ApiListRow[]
 const queryRlsModule = async (pool: Pool, apiId: string): Promise<RlsModuleRow | null> => {
   const result = await pool.query<RlsModuleRow>(RLS_MODULE_SQL, [apiId]);
   return result.rows[0] ?? null;
+};
+
+/**
+ * Load server-relevant auth settings from the tenant DB private schema.
+ * Fails gracefully if the table doesn't exist yet (pre-migration).
+ */
+const queryAuthSettings = async (
+  opts: ApiOptions,
+  dbname: string,
+  rlsModuleRow: RlsModuleRow | null
+): Promise<AuthSettingsRow | null> => {
+  if (!rlsModuleRow?.data?.authenticate_schema) return null;
+  const privateSchema = rlsModuleRow.data.authenticate_schema;
+  try {
+    const tenantPool = getPgPool({ ...opts.pg, database: dbname });
+    const result = await tenantPool.query<AuthSettingsRow>(AUTH_SETTINGS_SQL(privateSchema));
+    return result.rows[0] ?? null;
+  } catch (e: any) {
+    // Table may not exist yet if the 2FA migration hasn't been applied
+    log.debug(`[auth-settings] Failed to load auth settings from ${privateSchema}.app_settings_auth: ${e.message}`);
+    return null;
+  }
 };
 
 // =============================================================================
@@ -337,8 +407,9 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
   }
 
   const rlsModule = await queryRlsModule(pool, row.api_id);
-  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}`);
-  return toApiStructure(row, opts, rlsModule);
+  const authSettings = await queryAuthSettings(opts, row.dbname, rlsModule);
+  log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}, authSettings: ${authSettings ? 'found' : 'none'}`);
+  return toApiStructure(row, opts, rlsModule, authSettings);
 };
 
 const resolveMetaSchemaHeader = (
@@ -362,8 +433,9 @@ const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | 
   }
 
   const rlsModule = await queryRlsModule(pool, row.api_id);
-  log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}`);
-  return toApiStructure(row, opts, rlsModule);
+  const authSettings = await queryAuthSettings(opts, row.dbname, rlsModule);
+  log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}, authSettings: ${authSettings ? 'found' : 'none'}`);
+  return toApiStructure(row, opts, rlsModule, authSettings);
 };
 
 const buildDevFallbackError = async (

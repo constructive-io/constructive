@@ -182,14 +182,19 @@ const buildPreset = (
         }
 
         if (req.token?.user_id) {
-          return {
-            pgSettings: {
-              role: roleName,
-              'jwt.claims.token_id': req.token.id,
-              'jwt.claims.user_id': req.token.user_id,
-              ...context,
-            },
+          const pgSettings: Record<string, string> = {
+            role: roleName,
+            'jwt.claims.token_id': req.token.id,
+            'jwt.claims.user_id': req.token.user_id,
+            ...context,
           };
+
+          // Enforce read-only transactions for read_only credentials (API keys, etc.)
+          if (req.token.access_level === 'read_only') {
+            pgSettings['default_transaction_read_only'] = 'on';
+          }
+
+          return { pgSettings };
         }
       }
 

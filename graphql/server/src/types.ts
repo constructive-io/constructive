@@ -38,6 +38,25 @@ export interface RlsModule {
   currentUserAgent: string;
 }
 
+/**
+ * Server-visible subset of app_auth_settings (lives in the tenant DB private schema).
+ * Loaded once per API resolution and cached alongside the ApiStructure.
+ */
+export interface AuthSettings {
+  /** CORS allowed origins from app_auth_settings.allowed_origins */
+  allowedOrigins?: string[] | null;
+  /** Cookie configuration */
+  cookieSecure?: boolean;
+  cookieSamesite?: string;
+  cookieDomain?: string | null;
+  cookieHttponly?: boolean;
+  cookieMaxAge?: string | null;
+  cookiePath?: string;
+  /** reCAPTCHA / CAPTCHA */
+  enableCaptcha?: boolean;
+  captchaSiteKey?: string | null;
+}
+
 export interface ApiStructure {
   apiId?: string;
   dbname: string;
@@ -49,6 +68,7 @@ export interface ApiStructure {
   domains?: string[];
   databaseId?: string;
   isPublic?: boolean;
+  authSettings?: AuthSettings;
 }
 
 export type ApiError = { errorHtml: string };
