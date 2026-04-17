@@ -81,23 +81,50 @@ COMMENT ON COLUMN <owner_table>.<owner_col> IS
 
 ### Filter shapes
 
-2-arg operators use the familiar `some` / `every` / `none` shape:
+2-arg operators use the familiar `some` / `every` / `none` shape.
+
+Through the generated ORM (`where:`):
+
+```ts
+await orm.telemedicineClinic
+  .findMany({
+    select: { id: true, name: true },
+    where: { county: { some: { name: { equalTo: 'California County' } } } },
+  })
+  .execute();
+```
+
+Or equivalently at the GraphQL layer (`filter:`):
 
 ```graphql
 telemedicineClinics(
-  filter: { county: { some: { name: { eq: "California County" } } } }
+  filter: { county: { some: { name: { equalTo: "California County" } } } }
 ) { nodes { id name } }
 ```
 
 `st_dwithin` takes its distance at the relation level (it parametrises
 the join, not the joined row):
 
+```ts
+await orm.telemedicineClinic
+  .findMany({
+    select: { id: true, name: true },
+    where: {
+      nearbyClinic: {
+        distance: 5000,
+        some: { specialty: { equalTo: 'pediatrics' } },
+      },
+    },
+  })
+  .execute();
+```
+
 ```graphql
 telemedicineClinics(
   filter: {
     nearbyClinic: {
       distance: 5000
-      some: { specialty: { eq: "pediatrics" } }
+      some: { specialty: { equalTo: "pediatrics" } }
     }
   }
 ) { nodes { id name } }
