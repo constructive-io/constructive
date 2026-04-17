@@ -446,11 +446,17 @@ function buildSpatialJoinFragment(
   innerAlias: SQL,
   distanceValue: SQL | null
 ): SQL {
-  const inner = sql`${innerAlias}.${sql.identifier(rel.targetAttributeName)}`;
-  const outer = sql`${outerAlias}.${sql.identifier(rel.ownerAttributeName)}`;
+  // Tag grammar reads as "<owner_col> <op> <target_col>" (e.g. "location
+  // st_within counties.geom"), so the emitted PostGIS call is always
+  // `ST_<op>(owner_col, target_col)`. For symmetric operators
+  // (st_intersects, st_dwithin, st_equals, &&) the ordering is immaterial;
+  // for directional ones (st_within, st_contains, st_covers, st_coveredby)
+  // reversing the operands inverts the set of matched rows.
+  const ownerExpr = sql`${outerAlias}.${sql.identifier(rel.ownerAttributeName)}`;
+  const targetExpr = sql`${innerAlias}.${sql.identifier(rel.targetAttributeName)}`;
   if (rel.operator.kind === 'infix') {
-    // Only `&&` today — simple inline.
-    return sql`${inner} && ${outer}`;
+    // Only `&&` today — simple inline (symmetric).
+    return sql`${ownerExpr} && ${targetExpr}`;
   }
   const fn = sql.identifier(schemaName, rel.operator.pgToken);
   if (rel.operator.parametric) {
@@ -461,9 +467,9 @@ function buildSpatialJoinFragment(
         `a distance value in spatial relation '${rel.relationName}'.`
       );
     }
-    return sql`${fn}(${inner}, ${outer}, ${distanceValue})`;
+    return sql`${fn}(${ownerExpr}, ${targetExpr}, ${distanceValue})`;
   }
-  return sql`${fn}(${inner}, ${outer})`;
+  return sql`${fn}(${ownerExpr}, ${targetExpr})`;
 }
 
 /** Build the `other.pk <> self.pk` exclusion predicate for self-relations. */

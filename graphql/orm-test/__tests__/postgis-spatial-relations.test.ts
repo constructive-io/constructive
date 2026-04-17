@@ -164,7 +164,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true, name: true },
-          where: { county: { some: { name: { eq: 'Bay County' } } } },
+          where: { county: { some: { name: { equalTo: 'Bay County' } } } },
         })
         .execute();
       expect(r.ok).toBe(true);
@@ -177,7 +177,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
-          where: { county: { some: { name: { eq: 'LA County' } } } },
+          where: { county: { some: { name: { equalTo: 'LA County' } } } },
         })
         .execute();
       expect(r.ok).toBe(true);
@@ -188,7 +188,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
-          where: { county: { some: { name: { eq: 'NYC County' } } } },
+          where: { county: { some: { name: { equalTo: 'NYC County' } } } },
         })
         .execute();
       expect(r.ok).toBe(true);
@@ -213,7 +213,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
         .findMany({
           select: { id: true },
           where: {
-            intersectingCounty: { some: { name: { eq: 'Bay County' } } },
+            intersectingCounty: { some: { name: { equalTo: 'Bay County' } } },
           },
         })
         .execute();
@@ -228,7 +228,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
         .findMany({
           select: { id: true },
           where: {
-            coveringCounty: { some: { name: { eq: 'LA County' } } },
+            coveringCounty: { some: { name: { equalTo: 'LA County' } } },
           },
         })
         .execute();
@@ -245,7 +245,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
-          where: { county: { none: { name: { eq: 'NYC County' } } } },
+          where: { county: { none: { name: { equalTo: 'NYC County' } } } },
         })
         .execute();
       expect(r.ok).toBe(true);
@@ -260,7 +260,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
-          where: { county: { every: { name: { startsWith: 'B' } } } },
+          where: { county: { every: { name: { equalTo: 'Bay County' } } } },
         })
         .execute();
       expect(r.ok).toBe(true);
@@ -281,7 +281,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
           where: {
             nearbyClinic: {
               distance: 10.0,
-              some: { specialty: { eq: 'cardiology' } },
+              some: { specialty: { equalTo: 'cardiology' } },
             },
           },
         })
@@ -349,8 +349,8 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
           select: { id: true },
           where: {
             and: [
-              { county: { some: { name: { eq: 'Bay County' } } } },
-              { specialty: { eq: 'cardiology' } },
+              { county: { some: { name: { equalTo: 'Bay County' } } } },
+              { specialty: { equalTo: 'cardiology' } },
             ],
           },
         })
@@ -365,8 +365,8 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
           select: { id: true },
           where: {
             or: [
-              { county: { some: { name: { eq: 'Bay County' } } } },
-              { name: { eq: 'LA Pediatrics' } },
+              { county: { some: { name: { equalTo: 'Bay County' } } } },
+              { name: { equalTo: 'LA Pediatrics' } },
             ],
           },
         })
@@ -384,7 +384,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
         .findMany({
           select: { id: true },
           where: {
-            not: { county: { some: { name: { eq: 'Bay County' } } } },
+            not: { county: { some: { name: { equalTo: 'Bay County' } } } },
           },
         })
         .execute();
