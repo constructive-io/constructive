@@ -7,6 +7,7 @@ import { PostgisGeometryFieldsPlugin } from './plugins/geometry-fields';
 import { PostgisMeasurementFieldsPlugin } from './plugins/measurement-fields';
 import { PostgisTransformationFieldsPlugin } from './plugins/transformation-functions';
 import { PostgisAggregatePlugin } from './plugins/aggregate-functions';
+import { PostgisSpatialRelationsPlugin } from './plugins/spatial-relations';
 import { createPostgisOperatorFactory } from './plugins/connection-filter-operators';
 import { createWithinDistanceOperatorFactory } from './plugins/within-distance-operator';
 
@@ -44,7 +45,8 @@ export const GraphilePostgisPreset: GraphileConfig.Preset = {
     PostgisGeometryFieldsPlugin,
     PostgisMeasurementFieldsPlugin,
     PostgisTransformationFieldsPlugin,
-    PostgisAggregatePlugin
+    PostgisAggregatePlugin,
+    PostgisSpatialRelationsPlugin,
   ],
   schema: {
     // connectionFilterOperatorFactories is augmented by graphile-connection-filter

@@ -14,6 +14,7 @@ describe('graphile-postgis exports', () => {
     expect(postgisExports.PostgisMeasurementFieldsPlugin).toBeDefined();
     expect(postgisExports.PostgisTransformationFieldsPlugin).toBeDefined();
     expect(postgisExports.PostgisAggregatePlugin).toBeDefined();
+    expect(postgisExports.PostgisSpatialRelationsPlugin).toBeDefined();
   });
 
   it('should export constants', () => {
@@ -42,6 +43,11 @@ describe('graphile-postgis exports', () => {
       'PostgisMeasurementFieldsPlugin',
       'PostgisTransformationFieldsPlugin',
       'PostgisAggregatePlugin',
+      'PostgisSpatialRelationsPlugin',
+      // Spatial-relations helpers
+      'OPERATOR_REGISTRY',
+      'parseSpatialRelationTag',
+      'collectSpatialRelations',
       // Constants
       'GisSubtype',
       'SUBTYPE_STRING_BY_SUBTYPE',
