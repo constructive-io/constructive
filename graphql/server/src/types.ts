@@ -40,11 +40,10 @@ export interface RlsModule {
 
 /**
  * Server-visible subset of app_auth_settings (lives in the tenant DB private schema).
+ * Discovered dynamically via metaschema_modules_public.sessions_module.
  * Loaded once per API resolution and cached alongside the ApiStructure.
  */
 export interface AuthSettings {
-  /** CORS allowed origins from app_auth_settings.allowed_origins */
-  allowedOrigins?: string[] | null;
   /** Cookie configuration */
   cookieSecure?: boolean;
   cookieSamesite?: string;

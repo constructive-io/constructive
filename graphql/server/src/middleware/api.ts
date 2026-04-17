@@ -87,13 +87,27 @@ const RLS_MODULE_SQL = `
 `;
 
 /**
- * Query auth settings from the tenant DB private schema.
- * The table name follows the pattern: {privateSchema}.app_settings_auth
- * We select only the server-relevant columns.
+ * Discover auth settings table location via metaschema modules.
+ * Step 1: Get auth_settings_table_id from sessions_module
+ * Step 2: Resolve the actual schema + table name via metaschema.schema_and_table()
  */
-const AUTH_SETTINGS_SQL = (privateSchema: string) => `
+const AUTH_SETTINGS_TABLE_ID_SQL = `
+  SELECT auth_settings_table_id
+  FROM metaschema_modules_public.sessions_module
+  LIMIT 1
+`;
+
+const AUTH_SETTINGS_SCHEMA_AND_TABLE_SQL = `
+  SELECT schema_name, table_name
+  FROM metaschema.schema_and_table($1)
+`;
+
+/**
+ * Query auth settings from the discovered table.
+ * Schema and table name are resolved dynamically from metaschema modules.
+ */
+const AUTH_SETTINGS_SQL = (schemaName: string, tableName: string) => `
   SELECT
-    allowed_origins,
     cookie_secure,
     cookie_samesite,
     cookie_domain,
@@ -102,7 +116,7 @@ const AUTH_SETTINGS_SQL = (privateSchema: string) => `
     cookie_path,
     enable_captcha,
     captcha_site_key
-  FROM "${privateSchema}".app_settings_auth
+  FROM "${schemaName}"."${tableName}"
   LIMIT 1
 `;
 
@@ -132,7 +146,6 @@ interface RlsModuleData {
 }
 
 interface AuthSettingsRow {
-  allowed_origins: string[] | null;
   cookie_secure: boolean;
   cookie_samesite: string;
   cookie_domain: string | null;
@@ -243,7 +256,6 @@ const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
 const toAuthSettings = (row: AuthSettingsRow | null): AuthSettings | undefined => {
   if (!row) return undefined;
   return {
-    allowedOrigins: row.allowed_origins,
     cookieSecure: row.cookie_secure,
     cookieSamesite: row.cookie_samesite,
     cookieDomain: row.cookie_domain,
@@ -327,23 +339,41 @@ const queryRlsModule = async (pool: Pool, apiId: string): Promise<RlsModuleRow |
 };
 
 /**
- * Load server-relevant auth settings from the tenant DB private schema.
- * Fails gracefully if the table doesn't exist yet (pre-migration).
+ * Load server-relevant auth settings from the tenant DB.
+ * Discovers the auth settings table dynamically by querying
+ * metaschema_modules_public.sessions_module for the table ID,
+ * then resolving the actual schema + table name via metaschema.schema_and_table().
+ * Fails gracefully if modules or table don't exist yet (pre-migration).
  */
 const queryAuthSettings = async (
   opts: ApiOptions,
-  dbname: string,
-  rlsModuleRow: RlsModuleRow | null
+  dbname: string
 ): Promise<AuthSettingsRow | null> => {
-  if (!rlsModuleRow?.data?.authenticate_schema) return null;
-  const privateSchema = rlsModuleRow.data.authenticate_schema;
   try {
     const tenantPool = getPgPool({ ...opts.pg, database: dbname });
-    const result = await tenantPool.query<AuthSettingsRow>(AUTH_SETTINGS_SQL(privateSchema));
+
+    // Step 1: Get auth_settings_table_id from sessions_module
+    const modResult = await tenantPool.query<{ auth_settings_table_id: string }>(AUTH_SETTINGS_TABLE_ID_SQL);
+    const tableId = modResult.rows[0]?.auth_settings_table_id;
+    if (!tableId) {
+      log.debug('[auth-settings] No sessions_module row found in tenant DB');
+      return null;
+    }
+
+    // Step 2: Resolve actual schema + table name
+    const stResult = await tenantPool.query<{ schema_name: string; table_name: string }>(AUTH_SETTINGS_SCHEMA_AND_TABLE_SQL, [tableId]);
+    const resolved = stResult.rows[0];
+    if (!resolved) {
+      log.debug(`[auth-settings] Could not resolve schema_and_table for table_id=${tableId}`);
+      return null;
+    }
+
+    // Step 3: Query the actual auth settings table
+    const result = await tenantPool.query<AuthSettingsRow>(AUTH_SETTINGS_SQL(resolved.schema_name, resolved.table_name));
     return result.rows[0] ?? null;
   } catch (e: any) {
-    // Table may not exist yet if the 2FA migration hasn't been applied
-    log.debug(`[auth-settings] Failed to load auth settings from ${privateSchema}.app_settings_auth: ${e.message}`);
+    // Table/module may not exist yet if the 2FA migration hasn't been applied
+    log.debug(`[auth-settings] Failed to load auth settings: ${e.message}`);
     return null;
   }
 };
@@ -407,7 +437,7 @@ const resolveApiNameHeader = async (ctx: ResolveContext): Promise<ApiStructure |
   }
 
   const rlsModule = await queryRlsModule(pool, row.api_id);
-  const authSettings = await queryAuthSettings(opts, row.dbname, rlsModule);
+  const authSettings = await queryAuthSettings(opts, row.dbname);
   log.debug(`[api-name-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}, authSettings: ${authSettings ? 'found' : 'none'}`);
   return toApiStructure(row, opts, rlsModule, authSettings);
 };
@@ -433,7 +463,7 @@ const resolveDomainLookup = async (ctx: ResolveContext): Promise<ApiStructure | 
   }
 
   const rlsModule = await queryRlsModule(pool, row.api_id);
-  const authSettings = await queryAuthSettings(opts, row.dbname, rlsModule);
+  const authSettings = await queryAuthSettings(opts, row.dbname);
   log.debug(`[domain-lookup] resolved schemas: [${row.schemas?.join(', ')}], rlsModule: ${rlsModule ? 'found' : 'none'}, authSettings: ${authSettings ? 'found' : 'none'}`);
   return toApiStructure(row, opts, rlsModule, authSettings);
 };

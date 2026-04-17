@@ -33,18 +33,11 @@ export const cors = (fallbackOrigin?: string): RequestHandler => {
 
     // 2) Per-API allowlist sourced from req.api (if available)
     //    createApiMiddleware runs before this in server.ts, so req.api should be set
-    const api = (req as any).api as { apiModules?: any[]; domains?: string[]; authSettings?: { allowedOrigins?: string[] | null } } | undefined;
+    const api = (req as any).api as { apiModules?: any[]; domains?: string[] } | undefined;
     if (api) {
-      // Preferred: app_auth_settings.allowed_origins (new approach)
-      const settingsOrigins = api.authSettings?.allowedOrigins || [];
-      // Legacy: api_modules CORS entries (backward compat)
       const corsModules = (api.apiModules || []).filter((m: any) => m.name === 'cors') as { name: 'cors'; data: CorsModuleData }[];
       const siteUrls = api.domains || [];
-      const listOfDomains = [
-        ...settingsOrigins,
-        ...corsModules.reduce<string[]>((m, mod) => [...mod.data.urls, ...m], []),
-        ...siteUrls,
-      ];
+      const listOfDomains = corsModules.reduce<string[]>((m, mod) => [...mod.data.urls, ...m], siteUrls);
 
       if (origin && listOfDomains.includes(origin)) {
         return callback(null, true);
