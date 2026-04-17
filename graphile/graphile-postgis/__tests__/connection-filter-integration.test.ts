@@ -147,6 +147,43 @@ describe('Integration: connection-filter OperatorSpec compatibility', () => {
       }
     }
   });
+
+  // Regression guard for constructive-io/constructive-planning#724.
+  //
+  // Spatial filter operators receive GeoJSON input that must be wrapped with
+  // ST_GeomFromGeoJSON(...)::<codec> before hitting PostgreSQL — PG's
+  // geometry_in / geography_in parsers do NOT accept GeoJSON text cast to
+  // geometry / geography directly.
+  //
+  // graphile-connection-filter's operatorApply falls through to
+  // `sqlValueWithCodec(resolvedInput, inputCodec)` (a raw text bind cast to
+  // the codec's sqlType) unless the operator spec overrides the binding via
+  // `resolveSqlValue`, `resolveInput`, or `resolveInputCodec`. Without one
+  // of those overrides the operator is broken end-to-end on both codecs.
+  //
+  // See plugins/within-distance-operator.ts for the correct pattern
+  // (`resolveSqlValue: () => sql.null` + manual ST_GeomFromGeoJSON wrap in
+  // resolve()).
+  it('every spec overrides value binding so GeoJSON is wrapped with ST_GeomFromGeoJSON', () => {
+    const { registered } = runFactory();
+
+    for (const { spec, operatorName, typeName } of registered) {
+      const hasBindingOverride =
+        typeof spec.resolveSqlValue === 'function' ||
+        typeof spec.resolveInput === 'function' ||
+        spec.resolveInputCodec !== undefined;
+
+      expect({
+        operatorName,
+        typeName,
+        hasBindingOverride,
+      }).toEqual({
+        operatorName,
+        typeName,
+        hasBindingOverride: true,
+      });
+    }
+  });
 });
 
 describe('Integration: type name generation matches graphile-postgis', () => {

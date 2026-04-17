@@ -221,6 +221,9 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
     const { inflection } = build;
     const { schemaName, geometryCodec, geographyCodec } = postgisInfo;
 
+    const sqlGeomFromGeoJSON = sql.identifier(schemaName, 'st_geomfromgeojson');
+    const sqlGeographyType = sql.identifier(schemaName, 'geography');
+
     // Collect all GQL type names for geometry and geography
     const gqlTypeNamesByBase: Record<string, string[]> = {
       geometry: [],
@@ -254,6 +257,7 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
       typeNames: string[];
       operatorName: string;
       description: string;
+      baseType: 'geometry' | 'geography';
       resolve: (i: SQL, v: SQL) => SQL;
     }
     const allSpecs: InternalSpec[] = [];
@@ -267,6 +271,7 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
           typeNames: gqlTypeNamesByBase[baseType],
           operatorName,
           description,
+          baseType: baseType as 'geometry' | 'geography',
           resolve: (i: SQL, v: SQL) => sql.fragment`${sqlGisFunction}(${i}, ${v})`
         });
       }
@@ -281,6 +286,7 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
           typeNames: gqlTypeNamesByBase[baseType],
           operatorName,
           description,
+          baseType: baseType as 'geometry' | 'geography',
           resolve: (i: SQL, v: SQL) => buildOperatorExpr(capturedOp, i, v)
         });
       }
@@ -292,8 +298,22 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
     // Convert to ConnectionFilterOperatorRegistration format.
     // Each InternalSpec may target multiple type names; we expand each
     // into individual registrations keyed by typeName.
+    //
+    // The default operatorApply pipeline binds the filter value as a raw
+    // text parameter cast to the column codec's sqlType (geometry /
+    // geography). PostgreSQL's geometry_in / geography_in parsers reject
+    // GeoJSON text, so we must wrap the input with ST_GeomFromGeoJSON
+    // ourselves — see within-distance-operator.ts for the pattern.
+    //
+    // We disable the default bind via `resolveSqlValue: () => sql.null`
+    // and construct the geometry value from `input` inside resolve(),
+    // mirroring the ST_DWithin implementation.
     const registrations: ConnectionFilterOperatorRegistration[] = [];
     for (const spec of allSpecs) {
+      const geographyCast = spec.baseType === 'geography'
+        ? sql.fragment`::${sqlGeographyType}`
+        : sql.fragment``;
+
       for (const typeName of spec.typeNames) {
         registrations.push({
           typeNames: typeName,
@@ -301,14 +321,17 @@ export function createPostgisOperatorFactory(): ConnectionFilterOperatorFactory 
           spec: {
             description: spec.description,
             resolveType: (fieldType) => fieldType,
+            resolveSqlValue: () => sql.null,
             resolve(
               sqlIdentifier: SQL,
-              sqlValue: SQL,
-              _input: unknown,
+              _sqlValue: SQL,
+              input: unknown,
               _$where: any,
               _details: { fieldName: string | null; operatorName: string }
             ) {
-              return spec.resolve(sqlIdentifier, sqlValue);
+              const geoJsonStr = sql.value(JSON.stringify(input));
+              const geomSql = sql.fragment`${sqlGeomFromGeoJSON}(${geoJsonStr}::text)${geographyCast}`;
+              return spec.resolve(sqlIdentifier, geomSql);
             }
           } satisfies ConnectionFilterOperatorSpec,
         });
