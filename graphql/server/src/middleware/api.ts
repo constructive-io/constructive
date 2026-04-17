@@ -87,19 +87,15 @@ const RLS_MODULE_SQL = `
 `;
 
 /**
- * Discover auth settings table location via metaschema modules.
- * Step 1: Get auth_settings_table_id from sessions_module
- * Step 2: Resolve the actual schema + table name via metaschema.schema_and_table()
+ * Discover auth settings table location via public metaschema tables.
+ * Joins sessions_module with metaschema_public.schema to resolve
+ * the schema name + table name without touching private schemas.
  */
-const AUTH_SETTINGS_TABLE_ID_SQL = `
-  SELECT auth_settings_table_id
-  FROM metaschema_modules_public.sessions_module
+const AUTH_SETTINGS_DISCOVERY_SQL = `
+  SELECT s.schema_name, sm.auth_settings_table AS table_name
+  FROM metaschema_modules_public.sessions_module sm
+  JOIN metaschema_public.schema s ON s.id = sm.schema_id
   LIMIT 1
-`;
-
-const AUTH_SETTINGS_SCHEMA_AND_TABLE_SQL = `
-  SELECT schema_name, table_name
-  FROM metaschema.schema_and_table($1)
 `;
 
 /**
@@ -340,10 +336,9 @@ const queryRlsModule = async (pool: Pool, apiId: string): Promise<RlsModuleRow |
 
 /**
  * Load server-relevant auth settings from the tenant DB.
- * Discovers the auth settings table dynamically by querying
- * metaschema_modules_public.sessions_module for the table ID,
- * then resolving the actual schema + table name via metaschema.schema_and_table().
- * Fails gracefully if modules or table don't exist yet (pre-migration).
+ * Discovers the auth settings table dynamically by joining
+ * metaschema_modules_public.sessions_module with metaschema_public.schema
+ * (both public schemas). Fails gracefully if modules or table don't exist yet.
  */
 const queryAuthSettings = async (
   opts: ApiOptions,
@@ -352,23 +347,15 @@ const queryAuthSettings = async (
   try {
     const tenantPool = getPgPool({ ...opts.pg, database: dbname });
 
-    // Step 1: Get auth_settings_table_id from sessions_module
-    const modResult = await tenantPool.query<{ auth_settings_table_id: string }>(AUTH_SETTINGS_TABLE_ID_SQL);
-    const tableId = modResult.rows[0]?.auth_settings_table_id;
-    if (!tableId) {
+    // Discover the auth settings schema + table name from public metaschema tables
+    const discovery = await tenantPool.query<{ schema_name: string; table_name: string }>(AUTH_SETTINGS_DISCOVERY_SQL);
+    const resolved = discovery.rows[0];
+    if (!resolved) {
       log.debug('[auth-settings] No sessions_module row found in tenant DB');
       return null;
     }
 
-    // Step 2: Resolve actual schema + table name
-    const stResult = await tenantPool.query<{ schema_name: string; table_name: string }>(AUTH_SETTINGS_SCHEMA_AND_TABLE_SQL, [tableId]);
-    const resolved = stResult.rows[0];
-    if (!resolved) {
-      log.debug(`[auth-settings] Could not resolve schema_and_table for table_id=${tableId}`);
-      return null;
-    }
-
-    // Step 3: Query the actual auth settings table
+    // Query the discovered auth settings table
     const result = await tenantPool.query<AuthSettingsRow>(AUTH_SETTINGS_SQL(resolved.schema_name, resolved.table_name));
     return result.rows[0] ?? null;
   } catch (e: any) {
