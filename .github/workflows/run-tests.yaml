@@ -73,6 +73,8 @@ jobs:
             env: {}
           - package: graphile/graphile-connection-filter
             env: {}
+          - package: graphile/graphile-postgis
+            env: {}
           - package: graphql/server-test
             env: {}
           - package: graphql/env
