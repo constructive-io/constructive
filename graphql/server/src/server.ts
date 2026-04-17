@@ -32,6 +32,7 @@ import { createDebugDatabaseMiddleware } from './middleware/observability/debug-
 import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
+import { createCaptchaMiddleware } from './middleware/captcha';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { startDebugSampler } from './diagnostics/debug-sampler';
 
@@ -158,6 +159,7 @@ class Server {
     app.use(api);
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
+    app.use(createCaptchaMiddleware());
     app.use(graphile(effectiveOpts));
     app.use(flush);
 
