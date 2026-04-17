@@ -161,7 +161,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
   // ==========================================================================
   describe('B. Cross-table spatial relations (2-arg operators)', () => {
     it('st_within: clinics in Bay County → SF Pediatrics, Oakland General, SF Cardio', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true, name: true },
           where: { county: { some: { name: { eq: 'Bay County' } } } },
@@ -174,7 +174,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     });
 
     it('st_within: clinics in LA County → LA Pediatrics only', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: { county: { some: { name: { eq: 'LA County' } } } },
@@ -185,7 +185,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     });
 
     it('st_within: clinics in NYC County → NYC Cardio only', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: { county: { some: { name: { eq: 'NYC County' } } } },
@@ -198,7 +198,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     it('st_within: Seattle Uncovered matches no county', async () => {
       // Seattle_Uncovered's point is not inside any seeded county polygon,
       // so `county: { some: {...} }` with no name filter should still exclude it.
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true, name: true },
           where: { county: { some: {} } },
@@ -209,7 +209,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     });
 
     it('st_intersects: same sets as st_within for point-in-polygon cases', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: {
@@ -224,7 +224,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     });
 
     it('st_coveredby: clinics coveredBy LA County → LA Pediatrics', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: {
@@ -242,7 +242,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
   // ==========================================================================
   describe('C. some / every / none modes on spatial relations', () => {
     it('none: clinics whose county has name = "NYC County" → everyone except NYC Cardio', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: { county: { none: { name: { eq: 'NYC County' } } } },
@@ -257,7 +257,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       // `every: {}` is tautologically true when there are no matching rows,
       // so the assertion is weaker here — we just assert no crash + some
       // expected rows present.
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: { county: { every: { name: { startsWith: 'B' } } } },
@@ -275,7 +275,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       // 10 degrees is huge in SRID-4326 units — it's easily enough to sweep in
       // SF Pediatrics, Oakland General, SF Cardio, and LA Pediatrics, but not
       // NYC (>40 degrees away) or Seattle (~10 degrees north, borderline).
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true, name: true },
           where: {
@@ -301,7 +301,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     });
 
     it('finds no clinic when the distance is 0 (nothing is "near" another clinic at exactly 0 degrees)', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: {
@@ -321,7 +321,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
       // SF Pediatrics and SF Cardio are ~0.02 degrees apart; Oakland General
       // is ~0.15 degrees from SF. A 0.1-degree radius matches the two SF
       // clinics to each other but nobody else.
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: {
@@ -344,7 +344,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
   // ==========================================================================
   describe('E. Composition with logical and scalar filters', () => {
     it('AND: clinics in Bay County that are cardiology → SF Cardio', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: {
@@ -360,7 +360,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     });
 
     it('OR: clinics in Bay County OR named "LA Pediatrics" → Bay clinics + LA Pediatrics', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: {
@@ -380,7 +380,7 @@ describe('PostgisSpatialRelationsPlugin (ORM, live PG)', () => {
     });
 
     it('NOT: clinics NOT in Bay County → LA, NYC, Seattle', async () => {
-      const r = await orm.telemedicineClinics
+      const r = await orm.telemedicineClinic
         .findMany({
           select: { id: true },
           where: {
