@@ -26,7 +26,7 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
-import { flush, flushService } from './middleware/flush';
+import { flush, flushAuthSettingsCache, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
@@ -178,6 +178,9 @@ class Server {
     app.use(csrfMiddleware.protect);
 
     app.use(createCaptchaMiddleware(effectiveOpts));
+
+    // Admin: flush auth settings cache (requires administrator + step-up auth)
+    app.post('/admin/flush-auth-settings', flushAuthSettingsCache);
 
     // Cookie lifecycle: set/clear session cookies on auth mutations (when enabled)
     app.use(createCookieMiddleware());
