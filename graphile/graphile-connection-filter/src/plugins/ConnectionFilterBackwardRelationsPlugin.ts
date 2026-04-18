@@ -15,7 +15,7 @@ const version = '1.0.0';
  *
  * For unique backward relations (one-to-one), a single filter field is added:
  * ```graphql
- * allClients(filter: {
+ * allClients(where: {
  *   profileByClientId: { bio: { includes: "engineer" } }
  * }) { ... }
  * ```
@@ -23,7 +23,7 @@ const version = '1.0.0';
  * For non-unique backward relations (one-to-many), a "many" filter type is added
  * with `some`, `every`, and `none` sub-fields:
  * ```graphql
- * allClients(filter: {
+ * allClients(where: {
  *   ordersByClientId: { some: { total: { greaterThan: 1000 } } }
  * }) { ... }
  * ```

@@ -39,7 +39,7 @@ import type { GraphileConfig } from 'graphile-config';
  * and adds `+attribute:filterBy` and `+attribute:orderBy` back to ALL columns, regardless of index status.
  *
  * This means:
- * - All columns will appear in the connection filter's filter argument
+ * - All columns will appear in the connection filter's `where` argument
  * - All columns will appear in the connection's orderBy enum
  * - Developers can filter and sort by any column
  * - It's the developer's/DBA's responsibility to add indexes for frequently filtered/sorted columns

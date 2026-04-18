@@ -116,11 +116,11 @@ export function makeAssertAllowed(build: any): (value: unknown, mode: 'object' |
       isEmpty: (o: unknown) => boolean
     ) =>
       function (value: unknown, mode: 'object' | 'list') {
-        // Reject empty objects in nested filter contexts (and/or/not, relation filters)
+        // Reject empty objects in nested where contexts (and/or/not, relation filters)
         if (mode === 'object' && isEmpty(value)) {
           throw Object.assign(
             new Error(
-              'Empty objects are forbidden in filter argument input.'
+              'Empty objects are forbidden in where argument input.'
             ),
             {}
           );
@@ -134,7 +134,7 @@ export function makeAssertAllowed(build: any): (value: unknown, mode: 'object' |
               if (isEmpty(arr[i])) {
                 throw Object.assign(
                   new Error(
-                    'Empty objects are forbidden in filter argument input.'
+                    'Empty objects are forbidden in where argument input.'
                   ),
                   {}
                 );
@@ -147,7 +147,7 @@ export function makeAssertAllowed(build: any): (value: unknown, mode: 'object' |
         if (!connectionFilterAllowNullInput && value === null) {
           throw Object.assign(
             new Error(
-              'Null literals are forbidden in filter argument input.'
+              'Null literals are forbidden in where argument input.'
             ),
             {}
           );

@@ -7,9 +7,10 @@ const version = '1.0.0';
 /**
  * ConnectionFilterArgPlugin
  *
- * Adds the filter argument (configurable name, default 'where') to connection
- * and simple collection fields. Uses `applyPlan` to create a PgCondition that
- * child filter fields can add WHERE clauses to.
+ * Adds the `where` argument (name configurable via
+ * `connectionFilterArgumentName`, default `'where'`) to connection and
+ * simple collection fields. Uses `applyPlan` to create a PgCondition
+ * that child filter fields can add WHERE clauses to.
  *
  * This runs before PgConnectionArgOrderByPlugin so that filters are applied
  * before ordering (important for e.g. full-text search rank ordering).
@@ -17,7 +18,7 @@ const version = '1.0.0';
 export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
   name: 'ConnectionFilterArgPlugin',
   version,
-  description: 'Adds the filter argument to connection and list fields',
+  description: 'Adds the `where` argument to connection and list fields',
   before: ['PgConnectionArgOrderByPlugin'],
 
   schema: {
@@ -100,7 +101,7 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                           fieldArg.apply(
                             $pgSelect,
                             (queryBuilder: any, value: any) => {
-                              // If filter is null/undefined or empty {}, treat as "no filter" — skip
+                              // If where is null/undefined or empty {}, treat as "no filter" — skip
                               if (value == null || isEmpty(value)) return;
                               const condition = new PgCondition(queryBuilder);
                               if (attributeCodec) {
@@ -126,7 +127,7 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                           fieldArg.apply(
                             $pgSelect,
                             (queryBuilder: any, value: any) => {
-                              // If filter is null/undefined or empty {}, treat as "no filter" — skip
+                              // If where is null/undefined or empty {}, treat as "no filter" — skip
                               if (value == null || isEmpty(value)) return;
                               const condition = new PgCondition(queryBuilder);
                               if (attributeCodec) {
@@ -143,7 +144,7 @@ export const ConnectionFilterArgPlugin: GraphileConfig.Plugin = {
                   }),
             },
           },
-          `Adding connection filter '${argName}' arg to field '${fieldName}' of '${Self.name}'`
+          `Adding connection where arg '${argName}' to field '${fieldName}' of '${Self.name}'`
         );
       },
     },

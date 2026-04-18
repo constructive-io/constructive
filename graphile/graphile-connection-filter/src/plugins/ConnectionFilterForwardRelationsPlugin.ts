@@ -18,7 +18,7 @@ const version = '1.0.0';
  * allowing queries like:
  *
  * ```graphql
- * allOrders(filter: {
+ * allOrders(where: {
  *   clientByClientId: { name: { startsWith: "Acme" } }
  * }) { ... }
  * ```

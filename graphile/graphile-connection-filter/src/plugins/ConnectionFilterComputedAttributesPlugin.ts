@@ -18,7 +18,7 @@ const version = '1.0.0';
  *
  * This plugin adds a `fullName` filter field to `PersonFilter`, typed as `StringFilter`,
  * allowing queries like:
- *   { people(filter: { fullName: { startsWith: "John" } }) { ... } }
+ *   { people(where: { fullName: { startsWith: "John" } }) { ... } }
  *
  * Controlled by the `connectionFilterComputedColumns` schema option (default: true).
  * Requires the `filterBy` behavior on the pgResource to be enabled.
