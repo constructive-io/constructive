@@ -46,7 +46,7 @@ import type { PostgisExtensionInfo } from './detect-extension';
  * Generated GraphQL (for the `st_dwithin` case):
  *
  * ```graphql
- * telemedicineClinics(filter: {
+ * telemedicineClinics(where: {
  *   nearbyClinic: {
  *     distance: 5000,
  *     some: { specialty: { eq: "pediatrics" } }

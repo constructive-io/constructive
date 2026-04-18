@@ -83,7 +83,7 @@ export function makeApplyFromOperatorSpec(
         }
         if (!connectionFilterAllowNullInput && value === null) {
           throw Object.assign(
-            new Error('Null literals are forbidden in filter argument input.'),
+            new Error('Null literals are forbidden in where argument input.'),
             {}
           );
         }

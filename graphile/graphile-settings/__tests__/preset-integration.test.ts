@@ -131,7 +131,7 @@ describe('Schema introspection', () => {
     expect(fieldNames).toContain('embedding');
   });
 
-  it('locations connection exists and has filter argument but no condition', async () => {
+  it('locations connection exists and has where argument but no condition', async () => {
     const result = await query<{ __type: { fields: { name: string; args: { name: string }[] }[] } | null }>({
       query: `
         query {

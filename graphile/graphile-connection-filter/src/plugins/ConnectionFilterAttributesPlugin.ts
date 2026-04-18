@@ -96,7 +96,7 @@ export const ConnectionFilterAttributesPlugin: GraphileConfig.Plugin = {
                         if (isEmpty(value)) {
                           throw Object.assign(
                             new Error(
-                              'Empty objects are forbidden in filter argument input.'
+                              'Empty objects are forbidden in where argument input.'
                             ),
                             {}
                           );
@@ -107,7 +107,7 @@ export const ConnectionFilterAttributesPlugin: GraphileConfig.Plugin = {
                         ) {
                           throw Object.assign(
                             new Error(
-                              'Null literals are forbidden in filter argument input.'
+                              'Null literals are forbidden in where argument input.'
                             ),
                             {}
                           );

@@ -54,8 +54,8 @@ import { getBucketProvisionerConnection } from '../bucket-provisioner-resolver';
  *
  * RELATION FILTERS:
  * - Enabled via connectionFilterRelations: true
- * - Forward: filter child by parent (e.g. allOrders(filter: { clientByClientId: { name: { startsWith: "Acme" } } }))
- * - Backward: filter parent by children (e.g. allClients(filter: { ordersByClientId: { some: { total: { greaterThan: 1000 } } } }))
+ * - Forward: filter child by parent (e.g. allOrders(where: { clientByClientId: { name: { startsWith: "Acme" } } }))
+ * - Backward: filter parent by children (e.g. allClients(where: { ordersByClientId: { some: { total: { greaterThan: 1000 } } } }))
  *
  * USAGE:
  * ```typescript
@@ -105,9 +105,11 @@ export const ConstructivePreset: GraphileConfig.Preset = {
   ],
   /**
    * Disable PostGraphile core's condition argument entirely.
-   * All filtering now lives under the `filter` argument via our v5-native
-   * graphile-connection-filter plugin. Search, BM25, pgvector, and PostGIS
-   * filter fields all hook into `isPgConnectionFilter` instead of `isPgCondition`.
+   * All filtering now lives under the `where` argument via our v5-native
+   * graphile-connection-filter plugin (which renames the default `filter`
+   * argument to `where` via `connectionFilterArgumentName: 'where'`).
+   * Search, BM25, pgvector, and PostGIS filter fields all hook into
+   * `isPgConnectionFilter` instead of `isPgCondition`.
    */
   disablePlugins: [
     'PgConditionArgumentPlugin',
@@ -116,7 +118,7 @@ export const ConstructivePreset: GraphileConfig.Preset = {
   /**
    * Connection Filter Plugin Configuration
    *
-   * These options control what fields appear in the `filter` argument on connections.
+   * These options control what fields appear in the `where` argument on connections.
    * Our v5-native graphile-connection-filter plugin controls relation filters via the
    * `connectionFilterRelations` option passed to ConnectionFilterPreset().
    *
@@ -144,14 +146,14 @@ export const ConstructivePreset: GraphileConfig.Preset = {
     /**
      * connectionFilterLogicalOperators: true (default)
      * Keeps `and`, `or`, `not` operators for combining filter conditions.
-     * Example: filter: { or: [{ name: { eq: "foo" } }, { name: { eq: "bar" } }] }
+     * Example: where: { or: [{ name: { eq: "foo" } }, { name: { eq: "bar" } }] }
      */
     connectionFilterLogicalOperators: true,
 
     /**
      * connectionFilterArrays: true (default)
      * Allows filtering on PostgreSQL array columns.
-     * Example: filter: { tags: { contains: ["important"] } }
+     * Example: where: { tags: { contains: ["important"] } }
      */
     connectionFilterArrays: true,
 
