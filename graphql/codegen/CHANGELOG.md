@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.30.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.1...@constructive-io/graphql-codegen@4.30.2) (2026-04-18)
+
+### Bug Fixes
+
+- **codegen/cli:** make autoEmbedWhere/autoEmbedInput generic in embedder template ([c5f7369](https://github.com/constructive-io/constructive/commit/c5f7369772b19e0adbbec519a9967c2c564f04b3)), closes [constructive-io/agentic-db#29](https://github.com/constructive-io/agentic-db/issues/29)
+
 ## [4.30.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.0...@constructive-io/graphql-codegen@4.30.1) (2026-04-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen
