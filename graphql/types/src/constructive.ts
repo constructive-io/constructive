@@ -14,6 +14,8 @@ import {
   GraphileOptions,
   GraphileFeatureOptions,
   ApiOptions,
+  OAuthOptions,
+  CaptchaOptions,
   graphileDefaults,
   graphileFeatureDefaults,
   apiDefaults
@@ -56,6 +58,10 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   migrations?: MigrationOptions;
   /** Job system configuration */
   jobs?: JobsConfig;
+  /** OAuth/SSO configuration */
+  oauth?: OAuthOptions;
+  /** CAPTCHA configuration */
+  captcha?: CaptchaOptions;
 }
 
 /**

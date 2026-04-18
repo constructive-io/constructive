@@ -63,6 +63,38 @@ export const graphileFeatureDefaults: GraphileFeatureOptions = {
 };
 
 /**
+ * OAuth/SSO provider credentials
+ */
+export interface OAuthProviderCredentials {
+  /** OAuth client ID from the provider */
+  clientId: string;
+  /** OAuth client secret from the provider */
+  clientSecret: string;
+}
+
+/**
+ * OAuth/SSO configuration options
+ */
+export interface OAuthOptions {
+  /** Per-provider credentials keyed by provider name (e.g. google, github) */
+  providers?: Record<string, OAuthProviderCredentials>;
+  /** Base URL for constructing OAuth callback URLs (e.g. https://api.example.com) */
+  baseUrl?: string;
+  /** URL to redirect the browser to after successful SSO */
+  successRedirect?: string;
+  /** URL to redirect the browser to on SSO failure */
+  errorRedirect?: string;
+}
+
+/**
+ * CAPTCHA configuration options
+ */
+export interface CaptchaOptions {
+  /** Server-side secret key for reCAPTCHA verification */
+  recaptchaSecretKey?: string;
+}
+
+/**
  * Default API configuration values
  */
 export const apiDefaults: ApiOptions = {

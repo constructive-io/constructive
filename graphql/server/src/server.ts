@@ -1,6 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
+import { getNodeEnv } from '@pgpmjs/env';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
@@ -25,7 +26,7 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
-import { flush, flushService } from './middleware/flush';
+import { flush, flushAuthSettingsCache, flushService } from './middleware/flush';
 import { graphile } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
@@ -33,8 +34,12 @@ import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createCaptchaMiddleware } from './middleware/captcha';
+import { createCookieMiddleware } from './middleware/cookie';
+import { createCsrfProtectionMiddleware } from './middleware/csrf';
+import { mountOAuthRoutes } from './middleware/oauth';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { startDebugSampler } from './diagnostics/debug-sampler';
+import cookieParser from 'cookie-parser';
 
 const log = new Logger('server');
 
@@ -134,7 +139,7 @@ class Server {
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = effectiveOpts.server?.origin?.trim();
-    if (fallbackOrigin && process.env.NODE_ENV === 'production') {
+    if (fallbackOrigin && getNodeEnv() === 'production') {
       if (fallbackOrigin === '*') {
         log.warn(
           'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.',
@@ -156,14 +161,35 @@ class Server {
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
     app.use(requestLogger);
+    app.use(cookieParser());
     app.use(api);
+
+    // SSO / OAuth routes (must be before authenticate so unauthenticated
+    // users can initiate the OAuth flow; the callback sets the session)
+    mountOAuthRoutes(app, effectiveOpts);
+
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
-    app.use(createCaptchaMiddleware());
+
+    // CSRF: set token cookie on every request (when enabled)
+    const csrfMiddleware = createCsrfProtectionMiddleware();
+    app.use(csrfMiddleware.setToken);
+    // CSRF: validate token on mutations for cookie-authenticated requests
+    app.use(csrfMiddleware.protect);
+
+    app.use(createCaptchaMiddleware(effectiveOpts));
+
+    // Admin: flush auth settings cache (requires administrator + step-up auth)
+    app.post('/admin/flush-auth-settings', flushAuthSettingsCache);
+
+    // Cookie lifecycle: set/clear session cookies on auth mutations (when enabled)
+    app.use(createCookieMiddleware());
+
     app.use(graphile(effectiveOpts));
     app.use(flush);
 
     // Error handling - MUST be LAST
+    app.use(csrfMiddleware.errorHandler as any); // CSRF validation errors → 403
     app.use(notFoundHandler); // Catches unmatched routes (404)
     app.use(errorHandler); // Catches all thrown errors
 

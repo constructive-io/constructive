@@ -104,6 +104,8 @@ const AUTH_SETTINGS_DISCOVERY_SQL = `
  */
 const AUTH_SETTINGS_SQL = (schemaName: string, tableName: string) => `
   SELECT
+    enable_cookie_auth,
+    require_csrf_for_auth,
     cookie_secure,
     cookie_samesite,
     cookie_domain,
@@ -142,6 +144,8 @@ interface RlsModuleData {
 }
 
 interface AuthSettingsRow {
+  enable_cookie_auth: boolean;
+  require_csrf_for_auth: boolean;
   cookie_secure: boolean;
   cookie_samesite: string;
   cookie_domain: string | null;
@@ -252,6 +256,8 @@ const toRlsModule = (row: RlsModuleRow | null): RlsModule | undefined => {
 const toAuthSettings = (row: AuthSettingsRow | null): AuthSettings | undefined => {
   if (!row) return undefined;
   return {
+    enableCookieAuth: row.enable_cookie_auth,
+    requireCsrfForAuth: row.require_csrf_for_auth,
     cookieSecure: row.cookie_secure,
     cookieSamesite: row.cookie_samesite,
     cookieDomain: row.cookie_domain,
