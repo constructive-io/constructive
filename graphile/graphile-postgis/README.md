@@ -193,14 +193,14 @@ await orm.telemedicineClinic
 
 #### Through GraphQL
 
-PostGraphile exposes the same shape on its connection argument. The
-ORM calls it `where:`; raw PostGraphile calls it `filter:` — that's the
-generated schema's name, not ours. Both accept the same tree:
+The connection argument is `where:` at the GraphQL layer too — same
+name, same tree. Only the generated input **type** keeps the word
+"Filter" in it (e.g. `TelemedicineClinicFilter`):
 
 ```graphql
 {
   telemedicineClinics(
-    filter: { county: { some: { name: { equalTo: "Bay County" } } } }
+    where: { county: { some: { name: { equalTo: "Bay County" } } } }
   ) {
     nodes { id name }
   }
