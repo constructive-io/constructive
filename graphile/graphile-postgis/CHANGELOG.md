@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.11.0](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.10.1...graphile-postgis@2.11.0) (2026-04-18)
+
+### Bug Fixes
+
+- **graphile-postgis:** emit ST\_<op>(owner, target) — directional operand order ([4265d02](https://github.com/constructive-io/constructive/commit/4265d02b4138f6de08df98b223e2d48fb03f8e05))
+- **graphile-postgis:** remove isPgConnectionFilterMany scope to avoid some/every/none collision ([8135653](https://github.com/constructive-io/constructive/commit/81356539064e2d7926f67343ec8eb30d98b3253c))
+- **graphile-postgis:** wrap GeoJSON inputs with ST_GeomFromGeoJSON in spatial operators ([c73c647](https://github.com/constructive-io/constructive/commit/c73c647a0f15d562b94416d5faa4ec1355bb900a)), closes [#724](https://github.com/constructive-io/constructive/issues/724) [#989](https://github.com/constructive-io/constructive/issues/989)
+
+### Features
+
+- **graphile-postgis:** PostgisSpatialRelationsPlugin — cross-table spatial filters via [@spatial](https://github.com/spatial)Relation smart tags ([16ad9f9](https://github.com/constructive-io/constructive/commit/16ad9f9c580b915a567a53abbd75f8ae8305a554)), closes [constructive-io/constructive-planning#728](https://github.com/constructive-io/constructive-planning/issues/728)
+
 ## [2.10.1](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.10.0...graphile-postgis@2.10.1) (2026-04-11)
 
 **Note:** Version bump only for package graphile-postgis

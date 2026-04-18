@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.12.0...node-type-registry@0.14.0) (2026-04-18)
+
+### Features
+
+- **node-type-registry:** add RelationSpatial node type (v0.13.0) ([39d99c2](https://github.com/constructive-io/constructive/commit/39d99c2b35d9bc932238dd5a710f070f4d65fdbe)), closes [#844](https://github.com/constructive-io/constructive/issues/844)
+- **node-type-registry:** add table_provision to BlueprintMembershipType ([10bf488](https://github.com/constructive-io/constructive/commit/10bf488d86e8bc13567cc24f67e5beb1249d39d4)), closes [#824](https://github.com/constructive-io/constructive/issues/824)
+
 # [0.12.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.11.0...node-type-registry@0.12.0) (2026-04-17)
 
 ### Features

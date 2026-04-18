@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.17.0...@constructive-io/graphql-server@4.18.0) (2026-04-18)
+
+### Bug Fixes
+
+- discover auth settings via metaschema modules, remove CORS migration ([28884c2](https://github.com/constructive-io/constructive/commit/28884c2f3497608c33533fce2a112fe838ba4d7e))
+- use public metaschema tables for auth settings discovery ([17dbfc3](https://github.com/constructive-io/constructive/commit/17dbfc34d46df956c9e79a7f8bb40b2ce83b5c92))
+
+### Features
+
+- Part C server auth enforcement - access_level, cookie auth, CORS migration, reCAPTCHA ([a23123f](https://github.com/constructive-io/constructive/commit/a23123fe9e1733290e067503be5e0d18559e137b))
+- propagate kind + access_level as JWT claims in pgSettings ([788fdfe](https://github.com/constructive-io/constructive/commit/788fdfed6ccae525e1ba8183b691df25d6e16f53))
+
 # [4.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.16.2...@constructive-io/graphql-server@4.17.0) (2026-04-16)
 
 ### Features

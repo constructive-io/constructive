@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/constructive-io/jobs/compare/@constructive-io/job-pg@2.5.4...@constructive-io/job-pg@2.6.0) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/job-pg
+
 ## [2.5.4](https://github.com/constructive-io/jobs/compare/@constructive-io/job-pg@2.5.3...@constructive-io/job-pg@2.5.4) (2026-04-04)
 
 **Note:** Version bump only for package @constructive-io/job-pg
