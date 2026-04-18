@@ -33,23 +33,28 @@ csdk auth set-token <your-token>
 | `audit-log` | auditLog CRUD operations |
 | `role-type` | roleType CRUD operations |
 | `user` | user CRUD operations |
-| `current-ip-address` | currentIpAddress |
 | `current-user-agent` | currentUserAgent |
+| `current-ip-address` | currentIpAddress |
 | `current-user-id` | currentUserId |
+| `require-step-up` | requireStepUp |
 | `current-user` | currentUser |
 | `sign-out` | signOut |
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `check-password` | checkPassword |
+| `revoke-api-key` | revokeApiKey |
+| `revoke-session` | revokeSession |
 | `verify-password` | verifyPassword |
 | `verify-totp` | verifyTotp |
 | `confirm-delete-account` | confirmDeleteAccount |
 | `set-password` | setPassword |
 | `verify-email` | verifyEmail |
+| `provision-new-user` | provisionNewUser |
 | `reset-password` | resetPassword |
-| `sign-in-one-time-token` | signInOneTimeToken |
-| `sign-in` | signIn |
+| `create-api-key` | createApiKey |
+| `sign-in-cross-origin` | signInCrossOrigin |
 | `sign-up` | signUp |
-| `one-time-token` | oneTimeToken |
+| `request-cross-origin-token` | requestCrossOriginToken |
+| `sign-in` | signIn |
 | `extend-token-expires` | extendTokenExpires |
 | `forgot-password` | forgotPassword |
 | `send-verification-email` | sendVerificationEmail |
@@ -331,16 +336,16 @@ csdk user search "query" --limit 10 --select id,title,searchScore
 
 ## Custom Operations
 
-### `current-ip-address`
+### `current-user-agent`
 
-currentIpAddress
+currentUserAgent
 
 - **Type:** query
 - **Arguments:** none
 
-### `current-user-agent`
+### `current-ip-address`
 
-currentUserAgent
+currentIpAddress
 
 - **Type:** query
 - **Arguments:** none
@@ -351,6 +356,17 @@ currentUserId
 
 - **Type:** query
 - **Arguments:** none
+
+### `require-step-up`
+
+requireStepUp
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--stepUpType` | String |
 
 ### `current-user`
 
@@ -392,6 +408,30 @@ checkPassword
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.password` | String |
+
+### `revoke-api-key`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.keyId` | UUID (required) |
+
+### `revoke-session`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sessionId` | UUID (required) |
 
 ### `verify-password`
 
@@ -456,6 +496,19 @@ verifyEmail
   | `--input.emailId` | UUID |
   | `--input.token` | String |
 
+### `provision-new-user`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+
 ### `reset-password`
 
 resetPassword
@@ -470,9 +523,23 @@ resetPassword
   | `--input.resetToken` | String |
   | `--input.newPassword` | String |
 
-### `sign-in-one-time-token`
+### `create-api-key`
 
-signInOneTimeToken
+createApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.keyName` | String (required) |
+  | `--input.accessLevel` | String |
+  | `--input.mfaLevel` | String |
+
+### `sign-in-cross-origin`
+
+signInCrossOrigin
 
 - **Type:** mutation
 - **Arguments:**
@@ -482,22 +549,6 @@ signInOneTimeToken
   | `--input.clientMutationId` | String |
   | `--input.token` | String |
   | `--input.credentialKind` | String |
-
-### `sign-in`
-
-signIn
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | String |
-  | `--input.password` | String |
-  | `--input.rememberMe` | Boolean |
-  | `--input.credentialKind` | String |
-  | `--input.csrfToken` | String |
 
 ### `sign-up`
 
@@ -515,9 +566,9 @@ signUp
   | `--input.credentialKind` | String |
   | `--input.csrfToken` | String |
 
-### `one-time-token`
+### `request-cross-origin-token`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
@@ -529,6 +580,22 @@ oneTimeToken
   | `--input.password` | String |
   | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
+
+### `sign-in`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
 
 ### `extend-token-expires`
 

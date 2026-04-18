@@ -10,16 +10,20 @@ import type {
   SignOutInput,
   SendAccountDeletionEmailInput,
   CheckPasswordInput,
+  RevokeApiKeyInput,
+  RevokeSessionInput,
   VerifyPasswordInput,
   VerifyTotpInput,
   ConfirmDeleteAccountInput,
   SetPasswordInput,
   VerifyEmailInput,
+  ProvisionNewUserInput,
   ResetPasswordInput,
-  SignInOneTimeTokenInput,
-  SignInInput,
+  CreateApiKeyInput,
+  SignInCrossOriginInput,
   SignUpInput,
-  OneTimeTokenInput,
+  RequestCrossOriginTokenInput,
+  SignInInput,
   ExtendTokenExpiresInput,
   ForgotPasswordInput,
   SendVerificationEmailInput,
@@ -29,16 +33,20 @@ import type {
   SignOutPayload,
   SendAccountDeletionEmailPayload,
   CheckPasswordPayload,
+  RevokeApiKeyPayload,
+  RevokeSessionPayload,
   VerifyPasswordPayload,
   VerifyTotpPayload,
   ConfirmDeleteAccountPayload,
   SetPasswordPayload,
   VerifyEmailPayload,
+  ProvisionNewUserPayload,
   ResetPasswordPayload,
-  SignInOneTimeTokenPayload,
-  SignInPayload,
+  CreateApiKeyPayload,
+  SignInCrossOriginPayload,
   SignUpPayload,
-  OneTimeTokenPayload,
+  RequestCrossOriginTokenPayload,
+  SignInPayload,
   ExtendTokenExpiresPayload,
   ForgotPasswordPayload,
   SendVerificationEmailPayload,
@@ -48,16 +56,20 @@ import type {
   SignOutPayloadSelect,
   SendAccountDeletionEmailPayloadSelect,
   CheckPasswordPayloadSelect,
+  RevokeApiKeyPayloadSelect,
+  RevokeSessionPayloadSelect,
   VerifyPasswordPayloadSelect,
   VerifyTotpPayloadSelect,
   ConfirmDeleteAccountPayloadSelect,
   SetPasswordPayloadSelect,
   VerifyEmailPayloadSelect,
+  ProvisionNewUserPayloadSelect,
   ResetPasswordPayloadSelect,
-  SignInOneTimeTokenPayloadSelect,
-  SignInPayloadSelect,
+  CreateApiKeyPayloadSelect,
+  SignInCrossOriginPayloadSelect,
   SignUpPayloadSelect,
-  OneTimeTokenPayloadSelect,
+  RequestCrossOriginTokenPayloadSelect,
+  SignInPayloadSelect,
   ExtendTokenExpiresPayloadSelect,
   ForgotPasswordPayloadSelect,
   SendVerificationEmailPayloadSelect,
@@ -75,6 +87,12 @@ export interface SendAccountDeletionEmailVariables {
 export interface CheckPasswordVariables {
   input: CheckPasswordInput;
 }
+export interface RevokeApiKeyVariables {
+  input: RevokeApiKeyInput;
+}
+export interface RevokeSessionVariables {
+  input: RevokeSessionInput;
+}
 export interface VerifyPasswordVariables {
   input: VerifyPasswordInput;
 }
@@ -90,20 +108,26 @@ export interface SetPasswordVariables {
 export interface VerifyEmailVariables {
   input: VerifyEmailInput;
 }
+export interface ProvisionNewUserVariables {
+  input: ProvisionNewUserInput;
+}
 export interface ResetPasswordVariables {
   input: ResetPasswordInput;
 }
-export interface SignInOneTimeTokenVariables {
-  input: SignInOneTimeTokenInput;
+export interface CreateApiKeyVariables {
+  input: CreateApiKeyInput;
 }
-export interface SignInVariables {
-  input: SignInInput;
+export interface SignInCrossOriginVariables {
+  input: SignInCrossOriginInput;
 }
 export interface SignUpVariables {
   input: SignUpInput;
 }
-export interface OneTimeTokenVariables {
-  input: OneTimeTokenInput;
+export interface RequestCrossOriginTokenVariables {
+  input: RequestCrossOriginTokenInput;
+}
+export interface SignInVariables {
+  input: SignInInput;
 }
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
@@ -230,6 +254,64 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'CheckPasswordPayload'
+        ),
+      }),
+    revokeApiKey: <S extends RevokeApiKeyPayloadSelect>(
+      args: RevokeApiKeyVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RevokeApiKeyPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        revokeApiKey: InferSelectResult<RevokeApiKeyPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RevokeApiKey',
+        fieldName: 'revokeApiKey',
+        ...buildCustomDocument(
+          'mutation',
+          'RevokeApiKey',
+          'revokeApiKey',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RevokeApiKeyInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RevokeApiKeyPayload'
+        ),
+      }),
+    revokeSession: <S extends RevokeSessionPayloadSelect>(
+      args: RevokeSessionVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, RevokeSessionPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        revokeSession: InferSelectResult<RevokeSessionPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'RevokeSession',
+        fieldName: 'revokeSession',
+        ...buildCustomDocument(
+          'mutation',
+          'RevokeSession',
+          'revokeSession',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'RevokeSessionInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'RevokeSessionPayload'
         ),
       }),
     verifyPassword: <S extends VerifyPasswordPayloadSelect>(
@@ -377,6 +459,35 @@ export function createMutationOperations(client: OrmClient) {
           'VerifyEmailPayload'
         ),
       }),
+    provisionNewUser: <S extends ProvisionNewUserPayloadSelect>(
+      args: ProvisionNewUserVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, ProvisionNewUserPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        provisionNewUser: InferSelectResult<ProvisionNewUserPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'ProvisionNewUser',
+        fieldName: 'provisionNewUser',
+        ...buildCustomDocument(
+          'mutation',
+          'ProvisionNewUser',
+          'provisionNewUser',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'ProvisionNewUserInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'ProvisionNewUserPayload'
+        ),
+      }),
     resetPassword: <S extends ResetPasswordPayloadSelect>(
       args: ResetPasswordVariables,
       options: {
@@ -406,62 +517,62 @@ export function createMutationOperations(client: OrmClient) {
           'ResetPasswordPayload'
         ),
       }),
-    signInOneTimeToken: <S extends SignInOneTimeTokenPayloadSelect>(
-      args: SignInOneTimeTokenVariables,
+    createApiKey: <S extends CreateApiKeyPayloadSelect>(
+      args: CreateApiKeyVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SignInOneTimeTokenPayloadSelect>
+      } & StrictSelect<S, CreateApiKeyPayloadSelect>
     ) =>
       new QueryBuilder<{
-        signInOneTimeToken: InferSelectResult<SignInOneTimeTokenPayload, S> | null;
+        createApiKey: InferSelectResult<CreateApiKeyPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SignInOneTimeToken',
-        fieldName: 'signInOneTimeToken',
+        operationName: 'CreateApiKey',
+        fieldName: 'createApiKey',
         ...buildCustomDocument(
           'mutation',
-          'SignInOneTimeToken',
-          'signInOneTimeToken',
+          'CreateApiKey',
+          'createApiKey',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SignInOneTimeTokenInput!',
+              type: 'CreateApiKeyInput!',
             },
           ],
           connectionFieldsMap,
-          'SignInOneTimeTokenPayload'
+          'CreateApiKeyPayload'
         ),
       }),
-    signIn: <S extends SignInPayloadSelect>(
-      args: SignInVariables,
+    signInCrossOrigin: <S extends SignInCrossOriginPayloadSelect>(
+      args: SignInCrossOriginVariables,
       options: {
         select: S;
-      } & StrictSelect<S, SignInPayloadSelect>
+      } & StrictSelect<S, SignInCrossOriginPayloadSelect>
     ) =>
       new QueryBuilder<{
-        signIn: InferSelectResult<SignInPayload, S> | null;
+        signInCrossOrigin: InferSelectResult<SignInCrossOriginPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'SignIn',
-        fieldName: 'signIn',
+        operationName: 'SignInCrossOrigin',
+        fieldName: 'signInCrossOrigin',
         ...buildCustomDocument(
           'mutation',
-          'SignIn',
-          'signIn',
+          'SignInCrossOrigin',
+          'signInCrossOrigin',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'SignInInput!',
+              type: 'SignInCrossOriginInput!',
             },
           ],
           connectionFieldsMap,
-          'SignInPayload'
+          'SignInCrossOriginPayload'
         ),
       }),
     signUp: <S extends SignUpPayloadSelect>(
@@ -493,33 +604,62 @@ export function createMutationOperations(client: OrmClient) {
           'SignUpPayload'
         ),
       }),
-    oneTimeToken: <S extends OneTimeTokenPayloadSelect>(
-      args: OneTimeTokenVariables,
+    requestCrossOriginToken: <S extends RequestCrossOriginTokenPayloadSelect>(
+      args: RequestCrossOriginTokenVariables,
       options: {
         select: S;
-      } & StrictSelect<S, OneTimeTokenPayloadSelect>
+      } & StrictSelect<S, RequestCrossOriginTokenPayloadSelect>
     ) =>
       new QueryBuilder<{
-        oneTimeToken: InferSelectResult<OneTimeTokenPayload, S> | null;
+        requestCrossOriginToken: InferSelectResult<RequestCrossOriginTokenPayload, S> | null;
       }>({
         client,
         operation: 'mutation',
-        operationName: 'OneTimeToken',
-        fieldName: 'oneTimeToken',
+        operationName: 'RequestCrossOriginToken',
+        fieldName: 'requestCrossOriginToken',
         ...buildCustomDocument(
           'mutation',
-          'OneTimeToken',
-          'oneTimeToken',
+          'RequestCrossOriginToken',
+          'requestCrossOriginToken',
           options.select,
           args,
           [
             {
               name: 'input',
-              type: 'OneTimeTokenInput!',
+              type: 'RequestCrossOriginTokenInput!',
             },
           ],
           connectionFieldsMap,
-          'OneTimeTokenPayload'
+          'RequestCrossOriginTokenPayload'
+        ),
+      }),
+    signIn: <S extends SignInPayloadSelect>(
+      args: SignInVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, SignInPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        signIn: InferSelectResult<SignInPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'SignIn',
+        fieldName: 'signIn',
+        ...buildCustomDocument(
+          'mutation',
+          'SignIn',
+          'signIn',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'SignInInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'SignInPayload'
         ),
       }),
     extendTokenExpires: <S extends ExtendTokenExpiresPayloadSelect>(

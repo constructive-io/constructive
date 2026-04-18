@@ -706,6 +706,14 @@ export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
 }
+export interface RevokeApiKeyInput {
+  clientMutationId?: string;
+  keyId: string;
+}
+export interface RevokeSessionInput {
+  clientMutationId?: string;
+  sessionId: string;
+}
 export interface VerifyPasswordInput {
   clientMutationId?: string;
   password: string;
@@ -729,24 +737,27 @@ export interface VerifyEmailInput {
   emailId?: string;
   token?: string;
 }
+export interface ProvisionNewUserInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+}
 export interface ResetPasswordInput {
   clientMutationId?: string;
   roleId?: string;
   resetToken?: string;
   newPassword?: string;
 }
-export interface SignInOneTimeTokenInput {
+export interface CreateApiKeyInput {
+  clientMutationId?: string;
+  keyName: string;
+  accessLevel?: string;
+  mfaLevel?: string;
+}
+export interface SignInCrossOriginInput {
   clientMutationId?: string;
   token?: string;
   credentialKind?: string;
-}
-export interface SignInInput {
-  clientMutationId?: string;
-  email?: string;
-  password?: string;
-  rememberMe?: boolean;
-  credentialKind?: string;
-  csrfToken?: string;
 }
 export interface SignUpInput {
   clientMutationId?: string;
@@ -756,12 +767,20 @@ export interface SignUpInput {
   credentialKind?: string;
   csrfToken?: string;
 }
-export interface OneTimeTokenInput {
+export interface RequestCrossOriginTokenInput {
   clientMutationId?: string;
   email?: string;
   password?: string;
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
+}
+export interface SignInInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+  rememberMe?: boolean;
+  credentialKind?: string;
+  csrfToken?: string;
 }
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
@@ -1162,6 +1181,14 @@ export interface SendAccountDeletionEmailPayload {
 export interface CheckPasswordPayload {
   clientMutationId?: string | null;
 }
+export interface RevokeApiKeyPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface RevokeSessionPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
 export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -1182,25 +1209,33 @@ export interface VerifyEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
+export interface ProvisionNewUserPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
 export interface ResetPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
-export interface SignInOneTimeTokenPayload {
+export interface CreateApiKeyPayload {
   clientMutationId?: string | null;
-  result?: SignInOneTimeTokenRecord | null;
+  result?: CreateApiKeyRecord | null;
 }
-export interface SignInPayload {
+export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
-  result?: SignInRecord | null;
+  result?: SignInCrossOriginRecord | null;
 }
 export interface SignUpPayload {
   clientMutationId?: string | null;
   result?: SignUpRecord | null;
 }
-export interface OneTimeTokenPayload {
+export interface RequestCrossOriginTokenPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface SignInPayload {
+  clientMutationId?: string | null;
+  result?: SignInRecord | null;
 }
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -1440,15 +1475,11 @@ export interface MetaTable {
   inflection: MetaInflection;
   query: MetaQuery;
 }
-export interface SignInOneTimeTokenRecord {
-  id?: string | null;
-  userId?: string | null;
-  accessToken?: string | null;
-  accessTokenExpiresAt?: string | null;
-  isVerified?: boolean | null;
-  totpEnabled?: boolean | null;
+export interface CreateApiKeyRecord {
+  apiKey?: string | null;
+  keyId?: string | null;
 }
-export interface SignInRecord {
+export interface SignInCrossOriginRecord {
   id?: string | null;
   userId?: string | null;
   accessToken?: string | null;
@@ -1463,6 +1494,16 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+}
+export interface SignInRecord {
+  id?: string | null;
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  mfaRequired?: boolean | null;
+  mfaChallengeToken?: string | null;
 }
 export interface ExtendTokenExpiresRecord {
   id?: string | null;

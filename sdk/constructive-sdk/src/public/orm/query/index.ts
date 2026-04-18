@@ -17,6 +17,9 @@ import type {
   AppLevelRequirementConnection,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface RequireStepUpVariables {
+  stepUpType?: string;
+}
 export interface AppPermissionsGetPaddedMaskVariables {
   mask?: string;
 }
@@ -152,6 +155,25 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
+    currentUserAgent: (options?: { select?: Record<string, unknown> }) =>
+      new QueryBuilder<{
+        currentUserAgent: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'CurrentUserAgent',
+        fieldName: 'currentUserAgent',
+        ...buildCustomDocument(
+          'query',
+          'CurrentUserAgent',
+          'currentUserAgent',
+          options?.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
     currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
       new QueryBuilder<{
         currentIpAddress: string | null;
@@ -171,21 +193,31 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    currentUserAgent: (options?: { select?: Record<string, unknown> }) =>
+    requireStepUp: (
+      args: RequireStepUpVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
       new QueryBuilder<{
-        currentUserAgent: string | null;
+        requireStepUp: boolean | null;
       }>({
         client,
         operation: 'query',
-        operationName: 'CurrentUserAgent',
-        fieldName: 'currentUserAgent',
+        operationName: 'RequireStepUp',
+        fieldName: 'requireStepUp',
         ...buildCustomDocument(
           'query',
-          'CurrentUserAgent',
-          'currentUserAgent',
+          'RequireStepUp',
+          'requireStepUp',
           options?.select,
-          undefined,
-          [],
+          args,
+          [
+            {
+              name: 'stepUpType',
+              type: 'String',
+            },
+          ],
           connectionFieldsMap,
           undefined
         ),

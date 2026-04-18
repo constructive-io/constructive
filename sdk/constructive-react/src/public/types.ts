@@ -146,6 +146,23 @@ export interface Field {
   createdAt: string | null;
   updatedAt: string | null;
 }
+export interface SpatialRelation {
+  id: string | null;
+  databaseId: string | null;
+  tableId: string | null;
+  fieldId: string | null;
+  refTableId: string | null;
+  refFieldId: string | null;
+  name: string | null;
+  operator: string | null;
+  paramName: string | null;
+  category: ObjectCategory | null;
+  module: string | null;
+  scope: number | null;
+  tags: string[] | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
 export interface ForeignKeyConstraint {
   id: string | null;
   databaseId: string | null;
@@ -335,17 +352,6 @@ export interface EmbeddingChunk {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface TableTemplateModule {
-  id: string | null;
-  databaseId: string | null;
-  schemaId: string | null;
-  privateSchemaId: string | null;
-  tableId: string | null;
-  ownerTableId: string | null;
-  tableName: string | null;
-  nodeType: string | null;
-  data: unknown | null;
-}
 export interface SecureTableProvision {
   id: string | null;
   databaseId: string | null;
@@ -396,6 +402,14 @@ export interface RelationProvision {
   outJunctionTableId: string | null;
   outSourceFieldId: string | null;
   outTargetFieldId: string | null;
+}
+export interface SessionSecretsModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  tableId: string | null;
+  tableName: string | null;
+  sessionsTableId: string | null;
 }
 export interface SchemaGrant {
   id: string | null;
@@ -697,6 +711,7 @@ export interface MembershipsModule {
   entityIdsByMask: string | null;
   entityIdsByPerm: string | null;
   entityIdsFunction: string | null;
+  memberProfilesTableId: string | null;
 }
 export interface PermissionsModule {
   id: string | null;
@@ -790,8 +805,8 @@ export interface UserAuthModule {
   checkPasswordFunction: string | null;
   sendAccountDeletionEmailFunction: string | null;
   deleteAccountFunction: string | null;
-  signInOneTimeTokenFunction: string | null;
-  oneTimeTokenFunction: string | null;
+  signInCrossOriginFunction: string | null;
+  requestCrossOriginTokenFunction: string | null;
   extendTokenExpires: string | null;
 }
 export interface UsersModule {
@@ -874,6 +889,25 @@ export interface StorageModule {
   maxFilenameLength: number | null;
   cacheTtlSeconds: number | null;
 }
+export interface EntityTypeProvision {
+  id: string | null;
+  databaseId: string | null;
+  name: string | null;
+  prefix: string | null;
+  description: string | null;
+  parentEntity: string | null;
+  tableName: string | null;
+  isVisible: boolean | null;
+  hasLimits: boolean | null;
+  hasProfiles: boolean | null;
+  hasLevels: boolean | null;
+  skipEntityPolicies: boolean | null;
+  tableProvision: unknown | null;
+  outMembershipType: number | null;
+  outEntityTableId: string | null;
+  outEntityTableName: string | null;
+  outInstalledModules: string[] | null;
+}
 export interface DatabaseProvisionModule {
   id: string | null;
   databaseName: string | null;
@@ -925,12 +959,14 @@ export interface OrgMembership {
   isBanned: boolean | null;
   isDisabled: boolean | null;
   isActive: boolean | null;
+  isExternal: boolean | null;
   isOwner: boolean | null;
   isAdmin: boolean | null;
   permissions: string | null;
   granted: string | null;
   actorId: string | null;
   entityId: string | null;
+  isReadOnly: boolean | null;
   profileId: string | null;
 }
 export interface OrgMember {
@@ -956,6 +992,19 @@ export interface OrgOwnerGrant {
   grantorId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+export interface OrgMemberProfile {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  membershipId: string | null;
+  entityId: string | null;
+  actorId: string | null;
+  displayName: string | null;
+  email: string | null;
+  title: string | null;
+  bio: string | null;
+  profilePicture: ConstructiveInternalTypeImage | null;
 }
 export interface OrgGrant {
   id: string | null;
@@ -1165,11 +1214,14 @@ export interface OrgLimitDefault {
   name: string | null;
   max: number | null;
 }
-export interface MembershipType {
-  id: number | null;
-  name: string | null;
-  description: string | null;
-  prefix: string | null;
+export interface DevicesModule {
+  id: string | null;
+  databaseId: string | null;
+  schemaId: string | null;
+  userDevicesTableId: string | null;
+  deviceSettingsTableId: string | null;
+  userDevicesTable: string | null;
+  deviceSettingsTable: string | null;
 }
 export interface AppMembershipDefault {
   id: string | null;
@@ -1201,6 +1253,14 @@ export interface RateLimitsModule {
   rateLimitSettingsTable: string | null;
   ipRateLimitsTable: string | null;
   rateLimitsTable: string | null;
+}
+export interface MembershipType {
+  id: number | null;
+  name: string | null;
+  description: string | null;
+  prefix: string | null;
+  parentMembershipType: number | null;
+  hasUsersTableEntry: boolean | null;
 }
 export interface OrgMembershipDefault {
   id: string | null;
@@ -1280,6 +1340,7 @@ export interface AppMembership {
   isDisabled: boolean | null;
   isVerified: boolean | null;
   isActive: boolean | null;
+  isExternal: boolean | null;
   isOwner: boolean | null;
   isAdmin: boolean | null;
   permissions: string | null;

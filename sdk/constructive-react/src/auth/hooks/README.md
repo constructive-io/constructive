@@ -67,23 +67,28 @@ function App() {
 | `useCreateUserMutation` | Mutation | Create a user |
 | `useUpdateUserMutation` | Mutation | Update a user |
 | `useDeleteUserMutation` | Mutation | Delete a user |
-| `useCurrentIpAddressQuery` | Query | currentIpAddress |
 | `useCurrentUserAgentQuery` | Query | currentUserAgent |
+| `useCurrentIpAddressQuery` | Query | currentIpAddress |
 | `useCurrentUserIdQuery` | Query | currentUserId |
+| `useRequireStepUpQuery` | Query | requireStepUp |
 | `useCurrentUserQuery` | Query | currentUser |
 | `useSignOutMutation` | Mutation | signOut |
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
+| `useRevokeApiKeyMutation` | Mutation | revokeApiKey |
+| `useRevokeSessionMutation` | Mutation | revokeSession |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
 | `useVerifyTotpMutation` | Mutation | verifyTotp |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
 | `useSetPasswordMutation` | Mutation | setPassword |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
+| `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useResetPasswordMutation` | Mutation | resetPassword |
-| `useSignInOneTimeTokenMutation` | Mutation | signInOneTimeToken |
-| `useSignInMutation` | Mutation | signIn |
+| `useCreateApiKeyMutation` | Mutation | createApiKey |
+| `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useSignUpMutation` | Mutation | signUp |
-| `useOneTimeTokenMutation` | Mutation | oneTimeToken |
+| `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
+| `useSignInMutation` | Mutation | signIn |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
@@ -250,16 +255,16 @@ create({ username: '<String>', displayName: '<String>', profilePicture: '<Image>
 
 ## Custom Operation Hooks
 
-### `useCurrentIpAddressQuery`
+### `useCurrentUserAgentQuery`
 
-currentIpAddress
+currentUserAgent
 
 - **Type:** query
 - **Arguments:** none
 
-### `useCurrentUserAgentQuery`
+### `useCurrentIpAddressQuery`
 
-currentUserAgent
+currentIpAddress
 
 - **Type:** query
 - **Arguments:** none
@@ -270,6 +275,17 @@ currentUserId
 
 - **Type:** query
 - **Arguments:** none
+
+### `useRequireStepUpQuery`
+
+requireStepUp
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `stepUpType` | String |
 
 ### `useCurrentUserQuery`
 
@@ -310,6 +326,28 @@ checkPassword
   | Argument | Type |
   |----------|------|
   | `input` | CheckPasswordInput (required) |
+
+### `useRevokeApiKeyMutation`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeApiKeyInput (required) |
+
+### `useRevokeSessionMutation`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeSessionInput (required) |
 
 ### `useVerifyPasswordMutation`
 
@@ -366,6 +404,17 @@ verifyEmail
   |----------|------|
   | `input` | VerifyEmailInput (required) |
 
+### `useProvisionNewUserMutation`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionNewUserInput (required) |
+
 ### `useResetPasswordMutation`
 
 resetPassword
@@ -377,27 +426,27 @@ resetPassword
   |----------|------|
   | `input` | ResetPasswordInput (required) |
 
-### `useSignInOneTimeTokenMutation`
+### `useCreateApiKeyMutation`
 
-signInOneTimeToken
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
-
-### `useSignInMutation`
-
-signIn
+createApiKey
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `input` | CreateApiKeyInput (required) |
+
+### `useSignInCrossOriginMutation`
+
+signInCrossOrigin
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInCrossOriginInput (required) |
 
 ### `useSignUpMutation`
 
@@ -410,16 +459,27 @@ signUp
   |----------|------|
   | `input` | SignUpInput (required) |
 
-### `useOneTimeTokenMutation`
+### `useRequestCrossOriginTokenMutation`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `input` | RequestCrossOriginTokenInput (required) |
+
+### `useSignInMutation`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInInput (required) |
 
 ### `useExtendTokenExpiresMutation`
 

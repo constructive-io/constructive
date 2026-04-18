@@ -2209,6 +2209,56 @@ input CheckPasswordInput {
   password: String
 }
 
+"""The output of our `revokeApiKey` mutation."""
+type RevokeApiKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `revokeApiKey` mutation."""
+input RevokeApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  keyId: UUID!
+}
+
+"""The output of our `revokeSession` mutation."""
+type RevokeSessionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `revokeSession` mutation."""
+input RevokeSessionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  sessionId: UUID!
+}
+
 """The output of our `verifyPassword` mutation."""
 type VerifyPasswordPayload {
   """
@@ -2337,6 +2387,32 @@ input VerifyEmailInput {
   token: String
 }
 
+"""The output of our `provisionNewUser` mutation."""
+type ProvisionNewUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `provisionNewUser` mutation."""
+input ProvisionNewUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  password: String
+}
+
 """The output of our `resetPassword` mutation."""
 type ResetPasswordPayload {
   """
@@ -2364,14 +2440,14 @@ input ResetPasswordInput {
   newPassword: String
 }
 
-"""The output of our `signInOneTimeToken` mutation."""
-type SignInOneTimeTokenPayload {
+"""The output of our `createApiKey` mutation."""
+type CreateApiKeyPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: SignInOneTimeTokenRecord
+  result: CreateApiKeyRecord
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2379,7 +2455,39 @@ type SignInOneTimeTokenPayload {
   query: Query
 }
 
-type SignInOneTimeTokenRecord {
+type CreateApiKeyRecord {
+  apiKey: String
+  keyId: UUID
+}
+
+"""All input for the `createApiKey` mutation."""
+input CreateApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  keyName: String!
+  accessLevel: String
+  mfaLevel: String
+}
+
+"""The output of our `signInCrossOrigin` mutation."""
+type SignInCrossOriginPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: SignInCrossOriginRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SignInCrossOriginRecord {
   id: UUID
   userId: UUID
   accessToken: String
@@ -2388,8 +2496,8 @@ type SignInOneTimeTokenRecord {
   totpEnabled: Boolean
 }
 
-"""All input for the `signInOneTimeToken` mutation."""
-input SignInOneTimeTokenInput {
+"""All input for the `signInCrossOrigin` mutation."""
+input SignInCrossOriginInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -2397,44 +2505,6 @@ input SignInOneTimeTokenInput {
   clientMutationId: String
   token: String
   credentialKind: String
-}
-
-"""The output of our `signIn` mutation."""
-type SignInPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: SignInRecord
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type SignInRecord {
-  id: UUID
-  userId: UUID
-  accessToken: String
-  accessTokenExpiresAt: Datetime
-  isVerified: Boolean
-  totpEnabled: Boolean
-}
-
-"""All input for the `signIn` mutation."""
-input SignInInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  email: String
-  password: String
-  rememberMe: Boolean
-  credentialKind: String
-  csrfToken: String
 }
 
 """The output of our `signUp` mutation."""
@@ -2475,8 +2545,8 @@ input SignUpInput {
   csrfToken: String
 }
 
-"""The output of our `oneTimeToken` mutation."""
-type OneTimeTokenPayload {
+"""The output of our `requestCrossOriginToken` mutation."""
+type RequestCrossOriginTokenPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -2490,8 +2560,8 @@ type OneTimeTokenPayload {
   query: Query
 }
 
-"""All input for the `oneTimeToken` mutation."""
-input OneTimeTokenInput {
+"""All input for the `requestCrossOriginToken` mutation."""
+input RequestCrossOriginTokenInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -2501,6 +2571,46 @@ input OneTimeTokenInput {
   password: String
   origin: ConstructiveInternalTypeOrigin
   rememberMe: Boolean
+}
+
+"""The output of our `signIn` mutation."""
+type SignInPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: SignInRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SignInRecord {
+  id: UUID
+  userId: UUID
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  isVerified: Boolean
+  totpEnabled: Boolean
+  mfaRequired: Boolean
+  mfaChallengeToken: String
+}
+
+"""All input for the `signIn` mutation."""
+input SignInInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  password: String
+  rememberMe: Boolean
+  credentialKind: String
+  csrfToken: String
 }
 
 """The output of our `extendTokenExpires` mutation."""
@@ -3664,9 +3774,10 @@ type ConfirmUploadPayload {
 
 """The root query type which gives access points into the data universe."""
 type Query {
-  currentIpAddress: InternetAddress
   currentUserAgent: String
+  currentIpAddress: InternetAddress
   currentUserId: UUID
+  requireStepUp(stepUpType: String): Boolean
   currentUser: User
 
   """Reads and enables pagination through a set of `RoleType`."""
@@ -3900,6 +4011,18 @@ type Mutation {
     """
     input: CheckPasswordInput!
   ): CheckPasswordPayload
+  revokeApiKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RevokeApiKeyInput!
+  ): RevokeApiKeyPayload
+  revokeSession(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RevokeSessionInput!
+  ): RevokeSessionPayload
   verifyPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3930,36 +4053,48 @@ type Mutation {
     """
     input: VerifyEmailInput!
   ): VerifyEmailPayload
+  provisionNewUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionNewUserInput!
+  ): ProvisionNewUserPayload
   resetPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ResetPasswordInput!
   ): ResetPasswordPayload
-  signInOneTimeToken(
+  createApiKey(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: SignInOneTimeTokenInput!
-  ): SignInOneTimeTokenPayload
-  signIn(
+    input: CreateApiKeyInput!
+  ): CreateApiKeyPayload
+  signInCrossOrigin(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: SignInInput!
-  ): SignInPayload
+    input: SignInCrossOriginInput!
+  ): SignInCrossOriginPayload
   signUp(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: SignUpInput!
   ): SignUpPayload
-  oneTimeToken(
+  requestCrossOriginToken(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: OneTimeTokenInput!
-  ): OneTimeTokenPayload
+    input: RequestCrossOriginTokenInput!
+  ): RequestCrossOriginTokenPayload
+  signIn(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignInInput!
+  ): SignInPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.

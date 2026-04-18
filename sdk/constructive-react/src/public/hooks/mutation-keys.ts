@@ -124,6 +124,15 @@ export const fieldMutationKeys = {
   /** Delete field mutation key */ delete: (id: string | number) =>
     ['mutation', 'field', 'delete', id] as const,
 } as const;
+export const spatialRelationMutationKeys = {
+  /** All spatialRelation mutation keys */ all: ['mutation', 'spatialrelation'] as const,
+  /** Create spatialRelation mutation key */ create: () =>
+    ['mutation', 'spatialrelation', 'create'] as const,
+  /** Update spatialRelation mutation key */ update: (id: string | number) =>
+    ['mutation', 'spatialrelation', 'update', id] as const,
+  /** Delete spatialRelation mutation key */ delete: (id: string | number) =>
+    ['mutation', 'spatialrelation', 'delete', id] as const,
+} as const;
 export const foreignKeyConstraintMutationKeys = {
   /** All foreignKeyConstraint mutation keys */ all: ['mutation', 'foreignkeyconstraint'] as const,
   /** Create foreignKeyConstraint mutation key */ create: () =>
@@ -233,15 +242,6 @@ export const embeddingChunkMutationKeys = {
   /** Delete embeddingChunk mutation key */ delete: (id: string | number) =>
     ['mutation', 'embeddingchunk', 'delete', id] as const,
 } as const;
-export const tableTemplateModuleMutationKeys = {
-  /** All tableTemplateModule mutation keys */ all: ['mutation', 'tabletemplatemodule'] as const,
-  /** Create tableTemplateModule mutation key */ create: () =>
-    ['mutation', 'tabletemplatemodule', 'create'] as const,
-  /** Update tableTemplateModule mutation key */ update: (id: string | number) =>
-    ['mutation', 'tabletemplatemodule', 'update', id] as const,
-  /** Delete tableTemplateModule mutation key */ delete: (id: string | number) =>
-    ['mutation', 'tabletemplatemodule', 'delete', id] as const,
-} as const;
 export const secureTableProvisionMutationKeys = {
   /** All secureTableProvision mutation keys */ all: ['mutation', 'securetableprovision'] as const,
   /** Create secureTableProvision mutation key */ create: () =>
@@ -259,6 +259,15 @@ export const relationProvisionMutationKeys = {
     ['mutation', 'relationprovision', 'update', id] as const,
   /** Delete relationProvision mutation key */ delete: (id: string | number) =>
     ['mutation', 'relationprovision', 'delete', id] as const,
+} as const;
+export const sessionSecretsModuleMutationKeys = {
+  /** All sessionSecretsModule mutation keys */ all: ['mutation', 'sessionsecretsmodule'] as const,
+  /** Create sessionSecretsModule mutation key */ create: () =>
+    ['mutation', 'sessionsecretsmodule', 'create'] as const,
+  /** Update sessionSecretsModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'sessionsecretsmodule', 'update', id] as const,
+  /** Delete sessionSecretsModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'sessionsecretsmodule', 'delete', id] as const,
 } as const;
 export const schemaGrantMutationKeys = {
   /** All schemaGrant mutation keys */ all: ['mutation', 'schemagrant'] as const,
@@ -601,6 +610,15 @@ export const storageModuleMutationKeys = {
   /** Delete storageModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'storagemodule', 'delete', id] as const,
 } as const;
+export const entityTypeProvisionMutationKeys = {
+  /** All entityTypeProvision mutation keys */ all: ['mutation', 'entitytypeprovision'] as const,
+  /** Create entityTypeProvision mutation key */ create: () =>
+    ['mutation', 'entitytypeprovision', 'create'] as const,
+  /** Update entityTypeProvision mutation key */ update: (id: string | number) =>
+    ['mutation', 'entitytypeprovision', 'update', id] as const,
+  /** Delete entityTypeProvision mutation key */ delete: (id: string | number) =>
+    ['mutation', 'entitytypeprovision', 'delete', id] as const,
+} as const;
 export const databaseProvisionModuleMutationKeys = {
   /** All databaseProvisionModule mutation keys */ all: [
     'mutation',
@@ -673,6 +691,15 @@ export const orgOwnerGrantMutationKeys = {
     ['mutation', 'orgownergrant', 'update', id] as const,
   /** Delete orgOwnerGrant mutation key */ delete: (id: string | number) =>
     ['mutation', 'orgownergrant', 'delete', id] as const,
+} as const;
+export const orgMemberProfileMutationKeys = {
+  /** All orgMemberProfile mutation keys */ all: ['mutation', 'orgmemberprofile'] as const,
+  /** Create orgMemberProfile mutation key */ create: () =>
+    ['mutation', 'orgmemberprofile', 'create'] as const,
+  /** Update orgMemberProfile mutation key */ update: (id: string | number) =>
+    ['mutation', 'orgmemberprofile', 'update', id] as const,
+  /** Delete orgMemberProfile mutation key */ delete: (id: string | number) =>
+    ['mutation', 'orgmemberprofile', 'delete', id] as const,
 } as const;
 export const orgGrantMutationKeys = {
   /** All orgGrant mutation keys */ all: ['mutation', 'orggrant'] as const,
@@ -887,14 +914,14 @@ export const orgLimitDefaultMutationKeys = {
   /** Delete orgLimitDefault mutation key */ delete: (id: string | number) =>
     ['mutation', 'orglimitdefault', 'delete', id] as const,
 } as const;
-export const membershipTypeMutationKeys = {
-  /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
-  /** Create membershipType mutation key */ create: () =>
-    ['mutation', 'membershiptype', 'create'] as const,
-  /** Update membershipType mutation key */ update: (id: string | number) =>
-    ['mutation', 'membershiptype', 'update', id] as const,
-  /** Delete membershipType mutation key */ delete: (id: string | number) =>
-    ['mutation', 'membershiptype', 'delete', id] as const,
+export const devicesModuleMutationKeys = {
+  /** All devicesModule mutation keys */ all: ['mutation', 'devicesmodule'] as const,
+  /** Create devicesModule mutation key */ create: () =>
+    ['mutation', 'devicesmodule', 'create'] as const,
+  /** Update devicesModule mutation key */ update: (id: string | number) =>
+    ['mutation', 'devicesmodule', 'update', id] as const,
+  /** Delete devicesModule mutation key */ delete: (id: string | number) =>
+    ['mutation', 'devicesmodule', 'delete', id] as const,
 } as const;
 export const appMembershipDefaultMutationKeys = {
   /** All appMembershipDefault mutation keys */ all: ['mutation', 'appmembershipdefault'] as const,
@@ -921,6 +948,15 @@ export const rateLimitsModuleMutationKeys = {
     ['mutation', 'ratelimitsmodule', 'update', id] as const,
   /** Delete rateLimitsModule mutation key */ delete: (id: string | number) =>
     ['mutation', 'ratelimitsmodule', 'delete', id] as const,
+} as const;
+export const membershipTypeMutationKeys = {
+  /** All membershipType mutation keys */ all: ['mutation', 'membershiptype'] as const,
+  /** Create membershipType mutation key */ create: () =>
+    ['mutation', 'membershiptype', 'create'] as const,
+  /** Update membershipType mutation key */ update: (id: string | number) =>
+    ['mutation', 'membershiptype', 'update', id] as const,
+  /** Delete membershipType mutation key */ delete: (id: string | number) =>
+    ['mutation', 'membershiptype', 'delete', id] as const,
 } as const;
 export const orgMembershipDefaultMutationKeys = {
   /** All orgMembershipDefault mutation keys */ all: ['mutation', 'orgmembershipdefault'] as const,
@@ -1010,6 +1046,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'rejectDatabaseTransfer', identifier] as const)
       : (['mutation', 'rejectDatabaseTransfer'] as const),
+  /** Mutation key for revokeApiKey */ revokeApiKey: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'revokeApiKey', identifier] as const)
+      : (['mutation', 'revokeApiKey'] as const),
+  /** Mutation key for revokeSession */ revokeSession: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'revokeSession', identifier] as const)
+      : (['mutation', 'revokeSession'] as const),
   /** Mutation key for verifyPassword */ verifyPassword: (identifier?: string) =>
     identifier
       ? (['mutation', 'verifyPassword', identifier] as const)
@@ -1054,6 +1098,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'constructBlueprint', identifier] as const)
       : (['mutation', 'constructBlueprint'] as const),
+  /** Mutation key for provisionNewUser */ provisionNewUser: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'provisionNewUser', identifier] as const)
+      : (['mutation', 'provisionNewUser'] as const),
   /** Mutation key for resetPassword */ resetPassword: (identifier?: string) =>
     identifier
       ? (['mutation', 'resetPassword', identifier] as const)
@@ -1066,6 +1114,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'copyTemplateToBlueprint', identifier] as const)
       : (['mutation', 'copyTemplateToBlueprint'] as const),
+  /** Mutation key for createApiKey */ createApiKey: (identifier?: string) =>
+    identifier
+      ? (['mutation', 'createApiKey', identifier] as const)
+      : (['mutation', 'createApiKey'] as const),
   /** Mutation key for bootstrapUser */ bootstrapUser: (identifier?: string) =>
     identifier
       ? (['mutation', 'bootstrapUser', identifier] as const)
@@ -1122,10 +1174,10 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'applyRls', identifier] as const)
       : (['mutation', 'applyRls'] as const),
-  /** Mutation key for signInOneTimeToken */ signInOneTimeToken: (identifier?: string) =>
+  /** Mutation key for signInCrossOrigin */ signInCrossOrigin: (identifier?: string) =>
     identifier
-      ? (['mutation', 'signInOneTimeToken', identifier] as const)
-      : (['mutation', 'signInOneTimeToken'] as const),
+      ? (['mutation', 'signInCrossOrigin', identifier] as const)
+      : (['mutation', 'signInCrossOrigin'] as const),
   /** Mutation key for createUserDatabase */ createUserDatabase: (identifier?: string) =>
     identifier
       ? (['mutation', 'createUserDatabase', identifier] as const)
@@ -1134,14 +1186,14 @@ export const customMutationKeys = {
     identifier
       ? (['mutation', 'extendTokenExpires', identifier] as const)
       : (['mutation', 'extendTokenExpires'] as const),
-  /** Mutation key for signIn */ signIn: (identifier?: string) =>
-    identifier ? (['mutation', 'signIn', identifier] as const) : (['mutation', 'signIn'] as const),
   /** Mutation key for signUp */ signUp: (identifier?: string) =>
     identifier ? (['mutation', 'signUp', identifier] as const) : (['mutation', 'signUp'] as const),
-  /** Mutation key for oneTimeToken */ oneTimeToken: (identifier?: string) =>
+  /** Mutation key for signIn */ signIn: (identifier?: string) =>
+    identifier ? (['mutation', 'signIn', identifier] as const) : (['mutation', 'signIn'] as const),
+  /** Mutation key for requestCrossOriginToken */ requestCrossOriginToken: (identifier?: string) =>
     identifier
-      ? (['mutation', 'oneTimeToken', identifier] as const)
-      : (['mutation', 'oneTimeToken'] as const),
+      ? (['mutation', 'requestCrossOriginToken', identifier] as const)
+      : (['mutation', 'requestCrossOriginToken'] as const),
   /** Mutation key for provisionTable */ provisionTable: (identifier?: string) =>
     identifier
       ? (['mutation', 'provisionTable', identifier] as const)
@@ -1202,6 +1254,7 @@ export const mutationKeys = {
   table: tableMutationKeys,
   checkConstraint: checkConstraintMutationKeys,
   field: fieldMutationKeys,
+  spatialRelation: spatialRelationMutationKeys,
   foreignKeyConstraint: foreignKeyConstraintMutationKeys,
   fullTextSearch: fullTextSearchMutationKeys,
   index: indexMutationKeys,
@@ -1215,9 +1268,9 @@ export const mutationKeys = {
   viewGrant: viewGrantMutationKeys,
   viewRule: viewRuleMutationKeys,
   embeddingChunk: embeddingChunkMutationKeys,
-  tableTemplateModule: tableTemplateModuleMutationKeys,
   secureTableProvision: secureTableProvisionMutationKeys,
   relationProvision: relationProvisionMutationKeys,
+  sessionSecretsModule: sessionSecretsModuleMutationKeys,
   schemaGrant: schemaGrantMutationKeys,
   defaultPrivilege: defaultPrivilegeMutationKeys,
   enum: enumMutationKeys,
@@ -1255,6 +1308,7 @@ export const mutationKeys = {
   blueprintTemplate: blueprintTemplateMutationKeys,
   blueprintConstruction: blueprintConstructionMutationKeys,
   storageModule: storageModuleMutationKeys,
+  entityTypeProvision: entityTypeProvisionMutationKeys,
   databaseProvisionModule: databaseProvisionModuleMutationKeys,
   appAdminGrant: appAdminGrantMutationKeys,
   appOwnerGrant: appOwnerGrantMutationKeys,
@@ -1263,6 +1317,7 @@ export const mutationKeys = {
   orgMember: orgMemberMutationKeys,
   orgAdminGrant: orgAdminGrantMutationKeys,
   orgOwnerGrant: orgOwnerGrantMutationKeys,
+  orgMemberProfile: orgMemberProfileMutationKeys,
   orgGrant: orgGrantMutationKeys,
   orgChartEdge: orgChartEdgeMutationKeys,
   orgChartEdgeGrant: orgChartEdgeGrantMutationKeys,
@@ -1288,10 +1343,11 @@ export const mutationKeys = {
   migrateFile: migrateFileMutationKeys,
   appLimitDefault: appLimitDefaultMutationKeys,
   orgLimitDefault: orgLimitDefaultMutationKeys,
-  membershipType: membershipTypeMutationKeys,
+  devicesModule: devicesModuleMutationKeys,
   appMembershipDefault: appMembershipDefaultMutationKeys,
   commit: commitMutationKeys,
   rateLimitsModule: rateLimitsModuleMutationKeys,
+  membershipType: membershipTypeMutationKeys,
   orgMembershipDefault: orgMembershipDefaultMutationKeys,
   rlsModule: rlsModuleMutationKeys,
   sqlAction: sqlActionMutationKeys,

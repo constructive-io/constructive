@@ -283,17 +283,6 @@ const deleted = await db.user.delete({ where: { id: '<UUID>' } }).execute();
 
 ## Custom Operations
 
-### `db.query.currentIpAddress`
-
-currentIpAddress
-
-- **Type:** query
-- **Arguments:** none
-
-```typescript
-const result = await db.query.currentIpAddress().execute();
-```
-
 ### `db.query.currentUserAgent`
 
 currentUserAgent
@@ -305,6 +294,17 @@ currentUserAgent
 const result = await db.query.currentUserAgent().execute();
 ```
 
+### `db.query.currentIpAddress`
+
+currentIpAddress
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.currentIpAddress().execute();
+```
+
 ### `db.query.currentUserId`
 
 currentUserId
@@ -314,6 +314,21 @@ currentUserId
 
 ```typescript
 const result = await db.query.currentUserId().execute();
+```
+
+### `db.query.requireStepUp`
+
+requireStepUp
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `stepUpType` | String |
+
+```typescript
+const result = await db.query.requireStepUp({ stepUpType: '<String>' }).execute();
 ```
 
 ### `db.query.currentUser`
@@ -370,6 +385,36 @@ checkPassword
 
 ```typescript
 const result = await db.mutation.checkPassword({ input: { password: '<String>' } }).execute();
+```
+
+### `db.mutation.revokeApiKey`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeApiKeyInput (required) |
+
+```typescript
+const result = await db.mutation.revokeApiKey({ input: { keyId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.revokeSession`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeSessionInput (required) |
+
+```typescript
+const result = await db.mutation.revokeSession({ input: { sessionId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.verifyPassword`
@@ -447,6 +492,21 @@ verifyEmail
 const result = await db.mutation.verifyEmail({ input: { emailId: '<UUID>', token: '<String>' } }).execute();
 ```
 
+### `db.mutation.provisionNewUser`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionNewUserInput (required) |
+
+```typescript
+const result = await db.mutation.provisionNewUser({ input: { email: '<String>', password: '<String>' } }).execute();
+```
+
 ### `db.mutation.resetPassword`
 
 resetPassword
@@ -462,34 +522,34 @@ resetPassword
 const result = await db.mutation.resetPassword({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } }).execute();
 ```
 
-### `db.mutation.signInOneTimeToken`
+### `db.mutation.createApiKey`
 
-signInOneTimeToken
+createApiKey
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
+  | `input` | CreateApiKeyInput (required) |
 
 ```typescript
-const result = await db.mutation.signInOneTimeToken({ input: { token: '<String>', credentialKind: '<String>' } }).execute();
+const result = await db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>' } }).execute();
 ```
 
-### `db.mutation.signIn`
+### `db.mutation.signInCrossOrigin`
 
-signIn
+signInCrossOrigin
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `input` | SignInCrossOriginInput (required) |
 
 ```typescript
-const result = await db.mutation.signIn({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } }).execute();
+const result = await db.mutation.signInCrossOrigin({ input: { token: '<String>', credentialKind: '<String>' } }).execute();
 ```
 
 ### `db.mutation.signUp`
@@ -507,19 +567,34 @@ signUp
 const result = await db.mutation.signUp({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } }).execute();
 ```
 
-### `db.mutation.oneTimeToken`
+### `db.mutation.requestCrossOriginToken`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `input` | RequestCrossOriginTokenInput (required) |
 
 ```typescript
-const result = await db.mutation.oneTimeToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
+const result = await db.mutation.requestCrossOriginToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
+```
+
+### `db.mutation.signIn`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInInput (required) |
+
+```typescript
+const result = await db.mutation.signIn({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } }).execute();
 ```
 
 ### `db.mutation.extendTokenExpires`
