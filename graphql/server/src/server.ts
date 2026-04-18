@@ -33,8 +33,12 @@ import { debugMemory } from './middleware/observability/debug-memory';
 import { localObservabilityOnly } from './middleware/observability/guard';
 import { createRequestLogger } from './middleware/observability/request-logger';
 import { createCaptchaMiddleware } from './middleware/captcha';
+import { createCookieMiddleware } from './middleware/cookie';
+import { createCsrfProtectionMiddleware } from './middleware/csrf';
+import { mountOAuthRoutes } from './middleware/oauth';
 import { createUploadAuthenticateMiddleware, uploadRoute } from './middleware/upload';
 import { startDebugSampler } from './diagnostics/debug-sampler';
+import cookieParser from 'cookie-parser';
 
 const log = new Logger('server');
 
@@ -156,14 +160,32 @@ class Server {
     app.use(parseDomains() as RequestHandler);
     app.use(requestIp.mw());
     app.use(requestLogger);
+    app.use(cookieParser());
     app.use(api);
+
+    // SSO / OAuth routes (must be before authenticate so unauthenticated
+    // users can initiate the OAuth flow; the callback sets the session)
+    mountOAuthRoutes(app, effectiveOpts);
+
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
+
+    // CSRF: set token cookie on every request (when enabled)
+    const csrfMiddleware = createCsrfProtectionMiddleware();
+    app.use(csrfMiddleware.setToken);
+    // CSRF: validate token on mutations for cookie-authenticated requests
+    app.use(csrfMiddleware.protect);
+
     app.use(createCaptchaMiddleware());
+
+    // Cookie lifecycle: set/clear session cookies on auth mutations (when enabled)
+    app.use(createCookieMiddleware());
+
     app.use(graphile(effectiveOpts));
     app.use(flush);
 
     // Error handling - MUST be LAST
+    app.use(csrfMiddleware.errorHandler as any); // CSRF validation errors → 403
     app.use(notFoundHandler); // Catches unmatched routes (404)
     app.use(errorHandler); // Catches all thrown errors
 

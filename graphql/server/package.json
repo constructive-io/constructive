@@ -41,8 +41,10 @@
     "backend"
   ],
   "dependencies": {
+    "@constructive-io/csrf": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
+    "@constructive-io/oauth": "workspace:^",
     "@constructive-io/s3-utils": "workspace:^",
     "@constructive-io/upload-names": "workspace:^",
     "@constructive-io/url-domains": "workspace:^",
@@ -53,6 +55,7 @@
     "@pgpmjs/server-utils": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "@pgsql/quotes": "^17.1.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "deepmerge": "^4.3.1",
     "express": "^5.2.1",
@@ -79,6 +82,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.1009.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
     "@types/graphql-upload": "^8.0.12",
