@@ -67,8 +67,16 @@ function buildMockRegistry(
 }
 
 function makeBuild(registry: any): any {
+  // Minimal inflection double — only `camelCase` is consulted by
+  // `collectSpatialRelations` (to normalize the parametric arg name).
+  const inflection = {
+    camelCase(str: string): string {
+      return str.replace(/[-_](.)/g, (_, c: string) => c.toUpperCase());
+    },
+  };
   return {
     input: { pgRegistry: registry },
+    inflection,
   };
 }
 
@@ -287,6 +295,27 @@ describe('collectSpatialRelations', () => {
     expect(rel.operator.name).toBe('st_dwithin');
     expect(rel.operator.parametric).toBe(true);
     expect(rel.paramFieldName).toBe('distance');
+  });
+
+  it('camelCases snake_case parametric arg names', () => {
+    // The @spatialRelation tag grammar accepts any [A-Za-z_][A-Za-z0-9_]*
+    // identifier for the parametric arg; the GraphQL field we expose for
+    // it must follow the same camelCase convention as every other field.
+    const registry = buildMockRegistry({
+      clinics: {
+        pk: ['id'],
+        attributes: {
+          id: { base: 'int4' },
+          location: {
+            base: 'geometry',
+            spatialRelation:
+              'nearbyClinic clinics.location st_dwithin travel_distance',
+          },
+        },
+      },
+    });
+    const [rel] = collectSpatialRelations(makeBuild(registry));
+    expect(rel.paramFieldName).toBe('travelDistance');
   });
 
   it('supports multiple tags on the same column (string[] form)', () => {

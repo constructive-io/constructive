@@ -322,6 +322,13 @@ export function collectSpatialRelations(build: any): SpatialRelationInfo[] {
   const pgRegistry = build.input?.pgRegistry;
   if (!pgRegistry) return [];
 
+  // Inflection is used to normalize user-supplied identifiers (the
+  // parametric arg name, e.g. `travel_distance` → `travelDistance`) into the
+  // GraphQL casing conventions. Fall back to identity if not available
+  // (e.g. when invoked from unit tests with a stub build).
+  const camelCase: (s: string) => string =
+    build.inflection?.camelCase?.bind(build.inflection) ?? ((s: string) => s);
+
   const relations: SpatialRelationInfo[] = [];
 
   for (const resource of Object.values(pgRegistry.pgResources) as any[]) {
@@ -400,7 +407,7 @@ export function collectSpatialRelations(build: any): SpatialRelationInfo[] {
           targetResource: target.resource,
           targetAttributeName: target.attributeName,
           operator: OPERATOR_REGISTRY[parsed.operator],
-          paramFieldName: parsed.paramName,
+          paramFieldName: parsed.paramName ? camelCase(parsed.paramName) : null,
           isSelfRelation,
           ownerPkAttributes,
           targetPkAttributes,
@@ -431,7 +438,10 @@ export function collectSpatialRelations(build: any): SpatialRelationInfo[] {
 function spatialFilterTypeName(build: any, rel: SpatialRelationInfo): string {
   const { inflection } = build;
   const ownerTypeName = inflection.tableType(rel.ownerCodec);
-  const rel0 = rel.relationName.charAt(0).toUpperCase() + rel.relationName.slice(1);
+  // Normalize the user-supplied relation name (which may be snake_case,
+  // kebab-case, or mixed) into PascalCase so the type name is consistent
+  // with every other generated GraphQL type name.
+  const rel0 = inflection.upperCamelCase(rel.relationName);
   return `${ownerTypeName}Spatial${rel0}Filter`;
 }
 
@@ -638,7 +648,10 @@ export const PostgisSpatialRelationsPlugin: GraphileConfig.Plugin = {
             const FilterType = build.getTypeByName(filterTypeName);
             if (!FilterType) continue;
 
-            const fieldName = rel.relationName;
+            // Normalize the user-supplied relation name (which may be
+            // snake_case, kebab-case, or mixed) into camelCase so the GraphQL
+            // field name matches the casing of every other generated field.
+            const fieldName = inflection.camelCase(rel.relationName);
             // Avoid clobbering fields an upstream plugin may have registered
             // (e.g. an FK-derived relation with the same name).
             if (fields[fieldName]) {
