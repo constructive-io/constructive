@@ -1,13 +1,13 @@
 ---
 name: hooks-admin
-description: React Query hooks for the admin API — provides typed query and mutation hooks for 32 tables and 16 custom operations
+description: React Query hooks for the admin API — provides typed query and mutation hooks for 33 tables and 16 custom operations
 ---
 
 # hooks-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the admin API — provides typed query and mutation hooks for 32 tables and 16 custom operations
+React Query hooks for the admin API — provides typed query and mutation hooks for 33 tables and 16 custom operations
 
 ## Usage
 
@@ -51,24 +51,25 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-default](references/org-limit-default.md)
 - [org-admin-grant](references/org-admin-grant.md)
 - [org-owner-grant](references/org-owner-grant.md)
-- [membership-type](references/membership-type.md)
 - [app-limit](references/app-limit.md)
 - [app-achievement](references/app-achievement.md)
 - [app-step](references/app-step.md)
 - [app-claimed-invite](references/app-claimed-invite.md)
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [org-limit](references/org-limit.md)
+- [membership-type](references/membership-type.md)
 - [app-grant](references/app-grant.md)
 - [app-membership-default](references/app-membership-default.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
 - [org-membership-default](references/org-membership-default.md)
+- [org-member-profile](references/org-member-profile.md)
 - [app-level](references/app-level.md)
 - [app-invite](references/app-invite.md)
+- [org-invite](references/org-invite.md)
 - [app-membership](references/app-membership.md)
 - [org-membership](references/org-membership.md)
-- [org-invite](references/org-invite.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)
 - [org-is-manager-of](references/org-is-manager-of.md)

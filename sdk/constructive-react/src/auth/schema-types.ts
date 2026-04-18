@@ -6,12 +6,12 @@
 
 import type {
   AuditLog,
-  ConnectedAccount,
   CryptoAddress,
   Email,
   PhoneNumber,
   RoleType,
   User,
+  UserConnectedAccount,
   BigFloatFilter,
   BigIntFilter,
   BitStringFilter,
@@ -92,27 +92,6 @@ export type CryptoAddressOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `ConnectedAccount`. */
-export type ConnectedAccountOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'SERVICE_ASC'
-  | 'SERVICE_DESC'
-  | 'IDENTIFIER_ASC'
-  | 'IDENTIFIER_DESC'
-  | 'DETAILS_ASC'
-  | 'DETAILS_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `AuditLog`. */
 export type AuditLogOrderBy =
   | 'NATURAL'
@@ -143,6 +122,25 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
+/** Methods to use when ordering `UserConnectedAccount`. */
+export type UserConnectedAccountOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'SERVICE_ASC'
+  | 'SERVICE_DESC'
+  | 'IDENTIFIER_ASC'
+  | 'IDENTIFIER_DESC'
+  | 'DETAILS_ASC'
+  | 'DETAILS_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 /** Methods to use when ordering `User`. */
 export type UserOrderBy =
   | 'NATURAL'
@@ -310,10 +308,6 @@ export interface UserFilter {
   ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
   /** `ownedCryptoAddresses` exist. */
   ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedConnectedAccounts` relation. */
-  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
-  /** `ownedConnectedAccounts` exist. */
-  ownedConnectedAccountsExist?: boolean;
   /** Filter by the object’s `auditLogsByActorId` relation. */
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
@@ -545,42 +539,6 @@ export interface CryptoAddressFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-/** A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyConnectedAccountFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: ConnectedAccountFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: ConnectedAccountFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ConnectedAccountFilter;
-}
-/** A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
-export interface ConnectedAccountFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `service` field. */
-  service?: StringFilter;
-  /** Filter by the object’s `identifier` field. */
-  identifier?: StringFilter;
-  /** Filter by the object’s `details` field. */
-  details?: JSONFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: ConnectedAccountFilter[];
-  /** Checks for any expressions in this list. */
-  or?: ConnectedAccountFilter[];
-  /** Negates the expression. */
-  not?: ConnectedAccountFilter;
-  /** Filter by the object’s `owner` relation. */
-  owner?: UserFilter;
-}
 /** A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyAuditLogFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -696,6 +654,31 @@ export interface ConstructiveInternalTypeOriginFilter {
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
 }
+/** A filter to be used against `UserConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
+export interface UserConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
+  service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
+  identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
+  details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserConnectedAccountFilter[];
+  /** Negates the expression. */
+  not?: UserConnectedAccountFilter;
+}
 export interface SignOutInput {
   clientMutationId?: string;
 }
@@ -705,6 +688,18 @@ export interface SendAccountDeletionEmailInput {
 export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
+}
+export interface DisconnectAccountInput {
+  clientMutationId?: string;
+  accountId: string;
+}
+export interface RevokeApiKeyInput {
+  clientMutationId?: string;
+  keyId: string;
+}
+export interface RevokeSessionInput {
+  clientMutationId?: string;
+  sessionId: string;
 }
 export interface VerifyPasswordInput {
   clientMutationId?: string;
@@ -729,24 +724,27 @@ export interface VerifyEmailInput {
   emailId?: string;
   token?: string;
 }
+export interface ProvisionNewUserInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+}
 export interface ResetPasswordInput {
   clientMutationId?: string;
   roleId?: string;
   resetToken?: string;
   newPassword?: string;
 }
-export interface SignInOneTimeTokenInput {
+export interface CreateApiKeyInput {
+  clientMutationId?: string;
+  keyName: string;
+  accessLevel?: string;
+  mfaLevel?: string;
+}
+export interface SignInCrossOriginInput {
   clientMutationId?: string;
   token?: string;
   credentialKind?: string;
-}
-export interface SignInInput {
-  clientMutationId?: string;
-  email?: string;
-  password?: string;
-  rememberMe?: boolean;
-  credentialKind?: string;
-  csrfToken?: string;
 }
 export interface SignUpInput {
   clientMutationId?: string;
@@ -756,12 +754,21 @@ export interface SignUpInput {
   credentialKind?: string;
   csrfToken?: string;
 }
-export interface OneTimeTokenInput {
+export interface RequestCrossOriginTokenInput {
   clientMutationId?: string;
   email?: string;
   password?: string;
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
+}
+export interface SignInInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+  rememberMe?: boolean;
+  credentialKind?: string;
+  csrfToken?: string;
+  deviceToken?: string;
 }
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
@@ -842,22 +849,18 @@ export interface PhoneNumberInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateConnectedAccountInput {
+export interface CreateUserConnectedAccountInput {
   clientMutationId?: string;
-  /** The `ConnectedAccount` to be created by this mutation. */
-  connectedAccount: ConnectedAccountInput;
+  /** The `UserConnectedAccount` to be created by this mutation. */
+  userConnectedAccount: UserConnectedAccountInput;
 }
-/** An input for mutations affecting `ConnectedAccount` */
-export interface ConnectedAccountInput {
+/** An input for mutations affecting `UserConnectedAccount` */
+export interface UserConnectedAccountInput {
   id?: string;
   ownerId?: string;
-  /** The service used, e.g. `twitter` or `github`. */
-  service: string;
-  /** A unique identifier for the user within the service */
-  identifier: string;
-  /** Additional profile details extracted from this login method */
-  details: unknown;
-  /** Whether this connected account has been verified */
+  service?: string;
+  identifier?: string;
+  details?: unknown;
   isVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -969,27 +972,6 @@ export interface PhoneNumberPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `ConnectedAccount` being updated. */
-  connectedAccountPatch: ConnectedAccountPatch;
-}
-/** Represents an update to a `ConnectedAccount`. Fields that are set will be updated. */
-export interface ConnectedAccountPatch {
-  id?: string;
-  ownerId?: string;
-  /** The service used, e.g. `twitter` or `github`. */
-  service?: string;
-  /** A unique identifier for the user within the service */
-  identifier?: string;
-  /** Additional profile details extracted from this login method */
-  details?: unknown;
-  /** Whether this connected account has been verified */
-  isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
 export interface UpdateAuditLogInput {
   clientMutationId?: string;
   id: string;
@@ -1063,10 +1045,6 @@ export interface DeletePhoneNumberInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteAuditLogInput {
   clientMutationId?: string;
   id: string;
@@ -1120,10 +1098,10 @@ export interface PhoneNumberConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `ConnectedAccount` values. */
-export interface ConnectedAccountConnection {
-  nodes: ConnectedAccount[];
-  edges: ConnectedAccountEdge[];
+/** A connection to a list of `UserConnectedAccount` values. */
+export interface UserConnectedAccountConnection {
+  nodes: UserConnectedAccount[];
+  edges: UserConnectedAccountEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -1162,6 +1140,18 @@ export interface SendAccountDeletionEmailPayload {
 export interface CheckPasswordPayload {
   clientMutationId?: string | null;
 }
+export interface DisconnectAccountPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface RevokeApiKeyPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export interface RevokeSessionPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
 export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -1182,25 +1172,33 @@ export interface VerifyEmailPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
+export interface ProvisionNewUserPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
 export interface ResetPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
-export interface SignInOneTimeTokenPayload {
+export interface CreateApiKeyPayload {
   clientMutationId?: string | null;
-  result?: SignInOneTimeTokenRecord | null;
+  result?: CreateApiKeyRecord | null;
 }
-export interface SignInPayload {
+export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
-  result?: SignInRecord | null;
+  result?: SignInCrossOriginRecord | null;
 }
 export interface SignUpPayload {
   clientMutationId?: string | null;
   result?: SignUpRecord | null;
 }
-export interface OneTimeTokenPayload {
+export interface RequestCrossOriginTokenPayload {
   clientMutationId?: string | null;
   result?: string | null;
+}
+export interface SignInPayload {
+  clientMutationId?: string | null;
+  result?: SignInRecord | null;
 }
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -1231,11 +1229,10 @@ export interface CreatePhoneNumberPayload {
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
 }
-export interface CreateConnectedAccountPayload {
+export interface CreateUserConnectedAccountPayload {
   clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was created by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
+  /** The `UserConnectedAccount` that was created by this mutation. */
+  userConnectedAccount?: UserConnectedAccount | null;
 }
 export interface CreateAuditLogPayload {
   clientMutationId?: string | null;
@@ -1273,12 +1270,6 @@ export interface UpdatePhoneNumberPayload {
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
 }
-export interface UpdateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was updated by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
 export interface UpdateAuditLogPayload {
   clientMutationId?: string | null;
   /** The `AuditLog` that was updated by this mutation. */
@@ -1314,12 +1305,6 @@ export interface DeletePhoneNumberPayload {
   /** The `PhoneNumber` that was deleted by this mutation. */
   phoneNumber?: PhoneNumber | null;
   phoneNumberEdge?: PhoneNumberEdge | null;
-}
-export interface DeleteConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was deleted by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
 }
 export interface DeleteAuditLogPayload {
   clientMutationId?: string | null;
@@ -1402,11 +1387,11 @@ export interface PhoneNumberEdge {
   /** The `PhoneNumber` at the end of the edge. */
   node?: PhoneNumber | null;
 }
-/** A `ConnectedAccount` edge in the connection. */
-export interface ConnectedAccountEdge {
+/** A `UserConnectedAccount` edge in the connection. */
+export interface UserConnectedAccountEdge {
   cursor?: string | null;
-  /** The `ConnectedAccount` at the end of the edge. */
-  node?: ConnectedAccount | null;
+  /** The `UserConnectedAccount` at the end of the edge. */
+  node?: UserConnectedAccount | null;
 }
 /** A `AuditLog` edge in the connection. */
 export interface AuditLogEdge {
@@ -1440,15 +1425,11 @@ export interface MetaTable {
   inflection: MetaInflection;
   query: MetaQuery;
 }
-export interface SignInOneTimeTokenRecord {
-  id?: string | null;
-  userId?: string | null;
-  accessToken?: string | null;
-  accessTokenExpiresAt?: string | null;
-  isVerified?: boolean | null;
-  totpEnabled?: boolean | null;
+export interface CreateApiKeyRecord {
+  apiKey?: string | null;
+  keyId?: string | null;
 }
-export interface SignInRecord {
+export interface SignInCrossOriginRecord {
   id?: string | null;
   userId?: string | null;
   accessToken?: string | null;
@@ -1463,6 +1444,16 @@ export interface SignUpRecord {
   accessTokenExpiresAt?: string | null;
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
+}
+export interface SignInRecord {
+  id?: string | null;
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  mfaRequired?: boolean | null;
+  mfaChallengeToken?: string | null;
 }
 export interface ExtendTokenExpiresRecord {
   id?: string | null;

@@ -1352,94 +1352,6 @@ enum OrgOwnerGrantOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `MembershipType` values."""
-type MembershipTypeConnection {
-  """A list of `MembershipType` objects."""
-  nodes: [MembershipType]!
-
-  """
-  A list of edges which contains the `MembershipType` and cursor to aid in pagination.
-  """
-  edges: [MembershipTypeEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `MembershipType` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member)
-"""
-type MembershipType {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """Human-readable name of the membership type"""
-  name: String!
-
-  """Description of what this membership type represents"""
-  description: String!
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String!
-}
-
-"""A `MembershipType` edge in the connection."""
-type MembershipTypeEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `MembershipType` at the end of the edge."""
-  node: MembershipType
-}
-
-"""
-A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’
-"""
-input MembershipTypeFilter {
-  """Filter by the object’s `id` field."""
-  id: IntFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `prefix` field."""
-  prefix: StringFilter
-
-  """Checks for all expressions in this list."""
-  and: [MembershipTypeFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [MembershipTypeFilter!]
-
-  """Negates the expression."""
-  not: MembershipTypeFilter
-}
-
-"""Methods to use when ordering `MembershipType`."""
-enum MembershipTypeOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  PREFIX_ASC
-  PREFIX_DESC
-}
-
 """
 A filter to be used against `AppPermission` object types. All fields are combined with a logical ‘and.’
 """
@@ -2126,6 +2038,114 @@ enum OrgLimitOrderBy {
   MAX_DESC
   ENTITY_ID_ASC
   ENTITY_ID_DESC
+}
+
+"""A connection to a list of `MembershipType` values."""
+type MembershipTypeConnection {
+  """A list of `MembershipType` objects."""
+  nodes: [MembershipType]!
+
+  """
+  A list of edges which contains the `MembershipType` and cursor to aid in pagination.
+  """
+  edges: [MembershipTypeEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `MembershipType` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member)
+"""
+type MembershipType {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """Human-readable name of the membership type"""
+  name: String!
+
+  """Description of what this membership type represents"""
+  description: String!
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String!
+
+  """
+  Parent membership type ID for SPRT cascade chain (e.g. type 2 parent=1, type 3 parent=2)
+  """
+  parentMembershipType: Int
+
+  """
+  When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs
+  """
+  hasUsersTableEntry: Boolean!
+}
+
+"""A `MembershipType` edge in the connection."""
+type MembershipTypeEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `MembershipType` at the end of the edge."""
+  node: MembershipType
+}
+
+"""
+A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’
+"""
+input MembershipTypeFilter {
+  """Filter by the object’s `id` field."""
+  id: IntFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `prefix` field."""
+  prefix: StringFilter
+
+  """Filter by the object’s `parentMembershipType` field."""
+  parentMembershipType: IntFilter
+
+  """Filter by the object’s `hasUsersTableEntry` field."""
+  hasUsersTableEntry: BooleanFilter
+
+  """Checks for all expressions in this list."""
+  and: [MembershipTypeFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [MembershipTypeFilter!]
+
+  """Negates the expression."""
+  not: MembershipTypeFilter
+}
+
+"""Methods to use when ordering `MembershipType`."""
+enum MembershipTypeOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  PREFIX_ASC
+  PREFIX_DESC
+  PARENT_MEMBERSHIP_TYPE_ASC
+  PARENT_MEMBERSHIP_TYPE_DESC
+  HAS_USERS_TABLE_ENTRY_ASC
+  HAS_USERS_TABLE_ENTRY_DESC
 }
 
 """A connection to a list of `AppGrant` values."""
@@ -2834,73 +2854,143 @@ enum OrgMembershipDefaultOrderBy {
   CREATE_GROUPS_CASCADE_MEMBERS_DESC
 }
 
-"""A connection to a list of `AppLevel` values."""
-type AppLevelConnection {
-  """A list of `AppLevel` objects."""
-  nodes: [AppLevel]!
+"""A connection to a list of `OrgMemberProfile` values."""
+type OrgMemberProfileConnection {
+  """A list of `OrgMemberProfile` objects."""
+  nodes: [OrgMemberProfile]!
 
   """
-  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
+  A list of edges which contains the `OrgMemberProfile` and cursor to aid in pagination.
   """
-  edges: [AppLevelEdge]!
+  edges: [OrgMemberProfileEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* `AppLevel` you could get from the connection."""
+  """
+  The count of *all* `OrgMemberProfile` you could get from the connection.
+  """
   totalCount: Int!
 }
 
 """
-Defines available levels that users can achieve by completing requirements
+Per-membership profile information visible to other entity members (display name, email, title, bio, avatar)
 """
-type AppLevel {
+type OrgMemberProfile {
   id: UUID!
-
-  """Unique name of the level"""
-  name: String!
-
-  """Human-readable description of what this level represents"""
-  description: String
-
-  """Badge or icon image associated with this level"""
-  image: ConstructiveInternalTypeImage
-
-  """Optional owner (actor) who created or manages this level"""
-  ownerId: UUID
   createdAt: Datetime
   updatedAt: Datetime
+
+  """References the membership this profile belongs to (1:1)"""
+  membershipId: UUID!
+
+  """References the entity this profile belongs to (used for RLS lookups)"""
+  entityId: UUID!
+
+  """References the user who owns this profile (for self-edit RLS)"""
+  actorId: UUID!
+
+  """Display name shown to other entity members"""
+  displayName: String
+
+  """
+  Email address visible to other entity members (auto-populated from verified primary email)
+  """
+  email: String
+
+  """Job title or role description visible to other entity members"""
+  title: String
+
+  """Short biography visible to other entity members"""
+  bio: String
+
+  """Profile picture visible to other entity members"""
+  profilePicture: ConstructiveInternalTypeImage
+
+  """
+  Reads a single `OrgMembership` that is related to this `OrgMemberProfile`.
+  """
+  membership: OrgMembership
 }
 
 scalar ConstructiveInternalTypeImage
 
-"""A `AppLevel` edge in the connection."""
-type AppLevelEdge {
+"""
+Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
+"""
+type OrgMembership {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """Whether this membership has been approved by an admin"""
+  isApproved: Boolean!
+
+  """Whether this member has been banned from the entity"""
+  isBanned: Boolean!
+
+  """Whether this membership is temporarily disabled"""
+  isDisabled: Boolean!
+
+  """
+  Computed field indicating the membership is approved, verified, not banned, and not disabled
+  """
+  isActive: Boolean!
+
+  """
+  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
+  """
+  isExternal: Boolean!
+
+  """Whether the actor is the owner of this entity"""
+  isOwner: Boolean!
+
+  """Whether the actor has admin privileges on this entity"""
+  isAdmin: Boolean!
+
+  """
+  Aggregated permission bitmask combining profile-based and directly granted permissions
+  """
+  permissions: BitString!
+
+  """
+  Bitmask of permissions directly granted to this member (not from profiles)
+  """
+  granted: BitString!
+
+  """References the user who holds this membership"""
+  actorId: UUID!
+
+  """References the entity (org or group) this membership belongs to"""
+  entityId: UUID!
+
+  """Whether this member has read-only access (blocks mutations when true)"""
+  isReadOnly: Boolean!
+  profileId: UUID
+
+  """
+  Reads a single `OrgMemberProfile` that is related to this `OrgMembership`.
+  """
+  orgMemberProfileByMembershipId: OrgMemberProfile
+}
+
+"""A `OrgMemberProfile` edge in the connection."""
+type OrgMemberProfileEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `AppLevel` at the end of the edge."""
-  node: AppLevel
+  """The `OrgMemberProfile` at the end of the edge."""
+  node: OrgMemberProfile
 }
 
 """
-A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `OrgMemberProfile` object types. All fields are combined with a logical ‘and.’
 """
-input AppLevelFilter {
+input OrgMemberProfileFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
-
-  """Filter by the object’s `name` field."""
-  name: StringFilter
-
-  """Filter by the object’s `description` field."""
-  description: StringFilter
-
-  """Filter by the object’s `image` field."""
-  image: ConstructiveInternalTypeImageFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -2908,14 +2998,41 @@ input AppLevelFilter {
   """Filter by the object’s `updatedAt` field."""
   updatedAt: DatetimeFilter
 
+  """Filter by the object’s `membershipId` field."""
+  membershipId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `displayName` field."""
+  displayName: StringFilter
+
+  """Filter by the object’s `email` field."""
+  email: StringFilter
+
+  """Filter by the object’s `title` field."""
+  title: StringFilter
+
+  """Filter by the object’s `bio` field."""
+  bio: StringFilter
+
+  """Filter by the object’s `profilePicture` field."""
+  profilePicture: ConstructiveInternalTypeImageFilter
+
   """Checks for all expressions in this list."""
-  and: [AppLevelFilter!]
+  and: [OrgMemberProfileFilter!]
 
   """Checks for any expressions in this list."""
-  or: [AppLevelFilter!]
+  or: [OrgMemberProfileFilter!]
 
   """Negates the expression."""
-  not: AppLevelFilter
+  not: OrgMemberProfileFilter
+
+  """Filter by the object’s `membership` relation."""
+  membership: OrgMembershipFilter
 }
 
 """
@@ -2973,6 +3090,191 @@ input ConstructiveInternalTypeImageFilter {
 
   """Contained by the specified JSON."""
   containedBy: ConstructiveInternalTypeImage
+}
+
+"""
+A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’
+"""
+input OrgMembershipFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `isApproved` field."""
+  isApproved: BooleanFilter
+
+  """Filter by the object’s `isBanned` field."""
+  isBanned: BooleanFilter
+
+  """Filter by the object’s `isDisabled` field."""
+  isDisabled: BooleanFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isExternal` field."""
+  isExternal: BooleanFilter
+
+  """Filter by the object’s `isOwner` field."""
+  isOwner: BooleanFilter
+
+  """Filter by the object’s `isAdmin` field."""
+  isAdmin: BooleanFilter
+
+  """Filter by the object’s `permissions` field."""
+  permissions: BitStringFilter
+
+  """Filter by the object’s `granted` field."""
+  granted: BitStringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `entityId` field."""
+  entityId: UUIDFilter
+
+  """Filter by the object’s `isReadOnly` field."""
+  isReadOnly: BooleanFilter
+
+  """Filter by the object’s `profileId` field."""
+  profileId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [OrgMembershipFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [OrgMembershipFilter!]
+
+  """Negates the expression."""
+  not: OrgMembershipFilter
+
+  """Filter by the object’s `orgMemberProfileByMembershipId` relation."""
+  orgMemberProfileByMembershipId: OrgMemberProfileFilter
+
+  """A related `orgMemberProfileByMembershipId` exists."""
+  orgMemberProfileByMembershipIdExists: Boolean
+}
+
+"""Methods to use when ordering `OrgMemberProfile`."""
+enum OrgMemberProfileOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  MEMBERSHIP_ID_ASC
+  MEMBERSHIP_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  DISPLAY_NAME_ASC
+  DISPLAY_NAME_DESC
+  EMAIL_ASC
+  EMAIL_DESC
+  TITLE_ASC
+  TITLE_DESC
+  BIO_ASC
+  BIO_DESC
+  PROFILE_PICTURE_ASC
+  PROFILE_PICTURE_DESC
+}
+
+"""A connection to a list of `AppLevel` values."""
+type AppLevelConnection {
+  """A list of `AppLevel` objects."""
+  nodes: [AppLevel]!
+
+  """
+  A list of edges which contains the `AppLevel` and cursor to aid in pagination.
+  """
+  edges: [AppLevelEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppLevel` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Defines available levels that users can achieve by completing requirements
+"""
+type AppLevel {
+  id: UUID!
+
+  """Unique name of the level"""
+  name: String!
+
+  """Human-readable description of what this level represents"""
+  description: String
+
+  """Badge or icon image associated with this level"""
+  image: ConstructiveInternalTypeImage
+
+  """Optional owner (actor) who created or manages this level"""
+  ownerId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""A `AppLevel` edge in the connection."""
+type AppLevelEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppLevel` at the end of the edge."""
+  node: AppLevel
+}
+
+"""
+A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’
+"""
+input AppLevelFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `description` field."""
+  description: StringFilter
+
+  """Filter by the object’s `image` field."""
+  image: ConstructiveInternalTypeImageFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppLevelFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppLevelFilter!]
+
+  """Negates the expression."""
+  not: AppLevelFilter
 }
 
 """Methods to use when ordering `AppLevel`."""
@@ -3270,356 +3572,6 @@ enum AppInviteOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `AppMembership` values."""
-type AppMembershipConnection {
-  """A list of `AppMembership` objects."""
-  nodes: [AppMembership]!
-
-  """
-  A list of edges which contains the `AppMembership` and cursor to aid in pagination.
-  """
-  edges: [AppMembershipEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `AppMembership` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
-"""
-type AppMembership {
-  id: UUID!
-  createdAt: Datetime
-  updatedAt: Datetime
-  createdBy: UUID
-  updatedBy: UUID
-
-  """Whether this membership has been approved by an admin"""
-  isApproved: Boolean!
-
-  """Whether this member has been banned from the entity"""
-  isBanned: Boolean!
-
-  """Whether this membership is temporarily disabled"""
-  isDisabled: Boolean!
-
-  """Whether this member has been verified (e.g. email confirmation)"""
-  isVerified: Boolean!
-
-  """
-  Computed field indicating the membership is approved, verified, not banned, and not disabled
-  """
-  isActive: Boolean!
-
-  """Whether the actor is the owner of this entity"""
-  isOwner: Boolean!
-
-  """Whether the actor has admin privileges on this entity"""
-  isAdmin: Boolean!
-
-  """
-  Aggregated permission bitmask combining profile-based and directly granted permissions
-  """
-  permissions: BitString!
-
-  """
-  Bitmask of permissions directly granted to this member (not from profiles)
-  """
-  granted: BitString!
-
-  """References the user who holds this membership"""
-  actorId: UUID!
-  profileId: UUID
-}
-
-"""A `AppMembership` edge in the connection."""
-type AppMembershipEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `AppMembership` at the end of the edge."""
-  node: AppMembership
-}
-
-"""
-A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’
-"""
-input AppMembershipFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
-
-  """Filter by the object’s `updatedBy` field."""
-  updatedBy: UUIDFilter
-
-  """Filter by the object’s `isApproved` field."""
-  isApproved: BooleanFilter
-
-  """Filter by the object’s `isBanned` field."""
-  isBanned: BooleanFilter
-
-  """Filter by the object’s `isDisabled` field."""
-  isDisabled: BooleanFilter
-
-  """Filter by the object’s `isVerified` field."""
-  isVerified: BooleanFilter
-
-  """Filter by the object’s `isActive` field."""
-  isActive: BooleanFilter
-
-  """Filter by the object’s `isOwner` field."""
-  isOwner: BooleanFilter
-
-  """Filter by the object’s `isAdmin` field."""
-  isAdmin: BooleanFilter
-
-  """Filter by the object’s `permissions` field."""
-  permissions: BitStringFilter
-
-  """Filter by the object’s `granted` field."""
-  granted: BitStringFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `profileId` field."""
-  profileId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [AppMembershipFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [AppMembershipFilter!]
-
-  """Negates the expression."""
-  not: AppMembershipFilter
-}
-
-"""Methods to use when ordering `AppMembership`."""
-enum AppMembershipOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  CREATED_BY_ASC
-  CREATED_BY_DESC
-  UPDATED_BY_ASC
-  UPDATED_BY_DESC
-  IS_APPROVED_ASC
-  IS_APPROVED_DESC
-  IS_BANNED_ASC
-  IS_BANNED_DESC
-  IS_DISABLED_ASC
-  IS_DISABLED_DESC
-  IS_VERIFIED_ASC
-  IS_VERIFIED_DESC
-  IS_ACTIVE_ASC
-  IS_ACTIVE_DESC
-  IS_OWNER_ASC
-  IS_OWNER_DESC
-  IS_ADMIN_ASC
-  IS_ADMIN_DESC
-  PERMISSIONS_ASC
-  PERMISSIONS_DESC
-  GRANTED_ASC
-  GRANTED_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  PROFILE_ID_ASC
-  PROFILE_ID_DESC
-}
-
-"""A connection to a list of `OrgMembership` values."""
-type OrgMembershipConnection {
-  """A list of `OrgMembership` objects."""
-  nodes: [OrgMembership]!
-
-  """
-  A list of edges which contains the `OrgMembership` and cursor to aid in pagination.
-  """
-  edges: [OrgMembershipEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `OrgMembership` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""
-Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
-"""
-type OrgMembership {
-  id: UUID!
-  createdAt: Datetime
-  updatedAt: Datetime
-  createdBy: UUID
-  updatedBy: UUID
-
-  """Whether this membership has been approved by an admin"""
-  isApproved: Boolean!
-
-  """Whether this member has been banned from the entity"""
-  isBanned: Boolean!
-
-  """Whether this membership is temporarily disabled"""
-  isDisabled: Boolean!
-
-  """
-  Computed field indicating the membership is approved, verified, not banned, and not disabled
-  """
-  isActive: Boolean!
-
-  """Whether the actor is the owner of this entity"""
-  isOwner: Boolean!
-
-  """Whether the actor has admin privileges on this entity"""
-  isAdmin: Boolean!
-
-  """
-  Aggregated permission bitmask combining profile-based and directly granted permissions
-  """
-  permissions: BitString!
-
-  """
-  Bitmask of permissions directly granted to this member (not from profiles)
-  """
-  granted: BitString!
-
-  """References the user who holds this membership"""
-  actorId: UUID!
-
-  """References the entity (org or group) this membership belongs to"""
-  entityId: UUID!
-  profileId: UUID
-}
-
-"""A `OrgMembership` edge in the connection."""
-type OrgMembershipEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `OrgMembership` at the end of the edge."""
-  node: OrgMembership
-}
-
-"""
-A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’
-"""
-input OrgMembershipFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Filter by the object’s `createdBy` field."""
-  createdBy: UUIDFilter
-
-  """Filter by the object’s `updatedBy` field."""
-  updatedBy: UUIDFilter
-
-  """Filter by the object’s `isApproved` field."""
-  isApproved: BooleanFilter
-
-  """Filter by the object’s `isBanned` field."""
-  isBanned: BooleanFilter
-
-  """Filter by the object’s `isDisabled` field."""
-  isDisabled: BooleanFilter
-
-  """Filter by the object’s `isActive` field."""
-  isActive: BooleanFilter
-
-  """Filter by the object’s `isOwner` field."""
-  isOwner: BooleanFilter
-
-  """Filter by the object’s `isAdmin` field."""
-  isAdmin: BooleanFilter
-
-  """Filter by the object’s `permissions` field."""
-  permissions: BitStringFilter
-
-  """Filter by the object’s `granted` field."""
-  granted: BitStringFilter
-
-  """Filter by the object’s `actorId` field."""
-  actorId: UUIDFilter
-
-  """Filter by the object’s `entityId` field."""
-  entityId: UUIDFilter
-
-  """Filter by the object’s `profileId` field."""
-  profileId: UUIDFilter
-
-  """Checks for all expressions in this list."""
-  and: [OrgMembershipFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [OrgMembershipFilter!]
-
-  """Negates the expression."""
-  not: OrgMembershipFilter
-}
-
-"""Methods to use when ordering `OrgMembership`."""
-enum OrgMembershipOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  CREATED_BY_ASC
-  CREATED_BY_DESC
-  UPDATED_BY_ASC
-  UPDATED_BY_DESC
-  IS_APPROVED_ASC
-  IS_APPROVED_DESC
-  IS_BANNED_ASC
-  IS_BANNED_DESC
-  IS_DISABLED_ASC
-  IS_DISABLED_DESC
-  IS_ACTIVE_ASC
-  IS_ACTIVE_DESC
-  IS_OWNER_ASC
-  IS_OWNER_DESC
-  IS_ADMIN_ASC
-  IS_ADMIN_DESC
-  PERMISSIONS_ASC
-  PERMISSIONS_DESC
-  GRANTED_ASC
-  GRANTED_DESC
-  ACTOR_ID_ASC
-  ACTOR_ID_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  PROFILE_ID_ASC
-  PROFILE_ID_DESC
-}
-
 """A connection to a list of `OrgInvite` values."""
 type OrgInviteConnection {
   """A list of `OrgInvite` objects."""
@@ -3772,6 +3724,260 @@ enum OrgInviteOrderBy {
   UPDATED_AT_DESC
   ENTITY_ID_ASC
   ENTITY_ID_DESC
+}
+
+"""A connection to a list of `AppMembership` values."""
+type AppMembershipConnection {
+  """A list of `AppMembership` objects."""
+  nodes: [AppMembership]!
+
+  """
+  A list of edges which contains the `AppMembership` and cursor to aid in pagination.
+  """
+  edges: [AppMembershipEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `AppMembership` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""
+Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status
+"""
+type AppMembership {
+  id: UUID!
+  createdAt: Datetime
+  updatedAt: Datetime
+  createdBy: UUID
+  updatedBy: UUID
+
+  """Whether this membership has been approved by an admin"""
+  isApproved: Boolean!
+
+  """Whether this member has been banned from the entity"""
+  isBanned: Boolean!
+
+  """Whether this membership is temporarily disabled"""
+  isDisabled: Boolean!
+
+  """Whether this member has been verified (e.g. email confirmation)"""
+  isVerified: Boolean!
+
+  """
+  Computed field indicating the membership is approved, verified, not banned, and not disabled
+  """
+  isActive: Boolean!
+
+  """
+  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
+  """
+  isExternal: Boolean!
+
+  """Whether the actor is the owner of this entity"""
+  isOwner: Boolean!
+
+  """Whether the actor has admin privileges on this entity"""
+  isAdmin: Boolean!
+
+  """
+  Aggregated permission bitmask combining profile-based and directly granted permissions
+  """
+  permissions: BitString!
+
+  """
+  Bitmask of permissions directly granted to this member (not from profiles)
+  """
+  granted: BitString!
+
+  """References the user who holds this membership"""
+  actorId: UUID!
+  profileId: UUID
+}
+
+"""A `AppMembership` edge in the connection."""
+type AppMembershipEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `AppMembership` at the end of the edge."""
+  node: AppMembership
+}
+
+"""
+A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’
+"""
+input AppMembershipFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Filter by the object’s `createdBy` field."""
+  createdBy: UUIDFilter
+
+  """Filter by the object’s `updatedBy` field."""
+  updatedBy: UUIDFilter
+
+  """Filter by the object’s `isApproved` field."""
+  isApproved: BooleanFilter
+
+  """Filter by the object’s `isBanned` field."""
+  isBanned: BooleanFilter
+
+  """Filter by the object’s `isDisabled` field."""
+  isDisabled: BooleanFilter
+
+  """Filter by the object’s `isVerified` field."""
+  isVerified: BooleanFilter
+
+  """Filter by the object’s `isActive` field."""
+  isActive: BooleanFilter
+
+  """Filter by the object’s `isExternal` field."""
+  isExternal: BooleanFilter
+
+  """Filter by the object’s `isOwner` field."""
+  isOwner: BooleanFilter
+
+  """Filter by the object’s `isAdmin` field."""
+  isAdmin: BooleanFilter
+
+  """Filter by the object’s `permissions` field."""
+  permissions: BitStringFilter
+
+  """Filter by the object’s `granted` field."""
+  granted: BitStringFilter
+
+  """Filter by the object’s `actorId` field."""
+  actorId: UUIDFilter
+
+  """Filter by the object’s `profileId` field."""
+  profileId: UUIDFilter
+
+  """Checks for all expressions in this list."""
+  and: [AppMembershipFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [AppMembershipFilter!]
+
+  """Negates the expression."""
+  not: AppMembershipFilter
+}
+
+"""Methods to use when ordering `AppMembership`."""
+enum AppMembershipOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  IS_APPROVED_ASC
+  IS_APPROVED_DESC
+  IS_BANNED_ASC
+  IS_BANNED_DESC
+  IS_DISABLED_ASC
+  IS_DISABLED_DESC
+  IS_VERIFIED_ASC
+  IS_VERIFIED_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  IS_EXTERNAL_ASC
+  IS_EXTERNAL_DESC
+  IS_OWNER_ASC
+  IS_OWNER_DESC
+  IS_ADMIN_ASC
+  IS_ADMIN_DESC
+  PERMISSIONS_ASC
+  PERMISSIONS_DESC
+  GRANTED_ASC
+  GRANTED_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  PROFILE_ID_ASC
+  PROFILE_ID_DESC
+}
+
+"""A connection to a list of `OrgMembership` values."""
+type OrgMembershipConnection {
+  """A list of `OrgMembership` objects."""
+  nodes: [OrgMembership]!
+
+  """
+  A list of edges which contains the `OrgMembership` and cursor to aid in pagination.
+  """
+  edges: [OrgMembershipEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `OrgMembership` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `OrgMembership` edge in the connection."""
+type OrgMembershipEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `OrgMembership` at the end of the edge."""
+  node: OrgMembership
+}
+
+"""Methods to use when ordering `OrgMembership`."""
+enum OrgMembershipOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  CREATED_BY_ASC
+  CREATED_BY_DESC
+  UPDATED_BY_ASC
+  UPDATED_BY_DESC
+  IS_APPROVED_ASC
+  IS_APPROVED_DESC
+  IS_BANNED_ASC
+  IS_BANNED_DESC
+  IS_DISABLED_ASC
+  IS_DISABLED_DESC
+  IS_ACTIVE_ASC
+  IS_ACTIVE_DESC
+  IS_EXTERNAL_ASC
+  IS_EXTERNAL_DESC
+  IS_OWNER_ASC
+  IS_OWNER_DESC
+  IS_ADMIN_ASC
+  IS_ADMIN_DESC
+  PERMISSIONS_ASC
+  PERMISSIONS_DESC
+  GRANTED_ASC
+  GRANTED_DESC
+  ACTOR_ID_ASC
+  ACTOR_ID_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  IS_READ_ONLY_ASC
+  IS_READ_ONLY_DESC
+  PROFILE_ID_ASC
+  PROFILE_ID_DESC
 }
 
 """Root meta schema type"""
@@ -4406,60 +4612,6 @@ input OrgOwnerGrantInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `MembershipType` mutation."""
-type CreateMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was created by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the create `MembershipType` mutation."""
-input CreateMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` to be created by this mutation."""
-  membershipType: MembershipTypeInput!
-}
-
-"""An input for mutations affecting `MembershipType`"""
-input MembershipTypeInput {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """Human-readable name of the membership type"""
-  name: String!
-
-  """Description of what this membership type represents"""
-  description: String!
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String!
-}
-
 """The output of our create `AppPermission` mutation."""
 type CreateAppPermissionPayload {
   """
@@ -4892,6 +5044,70 @@ input OrgLimitInput {
   entityId: UUID!
 }
 
+"""The output of our create `MembershipType` mutation."""
+type CreateMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was created by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the create `MembershipType` mutation."""
+input CreateMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` to be created by this mutation."""
+  membershipType: MembershipTypeInput!
+}
+
+"""An input for mutations affecting `MembershipType`"""
+input MembershipTypeInput {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """Human-readable name of the membership type"""
+  name: String!
+
+  """Description of what this membership type represents"""
+  description: String!
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String!
+
+  """
+  Parent membership type ID for SPRT cascade chain (e.g. type 2 parent=1, type 3 parent=2)
+  """
+  parentMembershipType: Int
+
+  """
+  When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs
+  """
+  hasUsersTableEntry: Boolean
+}
+
 """The output of our create `AppGrant` mutation."""
 type CreateAppGrantPayload {
   """
@@ -5277,6 +5493,74 @@ input OrgMembershipDefaultInput {
   createGroupsCascadeMembers: Boolean
 }
 
+"""The output of our create `OrgMemberProfile` mutation."""
+type CreateOrgMemberProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` that was created by this mutation."""
+  orgMemberProfile: OrgMemberProfile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
+  orgMemberProfileEdge(
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileEdge
+}
+
+"""All input for the create `OrgMemberProfile` mutation."""
+input CreateOrgMemberProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` to be created by this mutation."""
+  orgMemberProfile: OrgMemberProfileInput!
+}
+
+"""An input for mutations affecting `OrgMemberProfile`"""
+input OrgMemberProfileInput {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """References the membership this profile belongs to (1:1)"""
+  membershipId: UUID!
+
+  """References the entity this profile belongs to (used for RLS lookups)"""
+  entityId: UUID!
+
+  """References the user who owns this profile (for self-edit RLS)"""
+  actorId: UUID!
+
+  """Display name shown to other entity members"""
+  displayName: String
+
+  """
+  Email address visible to other entity members (auto-populated from verified primary email)
+  """
+  email: String
+
+  """Job title or role description visible to other entity members"""
+  title: String
+
+  """Short biography visible to other entity members"""
+  bio: String
+
+  """Profile picture visible to other entity members"""
+  profilePicture: ConstructiveInternalTypeImage
+}
+
 """The output of our create `AppLevel` mutation."""
 type CreateAppLevelPayload {
   """
@@ -5400,6 +5684,79 @@ input AppInviteInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `OrgInvite` mutation."""
+type CreateOrgInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgInvite` that was created by this mutation."""
+  orgInvite: OrgInvite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgInvite`. May be used by Relay 1."""
+  orgInviteEdge(
+    """The method to use when ordering `OrgInvite`."""
+    orderBy: [OrgInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgInviteEdge
+}
+
+"""All input for the create `OrgInvite` mutation."""
+input CreateOrgInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `OrgInvite` to be created by this mutation."""
+  orgInvite: OrgInviteInput!
+}
+
+"""An input for mutations affecting `OrgInvite`"""
+input OrgInviteInput {
+  id: UUID
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID
+
+  """User ID of the intended recipient, if targeting a specific user"""
+  receiverId: UUID
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime
+  createdAt: Datetime
+  updatedAt: Datetime
+  entityId: UUID!
+}
+
 """The output of our create `AppMembership` mutation."""
 type CreateAppMembershipPayload {
   """
@@ -5459,6 +5816,11 @@ input AppMembershipInput {
   Computed field indicating the membership is approved, verified, not banned, and not disabled
   """
   isActive: Boolean
+
+  """
+  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
+  """
+  isExternal: Boolean
 
   """Whether the actor is the owner of this entity"""
   isOwner: Boolean
@@ -5538,6 +5900,11 @@ input OrgMembershipInput {
   """
   isActive: Boolean
 
+  """
+  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
+  """
+  isExternal: Boolean
+
   """Whether the actor is the owner of this entity"""
   isOwner: Boolean
 
@@ -5559,80 +5926,10 @@ input OrgMembershipInput {
 
   """References the entity (org or group) this membership belongs to"""
   entityId: UUID!
+
+  """Whether this member has read-only access (blocks mutations when true)"""
+  isReadOnly: Boolean
   profileId: UUID
-}
-
-"""The output of our create `OrgInvite` mutation."""
-type CreateOrgInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgInvite` that was created by this mutation."""
-  orgInvite: OrgInvite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgInvite`. May be used by Relay 1."""
-  orgInviteEdge(
-    """The method to use when ordering `OrgInvite`."""
-    orderBy: [OrgInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgInviteEdge
-}
-
-"""All input for the create `OrgInvite` mutation."""
-input CreateOrgInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `OrgInvite` to be created by this mutation."""
-  orgInvite: OrgInviteInput!
-}
-
-"""An input for mutations affecting `OrgInvite`"""
-input OrgInviteInput {
-  id: UUID
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID
-
-  """User ID of the intended recipient, if targeting a specific user"""
-  receiverId: UUID
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-  entityId: UUID!
 }
 
 """The output of our update `OrgMember` mutation."""
@@ -6112,69 +6409,6 @@ input OrgOwnerGrantPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `MembershipType` mutation."""
-type UpdateMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was updated by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the `updateMembershipType` mutation."""
-input UpdateMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `MembershipType` being updated.
-  """
-  membershipTypePatch: MembershipTypePatch!
-}
-
-"""
-Represents an update to a `MembershipType`. Fields that are set will be updated.
-"""
-input MembershipTypePatch {
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int
-
-  """Human-readable name of the membership type"""
-  name: String
-
-  """Description of what this membership type represents"""
-  description: String
-
-  """
-  Short prefix used to namespace tables and functions for this membership scope
-  """
-  prefix: String
-}
-
 """The output of our update `AppPermission` mutation."""
 type UpdateAppPermissionPayload {
   """
@@ -6647,6 +6881,79 @@ input OrgLimitPatch {
   entityId: UUID
 }
 
+"""The output of our update `MembershipType` mutation."""
+type UpdateMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was updated by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the `updateMembershipType` mutation."""
+input UpdateMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `MembershipType` being updated.
+  """
+  membershipTypePatch: MembershipTypePatch!
+}
+
+"""
+Represents an update to a `MembershipType`. Fields that are set will be updated.
+"""
+input MembershipTypePatch {
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int
+
+  """Human-readable name of the membership type"""
+  name: String
+
+  """Description of what this membership type represents"""
+  description: String
+
+  """
+  Short prefix used to namespace tables and functions for this membership scope
+  """
+  prefix: String
+
+  """
+  Parent membership type ID for SPRT cascade chain (e.g. type 2 parent=1, type 3 parent=2)
+  """
+  parentMembershipType: Int
+
+  """
+  When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs
+  """
+  hasUsersTableEntry: Boolean
+}
+
 """The output of our update `AppGrant` mutation."""
 type UpdateAppGrantPayload {
   """
@@ -7067,6 +7374,85 @@ input OrgMembershipDefaultPatch {
   createGroupsCascadeMembers: Boolean
 }
 
+"""The output of our update `OrgMemberProfile` mutation."""
+type UpdateOrgMemberProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` that was updated by this mutation."""
+  orgMemberProfile: OrgMemberProfile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
+  orgMemberProfileEdge(
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileEdge
+}
+
+"""All input for the `updateOrgMemberProfile` mutation."""
+input UpdateOrgMemberProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgMemberProfile` being updated.
+  """
+  orgMemberProfilePatch: OrgMemberProfilePatch!
+}
+
+"""
+Represents an update to a `OrgMemberProfile`. Fields that are set will be updated.
+"""
+input OrgMemberProfilePatch {
+  id: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+
+  """References the membership this profile belongs to (1:1)"""
+  membershipId: UUID
+
+  """References the entity this profile belongs to (used for RLS lookups)"""
+  entityId: UUID
+
+  """References the user who owns this profile (for self-edit RLS)"""
+  actorId: UUID
+
+  """Display name shown to other entity members"""
+  displayName: String
+
+  """
+  Email address visible to other entity members (auto-populated from verified primary email)
+  """
+  email: String
+
+  """Job title or role description visible to other entity members"""
+  title: String
+
+  """Short biography visible to other entity members"""
+  bio: String
+
+  """Profile picture visible to other entity members"""
+  profilePicture: ConstructiveInternalTypeImage
+
+  """Upload for Profile picture visible to other entity members"""
+  profilePictureUpload: Upload
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 """The output of our update `AppLevel` mutation."""
 type UpdateAppLevelPayload {
   """
@@ -7128,9 +7514,6 @@ input AppLevelPatch {
   """Upload for Badge or icon image associated with this level"""
   imageUpload: Upload
 }
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
 
 """The output of our update `AppInvite` mutation."""
 type UpdateAppInvitePayload {
@@ -7206,6 +7589,84 @@ input AppInvitePatch {
   updatedAt: Datetime
 }
 
+"""The output of our update `OrgInvite` mutation."""
+type UpdateOrgInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgInvite` that was updated by this mutation."""
+  orgInvite: OrgInvite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgInvite`. May be used by Relay 1."""
+  orgInviteEdge(
+    """The method to use when ordering `OrgInvite`."""
+    orderBy: [OrgInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgInviteEdge
+}
+
+"""All input for the `updateOrgInvite` mutation."""
+input UpdateOrgInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `OrgInvite` being updated.
+  """
+  orgInvitePatch: OrgInvitePatch!
+}
+
+"""
+Represents an update to a `OrgInvite`. Fields that are set will be updated.
+"""
+input OrgInvitePatch {
+  id: UUID
+
+  """Email address of the invited recipient"""
+  email: ConstructiveInternalTypeEmail
+
+  """User ID of the member who sent this invitation"""
+  senderId: UUID
+
+  """User ID of the intended recipient, if targeting a specific user"""
+  receiverId: UUID
+
+  """Unique random hex token used to redeem this invitation"""
+  inviteToken: String
+
+  """Whether this invitation is still valid and can be redeemed"""
+  inviteValid: Boolean
+
+  """Maximum number of times this invite can be claimed; -1 means unlimited"""
+  inviteLimit: Int
+
+  """Running count of how many times this invite has been claimed"""
+  inviteCount: Int
+
+  """Whether this invite can be claimed by multiple recipients"""
+  multiple: Boolean
+
+  """Optional JSON payload of additional invite metadata"""
+  data: JSON
+
+  """Timestamp after which this invitation can no longer be redeemed"""
+  expiresAt: Datetime
+  createdAt: Datetime
+  updatedAt: Datetime
+  entityId: UUID
+}
+
 """The output of our update `AppMembership` mutation."""
 type UpdateAppMembershipPayload {
   """
@@ -7270,6 +7731,11 @@ input AppMembershipPatch {
   Computed field indicating the membership is approved, verified, not banned, and not disabled
   """
   isActive: Boolean
+
+  """
+  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
+  """
+  isExternal: Boolean
 
   """Whether the actor is the owner of this entity"""
   isOwner: Boolean
@@ -7354,6 +7820,11 @@ input OrgMembershipPatch {
   """
   isActive: Boolean
 
+  """
+  Whether this member is external (not a member of the parent scope). External members may have restricted permissions.
+  """
+  isExternal: Boolean
+
   """Whether the actor is the owner of this entity"""
   isOwner: Boolean
 
@@ -7375,85 +7846,10 @@ input OrgMembershipPatch {
 
   """References the entity (org or group) this membership belongs to"""
   entityId: UUID
+
+  """Whether this member has read-only access (blocks mutations when true)"""
+  isReadOnly: Boolean
   profileId: UUID
-}
-
-"""The output of our update `OrgInvite` mutation."""
-type UpdateOrgInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgInvite` that was updated by this mutation."""
-  orgInvite: OrgInvite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgInvite`. May be used by Relay 1."""
-  orgInviteEdge(
-    """The method to use when ordering `OrgInvite`."""
-    orderBy: [OrgInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgInviteEdge
-}
-
-"""All input for the `updateOrgInvite` mutation."""
-input UpdateOrgInviteInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `OrgInvite` being updated.
-  """
-  orgInvitePatch: OrgInvitePatch!
-}
-
-"""
-Represents an update to a `OrgInvite`. Fields that are set will be updated.
-"""
-input OrgInvitePatch {
-  id: UUID
-
-  """Email address of the invited recipient"""
-  email: ConstructiveInternalTypeEmail
-
-  """User ID of the member who sent this invitation"""
-  senderId: UUID
-
-  """User ID of the intended recipient, if targeting a specific user"""
-  receiverId: UUID
-
-  """Unique random hex token used to redeem this invitation"""
-  inviteToken: String
-
-  """Whether this invitation is still valid and can be redeemed"""
-  inviteValid: Boolean
-
-  """Maximum number of times this invite can be claimed; -1 means unlimited"""
-  inviteLimit: Int
-
-  """Running count of how many times this invite has been claimed"""
-  inviteCount: Int
-
-  """Whether this invite can be claimed by multiple recipients"""
-  multiple: Boolean
-
-  """Optional JSON payload of additional invite metadata"""
-  data: JSON
-
-  """Timestamp after which this invitation can no longer be redeemed"""
-  expiresAt: Datetime
-  createdAt: Datetime
-  updatedAt: Datetime
-  entityId: UUID
 }
 
 """The output of our delete `OrgMember` mutation."""
@@ -7753,43 +8149,6 @@ input DeleteOrgOwnerGrantInput {
   id: UUID!
 }
 
-"""The output of our delete `MembershipType` mutation."""
-type DeleteMembershipTypePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `MembershipType` that was deleted by this mutation."""
-  membershipType: MembershipType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `MembershipType`. May be used by Relay 1."""
-  membershipTypeEdge(
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MembershipTypeEdge
-}
-
-"""All input for the `deleteMembershipType` mutation."""
-input DeleteMembershipTypeInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
-  """
-  id: Int!
-}
-
 """The output of our delete `AppPermission` mutation."""
 type DeleteAppPermissionPayload {
   """
@@ -8054,6 +8413,43 @@ input DeleteOrgLimitInput {
   id: UUID!
 }
 
+"""The output of our delete `MembershipType` mutation."""
+type DeleteMembershipTypePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `MembershipType` that was deleted by this mutation."""
+  membershipType: MembershipType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `MembershipType`. May be used by Relay 1."""
+  membershipTypeEdge(
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MembershipTypeEdge
+}
+
+"""All input for the `deleteMembershipType` mutation."""
+input DeleteMembershipTypeInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  Integer identifier for the membership type (1=App, 2=Organization, 3=Group)
+  """
+  id: Int!
+}
+
 """The output of our delete `AppGrant` mutation."""
 type DeleteAppGrantPayload {
   """
@@ -8285,6 +8681,39 @@ input DeleteOrgMembershipDefaultInput {
   id: UUID!
 }
 
+"""The output of our delete `OrgMemberProfile` mutation."""
+type DeleteOrgMemberProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgMemberProfile` that was deleted by this mutation."""
+  orgMemberProfile: OrgMemberProfile
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgMemberProfile`. May be used by Relay 1."""
+  orgMemberProfileEdge(
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileEdge
+}
+
+"""All input for the `deleteOrgMemberProfile` mutation."""
+input DeleteOrgMemberProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `AppLevel` mutation."""
 type DeleteAppLevelPayload {
   """
@@ -8351,6 +8780,39 @@ input DeleteAppInviteInput {
   id: UUID!
 }
 
+"""The output of our delete `OrgInvite` mutation."""
+type DeleteOrgInvitePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `OrgInvite` that was deleted by this mutation."""
+  orgInvite: OrgInvite
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `OrgInvite`. May be used by Relay 1."""
+  orgInviteEdge(
+    """The method to use when ordering `OrgInvite`."""
+    orderBy: [OrgInviteOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): OrgInviteEdge
+}
+
+"""All input for the `deleteOrgInvite` mutation."""
+input DeleteOrgInviteInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 """The output of our delete `AppMembership` mutation."""
 type DeleteAppMembershipPayload {
   """
@@ -8409,39 +8871,6 @@ type DeleteOrgMembershipPayload {
 
 """All input for the `deleteOrgMembership` mutation."""
 input DeleteOrgMembershipInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `OrgInvite` mutation."""
-type DeleteOrgInvitePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `OrgInvite` that was deleted by this mutation."""
-  orgInvite: OrgInvite
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `OrgInvite`. May be used by Relay 1."""
-  orgInviteEdge(
-    """The method to use when ordering `OrgInvite`."""
-    orderBy: [OrgInviteOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): OrgInviteEdge
-}
-
-"""All input for the `deleteOrgInvite` mutation."""
-input DeleteOrgInviteInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -8864,35 +9293,6 @@ type Query {
     orderBy: [OrgOwnerGrantOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgOwnerGrantConnection
 
-  """Reads and enables pagination through a set of `MembershipType`."""
-  membershipTypes(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: MembershipTypeFilter
-
-    """The method to use when ordering `MembershipType`."""
-    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MembershipTypeConnection
-
   """Reads and enables pagination through a set of `AppPermission`."""
   appPermissions(
     """Only read the first `n` values of the set."""
@@ -9125,6 +9525,35 @@ type Query {
     orderBy: [OrgLimitOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgLimitConnection
 
+  """Reads and enables pagination through a set of `MembershipType`."""
+  membershipTypes(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: MembershipTypeFilter
+
+    """The method to use when ordering `MembershipType`."""
+    orderBy: [MembershipTypeOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MembershipTypeConnection
+
   """Reads and enables pagination through a set of `AppGrant`."""
   appGrants(
     """Only read the first `n` values of the set."""
@@ -9328,6 +9757,35 @@ type Query {
     orderBy: [OrgMembershipDefaultOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMembershipDefaultConnection
 
+  """Reads and enables pagination through a set of `OrgMemberProfile`."""
+  orgMemberProfiles(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgMemberProfileFilter
+
+    """The method to use when ordering `OrgMemberProfile`."""
+    orderBy: [OrgMemberProfileOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgMemberProfileConnection
+
   """Reads and enables pagination through a set of `AppLevel`."""
   appLevels(
     """Only read the first `n` values of the set."""
@@ -9386,6 +9844,35 @@ type Query {
     orderBy: [AppInviteOrderBy!] = [PRIMARY_KEY_ASC]
   ): AppInviteConnection
 
+  """Reads and enables pagination through a set of `OrgInvite`."""
+  orgInvites(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: OrgInviteFilter
+
+    """The method to use when ordering `OrgInvite`."""
+    orderBy: [OrgInviteOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrgInviteConnection
+
   """Reads and enables pagination through a set of `AppMembership`."""
   appMemberships(
     """Only read the first `n` values of the set."""
@@ -9443,35 +9930,6 @@ type Query {
     """The method to use when ordering `OrgMembership`."""
     orderBy: [OrgMembershipOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrgMembershipConnection
-
-  """Reads and enables pagination through a set of `OrgInvite`."""
-  orgInvites(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: OrgInviteFilter
-
-    """The method to use when ordering `OrgInvite`."""
-    orderBy: [OrgInviteOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OrgInviteConnection
 
   """
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
@@ -9568,14 +10026,6 @@ type Mutation {
     input: CreateOrgOwnerGrantInput!
   ): CreateOrgOwnerGrantPayload
 
-  """Creates a single `MembershipType`."""
-  createMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateMembershipTypeInput!
-  ): CreateMembershipTypePayload
-
   """Creates a single `AppPermission`."""
   createAppPermission(
     """
@@ -9640,6 +10090,14 @@ type Mutation {
     input: CreateOrgLimitInput!
   ): CreateOrgLimitPayload
 
+  """Creates a single `MembershipType`."""
+  createMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMembershipTypeInput!
+  ): CreateMembershipTypePayload
+
   """Creates a single `AppGrant`."""
   createAppGrant(
     """
@@ -9696,6 +10154,14 @@ type Mutation {
     input: CreateOrgMembershipDefaultInput!
   ): CreateOrgMembershipDefaultPayload
 
+  """Creates a single `OrgMemberProfile`."""
+  createOrgMemberProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgMemberProfileInput!
+  ): CreateOrgMemberProfilePayload
+
   """Creates a single `AppLevel`."""
   createAppLevel(
     """
@@ -9712,6 +10178,14 @@ type Mutation {
     input: CreateAppInviteInput!
   ): CreateAppInvitePayload
 
+  """Creates a single `OrgInvite`."""
+  createOrgInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateOrgInviteInput!
+  ): CreateOrgInvitePayload
+
   """Creates a single `AppMembership`."""
   createAppMembership(
     """
@@ -9727,14 +10201,6 @@ type Mutation {
     """
     input: CreateOrgMembershipInput!
   ): CreateOrgMembershipPayload
-
-  """Creates a single `OrgInvite`."""
-  createOrgInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateOrgInviteInput!
-  ): CreateOrgInvitePayload
 
   """Updates a single `OrgMember` using a unique key and a patch."""
   updateOrgMember(
@@ -9812,14 +10278,6 @@ type Mutation {
     input: UpdateOrgOwnerGrantInput!
   ): UpdateOrgOwnerGrantPayload
 
-  """Updates a single `MembershipType` using a unique key and a patch."""
-  updateMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateMembershipTypeInput!
-  ): UpdateMembershipTypePayload
-
   """Updates a single `AppPermission` using a unique key and a patch."""
   updateAppPermission(
     """
@@ -9884,6 +10342,14 @@ type Mutation {
     input: UpdateOrgLimitInput!
   ): UpdateOrgLimitPayload
 
+  """Updates a single `MembershipType` using a unique key and a patch."""
+  updateMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMembershipTypeInput!
+  ): UpdateMembershipTypePayload
+
   """Updates a single `AppGrant` using a unique key and a patch."""
   updateAppGrant(
     """
@@ -9944,6 +10410,14 @@ type Mutation {
     input: UpdateOrgMembershipDefaultInput!
   ): UpdateOrgMembershipDefaultPayload
 
+  """Updates a single `OrgMemberProfile` using a unique key and a patch."""
+  updateOrgMemberProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgMemberProfileInput!
+  ): UpdateOrgMemberProfilePayload
+
   """Updates a single `AppLevel` using a unique key and a patch."""
   updateAppLevel(
     """
@@ -9960,6 +10434,14 @@ type Mutation {
     input: UpdateAppInviteInput!
   ): UpdateAppInvitePayload
 
+  """Updates a single `OrgInvite` using a unique key and a patch."""
+  updateOrgInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateOrgInviteInput!
+  ): UpdateOrgInvitePayload
+
   """Updates a single `AppMembership` using a unique key and a patch."""
   updateAppMembership(
     """
@@ -9975,14 +10457,6 @@ type Mutation {
     """
     input: UpdateOrgMembershipInput!
   ): UpdateOrgMembershipPayload
-
-  """Updates a single `OrgInvite` using a unique key and a patch."""
-  updateOrgInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateOrgInviteInput!
-  ): UpdateOrgInvitePayload
 
   """Deletes a single `OrgMember` using a unique key."""
   deleteOrgMember(
@@ -10056,14 +10530,6 @@ type Mutation {
     input: DeleteOrgOwnerGrantInput!
   ): DeleteOrgOwnerGrantPayload
 
-  """Deletes a single `MembershipType` using a unique key."""
-  deleteMembershipType(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMembershipTypeInput!
-  ): DeleteMembershipTypePayload
-
   """Deletes a single `AppPermission` using a unique key."""
   deleteAppPermission(
     """
@@ -10128,6 +10594,14 @@ type Mutation {
     input: DeleteOrgLimitInput!
   ): DeleteOrgLimitPayload
 
+  """Deletes a single `MembershipType` using a unique key."""
+  deleteMembershipType(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMembershipTypeInput!
+  ): DeleteMembershipTypePayload
+
   """Deletes a single `AppGrant` using a unique key."""
   deleteAppGrant(
     """
@@ -10184,6 +10658,14 @@ type Mutation {
     input: DeleteOrgMembershipDefaultInput!
   ): DeleteOrgMembershipDefaultPayload
 
+  """Deletes a single `OrgMemberProfile` using a unique key."""
+  deleteOrgMemberProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgMemberProfileInput!
+  ): DeleteOrgMemberProfilePayload
+
   """Deletes a single `AppLevel` using a unique key."""
   deleteAppLevel(
     """
@@ -10200,6 +10682,14 @@ type Mutation {
     input: DeleteAppInviteInput!
   ): DeleteAppInvitePayload
 
+  """Deletes a single `OrgInvite` using a unique key."""
+  deleteOrgInvite(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteOrgInviteInput!
+  ): DeleteOrgInvitePayload
+
   """Deletes a single `AppMembership` using a unique key."""
   deleteAppMembership(
     """
@@ -10215,14 +10705,6 @@ type Mutation {
     """
     input: DeleteOrgMembershipInput!
   ): DeleteOrgMembershipPayload
-
-  """Deletes a single `OrgInvite` using a unique key."""
-  deleteOrgInvite(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteOrgInviteInput!
-  ): DeleteOrgInvitePayload
 
   """
   Request a presigned URL for uploading a file directly to S3.

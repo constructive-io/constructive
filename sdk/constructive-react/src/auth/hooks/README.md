@@ -47,11 +47,6 @@ function App() {
 | `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
-| `useConnectedAccountsQuery` | Query | OAuth and social login connections linking external service accounts to users |
-| `useConnectedAccountQuery` | Query | OAuth and social login connections linking external service accounts to users |
-| `useCreateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
-| `useUpdateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
-| `useDeleteConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
 | `useAuditLogsQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useAuditLogQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useCreateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
@@ -62,28 +57,39 @@ function App() {
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
 | `useUpdateRoleTypeMutation` | Mutation | Update a roleType |
 | `useDeleteRoleTypeMutation` | Mutation | Delete a roleType |
+| `useUserConnectedAccountsQuery` | Query | List all userConnectedAccounts |
+| `useUserConnectedAccountQuery` | Query | Get one userConnectedAccount |
+| `useCreateUserConnectedAccountMutation` | Mutation | Create a userConnectedAccount |
+| `useUpdateUserConnectedAccountMutation` | Mutation | Update a userConnectedAccount |
+| `useDeleteUserConnectedAccountMutation` | Mutation | Delete a userConnectedAccount |
 | `useUsersQuery` | Query | List all users |
 | `useUserQuery` | Query | Get one user |
 | `useCreateUserMutation` | Mutation | Create a user |
 | `useUpdateUserMutation` | Mutation | Update a user |
 | `useDeleteUserMutation` | Mutation | Delete a user |
-| `useCurrentIpAddressQuery` | Query | currentIpAddress |
 | `useCurrentUserAgentQuery` | Query | currentUserAgent |
+| `useCurrentIpAddressQuery` | Query | currentIpAddress |
 | `useCurrentUserIdQuery` | Query | currentUserId |
+| `useRequireStepUpQuery` | Query | requireStepUp |
 | `useCurrentUserQuery` | Query | currentUser |
 | `useSignOutMutation` | Mutation | signOut |
 | `useSendAccountDeletionEmailMutation` | Mutation | sendAccountDeletionEmail |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
+| `useDisconnectAccountMutation` | Mutation | disconnectAccount |
+| `useRevokeApiKeyMutation` | Mutation | revokeApiKey |
+| `useRevokeSessionMutation` | Mutation | revokeSession |
 | `useVerifyPasswordMutation` | Mutation | verifyPassword |
 | `useVerifyTotpMutation` | Mutation | verifyTotp |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
 | `useSetPasswordMutation` | Mutation | setPassword |
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
+| `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useResetPasswordMutation` | Mutation | resetPassword |
-| `useSignInOneTimeTokenMutation` | Mutation | signInOneTimeToken |
-| `useSignInMutation` | Mutation | signIn |
+| `useCreateApiKeyMutation` | Mutation | createApiKey |
+| `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useSignUpMutation` | Mutation | signUp |
-| `useOneTimeTokenMutation` | Mutation | oneTimeToken |
+| `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
+| `useSignInMutation` | Mutation | signIn |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
@@ -164,27 +170,6 @@ const { mutate: create } = useCreateCryptoAddressMutation({
 create({ ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
 ```
 
-### ConnectedAccount
-
-```typescript
-// List all connectedAccounts
-const { data, isLoading } = useConnectedAccountsQuery({
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
-});
-
-// Get one connectedAccount
-const { data: item } = useConnectedAccountQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
-});
-
-// Create a connectedAccount
-const { mutate: create } = useCreateConnectedAccountMutation({
-  selection: { fields: { id: true } },
-});
-create({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
-```
-
 ### AuditLog
 
 ```typescript
@@ -227,6 +212,27 @@ const { mutate: create } = useCreateRoleTypeMutation({
 create({ name: '<String>' });
 ```
 
+### UserConnectedAccount
+
+```typescript
+// List all userConnectedAccounts
+const { data, isLoading } = useUserConnectedAccountsQuery({
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one userConnectedAccount
+const { data: item } = useUserConnectedAccountQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a userConnectedAccount
+const { mutate: create } = useCreateUserConnectedAccountMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
+```
+
 ### User
 
 ```typescript
@@ -250,16 +256,16 @@ create({ username: '<String>', displayName: '<String>', profilePicture: '<Image>
 
 ## Custom Operation Hooks
 
-### `useCurrentIpAddressQuery`
+### `useCurrentUserAgentQuery`
 
-currentIpAddress
+currentUserAgent
 
 - **Type:** query
 - **Arguments:** none
 
-### `useCurrentUserAgentQuery`
+### `useCurrentIpAddressQuery`
 
-currentUserAgent
+currentIpAddress
 
 - **Type:** query
 - **Arguments:** none
@@ -270,6 +276,17 @@ currentUserId
 
 - **Type:** query
 - **Arguments:** none
+
+### `useRequireStepUpQuery`
+
+requireStepUp
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `stepUpType` | String |
 
 ### `useCurrentUserQuery`
 
@@ -310,6 +327,39 @@ checkPassword
   | Argument | Type |
   |----------|------|
   | `input` | CheckPasswordInput (required) |
+
+### `useDisconnectAccountMutation`
+
+disconnectAccount
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisconnectAccountInput (required) |
+
+### `useRevokeApiKeyMutation`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeApiKeyInput (required) |
+
+### `useRevokeSessionMutation`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeSessionInput (required) |
 
 ### `useVerifyPasswordMutation`
 
@@ -366,6 +416,17 @@ verifyEmail
   |----------|------|
   | `input` | VerifyEmailInput (required) |
 
+### `useProvisionNewUserMutation`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionNewUserInput (required) |
+
 ### `useResetPasswordMutation`
 
 resetPassword
@@ -377,27 +438,27 @@ resetPassword
   |----------|------|
   | `input` | ResetPasswordInput (required) |
 
-### `useSignInOneTimeTokenMutation`
+### `useCreateApiKeyMutation`
 
-signInOneTimeToken
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
-
-### `useSignInMutation`
-
-signIn
+createApiKey
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `input` | CreateApiKeyInput (required) |
+
+### `useSignInCrossOriginMutation`
+
+signInCrossOrigin
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInCrossOriginInput (required) |
 
 ### `useSignUpMutation`
 
@@ -410,16 +471,27 @@ signUp
   |----------|------|
   | `input` | SignUpInput (required) |
 
-### `useOneTimeTokenMutation`
+### `useRequestCrossOriginTokenMutation`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `input` | RequestCrossOriginTokenInput (required) |
+
+### `useSignInMutation`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInInput (required) |
 
 ### `useExtendTokenExpiresMutation`
 

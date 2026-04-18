@@ -17,6 +17,7 @@ import { SchemaModel } from './models/schema';
 import { TableModel } from './models/table';
 import { CheckConstraintModel } from './models/checkConstraint';
 import { FieldModel } from './models/field';
+import { SpatialRelationModel } from './models/spatialRelation';
 import { ForeignKeyConstraintModel } from './models/foreignKeyConstraint';
 import { FullTextSearchModel } from './models/fullTextSearch';
 import { IndexModel } from './models/index';
@@ -30,9 +31,9 @@ import { ViewTableModel } from './models/viewTable';
 import { ViewGrantModel } from './models/viewGrant';
 import { ViewRuleModel } from './models/viewRule';
 import { EmbeddingChunkModel } from './models/embeddingChunk';
-import { TableTemplateModuleModel } from './models/tableTemplateModule';
 import { SecureTableProvisionModel } from './models/secureTableProvision';
 import { RelationProvisionModel } from './models/relationProvision';
+import { SessionSecretsModuleModel } from './models/sessionSecretsModule';
 import { SchemaGrantModel } from './models/schemaGrant';
 import { DefaultPrivilegeModel } from './models/defaultPrivilege';
 import { EnumModel } from './models/enum';
@@ -70,6 +71,8 @@ import { BlueprintModel } from './models/blueprint';
 import { BlueprintTemplateModel } from './models/blueprintTemplate';
 import { BlueprintConstructionModel } from './models/blueprintConstruction';
 import { StorageModuleModel } from './models/storageModule';
+import { EntityTypeProvisionModel } from './models/entityTypeProvision';
+import { WebauthnCredentialsModuleModel } from './models/webauthnCredentialsModule';
 import { DatabaseProvisionModuleModel } from './models/databaseProvisionModule';
 import { AppAdminGrantModel } from './models/appAdminGrant';
 import { AppOwnerGrantModel } from './models/appOwnerGrant';
@@ -78,6 +81,7 @@ import { OrgMembershipModel } from './models/orgMembership';
 import { OrgMemberModel } from './models/orgMember';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
 import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
+import { OrgMemberProfileModel } from './models/orgMemberProfile';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
@@ -90,7 +94,6 @@ import { AppLevelModel } from './models/appLevel';
 import { EmailModel } from './models/email';
 import { PhoneNumberModel } from './models/phoneNumber';
 import { CryptoAddressModel } from './models/cryptoAddress';
-import { ConnectedAccountModel } from './models/connectedAccount';
 import { AppInviteModel } from './models/appInvite';
 import { AppClaimedInviteModel } from './models/appClaimedInvite';
 import { OrgInviteModel } from './models/orgInvite';
@@ -103,10 +106,12 @@ import { RoleTypeModel } from './models/roleType';
 import { MigrateFileModel } from './models/migrateFile';
 import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
-import { MembershipTypeModel } from './models/membershipType';
+import { DevicesModuleModel } from './models/devicesModule';
+import { UserConnectedAccountModel } from './models/userConnectedAccount';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
 import { CommitModel } from './models/commit';
 import { RateLimitsModuleModel } from './models/rateLimitsModule';
+import { MembershipTypeModel } from './models/membershipType';
 import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { RlsModuleModel } from './models/rlsModule';
 import { SqlActionModel } from './models/sqlAction';
@@ -162,6 +167,7 @@ export function createClient(config: OrmClientConfig) {
     table: new TableModel(client),
     checkConstraint: new CheckConstraintModel(client),
     field: new FieldModel(client),
+    spatialRelation: new SpatialRelationModel(client),
     foreignKeyConstraint: new ForeignKeyConstraintModel(client),
     fullTextSearch: new FullTextSearchModel(client),
     index: new IndexModel(client),
@@ -175,9 +181,9 @@ export function createClient(config: OrmClientConfig) {
     viewGrant: new ViewGrantModel(client),
     viewRule: new ViewRuleModel(client),
     embeddingChunk: new EmbeddingChunkModel(client),
-    tableTemplateModule: new TableTemplateModuleModel(client),
     secureTableProvision: new SecureTableProvisionModel(client),
     relationProvision: new RelationProvisionModel(client),
+    sessionSecretsModule: new SessionSecretsModuleModel(client),
     schemaGrant: new SchemaGrantModel(client),
     defaultPrivilege: new DefaultPrivilegeModel(client),
     enum: new EnumModel(client),
@@ -215,6 +221,8 @@ export function createClient(config: OrmClientConfig) {
     blueprintTemplate: new BlueprintTemplateModel(client),
     blueprintConstruction: new BlueprintConstructionModel(client),
     storageModule: new StorageModuleModel(client),
+    entityTypeProvision: new EntityTypeProvisionModel(client),
+    webauthnCredentialsModule: new WebauthnCredentialsModuleModel(client),
     databaseProvisionModule: new DatabaseProvisionModuleModel(client),
     appAdminGrant: new AppAdminGrantModel(client),
     appOwnerGrant: new AppOwnerGrantModel(client),
@@ -223,6 +231,7 @@ export function createClient(config: OrmClientConfig) {
     orgMember: new OrgMemberModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),
     orgOwnerGrant: new OrgOwnerGrantModel(client),
+    orgMemberProfile: new OrgMemberProfileModel(client),
     orgGrant: new OrgGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
@@ -235,7 +244,6 @@ export function createClient(config: OrmClientConfig) {
     email: new EmailModel(client),
     phoneNumber: new PhoneNumberModel(client),
     cryptoAddress: new CryptoAddressModel(client),
-    connectedAccount: new ConnectedAccountModel(client),
     appInvite: new AppInviteModel(client),
     appClaimedInvite: new AppClaimedInviteModel(client),
     orgInvite: new OrgInviteModel(client),
@@ -248,10 +256,12 @@ export function createClient(config: OrmClientConfig) {
     migrateFile: new MigrateFileModel(client),
     appLimitDefault: new AppLimitDefaultModel(client),
     orgLimitDefault: new OrgLimitDefaultModel(client),
-    membershipType: new MembershipTypeModel(client),
+    devicesModule: new DevicesModuleModel(client),
+    userConnectedAccount: new UserConnectedAccountModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
     commit: new CommitModel(client),
     rateLimitsModule: new RateLimitsModuleModel(client),
+    membershipType: new MembershipTypeModel(client),
     orgMembershipDefault: new OrgMembershipDefaultModel(client),
     rlsModule: new RlsModuleModel(client),
     sqlAction: new SqlActionModel(client),

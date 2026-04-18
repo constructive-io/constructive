@@ -24,9 +24,9 @@ const db = createClient({
 | `email` | findMany, findOne, create, update, delete |
 | `phoneNumber` | findMany, findOne, create, update, delete |
 | `cryptoAddress` | findMany, findOne, create, update, delete |
-| `connectedAccount` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
 | `roleType` | findMany, findOne, create, update, delete |
+| `userConnectedAccount` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
 
 ## Table Operations
@@ -137,42 +137,6 @@ const updated = await db.cryptoAddress.update({ where: { id: '<UUID>' }, data: {
 const deleted = await db.cryptoAddress.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
-### `db.connectedAccount`
-
-CRUD operations for ConnectedAccount records.
-
-**Fields:**
-
-| Field | Type | Editable |
-|-------|------|----------|
-| `id` | UUID | No |
-| `ownerId` | UUID | Yes |
-| `service` | String | Yes |
-| `identifier` | String | Yes |
-| `details` | JSON | Yes |
-| `isVerified` | Boolean | Yes |
-| `createdAt` | Datetime | No |
-| `updatedAt` | Datetime | No |
-
-**Operations:**
-
-```typescript
-// List all connectedAccount records
-const items = await db.connectedAccount.findMany({ select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
-
-// Get one by id
-const item = await db.connectedAccount.findOne({ id: '<UUID>', select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
-
-// Create
-const created = await db.connectedAccount.create({ data: { ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' }, select: { id: true } }).execute();
-
-// Update
-const updated = await db.connectedAccount.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
-
-// Delete
-const deleted = await db.connectedAccount.delete({ where: { id: '<UUID>' } }).execute();
-```
-
 ### `db.auditLog`
 
 CRUD operations for AuditLog records.
@@ -239,6 +203,42 @@ const updated = await db.roleType.update({ where: { id: '<Int>' }, data: { name:
 const deleted = await db.roleType.delete({ where: { id: '<Int>' } }).execute();
 ```
 
+### `db.userConnectedAccount`
+
+CRUD operations for UserConnectedAccount records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `ownerId` | UUID | Yes |
+| `service` | String | Yes |
+| `identifier` | String | Yes |
+| `details` | JSON | Yes |
+| `isVerified` | Boolean | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all userConnectedAccount records
+const items = await db.userConnectedAccount.findMany({ select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.userConnectedAccount.findOne({ id: '<UUID>', select: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.userConnectedAccount.create({ data: { ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.userConnectedAccount.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.userConnectedAccount.delete({ where: { id: '<UUID>' } }).execute();
+```
+
 ### `db.user`
 
 CRUD operations for User records.
@@ -283,17 +283,6 @@ const deleted = await db.user.delete({ where: { id: '<UUID>' } }).execute();
 
 ## Custom Operations
 
-### `db.query.currentIpAddress`
-
-currentIpAddress
-
-- **Type:** query
-- **Arguments:** none
-
-```typescript
-const result = await db.query.currentIpAddress().execute();
-```
-
 ### `db.query.currentUserAgent`
 
 currentUserAgent
@@ -305,6 +294,17 @@ currentUserAgent
 const result = await db.query.currentUserAgent().execute();
 ```
 
+### `db.query.currentIpAddress`
+
+currentIpAddress
+
+- **Type:** query
+- **Arguments:** none
+
+```typescript
+const result = await db.query.currentIpAddress().execute();
+```
+
 ### `db.query.currentUserId`
 
 currentUserId
@@ -314,6 +314,21 @@ currentUserId
 
 ```typescript
 const result = await db.query.currentUserId().execute();
+```
+
+### `db.query.requireStepUp`
+
+requireStepUp
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `stepUpType` | String |
+
+```typescript
+const result = await db.query.requireStepUp({ stepUpType: '<String>' }).execute();
 ```
 
 ### `db.query.currentUser`
@@ -370,6 +385,51 @@ checkPassword
 
 ```typescript
 const result = await db.mutation.checkPassword({ input: { password: '<String>' } }).execute();
+```
+
+### `db.mutation.disconnectAccount`
+
+disconnectAccount
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | DisconnectAccountInput (required) |
+
+```typescript
+const result = await db.mutation.disconnectAccount({ input: { accountId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.revokeApiKey`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeApiKeyInput (required) |
+
+```typescript
+const result = await db.mutation.revokeApiKey({ input: { keyId: '<UUID>' } }).execute();
+```
+
+### `db.mutation.revokeSession`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeSessionInput (required) |
+
+```typescript
+const result = await db.mutation.revokeSession({ input: { sessionId: '<UUID>' } }).execute();
 ```
 
 ### `db.mutation.verifyPassword`
@@ -447,6 +507,21 @@ verifyEmail
 const result = await db.mutation.verifyEmail({ input: { emailId: '<UUID>', token: '<String>' } }).execute();
 ```
 
+### `db.mutation.provisionNewUser`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionNewUserInput (required) |
+
+```typescript
+const result = await db.mutation.provisionNewUser({ input: { email: '<String>', password: '<String>' } }).execute();
+```
+
 ### `db.mutation.resetPassword`
 
 resetPassword
@@ -462,34 +537,34 @@ resetPassword
 const result = await db.mutation.resetPassword({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } }).execute();
 ```
 
-### `db.mutation.signInOneTimeToken`
+### `db.mutation.createApiKey`
 
-signInOneTimeToken
+createApiKey
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
+  | `input` | CreateApiKeyInput (required) |
 
 ```typescript
-const result = await db.mutation.signInOneTimeToken({ input: { token: '<String>', credentialKind: '<String>' } }).execute();
+const result = await db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>' } }).execute();
 ```
 
-### `db.mutation.signIn`
+### `db.mutation.signInCrossOrigin`
 
-signIn
+signInCrossOrigin
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `input` | SignInCrossOriginInput (required) |
 
 ```typescript
-const result = await db.mutation.signIn({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } }).execute();
+const result = await db.mutation.signInCrossOrigin({ input: { token: '<String>', credentialKind: '<String>' } }).execute();
 ```
 
 ### `db.mutation.signUp`
@@ -507,19 +582,34 @@ signUp
 const result = await db.mutation.signUp({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } }).execute();
 ```
 
-### `db.mutation.oneTimeToken`
+### `db.mutation.requestCrossOriginToken`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `input` | RequestCrossOriginTokenInput (required) |
 
 ```typescript
-const result = await db.mutation.oneTimeToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
+const result = await db.mutation.requestCrossOriginToken({ input: { email: '<String>', password: '<String>', origin: '<Origin>', rememberMe: '<Boolean>' } }).execute();
+```
+
+### `db.mutation.signIn`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInInput (required) |
+
+```typescript
+const result = await db.mutation.signIn({ input: '<SignInInput>' }).execute();
 ```
 
 ### `db.mutation.extendTokenExpires`

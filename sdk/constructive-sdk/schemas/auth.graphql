@@ -106,35 +106,6 @@ type User {
     orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
   ): CryptoAddressConnection!
 
-  """Reads and enables pagination through a set of `ConnectedAccount`."""
-  ownedConnectedAccounts(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: ConnectedAccountFilter
-
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountConnection!
-
   """Reads and enables pagination through a set of `AuditLog`."""
   auditLogsByActorId(
     """Only read the first `n` values of the set."""
@@ -618,12 +589,6 @@ input UserFilter {
 
   """`ownedCryptoAddresses` exist."""
   ownedCryptoAddressesExist: Boolean
-
-  """Filter by the object’s `ownedConnectedAccounts` relation."""
-  ownedConnectedAccounts: UserToManyConnectedAccountFilter
-
-  """`ownedConnectedAccounts` exist."""
-  ownedConnectedAccountsExist: Boolean
 
   """Filter by the object’s `auditLogsByActorId` relation."""
   auditLogsByActorId: UserToManyAuditLogFilter
@@ -1207,123 +1172,6 @@ input CryptoAddressFilter {
 }
 
 """
-A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’
-"""
-input UserToManyConnectedAccountFilter {
-  """Filters to entities where at least one related entity matches."""
-  some: ConnectedAccountFilter
-
-  """Filters to entities where every related entity matches."""
-  every: ConnectedAccountFilter
-
-  """Filters to entities where no related entity matches."""
-  none: ConnectedAccountFilter
-}
-
-"""
-A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’
-"""
-input ConnectedAccountFilter {
-  """Filter by the object’s `id` field."""
-  id: UUIDFilter
-
-  """Filter by the object’s `ownerId` field."""
-  ownerId: UUIDFilter
-
-  """Filter by the object’s `service` field."""
-  service: StringFilter
-
-  """Filter by the object’s `identifier` field."""
-  identifier: StringFilter
-
-  """Filter by the object’s `details` field."""
-  details: JSONFilter
-
-  """Filter by the object’s `isVerified` field."""
-  isVerified: BooleanFilter
-
-  """Filter by the object’s `createdAt` field."""
-  createdAt: DatetimeFilter
-
-  """Filter by the object’s `updatedAt` field."""
-  updatedAt: DatetimeFilter
-
-  """Checks for all expressions in this list."""
-  and: [ConnectedAccountFilter!]
-
-  """Checks for any expressions in this list."""
-  or: [ConnectedAccountFilter!]
-
-  """Negates the expression."""
-  not: ConnectedAccountFilter
-
-  """Filter by the object’s `owner` relation."""
-  owner: UserFilter
-}
-
-"""
-A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
-"""
-input JSONFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: JSON
-
-  """Not equal to the specified value."""
-  notEqualTo: JSON
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: JSON
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: JSON
-
-  """Included in the specified list."""
-  in: [JSON!]
-
-  """Not included in the specified list."""
-  notIn: [JSON!]
-
-  """Less than the specified value."""
-  lessThan: JSON
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: JSON
-
-  """Greater than the specified value."""
-  greaterThan: JSON
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: JSON
-
-  """Contains the specified JSON."""
-  contains: JSON
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: JSON
-}
-
-"""
-Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
-
-"""
 A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’
 """
 input UserToManyAuditLogFilter {
@@ -1738,82 +1586,6 @@ enum CryptoAddressOrderBy {
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `ConnectedAccount` values."""
-type ConnectedAccountConnection {
-  """A list of `ConnectedAccount` objects."""
-  nodes: [ConnectedAccount]!
-
-  """
-  A list of edges which contains the `ConnectedAccount` and cursor to aid in pagination.
-  """
-  edges: [ConnectedAccountEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* `ConnectedAccount` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""
-OAuth and social login connections linking external service accounts to users
-"""
-type ConnectedAccount {
-  id: UUID!
-  ownerId: UUID!
-
-  """The service used, e.g. `twitter` or `github`."""
-  service: String!
-
-  """A unique identifier for the user within the service"""
-  identifier: String!
-
-  """Additional profile details extracted from this login method"""
-  details: JSON!
-
-  """Whether this connected account has been verified"""
-  isVerified: Boolean!
-  createdAt: Datetime
-  updatedAt: Datetime
-
-  """Reads a single `User` that is related to this `ConnectedAccount`."""
-  owner: User
-}
-
-"""A `ConnectedAccount` edge in the connection."""
-type ConnectedAccountEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `ConnectedAccount` at the end of the edge."""
-  node: ConnectedAccount
-}
-
-"""Methods to use when ordering `ConnectedAccount`."""
-enum ConnectedAccountOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  OWNER_ID_ASC
-  OWNER_ID_DESC
-  SERVICE_ASC
-  SERVICE_DESC
-  IDENTIFIER_ASC
-  IDENTIFIER_DESC
-  DETAILS_ASC
-  DETAILS_DESC
-  IS_VERIFIED_ASC
-  IS_VERIFIED_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-}
-
 """A connection to a list of `AuditLog` values."""
 type AuditLogConnection {
   """A list of `AuditLog` objects."""
@@ -1931,6 +1703,166 @@ enum RoleTypeOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
+}
+
+"""A connection to a list of `UserConnectedAccount` values."""
+type UserConnectedAccountConnection {
+  """A list of `UserConnectedAccount` objects."""
+  nodes: [UserConnectedAccount]!
+
+  """
+  A list of edges which contains the `UserConnectedAccount` and cursor to aid in pagination.
+  """
+  edges: [UserConnectedAccountEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `UserConnectedAccount` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type UserConnectedAccount {
+  id: UUID
+  ownerId: UUID
+  service: String
+  identifier: String
+  details: JSON
+  isVerified: Boolean
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""A `UserConnectedAccount` edge in the connection."""
+type UserConnectedAccountEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `UserConnectedAccount` at the end of the edge."""
+  node: UserConnectedAccount
+}
+
+"""
+A filter to be used against `UserConnectedAccount` object types. All fields are combined with a logical ‘and.’
+"""
+input UserConnectedAccountFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `service` field."""
+  service: StringFilter
+
+  """Filter by the object’s `identifier` field."""
+  identifier: StringFilter
+
+  """Filter by the object’s `details` field."""
+  details: JSONFilter
+
+  """Filter by the object’s `isVerified` field."""
+  isVerified: BooleanFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [UserConnectedAccountFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [UserConnectedAccountFilter!]
+
+  """Negates the expression."""
+  not: UserConnectedAccountFilter
+}
+
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: JSON
+}
+
+"""Methods to use when ordering `UserConnectedAccount`."""
+enum UserConnectedAccountOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  SERVICE_ASC
+  SERVICE_DESC
+  IDENTIFIER_ASC
+  IDENTIFIER_DESC
+  DETAILS_ASC
+  DETAILS_DESC
+  IS_VERIFIED_ASC
+  IS_VERIFIED_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """A connection to a list of `User` values."""
@@ -2209,6 +2141,81 @@ input CheckPasswordInput {
   password: String
 }
 
+"""The output of our `disconnectAccount` mutation."""
+type DisconnectAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `disconnectAccount` mutation."""
+input DisconnectAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  accountId: UUID!
+}
+
+"""The output of our `revokeApiKey` mutation."""
+type RevokeApiKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `revokeApiKey` mutation."""
+input RevokeApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  keyId: UUID!
+}
+
+"""The output of our `revokeSession` mutation."""
+type RevokeSessionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `revokeSession` mutation."""
+input RevokeSessionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  sessionId: UUID!
+}
+
 """The output of our `verifyPassword` mutation."""
 type VerifyPasswordPayload {
   """
@@ -2337,6 +2344,32 @@ input VerifyEmailInput {
   token: String
 }
 
+"""The output of our `provisionNewUser` mutation."""
+type ProvisionNewUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `provisionNewUser` mutation."""
+input ProvisionNewUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  password: String
+}
+
 """The output of our `resetPassword` mutation."""
 type ResetPasswordPayload {
   """
@@ -2364,14 +2397,14 @@ input ResetPasswordInput {
   newPassword: String
 }
 
-"""The output of our `signInOneTimeToken` mutation."""
-type SignInOneTimeTokenPayload {
+"""The output of our `createApiKey` mutation."""
+type CreateApiKeyPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: SignInOneTimeTokenRecord
+  result: CreateApiKeyRecord
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2379,7 +2412,39 @@ type SignInOneTimeTokenPayload {
   query: Query
 }
 
-type SignInOneTimeTokenRecord {
+type CreateApiKeyRecord {
+  apiKey: String
+  keyId: UUID
+}
+
+"""All input for the `createApiKey` mutation."""
+input CreateApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  keyName: String!
+  accessLevel: String
+  mfaLevel: String
+}
+
+"""The output of our `signInCrossOrigin` mutation."""
+type SignInCrossOriginPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: SignInCrossOriginRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SignInCrossOriginRecord {
   id: UUID
   userId: UUID
   accessToken: String
@@ -2388,8 +2453,8 @@ type SignInOneTimeTokenRecord {
   totpEnabled: Boolean
 }
 
-"""All input for the `signInOneTimeToken` mutation."""
-input SignInOneTimeTokenInput {
+"""All input for the `signInCrossOrigin` mutation."""
+input SignInCrossOriginInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -2397,44 +2462,6 @@ input SignInOneTimeTokenInput {
   clientMutationId: String
   token: String
   credentialKind: String
-}
-
-"""The output of our `signIn` mutation."""
-type SignInPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: SignInRecord
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type SignInRecord {
-  id: UUID
-  userId: UUID
-  accessToken: String
-  accessTokenExpiresAt: Datetime
-  isVerified: Boolean
-  totpEnabled: Boolean
-}
-
-"""All input for the `signIn` mutation."""
-input SignInInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  email: String
-  password: String
-  rememberMe: Boolean
-  credentialKind: String
-  csrfToken: String
 }
 
 """The output of our `signUp` mutation."""
@@ -2475,8 +2502,8 @@ input SignUpInput {
   csrfToken: String
 }
 
-"""The output of our `oneTimeToken` mutation."""
-type OneTimeTokenPayload {
+"""The output of our `requestCrossOriginToken` mutation."""
+type RequestCrossOriginTokenPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -2490,8 +2517,8 @@ type OneTimeTokenPayload {
   query: Query
 }
 
-"""All input for the `oneTimeToken` mutation."""
-input OneTimeTokenInput {
+"""All input for the `requestCrossOriginToken` mutation."""
+input RequestCrossOriginTokenInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -2501,6 +2528,47 @@ input OneTimeTokenInput {
   password: String
   origin: ConstructiveInternalTypeOrigin
   rememberMe: Boolean
+}
+
+"""The output of our `signIn` mutation."""
+type SignInPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: SignInRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SignInRecord {
+  id: UUID
+  userId: UUID
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  isVerified: Boolean
+  totpEnabled: Boolean
+  mfaRequired: Boolean
+  mfaChallengeToken: String
+}
+
+"""All input for the `signIn` mutation."""
+input SignInInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  password: String
+  rememberMe: Boolean
+  credentialKind: String
+  csrfToken: String
+  deviceToken: String
 }
 
 """The output of our `extendTokenExpires` mutation."""
@@ -2760,56 +2828,42 @@ input PhoneNumberInput {
   updatedAt: Datetime
 }
 
-"""The output of our create `ConnectedAccount` mutation."""
-type CreateConnectedAccountPayload {
+"""The output of our create `UserConnectedAccount` mutation."""
+type CreateUserConnectedAccountPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ConnectedAccount` that was created by this mutation."""
-  connectedAccount: ConnectedAccount
+  """The `UserConnectedAccount` that was created by this mutation."""
+  userConnectedAccount: UserConnectedAccount
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
 }
 
-"""All input for the create `ConnectedAccount` mutation."""
-input CreateConnectedAccountInput {
+"""All input for the create `UserConnectedAccount` mutation."""
+input CreateUserConnectedAccountInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `ConnectedAccount` to be created by this mutation."""
-  connectedAccount: ConnectedAccountInput!
+  """The `UserConnectedAccount` to be created by this mutation."""
+  userConnectedAccount: UserConnectedAccountInput!
 }
 
-"""An input for mutations affecting `ConnectedAccount`"""
-input ConnectedAccountInput {
+"""An input for mutations affecting `UserConnectedAccount`"""
+input UserConnectedAccountInput {
   id: UUID
   ownerId: UUID
-
-  """The service used, e.g. `twitter` or `github`."""
-  service: String!
-
-  """A unique identifier for the user within the service"""
-  identifier: String!
-
-  """Additional profile details extracted from this login method"""
-  details: JSON!
-
-  """Whether this connected account has been verified"""
+  service: String
+  identifier: String
+  details: JSON
   isVerified: Boolean
   createdAt: Datetime
   updatedAt: Datetime
@@ -3141,66 +3195,6 @@ input PhoneNumberPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `ConnectedAccount` mutation."""
-type UpdateConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` that was updated by this mutation."""
-  connectedAccount: ConnectedAccount
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
-}
-
-"""All input for the `updateConnectedAccount` mutation."""
-input UpdateConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `ConnectedAccount` being updated.
-  """
-  connectedAccountPatch: ConnectedAccountPatch!
-}
-
-"""
-Represents an update to a `ConnectedAccount`. Fields that are set will be updated.
-"""
-input ConnectedAccountPatch {
-  id: UUID
-  ownerId: UUID
-
-  """The service used, e.g. `twitter` or `github`."""
-  service: String
-
-  """A unique identifier for the user within the service"""
-  identifier: String
-
-  """Additional profile details extracted from this login method"""
-  details: JSON
-
-  """Whether this connected account has been verified"""
-  isVerified: Boolean
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
 """The output of our update `AuditLog` mutation."""
 type UpdateAuditLogPayload {
   """
@@ -3480,39 +3474,6 @@ input DeletePhoneNumberInput {
   id: UUID!
 }
 
-"""The output of our delete `ConnectedAccount` mutation."""
-type DeleteConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` that was deleted by this mutation."""
-  connectedAccount: ConnectedAccount
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
-}
-
-"""All input for the `deleteConnectedAccount` mutation."""
-input DeleteConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `AuditLog` mutation."""
 type DeleteAuditLogPayload {
   """
@@ -3664,9 +3625,10 @@ type ConfirmUploadPayload {
 
 """The root query type which gives access points into the data universe."""
 type Query {
-  currentIpAddress: InternetAddress
   currentUserAgent: String
+  currentIpAddress: InternetAddress
   currentUserId: UUID
+  requireStepUp(stepUpType: String): Boolean
   currentUser: User
 
   """Reads and enables pagination through a set of `RoleType`."""
@@ -3756,8 +3718,8 @@ type Query {
     orderBy: [PhoneNumberOrderBy!] = [PRIMARY_KEY_ASC]
   ): PhoneNumberConnection
 
-  """Reads and enables pagination through a set of `ConnectedAccount`."""
-  connectedAccounts(
+  """Reads and enables pagination through a set of `UserConnectedAccount`."""
+  userConnectedAccounts(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -3779,11 +3741,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ConnectedAccountFilter
+    where: UserConnectedAccountFilter
 
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountConnection
+    """The method to use when ordering `UserConnectedAccount`."""
+    orderBy: [UserConnectedAccountOrderBy!] = [NATURAL]
+  ): UserConnectedAccountConnection
 
   """Reads and enables pagination through a set of `AuditLog`."""
   auditLogs(
@@ -3900,6 +3862,24 @@ type Mutation {
     """
     input: CheckPasswordInput!
   ): CheckPasswordPayload
+  disconnectAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DisconnectAccountInput!
+  ): DisconnectAccountPayload
+  revokeApiKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RevokeApiKeyInput!
+  ): RevokeApiKeyPayload
+  revokeSession(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RevokeSessionInput!
+  ): RevokeSessionPayload
   verifyPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3930,36 +3910,48 @@ type Mutation {
     """
     input: VerifyEmailInput!
   ): VerifyEmailPayload
+  provisionNewUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionNewUserInput!
+  ): ProvisionNewUserPayload
   resetPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ResetPasswordInput!
   ): ResetPasswordPayload
-  signInOneTimeToken(
+  createApiKey(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: SignInOneTimeTokenInput!
-  ): SignInOneTimeTokenPayload
-  signIn(
+    input: CreateApiKeyInput!
+  ): CreateApiKeyPayload
+  signInCrossOrigin(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: SignInInput!
-  ): SignInPayload
+    input: SignInCrossOriginInput!
+  ): SignInCrossOriginPayload
   signUp(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: SignUpInput!
   ): SignUpPayload
-  oneTimeToken(
+  requestCrossOriginToken(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: OneTimeTokenInput!
-  ): OneTimeTokenPayload
+    input: RequestCrossOriginTokenInput!
+  ): RequestCrossOriginTokenPayload
+  signIn(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignInInput!
+  ): SignInPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4003,13 +3995,13 @@ type Mutation {
     input: CreatePhoneNumberInput!
   ): CreatePhoneNumberPayload
 
-  """Creates a single `ConnectedAccount`."""
-  createConnectedAccount(
+  """Creates a single `UserConnectedAccount`."""
+  createUserConnectedAccount(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateConnectedAccountInput!
-  ): CreateConnectedAccountPayload
+    input: CreateUserConnectedAccountInput!
+  ): CreateUserConnectedAccountPayload
 
   """Creates a single `AuditLog`."""
   createAuditLog(
@@ -4059,14 +4051,6 @@ type Mutation {
     input: UpdatePhoneNumberInput!
   ): UpdatePhoneNumberPayload
 
-  """Updates a single `ConnectedAccount` using a unique key and a patch."""
-  updateConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateConnectedAccountInput!
-  ): UpdateConnectedAccountPayload
-
   """Updates a single `AuditLog` using a unique key and a patch."""
   updateAuditLog(
     """
@@ -4114,14 +4098,6 @@ type Mutation {
     """
     input: DeletePhoneNumberInput!
   ): DeletePhoneNumberPayload
-
-  """Deletes a single `ConnectedAccount` using a unique key."""
-  deleteConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteConnectedAccountInput!
-  ): DeleteConnectedAccountPayload
 
   """Deletes a single `AuditLog` using a unique key."""
   deleteAuditLog(

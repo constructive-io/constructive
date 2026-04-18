@@ -6,7 +6,7 @@
 export { EmailModel } from './email';
 export { PhoneNumberModel } from './phoneNumber';
 export { CryptoAddressModel } from './cryptoAddress';
-export { ConnectedAccountModel } from './connectedAccount';
 export { AuditLogModel } from './auditLog';
 export { RoleTypeModel } from './roleType';
+export { UserConnectedAccountModel } from './userConnectedAccount';
 export { UserModel } from './user';

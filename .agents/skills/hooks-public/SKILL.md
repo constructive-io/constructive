@@ -1,13 +1,13 @@
 ---
 name: hooks-public
-description: React Query hooks for the public API — provides typed query and mutation hooks for 109 tables and 64 custom operations
+description: React Query hooks for the public API — provides typed query and mutation hooks for 114 tables and 72 custom operations
 ---
 
 # hooks-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-React Query hooks for the public API — provides typed query and mutation hooks for 109 tables and 64 custom operations
+React Query hooks for the public API — provides typed query and mutation hooks for 114 tables and 72 custom operations
 
 ## Usage
 
@@ -49,6 +49,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [table](references/table.md)
 - [check-constraint](references/check-constraint.md)
 - [field](references/field.md)
+- [spatial-relation](references/spatial-relation.md)
 - [foreign-key-constraint](references/foreign-key-constraint.md)
 - [full-text-search](references/full-text-search.md)
 - [index](references/index.md)
@@ -62,9 +63,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [view-grant](references/view-grant.md)
 - [view-rule](references/view-rule.md)
 - [embedding-chunk](references/embedding-chunk.md)
-- [table-template-module](references/table-template-module.md)
 - [secure-table-provision](references/secure-table-provision.md)
 - [relation-provision](references/relation-provision.md)
+- [session-secrets-module](references/session-secrets-module.md)
 - [schema-grant](references/schema-grant.md)
 - [default-privilege](references/default-privilege.md)
 - [enum](references/enum.md)
@@ -102,6 +103,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [blueprint-template](references/blueprint-template.md)
 - [blueprint-construction](references/blueprint-construction.md)
 - [storage-module](references/storage-module.md)
+- [entity-type-provision](references/entity-type-provision.md)
+- [webauthn-credentials-module](references/webauthn-credentials-module.md)
 - [database-provision-module](references/database-provision-module.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
@@ -110,6 +113,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-member](references/org-member.md)
 - [org-admin-grant](references/org-admin-grant.md)
 - [org-owner-grant](references/org-owner-grant.md)
+- [org-member-profile](references/org-member-profile.md)
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
@@ -122,7 +126,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [email](references/email.md)
 - [phone-number](references/phone-number.md)
 - [crypto-address](references/crypto-address.md)
-- [connected-account](references/connected-account.md)
 - [app-invite](references/app-invite.md)
 - [app-claimed-invite](references/app-claimed-invite.md)
 - [org-invite](references/org-invite.md)
@@ -135,10 +138,12 @@ See the `references/` directory for detailed per-entity API documentation:
 - [migrate-file](references/migrate-file.md)
 - [app-limit-default](references/app-limit-default.md)
 - [org-limit-default](references/org-limit-default.md)
-- [membership-type](references/membership-type.md)
+- [devices-module](references/devices-module.md)
+- [user-connected-account](references/user-connected-account.md)
 - [app-membership-default](references/app-membership-default.md)
 - [commit](references/commit.md)
 - [rate-limits-module](references/rate-limits-module.md)
+- [membership-type](references/membership-type.md)
 - [org-membership-default](references/org-membership-default.md)
 - [rls-module](references/rls-module.md)
 - [sql-action](references/sql-action.md)
@@ -147,12 +152,14 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-membership](references/app-membership.md)
 - [hierarchy-module](references/hierarchy-module.md)
 - [current-user-id](references/current-user-id.md)
-- [current-ip-address](references/current-ip-address.md)
 - [current-user-agent](references/current-user-agent.md)
+- [current-ip-address](references/current-ip-address.md)
+- [require-step-up](references/require-step-up.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)
 - [steps-achieved](references/steps-achieved.md)
 - [rev-parse](references/rev-parse.md)
+- [resolve-blueprint-field](references/resolve-blueprint-field.md)
 - [org-is-manager-of](references/org-is-manager-of.md)
 - [app-permissions-get-mask](references/app-permissions-get-mask.md)
 - [org-permissions-get-mask](references/org-permissions-get-mask.md)
@@ -171,6 +178,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [accept-database-transfer](references/accept-database-transfer.md)
 - [cancel-database-transfer](references/cancel-database-transfer.md)
 - [reject-database-transfer](references/reject-database-transfer.md)
+- [disconnect-account](references/disconnect-account.md)
+- [revoke-api-key](references/revoke-api-key.md)
+- [revoke-session](references/revoke-session.md)
 - [verify-password](references/verify-password.md)
 - [verify-totp](references/verify-totp.md)
 - [submit-app-invite-code](references/submit-app-invite-code.md)
@@ -182,9 +192,12 @@ See the `references/` directory for detailed per-entity API documentation:
 - [freeze-objects](references/freeze-objects.md)
 - [init-empty-repo](references/init-empty-repo.md)
 - [construct-blueprint](references/construct-blueprint.md)
+- [provision-new-user](references/provision-new-user.md)
 - [reset-password](references/reset-password.md)
 - [remove-node-at-path](references/remove-node-at-path.md)
 - [copy-template-to-blueprint](references/copy-template-to-blueprint.md)
+- [create-api-key](references/create-api-key.md)
+- [provision-spatial-relation](references/provision-spatial-relation.md)
 - [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
 - [provision-unique-constraint](references/provision-unique-constraint.md)
@@ -198,12 +211,12 @@ See the `references/` directory for detailed per-entity API documentation:
 - [set-and-commit](references/set-and-commit.md)
 - [provision-relation](references/provision-relation.md)
 - [apply-rls](references/apply-rls.md)
-- [sign-in-one-time-token](references/sign-in-one-time-token.md)
+- [sign-in-cross-origin](references/sign-in-cross-origin.md)
 - [create-user-database](references/create-user-database.md)
 - [extend-token-expires](references/extend-token-expires.md)
-- [sign-in](references/sign-in.md)
 - [sign-up](references/sign-up.md)
-- [one-time-token](references/one-time-token.md)
+- [request-cross-origin-token](references/request-cross-origin-token.md)
+- [sign-in](references/sign-in.md)
 - [provision-table](references/provision-table.md)
 - [send-verification-email](references/send-verification-email.md)
 - [forgot-password](references/forgot-password.md)

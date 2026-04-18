@@ -8,27 +8,11 @@ import { QueryBuilder, buildCustomDocument } from '../query-builder';
 import type { InferSelectResult, StrictSelect } from '../select-types';
 import type { User, UserSelect } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface RequireStepUpVariables {
+  stepUpType?: string;
+}
 export function createQueryOperations(client: OrmClient) {
   return {
-    currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
-      new QueryBuilder<{
-        currentIpAddress: string | null;
-      }>({
-        client,
-        operation: 'query',
-        operationName: 'CurrentIpAddress',
-        fieldName: 'currentIpAddress',
-        ...buildCustomDocument(
-          'query',
-          'CurrentIpAddress',
-          'currentIpAddress',
-          options?.select,
-          undefined,
-          [],
-          connectionFieldsMap,
-          undefined
-        ),
-      }),
     currentUserAgent: (options?: { select?: Record<string, unknown> }) =>
       new QueryBuilder<{
         currentUserAgent: string | null;
@@ -41,6 +25,25 @@ export function createQueryOperations(client: OrmClient) {
           'query',
           'CurrentUserAgent',
           'currentUserAgent',
+          options?.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
+      new QueryBuilder<{
+        currentIpAddress: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'CurrentIpAddress',
+        fieldName: 'currentIpAddress',
+        ...buildCustomDocument(
+          'query',
+          'CurrentIpAddress',
+          'currentIpAddress',
           options?.select,
           undefined,
           [],
@@ -63,6 +66,35 @@ export function createQueryOperations(client: OrmClient) {
           options?.select,
           undefined,
           [],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    requireStepUp: (
+      args: RequireStepUpVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        requireStepUp: boolean | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'RequireStepUp',
+        fieldName: 'requireStepUp',
+        ...buildCustomDocument(
+          'query',
+          'RequireStepUp',
+          'requireStepUp',
+          options?.select,
+          args,
+          [
+            {
+              name: 'stepUpType',
+              type: 'String',
+            },
+          ],
           connectionFieldsMap,
           undefined
         ),

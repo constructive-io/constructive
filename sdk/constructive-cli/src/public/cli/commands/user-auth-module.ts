@@ -39,8 +39,8 @@ const fieldSchema: FieldSchema = {
   checkPasswordFunction: 'string',
   sendAccountDeletionEmailFunction: 'string',
   deleteAccountFunction: 'string',
-  signInOneTimeTokenFunction: 'string',
-  oneTimeTokenFunction: 'string',
+  signInCrossOriginFunction: 'string',
+  requestCrossOriginTokenFunction: 'string',
   extendTokenExpires: 'string',
 };
 const usage =
@@ -117,8 +117,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       checkPasswordFunction: true,
       sendAccountDeletionEmailFunction: true,
       deleteAccountFunction: true,
-      signInOneTimeTokenFunction: true,
-      oneTimeTokenFunction: true,
+      signInCrossOriginFunction: true,
+      requestCrossOriginTokenFunction: true,
       extendTokenExpires: true,
     };
     const findManyArgs = parseFindManyArgs<
@@ -163,8 +163,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       checkPasswordFunction: true,
       sendAccountDeletionEmailFunction: true,
       deleteAccountFunction: true,
-      signInOneTimeTokenFunction: true,
-      oneTimeTokenFunction: true,
+      signInCrossOriginFunction: true,
+      requestCrossOriginTokenFunction: true,
       extendTokenExpires: true,
     };
     const findFirstArgs = parseFindFirstArgs<
@@ -221,8 +221,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           checkPasswordFunction: true,
           sendAccountDeletionEmailFunction: true,
           deleteAccountFunction: true,
-          signInOneTimeTokenFunction: true,
-          oneTimeTokenFunction: true,
+          signInCrossOriginFunction: true,
+          requestCrossOriginTokenFunction: true,
           extendTokenExpires: true,
         },
       })
@@ -394,15 +394,15 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'signInOneTimeTokenFunction',
-        message: 'signInOneTimeTokenFunction',
+        name: 'signInCrossOriginFunction',
+        message: 'signInCrossOriginFunction',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'oneTimeTokenFunction',
-        message: 'oneTimeTokenFunction',
+        name: 'requestCrossOriginTokenFunction',
+        message: 'requestCrossOriginTokenFunction',
         required: false,
         skipPrompt: true,
       },
@@ -445,8 +445,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           checkPasswordFunction: cleanedData.checkPasswordFunction,
           sendAccountDeletionEmailFunction: cleanedData.sendAccountDeletionEmailFunction,
           deleteAccountFunction: cleanedData.deleteAccountFunction,
-          signInOneTimeTokenFunction: cleanedData.signInOneTimeTokenFunction,
-          oneTimeTokenFunction: cleanedData.oneTimeTokenFunction,
+          signInCrossOriginFunction: cleanedData.signInCrossOriginFunction,
+          requestCrossOriginTokenFunction: cleanedData.requestCrossOriginTokenFunction,
           extendTokenExpires: cleanedData.extendTokenExpires,
         },
         select: {
@@ -473,8 +473,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           checkPasswordFunction: true,
           sendAccountDeletionEmailFunction: true,
           deleteAccountFunction: true,
-          signInOneTimeTokenFunction: true,
-          oneTimeTokenFunction: true,
+          signInCrossOriginFunction: true,
+          requestCrossOriginTokenFunction: true,
           extendTokenExpires: true,
         },
       })
@@ -652,15 +652,15 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
-        name: 'signInOneTimeTokenFunction',
-        message: 'signInOneTimeTokenFunction',
+        name: 'signInCrossOriginFunction',
+        message: 'signInCrossOriginFunction',
         required: false,
         skipPrompt: true,
       },
       {
         type: 'text',
-        name: 'oneTimeTokenFunction',
-        message: 'oneTimeTokenFunction',
+        name: 'requestCrossOriginTokenFunction',
+        message: 'requestCrossOriginTokenFunction',
         required: false,
         skipPrompt: true,
       },
@@ -703,8 +703,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           checkPasswordFunction: cleanedData.checkPasswordFunction,
           sendAccountDeletionEmailFunction: cleanedData.sendAccountDeletionEmailFunction,
           deleteAccountFunction: cleanedData.deleteAccountFunction,
-          signInOneTimeTokenFunction: cleanedData.signInOneTimeTokenFunction,
-          oneTimeTokenFunction: cleanedData.oneTimeTokenFunction,
+          signInCrossOriginFunction: cleanedData.signInCrossOriginFunction,
+          requestCrossOriginTokenFunction: cleanedData.requestCrossOriginTokenFunction,
           extendTokenExpires: cleanedData.extendTokenExpires,
         },
         select: {
@@ -731,8 +731,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           checkPasswordFunction: true,
           sendAccountDeletionEmailFunction: true,
           deleteAccountFunction: true,
-          signInOneTimeTokenFunction: true,
-          oneTimeTokenFunction: true,
+          signInCrossOriginFunction: true,
+          requestCrossOriginTokenFunction: true,
           extendTokenExpires: true,
         },
       })
