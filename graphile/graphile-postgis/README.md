@@ -12,38 +12,27 @@
    <a href="https://www.npmjs.com/package/graphile-postgis"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphile%2Fgraphile-postgis%2Fpackage.json"/></a>
 </p>
 
-PostGIS support for PostGraphile v5.
+A full PostGIS integration for PostGraphile v5. Turns every
+`geometry` / `geography` column into a typed, introspectable GraphQL
+field — with GeoJSON scalars, subtype-specific fields, measurement
+helpers, spatial filters, aggregates, and cross-table **spatial
+relations** — and wires the whole thing into the generated ORM so you
+can query spatial data the same way you query anything else.
 
-Automatically generates GraphQL types for PostGIS `geometry` and
-`geography` columns — GeoJSON scalars, dimension-aware interfaces,
-subtype-specific fields (coordinates, points, rings, etc.), plus
-measurement / transformation / aggregate fields — so spatial data
-flows through your API with the same ergonomics as every other column.
+## Table of contents
 
-## The problem
-
-PostGIS is a first-class spatial database, but the default PostGraphile
-schema doesn't know what to do with it: a `geometry` column looks
-opaque to the generated GraphQL types, there's no scalar for GeoJSON,
-no concrete type for `Point` vs `Polygon`, no way to read back
-coordinates, lengths, areas, or bounding boxes without writing your
-own computed columns. You end up hand-rolling GraphQL types,
-client-side parsers, and one-off SQL helpers for every spatial column.
-
-`graphile-postgis` closes that gap. The plugin detects the PostGIS
-extension (even when installed in a non-`public` schema), registers a
-`GeoJSON` scalar, and generates a full type hierarchy — `Geometry` /
-`Geography` interfaces, dimension-aware interfaces (`XY`, `XYZ`, `XYM`,
-`XYZM`), and concrete subtypes (`Point`, `LineString`, `Polygon`,
-`MultiPoint`, `MultiLineString`, `MultiPolygon`, `GeometryCollection`)
-— with subtype-specific fields, measurement fields, transformation
-fields, and aggregate fields already wired up. If PostGIS isn't
-installed, the plugin degrades gracefully instead of failing the
-schema build.
-
-Cross-table spatial joins — the "which clinics are inside this county"
-shape — are a separate feature built on top of the type layer; see
-[Spatial relations](#spatial-relations).
+- [Installation](#installation)
+- [Usage](#usage)
+- [Features at a glance](#features-at-a-glance)
+- [GeoJSON scalar and typed geometry columns](#geojson-scalar-and-typed-geometry-columns)
+- [Dimension-aware interfaces and subtype fields](#dimension-aware-interfaces-and-subtype-fields)
+- [Measurement fields (`length`, `area`, `perimeter`)](#measurement-fields-length-area-perimeter)
+- [Transformation fields (`centroid`, `bbox`, `numPoints`)](#transformation-fields-centroid-bbox-numpoints)
+- [Per-column spatial filters](#per-column-spatial-filters)
+- [PostGIS aggregate fields](#postgis-aggregate-fields)
+- [Spatial relations (`@spatialRelation`)](#spatial-relations-spatialrelation)
+- [Graceful degradation](#graceful-degradation)
+- [License](#license)
 
 ## Installation
 
@@ -53,153 +42,279 @@ npm install graphile-postgis
 
 ## Usage
 
-```typescript
+```ts
 import { GraphilePostgisPreset } from 'graphile-postgis';
 
 const preset = {
-  extends: [GraphilePostgisPreset]
+  extends: [GraphilePostgisPreset],
 };
 ```
 
-## Features
+The preset bundles every plugin listed below. You can also import each
+plugin individually (`PostgisCodecPlugin`, `PostgisRegisterTypesPlugin`,
+`PostgisGeometryFieldsPlugin`, `PostgisMeasurementFieldsPlugin`,
+`PostgisTransformationFieldsPlugin`, `PostgisAggregatePlugin`,
+`PostgisSpatialRelationsPlugin`, …) if you prefer à-la-carte.
 
-- GeoJSON scalar type for input/output
-- GraphQL interfaces for `geometry` and `geography` base types
-- Dimension-aware interfaces (`XY`, `XYZ`, `XYM`, `XYZM`)
-- Concrete types for all geometry subtypes: `Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`, `MultiPolygon`, `GeometryCollection`
-- Subtype-specific fields (`x` / `y` / `z` for points, `points` for line strings, `exterior` / `interiors` for polygons, etc.)
-- Geography-aware field naming (`longitude` / `latitude` / `height` instead of `x` / `y` / `z`)
-- Measurement fields (`length`, `area`, `perimeter`) computed geodesically from GeoJSON
-- Transformation fields (`centroid`, `bbox`, `numPoints`)
-- PostGIS aggregate fields (`stExtent`, `stUnion`, `stCollect`, `stConvexHull`)
-- Cross-table [spatial relations](#spatial-relations) via `@spatialRelation` smart tags
-- Auto-detects PostGIS in non-`public` schemas and degrades gracefully when the extension is missing
+## Features at a glance
 
-## Core PostGIS type support
+- **GeoJSON scalar** for input and output on every `geometry` /
+  `geography` column.
+- **Full type hierarchy** — `Geometry` / `Geography` interfaces,
+  dimension-aware interfaces (`XY`, `XYZ`, `XYM`, `XYZM`), and
+  concrete subtype objects (`Point`, `LineString`, `Polygon`,
+  `MultiPoint`, `MultiLineString`, `MultiPolygon`,
+  `GeometryCollection`).
+- **Subtype-specific accessors** — `x` / `y` / `z` on points
+  (`longitude` / `latitude` / `height` on `geography`), `points` on
+  line strings, `exterior` / `interiors` on polygons, etc.
+- **Measurement fields** — `length`, `area`, `perimeter`, computed
+  geodesically from GeoJSON on the server.
+- **Transformation fields** — `centroid`, `bbox`, `numPoints`.
+- **Per-column spatial filters** — every PostGIS topological
+  predicate (`intersects`, `contains`, `within`, `dwithin`, …) and
+  every bounding-box operator (`bboxIntersects2D`, `bboxContains`,
+  `bboxLeftOf`, …) wired into the generated `where:` shape.
+- **Aggregate fields** — `stExtent`, `stUnion`, `stCollect`,
+  `stConvexHull` exposed on every aggregate type for a geometry
+  column.
+- **Spatial relations** — a `@spatialRelation` smart tag that
+  declares cross-table spatial joins as first-class relations (ORM +
+  GraphQL), backed by PostGIS predicates and GIST indexes.
+- **Auto-detects PostGIS** in any schema (not just `public`) and
+  **degrades gracefully** when the extension isn't installed.
 
-Out of the box, the preset turns every `geometry` / `geography` column
-into a real, typed GraphQL field:
+## GeoJSON scalar and typed geometry columns
 
-- **GeoJSON scalar + subtype objects.** Values are serialised as
-  GeoJSON. Each concrete subtype (`Point`, `Polygon`, …) is its own
-  object type and exposes its natural accessor fields — e.g. `Point`
-  has `x` / `y` / `z` (or `longitude` / `latitude` / `height` on a
-  `geography` column), `Polygon` has `exterior` and `interiors`,
-  `LineString` has `points`.
-- **Dimension-aware interfaces.** `XY`, `XYZ`, `XYM`, and `XYZM`
-  interfaces let clients request coordinates without caring about the
-  specific subtype.
-- **Measurement, transformation, and aggregate fields.** Geometry
-  types expose `length`, `area`, `perimeter`, `centroid`, `bbox`, and
-  `numPoints`; aggregate types expose `stExtent`, `stUnion`,
-  `stCollect`, and `stConvexHull`.
-- **Graceful degradation.** If the `postgis` extension isn't installed
-  in the target database, the plugin skips type registration instead
-  of breaking the schema build.
-
-For cross-table spatial joins — e.g. "clinics inside a county" — see
-[Spatial relations](#spatial-relations).
-
-## Spatial relations
-
-### The problem
-
-Even with GeoJSON types on every column, working with PostGIS from an
-app is usually painful for one specific reason: **you end up juggling
-large amounts of GeoJSON across tables on the client**. You fetch
-every clinic as GeoJSON, fetch every county polygon as GeoJSON, and
-then — in the browser — loop through them yourself to figure out
-which clinic sits inside which county. Every query, every count,
-every page of results becomes a client-side geometry problem.
-
-An ORM generated automatically from your database schema can't fix
-this on its own. It sees a `geometry` column and stops there — it has
-no idea that "clinics inside a county" is the question you actually
-want to ask. Foreign keys tell it how tables relate by equality;
-nothing tells it how tables relate *spatially*.
-
-So we added the missing primitive: a **spatial relation**. You
-declare, on the database column, that `clinics.location` is "inside"
-`counties.geom`, and the generated GraphQL schema + ORM gain a
-first-class `where: { county: { some: { … } } }` shape that runs the
-join server-side, in one SQL query, using PostGIS and a GIST index.
-No GeoJSON on the wire, no client-side geometry, and the relation
-composes with the rest of your `where:` the same way a foreign-key
-relation would.
-
-### Smart-tag overview
-
-You declare a spatial relation with a `@spatialRelation` smart tag on
-a `geometry` or `geography` column. The plugin turns that tag into a
-virtual relation on the owning table: a new field on the table's
-generated `where` input that runs a PostGIS join server-side. You
-write one line of SQL once; the generated ORM and GraphQL schema pick
-it up automatically.
-
-#### At a glance
-
-**Before** — GeoJSON juggling on the client:
+A `geometry` / `geography` column is exposed as a typed GraphQL object
+with a `geojson` field carrying the GeoJSON payload. You select it the
+same way you select any nested object:
 
 ```ts
-// 1. Pull every clinic's location as GeoJSON.
-const clinics = await gql(`{ telemedicineClinics { nodes { id name location } } }`);
-// 2. Pull the polygon of the one county you care about.
-const { geom } = await gql(`{ countyByName(name: "Bay County") { geom } }`);
-// 3. Run point-in-polygon on the client for each clinic.
-const inBay = clinics.telemedicineClinics.nodes.filter((c) =>
-  booleanPointInPolygon(c.location, geom),
-);
+// Read a location column as GeoJSON through the ORM
+const result = await orm.location
+  .findMany({
+    select: { name: true, geom: { select: { geojson: true } } },
+    where: { name: { equalTo: 'Central Park Cafe' } },
+  })
+  .execute();
 ```
 
-**After** — server-side, one trip:
+Input values (mutations, filters) accept GeoJSON directly — any of
+`Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`,
+`MultiPolygon`, or `GeometryCollection`.
+
+## Dimension-aware interfaces and subtype fields
+
+Each concrete subtype is its own GraphQL object with fields that make
+sense for that subtype:
+
+| Subtype             | Notable fields                                      |
+|---------------------|------------------------------------------------------|
+| `Point`             | `x` / `y` / `z` (or `longitude` / `latitude` / `height` on `geography`) |
+| `LineString`        | `points: [Point!]`                                  |
+| `Polygon`           | `exterior: LineString`, `interiors: [LineString!]`  |
+| `MultiPoint`        | `points: [Point!]`                                  |
+| `MultiLineString`   | `lineStrings: [LineString!]`                        |
+| `MultiPolygon`      | `polygons: [Polygon!]`                              |
+| `GeometryCollection`| `geometries: [Geometry!]`                           |
+
+On top of those, every geometry type also exposes the `XY` / `XYZ` /
+`XYM` / `XYZM` dimension interfaces so a client can ask for
+coordinates without branching on the specific subtype.
+
+```graphql
+# Example GraphQL selection on a Polygon column
+{
+  counties {
+    nodes {
+      name
+      geom {
+        geojson
+        exterior {
+          points { x y }
+        }
+      }
+    }
+  }
+}
+```
+
+## Measurement fields (`length`, `area`, `perimeter`)
+
+Subtype-appropriate measurement fields are added automatically, using
+geodesic math on the GeoJSON payload (Haversine for distance,
+spherical excess for area, WGS84 / SRID 4326 assumed):
+
+| Subtype                                         | Fields added            |
+|-------------------------------------------------|-------------------------|
+| `LineString`, `MultiLineString`                 | `length`                |
+| `Polygon`, `MultiPolygon`                       | `area`, `perimeter`     |
+
+Values are `Float` in meters (length / perimeter) and square meters
+(area).
+
+```graphql
+{
+  counties {
+    nodes {
+      name
+      geom { area perimeter }
+    }
+  }
+  routes {
+    nodes {
+      id
+      path { length }
+    }
+  }
+}
+```
+
+For exact server-side PostGIS measurements (e.g. `ST_Area` with a
+specific SRID projection), define a computed column in SQL — these
+fields are client-facing conveniences, not a replacement for
+projection-aware analytics.
+
+## Transformation fields (`centroid`, `bbox`, `numPoints`)
+
+Every geometry object also gets three lightweight transformation
+fields:
+
+- `centroid: [Float!]` — coordinate-mean centroid.
+- `bbox: [Float!]` — `[minX, minY, maxX, maxY]` bounding box.
+- `numPoints: Int!` — total coordinate count.
+
+```graphql
+{
+  parks {
+    nodes {
+      name
+      geom { centroid bbox numPoints }
+    }
+  }
+}
+```
+
+For `ST_Transform` / `ST_Buffer` / `ST_Simplify` / `ST_MakeValid`,
+which all take parameters, declare a custom SQL function or computed
+column — the object-level transformation fields intentionally stick
+to parameter-free helpers.
+
+## Per-column spatial filters
+
+Every PostGIS predicate is registered as a filter operator on the
+column's `where:` entry, both for `geometry` and `geography` codecs:
+
+- Topological: `intersects`, `contains`, `containsProperly`, `within`,
+  `covers`, `coveredBy`, `touches`, `crosses`, `disjoint`, `overlaps`,
+  `equals`, `orderingEquals`.
+- Distance: `dwithin` (parametric).
+- 2D / ND bounding-box: `bboxIntersects2D`, `bboxIntersectsND`,
+  `bboxContains`, `bboxEquals`.
+- Directional bounding-box: `bboxLeftOf`, `bboxRightOf`, `bboxAbove`,
+  `bboxBelow`, `bboxOverlapsOrLeftOf`, `bboxOverlapsOrRightOf`,
+  `bboxOverlapsOrAbove`, `bboxOverlapsOrBelow`.
+
+All of them take GeoJSON as input — the plugin wraps the value with
+`ST_GeomFromGeoJSON(...)::<codec>` before it hits PostgreSQL, so
+`Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`,
+`MultiPolygon`, and `GeometryCollection` inputs all work uniformly.
+
+```ts
+// Cities whose location is inside a polygon
+const inBayArea = await orm.citiesGeom
+  .findMany({
+    select: { id: true, name: true },
+    where: { loc: { intersects: BAY_AREA_POLYGON } },
+  })
+  .execute();
+
+// Cities whose bbox sits strictly west of a reference point
+const westOfCentral = await orm.citiesGeom
+  .findMany({
+    select: { id: true, name: true },
+    where: { loc: { bboxLeftOf: { type: 'Point', coordinates: [-100.0, 37.77] } } },
+  })
+  .execute();
+```
+
+## PostGIS aggregate fields
+
+On every aggregate type for a geometry / geography column, the plugin
+adds four SQL-level aggregate fields that run in-database:
+
+- `stExtent` — `ST_Extent(...)` — bounding box of all rows as a
+  GeoJSON Polygon.
+- `stUnion` — `ST_Union(...)` — union of all rows as GeoJSON.
+- `stCollect` — `ST_Collect(...)` — collect into a
+  `GeometryCollection`.
+- `stConvexHull` — `ST_ConvexHull(ST_Collect(...))` — convex hull of
+  all rows as a GeoJSON Polygon.
+
+```graphql
+{
+  citiesGeoms {
+    aggregates {
+      stExtent { loc { geojson } }
+      stConvexHull { loc { geojson } }
+    }
+  }
+}
+```
+
+## Spatial relations (`@spatialRelation`)
+
+Spatial relations are the plugin's cross-table feature: a way to
+declare, directly on a database column, that two tables are related
+*spatially* — "clinics inside a county", "parcels touching a road",
+"events within 5 km of a user" — and get a first-class relation in
+the generated ORM and GraphQL schema for free.
+
+### Why a dedicated primitive
+
+Without this, spatial joins from an app usually devolve into shipping
+GeoJSON across the wire: every clinic as GeoJSON, every county
+polygon as GeoJSON, a point-in-polygon loop on the client. An
+auto-generated ORM can't do better on its own — it sees a `geometry`
+column and stops there. Foreign keys describe equality; nothing
+describes *containment* or *proximity*.
+
+A `@spatialRelation` tag declares that `clinics.location` is
+"within" `counties.geom`, and the generated schema + ORM gain a
+first-class `where: { county: { some: { … } } }` shape that runs the
+join server-side, in one SQL query, using PostGIS and a GIST index.
+No GeoJSON on the wire; the relation composes with the rest of your
+`where:` the same way a foreign-key relation would.
+
+### Declaring a relation
+
+Put the tag on the owning geometry / geography column:
 
 ```sql
 COMMENT ON COLUMN telemedicine_clinics.location IS
   E'@spatialRelation county counties.geom st_within';
 ```
 
-```ts
-const inBay = await orm.telemedicineClinic
-  .findMany({
-    select: { id: true, name: true },
-    where: { county: { some: { name: { equalTo: 'Bay County' } } } },
-  })
-  .execute();
-```
-
-No polygon crosses the wire. The join happens in a single
-`EXISTS (…)` subquery on the server, using a PostGIS predicate on the
-two columns.
-
-### Declaring a relation
-
-**Tag grammar**
+Tag grammar:
 
 ```
 @spatialRelation <relationName> <targetRef> <operator> [<paramName>]
 ```
 
-- `<relationName>` — user-chosen name for the new field on the owning
-  table's `where` input. Must match `/^[A-Za-z_][A-Za-z0-9_]*$/`. The
-  name is preserved as-written — `county` stays `county`,
-  `nearbyClinic` stays `nearbyClinic`.
+- `<relationName>` — user-chosen name for the new field on the
+  owner's `where` input. Must match `/^[A-Za-z_][A-Za-z0-9_]*$/`.
 - `<targetRef>` — `table.column` (defaults to the owning column's
-  schema) or `schema.table.column` (for references in another schema,
-  e.g. a shared `geo` schema).
-- `<operator>` — one of the eight PG-native snake_case tokens listed in
-  [Operator reference](#operator-reference).
-- `<paramName>` — required if and only if the operator is parametric.
-  Today that's `st_dwithin`, which needs a parameter name (typically
-  `distance`).
+  schema) or `schema.table.column`.
+- `<operator>` — one of the eight PG-native snake_case tokens listed
+  below.
+- `<paramName>` — required if the operator is parametric. Today that
+  is only `st_dwithin` (use `distance`).
 
-Both sides of the relation must be `geometry` or `geography`, and they
-must share the **same** base codec — you cannot mix `geometry` and
-`geography`.
+Both sides must be `geometry` or `geography`, and share the **same**
+codec — mixing is rejected at schema build.
 
-**Multiple relations on one column**
-
-Stack tags. Each line becomes its own field on the owning table's
-`where` input:
+Stack multiple relations on one column by separating tags with `\n`:
 
 ```sql
 COMMENT ON COLUMN telemedicine_clinics.location IS
@@ -209,52 +324,80 @@ COMMENT ON COLUMN telemedicine_clinics.location IS
   '@spatialRelation nearbyClinic        telemedicine_clinics.location  st_dwithin distance';
 ```
 
-The four relations above all exist in the integration test suite and
-can be used in the same query. Two relations on the same owner cannot
-share a `<relationName>`.
-
 ### Operator reference
 
-| Tag operator | PostGIS function | Parametric? | Symmetric? | Typical use |
-|---|---|---|---|---|
-| `st_contains`        | `ST_Contains(A, B)`  | no          | **no** (A contains B) | polygon containing a point / line / polygon |
-| `st_within`          | `ST_Within(A, B)`    | no          | **no** (A within B)   | point-in-polygon, line-in-polygon |
-| `st_covers`          | `ST_Covers(A, B)`    | no          | **no**                | like `st_contains` but boundary-inclusive |
-| `st_coveredby`       | `ST_CoveredBy(A, B)` | no          | **no**                | dual of `st_covers` |
-| `st_intersects`      | `ST_Intersects(A, B)`| no          | yes                   | any overlap at all |
-| `st_equals`          | `ST_Equals(A, B)`    | no          | yes                   | exact geometry match |
-| `st_bbox_intersects` | `A && B` (infix)     | no          | yes                   | fast bounding-box prefilter |
-| `st_dwithin`         | `ST_DWithin(A, B, d)`| **yes** (`d`) | yes                 | radius / proximity search |
+| Tag operator         | PostGIS function      | Parametric?    | Symmetric?            | Typical use                                      |
+|----------------------|-----------------------|----------------|-----------------------|--------------------------------------------------|
+| `st_contains`        | `ST_Contains(A, B)`   | no             | **no** (A contains B) | polygon containing a point / line / polygon     |
+| `st_within`          | `ST_Within(A, B)`     | no             | **no** (A within B)   | point-in-polygon, line-in-polygon               |
+| `st_covers`          | `ST_Covers(A, B)`     | no             | **no**                | like `st_contains`, boundary-inclusive          |
+| `st_coveredby`       | `ST_CoveredBy(A, B)`  | no             | **no**                | dual of `st_covers`                             |
+| `st_intersects`      | `ST_Intersects(A, B)` | no             | yes                   | any overlap at all                              |
+| `st_equals`          | `ST_Equals(A, B)`     | no             | yes                   | exact geometry match                            |
+| `st_bbox_intersects` | `A && B` (infix)      | no             | yes                   | fast bounding-box prefilter                     |
+| `st_dwithin`         | `ST_DWithin(A, B, d)` | **yes** (`d`)  | yes                   | radius / proximity search                       |
 
-> The tag reads left-to-right as **"owner op target"**, and the emitted
-> SQL is exactly `ST_<op>(owner_col, target_col[, distance])`. For
-> symmetric operators (`st_intersects`, `st_equals`, `st_dwithin`,
-> `st_bbox_intersects`) argument order doesn't matter. For directional
-> operators (`st_within`, `st_contains`, `st_covers`, `st_coveredby`),
-> flipping the two columns inverts the result set. Rule of thumb: put
-> the relation on the column whose type makes the sentence true —
-> `clinics.location st_within counties.geom` reads naturally; the
-> reverse does not.
+The tag reads left-to-right as **"owner op target"**, and the emitted
+SQL is exactly `ST_<op>(owner_col, target_col[, distance])`. For
+directional operators (`st_within`, `st_contains`, `st_covers`,
+`st_coveredby`), flipping the two columns inverts the result set; put
+the relation on the column whose type makes the sentence true.
 
-### Using the generated `where` shape
+### Using a spatial relation from the ORM
 
-**Through the ORM**
+Every 2-argument relation exposes `some` / `every` / `none` against
+the target table's full `where` input:
 
 ```ts
-// "Clinics inside any county named 'Bay County'"
+// "Clinics inside LA County" — st_within, one SQL query, no GeoJSON on the wire.
 await orm.telemedicineClinic
   .findMany({
     select: { id: true, name: true },
-    where: { county: { some: { name: { equalTo: 'Bay County' } } } },
+    where: { county: { some: { name: { equalTo: 'LA County' } } } },
+  })
+  .execute();
+
+// "Clinics NOT in NYC County" — negation via `none`.
+await orm.telemedicineClinic
+  .findMany({
+    select: { id: true },
+    where: { county: { none: { name: { equalTo: 'NYC County' } } } },
+  })
+  .execute();
+
+// "Any clinic that sits inside at least one county" — empty inner
+// clause still excludes points that fall outside every county.
+await orm.telemedicineClinic
+  .findMany({
+    select: { id: true, name: true },
+    where: { county: { some: {} } },
   })
   .execute();
 ```
 
-**Through GraphQL**
+Parametric relations (today: `st_dwithin`) add a required `distance`
+field alongside `some` / `every` / `none`:
 
-The connection argument is `where:` at the GraphQL layer too — same
-name, same tree. Only the generated input **type** keeps the word
-"Filter" in it (e.g. `TelemedicineClinicFilter`):
+```ts
+// "Clinics within 10 SRID units of any cardiology clinic" — self-relation
+// with parametric distance; a row never matches itself.
+await orm.telemedicineClinic
+  .findMany({
+    select: { id: true, name: true },
+    where: {
+      nearbyClinic: {
+        distance: 10.0,
+        some: { specialty: { equalTo: 'cardiology' } },
+      },
+    },
+  })
+  .execute();
+```
+
+### Using a spatial relation from GraphQL
+
+The same tree, same field names — just under `where:` on the
+connection argument:
 
 ```graphql
 {
@@ -266,58 +409,13 @@ name, same tree. Only the generated input **type** keeps the word
 }
 ```
 
-**`some` / `every` / `none`**
-
-Every 2-argument relation exposes three modes. They mean what you'd
-expect, backed by `EXISTS` / `NOT EXISTS`:
-
-- `some: { <where clause> }` — the row matches if at least one related
-  target row passes the where clause.
-- `none: { <where clause> }` — the row matches if no related target row
-  passes.
-- `every: { <where clause> }` — the row matches when every related
-  target row passes (i.e. "no counter-example exists"). Note that
-  `every: {}` on an empty target set is vacuously true.
-
-An empty inner clause (`some: {}`) means "at least one related target
-row exists, any row will do" — so for `@spatialRelation county …
-st_within`, clinics whose point is inside zero counties are correctly
-excluded.
-
-**Parametric operators (`st_dwithin` + `distance`)**
-
-Parametric relations add a **required** `distance: Float!` field next
-to `some` / `every` / `none`. The distance parametrises the join
-itself, not the inner `some:` clause:
-
-```ts
-await orm.telemedicineClinic
-  .findMany({
-    select: { id: true, name: true },
-    where: {
-      nearbyClinic: {
-        distance: 5000,
-        some: { specialty: { equalTo: 'pediatrics' } },
-      },
-    },
-  })
-  .execute();
-```
-
-Distance units follow PostGIS semantics:
-
-| Owner codec | `distance` units |
-|---|---|
-| `geography` | meters |
-| `geometry`  | SRID coordinate units (degrees for SRID 4326) |
-
-#### Composition with `and` / `or` / `not` and scalar where clauses
+### Composition
 
 Spatial relations live in the same `where:` tree as every scalar
-predicate and compose the same way:
+predicate and compose identically:
 
 ```ts
-// AND — Bay County clinics that are cardiology
+// Bay County clinics that are cardiology
 where: {
   and: [
     { county: { some: { name: { equalTo: 'Bay County' } } } },
@@ -325,7 +423,7 @@ where: {
   ],
 }
 
-// OR — Bay County clinics OR the one named "LA Pediatrics"
+// Bay County clinics OR the one named "LA Pediatrics"
 where: {
   or: [
     { county: { some: { name: { equalTo: 'Bay County' } } } },
@@ -333,30 +431,24 @@ where: {
   ],
 }
 
-// NOT — clinics that are NOT in Bay County
+// Clinics NOT in Bay County
 where: {
   not: { county: { some: { name: { equalTo: 'Bay County' } } } },
 }
 ```
 
-Inside `some` / `every` / `none`, the inner where clause is the target
-table's full `where` input — every scalar predicate the target exposes
-is available.
-
-### Self-relations
+### Self-relations and self-exclusion
 
 When the owner and target columns are the same column, the plugin
 emits a self-exclusion predicate so a row never matches itself:
 
-- Single-column primary key: `other.<pk> <> self.<pk>`
-- Composite primary key: `(other.a, other.b) IS DISTINCT FROM (self.a, self.b)`
+- Single-column primary key: `other.<pk> <> self.<pk>`.
+- Composite primary key: `(other.a, other.b) IS DISTINCT FROM (self.a, self.b)`.
+- Tables without a primary key are rejected at schema build.
 
-Tables without a primary key are rejected at schema build — a
-self-relation there would match every row against itself.
-
-One concrete consequence: with `st_dwithin`, a self-relation at
-`distance: 0` matches zero rows, because the only candidate at
-distance 0 is the row itself, which is excluded.
+One consequence: with `st_dwithin`, a self-relation at `distance: 0`
+matches zero rows, because the only candidate at distance 0 is the
+row itself — and it is excluded.
 
 ### Generated SQL shape
 
@@ -372,19 +464,20 @@ WHERE EXISTS (
 );
 ```
 
-The EXISTS lives inside the owner's generated `where` input, so it
-composes with pagination, ordering, and the rest of the outer plan.
-`st_bbox_intersects` compiles to infix `&&` rather than a function call.
-PostGIS functions are called with whichever schema PostGIS is installed
-in, so non-`public` installs work without configuration.
+The `EXISTS` sits inside the owner's generated `where` input, so it
+composes cleanly with pagination, ordering, and the rest of the outer
+plan. `st_bbox_intersects` compiles to infix `&&` rather than a
+function call. PostGIS functions are called with whichever schema
+PostGIS is installed in, so non-`public` installs work without extra
+configuration.
 
 ### Indexing
 
 Spatial predicates without a GIST index fall back to sequential scans,
 which is almost never what you want. The plugin checks your target
-columns at schema-build time and emits a non-fatal warning when a GIST
-index is missing, including the recommended `CREATE INDEX ... USING
-GIST(...)` in the warning text.
+columns at schema-build time and emits a non-fatal warning when a
+GIST index is missing, including the recommended `CREATE INDEX …
+USING GIST(...)` in the warning text:
 
 ```sql
 CREATE INDEX ON telemedicine_clinics USING GIST(location);
@@ -392,8 +485,8 @@ CREATE INDEX ON counties              USING GIST(geom);
 ```
 
 If a particular column is a known exception (e.g. a small prototype
-table), set `@spatialRelationSkipIndexCheck` on that column to suppress
-the warning.
+table), set `@spatialRelationSkipIndexCheck` on that column to
+suppress the warning.
 
 ### `geometry` vs `geography`
 
@@ -407,24 +500,31 @@ single relation.
 
 ### FAQ
 
-- **"Why doesn't `some: {}` return every row?"** — because `some` means
-  "at least one related target row exists". Rows whose column has no
-  match on the other side are correctly excluded.
-- **"Why does `distance: 0` on a self-relation return nothing?"** — the
-  self-exclusion predicate removes the row's match with itself, so at
-  distance 0 no candidates remain.
+- **"Why doesn't `some: {}` return every row?"** — because `some`
+  means "at least one related target row exists". Rows whose column
+  has no match on the other side are correctly excluded.
+- **"Why does `distance: 0` on a self-relation return nothing?"** —
+  the self-exclusion predicate removes the row's match with itself,
+  so at distance 0 no candidates remain.
 - **"Can I reuse a `relationName` across tables?"** — yes; uniqueness
   is scoped to the owning table.
 - **"Can I declare the relation from the polygon side instead of the
   point side?"** — yes. Flip owner and target and use the inverse
   operator (`st_contains` in place of `st_within`). Same rows, same
   SQL, different `where` location.
-- **"Does this work with PostGIS installed in a non-`public` schema?"**
-  — yes.
+- **"Does this work with PostGIS installed in a non-`public`
+  schema?"** — yes.
 - **"Can I use a spatial relation in `orderBy` or on a connection
-  field?"** — no; it's a where-only construct. Use PostGIS measurement
-  fields (see the `geometry-fields` / `measurement-fields` plugins) for
-  values you want to sort on.
+  field?"** — no; it's a where-only construct. Use the measurement /
+  transformation fields for values you want to sort on.
+
+## Graceful degradation
+
+If the `postgis` extension isn't installed in the target database,
+the plugin detects that at schema-build time and skips type, filter,
+aggregate, and spatial-relation registration instead of breaking the
+build. Turning PostGIS on later only requires restarting the server
+(or invalidating the schema cache) — no config change.
 
 ## License
 
