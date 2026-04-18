@@ -1,6 +1,7 @@
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
 import { Logger } from '@pgpmjs/logger';
+import { getNodeEnv } from '@pgpmjs/env';
 import { healthz, poweredBy, svcCache, trustProxy } from '@pgpmjs/server-utils';
 import { PgpmOptions } from '@pgpmjs/types';
 import { middleware as parseDomains } from '@constructive-io/url-domains';
@@ -138,7 +139,7 @@ class Server {
     trustProxy(app, effectiveOpts.server.trustProxy);
     // Warn if a global CORS override is set in production
     const fallbackOrigin = effectiveOpts.server?.origin?.trim();
-    if (fallbackOrigin && process.env.NODE_ENV === 'production') {
+    if (fallbackOrigin && getNodeEnv() === 'production') {
       if (fallbackOrigin === '*') {
         log.warn(
           'CORS wildcard ("*") is enabled in production; this effectively disables CORS and is not recommended. Prefer per-API CORS via meta schema.',
@@ -176,7 +177,7 @@ class Server {
     // CSRF: validate token on mutations for cookie-authenticated requests
     app.use(csrfMiddleware.protect);
 
-    app.use(createCaptchaMiddleware());
+    app.use(createCaptchaMiddleware(effectiveOpts));
 
     // Cookie lifecycle: set/clear session cookies on auth mutations (when enabled)
     app.use(createCookieMiddleware());

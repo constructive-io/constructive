@@ -1,4 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
+import { getNodeEnv } from '@pgpmjs/env';
 import { createCsrfMiddleware, csrfErrorHandler } from '@constructive-io/csrf';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import './types'; // for Request type
@@ -30,7 +31,7 @@ export const createCsrfProtectionMiddleware = (): {
     headerName: 'x-csrf-token',
     cookieOptions: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: getNodeEnv() === 'production',
       sameSite: 'lax',
       maxAge: 86400,
       path: '/',

@@ -1,4 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
+import { getNodeEnv } from '@pgpmjs/env';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { AuthSettings } from '../types';
 import './types'; // for Request type
@@ -57,7 +58,7 @@ const getOperationName = (req: Request): string | undefined => {
 const buildCookieOptions = (
   settings: AuthSettings | undefined,
 ): Record<string, unknown> => {
-  const secure = settings?.cookieSecure ?? (process.env.NODE_ENV === 'production');
+  const secure = settings?.cookieSecure ?? (getNodeEnv() === 'production');
   const sameSite = (settings?.cookieSamesite ?? 'lax') as 'strict' | 'lax' | 'none';
   const httpOnly = settings?.cookieHttponly ?? true;
   const path = settings?.cookiePath ?? '/';

@@ -3,6 +3,9 @@ export {
   GraphileOptions,
   GraphileFeatureOptions,
   ApiOptions,
+  OAuthProviderCredentials,
+  OAuthOptions,
+  CaptchaOptions,
   graphileDefaults,
   graphileFeatureDefaults,
   apiDefaults

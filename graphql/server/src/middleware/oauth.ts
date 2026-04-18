@@ -1,4 +1,5 @@
 import { Logger } from '@pgpmjs/logger';
+import { getNodeEnv } from '@pgpmjs/env';
 import { createOAuthMiddleware } from '@constructive-io/oauth';
 import type { OAuthProfile, OAuthCallbackContext } from '@constructive-io/oauth';
 import type { ConstructiveOptions } from '@constructive-io/graphql-types';
@@ -11,25 +12,6 @@ const log = new Logger('oauth');
 
 /** Default cookie name for session tokens (matches cookie.ts / auth.ts). */
 const SESSION_COOKIE_NAME = 'constructive_session';
-
-/**
- * Read OAuth provider credentials from environment variables.
- * Returns only providers that have both client ID and secret configured.
- */
-const getOAuthProvidersFromEnv = (): Record<string, { clientId: string; clientSecret: string }> => {
-  const providers: Record<string, { clientId: string; clientSecret: string }> = {};
-
-  const providerNames = ['google', 'github', 'facebook', 'linkedin'] as const;
-  for (const name of providerNames) {
-    const clientId = process.env[`OAUTH_${name.toUpperCase()}_CLIENT_ID`];
-    const clientSecret = process.env[`OAUTH_${name.toUpperCase()}_CLIENT_SECRET`];
-    if (clientId && clientSecret) {
-      providers[name] = { clientId, clientSecret };
-    }
-  }
-
-  return providers;
-};
 
 /**
  * Call the private schema's sign_in_sso function to authenticate the user
@@ -105,7 +87,7 @@ const callSignInSso = async (
  * The onSuccess callback calls sign_in_sso on the tenant DB and sets
  * the session cookie (when cookie auth is enabled).
  *
- * If no OAuth providers are configured via environment variables,
+ * If no OAuth providers are configured via opts.oauth.providers,
  * this function is a no-op (routes are not mounted).
  */
 /**
@@ -113,35 +95,35 @@ const callSignInSso = async (
  */
 const buildSessionCookieOptions = (req: Request): Record<string, unknown> => {
   const settings = req.api?.authSettings;
-  const secure = settings?.cookieSecure ?? (process.env.NODE_ENV === 'production');
+  const secure = settings?.cookieSecure ?? (getNodeEnv() === 'production');
   const sameSite = (settings?.cookieSamesite ?? 'lax') as 'strict' | 'lax' | 'none';
   const httpOnly = settings?.cookieHttponly ?? true;
   const path = settings?.cookiePath ?? '/';
   const domain = settings?.cookieDomain ?? undefined;
 
-  const opts: Record<string, unknown> = { httpOnly, secure, sameSite, path };
-  if (domain) opts.domain = domain;
-  return opts;
+  const cookieOpts: Record<string, unknown> = { httpOnly, secure, sameSite, path };
+  if (domain) cookieOpts.domain = domain;
+  return cookieOpts;
 };
 
 export const mountOAuthRoutes = (
   router: Router,
   opts: ConstructiveOptions,
 ): void => {
-  const providers = getOAuthProvidersFromEnv();
+  const providers = opts.oauth?.providers ?? {};
 
   if (Object.keys(providers).length === 0) {
     log.info('[oauth] No OAuth providers configured, SSO routes not mounted');
     return;
   }
 
-  const baseUrl = process.env.OAUTH_CALLBACK_BASE_URL || process.env.OAUTH_BASE_URL || '';
+  const baseUrl = opts.oauth?.baseUrl ?? '';
   if (!baseUrl) {
-    log.warn('[oauth] OAUTH_CALLBACK_BASE_URL / OAUTH_BASE_URL not set, OAuth callbacks may fail');
+    log.warn('[oauth] oauth.baseUrl not set, OAuth callbacks may fail');
   }
 
-  const successRedirect = process.env.OAUTH_SUCCESS_REDIRECT;
-  const errorRedirect = process.env.OAUTH_ERROR_REDIRECT;
+  const successRedirect = opts.oauth?.successRedirect;
+  const errorRedirect = opts.oauth?.errorRedirect;
 
   // We stash the request object so onSuccess can access it for the DB call
   // and cookie-setting. Express middleware runs synchronously before the
