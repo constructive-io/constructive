@@ -1054,6 +1054,8 @@ export type BlueprintRelation = {
   target_table: string;
   source_schema_name?: string;
   target_schema_name?: string;
+  /** Name of the geometry/geography column on source_table that carries the @spatialRelation smart tag. */source_field: string;
+  /** Name of the geometry/geography column on target_table that the predicate is evaluated against. */target_field: string;
 } & Partial<RelationSpatialParams>;
 /**
  * ===========================================================================

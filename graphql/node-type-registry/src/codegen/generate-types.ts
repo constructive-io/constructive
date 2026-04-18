@@ -537,13 +537,34 @@ function buildRelationTypes(
   relationNodes: NodeTypeDefinition[]
 ): t.ExportNamedDeclaration[] {
   const relationMembers: t.TSType[] = relationNodes.map((nt) => {
-    const baseType = t.tsTypeLiteral([
+    const baseMembers: t.TSTypeElement[] = [
       requiredProp('$type', strLit(nt.name)),
       requiredProp('source_table', t.tsStringKeyword()),
       requiredProp('target_table', t.tsStringKeyword()),
       optionalProp('source_schema_name', t.tsStringKeyword()),
       optionalProp('target_schema_name', t.tsStringKeyword()),
-    ]);
+    ];
+
+    // RelationSpatial is the only relation type that references *existing*
+    // columns rather than creating FK/junction fields. Its blueprint JSON
+    // therefore needs source_field / target_field (column *names* resolved
+    // server-side by resolve_blueprint_field), which have no ID-space
+    // equivalent in parameter_schema. Surface them here so blueprint authors
+    // get autocomplete without a cast.
+    if (nt.name === 'RelationSpatial') {
+      baseMembers.push(
+        addJSDoc(
+          requiredProp('source_field', t.tsStringKeyword()),
+          'Name of the geometry/geography column on source_table that carries the @spatialRelation smart tag.'
+        ),
+        addJSDoc(
+          requiredProp('target_field', t.tsStringKeyword()),
+          'Name of the geometry/geography column on target_table that the predicate is evaluated against.'
+        )
+      );
+    }
+
+    const baseType = t.tsTypeLiteral(baseMembers);
 
     return t.tsIntersectionType([
       baseType,
