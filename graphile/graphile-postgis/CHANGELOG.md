@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.11.2](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.11.1...graphile-postgis@2.11.2) (2026-04-18)
+
+### Bug Fixes
+
+- **graphile-postgis:** camelCase [@spatial](https://github.com/spatial)Relation field + PascalCase filter type ([78610ae](https://github.com/constructive-io/constructive/commit/78610ae9750f93c322e834c4751a170a5fdfc19d))
+
 ## [2.11.1](https://github.com/constructive-io/constructive/compare/graphile-postgis@2.11.0...graphile-postgis@2.11.1) (2026-04-18)
 
 **Note:** Version bump only for package graphile-postgis
