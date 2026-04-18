@@ -29,24 +29,25 @@ import {
   orgLimitDefaultKeys,
   orgAdminGrantKeys,
   orgOwnerGrantKeys,
-  membershipTypeKeys,
   appLimitKeys,
   appAchievementKeys,
   appStepKeys,
   appClaimedInviteKeys,
   orgChartEdgeGrantKeys,
   orgLimitKeys,
+  membershipTypeKeys,
   appGrantKeys,
   appMembershipDefaultKeys,
   orgClaimedInviteKeys,
   orgGrantKeys,
   orgChartEdgeKeys,
   orgMembershipDefaultKeys,
+  orgMemberProfileKeys,
   appLevelKeys,
   appInviteKeys,
+  orgInviteKeys,
   appMembershipKeys,
   orgMembershipKeys,
-  orgInviteKeys,
 } from './query-keys';
 /**
 // ============================================================================
@@ -306,23 +307,6 @@ export const invalidate = {
         queryKey: orgOwnerGrantKeys.detail(id),
       }),
   },
-  /** Invalidate membershipType queries */ membershipType: {
-    /** Invalidate all membershipType queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: membershipTypeKeys.all,
-      }),
-    /** Invalidate membershipType list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: membershipTypeKeys.lists(),
-      }),
-    /** Invalidate a specific membershipType */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: membershipTypeKeys.detail(id),
-      }),
-  },
   /** Invalidate appLimit queries */ appLimit: {
     /** Invalidate all appLimit queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -414,6 +398,23 @@ export const invalidate = {
     /** Invalidate a specific orgLimit */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: orgLimitKeys.detail(id),
+      }),
+  },
+  /** Invalidate membershipType queries */ membershipType: {
+    /** Invalidate all membershipType queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypeKeys.all,
+      }),
+    /** Invalidate membershipType list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypeKeys.lists(),
+      }),
+    /** Invalidate a specific membershipType */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypeKeys.detail(id),
       }),
   },
   /** Invalidate appGrant queries */ appGrant: {
@@ -512,6 +513,23 @@ export const invalidate = {
         queryKey: orgMembershipDefaultKeys.detail(id),
       }),
   },
+  /** Invalidate orgMemberProfile queries */ orgMemberProfile: {
+    /** Invalidate all orgMemberProfile queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMemberProfileKeys.all,
+      }),
+    /** Invalidate orgMemberProfile list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMemberProfileKeys.lists(),
+      }),
+    /** Invalidate a specific orgMemberProfile */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMemberProfileKeys.detail(id),
+      }),
+  },
   /** Invalidate appLevel queries */ appLevel: {
     /** Invalidate all appLevel queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -541,6 +559,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: appInviteKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgInvite queries */ orgInvite: {
+    /** Invalidate all orgInvite queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgInviteKeys.all,
+      }),
+    /** Invalidate orgInvite list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgInviteKeys.lists(),
+      }),
+    /** Invalidate a specific orgInvite */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgInviteKeys.detail(id),
       }),
   },
   /** Invalidate appMembership queries */ appMembership: {
@@ -575,23 +610,6 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: orgMembershipKeys.detail(id),
-      }),
-  },
-  /** Invalidate orgInvite queries */ orgInvite: {
-    /** Invalidate all orgInvite queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgInviteKeys.all,
-      }),
-    /** Invalidate orgInvite list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgInviteKeys.lists(),
-      }),
-    /** Invalidate a specific orgInvite */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgInviteKeys.detail(id),
       }),
   },
 } as const;
@@ -716,14 +734,6 @@ export const remove = {
       queryKey: orgOwnerGrantKeys.detail(id),
     });
   },
-  /** Remove membershipType from cache */ membershipType: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: membershipTypeKeys.detail(id),
-    });
-  },
   /** Remove appLimit from cache */ appLimit: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: appLimitKeys.detail(id),
@@ -761,6 +771,14 @@ export const remove = {
   /** Remove orgLimit from cache */ orgLimit: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: orgLimitKeys.detail(id),
+    });
+  },
+  /** Remove membershipType from cache */ membershipType: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: membershipTypeKeys.detail(id),
     });
   },
   /** Remove appGrant from cache */ appGrant: (queryClient: QueryClient, id: string | number) => {
@@ -805,6 +823,14 @@ export const remove = {
       queryKey: orgMembershipDefaultKeys.detail(id),
     });
   },
+  /** Remove orgMemberProfile from cache */ orgMemberProfile: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgMemberProfileKeys.detail(id),
+    });
+  },
   /** Remove appLevel from cache */ appLevel: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: appLevelKeys.detail(id),
@@ -813,6 +839,11 @@ export const remove = {
   /** Remove appInvite from cache */ appInvite: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: appInviteKeys.detail(id),
+    });
+  },
+  /** Remove orgInvite from cache */ orgInvite: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: orgInviteKeys.detail(id),
     });
   },
   /** Remove appMembership from cache */ appMembership: (
@@ -829,11 +860,6 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgMembershipKeys.detail(id),
-    });
-  },
-  /** Remove orgInvite from cache */ orgInvite: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: orgInviteKeys.detail(id),
     });
   },
 } as const;

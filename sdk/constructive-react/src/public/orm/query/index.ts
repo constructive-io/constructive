@@ -17,6 +17,9 @@ import type {
   AppLevelRequirementConnection,
 } from '../input-types';
 import { connectionFieldsMap } from '../input-types';
+export interface RequireStepUpVariables {
+  stepUpType?: string;
+}
 export interface AppPermissionsGetPaddedMaskVariables {
   mask?: string;
 }
@@ -31,6 +34,15 @@ export interface RevParseVariables {
   dbId?: string;
   storeId?: string;
   refname?: string;
+}
+/**
+ * Variables for resolveBlueprintField
+ * Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.
+ */
+export interface ResolveBlueprintFieldVariables {
+  databaseId?: string;
+  tableId?: string;
+  fieldName?: string;
 }
 export interface OrgIsManagerOfVariables {
   pEntityId?: string;
@@ -152,6 +164,25 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
+    currentUserAgent: (options?: { select?: Record<string, unknown> }) =>
+      new QueryBuilder<{
+        currentUserAgent: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'CurrentUserAgent',
+        fieldName: 'currentUserAgent',
+        ...buildCustomDocument(
+          'query',
+          'CurrentUserAgent',
+          'currentUserAgent',
+          options?.select,
+          undefined,
+          [],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
     currentIpAddress: (options?: { select?: Record<string, unknown> }) =>
       new QueryBuilder<{
         currentIpAddress: string | null;
@@ -171,21 +202,31 @@ export function createQueryOperations(client: OrmClient) {
           undefined
         ),
       }),
-    currentUserAgent: (options?: { select?: Record<string, unknown> }) =>
+    requireStepUp: (
+      args: RequireStepUpVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
       new QueryBuilder<{
-        currentUserAgent: string | null;
+        requireStepUp: boolean | null;
       }>({
         client,
         operation: 'query',
-        operationName: 'CurrentUserAgent',
-        fieldName: 'currentUserAgent',
+        operationName: 'RequireStepUp',
+        fieldName: 'requireStepUp',
         ...buildCustomDocument(
           'query',
-          'CurrentUserAgent',
-          'currentUserAgent',
+          'RequireStepUp',
+          'requireStepUp',
           options?.select,
-          undefined,
-          [],
+          args,
+          [
+            {
+              name: 'stepUpType',
+              type: 'String',
+            },
+          ],
           connectionFieldsMap,
           undefined
         ),
@@ -311,6 +352,43 @@ export function createQueryOperations(client: OrmClient) {
             },
             {
               name: 'refname',
+              type: 'String',
+            },
+          ],
+          connectionFieldsMap,
+          undefined
+        ),
+      }),
+    resolveBlueprintField: (
+      args: ResolveBlueprintFieldVariables,
+      options?: {
+        select?: Record<string, unknown>;
+      }
+    ) =>
+      new QueryBuilder<{
+        resolveBlueprintField: string | null;
+      }>({
+        client,
+        operation: 'query',
+        operationName: 'ResolveBlueprintField',
+        fieldName: 'resolveBlueprintField',
+        ...buildCustomDocument(
+          'query',
+          'ResolveBlueprintField',
+          'resolveBlueprintField',
+          options?.select,
+          args,
+          [
+            {
+              name: 'databaseId',
+              type: 'UUID',
+            },
+            {
+              name: 'tableId',
+              type: 'UUID',
+            },
+            {
+              name: 'fieldName',
               type: 'String',
             },
           ],

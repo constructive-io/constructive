@@ -12,8 +12,8 @@ csdk org-membership list --where.<field>.<op> <value> --orderBy <values>
 csdk org-membership list --limit 10 --after <cursor>
 csdk org-membership find-first --where.<field>.<op> <value>
 csdk org-membership get --id <UUID>
-csdk org-membership create --actorId <UUID> --entityId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isActive <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--profileId <UUID>]
-csdk org-membership update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isActive <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--actorId <UUID>] [--entityId <UUID>] [--profileId <UUID>]
+csdk org-membership create --actorId <UUID> --entityId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isActive <Boolean>] [--isExternal <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--isReadOnly <Boolean>] [--profileId <UUID>]
+csdk org-membership update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isActive <Boolean>] [--isExternal <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--actorId <UUID>] [--entityId <UUID>] [--isReadOnly <Boolean>] [--profileId <UUID>]
 csdk org-membership delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk org-membership list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a orgMembership
 
 ```bash
-csdk org-membership create --actorId <UUID> --entityId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isActive <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--profileId <UUID>]
+csdk org-membership create --actorId <UUID> --entityId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isActive <Boolean>] [--isExternal <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--isReadOnly <Boolean>] [--profileId <UUID>]
 ```
 
 ### Get a orgMembership by id

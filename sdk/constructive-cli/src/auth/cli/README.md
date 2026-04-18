@@ -29,27 +29,33 @@ csdk auth set-token <your-token>
 | `email` | email CRUD operations |
 | `phone-number` | phoneNumber CRUD operations |
 | `crypto-address` | cryptoAddress CRUD operations |
-| `connected-account` | connectedAccount CRUD operations |
 | `audit-log` | auditLog CRUD operations |
 | `role-type` | roleType CRUD operations |
+| `user-connected-account` | userConnectedAccount CRUD operations |
 | `user` | user CRUD operations |
-| `current-ip-address` | currentIpAddress |
 | `current-user-agent` | currentUserAgent |
+| `current-ip-address` | currentIpAddress |
 | `current-user-id` | currentUserId |
+| `require-step-up` | requireStepUp |
 | `current-user` | currentUser |
 | `sign-out` | signOut |
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `check-password` | checkPassword |
+| `disconnect-account` | disconnectAccount |
+| `revoke-api-key` | revokeApiKey |
+| `revoke-session` | revokeSession |
 | `verify-password` | verifyPassword |
 | `verify-totp` | verifyTotp |
 | `confirm-delete-account` | confirmDeleteAccount |
 | `set-password` | setPassword |
 | `verify-email` | verifyEmail |
+| `provision-new-user` | provisionNewUser |
 | `reset-password` | resetPassword |
-| `sign-in-one-time-token` | signInOneTimeToken |
-| `sign-in` | signIn |
+| `create-api-key` | createApiKey |
+| `sign-in-cross-origin` | signInCrossOrigin |
 | `sign-up` | signUp |
-| `one-time-token` | oneTimeToken |
+| `request-cross-origin-token` | requestCrossOriginToken |
+| `sign-in` | signIn |
 | `extend-token-expires` | extendTokenExpires |
 | `forgot-password` | forgotPassword |
 | `send-verification-email` | sendVerificationEmail |
@@ -191,35 +197,6 @@ CRUD operations for CryptoAddress records.
 **Required create fields:** `address`
 **Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
 
-### `connected-account`
-
-CRUD operations for ConnectedAccount records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all connectedAccount records |
-| `find-first` | Find first matching connectedAccount record |
-| `get` | Get a connectedAccount by id |
-| `create` | Create a new connectedAccount |
-| `update` | Update an existing connectedAccount |
-| `delete` | Delete a connectedAccount |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `ownerId` | UUID |
-| `service` | String |
-| `identifier` | String |
-| `details` | JSON |
-| `isVerified` | Boolean |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-
-**Required create fields:** `service`, `identifier`, `details`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`
-
 ### `audit-log`
 
 CRUD operations for AuditLog records.
@@ -270,6 +247,34 @@ CRUD operations for RoleType records.
 | `name` | String |
 
 **Required create fields:** `name`
+
+### `user-connected-account`
+
+CRUD operations for UserConnectedAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userConnectedAccount records |
+| `find-first` | Find first matching userConnectedAccount record |
+| `get` | Get a userConnectedAccount by id |
+| `create` | Create a new userConnectedAccount |
+| `update` | Update an existing userConnectedAccount |
+| `delete` | Delete a userConnectedAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `ownerId` | UUID |
+| `service` | String |
+| `identifier` | String |
+| `details` | JSON |
+| `isVerified` | Boolean |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Optional create fields (backend defaults):** `ownerId`, `service`, `identifier`, `details`, `isVerified`
 
 ### `user`
 
@@ -331,16 +336,16 @@ csdk user search "query" --limit 10 --select id,title,searchScore
 
 ## Custom Operations
 
-### `current-ip-address`
+### `current-user-agent`
 
-currentIpAddress
+currentUserAgent
 
 - **Type:** query
 - **Arguments:** none
 
-### `current-user-agent`
+### `current-ip-address`
 
-currentUserAgent
+currentIpAddress
 
 - **Type:** query
 - **Arguments:** none
@@ -351,6 +356,17 @@ currentUserId
 
 - **Type:** query
 - **Arguments:** none
+
+### `require-step-up`
+
+requireStepUp
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--stepUpType` | String |
 
 ### `current-user`
 
@@ -392,6 +408,42 @@ checkPassword
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.password` | String |
+
+### `disconnect-account`
+
+disconnectAccount
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.accountId` | UUID (required) |
+
+### `revoke-api-key`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.keyId` | UUID (required) |
+
+### `revoke-session`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sessionId` | UUID (required) |
 
 ### `verify-password`
 
@@ -456,6 +508,19 @@ verifyEmail
   | `--input.emailId` | UUID |
   | `--input.token` | String |
 
+### `provision-new-user`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+
 ### `reset-password`
 
 resetPassword
@@ -470,9 +535,23 @@ resetPassword
   | `--input.resetToken` | String |
   | `--input.newPassword` | String |
 
-### `sign-in-one-time-token`
+### `create-api-key`
 
-signInOneTimeToken
+createApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.keyName` | String (required) |
+  | `--input.accessLevel` | String |
+  | `--input.mfaLevel` | String |
+
+### `sign-in-cross-origin`
+
+signInCrossOrigin
 
 - **Type:** mutation
 - **Arguments:**
@@ -482,22 +561,6 @@ signInOneTimeToken
   | `--input.clientMutationId` | String |
   | `--input.token` | String |
   | `--input.credentialKind` | String |
-
-### `sign-in`
-
-signIn
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | String |
-  | `--input.password` | String |
-  | `--input.rememberMe` | Boolean |
-  | `--input.credentialKind` | String |
-  | `--input.csrfToken` | String |
 
 ### `sign-up`
 
@@ -515,9 +578,9 @@ signUp
   | `--input.credentialKind` | String |
   | `--input.csrfToken` | String |
 
-### `one-time-token`
+### `request-cross-origin-token`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
@@ -529,6 +592,23 @@ oneTimeToken
   | `--input.password` | String |
   | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
+
+### `sign-in`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
+  | `--input.deviceToken` | String |
 
 ### `extend-token-expires`
 

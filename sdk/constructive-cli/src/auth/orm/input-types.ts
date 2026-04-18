@@ -276,21 +276,6 @@ export interface CryptoAddress {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
-/** OAuth and social login connections linking external service accounts to users */
-export interface ConnectedAccount {
-  id: string;
-  ownerId?: string | null;
-  /** The service used, e.g. `twitter` or `github`. */
-  service?: string | null;
-  /** A unique identifier for the user within the service */
-  identifier?: string | null;
-  /** Additional profile details extracted from this login method */
-  details?: Record<string, unknown> | null;
-  /** Whether this connected account has been verified */
-  isVerified?: boolean | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-}
 /** Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) */
 export interface AuditLog {
   id: string;
@@ -312,6 +297,16 @@ export interface AuditLog {
 export interface RoleType {
   id: number;
   name?: string | null;
+}
+export interface UserConnectedAccount {
+  id: string;
+  ownerId?: string | null;
+  service?: string | null;
+  identifier?: string | null;
+  details?: Record<string, unknown> | null;
+  isVerified?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 export interface User {
   id: string;
@@ -351,28 +346,26 @@ export interface PhoneNumberRelations {
 export interface CryptoAddressRelations {
   owner?: User | null;
 }
-export interface ConnectedAccountRelations {
-  owner?: User | null;
-}
 export interface AuditLogRelations {
   actor?: User | null;
 }
 export interface RoleTypeRelations {}
+export interface UserConnectedAccountRelations {}
 export interface UserRelations {
   roleType?: RoleType | null;
   ownedEmails?: ConnectionResult<Email>;
   ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
   ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
-  ownedConnectedAccounts?: ConnectionResult<ConnectedAccount>;
   auditLogsByActorId?: ConnectionResult<AuditLog>;
 }
 // ============ Entity Types With Relations ============
 export type EmailWithRelations = Email & EmailRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
-export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
 export type AuditLogWithRelations = AuditLog & AuditLogRelations;
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
+export type UserConnectedAccountWithRelations = UserConnectedAccount &
+  UserConnectedAccountRelations;
 export type UserWithRelations = User & UserRelations;
 // ============ Entity Select Types ============
 export type EmailSelect = {
@@ -412,19 +405,6 @@ export type CryptoAddressSelect = {
     select: UserSelect;
   };
 };
-export type ConnectedAccountSelect = {
-  id?: boolean;
-  ownerId?: boolean;
-  service?: boolean;
-  identifier?: boolean;
-  details?: boolean;
-  isVerified?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  owner?: {
-    select: UserSelect;
-  };
-};
 export type AuditLogSelect = {
   id?: boolean;
   event?: boolean;
@@ -441,6 +421,16 @@ export type AuditLogSelect = {
 export type RoleTypeSelect = {
   id?: boolean;
   name?: boolean;
+};
+export type UserConnectedAccountSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  service?: boolean;
+  identifier?: boolean;
+  details?: boolean;
+  isVerified?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
 };
 export type UserSelect = {
   id?: boolean;
@@ -474,12 +464,6 @@ export type UserSelect = {
     first?: number;
     filter?: CryptoAddressFilter;
     orderBy?: CryptoAddressOrderBy[];
-  };
-  ownedConnectedAccounts?: {
-    select: ConnectedAccountSelect;
-    first?: number;
-    filter?: ConnectedAccountFilter;
-    orderBy?: ConnectedAccountOrderBy[];
   };
   auditLogsByActorId?: {
     select: AuditLogSelect;
@@ -563,32 +547,6 @@ export interface CryptoAddressFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-export interface ConnectedAccountFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `service` field. */
-  service?: StringFilter;
-  /** Filter by the object’s `identifier` field. */
-  identifier?: StringFilter;
-  /** Filter by the object’s `details` field. */
-  details?: JSONFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: ConnectedAccountFilter[];
-  /** Checks for any expressions in this list. */
-  or?: ConnectedAccountFilter[];
-  /** Negates the expression. */
-  not?: ConnectedAccountFilter;
-  /** Filter by the object’s `owner` relation. */
-  owner?: UserFilter;
-}
 export interface AuditLogFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -629,6 +587,30 @@ export interface RoleTypeFilter {
   /** Negates the expression. */
   not?: RoleTypeFilter;
 }
+export interface UserConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
+  service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
+  identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
+  details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserConnectedAccountFilter[];
+  /** Negates the expression. */
+  not?: UserConnectedAccountFilter;
+}
 export interface UserFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -666,10 +648,6 @@ export interface UserFilter {
   ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
   /** `ownedCryptoAddresses` exist. */
   ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedConnectedAccounts` relation. */
-  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
-  /** `ownedConnectedAccounts` exist. */
-  ownedConnectedAccountsExist?: boolean;
   /** Filter by the object’s `auditLogsByActorId` relation. */
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
@@ -743,26 +721,6 @@ export type CryptoAddressOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type ConnectedAccountOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'OWNER_ID_ASC'
-  | 'OWNER_ID_DESC'
-  | 'SERVICE_ASC'
-  | 'SERVICE_DESC'
-  | 'IDENTIFIER_ASC'
-  | 'IDENTIFIER_DESC'
-  | 'DETAILS_ASC'
-  | 'DETAILS_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC';
 export type AuditLogOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -791,6 +749,24 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
+export type UserConnectedAccountOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'SERVICE_ASC'
+  | 'SERVICE_DESC'
+  | 'IDENTIFIER_ASC'
+  | 'IDENTIFIER_DESC'
+  | 'DETAILS_ASC'
+  | 'DETAILS_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type UserOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -892,32 +868,6 @@ export interface DeleteCryptoAddressInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateConnectedAccountInput {
-  clientMutationId?: string;
-  connectedAccount: {
-    ownerId?: string;
-    service: string;
-    identifier: string;
-    details: Record<string, unknown>;
-    isVerified?: boolean;
-  };
-}
-export interface ConnectedAccountPatch {
-  ownerId?: string | null;
-  service?: string | null;
-  identifier?: string | null;
-  details?: Record<string, unknown> | null;
-  isVerified?: boolean | null;
-}
-export interface UpdateConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-  connectedAccountPatch: ConnectedAccountPatch;
-}
-export interface DeleteConnectedAccountInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateAuditLogInput {
   clientMutationId?: string;
   auditLog: {
@@ -964,6 +914,32 @@ export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
 }
+export interface CreateUserConnectedAccountInput {
+  clientMutationId?: string;
+  userConnectedAccount: {
+    ownerId?: string;
+    service?: string;
+    identifier?: string;
+    details?: Record<string, unknown>;
+    isVerified?: boolean;
+  };
+}
+export interface UserConnectedAccountPatch {
+  ownerId?: string | null;
+  service?: string | null;
+  identifier?: string | null;
+  details?: Record<string, unknown> | null;
+  isVerified?: boolean | null;
+}
+export interface UpdateUserConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
+  userConnectedAccountPatch: UserConnectedAccountPatch;
+}
+export interface DeleteUserConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateUserInput {
   clientMutationId?: string;
   user: {
@@ -995,7 +971,6 @@ export const connectionFieldsMap = {
     ownedEmails: 'Email',
     ownedPhoneNumbers: 'PhoneNumber',
     ownedCryptoAddresses: 'CryptoAddress',
-    ownedConnectedAccounts: 'ConnectedAccount',
     auditLogsByActorId: 'AuditLog',
   },
 } as Record<string, Record<string, string>>;
@@ -1009,6 +984,18 @@ export interface SendAccountDeletionEmailInput {
 export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
+}
+export interface DisconnectAccountInput {
+  clientMutationId?: string;
+  accountId: string;
+}
+export interface RevokeApiKeyInput {
+  clientMutationId?: string;
+  keyId: string;
+}
+export interface RevokeSessionInput {
+  clientMutationId?: string;
+  sessionId: string;
 }
 export interface VerifyPasswordInput {
   clientMutationId?: string;
@@ -1033,24 +1020,27 @@ export interface VerifyEmailInput {
   emailId?: string;
   token?: string;
 }
+export interface ProvisionNewUserInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+}
 export interface ResetPasswordInput {
   clientMutationId?: string;
   roleId?: string;
   resetToken?: string;
   newPassword?: string;
 }
-export interface SignInOneTimeTokenInput {
+export interface CreateApiKeyInput {
+  clientMutationId?: string;
+  keyName: string;
+  accessLevel?: string;
+  mfaLevel?: string;
+}
+export interface SignInCrossOriginInput {
   clientMutationId?: string;
   token?: string;
   credentialKind?: string;
-}
-export interface SignInInput {
-  clientMutationId?: string;
-  email?: string;
-  password?: string;
-  rememberMe?: boolean;
-  credentialKind?: string;
-  csrfToken?: string;
 }
 export interface SignUpInput {
   clientMutationId?: string;
@@ -1060,12 +1050,21 @@ export interface SignUpInput {
   credentialKind?: string;
   csrfToken?: string;
 }
-export interface OneTimeTokenInput {
+export interface RequestCrossOriginTokenInput {
   clientMutationId?: string;
   email?: string;
   password?: string;
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
+}
+export interface SignInInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+  rememberMe?: boolean;
+  credentialKind?: string;
+  csrfToken?: string;
+  deviceToken?: string;
 }
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
@@ -1396,15 +1395,6 @@ export interface UserToManyCryptoAddressFilter {
   /** Filters to entities where no related entity matches. */
   none?: CryptoAddressFilter;
 }
-/** A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyConnectedAccountFilter {
-  /** Filters to entities where at least one related entity matches. */
-  some?: ConnectedAccountFilter;
-  /** Filters to entities where every related entity matches. */
-  every?: ConnectedAccountFilter;
-  /** Filters to entities where no related entity matches. */
-  none?: ConnectedAccountFilter;
-}
 /** A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyAuditLogFilter {
   /** Filters to entities where at least one related entity matches. */
@@ -1514,33 +1504,6 @@ export interface CryptoAddressFilter {
   or?: CryptoAddressFilter[];
   /** Negates the expression. */
   not?: CryptoAddressFilter;
-  /** Filter by the object’s `owner` relation. */
-  owner?: UserFilter;
-}
-/** A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
-export interface ConnectedAccountFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `service` field. */
-  service?: StringFilter;
-  /** Filter by the object’s `identifier` field. */
-  identifier?: StringFilter;
-  /** Filter by the object’s `details` field. */
-  details?: JSONFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: ConnectedAccountFilter[];
-  /** Checks for any expressions in this list. */
-  or?: ConnectedAccountFilter[];
-  /** Negates the expression. */
-  not?: ConnectedAccountFilter;
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
@@ -1686,10 +1649,6 @@ export interface UserFilter {
   ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
   /** `ownedCryptoAddresses` exist. */
   ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedConnectedAccounts` relation. */
-  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
-  /** `ownedConnectedAccounts` exist. */
-  ownedConnectedAccountsExist?: boolean;
   /** Filter by the object’s `auditLogsByActorId` relation. */
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
@@ -1782,41 +1741,6 @@ export interface StringFilter {
   greaterThanInsensitive?: string;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
-}
-/** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
-export interface JSONFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: Record<string, unknown>;
-  /** Not equal to the specified value. */
-  notEqualTo?: Record<string, unknown>;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: Record<string, unknown>;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: Record<string, unknown>;
-  /** Included in the specified list. */
-  in?: Record<string, unknown>[];
-  /** Not included in the specified list. */
-  notIn?: Record<string, unknown>[];
-  /** Less than the specified value. */
-  lessThan?: Record<string, unknown>;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: Record<string, unknown>;
-  /** Greater than the specified value. */
-  greaterThan?: Record<string, unknown>;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: Record<string, unknown>;
-  /** Contains the specified JSON. */
-  contains?: Record<string, unknown>;
-  /** Contains the specified key. */
-  containsKey?: string;
-  /** Contains all of the specified keys. */
-  containsAllKeys?: string[];
-  /** Contains any of the specified keys. */
-  containsAnyKeys?: string[];
-  /** Contained by the specified JSON. */
-  containedBy?: Record<string, unknown>;
 }
 /** A filter to be used against InternetAddress fields. All fields are combined with a logical ‘and.’ */
 export interface InternetAddressFilter {
@@ -1931,6 +1855,30 @@ export interface CheckPasswordPayload {
 export type CheckPasswordPayloadSelect = {
   clientMutationId?: boolean;
 };
+export interface DisconnectAccountPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type DisconnectAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RevokeApiKeyPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RevokeApiKeyPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RevokeSessionPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RevokeSessionPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface VerifyPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -1971,6 +1919,14 @@ export type VerifyEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface ProvisionNewUserPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type ProvisionNewUserPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ResetPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -1979,24 +1935,24 @@ export type ResetPasswordPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface SignInOneTimeTokenPayload {
+export interface CreateApiKeyPayload {
   clientMutationId?: string | null;
-  result?: SignInOneTimeTokenRecord | null;
+  result?: CreateApiKeyRecord | null;
 }
-export type SignInOneTimeTokenPayloadSelect = {
+export type CreateApiKeyPayloadSelect = {
   clientMutationId?: boolean;
   result?: {
-    select: SignInOneTimeTokenRecordSelect;
+    select: CreateApiKeyRecordSelect;
   };
 };
-export interface SignInPayload {
+export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
-  result?: SignInRecord | null;
+  result?: SignInCrossOriginRecord | null;
 }
-export type SignInPayloadSelect = {
+export type SignInCrossOriginPayloadSelect = {
   clientMutationId?: boolean;
   result?: {
-    select: SignInRecordSelect;
+    select: SignInCrossOriginRecordSelect;
   };
 };
 export interface SignUpPayload {
@@ -2009,13 +1965,23 @@ export type SignUpPayloadSelect = {
     select: SignUpRecordSelect;
   };
 };
-export interface OneTimeTokenPayload {
+export interface RequestCrossOriginTokenPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export type OneTimeTokenPayloadSelect = {
+export type RequestCrossOriginTokenPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface SignInPayload {
+  clientMutationId?: string | null;
+  result?: SignInRecord | null;
+}
+export type SignInPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignInRecordSelect;
+  };
 };
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -2230,51 +2196,6 @@ export type DeleteCryptoAddressPayloadSelect = {
     select: CryptoAddressEdgeSelect;
   };
 };
-export interface CreateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was created by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type CreateConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
-  };
-};
-export interface UpdateConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was updated by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type UpdateConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
-  };
-};
-export interface DeleteConnectedAccountPayload {
-  clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was deleted by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
-}
-export type DeleteConnectedAccountPayloadSelect = {
-  clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
-  };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
-  };
-};
 export interface CreateAuditLogPayload {
   clientMutationId?: string | null;
   /** The `AuditLog` that was created by this mutation. */
@@ -2365,6 +2286,17 @@ export type DeleteRoleTypePayloadSelect = {
     select: RoleTypeEdgeSelect;
   };
 };
+export interface CreateUserConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `UserConnectedAccount` that was created by this mutation. */
+  userConnectedAccount?: UserConnectedAccount | null;
+}
+export type CreateUserConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  userConnectedAccount?: {
+    select: UserConnectedAccountSelect;
+  };
+};
 export interface CreateUserPayload {
   clientMutationId?: string | null;
   /** The `User` that was created by this mutation. */
@@ -2410,23 +2342,15 @@ export type DeleteUserPayloadSelect = {
     select: UserEdgeSelect;
   };
 };
-export interface SignInOneTimeTokenRecord {
-  id?: string | null;
-  userId?: string | null;
-  accessToken?: string | null;
-  accessTokenExpiresAt?: string | null;
-  isVerified?: boolean | null;
-  totpEnabled?: boolean | null;
+export interface CreateApiKeyRecord {
+  apiKey?: string | null;
+  keyId?: string | null;
 }
-export type SignInOneTimeTokenRecordSelect = {
-  id?: boolean;
-  userId?: boolean;
-  accessToken?: boolean;
-  accessTokenExpiresAt?: boolean;
-  isVerified?: boolean;
-  totpEnabled?: boolean;
+export type CreateApiKeyRecordSelect = {
+  apiKey?: boolean;
+  keyId?: boolean;
 };
-export interface SignInRecord {
+export interface SignInCrossOriginRecord {
   id?: string | null;
   userId?: string | null;
   accessToken?: string | null;
@@ -2434,7 +2358,7 @@ export interface SignInRecord {
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
 }
-export type SignInRecordSelect = {
+export type SignInCrossOriginRecordSelect = {
   id?: boolean;
   userId?: boolean;
   accessToken?: boolean;
@@ -2457,6 +2381,26 @@ export type SignUpRecordSelect = {
   accessTokenExpiresAt?: boolean;
   isVerified?: boolean;
   totpEnabled?: boolean;
+};
+export interface SignInRecord {
+  id?: string | null;
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  mfaRequired?: boolean | null;
+  mfaChallengeToken?: string | null;
+}
+export type SignInRecordSelect = {
+  id?: boolean;
+  userId?: boolean;
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
+  isVerified?: boolean;
+  totpEnabled?: boolean;
+  mfaRequired?: boolean;
+  mfaChallengeToken?: boolean;
 };
 export interface ExtendTokenExpiresRecord {
   id?: string | null;
@@ -2502,18 +2446,6 @@ export type CryptoAddressEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: CryptoAddressSelect;
-  };
-};
-/** A `ConnectedAccount` edge in the connection. */
-export interface ConnectedAccountEdge {
-  cursor?: string | null;
-  /** The `ConnectedAccount` at the end of the edge. */
-  node?: ConnectedAccount | null;
-}
-export type ConnectedAccountEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: ConnectedAccountSelect;
   };
 };
 /** A `AuditLog` edge in the connection. */

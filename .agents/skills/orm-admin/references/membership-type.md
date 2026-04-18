@@ -9,7 +9,7 @@ Defines the different scopes of membership (e.g. App Member, Organization Member
 ```typescript
 db.membershipType.findMany({ select: { id: true } }).execute()
 db.membershipType.findOne({ id: '<Int>', select: { id: true } }).execute()
-db.membershipType.create({ data: { name: '<String>', description: '<String>', prefix: '<String>' }, select: { id: true } }).execute()
+db.membershipType.create({ data: { name: '<String>', description: '<String>', prefix: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' }, select: { id: true } }).execute()
 db.membershipType.update({ where: { id: '<Int>' }, data: { name: '<String>' }, select: { id: true } }).execute()
 db.membershipType.delete({ where: { id: '<Int>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.membershipType.findMany({
 
 ```typescript
 const item = await db.membershipType.create({
-  data: { name: '<String>', description: '<String>', prefix: '<String>' },
+  data: { name: '<String>', description: '<String>', prefix: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' },
   select: { id: true }
 }).execute();
 ```

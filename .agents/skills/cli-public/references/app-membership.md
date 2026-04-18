@@ -12,8 +12,8 @@ csdk app-membership list --where.<field>.<op> <value> --orderBy <values>
 csdk app-membership list --limit 10 --after <cursor>
 csdk app-membership find-first --where.<field>.<op> <value>
 csdk app-membership get --id <UUID>
-csdk app-membership create --actorId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isVerified <Boolean>] [--isActive <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--profileId <UUID>]
-csdk app-membership update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isVerified <Boolean>] [--isActive <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--actorId <UUID>] [--profileId <UUID>]
+csdk app-membership create --actorId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isVerified <Boolean>] [--isActive <Boolean>] [--isExternal <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--profileId <UUID>]
+csdk app-membership update --id <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isVerified <Boolean>] [--isActive <Boolean>] [--isExternal <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--actorId <UUID>] [--profileId <UUID>]
 csdk app-membership delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk app-membership list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a appMembership
 
 ```bash
-csdk app-membership create --actorId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isVerified <Boolean>] [--isActive <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--profileId <UUID>]
+csdk app-membership create --actorId <UUID> [--createdBy <UUID>] [--updatedBy <UUID>] [--isApproved <Boolean>] [--isBanned <Boolean>] [--isDisabled <Boolean>] [--isVerified <Boolean>] [--isActive <Boolean>] [--isExternal <Boolean>] [--isOwner <Boolean>] [--isAdmin <Boolean>] [--permissions <BitString>] [--granted <BitString>] [--profileId <UUID>]
 ```
 
 ### Get a appMembership by id

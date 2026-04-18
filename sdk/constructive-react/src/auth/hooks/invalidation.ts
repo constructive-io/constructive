@@ -18,9 +18,9 @@ import {
   emailKeys,
   phoneNumberKeys,
   cryptoAddressKeys,
-  connectedAccountKeys,
   auditLogKeys,
   roleTypeKeys,
+  userConnectedAccountKeys,
   userKeys,
 } from './query-keys';
 /**
@@ -91,23 +91,6 @@ export const invalidate = {
         queryKey: cryptoAddressKeys.detail(id),
       }),
   },
-  /** Invalidate connectedAccount queries */ connectedAccount: {
-    /** Invalidate all connectedAccount queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.all,
-      }),
-    /** Invalidate connectedAccount list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.lists(),
-      }),
-    /** Invalidate a specific connectedAccount */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.detail(id),
-      }),
-  },
   /** Invalidate auditLog queries */ auditLog: {
     /** Invalidate all auditLog queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -134,6 +117,23 @@ export const invalidate = {
     /** Invalidate a specific roleType */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: roleTypeKeys.detail(id),
+      }),
+  },
+  /** Invalidate userConnectedAccount queries */ userConnectedAccount: {
+    /** Invalidate all userConnectedAccount queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.all,
+      }),
+    /** Invalidate userConnectedAccount list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.lists(),
+      }),
+    /** Invalidate a specific userConnectedAccount */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.detail(id),
       }),
   },
   /** Invalidate user queries */ user: {
@@ -184,14 +184,6 @@ export const remove = {
       queryKey: cryptoAddressKeys.detail(id),
     });
   },
-  /** Remove connectedAccount from cache */ connectedAccount: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: connectedAccountKeys.detail(id),
-    });
-  },
   /** Remove auditLog from cache */ auditLog: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: auditLogKeys.detail(id),
@@ -200,6 +192,14 @@ export const remove = {
   /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: roleTypeKeys.detail(id),
+    });
+  },
+  /** Remove userConnectedAccount from cache */ userConnectedAccount: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userConnectedAccountKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

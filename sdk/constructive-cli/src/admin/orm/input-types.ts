@@ -370,17 +370,6 @@ export interface OrgOwnerGrant {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
-/** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
-export interface MembershipType {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** Human-readable name of the membership type */
-  name?: string | null;
-  /** Description of what this membership type represents */
-  description?: string | null;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix?: string | null;
-}
 /** Tracks per-actor usage counts against configurable maximum limits */
 export interface AppLimit {
   id: string;
@@ -459,6 +448,21 @@ export interface OrgLimit {
   /** Maximum allowed usage; NULL means use the default limit value */
   max?: number | null;
   entityId?: string | null;
+}
+/** Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) */
+export interface MembershipType {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** Human-readable name of the membership type */
+  name?: string | null;
+  /** Description of what this membership type represents */
+  description?: string | null;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix?: string | null;
+  /** Parent membership type ID for SPRT cascade chain (e.g. type 2 parent=1, type 3 parent=2) */
+  parentMembershipType?: number | null;
+  /** When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs */
+  hasUsersTableEntry?: boolean | null;
 }
 /** Records of individual permission grants and revocations for members via bitmask */
 export interface AppGrant {
@@ -545,6 +549,28 @@ export interface OrgMembershipDefault {
   /** When a group is created, whether to auto-add existing org members as group members */
   createGroupsCascadeMembers?: boolean | null;
 }
+/** Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) */
+export interface OrgMemberProfile {
+  id: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  /** References the membership this profile belongs to (1:1) */
+  membershipId?: string | null;
+  /** References the entity this profile belongs to (used for RLS lookups) */
+  entityId?: string | null;
+  /** References the user who owns this profile (for self-edit RLS) */
+  actorId?: string | null;
+  /** Display name shown to other entity members */
+  displayName?: string | null;
+  /** Email address visible to other entity members (auto-populated from verified primary email) */
+  email?: string | null;
+  /** Job title or role description visible to other entity members */
+  title?: string | null;
+  /** Short biography visible to other entity members */
+  bio?: string | null;
+  /** Profile picture visible to other entity members */
+  profilePicture?: ConstructiveInternalTypeImage | null;
+}
 /** Defines available levels that users can achieve by completing requirements */
 export interface AppLevel {
   id: string;
@@ -583,6 +609,33 @@ export interface AppInvite {
   createdAt?: string | null;
   updatedAt?: string | null;
 }
+/** Invitation records sent to prospective members via email, with token-based redemption and expiration */
+export interface OrgInvite {
+  id: string;
+  /** Email address of the invited recipient */
+  email?: ConstructiveInternalTypeEmail | null;
+  /** User ID of the member who sent this invitation */
+  senderId?: string | null;
+  /** User ID of the intended recipient, if targeting a specific user */
+  receiverId?: string | null;
+  /** Unique random hex token used to redeem this invitation */
+  inviteToken?: string | null;
+  /** Whether this invitation is still valid and can be redeemed */
+  inviteValid?: boolean | null;
+  /** Maximum number of times this invite can be claimed; -1 means unlimited */
+  inviteLimit?: number | null;
+  /** Running count of how many times this invite has been claimed */
+  inviteCount?: number | null;
+  /** Whether this invite can be claimed by multiple recipients */
+  multiple?: boolean | null;
+  /** Optional JSON payload of additional invite metadata */
+  data?: Record<string, unknown> | null;
+  /** Timestamp after which this invitation can no longer be redeemed */
+  expiresAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  entityId?: string | null;
+}
 /** Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status */
 export interface AppMembership {
   id: string;
@@ -600,6 +653,8 @@ export interface AppMembership {
   isVerified?: boolean | null;
   /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
   isActive?: boolean | null;
+  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
+  isExternal?: boolean | null;
   /** Whether the actor is the owner of this entity */
   isOwner?: boolean | null;
   /** Whether the actor has admin privileges on this entity */
@@ -627,6 +682,8 @@ export interface OrgMembership {
   isDisabled?: boolean | null;
   /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
   isActive?: boolean | null;
+  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
+  isExternal?: boolean | null;
   /** Whether the actor is the owner of this entity */
   isOwner?: boolean | null;
   /** Whether the actor has admin privileges on this entity */
@@ -639,34 +696,9 @@ export interface OrgMembership {
   actorId?: string | null;
   /** References the entity (org or group) this membership belongs to */
   entityId?: string | null;
+  /** Whether this member has read-only access (blocks mutations when true) */
+  isReadOnly?: boolean | null;
   profileId?: string | null;
-}
-/** Invitation records sent to prospective members via email, with token-based redemption and expiration */
-export interface OrgInvite {
-  id: string;
-  /** Email address of the invited recipient */
-  email?: ConstructiveInternalTypeEmail | null;
-  /** User ID of the member who sent this invitation */
-  senderId?: string | null;
-  /** User ID of the intended recipient, if targeting a specific user */
-  receiverId?: string | null;
-  /** Unique random hex token used to redeem this invitation */
-  inviteToken?: string | null;
-  /** Whether this invitation is still valid and can be redeemed */
-  inviteValid?: boolean | null;
-  /** Maximum number of times this invite can be claimed; -1 means unlimited */
-  inviteLimit?: number | null;
-  /** Running count of how many times this invite has been claimed */
-  inviteCount?: number | null;
-  /** Whether this invite can be claimed by multiple recipients */
-  multiple?: boolean | null;
-  /** Optional JSON payload of additional invite metadata */
-  data?: Record<string, unknown> | null;
-  /** Timestamp after which this invitation can no longer be redeemed */
-  expiresAt?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  entityId?: string | null;
 }
 // ============ Relation Helper Types ============
 export interface ConnectionResult<T> {
@@ -695,24 +727,29 @@ export interface AppLimitDefaultRelations {}
 export interface OrgLimitDefaultRelations {}
 export interface OrgAdminGrantRelations {}
 export interface OrgOwnerGrantRelations {}
-export interface MembershipTypeRelations {}
 export interface AppLimitRelations {}
 export interface AppAchievementRelations {}
 export interface AppStepRelations {}
 export interface AppClaimedInviteRelations {}
 export interface OrgChartEdgeGrantRelations {}
 export interface OrgLimitRelations {}
+export interface MembershipTypeRelations {}
 export interface AppGrantRelations {}
 export interface AppMembershipDefaultRelations {}
 export interface OrgClaimedInviteRelations {}
 export interface OrgGrantRelations {}
 export interface OrgChartEdgeRelations {}
 export interface OrgMembershipDefaultRelations {}
+export interface OrgMemberProfileRelations {
+  membership?: OrgMembership | null;
+}
 export interface AppLevelRelations {}
 export interface AppInviteRelations {}
-export interface AppMembershipRelations {}
-export interface OrgMembershipRelations {}
 export interface OrgInviteRelations {}
+export interface AppMembershipRelations {}
+export interface OrgMembershipRelations {
+  orgMemberProfileByMembershipId?: OrgMemberProfile | null;
+}
 // ============ Entity Types With Relations ============
 export type OrgGetManagersRecordWithRelations = OrgGetManagersRecord &
   OrgGetManagersRecordRelations;
@@ -732,13 +769,13 @@ export type AppLimitDefaultWithRelations = AppLimitDefault & AppLimitDefaultRela
 export type OrgLimitDefaultWithRelations = OrgLimitDefault & OrgLimitDefaultRelations;
 export type OrgAdminGrantWithRelations = OrgAdminGrant & OrgAdminGrantRelations;
 export type OrgOwnerGrantWithRelations = OrgOwnerGrant & OrgOwnerGrantRelations;
-export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type AppLimitWithRelations = AppLimit & AppLimitRelations;
 export type AppAchievementWithRelations = AppAchievement & AppAchievementRelations;
 export type AppStepWithRelations = AppStep & AppStepRelations;
 export type AppClaimedInviteWithRelations = AppClaimedInvite & AppClaimedInviteRelations;
 export type OrgChartEdgeGrantWithRelations = OrgChartEdgeGrant & OrgChartEdgeGrantRelations;
 export type OrgLimitWithRelations = OrgLimit & OrgLimitRelations;
+export type MembershipTypeWithRelations = MembershipType & MembershipTypeRelations;
 export type AppGrantWithRelations = AppGrant & AppGrantRelations;
 export type AppMembershipDefaultWithRelations = AppMembershipDefault &
   AppMembershipDefaultRelations;
@@ -747,11 +784,12 @@ export type OrgGrantWithRelations = OrgGrant & OrgGrantRelations;
 export type OrgChartEdgeWithRelations = OrgChartEdge & OrgChartEdgeRelations;
 export type OrgMembershipDefaultWithRelations = OrgMembershipDefault &
   OrgMembershipDefaultRelations;
+export type OrgMemberProfileWithRelations = OrgMemberProfile & OrgMemberProfileRelations;
 export type AppLevelWithRelations = AppLevel & AppLevelRelations;
 export type AppInviteWithRelations = AppInvite & AppInviteRelations;
+export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 export type AppMembershipWithRelations = AppMembership & AppMembershipRelations;
 export type OrgMembershipWithRelations = OrgMembership & OrgMembershipRelations;
-export type OrgInviteWithRelations = OrgInvite & OrgInviteRelations;
 // ============ Entity Select Types ============
 export type OrgGetManagersRecordSelect = {
   userId?: boolean;
@@ -844,12 +882,6 @@ export type OrgOwnerGrantSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
 };
-export type MembershipTypeSelect = {
-  id?: boolean;
-  name?: boolean;
-  description?: boolean;
-  prefix?: boolean;
-};
 export type AppLimitSelect = {
   id?: boolean;
   name?: boolean;
@@ -899,6 +931,14 @@ export type OrgLimitSelect = {
   num?: boolean;
   max?: boolean;
   entityId?: boolean;
+};
+export type MembershipTypeSelect = {
+  id?: boolean;
+  name?: boolean;
+  description?: boolean;
+  prefix?: boolean;
+  parentMembershipType?: boolean;
+  hasUsersTableEntry?: boolean;
 };
 export type AppGrantSelect = {
   id?: boolean;
@@ -958,6 +998,22 @@ export type OrgMembershipDefaultSelect = {
   deleteMemberCascadeGroups?: boolean;
   createGroupsCascadeMembers?: boolean;
 };
+export type OrgMemberProfileSelect = {
+  id?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  membershipId?: boolean;
+  entityId?: boolean;
+  actorId?: boolean;
+  displayName?: boolean;
+  email?: boolean;
+  title?: boolean;
+  bio?: boolean;
+  profilePicture?: boolean;
+  membership?: {
+    select: OrgMembershipSelect;
+  };
+};
 export type AppLevelSelect = {
   id?: boolean;
   name?: boolean;
@@ -981,6 +1037,22 @@ export type AppInviteSelect = {
   createdAt?: boolean;
   updatedAt?: boolean;
 };
+export type OrgInviteSelect = {
+  id?: boolean;
+  email?: boolean;
+  senderId?: boolean;
+  receiverId?: boolean;
+  inviteToken?: boolean;
+  inviteValid?: boolean;
+  inviteLimit?: boolean;
+  inviteCount?: boolean;
+  multiple?: boolean;
+  data?: boolean;
+  expiresAt?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
+  entityId?: boolean;
+};
 export type AppMembershipSelect = {
   id?: boolean;
   createdAt?: boolean;
@@ -992,6 +1064,7 @@ export type AppMembershipSelect = {
   isDisabled?: boolean;
   isVerified?: boolean;
   isActive?: boolean;
+  isExternal?: boolean;
   isOwner?: boolean;
   isAdmin?: boolean;
   permissions?: boolean;
@@ -1009,29 +1082,18 @@ export type OrgMembershipSelect = {
   isBanned?: boolean;
   isDisabled?: boolean;
   isActive?: boolean;
+  isExternal?: boolean;
   isOwner?: boolean;
   isAdmin?: boolean;
   permissions?: boolean;
   granted?: boolean;
   actorId?: boolean;
   entityId?: boolean;
+  isReadOnly?: boolean;
   profileId?: boolean;
-};
-export type OrgInviteSelect = {
-  id?: boolean;
-  email?: boolean;
-  senderId?: boolean;
-  receiverId?: boolean;
-  inviteToken?: boolean;
-  inviteValid?: boolean;
-  inviteLimit?: boolean;
-  inviteCount?: boolean;
-  multiple?: boolean;
-  data?: boolean;
-  expiresAt?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
-  entityId?: boolean;
+  orgMemberProfileByMembershipId?: {
+    select: OrgMemberProfileSelect;
+  };
 };
 // ============ Table Filter Types ============
 export interface OrgGetManagersRecordFilter {
@@ -1262,22 +1324,6 @@ export interface OrgOwnerGrantFilter {
   /** Negates the expression. */
   not?: OrgOwnerGrantFilter;
 }
-export interface MembershipTypeFilter {
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: MembershipTypeFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MembershipTypeFilter[];
-  /** Negates the expression. */
-  not?: MembershipTypeFilter;
-}
 export interface AppLimitFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -1399,6 +1445,26 @@ export interface OrgLimitFilter {
   or?: OrgLimitFilter[];
   /** Negates the expression. */
   not?: OrgLimitFilter;
+}
+export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `parentMembershipType` field. */
+  parentMembershipType?: IntFilter;
+  /** Filter by the object’s `hasUsersTableEntry` field. */
+  hasUsersTableEntry?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipTypeFilter[];
+  /** Negates the expression. */
+  not?: MembershipTypeFilter;
 }
 export interface AppGrantFilter {
   /** Filter by the object’s `id` field. */
@@ -1538,6 +1604,38 @@ export interface OrgMembershipDefaultFilter {
   /** Negates the expression. */
   not?: OrgMembershipDefaultFilter;
 }
+export interface OrgMemberProfileFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `membershipId` field. */
+  membershipId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: StringFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `bio` field. */
+  bio?: StringFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMemberProfileFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMemberProfileFilter[];
+  /** Negates the expression. */
+  not?: OrgMemberProfileFilter;
+  /** Filter by the object’s `membership` relation. */
+  membership?: OrgMembershipFilter;
+}
 export interface AppLevelFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -1590,6 +1688,40 @@ export interface AppInviteFilter {
   /** Negates the expression. */
   not?: AppInviteFilter;
 }
+export interface OrgInviteFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `email` field. */
+  email?: ConstructiveInternalTypeEmailFilter;
+  /** Filter by the object’s `senderId` field. */
+  senderId?: UUIDFilter;
+  /** Filter by the object’s `receiverId` field. */
+  receiverId?: UUIDFilter;
+  /** Filter by the object’s `inviteToken` field. */
+  inviteToken?: StringFilter;
+  /** Filter by the object’s `inviteValid` field. */
+  inviteValid?: BooleanFilter;
+  /** Filter by the object’s `inviteLimit` field. */
+  inviteLimit?: IntFilter;
+  /** Filter by the object’s `inviteCount` field. */
+  inviteCount?: IntFilter;
+  /** Filter by the object’s `multiple` field. */
+  multiple?: BooleanFilter;
+  /** Filter by the object’s `expiresAt` field. */
+  expiresAt?: DatetimeFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgInviteFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgInviteFilter[];
+  /** Negates the expression. */
+  not?: OrgInviteFilter;
+}
 export interface AppMembershipFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
@@ -1611,6 +1743,8 @@ export interface AppMembershipFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isExternal` field. */
+  isExternal?: BooleanFilter;
   /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
   /** Filter by the object’s `isAdmin` field. */
@@ -1649,6 +1783,8 @@ export interface OrgMembershipFilter {
   isDisabled?: BooleanFilter;
   /** Filter by the object’s `isActive` field. */
   isActive?: BooleanFilter;
+  /** Filter by the object’s `isExternal` field. */
+  isExternal?: BooleanFilter;
   /** Filter by the object’s `isOwner` field. */
   isOwner?: BooleanFilter;
   /** Filter by the object’s `isAdmin` field. */
@@ -1661,6 +1797,8 @@ export interface OrgMembershipFilter {
   actorId?: UUIDFilter;
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
   /** Filter by the object’s `profileId` field. */
   profileId?: UUIDFilter;
   /** Checks for all expressions in this list. */
@@ -1669,40 +1807,10 @@ export interface OrgMembershipFilter {
   or?: OrgMembershipFilter[];
   /** Negates the expression. */
   not?: OrgMembershipFilter;
-}
-export interface OrgInviteFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `email` field. */
-  email?: ConstructiveInternalTypeEmailFilter;
-  /** Filter by the object’s `senderId` field. */
-  senderId?: UUIDFilter;
-  /** Filter by the object’s `receiverId` field. */
-  receiverId?: UUIDFilter;
-  /** Filter by the object’s `inviteToken` field. */
-  inviteToken?: StringFilter;
-  /** Filter by the object’s `inviteValid` field. */
-  inviteValid?: BooleanFilter;
-  /** Filter by the object’s `inviteLimit` field. */
-  inviteLimit?: IntFilter;
-  /** Filter by the object’s `inviteCount` field. */
-  inviteCount?: IntFilter;
-  /** Filter by the object’s `multiple` field. */
-  multiple?: BooleanFilter;
-  /** Filter by the object’s `expiresAt` field. */
-  expiresAt?: DatetimeFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgInviteFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgInviteFilter[];
-  /** Negates the expression. */
-  not?: OrgInviteFilter;
+  /** Filter by the object’s `orgMemberProfileByMembershipId` relation. */
+  orgMemberProfileByMembershipId?: OrgMemberProfileFilter;
+  /** A related `orgMemberProfileByMembershipId` exists. */
+  orgMemberProfileByMembershipIdExists?: boolean;
 }
 // ============ OrderBy Types ============
 export type OrgGetManagersRecordsOrderBy =
@@ -1887,18 +1995,6 @@ export type OrgOwnerGrantOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type MembershipTypeOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC';
 export type AppLimitOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -1999,6 +2095,22 @@ export type OrgLimitOrderBy =
   | 'MAX_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
+export type MembershipTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PARENT_MEMBERSHIP_TYPE_ASC'
+  | 'PARENT_MEMBERSHIP_TYPE_DESC'
+  | 'HAS_USERS_TABLE_ENTRY_ASC'
+  | 'HAS_USERS_TABLE_ENTRY_DESC';
 export type AppGrantOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -2115,6 +2227,32 @@ export type OrgMembershipDefaultOrderBy =
   | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
   | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
   | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
+export type OrgMemberProfileOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'MEMBERSHIP_ID_ASC'
+  | 'MEMBERSHIP_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'BIO_ASC'
+  | 'BIO_DESC'
+  | 'PROFILE_PICTURE_ASC'
+  | 'PROFILE_PICTURE_DESC';
 export type AppLevelOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -2161,6 +2299,38 @@ export type AppInviteOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+export type OrgInviteOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'SENDER_ID_ASC'
+  | 'SENDER_ID_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
+  | 'INVITE_TOKEN_ASC'
+  | 'INVITE_TOKEN_DESC'
+  | 'INVITE_VALID_ASC'
+  | 'INVITE_VALID_DESC'
+  | 'INVITE_LIMIT_ASC'
+  | 'INVITE_LIMIT_DESC'
+  | 'INVITE_COUNT_ASC'
+  | 'INVITE_COUNT_DESC'
+  | 'MULTIPLE_ASC'
+  | 'MULTIPLE_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 export type AppMembershipOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -2185,6 +2355,8 @@ export type AppMembershipOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_ACTIVE_ASC'
   | 'IS_ACTIVE_DESC'
+  | 'IS_EXTERNAL_ASC'
+  | 'IS_EXTERNAL_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
@@ -2219,6 +2391,8 @@ export type OrgMembershipOrderBy =
   | 'IS_DISABLED_DESC'
   | 'IS_ACTIVE_ASC'
   | 'IS_ACTIVE_DESC'
+  | 'IS_EXTERNAL_ASC'
+  | 'IS_EXTERNAL_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
@@ -2231,40 +2405,10 @@ export type OrgMembershipOrderBy =
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC'
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
-export type OrgInviteOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'INVITE_TOKEN_ASC'
-  | 'INVITE_TOKEN_DESC'
-  | 'INVITE_VALID_ASC'
-  | 'INVITE_VALID_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
 // ============ CRUD Input Types ============
 export interface CreateOrgGetManagersRecordInput {
   clientMutationId?: string;
@@ -2572,28 +2716,6 @@ export interface DeleteOrgOwnerGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateMembershipTypeInput {
-  clientMutationId?: string;
-  membershipType: {
-    name: string;
-    description: string;
-    prefix: string;
-  };
-}
-export interface MembershipTypePatch {
-  name?: string | null;
-  description?: string | null;
-  prefix?: string | null;
-}
-export interface UpdateMembershipTypeInput {
-  clientMutationId?: string;
-  id: number;
-  membershipTypePatch: MembershipTypePatch;
-}
-export interface DeleteMembershipTypeInput {
-  clientMutationId?: string;
-  id: number;
-}
 export interface CreateAppLimitInput {
   clientMutationId?: string;
   appLimit: {
@@ -2739,6 +2861,32 @@ export interface UpdateOrgLimitInput {
 export interface DeleteOrgLimitInput {
   clientMutationId?: string;
   id: string;
+}
+export interface CreateMembershipTypeInput {
+  clientMutationId?: string;
+  membershipType: {
+    name: string;
+    description: string;
+    prefix: string;
+    parentMembershipType?: number;
+    hasUsersTableEntry?: boolean;
+  };
+}
+export interface MembershipTypePatch {
+  name?: string | null;
+  description?: string | null;
+  prefix?: string | null;
+  parentMembershipType?: number | null;
+  hasUsersTableEntry?: boolean | null;
+}
+export interface UpdateMembershipTypeInput {
+  clientMutationId?: string;
+  id: number;
+  membershipTypePatch: MembershipTypePatch;
+}
+export interface DeleteMembershipTypeInput {
+  clientMutationId?: string;
+  id: number;
 }
 export interface CreateAppGrantInput {
   clientMutationId?: string;
@@ -2892,6 +3040,39 @@ export interface DeleteOrgMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateOrgMemberProfileInput {
+  clientMutationId?: string;
+  orgMemberProfile: {
+    membershipId: string;
+    entityId: string;
+    actorId: string;
+    displayName?: string;
+    email?: string;
+    title?: string;
+    bio?: string;
+    profilePicture?: ConstructiveInternalTypeImage;
+  };
+}
+export interface OrgMemberProfilePatch {
+  membershipId?: string | null;
+  entityId?: string | null;
+  actorId?: string | null;
+  displayName?: string | null;
+  email?: string | null;
+  title?: string | null;
+  bio?: string | null;
+  profilePicture?: ConstructiveInternalTypeImage | null;
+  profilePictureUpload?: File | null;
+}
+export interface UpdateOrgMemberProfileInput {
+  clientMutationId?: string;
+  id: string;
+  orgMemberProfilePatch: OrgMemberProfilePatch;
+}
+export interface DeleteOrgMemberProfileInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateAppLevelInput {
   clientMutationId?: string;
   appLevel: {
@@ -2951,90 +3132,6 @@ export interface DeleteAppInviteInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateAppMembershipInput {
-  clientMutationId?: string;
-  appMembership: {
-    createdBy?: string;
-    updatedBy?: string;
-    isApproved?: boolean;
-    isBanned?: boolean;
-    isDisabled?: boolean;
-    isVerified?: boolean;
-    isActive?: boolean;
-    isOwner?: boolean;
-    isAdmin?: boolean;
-    permissions?: string;
-    granted?: string;
-    actorId: string;
-    profileId?: string;
-  };
-}
-export interface AppMembershipPatch {
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  isApproved?: boolean | null;
-  isBanned?: boolean | null;
-  isDisabled?: boolean | null;
-  isVerified?: boolean | null;
-  isActive?: boolean | null;
-  isOwner?: boolean | null;
-  isAdmin?: boolean | null;
-  permissions?: string | null;
-  granted?: string | null;
-  actorId?: string | null;
-  profileId?: string | null;
-}
-export interface UpdateAppMembershipInput {
-  clientMutationId?: string;
-  id: string;
-  appMembershipPatch: AppMembershipPatch;
-}
-export interface DeleteAppMembershipInput {
-  clientMutationId?: string;
-  id: string;
-}
-export interface CreateOrgMembershipInput {
-  clientMutationId?: string;
-  orgMembership: {
-    createdBy?: string;
-    updatedBy?: string;
-    isApproved?: boolean;
-    isBanned?: boolean;
-    isDisabled?: boolean;
-    isActive?: boolean;
-    isOwner?: boolean;
-    isAdmin?: boolean;
-    permissions?: string;
-    granted?: string;
-    actorId: string;
-    entityId: string;
-    profileId?: string;
-  };
-}
-export interface OrgMembershipPatch {
-  createdBy?: string | null;
-  updatedBy?: string | null;
-  isApproved?: boolean | null;
-  isBanned?: boolean | null;
-  isDisabled?: boolean | null;
-  isActive?: boolean | null;
-  isOwner?: boolean | null;
-  isAdmin?: boolean | null;
-  permissions?: string | null;
-  granted?: string | null;
-  actorId?: string | null;
-  entityId?: string | null;
-  profileId?: string | null;
-}
-export interface UpdateOrgMembershipInput {
-  clientMutationId?: string;
-  id: string;
-  orgMembershipPatch: OrgMembershipPatch;
-}
-export interface DeleteOrgMembershipInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface CreateOrgInviteInput {
   clientMutationId?: string;
   orgInvite: {
@@ -3070,6 +3167,96 @@ export interface UpdateOrgInviteInput {
   orgInvitePatch: OrgInvitePatch;
 }
 export interface DeleteOrgInviteInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateAppMembershipInput {
+  clientMutationId?: string;
+  appMembership: {
+    createdBy?: string;
+    updatedBy?: string;
+    isApproved?: boolean;
+    isBanned?: boolean;
+    isDisabled?: boolean;
+    isVerified?: boolean;
+    isActive?: boolean;
+    isExternal?: boolean;
+    isOwner?: boolean;
+    isAdmin?: boolean;
+    permissions?: string;
+    granted?: string;
+    actorId: string;
+    profileId?: string;
+  };
+}
+export interface AppMembershipPatch {
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  isApproved?: boolean | null;
+  isBanned?: boolean | null;
+  isDisabled?: boolean | null;
+  isVerified?: boolean | null;
+  isActive?: boolean | null;
+  isExternal?: boolean | null;
+  isOwner?: boolean | null;
+  isAdmin?: boolean | null;
+  permissions?: string | null;
+  granted?: string | null;
+  actorId?: string | null;
+  profileId?: string | null;
+}
+export interface UpdateAppMembershipInput {
+  clientMutationId?: string;
+  id: string;
+  appMembershipPatch: AppMembershipPatch;
+}
+export interface DeleteAppMembershipInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface CreateOrgMembershipInput {
+  clientMutationId?: string;
+  orgMembership: {
+    createdBy?: string;
+    updatedBy?: string;
+    isApproved?: boolean;
+    isBanned?: boolean;
+    isDisabled?: boolean;
+    isActive?: boolean;
+    isExternal?: boolean;
+    isOwner?: boolean;
+    isAdmin?: boolean;
+    permissions?: string;
+    granted?: string;
+    actorId: string;
+    entityId: string;
+    isReadOnly?: boolean;
+    profileId?: string;
+  };
+}
+export interface OrgMembershipPatch {
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  isApproved?: boolean | null;
+  isBanned?: boolean | null;
+  isDisabled?: boolean | null;
+  isActive?: boolean | null;
+  isExternal?: boolean | null;
+  isOwner?: boolean | null;
+  isAdmin?: boolean | null;
+  permissions?: string | null;
+  granted?: string | null;
+  actorId?: string | null;
+  entityId?: string | null;
+  isReadOnly?: boolean | null;
+  profileId?: string | null;
+}
+export interface UpdateOrgMembershipInput {
+  clientMutationId?: string;
+  id: string;
+  orgMembershipPatch: OrgMembershipPatch;
+}
+export interface DeleteOrgMembershipInput {
   clientMutationId?: string;
   id: string;
 }
@@ -3884,51 +4071,6 @@ export type DeleteOrgOwnerGrantPayloadSelect = {
     select: OrgOwnerGrantEdgeSelect;
   };
 };
-export interface CreateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was created by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
-export type CreateMembershipTypePayloadSelect = {
-  clientMutationId?: boolean;
-  membershipType?: {
-    select: MembershipTypeSelect;
-  };
-  membershipTypeEdge?: {
-    select: MembershipTypeEdgeSelect;
-  };
-};
-export interface UpdateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was updated by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
-export type UpdateMembershipTypePayloadSelect = {
-  clientMutationId?: boolean;
-  membershipType?: {
-    select: MembershipTypeSelect;
-  };
-  membershipTypeEdge?: {
-    select: MembershipTypeEdgeSelect;
-  };
-};
-export interface DeleteMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was deleted by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
-export type DeleteMembershipTypePayloadSelect = {
-  clientMutationId?: boolean;
-  membershipType?: {
-    select: MembershipTypeSelect;
-  };
-  membershipTypeEdge?: {
-    select: MembershipTypeEdgeSelect;
-  };
-};
 export interface CreateAppLimitPayload {
   clientMutationId?: string | null;
   /** The `AppLimit` that was created by this mutation. */
@@ -4197,6 +4339,51 @@ export type DeleteOrgLimitPayloadSelect = {
   };
   orgLimitEdge?: {
     select: OrgLimitEdgeSelect;
+  };
+};
+export interface CreateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was created by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
+export type CreateMembershipTypePayloadSelect = {
+  clientMutationId?: boolean;
+  membershipType?: {
+    select: MembershipTypeSelect;
+  };
+  membershipTypeEdge?: {
+    select: MembershipTypeEdgeSelect;
+  };
+};
+export interface UpdateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was updated by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
+export type UpdateMembershipTypePayloadSelect = {
+  clientMutationId?: boolean;
+  membershipType?: {
+    select: MembershipTypeSelect;
+  };
+  membershipTypeEdge?: {
+    select: MembershipTypeEdgeSelect;
+  };
+};
+export interface DeleteMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was deleted by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
+export type DeleteMembershipTypePayloadSelect = {
+  clientMutationId?: boolean;
+  membershipType?: {
+    select: MembershipTypeSelect;
+  };
+  membershipTypeEdge?: {
+    select: MembershipTypeEdgeSelect;
   };
 };
 export interface CreateAppGrantPayload {
@@ -4469,6 +4656,51 @@ export type DeleteOrgMembershipDefaultPayloadSelect = {
     select: OrgMembershipDefaultEdgeSelect;
   };
 };
+export interface CreateOrgMemberProfilePayload {
+  clientMutationId?: string | null;
+  /** The `OrgMemberProfile` that was created by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export type CreateOrgMemberProfilePayloadSelect = {
+  clientMutationId?: boolean;
+  orgMemberProfile?: {
+    select: OrgMemberProfileSelect;
+  };
+  orgMemberProfileEdge?: {
+    select: OrgMemberProfileEdgeSelect;
+  };
+};
+export interface UpdateOrgMemberProfilePayload {
+  clientMutationId?: string | null;
+  /** The `OrgMemberProfile` that was updated by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export type UpdateOrgMemberProfilePayloadSelect = {
+  clientMutationId?: boolean;
+  orgMemberProfile?: {
+    select: OrgMemberProfileSelect;
+  };
+  orgMemberProfileEdge?: {
+    select: OrgMemberProfileEdgeSelect;
+  };
+};
+export interface DeleteOrgMemberProfilePayload {
+  clientMutationId?: string | null;
+  /** The `OrgMemberProfile` that was deleted by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export type DeleteOrgMemberProfilePayloadSelect = {
+  clientMutationId?: boolean;
+  orgMemberProfile?: {
+    select: OrgMemberProfileSelect;
+  };
+  orgMemberProfileEdge?: {
+    select: OrgMemberProfileEdgeSelect;
+  };
+};
 export interface CreateAppLevelPayload {
   clientMutationId?: string | null;
   /** The `AppLevel` that was created by this mutation. */
@@ -4559,6 +4791,51 @@ export type DeleteAppInvitePayloadSelect = {
     select: AppInviteEdgeSelect;
   };
 };
+export interface CreateOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was created by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
+}
+export type CreateOrgInvitePayloadSelect = {
+  clientMutationId?: boolean;
+  orgInvite?: {
+    select: OrgInviteSelect;
+  };
+  orgInviteEdge?: {
+    select: OrgInviteEdgeSelect;
+  };
+};
+export interface UpdateOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was updated by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
+}
+export type UpdateOrgInvitePayloadSelect = {
+  clientMutationId?: boolean;
+  orgInvite?: {
+    select: OrgInviteSelect;
+  };
+  orgInviteEdge?: {
+    select: OrgInviteEdgeSelect;
+  };
+};
+export interface DeleteOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was deleted by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
+}
+export type DeleteOrgInvitePayloadSelect = {
+  clientMutationId?: boolean;
+  orgInvite?: {
+    select: OrgInviteSelect;
+  };
+  orgInviteEdge?: {
+    select: OrgInviteEdgeSelect;
+  };
+};
 export interface CreateAppMembershipPayload {
   clientMutationId?: string | null;
   /** The `AppMembership` that was created by this mutation. */
@@ -4647,51 +4924,6 @@ export type DeleteOrgMembershipPayloadSelect = {
   };
   orgMembershipEdge?: {
     select: OrgMembershipEdgeSelect;
-  };
-};
-export interface CreateOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was created by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
-}
-export type CreateOrgInvitePayloadSelect = {
-  clientMutationId?: boolean;
-  orgInvite?: {
-    select: OrgInviteSelect;
-  };
-  orgInviteEdge?: {
-    select: OrgInviteEdgeSelect;
-  };
-};
-export interface UpdateOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was updated by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
-}
-export type UpdateOrgInvitePayloadSelect = {
-  clientMutationId?: boolean;
-  orgInvite?: {
-    select: OrgInviteSelect;
-  };
-  orgInviteEdge?: {
-    select: OrgInviteEdgeSelect;
-  };
-};
-export interface DeleteOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was deleted by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
-}
-export type DeleteOrgInvitePayloadSelect = {
-  clientMutationId?: boolean;
-  orgInvite?: {
-    select: OrgInviteSelect;
-  };
-  orgInviteEdge?: {
-    select: OrgInviteEdgeSelect;
   };
 };
 /** A `AppPermission` edge in the connection. */
@@ -4855,18 +5087,6 @@ export type OrgOwnerGrantEdgeSelect = {
     select: OrgOwnerGrantSelect;
   };
 };
-/** A `MembershipType` edge in the connection. */
-export interface MembershipTypeEdge {
-  cursor?: string | null;
-  /** The `MembershipType` at the end of the edge. */
-  node?: MembershipType | null;
-}
-export type MembershipTypeEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: MembershipTypeSelect;
-  };
-};
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
   cursor?: string | null;
@@ -4937,6 +5157,18 @@ export type OrgLimitEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgLimitSelect;
+  };
+};
+/** A `MembershipType` edge in the connection. */
+export interface MembershipTypeEdge {
+  cursor?: string | null;
+  /** The `MembershipType` at the end of the edge. */
+  node?: MembershipType | null;
+}
+export type MembershipTypeEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: MembershipTypeSelect;
   };
 };
 /** A `AppGrant` edge in the connection. */
@@ -5011,6 +5243,18 @@ export type OrgMembershipDefaultEdgeSelect = {
     select: OrgMembershipDefaultSelect;
   };
 };
+/** A `OrgMemberProfile` edge in the connection. */
+export interface OrgMemberProfileEdge {
+  cursor?: string | null;
+  /** The `OrgMemberProfile` at the end of the edge. */
+  node?: OrgMemberProfile | null;
+}
+export type OrgMemberProfileEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: OrgMemberProfileSelect;
+  };
+};
 /** A `AppLevel` edge in the connection. */
 export interface AppLevelEdge {
   cursor?: string | null;
@@ -5035,6 +5279,18 @@ export type AppInviteEdgeSelect = {
     select: AppInviteSelect;
   };
 };
+/** A `OrgInvite` edge in the connection. */
+export interface OrgInviteEdge {
+  cursor?: string | null;
+  /** The `OrgInvite` at the end of the edge. */
+  node?: OrgInvite | null;
+}
+export type OrgInviteEdgeSelect = {
+  cursor?: boolean;
+  node?: {
+    select: OrgInviteSelect;
+  };
+};
 /** A `AppMembership` edge in the connection. */
 export interface AppMembershipEdge {
   cursor?: string | null;
@@ -5057,17 +5313,5 @@ export type OrgMembershipEdgeSelect = {
   cursor?: boolean;
   node?: {
     select: OrgMembershipSelect;
-  };
-};
-/** A `OrgInvite` edge in the connection. */
-export interface OrgInviteEdge {
-  cursor?: string | null;
-  /** The `OrgInvite` at the end of the edge. */
-  node?: OrgInvite | null;
-}
-export type OrgInviteEdgeSelect = {
-  cursor?: boolean;
-  node?: {
-    select: OrgInviteSelect;
   };
 };

@@ -96,11 +96,6 @@ function App() {
 | `useCreateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
-| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useAppLimitsQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useAppLimitQuery` | Query | Tracks per-actor usage counts against configurable maximum limits |
 | `useCreateAppLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
@@ -131,6 +126,11 @@ function App() {
 | `useCreateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useUpdateOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
 | `useDeleteOrgLimitMutation` | Mutation | Tracks per-actor usage counts against configurable maximum limits |
+| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useAppGrantsQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
 | `useAppGrantQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
 | `useCreateAppGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
@@ -161,6 +161,11 @@ function App() {
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useOrgMemberProfilesQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useOrgMemberProfileQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useCreateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useUpdateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useDeleteOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useAppLevelsQuery` | Query | Defines available levels that users can achieve by completing requirements |
 | `useAppLevelQuery` | Query | Defines available levels that users can achieve by completing requirements |
 | `useCreateAppLevelMutation` | Mutation | Defines available levels that users can achieve by completing requirements |
@@ -171,6 +176,11 @@ function App() {
 | `useCreateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useUpdateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useDeleteAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useUpdateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useDeleteOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useAppMembershipsQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useAppMembershipQuery` | Query | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useCreateAppMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
@@ -181,11 +191,6 @@ function App() {
 | `useCreateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useUpdateOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
 | `useDeleteOrgMembershipMutation` | Mutation | Tracks membership records linking actors to entities with permission bitmasks, ownership, and admin status |
-| `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useUpdateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useDeleteOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useAppPermissionsGetPaddedMaskQuery` | Query | appPermissionsGetPaddedMask |
 | `useOrgPermissionsGetPaddedMaskQuery` | Query | orgPermissionsGetPaddedMask |
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
@@ -495,27 +500,6 @@ const { mutate: create } = useCreateOrgOwnerGrantMutation({
 create({ isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
 ```
 
-### MembershipType
-
-```typescript
-// List all membershipTypes
-const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Get one membershipType
-const { data: item } = useMembershipTypeQuery({
-  id: '<Int>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
-});
-
-// Create a membershipType
-const { mutate: create } = useCreateMembershipTypeMutation({
-  selection: { fields: { id: true } },
-});
-create({ name: '<String>', description: '<String>', prefix: '<String>' });
-```
-
 ### AppLimit
 
 ```typescript
@@ -640,6 +624,27 @@ const { mutate: create } = useCreateOrgLimitMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', actorId: '<UUID>', num: '<Int>', max: '<Int>', entityId: '<UUID>' });
+```
+
+### MembershipType
+
+```typescript
+// List all membershipTypes
+const { data, isLoading } = useMembershipTypesQuery({
+  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
+});
+
+// Get one membershipType
+const { data: item } = useMembershipTypeQuery({
+  id: '<Int>',
+  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
+});
+
+// Create a membershipType
+const { mutate: create } = useCreateMembershipTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', description: '<String>', prefix: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' });
 ```
 
 ### AppGrant
@@ -768,6 +773,27 @@ const { mutate: create } = useCreateOrgMembershipDefaultMutation({
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' });
 ```
 
+### OrgMemberProfile
+
+```typescript
+// List all orgMemberProfiles
+const { data, isLoading } = useOrgMemberProfilesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
+});
+
+// Get one orgMemberProfile
+const { data: item } = useOrgMemberProfileQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
+});
+
+// Create a orgMemberProfile
+const { mutate: create } = useCreateOrgMemberProfileMutation({
+  selection: { fields: { id: true } },
+});
+create({ membershipId: '<UUID>', entityId: '<UUID>', actorId: '<UUID>', displayName: '<String>', email: '<String>', title: '<String>', bio: '<String>', profilePicture: '<Image>' });
+```
+
 ### AppLevel
 
 ```typescript
@@ -810,48 +836,6 @@ const { mutate: create } = useCreateAppInviteMutation({
 create({ email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' });
 ```
 
-### AppMembership
-
-```typescript
-// List all appMemberships
-const { data, isLoading } = useAppMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
-});
-
-// Get one appMembership
-const { data: item } = useAppMembershipQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
-});
-
-// Create a appMembership
-const { mutate: create } = useCreateAppMembershipMutation({
-  selection: { fields: { id: true } },
-});
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
-```
-
-### OrgMembership
-
-```typescript
-// List all orgMemberships
-const { data, isLoading } = useOrgMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, profileId: true } },
-});
-
-// Get one orgMembership
-const { data: item } = useOrgMembershipQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, profileId: true } },
-});
-
-// Create a orgMembership
-const { mutate: create } = useCreateOrgMembershipMutation({
-  selection: { fields: { id: true } },
-});
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', entityId: '<UUID>', profileId: '<UUID>' });
-```
-
 ### OrgInvite
 
 ```typescript
@@ -871,6 +855,48 @@ const { mutate: create } = useCreateOrgInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ email: '<Email>', senderId: '<UUID>', receiverId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>', entityId: '<UUID>' });
+```
+
+### AppMembership
+
+```typescript
+// List all appMemberships
+const { data, isLoading } = useAppMembershipsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+});
+
+// Get one appMembership
+const { data: item } = useAppMembershipQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+});
+
+// Create a appMembership
+const { mutate: create } = useCreateAppMembershipMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
+```
+
+### OrgMembership
+
+```typescript
+// List all orgMemberships
+const { data, isLoading } = useOrgMembershipsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, isReadOnly: true, profileId: true } },
+});
+
+// Get one orgMembership
+const { data: item } = useOrgMembershipQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, isReadOnly: true, profileId: true } },
+});
+
+// Create a orgMembership
+const { mutate: create } = useCreateOrgMembershipMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isActive: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', entityId: '<UUID>', isReadOnly: '<Boolean>', profileId: '<UUID>' });
 ```
 
 ## Custom Operation Hooks

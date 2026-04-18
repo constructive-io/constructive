@@ -34,16 +34,6 @@ export interface CryptoAddress {
   createdAt: string | null;
   updatedAt: string | null;
 }
-export interface ConnectedAccount {
-  id: string | null;
-  ownerId: string | null;
-  service: string | null;
-  identifier: string | null;
-  details: unknown | null;
-  isVerified: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
 export interface AuditLog {
   id: string | null;
   event: string | null;
@@ -57,6 +47,16 @@ export interface AuditLog {
 export interface RoleType {
   id: number | null;
   name: string | null;
+}
+export interface UserConnectedAccount {
+  id: string | null;
+  ownerId: string | null;
+  service: string | null;
+  identifier: string | null;
+  details: unknown | null;
+  isVerified: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 export interface User {
   id: string | null;

@@ -46,15 +46,6 @@ export const cryptoAddressKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...cryptoAddressKeys.details(), id] as const,
 } as const;
-export const connectedAccountKeys = {
-  /** All connectedAccount queries */ all: ['connectedaccount'] as const,
-  /** List query keys */ lists: () => [...connectedAccountKeys.all, 'list'] as const,
-  /** List query key with variables */ list: (variables?: object) =>
-    [...connectedAccountKeys.lists(), variables] as const,
-  /** Detail query keys */ details: () => [...connectedAccountKeys.all, 'detail'] as const,
-  /** Detail query key for specific item */ detail: (id: string | number) =>
-    [...connectedAccountKeys.details(), id] as const,
-} as const;
 export const auditLogKeys = {
   /** All auditLog queries */ all: ['auditlog'] as const,
   /** List query keys */ lists: () => [...auditLogKeys.all, 'list'] as const,
@@ -73,6 +64,15 @@ export const roleTypeKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...roleTypeKeys.details(), id] as const,
 } as const;
+export const userConnectedAccountKeys = {
+  /** All userConnectedAccount queries */ all: ['userconnectedaccount'] as const,
+  /** List query keys */ lists: () => [...userConnectedAccountKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...userConnectedAccountKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...userConnectedAccountKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...userConnectedAccountKeys.details(), id] as const,
+} as const;
 export const userKeys = {
   /** All user queries */ all: ['user'] as const,
   /** List query keys */ lists: () => [...userKeys.all, 'list'] as const,
@@ -88,9 +88,11 @@ export const userKeys = {
 // ============================================================================
 
 export const customQueryKeys = {
-  /** Query key for currentIpAddress */ currentIpAddress: () => ['currentIpAddress'] as const,
   /** Query key for currentUserAgent */ currentUserAgent: () => ['currentUserAgent'] as const,
+  /** Query key for currentIpAddress */ currentIpAddress: () => ['currentIpAddress'] as const,
   /** Query key for currentUserId */ currentUserId: () => ['currentUserId'] as const,
+  /** Query key for requireStepUp */ requireStepUp: (variables?: object) =>
+    ['requireStepUp', variables] as const,
   /** Query key for currentUser */ currentUser: () => ['currentUser'] as const,
 } as const;
 /**
@@ -119,9 +121,9 @@ export const queryKeys = {
   email: emailKeys,
   phoneNumber: phoneNumberKeys,
   cryptoAddress: cryptoAddressKeys,
-  connectedAccount: connectedAccountKeys,
   auditLog: auditLogKeys,
   roleType: roleTypeKeys,
+  userConnectedAccount: userConnectedAccountKeys,
   user: userKeys,
   custom: customQueryKeys,
 } as const;

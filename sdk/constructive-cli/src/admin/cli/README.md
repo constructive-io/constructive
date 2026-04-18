@@ -40,24 +40,25 @@ csdk auth set-token <your-token>
 | `org-limit-default` | orgLimitDefault CRUD operations |
 | `org-admin-grant` | orgAdminGrant CRUD operations |
 | `org-owner-grant` | orgOwnerGrant CRUD operations |
-| `membership-type` | membershipType CRUD operations |
 | `app-limit` | appLimit CRUD operations |
 | `app-achievement` | appAchievement CRUD operations |
 | `app-step` | appStep CRUD operations |
 | `app-claimed-invite` | appClaimedInvite CRUD operations |
 | `org-chart-edge-grant` | orgChartEdgeGrant CRUD operations |
 | `org-limit` | orgLimit CRUD operations |
+| `membership-type` | membershipType CRUD operations |
 | `app-grant` | appGrant CRUD operations |
 | `app-membership-default` | appMembershipDefault CRUD operations |
 | `org-claimed-invite` | orgClaimedInvite CRUD operations |
 | `org-grant` | orgGrant CRUD operations |
 | `org-chart-edge` | orgChartEdge CRUD operations |
 | `org-membership-default` | orgMembershipDefault CRUD operations |
+| `org-member-profile` | orgMemberProfile CRUD operations |
 | `app-level` | appLevel CRUD operations |
 | `app-invite` | appInvite CRUD operations |
+| `org-invite` | orgInvite CRUD operations |
 | `app-membership` | appMembership CRUD operations |
 | `org-membership` | orgMembership CRUD operations |
-| `org-invite` | orgInvite CRUD operations |
 | `app-permissions-get-padded-mask` | appPermissionsGetPaddedMask |
 | `org-permissions-get-padded-mask` | orgPermissionsGetPaddedMask |
 | `org-is-manager-of` | orgIsManagerOf |
@@ -476,30 +477,6 @@ CRUD operations for OrgOwnerGrant records.
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `isGrant`, `grantorId`
 
-### `membership-type`
-
-CRUD operations for MembershipType records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all membershipType records |
-| `find-first` | Find first matching membershipType record |
-| `get` | Get a membershipType by id |
-| `create` | Create a new membershipType |
-| `update` | Update an existing membershipType |
-| `delete` | Delete a membershipType |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | Int |
-| `name` | String |
-| `description` | String |
-| `prefix` | String |
-
-**Required create fields:** `name`, `description`, `prefix`
-
 ### `app-limit`
 
 CRUD operations for AppLimit records.
@@ -662,6 +639,33 @@ CRUD operations for OrgLimit records.
 
 **Required create fields:** `actorId`, `entityId`
 **Optional create fields (backend defaults):** `name`, `num`, `max`
+
+### `membership-type`
+
+CRUD operations for MembershipType records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all membershipType records |
+| `find-first` | Find first matching membershipType record |
+| `get` | Get a membershipType by id |
+| `create` | Create a new membershipType |
+| `update` | Update an existing membershipType |
+| `delete` | Delete a membershipType |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | Int |
+| `name` | String |
+| `description` | String |
+| `prefix` | String |
+| `parentMembershipType` | Int |
+| `hasUsersTableEntry` | Boolean |
+
+**Required create fields:** `name`, `description`, `prefix`
+**Optional create fields (backend defaults):** `parentMembershipType`, `hasUsersTableEntry`
 
 ### `app-grant`
 
@@ -834,6 +838,38 @@ CRUD operations for OrgMembershipDefault records.
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `deleteMemberCascadeGroups`, `createGroupsCascadeMembers`
 
+### `org-member-profile`
+
+CRUD operations for OrgMemberProfile records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgMemberProfile records |
+| `find-first` | Find first matching orgMemberProfile record |
+| `get` | Get a orgMemberProfile by id |
+| `create` | Create a new orgMemberProfile |
+| `update` | Update an existing orgMemberProfile |
+| `delete` | Delete a orgMemberProfile |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `membershipId` | UUID |
+| `entityId` | UUID |
+| `actorId` | UUID |
+| `displayName` | String |
+| `email` | String |
+| `title` | String |
+| `bio` | String |
+| `profilePicture` | Image |
+
+**Required create fields:** `membershipId`, `entityId`, `actorId`
+**Optional create fields (backend defaults):** `displayName`, `email`, `title`, `bio`, `profilePicture`
+
 ### `app-level`
 
 CRUD operations for AppLevel records.
@@ -894,80 +930,6 @@ CRUD operations for AppInvite records.
 
 **Optional create fields (backend defaults):** `email`, `senderId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
 
-### `app-membership`
-
-CRUD operations for AppMembership records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all appMembership records |
-| `find-first` | Find first matching appMembership record |
-| `get` | Get a appMembership by id |
-| `create` | Create a new appMembership |
-| `update` | Update an existing appMembership |
-| `delete` | Delete a appMembership |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `isBanned` | Boolean |
-| `isDisabled` | Boolean |
-| `isVerified` | Boolean |
-| `isActive` | Boolean |
-| `isOwner` | Boolean |
-| `isAdmin` | Boolean |
-| `permissions` | BitString |
-| `granted` | BitString |
-| `actorId` | UUID |
-| `profileId` | UUID |
-
-**Required create fields:** `actorId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
-
-### `org-membership`
-
-CRUD operations for OrgMembership records.
-
-| Subcommand | Description |
-|------------|-------------|
-| `list` | List all orgMembership records |
-| `find-first` | Find first matching orgMembership record |
-| `get` | Get a orgMembership by id |
-| `create` | Create a new orgMembership |
-| `update` | Update an existing orgMembership |
-| `delete` | Delete a orgMembership |
-
-**Fields:**
-
-| Field | Type |
-|-------|------|
-| `id` | UUID |
-| `createdAt` | Datetime |
-| `updatedAt` | Datetime |
-| `createdBy` | UUID |
-| `updatedBy` | UUID |
-| `isApproved` | Boolean |
-| `isBanned` | Boolean |
-| `isDisabled` | Boolean |
-| `isActive` | Boolean |
-| `isOwner` | Boolean |
-| `isAdmin` | Boolean |
-| `permissions` | BitString |
-| `granted` | BitString |
-| `actorId` | UUID |
-| `entityId` | UUID |
-| `profileId` | UUID |
-
-**Required create fields:** `actorId`, `entityId`
-**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
-
 ### `org-invite`
 
 CRUD operations for OrgInvite records.
@@ -1002,6 +964,83 @@ CRUD operations for OrgInvite records.
 
 **Required create fields:** `entityId`
 **Optional create fields (backend defaults):** `email`, `senderId`, `receiverId`, `inviteToken`, `inviteValid`, `inviteLimit`, `inviteCount`, `multiple`, `data`, `expiresAt`
+
+### `app-membership`
+
+CRUD operations for AppMembership records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all appMembership records |
+| `find-first` | Find first matching appMembership record |
+| `get` | Get a appMembership by id |
+| `create` | Create a new appMembership |
+| `update` | Update an existing appMembership |
+| `delete` | Delete a appMembership |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `isBanned` | Boolean |
+| `isDisabled` | Boolean |
+| `isVerified` | Boolean |
+| `isActive` | Boolean |
+| `isExternal` | Boolean |
+| `isOwner` | Boolean |
+| `isAdmin` | Boolean |
+| `permissions` | BitString |
+| `granted` | BitString |
+| `actorId` | UUID |
+| `profileId` | UUID |
+
+**Required create fields:** `actorId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isVerified`, `isActive`, `isExternal`, `isOwner`, `isAdmin`, `permissions`, `granted`, `profileId`
+
+### `org-membership`
+
+CRUD operations for OrgMembership records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all orgMembership records |
+| `find-first` | Find first matching orgMembership record |
+| `get` | Get a orgMembership by id |
+| `create` | Create a new orgMembership |
+| `update` | Update an existing orgMembership |
+| `delete` | Delete a orgMembership |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+| `createdBy` | UUID |
+| `updatedBy` | UUID |
+| `isApproved` | Boolean |
+| `isBanned` | Boolean |
+| `isDisabled` | Boolean |
+| `isActive` | Boolean |
+| `isExternal` | Boolean |
+| `isOwner` | Boolean |
+| `isAdmin` | Boolean |
+| `permissions` | BitString |
+| `granted` | BitString |
+| `actorId` | UUID |
+| `entityId` | UUID |
+| `isReadOnly` | Boolean |
+| `profileId` | UUID |
+
+**Required create fields:** `actorId`, `entityId`
+**Optional create fields (backend defaults):** `createdBy`, `updatedBy`, `isApproved`, `isBanned`, `isDisabled`, `isActive`, `isExternal`, `isOwner`, `isAdmin`, `permissions`, `granted`, `isReadOnly`, `profileId`
 
 ## Custom Operations
 
