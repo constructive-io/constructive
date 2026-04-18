@@ -49,6 +49,13 @@
  * ```
  */
 
+// Load the global type augmentations (inflection methods, build/scope
+// properties) so that downstream satellite plugins which `import
+// 'graphile-connection-filter'` pick up the `filterType`/`filterManyType`/
+// etc. type extensions without having to reach into the package's internal
+// file layout.
+import './augmentations';
+
 export { ConnectionFilterPreset } from './preset';
 
 // Re-export all plugins for granular use
