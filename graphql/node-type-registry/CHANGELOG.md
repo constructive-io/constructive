@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.16.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.14.0...node-type-registry@0.16.0) (2026-04-18)
+
+### Features
+
+- **node-type-registry:** add source_field/target_field to RelationSpatial BlueprintRelation arm (v0.15.0) ([6e028c0](https://github.com/constructive-io/constructive/commit/6e028c069e6a64625e8b34b921e7c22f4edba133))
+
 # [0.14.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.12.0...node-type-registry@0.14.0) (2026-04-18)
 
 ### Features
