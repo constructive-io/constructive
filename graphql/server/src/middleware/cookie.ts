@@ -151,6 +151,55 @@ const extractDeviceId = (body: any, operationName: string): string | undefined =
 };
 
 /**
+ * Serialize a single Set-Cookie value from Express-style cookie options.
+ * This is needed because grafserv writes headers via res.writeHead() which
+ * bypasses Express's res.cookie() helper. We build the header value manually.
+ */
+const serializeCookie = (
+  name: string,
+  value: string,
+  opts: Record<string, unknown>,
+): string => {
+  const parts = [`${name}=${encodeURIComponent(value)}`];
+
+  if (opts.maxAge != null) {
+    const maxAge = Math.floor(Number(opts.maxAge) / 1000); // Express maxAge is ms, Set-Cookie is seconds
+    parts.push(`Max-Age=${maxAge}`);
+  }
+  if (opts.domain) parts.push(`Domain=${opts.domain}`);
+  if (opts.path) parts.push(`Path=${opts.path}`);
+  if (opts.httpOnly) parts.push('HttpOnly');
+  if (opts.secure) parts.push('Secure');
+  if (opts.sameSite) {
+    const ss = String(opts.sameSite);
+    parts.push(`SameSite=${ss.charAt(0).toUpperCase() + ss.slice(1)}`);
+  }
+
+  return parts.join('; ');
+};
+
+/**
+ * Serialize a Set-Cookie header for clearing (expiring) a cookie.
+ */
+const serializeClearCookie = (
+  name: string,
+  opts: Record<string, unknown>,
+): string => {
+  const parts = [`${name}=`];
+  parts.push('Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+  parts.push('Max-Age=0');
+  if (opts.domain) parts.push(`Domain=${opts.domain}`);
+  if (opts.path) parts.push(`Path=${opts.path}`);
+  if (opts.httpOnly) parts.push('HttpOnly');
+  if (opts.secure) parts.push('Secure');
+  if (opts.sameSite) {
+    const ss = String(opts.sameSite);
+    parts.push(`SameSite=${ss.charAt(0).toUpperCase() + ss.slice(1)}`);
+  }
+  return parts.join('; ');
+};
+
+/**
  * Creates the cookie lifecycle middleware.
  *
  * When `enable_cookie_auth` is true in app_auth_settings:
@@ -161,6 +210,12 @@ const extractDeviceId = (body: any, operationName: string): string | undefined =
  *
  * When `enable_cookie_auth` is false (default): this middleware is a no-op.
  * Bearer token authentication continues to work regardless of this setting.
+ *
+ * Implementation note: grafserv (PostGraphile v5) writes responses via
+ * res.writeHead() + res.end(buffer), bypassing Express's res.json(). This
+ * middleware therefore intercepts res.writeHead() to defer header emission
+ * and res.end() to parse the JSON body and inject Set-Cookie headers before
+ * the actual writeHead + end calls.
  */
 export const createCookieMiddleware = (): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -176,43 +231,103 @@ export const createCookieMiddleware = (): RequestHandler => {
       return next();
     }
 
-    // Sign-out: clear session cookie before passing through
-    if (AUTH_MUTATIONS_SIGN_OUT.has(opName)) {
-      const cookieOpts = buildCookieOptions(authSettings);
-      res.clearCookie(SESSION_COOKIE_NAME, cookieOpts);
-      log.info(`[cookie] Cleared session cookie for operation=${opName}`);
+    // Only intercept auth-related mutations
+    const isSignIn = AUTH_MUTATIONS_SIGN_IN.has(opName);
+    const isSignOut = AUTH_MUTATIONS_SIGN_OUT.has(opName);
+
+    if (!isSignIn && !isSignOut) {
       return next();
     }
 
-    // Sign-in: intercept the response to set session cookie
-    if (AUTH_MUTATIONS_SIGN_IN.has(opName)) {
-      // Monkey-patch res.json to intercept the GraphQL response
-      const originalJson = res.json.bind(res);
-      res.json = (body: any) => {
-        try {
-          const accessToken = extractAccessToken(body, opName);
-          if (accessToken) {
+    // Intercept writeHead + end to inject Set-Cookie headers into the response.
+    // grafserv calls writeHead(statusCode, headers) then end(buffer), so we
+    // defer writeHead, parse the body in end(), compute cookie headers, then
+    // flush everything.
+    let deferredStatusCode: number | undefined;
+    let deferredHeaders: Record<string, string | string[]> | undefined;
+
+    const originalWriteHead = res.writeHead.bind(res);
+    const originalEnd = res.end.bind(res);
+
+    // Capture writeHead args without sending them yet
+    (res as any).writeHead = (
+      statusCode: number,
+      headers?: Record<string, string | string[]>,
+    ) => {
+      deferredStatusCode = statusCode;
+      deferredHeaders = headers ? { ...headers } : {};
+      return res; // writeHead returns the response for chaining
+    };
+
+    // Intercept end() to parse the body, inject cookies, then flush
+    (res as any).end = (
+      chunk?: Buffer | string,
+      encoding?: BufferEncoding | (() => void),
+      cb?: () => void,
+    ) => {
+      try {
+        // Only process successful JSON responses
+        const contentType = deferredHeaders?.['Content-Type'] ?? deferredHeaders?.['content-type'] ?? '';
+        const isJson = typeof contentType === 'string' && contentType.includes('json');
+
+        if (isJson && chunk) {
+          const bodyStr = Buffer.isBuffer(chunk) ? chunk.toString('utf8') : String(chunk);
+          let body: any;
+          try {
+            body = JSON.parse(bodyStr);
+          } catch {
+            // Not valid JSON — skip cookie processing
+          }
+
+          if (body) {
+            const cookieHeaders: string[] = [];
             const cookieOpts = buildCookieOptions(authSettings);
-            res.cookie(SESSION_COOKIE_NAME, accessToken, cookieOpts);
-            log.info(`[cookie] Set session cookie for operation=${opName}`);
-          }
 
-          // Also handle device token cookie
-          const deviceId = extractDeviceId(body, opName);
-          if (deviceId) {
-            const deviceCookieOpts = buildCookieOptions(authSettings);
-            // Device tokens are long-lived (90 days default)
-            deviceCookieOpts.maxAge = 90 * 24 * 60 * 60 * 1000;
-            res.cookie(DEVICE_COOKIE_NAME, deviceId, deviceCookieOpts);
-            log.info(`[cookie] Set device token cookie for operation=${opName}`);
+            if (isSignOut) {
+              cookieHeaders.push(serializeClearCookie(SESSION_COOKIE_NAME, cookieOpts));
+              log.info(`[cookie] Cleared session cookie for operation=${opName}`);
+            } else if (isSignIn) {
+              const accessToken = extractAccessToken(body, opName);
+              if (accessToken) {
+                cookieHeaders.push(serializeCookie(SESSION_COOKIE_NAME, accessToken, cookieOpts));
+                log.info(`[cookie] Set session cookie for operation=${opName}`);
+              }
+
+              const deviceId = extractDeviceId(body, opName);
+              if (deviceId) {
+                const deviceOpts = { ...cookieOpts, maxAge: 90 * 24 * 60 * 60 * 1000 };
+                cookieHeaders.push(serializeCookie(DEVICE_COOKIE_NAME, deviceId, deviceOpts));
+                log.info(`[cookie] Set device token cookie for operation=${opName}`);
+              }
+            }
+
+            // Merge Set-Cookie headers into deferred headers
+            if (cookieHeaders.length > 0 && deferredHeaders) {
+              const existing = deferredHeaders['Set-Cookie'];
+              if (Array.isArray(existing)) {
+                deferredHeaders['Set-Cookie'] = [...existing, ...cookieHeaders];
+              } else if (typeof existing === 'string') {
+                deferredHeaders['Set-Cookie'] = [existing, ...cookieHeaders];
+              } else {
+                deferredHeaders['Set-Cookie'] = cookieHeaders;
+              }
+            }
           }
-        } catch (e: any) {
-          log.error(`[cookie] Error processing response for ${opName}:`, e.message);
         }
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        log.error(`[cookie] Error processing response for ${opName}:`, message);
+      }
 
-        return originalJson(body);
-      };
-    }
+      // Now flush the actual response
+      if (deferredStatusCode != null) {
+        originalWriteHead(deferredStatusCode, deferredHeaders);
+      }
+      if (typeof encoding === 'function') {
+        return originalEnd(chunk, encoding);
+      }
+      return originalEnd(chunk, encoding, cb);
+    };
 
     next();
   };
