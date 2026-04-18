@@ -64,6 +64,8 @@ For detailed codegen configuration, see the [constructive-graphql skill](https:/
 
 Graphile plugins live under `graphile/*`. For PostGIS plugin development and testing, see the [constructive-graphql skill](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-graphql) — specifically the [search-postgis.md reference](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-graphql/references/search-postgis.md).
 
+For exposing cross-table PostGIS queries to the ORM/GraphQL layer via `@spatialRelation` smart tags and the `RelationSpatial` blueprint node (point-in-polygon, radius search, etc. without sending GeoJSON to the client), see the [graphile-postgis skill](../graphile-postgis/SKILL.md) in this repo.
+
 ## Testing
 
 See [AGENTS.md](../../AGENTS.md) for the testing framework selection guide. For comprehensive database testing patterns, see the [constructive-testing skill](https://github.com/constructive-io/constructive-skills/tree/main/.agents/skills/constructive-testing).
