@@ -1,6 +1,6 @@
 ---
 name: graphile-postgis
-description: How to expose cross-table PostGIS queries to the ORM/GraphQL layer without shipping GeoJSON to the client. Covers the @spatialRelation smart tag (8 operators, parametric distance), the RelationSpatial blueprint node, and the where:/filter: shape the generated ORM consumes.
+description: How to expose cross-table PostGIS queries to the ORM/GraphQL layer without shipping GeoJSON to the client. Covers the @spatialRelation smart tag (8 operators, parametric distance), the RelationSpatial blueprint node, and the ORM `where:` shape the generated client consumes.
 ---
 
 # graphile-postgis
@@ -105,7 +105,7 @@ With a parametric operator, add `param_name`:
 
 ## Querying through the ORM (`where:`)
 
-The generated field lives in the owning table's `where` input. Through the ORM, you write `where:` — the codegen layer translates it to `filter:` at the GraphQL layer:
+The generated field lives in the owning table's `where` input. You always write `where:` — that's the shape the ORM exposes.
 
 ```ts
 // "Clinics inside any county named 'Bay County'" — one round trip, no GeoJSON on the wire
@@ -173,11 +173,11 @@ Opt a column out with `@spatialRelationSkipIndexCheck` on that column.
 
 | Symptom | Likely cause |
 |---|---|
-| `column reference "name" is ambiguous` from a procedure | A PL/pgSQL parameter clashes with a column of the target table. Rename params with `p_` prefix (see `provision_spatial_relation` in constructive-db). |
-| `Missing required changes … metaschema:schemas/metaschema_modules_public/schema` on `pgpm deploy` | `pgpm.plan` entry uses bare `schemas/…` for a cross-module dep. Prefix with the owning module: `metaschema-modules:schemas/metaschema_modules_public/schema`. |
-| Smart tag not appearing on `field.smart_tags` | `spatial_relation` row inserted but the `@spatialRelation` key got clobbered by an unrelated writer. The trigger preserves other keys, but confirm no other writer is overwriting the whole smart-tags jsonb on the same column. |
-| `where: { myRelation: { some: {} } }` returns everything | Using `some:` as if it meant "no filter". `some: {}` means "at least one related target row exists". Use `every:` or drop the relation from the where clause if you want unfiltered. |
-| Radius search returns wrong rows on a `geometry` column | SRID units, not meters. Cast to `::geography` on ingest or switch the column codec. |
+| `where: { myRelation: { some: {} } }` excludes rows you expected to see | `some: {}` means "at least one related target row exists". Rows whose owner column has zero matches on the target side are correctly excluded. If you want unfiltered, drop the relation from the where clause. |
+| Radius search returns wrong rows on a `geometry` column | `distance` is SRID units, not meters, for `geometry`. Cast to `::geography` on ingest for meter-based radius, or pick the SRID whose units you want. |
+| Schema-build warning about missing GIST index | Target column has no GIST index. Add one, or set `@spatialRelationSkipIndexCheck` if you know what you're doing (small table, prototype). |
+| Schema-build error "cannot mix geometry and geography" | Owner and target columns have different codecs. Pick one — cast on ingest. |
+| Schema-build error on a self-relation | Owner table has no primary key. Self-relations need a PK so a row can be excluded from matching itself. Add one. |
 
 ## Scope guardrails
 
