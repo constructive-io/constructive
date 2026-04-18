@@ -14,32 +14,36 @@
 
 PostGIS support for PostGraphile v5.
 
-Automatically generates GraphQL types for PostGIS geometry and geography columns, including GeoJSON scalar types, dimension-aware interfaces, and subtype-specific fields (coordinates, points, rings, etc.).
+Automatically generates GraphQL types for PostGIS `geometry` and
+`geography` columns — GeoJSON scalars, dimension-aware interfaces,
+subtype-specific fields (coordinates, points, rings, etc.), plus
+measurement / transformation / aggregate fields — so spatial data
+flows through your API with the same ergonomics as every other column.
 
 ## The problem
 
-Working with PostGIS from an app is usually painful for one specific
-reason: **you end up juggling large amounts of GeoJSON across tables on
-the client**. You fetch every clinic as GeoJSON, fetch every county
-polygon as GeoJSON, and then — in the browser — loop through them
-yourself to figure out which clinic sits inside which county. Every
-query, every count, every page of results becomes a client-side
-geometry problem.
+PostGIS is a first-class spatial database, but the default PostGraphile
+schema doesn't know what to do with it: a `geometry` column looks
+opaque to the generated GraphQL types, there's no scalar for GeoJSON,
+no concrete type for `Point` vs `Polygon`, no way to read back
+coordinates, lengths, areas, or bounding boxes without writing your
+own computed columns. You end up hand-rolling GraphQL types,
+client-side parsers, and one-off SQL helpers for every spatial column.
 
-An ORM generated automatically from your database schema can't fix this
-on its own. It sees a `geometry` column and stops there — it has no
-idea that "clinics inside a county" is the question you actually want
-to ask. Foreign keys tell it how tables relate by equality; nothing
-tells it how tables relate *spatially*.
+`graphile-postgis` closes that gap. The plugin detects the PostGIS
+extension (even when installed in a non-`public` schema), registers a
+`GeoJSON` scalar, and generates a full type hierarchy — `Geometry` /
+`Geography` interfaces, dimension-aware interfaces (`XY`, `XYZ`, `XYM`,
+`XYZM`), and concrete subtypes (`Point`, `LineString`, `Polygon`,
+`MultiPoint`, `MultiLineString`, `MultiPolygon`, `GeometryCollection`)
+— with subtype-specific fields, measurement fields, transformation
+fields, and aggregate fields already wired up. If PostGIS isn't
+installed, the plugin degrades gracefully instead of failing the
+schema build.
 
-So we added the missing primitive: a **spatial relation**. You declare,
-on the database column, that `clinics.location` is "inside"
-`counties.geom`, and the generated GraphQL schema + ORM gain a
-first-class `where: { county: { some: { … } } }` shape that runs the
-join server-side, in one SQL query, using PostGIS and a GIST index. No
-GeoJSON on the wire, no client-side geometry, and the relation composes
-with the rest of your `where:` the same way a foreign-key relation
-would.
+Cross-table spatial joins — the "which clinics are inside this county"
+shape — are a separate feature built on top of the type layer; see
+[Spatial relations](#spatial-relations).
 
 ## Installation
 
@@ -60,24 +64,79 @@ const preset = {
 ## Features
 
 - GeoJSON scalar type for input/output
-- GraphQL interfaces for geometry and geography base types
-- Dimension-aware interfaces (XY, XYZ, XYM, XYZM)
-- Concrete types for all geometry subtypes: Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection
-- Subtype-specific fields (x/y/z for Points, points for LineStrings, exterior/interiors for Polygons, etc.)
-- Geography-aware field naming (longitude/latitude/height instead of x/y/z)
-- Cross-table spatial relations via `@spatialRelation` smart tags (see below)
-- Graceful degradation when PostGIS is not installed
+- GraphQL interfaces for `geometry` and `geography` base types
+- Dimension-aware interfaces (`XY`, `XYZ`, `XYM`, `XYZM`)
+- Concrete types for all geometry subtypes: `Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`, `MultiPolygon`, `GeometryCollection`
+- Subtype-specific fields (`x` / `y` / `z` for points, `points` for line strings, `exterior` / `interiors` for polygons, etc.)
+- Geography-aware field naming (`longitude` / `latitude` / `height` instead of `x` / `y` / `z`)
+- Measurement fields (`length`, `area`, `perimeter`) computed geodesically from GeoJSON
+- Transformation fields (`centroid`, `bbox`, `numPoints`)
+- PostGIS aggregate fields (`stExtent`, `stUnion`, `stCollect`, `stConvexHull`)
+- Cross-table [spatial relations](#spatial-relations) via `@spatialRelation` smart tags
+- Auto-detects PostGIS in non-`public` schemas and degrades gracefully when the extension is missing
 
-## Spatial relations via smart tags
+## Core PostGIS type support
 
-You declare a **spatial relation** with a `@spatialRelation` smart tag
-on a `geometry` or `geography` column. The plugin turns that tag into a
+Out of the box, the preset turns every `geometry` / `geography` column
+into a real, typed GraphQL field:
+
+- **GeoJSON scalar + subtype objects.** Values are serialised as
+  GeoJSON. Each concrete subtype (`Point`, `Polygon`, …) is its own
+  object type and exposes its natural accessor fields — e.g. `Point`
+  has `x` / `y` / `z` (or `longitude` / `latitude` / `height` on a
+  `geography` column), `Polygon` has `exterior` and `interiors`,
+  `LineString` has `points`.
+- **Dimension-aware interfaces.** `XY`, `XYZ`, `XYM`, and `XYZM`
+  interfaces let clients request coordinates without caring about the
+  specific subtype.
+- **Measurement, transformation, and aggregate fields.** Geometry
+  types expose `length`, `area`, `perimeter`, `centroid`, `bbox`, and
+  `numPoints`; aggregate types expose `stExtent`, `stUnion`,
+  `stCollect`, and `stConvexHull`.
+- **Graceful degradation.** If the `postgis` extension isn't installed
+  in the target database, the plugin skips type registration instead
+  of breaking the schema build.
+
+For cross-table spatial joins — e.g. "clinics inside a county" — see
+[Spatial relations](#spatial-relations).
+
+## Spatial relations
+
+### The problem
+
+Even with GeoJSON types on every column, working with PostGIS from an
+app is usually painful for one specific reason: **you end up juggling
+large amounts of GeoJSON across tables on the client**. You fetch
+every clinic as GeoJSON, fetch every county polygon as GeoJSON, and
+then — in the browser — loop through them yourself to figure out
+which clinic sits inside which county. Every query, every count,
+every page of results becomes a client-side geometry problem.
+
+An ORM generated automatically from your database schema can't fix
+this on its own. It sees a `geometry` column and stops there — it has
+no idea that "clinics inside a county" is the question you actually
+want to ask. Foreign keys tell it how tables relate by equality;
+nothing tells it how tables relate *spatially*.
+
+So we added the missing primitive: a **spatial relation**. You
+declare, on the database column, that `clinics.location` is "inside"
+`counties.geom`, and the generated GraphQL schema + ORM gain a
+first-class `where: { county: { some: { … } } }` shape that runs the
+join server-side, in one SQL query, using PostGIS and a GIST index.
+No GeoJSON on the wire, no client-side geometry, and the relation
+composes with the rest of your `where:` the same way a foreign-key
+relation would.
+
+### Smart-tag overview
+
+You declare a spatial relation with a `@spatialRelation` smart tag on
+a `geometry` or `geography` column. The plugin turns that tag into a
 virtual relation on the owning table: a new field on the table's
-generated `where` input that runs a PostGIS join server-side. You write
-one line of SQL once; the generated ORM and GraphQL schema pick it up
-automatically.
+generated `where` input that runs a PostGIS join server-side. You
+write one line of SQL once; the generated ORM and GraphQL schema pick
+it up automatically.
 
-### At a glance
+#### At a glance
 
 **Before** — GeoJSON juggling on the client:
 
@@ -114,7 +173,7 @@ two columns.
 
 ### Declaring a relation
 
-#### Tag grammar
+**Tag grammar**
 
 ```
 @spatialRelation <relationName> <targetRef> <operator> [<paramName>]
@@ -137,7 +196,7 @@ Both sides of the relation must be `geometry` or `geography`, and they
 must share the **same** base codec — you cannot mix `geometry` and
 `geography`.
 
-#### Multiple relations on one column
+**Multiple relations on one column**
 
 Stack tags. Each line becomes its own field on the owning table's
 `where` input:
@@ -179,7 +238,7 @@ share a `<relationName>`.
 
 ### Using the generated `where` shape
 
-#### Through the ORM
+**Through the ORM**
 
 ```ts
 // "Clinics inside any county named 'Bay County'"
@@ -191,7 +250,7 @@ await orm.telemedicineClinic
   .execute();
 ```
 
-#### Through GraphQL
+**Through GraphQL**
 
 The connection argument is `where:` at the GraphQL layer too — same
 name, same tree. Only the generated input **type** keeps the word
@@ -207,7 +266,7 @@ name, same tree. Only the generated input **type** keeps the word
 }
 ```
 
-#### `some` / `every` / `none`
+**`some` / `every` / `none`**
 
 Every 2-argument relation exposes three modes. They mean what you'd
 expect, backed by `EXISTS` / `NOT EXISTS`:
@@ -225,7 +284,7 @@ row exists, any row will do" — so for `@spatialRelation county …
 st_within`, clinics whose point is inside zero counties are correctly
 excluded.
 
-#### Parametric operators (`st_dwithin` + `distance`)
+**Parametric operators (`st_dwithin` + `distance`)**
 
 Parametric relations add a **required** `distance: Float!` field next
 to `some` / `every` / `none`. The distance parametrises the join
