@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.2...@constructive-io/graphql-test@4.11.3) (2026-04-19)
+
+### Bug Fixes
+
+- correct snapshot UUID position and ProvisionBucketInput description ([37b5856](https://github.com/constructive-io/constructive/commit/37b5856e2a3a6661c51210960a4949158fc7710e))
+- remove leading space in ProvisionBucketInput ownerId description snapshot ([a759376](https://github.com/constructive-io/constructive/commit/a759376f44296e3b79939afae73d60bf024a53a3))
+- update introspection snapshots for ownerId field additions ([da81af9](https://github.com/constructive-io/constructive/commit/da81af952bd417d1022ee08e2051bc4943e28d92))
+
 ## [4.11.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.1...@constructive-io/graphql-test@4.11.2) (2026-04-18)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

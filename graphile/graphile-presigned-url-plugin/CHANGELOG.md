@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.5.0...graphile-presigned-url-plugin@0.6.0) (2026-04-19)
+
+### Bug Fixes
+
+- backward-compatible SQL queries for legacy schema (no membership_type column) ([348e408](https://github.com/constructive-io/constructive/commit/348e408ccac7444793dcd148a67b6490cf6dc9fd))
+- use SAVEPOINT for schema probe queries to avoid poisoning PG transactions ([3865697](https://github.com/constructive-io/constructive/commit/3865697ea7a0271f1e8a25963c071fb1ff3f9a92))
+
+### Features
+
+- multi-scope bucket resolution (Option C: bucketKey + ownerId) ([9968adf](https://github.com/constructive-io/constructive/commit/9968adf8dd53d41cca7875f4008b8992cc53cc82)), closes [#876](https://github.com/constructive-io/constructive/issues/876)
+
 # [0.5.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.4.1...graphile-presigned-url-plugin@0.5.0) (2026-04-18)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin
