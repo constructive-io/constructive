@@ -1,4 +1,5 @@
 import { join } from 'path';
+import OllamaClient from '@agentic-kit/ollama';
 import { getConnections, seed } from 'graphile-test';
 import type { GraphQLResponse } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
@@ -14,39 +15,18 @@ import {
   buildEmbedderFromModule,
   buildEmbedderFromEnv,
 } from '../../src/embedder';
-import type { EmbedderConfig, LlmModuleData } from '../../src/types';
+import type { LlmModuleData } from '../../src/types';
 
-// ─── Ollama helpers (same pattern as cli-e2e.test.ts) ────────────────────────
+// ─── @agentic-kit/ollama client ─────────────────────────────────────────────
 
-async function isOllamaAvailable(): Promise<boolean> {
-  try {
-    const res = await fetch('http://localhost:11434/api/tags');
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
+const ollamaClient = new OllamaClient('http://localhost:11434');
 
-async function ensureNomicModel(): Promise<boolean> {
-  try {
-    const res = await fetch('http://localhost:11434/api/tags');
-    if (!res.ok) return false;
-    const data = (await res.json()) as { models?: Array<{ name: string }> };
-    const models = data.models ?? [];
-    const hasModel = models.some((m: { name: string }) =>
-      m.name.includes('nomic-embed-text'),
-    );
-    if (hasModel) return true;
-
+async function ensureNomicModel(): Promise<void> {
+  const models = await ollamaClient.listModels();
+  const hasModel = models.some((m: string) => m.includes('nomic-embed-text'));
+  if (!hasModel) {
     console.log('Pulling nomic-embed-text model...');
-    const pullRes = await fetch('http://localhost:11434/api/pull', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'nomic-embed-text' }),
-    });
-    return pullRes.ok;
-  } catch {
-    return false;
+    await ollamaClient.pullModel('nomic-embed-text');
   }
 }
 
@@ -138,61 +118,53 @@ describe('Embedder abstraction', () => {
 
 // =============================================================================
 // Suite 2: Schema enrichment — plugin adds text fields to GraphQL schema
+// Requires PostgreSQL + pgvector. Tests WILL fail if database is unavailable.
 // =============================================================================
 
 describe('graphile-llm schema enrichment', () => {
   let db: PgTestClient;
   let teardown: () => Promise<void>;
   let query: QueryFn;
-  let pgReady = false;
 
   beforeAll(async () => {
-    try {
-      const unifiedPlugin = createUnifiedSearchPlugin({
-        adapters: [createPgvectorAdapter()],
-      });
+    const unifiedPlugin = createUnifiedSearchPlugin({
+      adapters: [createPgvectorAdapter()],
+    });
 
-      const testPreset = {
-        extends: [ConnectionFilterPreset()],
-        plugins: [
-          // Search infrastructure (provides VectorNearbyInput)
-          VectorCodecPlugin,
-          unifiedPlugin,
-          // LLM plugins under test
-          createLlmModulePlugin({
-            defaultEmbedder: {
-              provider: 'ollama',
-              model: 'nomic-embed-text',
-              baseUrl: 'http://localhost:11434',
-            },
-          }),
-          createLlmTextSearchPlugin(),
-          createLlmTextMutationPlugin(),
-        ],
-      };
+    const testPreset = {
+      extends: [ConnectionFilterPreset()],
+      plugins: [
+        // Search infrastructure (provides VectorNearbyInput)
+        VectorCodecPlugin,
+        unifiedPlugin,
+        // LLM plugins under test
+        createLlmModulePlugin({
+          defaultEmbedder: {
+            provider: 'ollama',
+            model: 'nomic-embed-text',
+            baseUrl: 'http://localhost:11434',
+          },
+        }),
+        createLlmTextSearchPlugin(),
+        createLlmTextMutationPlugin(),
+      ],
+    };
 
-      const connections = await getConnections(
-        {
-          schemas: ['llm_test'],
-          preset: testPreset,
-          useRoot: true,
-          authRole: 'postgres',
-        },
-        [seed.sqlfile([join(__dirname, './setup.sql')])],
-      );
+    const connections = await getConnections(
+      {
+        schemas: ['llm_test'],
+        preset: testPreset,
+        useRoot: true,
+        authRole: 'postgres',
+      },
+      [seed.sqlfile([join(__dirname, './setup.sql')])],
+    );
 
-      db = connections.db;
-      teardown = connections.teardown;
-      query = connections.query;
-      pgReady = true;
+    db = connections.db;
+    teardown = connections.teardown;
+    query = connections.query;
 
-      await db.client.query('BEGIN');
-    } catch (err) {
-      console.log(
-        'PostgreSQL not available — skipping schema enrichment tests. Error:',
-        (err as Error).message,
-      );
-    }
+    await db.client.query('BEGIN');
   });
 
   afterAll(async () => {
@@ -200,7 +172,7 @@ describe('graphile-llm schema enrichment', () => {
       try {
         await db.client.query('ROLLBACK');
       } catch {
-        // Ignore rollback errors
+        // Ignore rollback errors during cleanup
       }
     }
     if (teardown) {
@@ -209,22 +181,17 @@ describe('graphile-llm schema enrichment', () => {
   });
 
   beforeEach(async () => {
-    if (db) await db.beforeEach();
+    await db.beforeEach();
   });
 
   afterEach(async () => {
-    if (db) await db.afterEach();
+    await db.afterEach();
   });
 
   // ─── VectorNearbyInput text field ────────────────────────────────────────
 
   describe('VectorNearbyInput text field', () => {
     it('adds text field to VectorNearbyInput type', async () => {
-      if (!pgReady) {
-        console.log('PostgreSQL not available — skipping');
-        return;
-      }
-
       const result = await query<{
         __type: { inputFields: Array<{ name: string; type: { name: string } }> };
       }>(`
@@ -256,11 +223,6 @@ describe('graphile-llm schema enrichment', () => {
     });
 
     it('still allows vector-based queries (existing behavior unchanged)', async () => {
-      if (!pgReady) {
-        console.log('PostgreSQL not available — skipping');
-        return;
-      }
-
       const result = await query<{
         allArticles: { nodes: Array<{ title: string; embeddingVectorDistance: number }> };
       }>(`
@@ -295,11 +257,6 @@ describe('graphile-llm schema enrichment', () => {
 
   describe('Mutation text companion fields', () => {
     it('adds embeddingText field to CreateArticleInput', async () => {
-      if (!pgReady) {
-        console.log('PostgreSQL not available — skipping');
-        return;
-      }
-
       const result = await query<{
         __type: { inputFields: Array<{ name: string; type: { name: string } }> };
       }>(`
@@ -315,30 +272,22 @@ describe('graphile-llm schema enrichment', () => {
 
       expect(result.errors).toBeUndefined();
       const inputType = result.data?.__type;
-      // CreateArticleInput may or may not exist depending on schema config
-      // If it exists, verify the text companion field
-      if (inputType) {
-        const fieldNames = inputType.inputFields.map((f) => f.name);
-        // Original embedding field
-        expect(fieldNames).toContain('embedding');
-        // Companion text field from LlmTextMutationPlugin
-        expect(fieldNames).toContain('embeddingText');
+      expect(inputType).toBeDefined();
 
-        const textField = inputType.inputFields.find(
-          (f) => f.name === 'embeddingText',
-        );
-        if (textField) {
-          expect(textField.type.name).toBe('String');
-        }
-      }
+      const fieldNames = inputType!.inputFields.map((f) => f.name);
+      // Original embedding field
+      expect(fieldNames).toContain('embedding');
+      // Companion text field from LlmTextMutationPlugin
+      expect(fieldNames).toContain('embeddingText');
+
+      const textField = inputType!.inputFields.find(
+        (f) => f.name === 'embeddingText',
+      );
+      expect(textField).toBeDefined();
+      expect(textField!.type.name).toBe('String');
     });
 
     it('adds embeddingText field to UpdateArticleInput (patch)', async () => {
-      if (!pgReady) {
-        console.log('PostgreSQL not available — skipping');
-        return;
-      }
-
       const result = await query<{
         __type: { inputFields: Array<{ name: string; type: { name: string } }> };
       }>(`
@@ -354,41 +303,31 @@ describe('graphile-llm schema enrichment', () => {
 
       expect(result.errors).toBeUndefined();
       const inputType = result.data?.__type;
-      if (inputType) {
-        const fieldNames = inputType.inputFields.map((f) => f.name);
-        expect(fieldNames).toContain('embeddingText');
+      expect(inputType).toBeDefined();
 
-        const textField = inputType.inputFields.find(
-          (f) => f.name === 'embeddingText',
-        );
-        if (textField) {
-          expect(textField.type.name).toBe('String');
-        }
-      }
+      const fieldNames = inputType!.inputFields.map((f) => f.name);
+      expect(fieldNames).toContain('embeddingText');
+
+      const textField = inputType!.inputFields.find(
+        (f) => f.name === 'embeddingText',
+      );
+      expect(textField).toBeDefined();
+      expect(textField!.type.name).toBe('String');
     });
   });
 });
 
 // =============================================================================
-// Suite 3: Real Ollama embedding (skips if Ollama is not available)
+// Suite 3: Real Ollama embedding via @agentic-kit/ollama
+// Requires Ollama running with nomic-embed-text. Tests WILL fail if unavailable.
 // =============================================================================
 
 describe('graphile-llm with real Ollama embedding', () => {
-  let ollamaReady = false;
-
   beforeAll(async () => {
-    const ollamaUp = await isOllamaAvailable();
-    if (ollamaUp) {
-      ollamaReady = await ensureNomicModel();
-    }
+    await ensureNomicModel();
   });
 
   it('should embed text to a real vector via Ollama nomic-embed-text', async () => {
-    if (!ollamaReady) {
-      console.log('Ollama not available — skipping real embedding test');
-      return;
-    }
-
     const embedder = buildEmbedder({
       provider: 'ollama',
       model: 'nomic-embed-text',
@@ -413,17 +352,9 @@ describe('graphile-llm with real Ollama embedding', () => {
     const magnitude = Math.sqrt(vector.reduce((sum, v) => sum + v * v, 0));
     expect(magnitude).toBeGreaterThan(0);
 
-    console.log(
-      `[graphile-llm test] Embedded text to ${vector.length}-dim vector (magnitude: ${magnitude.toFixed(4)})`,
-    );
   });
 
   it('should produce different vectors for semantically different text', async () => {
-    if (!ollamaReady) {
-      console.log('Ollama not available — skipping semantic difference test');
-      return;
-    }
-
     const embedder = buildEmbedder({
       provider: 'ollama',
       model: 'nomic-embed-text',
@@ -452,20 +383,10 @@ describe('graphile-llm with real Ollama embedding', () => {
     const cosineSimilarity = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 
     // Semantically different texts should have lower similarity
-    // (not identical vectors)
     expect(cosineSimilarity).toBeLessThan(0.95);
-
-    console.log(
-      `[graphile-llm test] Cosine similarity between different topics: ${cosineSimilarity.toFixed(4)}`,
-    );
   });
 
   it('should produce similar vectors for semantically similar text', async () => {
-    if (!ollamaReady) {
-      console.log('Ollama not available — skipping semantic similarity test');
-      return;
-    }
-
     const embedder = buildEmbedder({
       provider: 'ollama',
       model: 'nomic-embed-text',
@@ -495,9 +416,20 @@ describe('graphile-llm with real Ollama embedding', () => {
 
     // Semantically similar texts should have high similarity
     expect(cosineSimilarity).toBeGreaterThan(0.5);
+  });
 
-    console.log(
-      `[graphile-llm test] Cosine similarity between similar topics: ${cosineSimilarity.toFixed(4)}`,
+  it('should produce embeddings via @agentic-kit/ollama OllamaClient directly', async () => {
+    const vector = await ollamaClient.generateEmbedding(
+      'Testing the agentic-kit Ollama client directly',
+      'nomic-embed-text',
     );
+
+    expect(Array.isArray(vector)).toBe(true);
+    expect(vector.length).toBe(768);
+
+    for (const v of vector) {
+      expect(typeof v).toBe('number');
+      expect(Number.isFinite(v)).toBe(true);
+    }
   });
 });
