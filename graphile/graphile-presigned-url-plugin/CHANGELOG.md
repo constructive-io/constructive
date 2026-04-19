@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.1...graphile-presigned-url-plugin@0.6.2) (2026-04-19)
+
+### Bug Fixes
+
+- also remove size from dedup upload_requests INSERT ([9e1579d](https://github.com/constructive-io/constructive/commit/9e1579ddc88272152185804b95bca971842d20c1))
+- remove non-existent 'size' column from upload_requests INSERT ([da7d796](https://github.com/constructive-io/constructive/commit/da7d796be36a054864dc5bfa78c19f1c96e62dc2))
+
 ## [0.6.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.0...graphile-presigned-url-plugin@0.6.1) (2026-04-19)
 
 ### Bug Fixes

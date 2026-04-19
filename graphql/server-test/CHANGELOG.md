@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.12.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.5...graphql-server-test@2.12.6) (2026-04-19)
+
+### Bug Fixes
+
+- remove non-existent 'size' column from upload_requests INSERT ([da7d796](https://github.com/constructive-io/constructive/commit/da7d796be36a054864dc5bfa78c19f1c96e62dc2))
+
 ## [2.12.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.4...graphql-server-test@2.12.5) (2026-04-19)
 
 ### Bug Fixes
