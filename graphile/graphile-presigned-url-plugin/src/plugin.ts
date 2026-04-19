@@ -385,9 +385,9 @@ export function createPresignedUrlPlugin(
                 // --- Track the upload request ---
                 await txClient.query({
                   text: `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
-                   (file_id, bucket_id, key, content_type, content_hash, size, status, expires_at)
-                   VALUES ($1, $2, $3, $4, $5, $6, 'issued', $7)`,
-                  values: [fileId, bucket.id, s3Key, contentType, contentHash, size, expiresAt],
+                   (file_id, bucket_id, key, content_type, content_hash, status, expires_at)
+                   VALUES ($1, $2, $3, $4, $5, 'issued', $6)`,
+                  values: [fileId, bucket.id, s3Key, contentType, contentHash, expiresAt],
                 });
 
                 return {

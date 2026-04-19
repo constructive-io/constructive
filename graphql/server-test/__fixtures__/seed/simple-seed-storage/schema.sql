@@ -56,14 +56,16 @@ COMMENT ON TABLE "simple-storage-public".files IS E'@storageFiles\nStorage files
 CREATE TABLE IF NOT EXISTS "simple-storage-public".upload_requests (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   file_id uuid NOT NULL REFERENCES "simple-storage-public".files(id),
+  actor_id uuid,
   bucket_id uuid NOT NULL REFERENCES "simple-storage-public".buckets(id),
   key text NOT NULL,
   content_type text NOT NULL,
   content_hash text,
-  size bigint,
   status text NOT NULL DEFAULT 'issued',
   expires_at timestamptz,
   confirmed_at timestamptz,
+  ip_address inet,
+  user_agent text,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
