@@ -294,7 +294,7 @@ export async function resolveStorageModuleByFileId(
   pgClient: { query: (opts: { text: string; values?: unknown[] }) => Promise<{ rows: unknown[] }> },
   databaseId: string,
   fileId: string,
-): Promise<{ storageConfig: StorageModuleConfig; file: { id: string; key: string; content_type: string; status: string; bucket_id: string } } | null> {
+): Promise<{ storageConfig: StorageModuleConfig; file: { id: string; key: string; mime_type: string; status: string; bucket_id: string } } | null> {
   // Load all storage modules for this database
   log.debug(`Resolving file ${fileId} across all storage modules for database ${databaseId}`);
 
@@ -305,14 +305,14 @@ export async function resolveStorageModuleByFileId(
   // Probe each module's files table for the fileId
   for (const config of allConfigs) {
     const fileResult = await pgClient.query({
-      text: `SELECT id, key, content_type, status, bucket_id
+      text: `SELECT id, key, mime_type, status, bucket_id
        FROM ${config.filesQualifiedName}
        WHERE id = $1
        LIMIT 1`,
       values: [fileId],
     });
     if (fileResult.rows.length > 0) {
-      const file = fileResult.rows[0] as { id: string; key: string; content_type: string; status: string; bucket_id: string };
+      const file = fileResult.rows[0] as { id: string; key: string; mime_type: string; status: string; bucket_id: string };
       return { storageConfig: config, file };
     }
   }
