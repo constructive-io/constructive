@@ -68,15 +68,15 @@ export function createLlmTextMutationPlugin(): GraphileConfig.Plugin {
         GraphQLInputObjectType_fields(fields, build, context) {
           const {
             scope: {
-              isPgRowType,
               isPgPatch,
               isPgBaseInput,
+              isMutationInput,
               pgCodec,
             },
           } = context as any;
 
           // Only intercept create/update input types for table rows
-          if (!pgCodec?.attributes || (!isPgRowType && !isPgPatch && !isPgBaseInput)) {
+          if (!pgCodec?.attributes || (!isPgPatch && !isPgBaseInput && !isMutationInput)) {
             return fields;
           }
 

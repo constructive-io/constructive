@@ -163,18 +163,9 @@ describe('graphile-llm schema enrichment', () => {
     db = connections.db;
     teardown = connections.teardown;
     query = connections.query;
-
-    await db.client.query('BEGIN');
   });
 
   afterAll(async () => {
-    if (db) {
-      try {
-        await db.client.query('ROLLBACK');
-      } catch {
-        // Ignore rollback errors during cleanup
-      }
-    }
     if (teardown) {
       await teardown();
     }
