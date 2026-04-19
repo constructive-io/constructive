@@ -11,6 +11,7 @@
  */
 
 import OllamaClient from '@agentic-kit/ollama';
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { EmbedderConfig, EmbedderFunction, LlmModuleData } from './types';
 
 // ─── Built-in Providers ─────────────────────────────────────────────────────
@@ -63,21 +64,22 @@ export function buildEmbedderFromModule(data: LlmModuleData): EmbedderFunction |
 }
 
 /**
- * Resolve an embedder from environment variables.
+ * Resolve an embedder from environment variables via getEnvOptions().
  * This is a fallback for development when no llm_module or defaultEmbedder is configured.
  *
- * Environment variables:
+ * Environment variables (parsed by @constructive-io/graphql-env):
  *   EMBEDDER_PROVIDER - Provider name ('ollama')
  *   EMBEDDER_MODEL    - Model identifier
  *   EMBEDDER_BASE_URL - Provider base URL
  */
 export function buildEmbedderFromEnv(): EmbedderFunction | null {
-  const provider = process.env.EMBEDDER_PROVIDER;
+  const { llm } = getEnvOptions();
+  const provider = llm?.embedder?.provider;
   if (!provider) return null;
 
   return buildEmbedder({
     provider,
-    model: process.env.EMBEDDER_MODEL,
-    baseUrl: process.env.EMBEDDER_BASE_URL,
+    model: llm?.embedder?.model,
+    baseUrl: llm?.embedder?.baseUrl,
   });
 }
