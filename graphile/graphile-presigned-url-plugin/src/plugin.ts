@@ -300,15 +300,15 @@ export function createPresignedUrlPlugin(
 
                 const s3Key = buildS3Key(contentHash);
 
-                // --- Dedup check: look for existing file with same content_hash in this bucket ---
+                // --- Dedup check: look for existing file with same key (content hash) in this bucket ---
                 const dedupResult = await txClient.query({
                   text: `SELECT id, status
                    FROM ${storageConfig.filesQualifiedName}
-                   WHERE content_hash = $1
+                   WHERE key = $1
                      AND bucket_id = $2
                      AND status IN ('ready', 'processed')
                    LIMIT 1`,
-                  values: [contentHash, bucket.id],
+                  values: [s3Key, bucket.id],
                 });
 
                 if (dedupResult.rows.length > 0) {
@@ -338,19 +338,18 @@ export function createPresignedUrlPlugin(
                 const fileResult = await txClient.query({
                   text: hasOwnerColumn
                     ? `INSERT INTO ${storageConfig.filesQualifiedName}
-                       (bucket_id, key, content_type, content_hash, size, filename, owner_id, is_public, status)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
+                       (bucket_id, key, mime_type, size, filename, owner_id, is_public, status)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
                        RETURNING id`
                     : `INSERT INTO ${storageConfig.filesQualifiedName}
-                       (bucket_id, key, content_type, content_hash, size, filename, is_public, status)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+                       (bucket_id, key, mime_type, size, filename, is_public, status)
+                       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
                        RETURNING id`,
                   values: hasOwnerColumn
                     ? [
                         bucket.id,
                         s3Key,
                         contentType,
-                        contentHash,
                         size,
                         filename || null,
                         bucket.owner_id,
@@ -360,7 +359,6 @@ export function createPresignedUrlPlugin(
                         bucket.id,
                         s3Key,
                         contentType,
-                        contentHash,
                         size,
                         filename || null,
                         bucket.is_public,
@@ -447,14 +445,14 @@ export function createPresignedUrlPlugin(
 
                 // --- Verify file exists in S3 (per-database bucket) ---
                 const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
-                const s3Head = await headObject(s3ForDb, file.key, file.content_type as string);
+                const s3Head = await headObject(s3ForDb, file.key, file.mime_type as string);
 
                 if (!s3Head) {
                   throw new Error('FILE_NOT_IN_S3: the file has not been uploaded yet');
                 }
 
                 // --- Content-type verification ---
-                if (s3Head.contentType && s3Head.contentType !== file.content_type) {
+                if (s3Head.contentType && s3Head.contentType !== file.mime_type) {
                   // Mark upload_request as rejected
                   await txClient.query({
                     text: `UPDATE ${storageConfig.uploadRequestsQualifiedName}
@@ -464,7 +462,7 @@ export function createPresignedUrlPlugin(
                   });
 
                   throw new Error(
-                    `CONTENT_TYPE_MISMATCH: expected ${file.content_type}, got ${s3Head.contentType}`,
+                    `CONTENT_TYPE_MISMATCH: expected ${file.mime_type}, got ${s3Head.contentType}`,
                   );
                 }
 
