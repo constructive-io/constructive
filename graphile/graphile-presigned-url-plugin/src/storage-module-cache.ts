@@ -243,15 +243,23 @@ export async function getStorageModuleConfig(
     result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
   } else {
     try {
+      // Use SAVEPOINT so a failed probe doesn't abort the surrounding transaction
+      await pgClient.query({ text: 'SAVEPOINT storage_module_probe' });
       result = await pgClient.query({ text: APP_STORAGE_MODULE_QUERY, values: [databaseId] });
+      await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
       schemaSupportsMultiScope = true;
     } catch (err: any) {
       // PostgreSQL error 42703 = "column does not exist"
       if (err.code === '42703' || err.message?.includes('does not exist')) {
         log.debug('Multi-scope schema not detected, falling back to legacy query');
         schemaSupportsMultiScope = false;
+        await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' });
+        await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
         result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
       } else {
+        // Release savepoint even on unexpected errors
+        try { await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
+        try { await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
         throw err;
       }
     }
@@ -318,14 +326,20 @@ export async function getStorageModuleConfigForOwner(
     log.debug(`Loading all storage modules for database ${databaseId} to resolve ownerId ${ownerId}`);
     let result: { rows: unknown[] };
     try {
+      await pgClient.query({ text: 'SAVEPOINT storage_module_probe' });
       result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
+      await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
       schemaSupportsMultiScope = true;
     } catch (err: any) {
       if (err.code === '42703' || err.message?.includes('does not exist')) {
         log.debug('Multi-scope schema not detected during owner resolution');
         schemaSupportsMultiScope = false;
+        await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' });
+        await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
         return null;
       }
+      try { await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
+      try { await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
       throw err;
     }
     allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
@@ -389,16 +403,22 @@ export async function resolveStorageModuleByFileId(
     allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
   } else {
     try {
+      await pgClient.query({ text: 'SAVEPOINT storage_module_probe' });
       const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
+      await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
       schemaSupportsMultiScope = true;
       allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
     } catch (err: any) {
       if (err.code === '42703' || err.message?.includes('does not exist')) {
         log.debug('Multi-scope schema not detected during file resolution, falling back');
         schemaSupportsMultiScope = false;
+        await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' });
+        await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
         const result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
         allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
       } else {
+        try { await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
+        try { await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
         throw err;
       }
     }

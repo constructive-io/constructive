@@ -155,16 +155,23 @@ async function resolveStorageModule(
       return (result.rows[0] as StorageModuleRow) ?? null;
     }
     try {
+      // Use SAVEPOINT so a failed probe doesn't abort the surrounding transaction
+      await pgClient.query('SAVEPOINT storage_module_probe');
       const result = await pgClient.query(APP_STORAGE_MODULE_QUERY, [databaseId]);
+      await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
       schemaSupportsMultiScope = true;
       return (result.rows[0] as StorageModuleRow) ?? null;
     } catch (err: any) {
       if (err.code === '42703' || err.message?.includes('does not exist')) {
         log.debug('Multi-scope schema not detected, falling back to legacy query');
         schemaSupportsMultiScope = false;
+        await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe');
+        await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
         const result = await pgClient.query(LEGACY_STORAGE_MODULE_QUERY, [databaseId]);
         return (result.rows[0] as StorageModuleRow) ?? null;
       }
+      try { await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
+      try { await pgClient.query('RELEASE SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
       throw err;
     }
   }
@@ -178,15 +185,21 @@ async function resolveStorageModule(
   // Load all modules and probe entity tables
   let modules: StorageModuleRow[];
   try {
+    await pgClient.query('SAVEPOINT storage_module_probe');
     const result = await pgClient.query(ALL_STORAGE_MODULES_QUERY, [databaseId]);
+    await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
     schemaSupportsMultiScope = true;
     modules = result.rows as StorageModuleRow[];
   } catch (err: any) {
     if (err.code === '42703' || err.message?.includes('does not exist')) {
       log.debug('Multi-scope schema not detected during owner resolution');
       schemaSupportsMultiScope = false;
+      await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe');
+      await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
       return null;
     }
+    try { await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
+    try { await pgClient.query('RELEASE SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
     throw err;
   }
 
