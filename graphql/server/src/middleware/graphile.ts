@@ -239,6 +239,10 @@ const buildPreset = (
             ...context,
           };
 
+          if (req.token.session_id) {
+            pgSettings['jwt.claims.session_id'] = req.token.session_id;
+          }
+
           // Propagate credential metadata as JWT claims so PG functions
           // can read them via current_setting('jwt.claims.access_level') etc.
           if (req.token.access_level) {
