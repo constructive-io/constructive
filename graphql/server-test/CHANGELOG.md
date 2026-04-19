@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.12.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.4...graphql-server-test@2.12.5) (2026-04-19)
+
+### Bug Fixes
+
+- update test fixture files table to use mime_type (no content_hash) ([7c1abf9](https://github.com/constructive-io/constructive/commit/7c1abf9293115589b381cc875c461bd1b92d630c))
+
 ## [2.12.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.3...graphql-server-test@2.12.4) (2026-04-19)
 
 ### Bug Fixes

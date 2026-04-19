@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.0...graphile-presigned-url-plugin@0.6.1) (2026-04-19)
+
+### Bug Fixes
+
+- align plugin SQL with actual DB schema (mime_type, no content_hash on files) ([7e9f539](https://github.com/constructive-io/constructive/commit/7e9f5391b801b46ee7c05ac5eaebe85806fa48c0))
+
 # [0.6.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.5.0...graphile-presigned-url-plugin@0.6.0) (2026-04-19)
 
 ### Bug Fixes
