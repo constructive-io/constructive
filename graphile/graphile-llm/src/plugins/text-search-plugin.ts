@@ -14,6 +14,12 @@
  * one or the other. When `text` is provided, the plugin embeds it and
  * injects the resulting vector into the normal pgvector pipeline.
  *
+ * Runtime embedding for query filters uses the v4-style resolver wrapping
+ * approach (same as graphile-upload-plugin). When a connection query's
+ * `where` argument includes a VectorNearbyInput with `text`, the resolver
+ * wrapper embeds the text and replaces it with the resulting vector before
+ * the plan executes.
+ *
  * If the embedder is not configured, the `text` field is still registered
  * (so the schema is stable) but will return a clear error at execution time.
  */
@@ -32,11 +38,72 @@ declare global {
 }
 
 /**
+ * Check if a codec has any pgvector `vector` columns.
+ */
+function hasVectorColumns(pgCodec: any): boolean {
+  if (!pgCodec?.attributes) return false;
+  for (const attribute of Object.values(pgCodec.attributes as Record<string, any>)) {
+    if (attribute.codec?.name === 'vector') return true;
+  }
+  return false;
+}
+
+/**
+ * Recursively walk a `where` argument object and embed any VectorNearbyInput
+ * values that have `text` instead of `vector`.
+ */
+async function embedTextInWhere(
+  obj: any,
+  embedder: EmbedderFunction,
+): Promise<void> {
+  if (!obj || typeof obj !== 'object') return;
+
+  const pending: Promise<void>[] = [];
+
+  for (const key of Object.keys(obj)) {
+    const value = obj[key];
+    if (!value || typeof value !== 'object') continue;
+
+    // Detect VectorNearbyInput shape: has `text` and no `vector`
+    if ('text' in value && typeof value.text === 'string' && !value.vector) {
+      pending.push((async () => {
+        const startTime = Date.now();
+        const vector = await embedder(value.text);
+        const latencyMs = Date.now() - startTime;
+
+        console.log(
+          `[graphile-llm] Search embed: field=${key}, dims=${vector.length}, latency=${latencyMs}ms`
+        );
+
+        // Replace text with vector
+        value.vector = vector;
+        delete value.text;
+      })());
+      continue;
+    }
+
+    // Recurse into nested filter objects (AND, OR, etc.)
+    if (!Array.isArray(value)) {
+      pending.push(embedTextInWhere(value, embedder));
+    } else {
+      // Handle arrays (e.g. AND: [...], OR: [...])
+      for (const item of value) {
+        pending.push(embedTextInWhere(item, embedder));
+      }
+    }
+  }
+
+  if (pending.length > 0) {
+    await Promise.all(pending);
+  }
+}
+
+/**
  * Creates the LlmTextSearchPlugin.
  *
  * Hooks into VectorNearbyInput to add a `text` field alongside the
  * existing `vector` field. When a user provides `text`, the plugin's
- * filter-apply logic embeds it before passing to pgvector.
+ * resolver wrapper embeds it before passing to pgvector.
  */
 export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
   return {
@@ -87,12 +154,47 @@ export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
         },
 
         /**
-         * Intercept filter application to embed text before pgvector processing.
+         * Wrap connection query resolvers to intercept `where` arguments that
+         * contain VectorNearbyInput with `text`, embed the text, and replace
+         * it with the resulting vector before the plan executes.
          *
-         * When a VectorNearbyInput filter value contains `text` instead of `vector`,
-         * we embed the text and replace it with the resulting vector array so the
-         * downstream pgvector adapter processes it normally.
+         * Uses the same v4-style resolver wrapping pattern as graphile-upload-plugin
+         * and graphile-bucket-provisioner-plugin.
          */
+        GraphQLObjectType_fields_field(field, build, context) {
+          const {
+            scope: { isRootQuery, pgCodec },
+          } = context as any;
+
+          // Only wrap root query fields on tables with vector columns
+          if (!isRootQuery || !pgCodec || !hasVectorColumns(pgCodec)) {
+            return field;
+          }
+
+          const embedder: EmbedderFunction | null = (build as any).llmEmbedder;
+          if (!embedder) return field;
+
+          const defaultResolver = (obj: any) => obj[context.scope.fieldName];
+          const { resolve: oldResolve = defaultResolver, ...rest } = field;
+
+          return {
+            ...rest,
+            async resolve(source: any, args: any, graphqlContext: any, info: any) {
+              // If the query has a `where` argument, check for text fields
+              if (args?.where) {
+                await embedTextInWhere(args.where, embedder);
+              }
+
+              // Also handle `filter` for relay-style connections
+              if (args?.filter) {
+                await embedTextInWhere(args.filter, embedder);
+              }
+
+              return oldResolve(source, args, graphqlContext, info);
+            },
+          };
+        },
+
         finalize(schema, build) {
           const embedder: EmbedderFunction | null = (build as any).llmEmbedder;
 
@@ -102,10 +204,6 @@ export function createLlmTextSearchPlugin(): GraphileConfig.Plugin {
               'will return errors if used. Configure an embedding provider to enable.'
             );
           }
-
-          // Store the embedder on the schema extensions so it can be accessed
-          // at execution time by the resolveInputValue override
-          (schema as any).__llmEmbedder = embedder;
 
           return schema;
         },

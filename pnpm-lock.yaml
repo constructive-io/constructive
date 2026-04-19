@@ -299,6 +299,9 @@ importers:
       graphile-config:
         specifier: 1.0.0
         version: 1.0.0
+      graphile-utils:
+        specifier: 5.0.0
+        version: 5.0.0(@dataplan/pg@1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0))(grafast@1.0.0(graphql@16.13.0))(graphile-build-pg@5.0.0(@dataplan/pg@1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0))(grafast@1.0.0(graphql@16.13.0))(graphile-build@5.0.0(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0)(tamedevil@0.1.0))(graphile-build@5.0.0(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(tamedevil@0.1.0)
       graphql:
         specifier: 16.13.0
         version: 16.13.0

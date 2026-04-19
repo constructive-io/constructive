@@ -48,6 +48,7 @@ import type { GraphileConfig } from 'graphile-config';
 import { createLlmModulePlugin } from './plugins/llm-module-plugin';
 import { createLlmTextSearchPlugin } from './plugins/text-search-plugin';
 import { createLlmTextMutationPlugin } from './plugins/text-mutation-plugin';
+import { createLlmRagPlugin } from './plugins/rag-plugin';
 import type { GraphileLlmOptions } from './types';
 
 /**
@@ -62,6 +63,8 @@ export function GraphileLlmPreset(
   const {
     enableTextSearch = true,
     enableTextMutations = true,
+    enableRag = false,
+    ragDefaults,
   } = options;
 
   const plugins: GraphileConfig.Plugin[] = [
@@ -74,6 +77,10 @@ export function GraphileLlmPreset(
 
   if (enableTextMutations) {
     plugins.push(createLlmTextMutationPlugin());
+  }
+
+  if (enableRag) {
+    plugins.push(createLlmRagPlugin(ragDefaults));
   }
 
   return {

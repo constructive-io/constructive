@@ -18,7 +18,8 @@
 
 import type { GraphileConfig } from 'graphile-config';
 import { buildEmbedder, buildEmbedderFromEnv } from '../embedder';
-import type { EmbedderConfig, EmbedderFunction, GraphileLlmOptions } from '../types';
+import { buildChatCompleter, buildChatCompleterFromEnv } from '../chat';
+import type { EmbedderFunction, ChatFunction, GraphileLlmOptions } from '../types';
 
 // ─── TypeScript Augmentation ────────────────────────────────────────────────
 
@@ -27,6 +28,8 @@ declare global {
     interface Build {
       /** The resolved embedder function, or null if LLM is not configured */
       llmEmbedder: EmbedderFunction | null;
+      /** The resolved chat completion function, or null if not configured */
+      llmChatCompleter: ChatFunction | null;
     }
   }
   namespace GraphileConfig {
@@ -42,13 +45,13 @@ declare global {
 export function createLlmModulePlugin(
   options: GraphileLlmOptions = {}
 ): GraphileConfig.Plugin {
-  const { defaultEmbedder } = options;
+  const { defaultEmbedder, defaultChatCompleter } = options;
 
   return {
     name: 'LlmModulePlugin',
     version: '0.1.0',
     description:
-      'Resolves LLM embedder configuration and makes it available to other plugins',
+      'Resolves LLM embedder and chat completer configuration and makes them available to other plugins',
 
     schema: {
       hooks: {
@@ -82,9 +85,33 @@ export function createLlmModulePlugin(
             );
           }
 
+          // Resolve the chat completer from available sources:
+          // 1. Preset default chat completer option
+          // 2. Environment variables
+          // 3. null (disabled — RAG queries will error)
+          let chat: ChatFunction | null = null;
+
+          if (defaultChatCompleter) {
+            chat = buildChatCompleter(defaultChatCompleter);
+          }
+
+          if (!chat) {
+            chat = buildChatCompleterFromEnv();
+          }
+
+          if (chat) {
+            console.log('[graphile-llm] Chat completer configured — RAG queries will be enabled');
+          } else {
+            console.log(
+              '[graphile-llm] No chat completer configured. Set defaultChatCompleter in preset ' +
+              'options or CHAT_PROVIDER env var to enable RAG queries.'
+            );
+          }
+
           return build.extend(build, {
             llmEmbedder: embedder,
-          }, 'LlmModulePlugin adding llmEmbedder to build');
+            llmChatCompleter: chat,
+          }, 'LlmModulePlugin adding llmEmbedder and llmChatCompleter to build');
         },
       },
     },

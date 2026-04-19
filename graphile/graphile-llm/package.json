@@ -38,12 +38,16 @@
     "graphile-build-pg": "5.0.0",
     "graphile-config": "1.0.0",
     "graphile-search": "workspace:^",
+    "graphile-utils": "5.0.0",
     "graphql": "16.13.0",
     "pg-sql2": "5.0.0",
     "postgraphile": "5.0.0"
   },
   "peerDependenciesMeta": {
     "graphile-search": {
+      "optional": true
+    },
+    "graphile-utils": {
       "optional": true
     }
   },
