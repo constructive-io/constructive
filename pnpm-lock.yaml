@@ -299,9 +299,6 @@ importers:
       graphile-config:
         specifier: 1.0.0
         version: 1.0.0
-      graphile-search:
-        specifier: workspace:^
-        version: link:../graphile-search/dist
       graphql:
         specifier: 16.13.0
         version: 16.13.0
@@ -315,9 +312,21 @@ importers:
       '@types/node':
         specifier: ^22.19.11
         version: 22.19.15
+      graphile-connection-filter:
+        specifier: workspace:^
+        version: link:../graphile-connection-filter/dist
+      graphile-search:
+        specifier: workspace:^
+        version: link:../graphile-search/dist
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
       makage:
         specifier: ^0.3.0
         version: 0.3.0
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
   graphile/graphile-postgis:

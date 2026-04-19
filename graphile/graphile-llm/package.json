@@ -49,7 +49,11 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.11",
-    "makage": "^0.3.0"
+    "graphile-connection-filter": "workspace:^",
+    "graphile-search": "workspace:^",
+    "graphile-test": "workspace:^",
+    "makage": "^0.3.0",
+    "pgsql-test": "workspace:^"
   },
   "keywords": [
     "postgraphile",
