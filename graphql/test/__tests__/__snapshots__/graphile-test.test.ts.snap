@@ -3269,6 +3269,16 @@ that owns this entity instance (e.g., a data room ID, team ID).",
           "possibleTypes": null,
         },
         {
+          "description": "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).",
+          "enumValues": null,
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "kind": "SCALAR",
+          "name": "UUID",
+          "possibleTypes": null,
+        },
+        {
           "description": null,
           "enumValues": null,
           "fields": [
@@ -3349,16 +3359,6 @@ that owns this entity instance (e.g., a data room ID, team ID).",
           "interfaces": [],
           "kind": "OBJECT",
           "name": "RequestUploadUrlPayload",
-          "possibleTypes": null,
-        },
-        {
-          "description": "A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).",
-          "enumValues": null,
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "kind": "SCALAR",
-          "name": "UUID",
           "possibleTypes": null,
         },
         {
@@ -3777,9 +3777,7 @@ and lifecycle settings.",
             {
               "defaultValue": null,
               "description": "Owner entity ID for entity-scoped bucket provisioning.
-Omit for app-level (database-wide) storage.
-When provided, resolves the storage module for the entity type
-that owns this entity instance (e.g., a data room ID, team ID).",
+ Omit for app-level (database-wide) storage.",
               "name": "ownerId",
               "type": {
                 "kind": "SCALAR",

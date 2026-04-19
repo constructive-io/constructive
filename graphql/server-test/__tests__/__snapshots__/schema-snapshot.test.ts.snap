@@ -2447,8 +2447,6 @@ input ProvisionBucketInput {
   """
   Owner entity ID for entity-scoped bucket provisioning.
   Omit for app-level (database-wide) storage.
-  When provided, resolves the storage module for the entity type
-  that owns this entity instance (e.g., a data room ID, team ID).
   """
   ownerId: UUID
 }
