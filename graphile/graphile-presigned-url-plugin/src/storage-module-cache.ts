@@ -35,6 +35,8 @@ const storageModuleCache = new LRUCache<string, StorageModuleConfig>({
  *
  * Joins storage_module → table → schema to get fully-qualified table names.
  * Filters to app-level (membership_type IS NULL) by default.
+ *
+ * Requires the multi-scope schema (membership_type column on storage_module).
  */
 const APP_STORAGE_MODULE_QUERY = `
   SELECT
@@ -71,9 +73,58 @@ const APP_STORAGE_MODULE_QUERY = `
 `;
 
 /**
+ * Legacy SQL query for databases without the multi-scope schema.
+ *
+ * Falls back to the original LIMIT 1 pattern when membership_type column
+ * doesn't exist (pre-PR#876 schema). Returns NULL for scope-related fields
+ * so the row shape matches StorageModuleRow.
+ */
+const LEGACY_STORAGE_MODULE_QUERY = `
+  SELECT
+    sm.id,
+    NULL::int AS membership_type,
+    NULL::uuid AS entity_table_id,
+    bs.schema_name AS buckets_schema,
+    bt.name AS buckets_table,
+    fs.schema_name AS files_schema,
+    ft.name AS files_table,
+    urs.schema_name AS upload_requests_schema,
+    urt.name AS upload_requests_table,
+    sm.endpoint,
+    sm.public_url_prefix,
+    sm.provider,
+    sm.allowed_origins,
+    sm.upload_url_expiry_seconds,
+    sm.download_url_expiry_seconds,
+    sm.default_max_file_size,
+    sm.max_filename_length,
+    sm.cache_ttl_seconds,
+    NULL AS entity_schema,
+    NULL AS entity_table
+  FROM metaschema_modules_public.storage_module sm
+  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
+  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
+  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
+  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
+  JOIN metaschema_public.table urt ON urt.id = sm.upload_requests_table_id
+  JOIN metaschema_public.schema urs ON urs.id = urt.schema_id
+  WHERE sm.database_id = $1
+  LIMIT 1
+`;
+
+/**
+ * Module-level flag to track whether the database schema supports multi-scope storage.
+ *
+ * null = not yet detected, true = new schema (has membership_type), false = legacy schema.
+ * Once detected, avoids repeated failed queries on legacy schemas.
+ */
+let schemaSupportsMultiScope: boolean | null = null;
+
+/**
  * SQL query to resolve ALL storage modules for a database (app-level + entity-scoped).
  *
  * Returns all storage modules with their entity table names for ownerId resolution.
+ * Requires the multi-scope schema.
  */
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
@@ -185,7 +236,27 @@ export async function getStorageModuleConfig(
 
   log.debug(`Cache miss for app-level storage in database ${databaseId}, querying metaschema...`);
 
-  const result = await pgClient.query({ text: APP_STORAGE_MODULE_QUERY, values: [databaseId] });
+  let result: { rows: unknown[] };
+
+  if (schemaSupportsMultiScope === false) {
+    // Known legacy schema — skip the new query
+    result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
+  } else {
+    try {
+      result = await pgClient.query({ text: APP_STORAGE_MODULE_QUERY, values: [databaseId] });
+      schemaSupportsMultiScope = true;
+    } catch (err: any) {
+      // PostgreSQL error 42703 = "column does not exist"
+      if (err.code === '42703' || err.message?.includes('does not exist')) {
+        log.debug('Multi-scope schema not detected, falling back to legacy query');
+        schemaSupportsMultiScope = false;
+        result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
+      } else {
+        throw err;
+      }
+    }
+  }
+
   if (result.rows.length === 0) {
     log.warn(`No app-level storage module found for database ${databaseId}`);
     return null;
@@ -218,6 +289,12 @@ export async function getStorageModuleConfigForOwner(
   databaseId: string,
   ownerId: string,
 ): Promise<StorageModuleConfig | null> {
+  // Entity-scoped resolution requires the multi-scope schema
+  if (schemaSupportsMultiScope === false) {
+    log.debug('Legacy schema detected — entity-scoped storage not available');
+    return null;
+  }
+
   // Check if we already have a cached mapping for this ownerId
   const ownerCacheKey = `storage:${databaseId}:owner:${ownerId}`;
   const cachedOwner = storageModuleCache.get(ownerCacheKey);
@@ -239,7 +316,18 @@ export async function getStorageModuleConfigForOwner(
 
   if (allConfigs.length === 0) {
     log.debug(`Loading all storage modules for database ${databaseId} to resolve ownerId ${ownerId}`);
-    const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
+    let result: { rows: unknown[] };
+    try {
+      result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
+      schemaSupportsMultiScope = true;
+    } catch (err: any) {
+      if (err.code === '42703' || err.message?.includes('does not exist')) {
+        log.debug('Multi-scope schema not detected during owner resolution');
+        schemaSupportsMultiScope = false;
+        return null;
+      }
+      throw err;
+    }
     allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
 
     // Cache each individual config by its membership type
@@ -292,8 +380,29 @@ export async function resolveStorageModuleByFileId(
 ): Promise<{ storageConfig: StorageModuleConfig; file: { id: string; key: string; content_type: string; status: string; bucket_id: string } } | null> {
   // Load all storage modules for this database
   log.debug(`Resolving file ${fileId} across all storage modules for database ${databaseId}`);
-  const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
-  const allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
+
+  let allConfigs: StorageModuleConfig[];
+
+  if (schemaSupportsMultiScope === false) {
+    // Legacy schema — only one storage module, use the legacy query
+    const result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
+    allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
+  } else {
+    try {
+      const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
+      schemaSupportsMultiScope = true;
+      allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
+    } catch (err: any) {
+      if (err.code === '42703' || err.message?.includes('does not exist')) {
+        log.debug('Multi-scope schema not detected during file resolution, falling back');
+        schemaSupportsMultiScope = false;
+        const result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
+        allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
+      } else {
+        throw err;
+      }
+    }
+  }
 
   // Probe each module's files table for the fileId
   for (const config of allConfigs) {
@@ -456,6 +565,7 @@ export function clearStorageModuleCache(): void {
   storageModuleCache.clear();
   bucketCache.clear();
   provisionedBuckets.clear();
+  schemaSupportsMultiScope = null;
 }
 
 /**
