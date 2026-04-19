@@ -29,7 +29,8 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "dependencies": {
-    "@agentic-kit/ollama": "^1.0.3"
+    "@agentic-kit/ollama": "^1.0.3",
+    "@constructive-io/graphql-env": "workspace:^"
   },
   "peerDependencies": {
     "@dataplan/pg": "1.0.0",
