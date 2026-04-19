@@ -1,0 +1,67 @@
+{
+  "name": "graphile-llm",
+  "version": "0.1.0",
+  "description": "LLM integration plugin for PostGraphile v5 — server-side text-to-vector embedding and text companion fields for pgvector columns",
+  "author": "Constructive <developers@constructive.io>",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "dependencies": {
+    "@agentic-kit/ollama": "^1.0.3"
+  },
+  "peerDependencies": {
+    "@dataplan/pg": "1.0.0",
+    "grafast": "1.0.0",
+    "graphile-build": "5.0.0",
+    "graphile-build-pg": "5.0.0",
+    "graphile-config": "1.0.0",
+    "graphile-search": "workspace:^",
+    "graphql": "16.13.0",
+    "pg-sql2": "5.0.0",
+    "postgraphile": "5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "graphile-search": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "makage": "^0.3.0"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "constructive",
+    "plugin",
+    "llm",
+    "embedding",
+    "pgvector",
+    "rag",
+    "agentic-kit",
+    "ollama",
+    "openai"
+  ]
+}
