@@ -44,6 +44,9 @@ export interface RlsModule {
  * Loaded once per API resolution and cached alongside the ApiStructure.
  */
 export interface AuthSettings {
+  /** Feature toggles */
+  enableCookieAuth?: boolean;
+  requireCsrfForAuth?: boolean;
   /** Cookie configuration */
   cookieSecure?: boolean;
   cookieSamesite?: string;

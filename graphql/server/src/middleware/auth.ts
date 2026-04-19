@@ -136,6 +136,7 @@ export const createAuthenticateMiddleware = (
       }
 
       req.token = token;
+      req.tokenSource = tokenSource as 'bearer' | 'cookie' | 'none';
     } else {
       log.info(
         `[auth] Skipping auth: authFn=${authFn ?? 'none'}, ` +

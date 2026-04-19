@@ -13,6 +13,7 @@ import './types'; // for Request type
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
 import { observeGraphileBuild } from './observability/graphile-build-stats';
+import { CookiePlugin } from './cookie-plugin';
 
 const maskErrorLog = new Logger('graphile:maskError');
 
@@ -197,6 +198,7 @@ const buildPreset = (
 ): GraphileConfig.Preset => {
   return {
   extends: [ConstructivePreset],
+  plugins: [CookiePlugin],
   pgServices: [
     makePgService({
       pool,
