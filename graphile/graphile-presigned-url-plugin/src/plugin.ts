@@ -318,9 +318,9 @@ export function createPresignedUrlPlugin(
                   // Track the dedup request
                   await txClient.query({
                     text: `INSERT INTO ${storageConfig.uploadRequestsQualifiedName}
-                     (file_id, bucket_id, key, content_type, content_hash, size, status, expires_at)
-                     VALUES ($1, $2, $3, $4, $5, $6, 'confirmed', NOW())`,
-                    values: [existingFile.id, bucket.id, s3Key, contentType, contentHash, size],
+                     (file_id, bucket_id, key, content_type, content_hash, status, expires_at)
+                     VALUES ($1, $2, $3, $4, $5, 'confirmed', NOW())`,
+                    values: [existingFile.id, bucket.id, s3Key, contentType, contentHash],
                   });
 
                   return {
