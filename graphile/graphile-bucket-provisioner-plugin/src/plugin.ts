@@ -35,6 +35,7 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
+import { QuoteUtils } from '@pgsql/quotes';
 import {
   BucketProvisioner,
 } from '@constructive-io/bucket-provisioner';
@@ -72,30 +73,7 @@ const APP_STORAGE_MODULE_QUERY = `
 `;
 
 /**
- * Legacy query for databases without the multi-scope schema.
- * Returns NULL for scope-related fields so the row shape matches StorageModuleRow.
- */
-const LEGACY_STORAGE_MODULE_QUERY = `
-  SELECT
-    sm.id,
-    NULL::int AS membership_type,
-    NULL::uuid AS entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  WHERE sm.database_id = $1
-  LIMIT 1
-`;
-
-/**
  * Resolve ALL storage modules for a database (for ownerId-based resolution).
- * Requires the multi-scope schema.
  */
 const ALL_STORAGE_MODULES_QUERY = `
   SELECT
@@ -117,12 +95,6 @@ const ALL_STORAGE_MODULES_QUERY = `
   LEFT JOIN metaschema_public.schema es ON es.id = et.schema_id
   WHERE sm.database_id = $1
 `;
-
-/**
- * Module-level flag to track whether the database schema supports multi-scope storage.
- * null = not yet detected, true = new schema (has membership_type), false = legacy schema.
- */
-let schemaSupportsMultiScope: boolean | null = null;
 
 interface StorageModuleRow {
   id: string;
@@ -149,65 +121,20 @@ async function resolveStorageModule(
   ownerId?: string,
 ): Promise<StorageModuleRow | null> {
   if (!ownerId) {
-    // App-level resolution with backward compatibility
-    if (schemaSupportsMultiScope === false) {
-      const result = await pgClient.query(LEGACY_STORAGE_MODULE_QUERY, [databaseId]);
-      return (result.rows[0] as StorageModuleRow) ?? null;
-    }
-    try {
-      // Use SAVEPOINT so a failed probe doesn't abort the surrounding transaction
-      await pgClient.query('SAVEPOINT storage_module_probe');
-      const result = await pgClient.query(APP_STORAGE_MODULE_QUERY, [databaseId]);
-      await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
-      schemaSupportsMultiScope = true;
-      return (result.rows[0] as StorageModuleRow) ?? null;
-    } catch (err: any) {
-      if (err.code === '42703' || err.message?.includes('does not exist')) {
-        log.debug('Multi-scope schema not detected, falling back to legacy query');
-        schemaSupportsMultiScope = false;
-        await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe');
-        await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
-        const result = await pgClient.query(LEGACY_STORAGE_MODULE_QUERY, [databaseId]);
-        return (result.rows[0] as StorageModuleRow) ?? null;
-      }
-      try { await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
-      try { await pgClient.query('RELEASE SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
-      throw err;
-    }
+    // App-level resolution
+    const result = await pgClient.query(APP_STORAGE_MODULE_QUERY, [databaseId]);
+    return (result.rows[0] as StorageModuleRow) ?? null;
   }
 
-  // Entity-scoped resolution requires the multi-scope schema
-  if (schemaSupportsMultiScope === false) {
-    log.debug('Legacy schema detected — entity-scoped storage not available');
-    return null;
-  }
-
-  // Load all modules and probe entity tables
-  let modules: StorageModuleRow[];
-  try {
-    await pgClient.query('SAVEPOINT storage_module_probe');
-    const result = await pgClient.query(ALL_STORAGE_MODULES_QUERY, [databaseId]);
-    await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
-    schemaSupportsMultiScope = true;
-    modules = result.rows as StorageModuleRow[];
-  } catch (err: any) {
-    if (err.code === '42703' || err.message?.includes('does not exist')) {
-      log.debug('Multi-scope schema not detected during owner resolution');
-      schemaSupportsMultiScope = false;
-      await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe');
-      await pgClient.query('RELEASE SAVEPOINT storage_module_probe');
-      return null;
-    }
-    try { await pgClient.query('ROLLBACK TO SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
-    try { await pgClient.query('RELEASE SAVEPOINT storage_module_probe'); } catch { /* ignore */ }
-    throw err;
-  }
-
+  // Entity-scoped: load all modules and probe entity tables
+  const result = await pgClient.query(ALL_STORAGE_MODULES_QUERY, [databaseId]);
+  const modules = result.rows as StorageModuleRow[];
   const entityModules = modules.filter((m) => m.entity_schema && m.entity_table);
 
   for (const mod of entityModules) {
+    const entityTable = QuoteUtils.quoteQualifiedIdentifier(mod.entity_schema!, mod.entity_table!);
     const probe = await pgClient.query(
-      `SELECT 1 FROM "${mod.entity_schema}"."${mod.entity_table}" WHERE id = $1 LIMIT 1`,
+      `SELECT 1 FROM ${entityTable} WHERE id = $1 LIMIT 1`,
       [ownerId],
     );
     if (probe.rows.length > 0) {
@@ -500,14 +427,15 @@ export function createBucketProvisionerPlugin(
 
               // Look up the bucket row (RLS enforced via pgSettings)
               const hasOwner = ownerId && storageModule.membership_type !== null;
+              const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
               const bucketResult = await pgClient.query(
                 hasOwner
                   ? `SELECT id, key, type, is_public, allowed_origins
-                     FROM "${storageModule.buckets_schema}"."${storageModule.buckets_table}"
+                     FROM ${bucketsTable}
                      WHERE key = $1 AND owner_id = $2
                      LIMIT 1`
                   : `SELECT id, key, type, is_public, allowed_origins
-                     FROM "${storageModule.buckets_schema}"."${storageModule.buckets_table}"
+                     FROM ${bucketsTable}
                      WHERE key = $1
                      LIMIT 1`,
                 hasOwner ? [bucketKey, ownerId] : [bucketKey],
@@ -697,9 +625,10 @@ export function createBucketProvisionerPlugin(
                     }
 
                     // Read the full bucket row (post-update) to get type + origins
+                    const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
                     const bucketResult = await pgClient.query(
                       `SELECT id, key, type, is_public, allowed_origins
-                       FROM "${storageModule.buckets_schema}"."${storageModule.buckets_table}"
+                       FROM ${bucketsTable}
                        WHERE key = $1
                        LIMIT 1`,
                       [patchKey],

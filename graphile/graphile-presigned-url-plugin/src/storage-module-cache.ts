@@ -1,5 +1,6 @@
 import { Logger } from '@pgpmjs/logger';
 import { LRUCache } from 'lru-cache';
+import { QuoteUtils } from '@pgsql/quotes';
 import type { StorageModuleConfig, BucketConfig } from './types';
 
 const log = new Logger('graphile-presigned-url:cache');
@@ -73,54 +74,6 @@ const APP_STORAGE_MODULE_QUERY = `
 `;
 
 /**
- * Legacy SQL query for databases without the multi-scope schema.
- *
- * Falls back to the original LIMIT 1 pattern when membership_type column
- * doesn't exist (pre-PR#876 schema). Returns NULL for scope-related fields
- * so the row shape matches StorageModuleRow.
- */
-const LEGACY_STORAGE_MODULE_QUERY = `
-  SELECT
-    sm.id,
-    NULL::int AS membership_type,
-    NULL::uuid AS entity_table_id,
-    bs.schema_name AS buckets_schema,
-    bt.name AS buckets_table,
-    fs.schema_name AS files_schema,
-    ft.name AS files_table,
-    urs.schema_name AS upload_requests_schema,
-    urt.name AS upload_requests_table,
-    sm.endpoint,
-    sm.public_url_prefix,
-    sm.provider,
-    sm.allowed_origins,
-    sm.upload_url_expiry_seconds,
-    sm.download_url_expiry_seconds,
-    sm.default_max_file_size,
-    sm.max_filename_length,
-    sm.cache_ttl_seconds,
-    NULL AS entity_schema,
-    NULL AS entity_table
-  FROM metaschema_modules_public.storage_module sm
-  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
-  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
-  JOIN metaschema_public.table ft ON ft.id = sm.files_table_id
-  JOIN metaschema_public.schema fs ON fs.id = ft.schema_id
-  JOIN metaschema_public.table urt ON urt.id = sm.upload_requests_table_id
-  JOIN metaschema_public.schema urs ON urs.id = urt.schema_id
-  WHERE sm.database_id = $1
-  LIMIT 1
-`;
-
-/**
- * Module-level flag to track whether the database schema supports multi-scope storage.
- *
- * null = not yet detected, true = new schema (has membership_type), false = legacy schema.
- * Once detected, avoids repeated failed queries on legacy schemas.
- */
-let schemaSupportsMultiScope: boolean | null = null;
-
-/**
  * SQL query to resolve ALL storage modules for a database (app-level + entity-scoped).
  *
  * Returns all storage modules with their entity table names for ownerId resolution.
@@ -190,9 +143,9 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
   const cacheTtlSeconds = row.cache_ttl_seconds ?? DEFAULT_CACHE_TTL_SECONDS;
   return {
     id: row.id,
-    bucketsQualifiedName: `"${row.buckets_schema}"."${row.buckets_table}"`,
-    filesQualifiedName: `"${row.files_schema}"."${row.files_table}"`,
-    uploadRequestsQualifiedName: `"${row.upload_requests_schema}"."${row.upload_requests_table}"`,
+    bucketsQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.buckets_schema, row.buckets_table),
+    filesQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.files_schema, row.files_table),
+    uploadRequestsQualifiedName: QuoteUtils.quoteQualifiedIdentifier(row.upload_requests_schema, row.upload_requests_table),
     schemaName: row.buckets_schema,
     bucketsTableName: row.buckets_table,
     filesTableName: row.files_table,
@@ -200,7 +153,7 @@ function buildConfig(row: StorageModuleRow): StorageModuleConfig {
     membershipType: row.membership_type,
     entityTableId: row.entity_table_id,
     entityQualifiedName: row.entity_schema && row.entity_table
-      ? `"${row.entity_schema}"."${row.entity_table}"`
+      ? QuoteUtils.quoteQualifiedIdentifier(row.entity_schema, row.entity_table)
       : null,
     endpoint: row.endpoint,
     publicUrlPrefix: row.public_url_prefix,
@@ -236,34 +189,7 @@ export async function getStorageModuleConfig(
 
   log.debug(`Cache miss for app-level storage in database ${databaseId}, querying metaschema...`);
 
-  let result: { rows: unknown[] };
-
-  if (schemaSupportsMultiScope === false) {
-    // Known legacy schema — skip the new query
-    result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
-  } else {
-    try {
-      // Use SAVEPOINT so a failed probe doesn't abort the surrounding transaction
-      await pgClient.query({ text: 'SAVEPOINT storage_module_probe' });
-      result = await pgClient.query({ text: APP_STORAGE_MODULE_QUERY, values: [databaseId] });
-      await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
-      schemaSupportsMultiScope = true;
-    } catch (err: any) {
-      // PostgreSQL error 42703 = "column does not exist"
-      if (err.code === '42703' || err.message?.includes('does not exist')) {
-        log.debug('Multi-scope schema not detected, falling back to legacy query');
-        schemaSupportsMultiScope = false;
-        await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' });
-        await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
-        result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
-      } else {
-        // Release savepoint even on unexpected errors
-        try { await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
-        try { await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
-        throw err;
-      }
-    }
-  }
+  const result = await pgClient.query({ text: APP_STORAGE_MODULE_QUERY, values: [databaseId] });
 
   if (result.rows.length === 0) {
     log.warn(`No app-level storage module found for database ${databaseId}`);
@@ -297,12 +223,6 @@ export async function getStorageModuleConfigForOwner(
   databaseId: string,
   ownerId: string,
 ): Promise<StorageModuleConfig | null> {
-  // Entity-scoped resolution requires the multi-scope schema
-  if (schemaSupportsMultiScope === false) {
-    log.debug('Legacy schema detected — entity-scoped storage not available');
-    return null;
-  }
-
   // Check if we already have a cached mapping for this ownerId
   const ownerCacheKey = `storage:${databaseId}:owner:${ownerId}`;
   const cachedOwner = storageModuleCache.get(ownerCacheKey);
@@ -324,24 +244,7 @@ export async function getStorageModuleConfigForOwner(
 
   if (allConfigs.length === 0) {
     log.debug(`Loading all storage modules for database ${databaseId} to resolve ownerId ${ownerId}`);
-    let result: { rows: unknown[] };
-    try {
-      await pgClient.query({ text: 'SAVEPOINT storage_module_probe' });
-      result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
-      await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
-      schemaSupportsMultiScope = true;
-    } catch (err: any) {
-      if (err.code === '42703' || err.message?.includes('does not exist')) {
-        log.debug('Multi-scope schema not detected during owner resolution');
-        schemaSupportsMultiScope = false;
-        await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' });
-        await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
-        return null;
-      }
-      try { await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
-      try { await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
-      throw err;
-    }
+    const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
     allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
 
     // Cache each individual config by its membership type
@@ -395,34 +298,9 @@ export async function resolveStorageModuleByFileId(
   // Load all storage modules for this database
   log.debug(`Resolving file ${fileId} across all storage modules for database ${databaseId}`);
 
-  let allConfigs: StorageModuleConfig[];
-
-  if (schemaSupportsMultiScope === false) {
-    // Legacy schema — only one storage module, use the legacy query
-    const result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
-    allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
-  } else {
-    try {
-      await pgClient.query({ text: 'SAVEPOINT storage_module_probe' });
-      const result = await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] });
-      await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
-      schemaSupportsMultiScope = true;
-      allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
-    } catch (err: any) {
-      if (err.code === '42703' || err.message?.includes('does not exist')) {
-        log.debug('Multi-scope schema not detected during file resolution, falling back');
-        schemaSupportsMultiScope = false;
-        await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' });
-        await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' });
-        const result = await pgClient.query({ text: LEGACY_STORAGE_MODULE_QUERY, values: [databaseId] });
-        allConfigs = (result.rows as StorageModuleRow[]).map(buildConfig);
-      } else {
-        try { await pgClient.query({ text: 'ROLLBACK TO SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
-        try { await pgClient.query({ text: 'RELEASE SAVEPOINT storage_module_probe' }); } catch { /* ignore */ }
-        throw err;
-      }
-    }
-  }
+  const allConfigs = (await pgClient.query({ text: ALL_STORAGE_MODULES_QUERY, values: [databaseId] })).rows.map(
+    (row: unknown) => buildConfig(row as StorageModuleRow),
+  );
 
   // Probe each module's files table for the fileId
   for (const config of allConfigs) {
@@ -470,13 +348,6 @@ const bucketCache = new LRUCache<string, BucketConfig>({
  * On cache miss, queries the bucket table (RLS-enforced via pgSettings on
  * the pgClient). On cache hit, returns the cached metadata directly.
  *
- * @param pgClient - A pg client from the Graphile context
- * @param storageConfig - The resolved StorageModuleConfig for this database
- * @param databaseId - The metaschema database UUID (used as cache key prefix)
- * @param bucketKey - The bucket key (e.g., "public", "private")
- * @returns BucketConfig or null if the bucket doesn't exist / isn't accessible
- */
-/**
  * @param pgClient - A pg client from the Graphile context
  * @param storageConfig - The resolved StorageModuleConfig for this database/scope
  * @param databaseId - The metaschema database UUID (used as cache key prefix)
@@ -585,7 +456,6 @@ export function clearStorageModuleCache(): void {
   storageModuleCache.clear();
   bucketCache.clear();
   provisionedBuckets.clear();
-  schemaSupportsMultiScope = null;
 }
 
 /**
