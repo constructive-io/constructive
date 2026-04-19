@@ -8,7 +8,7 @@ export interface BucketConfig {
   key: string;
   type: 'public' | 'private' | 'temp';
   is_public: boolean;
-  owner_id: string;
+  owner_id: string | null;
   allowed_mime_types: string[] | null;
   max_file_size: number | null;
 }
@@ -33,6 +33,15 @@ export interface StorageModuleConfig {
   filesTableName: string;
   /** Upload requests table name */
   uploadRequestsTableName: string;
+
+  // --- Scope identity ---
+
+  /** Membership type (NULL for app-level, non-NULL for entity-scoped) */
+  membershipType: number | null;
+  /** Entity table ID for entity-scoped storage (NULL for app-level) */
+  entityTableId: string | null;
+  /** Qualified entity table name for ownerId lookups (NULL for app-level) */
+  entityQualifiedName: string | null;
 
   // --- S3 connection config (NULL in DB = use global env/plugin defaults) ---
 
@@ -65,6 +74,13 @@ export interface StorageModuleConfig {
 export interface RequestUploadUrlInput {
   /** Bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped uploads.
+   * Omit for app-level (database-wide) storage.
+   * When provided, resolves the storage module for the entity type
+   * that owns this entity instance (e.g., a data room ID, team ID).
+   */
+  ownerId?: string;
   /** SHA-256 content hash computed by the client */
   contentHash: string;
   /** MIME type of the file */

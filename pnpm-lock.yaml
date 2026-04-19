@@ -176,6 +176,9 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
+      '@pgsql/quotes':
+        specifier: ^17.1.0
+        version: 17.1.0
       grafast:
         specifier: 1.0.0
         version: 1.0.0(graphql@16.13.0)
@@ -393,6 +396,9 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
+      '@pgsql/quotes':
+        specifier: ^17.1.0
+        version: 17.1.0
       grafast:
         specifier: 1.0.0
         version: 1.0.0(graphql@16.13.0)
@@ -1689,8 +1695,8 @@ importers:
         specifier: ^0.18.0
         version: 0.18.0
       '@pgpm/metaschema-modules':
-        specifier: ^0.18.0
-        version: 0.18.0
+        specifier: ^0.21.1
+        version: 0.21.1
       '@pgpm/metaschema-schema':
         specifier: ^0.18.0
         version: 0.18.0
@@ -4347,14 +4353,23 @@ packages:
   '@pgpm/database-jobs@0.18.0':
     resolution: {integrity: sha512-3LX7ZQJQEMHd4POG2I2xPzMFR2X6LwvuxJAMpLhcc/I4P3EbEyEig6rPpsyDr9uabRjgUWfZDz05w6cW8X4KwA==}
 
+  '@pgpm/database-jobs@0.21.0':
+    resolution: {integrity: sha512-TN6Uddyq5PJMQ7P+dJOCl0xwyIW1Hv8PkJmRshMNljzt0OVu4Mq8YR5gNkTDveGGHdYCDyP0vhCrpty9aQld6g==}
+
   '@pgpm/inflection@0.18.0':
     resolution: {integrity: sha512-gHfxI6l/+cE9zY5ea6BjVjNcb9VKIavqRXGVyw16Fy0n4HgCmxF8ccZFFPq46JXfakNSk3cPTHDYvvWQaAlIPA==}
 
-  '@pgpm/metaschema-modules@0.18.0':
-    resolution: {integrity: sha512-bSawB8SJJWGRpQjazJR4MYL6zMmI7dqdUtmw9O9jj7NqGXbZDLqrfUYOzxDbThJ/4BI49fJba19Qiz94Ys/CCg==}
+  '@pgpm/inflection@0.21.0':
+    resolution: {integrity: sha512-tb1OQCQp1i5SjT04CCN27ptGQcDXidVZrDB8SJsdZZrz6Rcl0WStf4t50z5CSUebg8RJxkpiF4VNpv583RCuhQ==}
+
+  '@pgpm/metaschema-modules@0.21.1':
+    resolution: {integrity: sha512-6RTHN+PcxmTma7k7uHPZdjtN92P3kkqndXxu2acuSOpXi1sxrN5nNSNgi2r42ovl92B8MKy4r7SyF5DUlQwD1A==}
 
   '@pgpm/metaschema-schema@0.18.0':
     resolution: {integrity: sha512-joIBoYegI4ZQFFPW7w0HhNXMT+sXnmSytX8YBxGgi5XZqjE2aQdtZcWBIiwZa3MjqU7mYN2xlZt5gPmo/IzLMw==}
+
+  '@pgpm/metaschema-schema@0.21.0':
+    resolution: {integrity: sha512-kRfVyysGOrGcZEElcAJWaX9Xx2f5fMPtI4rmAxI11vJ0axYUcqtI+9fyp7McwqXnIHr0ShR28jvwqUGaZherJw==}
 
   '@pgpm/services@0.18.0':
     resolution: {integrity: sha512-YedLEVdgwkHden55uaZaO8O3HACEiIvblYmPFsQk1ivHwzw1l0KUv6WT5+idwMC/SOsexH/Xq8ckSSM84ErWtQ==}
@@ -4362,8 +4377,14 @@ packages:
   '@pgpm/types@0.18.0':
     resolution: {integrity: sha512-w6pfcS5HuJ2IGfyn74mGChl0nhNBIbxdu6sarlARGveZFHvBkTIPKEezA524sLKhUHda84YWuExEhCUd6N/AqQ==}
 
+  '@pgpm/types@0.21.0':
+    resolution: {integrity: sha512-F5ph4z7JWwKVcy/CmAgodEIXqXCwSgv0ESVxIV2spdl01RgNi0SdKuHqVJnjp8rbHHUtlCPRj/UlAopUSpIIOg==}
+
   '@pgpm/verify@0.18.0':
     resolution: {integrity: sha512-7XtY+hj9CbYb0ZhD0LJRp+TErtYS2z0FZbdkMNM7UabEwz05VLlS/lXbdtn5hksbUq6dkIxwxQ2mfFpATPpqDQ==}
+
+  '@pgpm/verify@0.21.0':
+    resolution: {integrity: sha512-z4iiwEUrUR+aIvxfu4+HefitVPLtypXdbyEkbNJ//EMsnzturo6wzxT1e60w/Xp29AzF6m5OaJ0djc6lzr9hTw==}
 
   '@pgsql/quotes@17.1.0':
     resolution: {integrity: sha512-J/H+LcrENBpYgL45WW6aTjb5Yk4tX4+AmB2/k8KZa+Zh3wiCtqmNIag+HZz5HmWaF6EZK9ZGC95NBD1fs+rUvg==}
@@ -12062,14 +12083,22 @@ snapshots:
     dependencies:
       '@pgpm/verify': 0.18.0
 
+  '@pgpm/database-jobs@0.21.0':
+    dependencies:
+      '@pgpm/verify': 0.21.0
+
   '@pgpm/inflection@0.18.0':
     dependencies:
       '@pgpm/verify': 0.18.0
 
-  '@pgpm/metaschema-modules@0.18.0':
+  '@pgpm/inflection@0.21.0':
     dependencies:
-      '@pgpm/metaschema-schema': 0.18.0
-      '@pgpm/verify': 0.18.0
+      '@pgpm/verify': 0.21.0
+
+  '@pgpm/metaschema-modules@0.21.1':
+    dependencies:
+      '@pgpm/metaschema-schema': 0.21.0
+      '@pgpm/verify': 0.21.0
 
   '@pgpm/metaschema-schema@0.18.0':
     dependencies:
@@ -12077,6 +12106,13 @@ snapshots:
       '@pgpm/inflection': 0.18.0
       '@pgpm/types': 0.18.0
       '@pgpm/verify': 0.18.0
+
+  '@pgpm/metaschema-schema@0.21.0':
+    dependencies:
+      '@pgpm/database-jobs': 0.21.0
+      '@pgpm/inflection': 0.21.0
+      '@pgpm/types': 0.21.0
+      '@pgpm/verify': 0.21.0
 
   '@pgpm/services@0.18.0':
     dependencies:
@@ -12087,7 +12123,13 @@ snapshots:
     dependencies:
       '@pgpm/verify': 0.18.0
 
+  '@pgpm/types@0.21.0':
+    dependencies:
+      '@pgpm/verify': 0.21.0
+
   '@pgpm/verify@0.18.0': {}
+
+  '@pgpm/verify@0.21.0': {}
 
   '@pgsql/quotes@17.1.0': {}
 

@@ -35,6 +35,7 @@ import { context as grafastContext, lambda, object } from 'grafast';
 import type { GraphileConfig } from 'graphile-config';
 import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
+import { QuoteUtils } from '@pgsql/quotes';
 import {
   BucketProvisioner,
 } from '@constructive-io/bucket-provisioner';
@@ -47,11 +48,16 @@ import type {
 
 const log = new Logger('graphile-bucket-provisioner:plugin');
 
-// --- Storage module query (same as presigned-url-plugin) ---
+// --- Storage module queries ---
 
-const STORAGE_MODULE_QUERY = `
+/**
+ * Resolve the app-level storage module (membership_type IS NULL).
+ */
+const APP_STORAGE_MODULE_QUERY = `
   SELECT
     sm.id,
+    sm.membership_type,
+    sm.entity_table_id,
     bs.schema_name AS buckets_schema,
     bt.name AS buckets_table,
     sm.endpoint,
@@ -62,17 +68,81 @@ const STORAGE_MODULE_QUERY = `
   JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
   JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
   WHERE sm.database_id = $1
+    AND sm.membership_type IS NULL
   LIMIT 1
+`;
+
+/**
+ * Resolve ALL storage modules for a database (for ownerId-based resolution).
+ */
+const ALL_STORAGE_MODULES_QUERY = `
+  SELECT
+    sm.id,
+    sm.membership_type,
+    sm.entity_table_id,
+    bs.schema_name AS buckets_schema,
+    bt.name AS buckets_table,
+    sm.endpoint,
+    sm.public_url_prefix,
+    sm.provider,
+    sm.allowed_origins,
+    es.schema_name AS entity_schema,
+    et.name AS entity_table
+  FROM metaschema_modules_public.storage_module sm
+  JOIN metaschema_public.table bt ON bt.id = sm.buckets_table_id
+  JOIN metaschema_public.schema bs ON bs.id = bt.schema_id
+  LEFT JOIN metaschema_public.table et ON et.id = sm.entity_table_id
+  LEFT JOIN metaschema_public.schema es ON es.id = et.schema_id
+  WHERE sm.database_id = $1
 `;
 
 interface StorageModuleRow {
   id: string;
+  membership_type: number | null;
+  entity_table_id: string | null;
   buckets_schema: string;
   buckets_table: string;
   endpoint: string | null;
   public_url_prefix: string | null;
   provider: string | null;
   allowed_origins: string[] | null;
+  entity_schema?: string | null;
+  entity_table?: string | null;
+}
+
+/**
+ * Resolve the storage module for a given scope.
+ * If ownerId is provided, probes entity tables to find the matching module.
+ * Otherwise, returns the app-level module.
+ */
+async function resolveStorageModule(
+  pgClient: any,
+  databaseId: string,
+  ownerId?: string,
+): Promise<StorageModuleRow | null> {
+  if (!ownerId) {
+    // App-level resolution
+    const result = await pgClient.query(APP_STORAGE_MODULE_QUERY, [databaseId]);
+    return (result.rows[0] as StorageModuleRow) ?? null;
+  }
+
+  // Entity-scoped: load all modules and probe entity tables
+  const result = await pgClient.query(ALL_STORAGE_MODULES_QUERY, [databaseId]);
+  const modules = result.rows as StorageModuleRow[];
+  const entityModules = modules.filter((m) => m.entity_schema && m.entity_table);
+
+  for (const mod of entityModules) {
+    const entityTable = QuoteUtils.quoteQualifiedIdentifier(mod.entity_schema!, mod.entity_table!);
+    const probe = await pgClient.query(
+      `SELECT 1 FROM ${entityTable} WHERE id = $1 LIMIT 1`,
+      [ownerId],
+    );
+    if (probe.rows.length > 0) {
+      return mod;
+    }
+  }
+
+  return null;
 }
 
 interface BucketRow {
@@ -187,8 +257,7 @@ async function provisionBucketForRow(
   const accessType = bucketType as 'public' | 'private' | 'temp';
 
   // Read storage module config to check for endpoint/provider/CORS overrides
-  const smResult = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
-  const storageModule: StorageModuleRow | null = smResult.rows[0] ?? null;
+  const storageModule = await resolveStorageModule(pgClient, databaseId);
 
   // Resolve CORS origins using the 3-tier hierarchy
   const effectiveOrigins = resolveAllowedOrigins(
@@ -234,8 +303,7 @@ async function updateBucketCors(
   const s3BucketName = resolveBucketName(bucketKey, databaseId, options);
   const accessType = bucketType as 'public' | 'private' | 'temp';
 
-  const smResult = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
-  const storageModule: StorageModuleRow | null = smResult.rows[0] ?? null;
+  const storageModule = await resolveStorageModule(pgClient, databaseId);
 
   const effectiveOrigins = resolveAllowedOrigins(
     bucketAllowedOrigins,
@@ -287,6 +355,11 @@ export function createBucketProvisionerPlugin(
       input ProvisionBucketInput {
         """The logical bucket key (e.g., "public", "private")"""
         bucketKey: String!
+        """
+        Owner entity ID for entity-scoped bucket provisioning.
+        Omit for app-level (database-wide) storage.
+        """
+        ownerId: UUID
       }
 
       type ProvisionBucketPayload {
@@ -329,7 +402,7 @@ export function createBucketProvisionerPlugin(
           });
 
           return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
-            const { bucketKey } = input;
+            const { bucketKey, ownerId } = input;
 
             if (!bucketKey || typeof bucketKey !== 'string') {
               throw new Error('INVALID_BUCKET_KEY');
@@ -342,20 +415,30 @@ export function createBucketProvisionerPlugin(
                 throw new Error('DATABASE_NOT_FOUND');
               }
 
-              // Read storage module config
-              const smResult = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
-              if (smResult.rows.length === 0) {
-                throw new Error('STORAGE_MODULE_NOT_PROVISIONED');
+              // Resolve storage module (app-level or entity-scoped via ownerId)
+              const storageModule = await resolveStorageModule(pgClient, databaseId, ownerId);
+              if (!storageModule) {
+                throw new Error(
+                  ownerId
+                    ? 'STORAGE_MODULE_NOT_FOUND_FOR_OWNER: no storage module found for the given ownerId'
+                    : 'STORAGE_MODULE_NOT_PROVISIONED',
+                );
               }
-              const storageModule = smResult.rows[0] as StorageModuleRow;
 
               // Look up the bucket row (RLS enforced via pgSettings)
+              const hasOwner = ownerId && storageModule.membership_type !== null;
+              const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
               const bucketResult = await pgClient.query(
-                `SELECT id, key, type, is_public, allowed_origins
-                 FROM "${storageModule.buckets_schema}"."${storageModule.buckets_table}"
-                 WHERE key = $1
-                 LIMIT 1`,
-                [bucketKey],
+                hasOwner
+                  ? `SELECT id, key, type, is_public, allowed_origins
+                     FROM ${bucketsTable}
+                     WHERE key = $1 AND owner_id = $2
+                     LIMIT 1`
+                  : `SELECT id, key, type, is_public, allowed_origins
+                     FROM ${bucketsTable}
+                     WHERE key = $1
+                     LIMIT 1`,
+                hasOwner ? [bucketKey, ownerId] : [bucketKey],
               );
 
               if (bucketResult.rows.length === 0) {
@@ -522,13 +605,12 @@ export function createBucketProvisionerPlugin(
                       return;
                     }
 
-                    // Read the updated bucket row to get full state
-                    const smResult = await pgClient.query(STORAGE_MODULE_QUERY, [databaseId]);
-                    if (smResult.rows.length === 0) {
+                    // Read the storage module config (app-level; auto-hook doesn't have ownerId context)
+                    const storageModule = await resolveStorageModule(pgClient, databaseId);
+                    if (!storageModule) {
                       log.warn('CORS update skipped: storage module not provisioned');
                       return;
                     }
-                    const storageModule = smResult.rows[0] as StorageModuleRow;
 
                     // We need the bucket key — it may come from input or patch
                     // For updates, PostGraphile uses nodeId or the row's PK, so
@@ -543,9 +625,10 @@ export function createBucketProvisionerPlugin(
                     }
 
                     // Read the full bucket row (post-update) to get type + origins
+                    const bucketsTable = QuoteUtils.quoteQualifiedIdentifier(storageModule.buckets_schema, storageModule.buckets_table);
                     const bucketResult = await pgClient.query(
                       `SELECT id, key, type, is_public, allowed_origins
-                       FROM "${storageModule.buckets_schema}"."${storageModule.buckets_table}"
+                       FROM ${bucketsTable}
                        WHERE key = $1
                        LIMIT 1`,
                       [patchKey],

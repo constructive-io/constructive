@@ -48,9 +48,10 @@ CREATE TABLE IF NOT EXISTS metaschema_modules_public.storage_module (
   buckets_table_id uuid NOT NULL DEFAULT uuid_nil(),
   files_table_id uuid NOT NULL DEFAULT uuid_nil(),
   upload_requests_table_id uuid NOT NULL DEFAULT uuid_nil(),
-  buckets_table_name text NOT NULL DEFAULT 'buckets',
-  files_table_name text NOT NULL DEFAULT 'files',
-  upload_requests_table_name text NOT NULL DEFAULT 'upload_requests',
+  buckets_table_name text NOT NULL DEFAULT 'app_buckets',
+  files_table_name text NOT NULL DEFAULT 'app_files',
+  upload_requests_table_name text NOT NULL DEFAULT 'app_upload_requests',
+  membership_type int DEFAULT NULL,
   entity_table_id uuid NULL,
   endpoint text NULL,
   public_url_prefix text NULL,
@@ -66,5 +67,8 @@ CREATE TABLE IF NOT EXISTS metaschema_modules_public.storage_module (
 
 CREATE INDEX IF NOT EXISTS storage_module_database_id_idx
   ON metaschema_modules_public.storage_module (database_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS storage_module_unique_scope
+  ON metaschema_modules_public.storage_module (database_id, COALESCE(membership_type, -1));
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON metaschema_modules_public.storage_module TO administrator, authenticated, anonymous;
