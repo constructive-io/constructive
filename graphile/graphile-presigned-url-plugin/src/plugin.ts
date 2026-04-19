@@ -23,7 +23,7 @@ import { extendSchema, gql } from 'graphile-utils';
 import { Logger } from '@pgpmjs/logger';
 
 import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig, BucketConfig } from './types';
-import { getStorageModuleConfig, getBucketConfig, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
+import { getStorageModuleConfig, getStorageModuleConfigForOwner, getBucketConfig, resolveStorageModuleByFileId, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
 import { generatePresignedPutUrl, headObject } from './s3-signer';
 
 const log = new Logger('graphile-presigned-url:plugin');
@@ -147,6 +147,13 @@ export function createPresignedUrlPlugin(
       input RequestUploadUrlInput {
         """Bucket key (e.g., "public", "private")"""
         bucketKey: String!
+        """
+        Owner entity ID for entity-scoped uploads.
+        Omit for app-level (database-wide) storage.
+        When provided, resolves the storage module for the entity type
+        that owns this entity instance (e.g., a data room ID, team ID).
+        """
+        ownerId: UUID
         """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
         contentHash: String!
         """MIME type of the file (e.g., "image/png")"""
@@ -219,7 +226,7 @@ export function createPresignedUrlPlugin(
 
           return lambda($combined, async ({ input, withPgClient, pgSettings }: any) => {
             // --- Input validation ---
-            const { bucketKey, contentHash, contentType, size, filename } = input;
+            const { bucketKey, ownerId, contentHash, contentType, size, filename } = input;
 
             if (!bucketKey || typeof bucketKey !== 'string' || bucketKey.length > MAX_BUCKET_KEY_LENGTH) {
               throw new Error('INVALID_BUCKET_KEY');
@@ -242,9 +249,16 @@ export function createPresignedUrlPlugin(
                   throw new Error('DATABASE_NOT_FOUND');
                 }
 
-                const storageConfig = await getStorageModuleConfig(txClient, databaseId);
+                // --- Resolve storage module (app-level or entity-scoped) ---
+                const storageConfig = ownerId
+                  ? await getStorageModuleConfigForOwner(txClient, databaseId, ownerId)
+                  : await getStorageModuleConfig(txClient, databaseId);
                 if (!storageConfig) {
-                  throw new Error('STORAGE_MODULE_NOT_PROVISIONED');
+                  throw new Error(
+                    ownerId
+                      ? 'STORAGE_MODULE_NOT_FOUND_FOR_OWNER: no storage module found for the given ownerId'
+                      : 'STORAGE_MODULE_NOT_PROVISIONED',
+                  );
                 }
 
                 // --- Validate size against storage module default (bucket override checked below) ---
@@ -258,7 +272,7 @@ export function createPresignedUrlPlugin(
                 }
 
                 // --- Look up the bucket (cached; first miss queries via RLS) ---
-                const bucket = await getBucketConfig(txClient, storageConfig, databaseId, bucketKey);
+                const bucket = await getBucketConfig(txClient, storageConfig, databaseId, bucketKey, ownerId);
                 if (!bucket) {
                   throw new Error('BUCKET_NOT_FOUND');
                 }
@@ -319,21 +333,38 @@ export function createPresignedUrlPlugin(
                 }
 
                 // --- Create file record (status=pending) ---
+                // For app-level storage (no owner_id column), omit owner_id from the INSERT.
+                const hasOwnerColumn = storageConfig.membershipType !== null;
                 const fileResult = await txClient.query({
-                  text: `INSERT INTO ${storageConfig.filesQualifiedName}
-                   (bucket_id, key, content_type, content_hash, size, filename, owner_id, is_public, status)
-                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
-                   RETURNING id`,
-                  values: [
-                    bucket.id,
-                    s3Key,
-                    contentType,
-                    contentHash,
-                    size,
-                    filename || null,
-                    bucket.owner_id,
-                    bucket.is_public,
-                  ],
+                  text: hasOwnerColumn
+                    ? `INSERT INTO ${storageConfig.filesQualifiedName}
+                       (bucket_id, key, content_type, content_hash, size, filename, owner_id, is_public, status)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
+                       RETURNING id`
+                    : `INSERT INTO ${storageConfig.filesQualifiedName}
+                       (bucket_id, key, content_type, content_hash, size, filename, is_public, status)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+                       RETURNING id`,
+                  values: hasOwnerColumn
+                    ? [
+                        bucket.id,
+                        s3Key,
+                        contentType,
+                        contentHash,
+                        size,
+                        filename || null,
+                        bucket.owner_id,
+                        bucket.is_public,
+                      ]
+                    : [
+                        bucket.id,
+                        s3Key,
+                        contentType,
+                        contentHash,
+                        size,
+                        filename || null,
+                        bucket.is_public,
+                      ],
                 });
 
                 const fileId = fileResult.rows[0].id;
@@ -392,31 +423,18 @@ export function createPresignedUrlPlugin(
 
             return withPgClient(pgSettings, async (pgClient: any) => {
               return pgClient.withTransaction(async (txClient: any) => {
-                // --- Resolve storage module config ---
+                // --- Resolve storage module by file ID (probes all file tables) ---
                 const databaseId = await resolveDatabaseId(txClient);
                 if (!databaseId) {
                   throw new Error('DATABASE_NOT_FOUND');
                 }
 
-                const storageConfig = await getStorageModuleConfig(txClient, databaseId);
-                if (!storageConfig) {
-                  throw new Error('STORAGE_MODULE_NOT_PROVISIONED');
-                }
-
-                // --- Look up the file (RLS enforced) ---
-                const fileResult = await txClient.query({
-                  text: `SELECT id, key, content_type, status, bucket_id
-                   FROM ${storageConfig.filesQualifiedName}
-                   WHERE id = $1
-                   LIMIT 1`,
-                  values: [fileId],
-                });
-
-                if (fileResult.rows.length === 0) {
+                const resolved = await resolveStorageModuleByFileId(txClient, databaseId, fileId);
+                if (!resolved) {
                   throw new Error('FILE_NOT_FOUND');
                 }
 
-                const file = fileResult.rows[0];
+                const { storageConfig, file } = resolved;
 
                 if (file.status !== 'pending') {
                   // File is already confirmed or processed — idempotent success
@@ -429,7 +447,7 @@ export function createPresignedUrlPlugin(
 
                 // --- Verify file exists in S3 (per-database bucket) ---
                 const s3ForDb = resolveS3ForDatabase(options, storageConfig, databaseId);
-                const s3Head = await headObject(s3ForDb, file.key, file.content_type);
+                const s3Head = await headObject(s3ForDb, file.key, file.content_type as string);
 
                 if (!s3Head) {
                   throw new Error('FILE_NOT_IN_S3: the file has not been uploaded yet');

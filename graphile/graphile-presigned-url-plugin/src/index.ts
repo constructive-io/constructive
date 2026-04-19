@@ -30,7 +30,7 @@
 export { PresignedUrlPlugin, createPresignedUrlPlugin } from './plugin';
 export { createDownloadUrlPlugin } from './download-url-field';
 export { PresignedUrlPreset } from './preset';
-export { getStorageModuleConfig, getBucketConfig, clearStorageModuleCache, clearBucketCache, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
+export { getStorageModuleConfig, getStorageModuleConfigForOwner, getBucketConfig, resolveStorageModuleByFileId, clearStorageModuleCache, clearBucketCache, isS3BucketProvisioned, markS3BucketProvisioned } from './storage-module-cache';
 export { generatePresignedPutUrl, generatePresignedGetUrl, headObject } from './s3-signer';
 export type {
   BucketConfig,
