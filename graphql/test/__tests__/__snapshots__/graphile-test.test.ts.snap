@@ -3777,7 +3777,7 @@ and lifecycle settings.",
             {
               "defaultValue": null,
               "description": "Owner entity ID for entity-scoped bucket provisioning.
- Omit for app-level (database-wide) storage.",
+Omit for app-level (database-wide) storage.",
               "name": "ownerId",
               "type": {
                 "kind": "SCALAR",
