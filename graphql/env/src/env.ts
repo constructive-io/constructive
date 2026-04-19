@@ -27,6 +27,13 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     API_ANON_ROLE,
     API_ROLE_NAME,
     API_DEFAULT_DATABASE_ID,
+
+    EMBEDDER_PROVIDER,
+    EMBEDDER_MODEL,
+    EMBEDDER_BASE_URL,
+    CHAT_PROVIDER,
+    CHAT_MODEL,
+    CHAT_BASE_URL,
   } = env;
 
   return {
@@ -51,5 +58,23 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME }),
       ...(API_DEFAULT_DATABASE_ID && { defaultDatabaseId: API_DEFAULT_DATABASE_ID }),
     },
+    ...((EMBEDDER_PROVIDER || CHAT_PROVIDER) && {
+      llm: {
+        ...((EMBEDDER_PROVIDER || EMBEDDER_MODEL || EMBEDDER_BASE_URL) && {
+          embedder: {
+            ...(EMBEDDER_PROVIDER && { provider: EMBEDDER_PROVIDER }),
+            ...(EMBEDDER_MODEL && { model: EMBEDDER_MODEL }),
+            ...(EMBEDDER_BASE_URL && { baseUrl: EMBEDDER_BASE_URL }),
+          },
+        }),
+        ...((CHAT_PROVIDER || CHAT_MODEL || CHAT_BASE_URL) && {
+          chat: {
+            ...(CHAT_PROVIDER && { provider: CHAT_PROVIDER }),
+            ...(CHAT_MODEL && { model: CHAT_MODEL }),
+            ...(CHAT_BASE_URL && { baseUrl: CHAT_BASE_URL }),
+          },
+        }),
+      },
+    }),
   };
 };

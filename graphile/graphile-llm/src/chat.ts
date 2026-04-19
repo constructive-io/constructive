@@ -13,6 +13,7 @@
  */
 
 import OllamaClient from '@agentic-kit/ollama';
+import { getEnvOptions } from '@constructive-io/graphql-env';
 import type { ChatConfig, ChatFunction, ChatMessage, ChatOptions, LlmModuleData } from './types';
 
 // ─── Built-in Providers ─────────────────────────────────────────────────────
@@ -95,21 +96,22 @@ export function buildChatCompleterFromModule(data: LlmModuleData): ChatFunction 
 }
 
 /**
- * Resolve a chat completer from environment variables.
+ * Resolve a chat completer from environment variables via getEnvOptions().
  * This is a fallback for development when no llm_module or defaultChatCompleter is configured.
  *
- * Environment variables:
+ * Environment variables (parsed by @constructive-io/graphql-env):
  *   CHAT_PROVIDER - Provider name ('ollama')
  *   CHAT_MODEL    - Model identifier (e.g. 'llama3')
  *   CHAT_BASE_URL - Provider base URL
  */
 export function buildChatCompleterFromEnv(): ChatFunction | null {
-  const provider = process.env.CHAT_PROVIDER;
+  const { llm } = getEnvOptions();
+  const provider = llm?.chat?.provider;
   if (!provider) return null;
 
   return buildChatCompleter({
     provider,
-    model: process.env.CHAT_MODEL,
-    baseUrl: process.env.CHAT_BASE_URL,
+    model: llm?.chat?.model,
+    baseUrl: llm?.chat?.baseUrl,
   });
 }

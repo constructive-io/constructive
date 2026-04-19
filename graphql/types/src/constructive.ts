@@ -18,6 +18,7 @@ import {
   graphileFeatureDefaults,
   apiDefaults
 } from './graphile';
+import { LlmOptions } from './llm';
 
 /**
  * GraphQL-specific options for Constructive
@@ -56,6 +57,8 @@ export interface ConstructiveOptions extends PgpmOptions, ConstructiveGraphQLOpt
   migrations?: MigrationOptions;
   /** Job system configuration */
   jobs?: JobsConfig;
+  /** LLM provider configuration (embeddings, chat, RAG) */
+  llm?: LlmOptions;
 }
 
 /**
