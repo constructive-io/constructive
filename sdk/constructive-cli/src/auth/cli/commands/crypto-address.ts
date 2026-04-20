@@ -21,6 +21,7 @@ const fieldSchema: FieldSchema = {
   address: 'string',
   isVerified: 'boolean',
   isPrimary: 'boolean',
+  name: 'string',
   createdAt: 'string',
   updatedAt: 'string',
 };
@@ -80,6 +81,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       address: true,
       isVerified: true,
       isPrimary: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -107,6 +109,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       address: true,
       isVerified: true,
       isPrimary: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     };
@@ -146,6 +149,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           address: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -190,6 +194,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -204,6 +215,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           address: cleanedData.address,
           isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          name: cleanedData.name,
         },
         select: {
           id: true,
@@ -211,6 +223,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           address: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -261,6 +274,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CryptoAddressPatch;
@@ -275,6 +295,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           address: cleanedData.address,
           isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          name: cleanedData.name,
         },
         select: {
           id: true,
@@ -282,6 +303,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           address: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },

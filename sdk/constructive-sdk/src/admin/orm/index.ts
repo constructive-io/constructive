@@ -28,11 +28,12 @@ import { OrgLimitModel } from './models/orgLimit';
 import { MembershipTypeModel } from './models/membershipType';
 import { AppGrantModel } from './models/appGrant';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
+import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
-import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { OrgMemberProfileModel } from './models/orgMemberProfile';
+import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
 import { AppLevelModel } from './models/appLevel';
 import { AppInviteModel } from './models/appInvite';
 import { OrgInviteModel } from './models/orgInvite';
@@ -96,11 +97,12 @@ export function createClient(config: OrmClientConfig) {
     membershipType: new MembershipTypeModel(client),
     appGrant: new AppGrantModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
+    orgMembershipDefault: new OrgMembershipDefaultModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
     orgGrant: new OrgGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
-    orgMembershipDefault: new OrgMembershipDefaultModel(client),
     orgMemberProfile: new OrgMemberProfileModel(client),
+    orgMembershipSetting: new OrgMembershipSettingModel(client),
     appLevel: new AppLevelModel(client),
     appInvite: new AppInviteModel(client),
     orgInvite: new OrgInviteModel(client),

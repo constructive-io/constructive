@@ -20,12 +20,12 @@ import type {
   VerifyEmailInput,
   ProvisionNewUserInput,
   ResetPasswordInput,
-  CreateApiKeyInput,
   SignInCrossOriginInput,
   SignUpInput,
   RequestCrossOriginTokenInput,
   SignInInput,
   ExtendTokenExpiresInput,
+  CreateApiKeyInput,
   ForgotPasswordInput,
   SendVerificationEmailInput,
   RequestUploadUrlInput,
@@ -44,12 +44,12 @@ import type {
   VerifyEmailPayload,
   ProvisionNewUserPayload,
   ResetPasswordPayload,
-  CreateApiKeyPayload,
   SignInCrossOriginPayload,
   SignUpPayload,
   RequestCrossOriginTokenPayload,
   SignInPayload,
   ExtendTokenExpiresPayload,
+  CreateApiKeyPayload,
   ForgotPasswordPayload,
   SendVerificationEmailPayload,
   RequestUploadUrlPayload,
@@ -68,12 +68,12 @@ import type {
   VerifyEmailPayloadSelect,
   ProvisionNewUserPayloadSelect,
   ResetPasswordPayloadSelect,
-  CreateApiKeyPayloadSelect,
   SignInCrossOriginPayloadSelect,
   SignUpPayloadSelect,
   RequestCrossOriginTokenPayloadSelect,
   SignInPayloadSelect,
   ExtendTokenExpiresPayloadSelect,
+  CreateApiKeyPayloadSelect,
   ForgotPasswordPayloadSelect,
   SendVerificationEmailPayloadSelect,
   RequestUploadUrlPayloadSelect,
@@ -120,9 +120,6 @@ export interface ProvisionNewUserVariables {
 export interface ResetPasswordVariables {
   input: ResetPasswordInput;
 }
-export interface CreateApiKeyVariables {
-  input: CreateApiKeyInput;
-}
 export interface SignInCrossOriginVariables {
   input: SignInCrossOriginInput;
 }
@@ -137,6 +134,9 @@ export interface SignInVariables {
 }
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
+}
+export interface CreateApiKeyVariables {
+  input: CreateApiKeyInput;
 }
 export interface ForgotPasswordVariables {
   input: ForgotPasswordInput;
@@ -552,35 +552,6 @@ export function createMutationOperations(client: OrmClient) {
           'ResetPasswordPayload'
         ),
       }),
-    createApiKey: <S extends CreateApiKeyPayloadSelect>(
-      args: CreateApiKeyVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CreateApiKeyPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        createApiKey: InferSelectResult<CreateApiKeyPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CreateApiKey',
-        fieldName: 'createApiKey',
-        ...buildCustomDocument(
-          'mutation',
-          'CreateApiKey',
-          'createApiKey',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CreateApiKeyInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CreateApiKeyPayload'
-        ),
-      }),
     signInCrossOrigin: <S extends SignInCrossOriginPayloadSelect>(
       args: SignInCrossOriginVariables,
       options: {
@@ -724,6 +695,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ExtendTokenExpiresPayload'
+        ),
+      }),
+    createApiKey: <S extends CreateApiKeyPayloadSelect>(
+      args: CreateApiKeyVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CreateApiKeyPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        createApiKey: InferSelectResult<CreateApiKeyPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CreateApiKey',
+        fieldName: 'createApiKey',
+        ...buildCustomDocument(
+          'mutation',
+          'CreateApiKey',
+          'createApiKey',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CreateApiKeyInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CreateApiKeyPayload'
         ),
       }),
     forgotPassword: <S extends ForgotPasswordPayloadSelect>(

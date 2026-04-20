@@ -409,7 +409,7 @@ existing file ID and deduplicated=true with no uploadUrl.
   | `input` | RequestUploadUrlInput (required) |
 
 ```typescript
-const result = await db.mutation.requestUploadUrl({ input: { bucketKey: '<String>', contentHash: '<String>', contentType: '<String>', size: '<Int>', filename: '<String>' } }).execute();
+const result = await db.mutation.requestUploadUrl({ input: '<RequestUploadUrlInput>' }).execute();
 ```
 
 ### `db.mutation.confirmUpload`
@@ -444,7 +444,7 @@ and lifecycle settings.
   | `input` | ProvisionBucketInput (required) |
 
 ```typescript
-const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>' } }).execute();
+const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
 ```
 
 ---

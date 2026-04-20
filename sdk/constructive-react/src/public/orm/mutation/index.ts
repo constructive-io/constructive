@@ -30,7 +30,6 @@ import type {
   ResetPasswordInput,
   RemoveNodeAtPathInput,
   CopyTemplateToBlueprintInput,
-  CreateApiKeyInput,
   ProvisionSpatialRelationInput,
   BootstrapUserInput,
   SetFieldOrderInput,
@@ -48,6 +47,7 @@ import type {
   SignInCrossOriginInput,
   CreateUserDatabaseInput,
   ExtendTokenExpiresInput,
+  CreateApiKeyInput,
   SignUpInput,
   RequestCrossOriginTokenInput,
   SignInInput,
@@ -80,7 +80,6 @@ import type {
   ResetPasswordPayload,
   RemoveNodeAtPathPayload,
   CopyTemplateToBlueprintPayload,
-  CreateApiKeyPayload,
   ProvisionSpatialRelationPayload,
   BootstrapUserPayload,
   SetFieldOrderPayload,
@@ -98,6 +97,7 @@ import type {
   SignInCrossOriginPayload,
   CreateUserDatabasePayload,
   ExtendTokenExpiresPayload,
+  CreateApiKeyPayload,
   SignUpPayload,
   RequestCrossOriginTokenPayload,
   SignInPayload,
@@ -130,7 +130,6 @@ import type {
   ResetPasswordPayloadSelect,
   RemoveNodeAtPathPayloadSelect,
   CopyTemplateToBlueprintPayloadSelect,
-  CreateApiKeyPayloadSelect,
   ProvisionSpatialRelationPayloadSelect,
   BootstrapUserPayloadSelect,
   SetFieldOrderPayloadSelect,
@@ -148,6 +147,7 @@ import type {
   SignInCrossOriginPayloadSelect,
   CreateUserDatabasePayloadSelect,
   ExtendTokenExpiresPayloadSelect,
+  CreateApiKeyPayloadSelect,
   SignUpPayloadSelect,
   RequestCrossOriginTokenPayloadSelect,
   SignInPayloadSelect,
@@ -235,9 +235,6 @@ export interface RemoveNodeAtPathVariables {
  */
 export interface CopyTemplateToBlueprintVariables {
   input: CopyTemplateToBlueprintInput;
-}
-export interface CreateApiKeyVariables {
-  input: CreateApiKeyInput;
 }
 /**
  * Variables for provisionSpatialRelation
@@ -328,6 +325,9 @@ export interface CreateUserDatabaseVariables {
 }
 export interface ExtendTokenExpiresVariables {
   input: ExtendTokenExpiresInput;
+}
+export interface CreateApiKeyVariables {
+  input: CreateApiKeyInput;
 }
 export interface SignUpVariables {
   input: SignUpInput;
@@ -1049,35 +1049,6 @@ export function createMutationOperations(client: OrmClient) {
           'CopyTemplateToBlueprintPayload'
         ),
       }),
-    createApiKey: <S extends CreateApiKeyPayloadSelect>(
-      args: CreateApiKeyVariables,
-      options: {
-        select: S;
-      } & StrictSelect<S, CreateApiKeyPayloadSelect>
-    ) =>
-      new QueryBuilder<{
-        createApiKey: InferSelectResult<CreateApiKeyPayload, S> | null;
-      }>({
-        client,
-        operation: 'mutation',
-        operationName: 'CreateApiKey',
-        fieldName: 'createApiKey',
-        ...buildCustomDocument(
-          'mutation',
-          'CreateApiKey',
-          'createApiKey',
-          options.select,
-          args,
-          [
-            {
-              name: 'input',
-              type: 'CreateApiKeyInput!',
-            },
-          ],
-          connectionFieldsMap,
-          'CreateApiKeyPayload'
-        ),
-      }),
     provisionSpatialRelation: <S extends ProvisionSpatialRelationPayloadSelect>(
       args: ProvisionSpatialRelationVariables,
       options: {
@@ -1569,6 +1540,35 @@ export function createMutationOperations(client: OrmClient) {
           ],
           connectionFieldsMap,
           'ExtendTokenExpiresPayload'
+        ),
+      }),
+    createApiKey: <S extends CreateApiKeyPayloadSelect>(
+      args: CreateApiKeyVariables,
+      options: {
+        select: S;
+      } & StrictSelect<S, CreateApiKeyPayloadSelect>
+    ) =>
+      new QueryBuilder<{
+        createApiKey: InferSelectResult<CreateApiKeyPayload, S> | null;
+      }>({
+        client,
+        operation: 'mutation',
+        operationName: 'CreateApiKey',
+        fieldName: 'createApiKey',
+        ...buildCustomDocument(
+          'mutation',
+          'CreateApiKey',
+          'createApiKey',
+          options.select,
+          args,
+          [
+            {
+              name: 'input',
+              type: 'CreateApiKeyInput!',
+            },
+          ],
+          connectionFieldsMap,
+          'CreateApiKeyPayload'
         ),
       }),
     signUp: <S extends SignUpPayloadSelect>(

@@ -35,6 +35,7 @@ import type {
   OrgMemberProfile,
   OrgMembership,
   OrgMembershipDefault,
+  OrgMembershipSetting,
   OrgOwnerGrant,
   OrgPermission,
   OrgPermissionDefault,
@@ -376,6 +377,25 @@ export type AppMembershipDefaultOrderBy =
   | 'IS_APPROVED_DESC'
   | 'IS_VERIFIED_ASC'
   | 'IS_VERIFIED_DESC';
+/** Methods to use when ordering `OrgMembershipDefault`. */
+export type OrgMembershipDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `OrgClaimedInvite`. */
 export type OrgClaimedInviteOrderBy =
   | 'NATURAL'
@@ -458,29 +478,6 @@ export type AppLevelRequirementOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `OrgMembershipDefault`. */
-export type OrgMembershipDefaultOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'CREATED_BY_ASC'
-  | 'CREATED_BY_DESC'
-  | 'UPDATED_BY_ASC'
-  | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_ASC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
 /** Methods to use when ordering `OrgMemberProfile`. */
 export type OrgMemberProfileOrderBy =
   | 'NATURAL'
@@ -508,6 +505,35 @@ export type OrgMemberProfileOrderBy =
   | 'BIO_DESC'
   | 'PROFILE_PICTURE_ASC'
   | 'PROFILE_PICTURE_DESC';
+/** Methods to use when ordering `OrgMembershipSetting`. */
+export type OrgMembershipSettingOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'DELETE_MEMBER_CASCADE_CHILDREN_ASC'
+  | 'DELETE_MEMBER_CASCADE_CHILDREN_DESC'
+  | 'CREATE_CHILD_CASCADE_OWNERS_ASC'
+  | 'CREATE_CHILD_CASCADE_OWNERS_DESC'
+  | 'CREATE_CHILD_CASCADE_ADMINS_ASC'
+  | 'CREATE_CHILD_CASCADE_ADMINS_DESC'
+  | 'CREATE_CHILD_CASCADE_MEMBERS_ASC'
+  | 'CREATE_CHILD_CASCADE_MEMBERS_DESC'
+  | 'ALLOW_EXTERNAL_MEMBERS_ASC'
+  | 'ALLOW_EXTERNAL_MEMBERS_DESC'
+  | 'POPULATE_MEMBER_EMAIL_ASC'
+  | 'POPULATE_MEMBER_EMAIL_DESC';
 /** Methods to use when ordering `AppLevel`. */
 export type AppLevelOrderBy =
   | 'NATURAL'
@@ -1065,6 +1091,29 @@ export interface AppMembershipDefaultFilter {
   /** Negates the expression. */
   not?: AppMembershipDefaultFilter;
 }
+/** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipDefaultFilter;
+}
 /** A filter to be used against `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
@@ -1160,33 +1209,6 @@ export interface AppLevelRequirementFilter {
   or?: AppLevelRequirementFilter[];
   /** Negates the expression. */
   not?: AppLevelRequirementFilter;
-}
-/** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgMembershipDefaultFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `isApproved` field. */
-  isApproved?: BooleanFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
-  deleteMemberCascadeGroups?: BooleanFilter;
-  /** Filter by the object’s `createGroupsCascadeMembers` field. */
-  createGroupsCascadeMembers?: BooleanFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgMembershipDefaultFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgMembershipDefaultFilter[];
-  /** Negates the expression. */
-  not?: OrgMembershipDefaultFilter;
 }
 /** A filter to be used against `OrgMemberProfile` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgMemberProfileFilter {
@@ -1304,6 +1326,39 @@ export interface OrgMembershipFilter {
   orgMemberProfileByMembershipId?: OrgMemberProfileFilter;
   /** A related `orgMemberProfileByMembershipId` exists. */
   orgMemberProfileByMembershipIdExists?: boolean;
+}
+/** A filter to be used against `OrgMembershipSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeChildren` field. */
+  deleteMemberCascadeChildren?: BooleanFilter;
+  /** Filter by the object’s `createChildCascadeOwners` field. */
+  createChildCascadeOwners?: BooleanFilter;
+  /** Filter by the object’s `createChildCascadeAdmins` field. */
+  createChildCascadeAdmins?: BooleanFilter;
+  /** Filter by the object’s `createChildCascadeMembers` field. */
+  createChildCascadeMembers?: BooleanFilter;
+  /** Filter by the object’s `allowExternalMembers` field. */
+  allowExternalMembers?: BooleanFilter;
+  /** Filter by the object’s `populateMemberEmail` field. */
+  populateMemberEmail?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipSettingFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipSettingFilter;
 }
 /** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
 export interface AppLevelFilter {
@@ -1853,6 +1908,23 @@ export interface AppMembershipDefaultInput {
   /** Whether new members are automatically verified upon joining */
   isVerified?: boolean;
 }
+export interface CreateOrgMembershipDefaultInput {
+  clientMutationId?: string;
+  /** The `OrgMembershipDefault` to be created by this mutation. */
+  orgMembershipDefault: OrgMembershipDefaultInput;
+}
+/** An input for mutations affecting `OrgMembershipDefault` */
+export interface OrgMembershipDefaultInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether new members are automatically approved upon joining */
+  isApproved?: boolean;
+  /** References the entity these membership defaults apply to */
+  entityId: string;
+}
 export interface CreateOrgClaimedInviteInput {
   clientMutationId?: string;
   /** The `OrgClaimedInvite` to be created by this mutation. */
@@ -1933,27 +2005,6 @@ export interface AppLevelRequirementInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateOrgMembershipDefaultInput {
-  clientMutationId?: string;
-  /** The `OrgMembershipDefault` to be created by this mutation. */
-  orgMembershipDefault: OrgMembershipDefaultInput;
-}
-/** An input for mutations affecting `OrgMembershipDefault` */
-export interface OrgMembershipDefaultInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether new members are automatically approved upon joining */
-  isApproved?: boolean;
-  /** References the entity these membership defaults apply to */
-  entityId: string;
-  /** When an org member is deleted, whether to cascade-remove their group memberships */
-  deleteMemberCascadeGroups?: boolean;
-  /** When a group is created, whether to auto-add existing org members as group members */
-  createGroupsCascadeMembers?: boolean;
-}
 export interface CreateOrgMemberProfileInput {
   clientMutationId?: string;
   /** The `OrgMemberProfile` to be created by this mutation. */
@@ -1980,6 +2031,33 @@ export interface OrgMemberProfileInput {
   bio?: string;
   /** Profile picture visible to other entity members */
   profilePicture?: ConstructiveInternalTypeImage;
+}
+export interface CreateOrgMembershipSettingInput {
+  clientMutationId?: string;
+  /** The `OrgMembershipSetting` to be created by this mutation. */
+  orgMembershipSetting: OrgMembershipSettingInput;
+}
+/** An input for mutations affecting `OrgMembershipSetting` */
+export interface OrgMembershipSettingInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** References the entity these settings apply to */
+  entityId: string;
+  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
+  deleteMemberCascadeChildren?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
+  createChildCascadeOwners?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
+  createChildCascadeAdmins?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
+  createChildCascadeMembers?: boolean;
+  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
+  allowExternalMembers?: boolean;
+  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
+  populateMemberEmail?: boolean;
 }
 export interface CreateAppLevelInput {
   clientMutationId?: string;
@@ -2487,6 +2565,24 @@ export interface AppMembershipDefaultPatch {
   /** Whether new members are automatically verified upon joining */
   isVerified?: boolean;
 }
+export interface UpdateOrgMembershipDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgMembershipDefault` being updated. */
+  orgMembershipDefaultPatch: OrgMembershipDefaultPatch;
+}
+/** Represents an update to a `OrgMembershipDefault`. Fields that are set will be updated. */
+export interface OrgMembershipDefaultPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether new members are automatically approved upon joining */
+  isApproved?: boolean;
+  /** References the entity these membership defaults apply to */
+  entityId?: string;
+}
 export interface UpdateOrgClaimedInviteInput {
   clientMutationId?: string;
   id: string;
@@ -2571,28 +2667,6 @@ export interface AppLevelRequirementPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateOrgMembershipDefaultInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgMembershipDefault` being updated. */
-  orgMembershipDefaultPatch: OrgMembershipDefaultPatch;
-}
-/** Represents an update to a `OrgMembershipDefault`. Fields that are set will be updated. */
-export interface OrgMembershipDefaultPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether new members are automatically approved upon joining */
-  isApproved?: boolean;
-  /** References the entity these membership defaults apply to */
-  entityId?: string;
-  /** When an org member is deleted, whether to cascade-remove their group memberships */
-  deleteMemberCascadeGroups?: boolean;
-  /** When a group is created, whether to auto-add existing org members as group members */
-  createGroupsCascadeMembers?: boolean;
-}
 export interface UpdateOrgMemberProfileInput {
   clientMutationId?: string;
   id: string;
@@ -2622,6 +2696,34 @@ export interface OrgMemberProfilePatch {
   profilePicture?: ConstructiveInternalTypeImage;
   /** Upload for Profile picture visible to other entity members */
   profilePictureUpload?: File;
+}
+export interface UpdateOrgMembershipSettingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgMembershipSetting` being updated. */
+  orgMembershipSettingPatch: OrgMembershipSettingPatch;
+}
+/** Represents an update to a `OrgMembershipSetting`. Fields that are set will be updated. */
+export interface OrgMembershipSettingPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** References the entity these settings apply to */
+  entityId?: string;
+  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
+  deleteMemberCascadeChildren?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
+  createChildCascadeOwners?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
+  createChildCascadeAdmins?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
+  createChildCascadeMembers?: boolean;
+  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
+  allowExternalMembers?: boolean;
+  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
+  populateMemberEmail?: boolean;
 }
 export interface UpdateAppLevelInput {
   clientMutationId?: string;
@@ -2865,6 +2967,10 @@ export interface DeleteAppMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteOrgMembershipDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface DeleteOrgClaimedInviteInput {
   clientMutationId?: string;
   id: string;
@@ -2881,11 +2987,11 @@ export interface DeleteAppLevelRequirementInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteOrgMembershipDefaultInput {
+export interface DeleteOrgMemberProfileInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteOrgMemberProfileInput {
+export interface DeleteOrgMembershipSettingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2912,6 +3018,13 @@ export interface DeleteOrgMembershipInput {
 export interface RequestUploadUrlInput {
   /** Bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped uploads.
+   * Omit for app-level (database-wide) storage.
+   * When provided, resolves the storage module for the entity type
+   * that owns this entity instance (e.g., a data room ID, team ID).
+   */
+  ownerId?: string;
   /** SHA-256 content hash computed by the client (hex-encoded, 64 chars) */
   contentHash: string;
   /** MIME type of the file (e.g., "image/png") */
@@ -2928,6 +3041,11 @@ export interface ConfirmUploadInput {
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped bucket provisioning.
+   * Omit for app-level (database-wide) storage.
+   */
+  ownerId?: string;
 }
 /** A connection to a list of `OrgGetManagersRecord` values. */
 export interface OrgGetManagersConnection {
@@ -3090,6 +3208,13 @@ export interface AppMembershipDefaultConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `OrgMembershipDefault` values. */
+export interface OrgMembershipDefaultConnection {
+  nodes: OrgMembershipDefault[];
+  edges: OrgMembershipDefaultEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `OrgClaimedInvite` values. */
 export interface OrgClaimedInviteConnection {
   nodes: OrgClaimedInvite[];
@@ -3111,17 +3236,17 @@ export interface OrgChartEdgeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgMembershipDefault` values. */
-export interface OrgMembershipDefaultConnection {
-  nodes: OrgMembershipDefault[];
-  edges: OrgMembershipDefaultEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `OrgMemberProfile` values. */
 export interface OrgMemberProfileConnection {
   nodes: OrgMemberProfile[];
   edges: OrgMemberProfileEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgMembershipSetting` values. */
+export interface OrgMembershipSettingConnection {
+  nodes: OrgMembershipSetting[];
+  edges: OrgMembershipSettingEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -3292,6 +3417,12 @@ export interface CreateAppMembershipDefaultPayload {
   appMembershipDefault?: AppMembershipDefault | null;
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
 }
+export interface CreateOrgMembershipDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipDefault` that was created by this mutation. */
+  orgMembershipDefault?: OrgMembershipDefault | null;
+  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
+}
 export interface CreateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was created by this mutation. */
@@ -3316,17 +3447,17 @@ export interface CreateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface CreateOrgMembershipDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgMembershipDefault` that was created by this mutation. */
-  orgMembershipDefault?: OrgMembershipDefault | null;
-  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
-}
 export interface CreateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was created by this mutation. */
   orgMemberProfile?: OrgMemberProfile | null;
   orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface CreateOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was created by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface CreateAppLevelPayload {
   clientMutationId?: string | null;
@@ -3478,6 +3609,12 @@ export interface UpdateAppMembershipDefaultPayload {
   appMembershipDefault?: AppMembershipDefault | null;
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
 }
+export interface UpdateOrgMembershipDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipDefault` that was updated by this mutation. */
+  orgMembershipDefault?: OrgMembershipDefault | null;
+  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
+}
 export interface UpdateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was updated by this mutation. */
@@ -3502,17 +3639,17 @@ export interface UpdateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface UpdateOrgMembershipDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgMembershipDefault` that was updated by this mutation. */
-  orgMembershipDefault?: OrgMembershipDefault | null;
-  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
-}
 export interface UpdateOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was updated by this mutation. */
   orgMemberProfile?: OrgMemberProfile | null;
   orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface UpdateOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was updated by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface UpdateAppLevelPayload {
   clientMutationId?: string | null;
@@ -3664,6 +3801,12 @@ export interface DeleteAppMembershipDefaultPayload {
   appMembershipDefault?: AppMembershipDefault | null;
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
 }
+export interface DeleteOrgMembershipDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipDefault` that was deleted by this mutation. */
+  orgMembershipDefault?: OrgMembershipDefault | null;
+  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
+}
 export interface DeleteOrgClaimedInvitePayload {
   clientMutationId?: string | null;
   /** The `OrgClaimedInvite` that was deleted by this mutation. */
@@ -3688,17 +3831,17 @@ export interface DeleteAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface DeleteOrgMembershipDefaultPayload {
-  clientMutationId?: string | null;
-  /** The `OrgMembershipDefault` that was deleted by this mutation. */
-  orgMembershipDefault?: OrgMembershipDefault | null;
-  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
-}
 export interface DeleteOrgMemberProfilePayload {
   clientMutationId?: string | null;
   /** The `OrgMemberProfile` that was deleted by this mutation. */
   orgMemberProfile?: OrgMemberProfile | null;
   orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface DeleteOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was deleted by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface DeleteAppLevelPayload {
   clientMutationId?: string | null;
@@ -3913,6 +4056,12 @@ export interface AppMembershipDefaultEdge {
   /** The `AppMembershipDefault` at the end of the edge. */
   node?: AppMembershipDefault | null;
 }
+/** A `OrgMembershipDefault` edge in the connection. */
+export interface OrgMembershipDefaultEdge {
+  cursor?: string | null;
+  /** The `OrgMembershipDefault` at the end of the edge. */
+  node?: OrgMembershipDefault | null;
+}
 /** A `OrgClaimedInvite` edge in the connection. */
 export interface OrgClaimedInviteEdge {
   cursor?: string | null;
@@ -3931,17 +4080,17 @@ export interface OrgChartEdgeEdge {
   /** The `OrgChartEdge` at the end of the edge. */
   node?: OrgChartEdge | null;
 }
-/** A `OrgMembershipDefault` edge in the connection. */
-export interface OrgMembershipDefaultEdge {
-  cursor?: string | null;
-  /** The `OrgMembershipDefault` at the end of the edge. */
-  node?: OrgMembershipDefault | null;
-}
 /** A `OrgMemberProfile` edge in the connection. */
 export interface OrgMemberProfileEdge {
   cursor?: string | null;
   /** The `OrgMemberProfile` at the end of the edge. */
   node?: OrgMemberProfile | null;
+}
+/** A `OrgMembershipSetting` edge in the connection. */
+export interface OrgMembershipSettingEdge {
+  cursor?: string | null;
+  /** The `OrgMembershipSetting` at the end of the edge. */
+  node?: OrgMembershipSetting | null;
 }
 /** A `AppLevel` edge in the connection. */
 export interface AppLevelEdge {

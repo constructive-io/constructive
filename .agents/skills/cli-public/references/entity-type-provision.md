@@ -12,8 +12,8 @@ csdk entity-type-provision list --where.<field>.<op> <value> --orderBy <values>
 csdk entity-type-provision list --limit 10 --after <cursor>
 csdk entity-type-provision find-first --where.<field>.<op> <value>
 csdk entity-type-provision get --id <UUID>
-csdk entity-type-provision create --databaseId <UUID> --name <String> --prefix <String> [--description <String>] [--parentEntity <String>] [--tableName <String>] [--isVisible <Boolean>] [--hasLimits <Boolean>] [--hasProfiles <Boolean>] [--hasLevels <Boolean>] [--skipEntityPolicies <Boolean>] [--tableProvision <JSON>] [--outMembershipType <Int>] [--outEntityTableId <UUID>] [--outEntityTableName <String>] [--outInstalledModules <String>]
-csdk entity-type-provision update --id <UUID> [--databaseId <UUID>] [--name <String>] [--prefix <String>] [--description <String>] [--parentEntity <String>] [--tableName <String>] [--isVisible <Boolean>] [--hasLimits <Boolean>] [--hasProfiles <Boolean>] [--hasLevels <Boolean>] [--skipEntityPolicies <Boolean>] [--tableProvision <JSON>] [--outMembershipType <Int>] [--outEntityTableId <UUID>] [--outEntityTableName <String>] [--outInstalledModules <String>]
+csdk entity-type-provision create --databaseId <UUID> --name <String> --prefix <String> [--description <String>] [--parentEntity <String>] [--tableName <String>] [--isVisible <Boolean>] [--hasLimits <Boolean>] [--hasProfiles <Boolean>] [--hasLevels <Boolean>] [--hasStorage <Boolean>] [--storageConfig <JSON>] [--skipEntityPolicies <Boolean>] [--tableProvision <JSON>] [--outMembershipType <Int>] [--outEntityTableId <UUID>] [--outEntityTableName <String>] [--outInstalledModules <String>] [--outStorageModuleId <UUID>] [--outBucketsTableId <UUID>] [--outFilesTableId <UUID>]
+csdk entity-type-provision update --id <UUID> [--databaseId <UUID>] [--name <String>] [--prefix <String>] [--description <String>] [--parentEntity <String>] [--tableName <String>] [--isVisible <Boolean>] [--hasLimits <Boolean>] [--hasProfiles <Boolean>] [--hasLevels <Boolean>] [--hasStorage <Boolean>] [--storageConfig <JSON>] [--skipEntityPolicies <Boolean>] [--tableProvision <JSON>] [--outMembershipType <Int>] [--outEntityTableId <UUID>] [--outEntityTableName <String>] [--outInstalledModules <String>] [--outStorageModuleId <UUID>] [--outBucketsTableId <UUID>] [--outFilesTableId <UUID>]
 csdk entity-type-provision delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk entity-type-provision list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a entityTypeProvision
 
 ```bash
-csdk entity-type-provision create --databaseId <UUID> --name <String> --prefix <String> [--description <String>] [--parentEntity <String>] [--tableName <String>] [--isVisible <Boolean>] [--hasLimits <Boolean>] [--hasProfiles <Boolean>] [--hasLevels <Boolean>] [--skipEntityPolicies <Boolean>] [--tableProvision <JSON>] [--outMembershipType <Int>] [--outEntityTableId <UUID>] [--outEntityTableName <String>] [--outInstalledModules <String>]
+csdk entity-type-provision create --databaseId <UUID> --name <String> --prefix <String> [--description <String>] [--parentEntity <String>] [--tableName <String>] [--isVisible <Boolean>] [--hasLimits <Boolean>] [--hasProfiles <Boolean>] [--hasLevels <Boolean>] [--hasStorage <Boolean>] [--storageConfig <JSON>] [--skipEntityPolicies <Boolean>] [--tableProvision <JSON>] [--outMembershipType <Int>] [--outEntityTableId <UUID>] [--outEntityTableName <String>] [--outInstalledModules <String>] [--outStorageModuleId <UUID>] [--outBucketsTableId <UUID>] [--outFilesTableId <UUID>]
 ```
 
 ### Get a entityTypeProvision by id

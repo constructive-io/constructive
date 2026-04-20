@@ -7,8 +7,8 @@ User email addresses with verification and primary-email management
 ## Usage
 
 ```typescript
-useEmailsQuery({ selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
-useEmailQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
+useEmailsQuery({ selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } } })
+useEmailQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } } })
 useCreateEmailMutation({ selection: { fields: { id: true } } })
 useUpdateEmailMutation({ selection: { fields: { id: true } } })
 useDeleteEmailMutation({})
@@ -20,7 +20,7 @@ useDeleteEmailMutation({})
 
 ```typescript
 const { data, isLoading } = useEmailsQuery({
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useEmailsQuery({
 const { mutate } = useCreateEmailMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+mutate({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```

@@ -152,6 +152,14 @@ input RequestUploadUrlInput {
   """Bucket key (e.g., "public", "private")"""
   bucketKey: String!
 
+  """
+  Owner entity ID for entity-scoped uploads.
+  Omit for app-level (database-wide) storage.
+  When provided, resolves the storage module for the entity type
+  that owns this entity instance (e.g., a data room ID, team ID).
+  """
+  ownerId: UUID
+
   """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
   contentHash: String!
 
@@ -164,6 +172,11 @@ input RequestUploadUrlInput {
   """Original filename (optional, for display and Content-Disposition)"""
   filename: String
 }
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
 
 type RequestUploadUrlPayload {
   """Presigned PUT URL (null if file was deduplicated)"""
@@ -181,11 +194,6 @@ type RequestUploadUrlPayload {
   """Presigned URL expiry time (null if deduplicated)"""
   expiresAt: Datetime
 }
-
-"""
-A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-"""
-scalar UUID
 
 """
 A point in time as described by the [ISO
@@ -266,6 +274,12 @@ type Mutation {
 input ProvisionBucketInput {
   """The logical bucket key (e.g., "public", "private")"""
   bucketKey: String!
+
+  """
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
+  """
+  ownerId: UUID
 }
 
 type ProvisionBucketPayload {

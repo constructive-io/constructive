@@ -24,7 +24,9 @@ const db = createClient({
 | `email` | findMany, findOne, create, update, delete |
 | `phoneNumber` | findMany, findOne, create, update, delete |
 | `cryptoAddress` | findMany, findOne, create, update, delete |
+| `webauthnCredential` | findMany, findOne, create, update, delete |
 | `auditLog` | findMany, findOne, create, update, delete |
+| `identityProvider` | findMany, findOne, create, update, delete |
 | `roleType` | findMany, findOne, create, update, delete |
 | `userConnectedAccount` | findMany, findOne, create, update, delete |
 | `user` | findMany, findOne, create, update, delete |
@@ -44,6 +46,7 @@ CRUD operations for Email records.
 | `email` | ConstructiveInternalTypeEmail | Yes |
 | `isVerified` | Boolean | Yes |
 | `isPrimary` | Boolean | Yes |
+| `name` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 
@@ -51,13 +54,13 @@ CRUD operations for Email records.
 
 ```typescript
 // List all email records
-const items = await db.email.findMany({ select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.email.findMany({ select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.email.findOne({ id: '<UUID>', select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.email.findOne({ id: '<UUID>', select: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.email.create({ data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.email.create({ data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.email.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
@@ -80,6 +83,7 @@ CRUD operations for PhoneNumber records.
 | `number` | String | Yes |
 | `isVerified` | Boolean | Yes |
 | `isPrimary` | Boolean | Yes |
+| `name` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 
@@ -87,13 +91,13 @@ CRUD operations for PhoneNumber records.
 
 ```typescript
 // List all phoneNumber records
-const items = await db.phoneNumber.findMany({ select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.phoneNumber.findMany({ select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.phoneNumber.findOne({ id: '<UUID>', select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.phoneNumber.findOne({ id: '<UUID>', select: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.phoneNumber.create({ data: { ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.phoneNumber.create({ data: { ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.phoneNumber.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
@@ -115,6 +119,7 @@ CRUD operations for CryptoAddress records.
 | `address` | String | Yes |
 | `isVerified` | Boolean | Yes |
 | `isPrimary` | Boolean | Yes |
+| `name` | String | Yes |
 | `createdAt` | Datetime | No |
 | `updatedAt` | Datetime | No |
 
@@ -122,19 +127,61 @@ CRUD operations for CryptoAddress records.
 
 ```typescript
 // List all cryptoAddress records
-const items = await db.cryptoAddress.findMany({ select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const items = await db.cryptoAddress.findMany({ select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } }).execute();
 
 // Get one by id
-const item = await db.cryptoAddress.findOne({ id: '<UUID>', select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } }).execute();
+const item = await db.cryptoAddress.findOne({ id: '<UUID>', select: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } }).execute();
 
 // Create
-const created = await db.cryptoAddress.create({ data: { ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' }, select: { id: true } }).execute();
+const created = await db.cryptoAddress.create({ data: { ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.cryptoAddress.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
 
 // Delete
 const deleted = await db.cryptoAddress.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.webauthnCredential`
+
+CRUD operations for WebauthnCredential records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `id` | UUID | No |
+| `ownerId` | UUID | Yes |
+| `credentialId` | String | Yes |
+| `publicKey` | Base64EncodedBinary | Yes |
+| `signCount` | BigInt | Yes |
+| `webauthnUserId` | String | Yes |
+| `transports` | String | Yes |
+| `credentialDeviceType` | String | Yes |
+| `backupEligible` | Boolean | Yes |
+| `backupState` | Boolean | Yes |
+| `name` | String | Yes |
+| `lastUsedAt` | Datetime | Yes |
+| `createdAt` | Datetime | No |
+| `updatedAt` | Datetime | No |
+
+**Operations:**
+
+```typescript
+// List all webauthnCredential records
+const items = await db.webauthnCredential.findMany({ select: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } }).execute();
+
+// Get one by id
+const item = await db.webauthnCredential.findOne({ id: '<UUID>', select: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } }).execute();
+
+// Create
+const created = await db.webauthnCredential.create({ data: { ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', webauthnUserId: '<String>', transports: '<String>', credentialDeviceType: '<String>', backupEligible: '<Boolean>', backupState: '<Boolean>', name: '<String>', lastUsedAt: '<Datetime>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.webauthnCredential.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.webauthnCredential.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.auditLog`
@@ -171,6 +218,39 @@ const updated = await db.auditLog.update({ where: { id: '<UUID>' }, data: { even
 
 // Delete
 const deleted = await db.auditLog.delete({ where: { id: '<UUID>' } }).execute();
+```
+
+### `db.identityProvider`
+
+CRUD operations for IdentityProvider records.
+
+**Fields:**
+
+| Field | Type | Editable |
+|-------|------|----------|
+| `slug` | String | Yes |
+| `kind` | String | Yes |
+| `displayName` | String | Yes |
+| `enabled` | Boolean | Yes |
+| `isBuiltIn` | Boolean | Yes |
+
+**Operations:**
+
+```typescript
+// List all identityProvider records
+const items = await db.identityProvider.findMany({ select: { slug: true, kind: true, displayName: true, enabled: true, isBuiltIn: true } }).execute();
+
+// Get one by id
+const item = await db.identityProvider.findOne({ id: '<UUID>', select: { slug: true, kind: true, displayName: true, enabled: true, isBuiltIn: true } }).execute();
+
+// Create
+const created = await db.identityProvider.create({ data: { slug: '<String>', kind: '<String>', displayName: '<String>', enabled: '<Boolean>', isBuiltIn: '<Boolean>' }, select: { id: true } }).execute();
+
+// Update
+const updated = await db.identityProvider.update({ where: { id: '<UUID>' }, data: { slug: '<String>' }, select: { id: true } }).execute();
+
+// Delete
+const deleted = await db.identityProvider.delete({ where: { id: '<UUID>' } }).execute();
 ```
 
 ### `db.roleType`
@@ -537,21 +617,6 @@ resetPassword
 const result = await db.mutation.resetPassword({ input: { roleId: '<UUID>', resetToken: '<String>', newPassword: '<String>' } }).execute();
 ```
 
-### `db.mutation.createApiKey`
-
-createApiKey
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | CreateApiKeyInput (required) |
-
-```typescript
-const result = await db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>' } }).execute();
-```
-
 ### `db.mutation.signInCrossOrigin`
 
 signInCrossOrigin
@@ -627,6 +692,21 @@ extendTokenExpires
 const result = await db.mutation.extendTokenExpires({ input: { amount: '<IntervalInput>' } }).execute();
 ```
 
+### `db.mutation.createApiKey`
+
+createApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateApiKeyInput (required) |
+
+```typescript
+const result = await db.mutation.createApiKey({ input: { keyName: '<String>', accessLevel: '<String>', mfaLevel: '<String>', expiresIn: '<IntervalInput>' } }).execute();
+```
+
 ### `db.mutation.forgotPassword`
 
 forgotPassword
@@ -672,7 +752,7 @@ existing file ID and deduplicated=true with no uploadUrl.
   | `input` | RequestUploadUrlInput (required) |
 
 ```typescript
-const result = await db.mutation.requestUploadUrl({ input: { bucketKey: '<String>', contentHash: '<String>', contentType: '<String>', size: '<Int>', filename: '<String>' } }).execute();
+const result = await db.mutation.requestUploadUrl({ input: '<RequestUploadUrlInput>' }).execute();
 ```
 
 ### `db.mutation.confirmUpload`
@@ -707,7 +787,7 @@ and lifecycle settings.
   | `input` | ProvisionBucketInput (required) |
 
 ```typescript
-const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>' } }).execute();
+const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
 ```
 
 ---

@@ -10,7 +10,7 @@ and lifecycle settings.
 ## Usage
 
 ```typescript
-const { mutate } = useProvisionBucketMutation(); mutate({ input: { bucketKey: '<String>' } });
+const { mutate } = useProvisionBucketMutation(); mutate({ input: { bucketKey: '<String>', ownerId: '<UUID>' } });
 ```
 
 ## Examples
@@ -19,5 +19,5 @@ const { mutate } = useProvisionBucketMutation(); mutate({ input: { bucketKey: '<
 
 ```typescript
 const { mutate, isLoading } = useProvisionBucketMutation();
-mutate({ input: { bucketKey: '<String>' } });
+mutate({ input: { bucketKey: '<String>', ownerId: '<UUID>' } });
 ```
