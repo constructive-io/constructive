@@ -1975,8 +1975,8 @@ export type NotificationsModuleOrderBy =
   | 'PRIVATE_SCHEMA_ID_DESC'
   | 'NOTIFICATIONS_TABLE_ID_ASC'
   | 'NOTIFICATIONS_TABLE_ID_DESC'
-  | 'EVENTS_TABLE_ID_ASC'
-  | 'EVENTS_TABLE_ID_DESC'
+  | 'READ_STATE_TABLE_ID_ASC'
+  | 'READ_STATE_TABLE_ID_DESC'
   | 'PREFERENCES_TABLE_ID_ASC'
   | 'PREFERENCES_TABLE_ID_DESC'
   | 'CHANNELS_TABLE_ID_ASC'
@@ -1988,7 +1988,17 @@ export type NotificationsModuleOrderBy =
   | 'USER_SETTINGS_TABLE_ID_ASC'
   | 'USER_SETTINGS_TABLE_ID_DESC'
   | 'ORGANIZATION_SETTINGS_TABLE_ID_ASC'
-  | 'ORGANIZATION_SETTINGS_TABLE_ID_DESC';
+  | 'ORGANIZATION_SETTINGS_TABLE_ID_DESC'
+  | 'HAS_CHANNELS_ASC'
+  | 'HAS_CHANNELS_DESC'
+  | 'HAS_PREFERENCES_ASC'
+  | 'HAS_PREFERENCES_DESC'
+  | 'HAS_SETTINGS_EXTENSION_ASC'
+  | 'HAS_SETTINGS_EXTENSION_DESC'
+  | 'HAS_DIGEST_METADATA_ASC'
+  | 'HAS_DIGEST_METADATA_DESC'
+  | 'HAS_SUBSCRIPTIONS_ASC'
+  | 'HAS_SUBSCRIPTIONS_DESC';
 /** Methods to use when ordering `DatabaseProvisionModule`. */
 export type DatabaseProvisionModuleOrderBy =
   | 'NATURAL'
@@ -9265,8 +9275,8 @@ export interface NotificationsModuleFilter {
   privateSchemaId?: UUIDFilter;
   /** Filter by the object’s `notificationsTableId` field. */
   notificationsTableId?: UUIDFilter;
-  /** Filter by the object’s `eventsTableId` field. */
-  eventsTableId?: UUIDFilter;
+  /** Filter by the object’s `readStateTableId` field. */
+  readStateTableId?: UUIDFilter;
   /** Filter by the object’s `preferencesTableId` field. */
   preferencesTableId?: UUIDFilter;
   /** Filter by the object’s `channelsTableId` field. */
@@ -9279,6 +9289,16 @@ export interface NotificationsModuleFilter {
   userSettingsTableId?: UUIDFilter;
   /** Filter by the object’s `organizationSettingsTableId` field. */
   organizationSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `hasChannels` field. */
+  hasChannels?: BooleanFilter;
+  /** Filter by the object’s `hasPreferences` field. */
+  hasPreferences?: BooleanFilter;
+  /** Filter by the object’s `hasSettingsExtension` field. */
+  hasSettingsExtension?: BooleanFilter;
+  /** Filter by the object’s `hasDigestMetadata` field. */
+  hasDigestMetadata?: BooleanFilter;
+  /** Filter by the object’s `hasSubscriptions` field. */
+  hasSubscriptions?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: NotificationsModuleFilter[];
   /** Checks for any expressions in this list. */
@@ -9287,12 +9307,14 @@ export interface NotificationsModuleFilter {
   not?: NotificationsModuleFilter;
   /** Filter by the object’s `channelsTableByChannelsTableId` relation. */
   channelsTableByChannelsTableId?: TableFilter;
+  /** A related `channelsTableByChannelsTableId` exists. */
+  channelsTableByChannelsTableIdExists?: boolean;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `deliveryLogTableByDeliveryLogTableId` relation. */
   deliveryLogTableByDeliveryLogTableId?: TableFilter;
-  /** Filter by the object’s `eventsTableByEventsTableId` relation. */
-  eventsTableByEventsTableId?: TableFilter;
+  /** A related `deliveryLogTableByDeliveryLogTableId` exists. */
+  deliveryLogTableByDeliveryLogTableIdExists?: boolean;
   /** Filter by the object’s `notificationsTableByNotificationsTableId` relation. */
   notificationsTableByNotificationsTableId?: TableFilter;
   /** Filter by the object’s `organizationSettingsTableByOrganizationSettingsTableId` relation. */
@@ -9303,8 +9325,12 @@ export interface NotificationsModuleFilter {
   ownerTable?: TableFilter;
   /** Filter by the object’s `preferencesTableByPreferencesTableId` relation. */
   preferencesTableByPreferencesTableId?: TableFilter;
+  /** A related `preferencesTableByPreferencesTableId` exists. */
+  preferencesTableByPreferencesTableIdExists?: boolean;
   /** Filter by the object’s `privateSchema` relation. */
   privateSchema?: SchemaFilter;
+  /** Filter by the object’s `readStateTableByReadStateTableId` relation. */
+  readStateTableByReadStateTableId?: TableFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
   /** Filter by the object’s `userSettingsTableByUserSettingsTableId` relation. */
@@ -11288,26 +11314,6 @@ export interface DenormalizedTableFieldInput {
   funcName?: string;
   funcOrder?: number;
 }
-export interface CreateNotificationsModuleInput {
-  clientMutationId?: string;
-  /** The `NotificationsModule` to be created by this mutation. */
-  notificationsModule: NotificationsModuleInput;
-}
-/** An input for mutations affecting `NotificationsModule` */
-export interface NotificationsModuleInput {
-  id?: string;
-  databaseId: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  notificationsTableId?: string;
-  eventsTableId?: string;
-  preferencesTableId?: string;
-  channelsTableId?: string;
-  deliveryLogTableId?: string;
-  ownerTableId?: string;
-  userSettingsTableId?: string;
-  organizationSettingsTableId?: string;
-}
 export interface CreateEmailInput {
   clientMutationId?: string;
   /** The `Email` to be created by this mutation. */
@@ -11819,6 +11825,31 @@ export interface PolicyInput {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+}
+export interface CreateNotificationsModuleInput {
+  clientMutationId?: string;
+  /** The `NotificationsModule` to be created by this mutation. */
+  notificationsModule: NotificationsModuleInput;
+}
+/** An input for mutations affecting `NotificationsModule` */
+export interface NotificationsModuleInput {
+  id?: string;
+  databaseId: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  notificationsTableId?: string;
+  readStateTableId?: string;
+  preferencesTableId?: string;
+  channelsTableId?: string;
+  deliveryLogTableId?: string;
+  ownerTableId?: string;
+  userSettingsTableId?: string;
+  organizationSettingsTableId?: string;
+  hasChannels?: boolean;
+  hasPreferences?: boolean;
+  hasSettingsExtension?: boolean;
+  hasDigestMetadata?: boolean;
+  hasSubscriptions?: boolean;
 }
 export interface CreatePermissionsModuleInput {
   clientMutationId?: string;
@@ -14005,27 +14036,6 @@ export interface DenormalizedTableFieldPatch {
   funcName?: string;
   funcOrder?: number;
 }
-export interface UpdateNotificationsModuleInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `NotificationsModule` being updated. */
-  notificationsModulePatch: NotificationsModulePatch;
-}
-/** Represents an update to a `NotificationsModule`. Fields that are set will be updated. */
-export interface NotificationsModulePatch {
-  id?: string;
-  databaseId?: string;
-  schemaId?: string;
-  privateSchemaId?: string;
-  notificationsTableId?: string;
-  eventsTableId?: string;
-  preferencesTableId?: string;
-  channelsTableId?: string;
-  deliveryLogTableId?: string;
-  ownerTableId?: string;
-  userSettingsTableId?: string;
-  organizationSettingsTableId?: string;
-}
 export interface UpdateEmailInput {
   clientMutationId?: string;
   id: string;
@@ -14532,6 +14542,32 @@ export interface PolicyPatch {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UpdateNotificationsModuleInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `NotificationsModule` being updated. */
+  notificationsModulePatch: NotificationsModulePatch;
+}
+/** Represents an update to a `NotificationsModule`. Fields that are set will be updated. */
+export interface NotificationsModulePatch {
+  id?: string;
+  databaseId?: string;
+  schemaId?: string;
+  privateSchemaId?: string;
+  notificationsTableId?: string;
+  readStateTableId?: string;
+  preferencesTableId?: string;
+  channelsTableId?: string;
+  deliveryLogTableId?: string;
+  ownerTableId?: string;
+  userSettingsTableId?: string;
+  organizationSettingsTableId?: string;
+  hasChannels?: boolean;
+  hasPreferences?: boolean;
+  hasSettingsExtension?: boolean;
+  hasDigestMetadata?: boolean;
+  hasSubscriptions?: boolean;
 }
 export interface UpdatePermissionsModuleInput {
   clientMutationId?: string;
@@ -15764,10 +15800,6 @@ export interface DeleteDenormalizedTableFieldInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteNotificationsModuleInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface DeleteEmailInput {
   clientMutationId?: string;
   id: string;
@@ -15848,6 +15880,10 @@ export interface DeleteSpatialRelationInput {
   id: string;
 }
 export interface DeletePolicyInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteNotificationsModuleInput {
   clientMutationId?: string;
   id: string;
 }
@@ -16499,13 +16535,6 @@ export interface DenormalizedTableFieldConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `NotificationsModule` values. */
-export interface NotificationsModuleConnection {
-  nodes: NotificationsModule[];
-  edges: NotificationsModuleEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `Email` values. */
 export interface EmailConnection {
   nodes: Email[];
@@ -16657,6 +16686,13 @@ export interface SpatialRelationConnection {
 export interface PolicyConnection {
   nodes: Policy[];
   edges: PolicyEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `NotificationsModule` values. */
+export interface NotificationsModuleConnection {
+  nodes: NotificationsModule[];
+  edges: NotificationsModuleEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -17427,12 +17463,6 @@ export interface CreateDenormalizedTableFieldPayload {
   denormalizedTableField?: DenormalizedTableField | null;
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
-export interface CreateNotificationsModulePayload {
-  clientMutationId?: string | null;
-  /** The `NotificationsModule` that was created by this mutation. */
-  notificationsModule?: NotificationsModule | null;
-  notificationsModuleEdge?: NotificationsModuleEdge | null;
-}
 export interface CreateEmailPayload {
   clientMutationId?: string | null;
   /** The `Email` that was created by this mutation. */
@@ -17562,6 +17592,12 @@ export interface CreatePolicyPayload {
   /** The `Policy` that was created by this mutation. */
   policy?: Policy | null;
   policyEdge?: PolicyEdge | null;
+}
+export interface CreateNotificationsModulePayload {
+  clientMutationId?: string | null;
+  /** The `NotificationsModule` that was created by this mutation. */
+  notificationsModule?: NotificationsModule | null;
+  notificationsModuleEdge?: NotificationsModuleEdge | null;
 }
 export interface CreatePermissionsModulePayload {
   clientMutationId?: string | null;
@@ -18109,12 +18145,6 @@ export interface UpdateDenormalizedTableFieldPayload {
   denormalizedTableField?: DenormalizedTableField | null;
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
-export interface UpdateNotificationsModulePayload {
-  clientMutationId?: string | null;
-  /** The `NotificationsModule` that was updated by this mutation. */
-  notificationsModule?: NotificationsModule | null;
-  notificationsModuleEdge?: NotificationsModuleEdge | null;
-}
 export interface UpdateEmailPayload {
   clientMutationId?: string | null;
   /** The `Email` that was updated by this mutation. */
@@ -18234,6 +18264,12 @@ export interface UpdatePolicyPayload {
   /** The `Policy` that was updated by this mutation. */
   policy?: Policy | null;
   policyEdge?: PolicyEdge | null;
+}
+export interface UpdateNotificationsModulePayload {
+  clientMutationId?: string | null;
+  /** The `NotificationsModule` that was updated by this mutation. */
+  notificationsModule?: NotificationsModule | null;
+  notificationsModuleEdge?: NotificationsModuleEdge | null;
 }
 export interface UpdatePermissionsModulePayload {
   clientMutationId?: string | null;
@@ -18781,12 +18817,6 @@ export interface DeleteDenormalizedTableFieldPayload {
   denormalizedTableField?: DenormalizedTableField | null;
   denormalizedTableFieldEdge?: DenormalizedTableFieldEdge | null;
 }
-export interface DeleteNotificationsModulePayload {
-  clientMutationId?: string | null;
-  /** The `NotificationsModule` that was deleted by this mutation. */
-  notificationsModule?: NotificationsModule | null;
-  notificationsModuleEdge?: NotificationsModuleEdge | null;
-}
 export interface DeleteEmailPayload {
   clientMutationId?: string | null;
   /** The `Email` that was deleted by this mutation. */
@@ -18906,6 +18936,12 @@ export interface DeletePolicyPayload {
   /** The `Policy` that was deleted by this mutation. */
   policy?: Policy | null;
   policyEdge?: PolicyEdge | null;
+}
+export interface DeleteNotificationsModulePayload {
+  clientMutationId?: string | null;
+  /** The `NotificationsModule` that was deleted by this mutation. */
+  notificationsModule?: NotificationsModule | null;
+  notificationsModuleEdge?: NotificationsModuleEdge | null;
 }
 export interface DeletePermissionsModulePayload {
   clientMutationId?: string | null;
@@ -19534,12 +19570,6 @@ export interface DenormalizedTableFieldEdge {
   /** The `DenormalizedTableField` at the end of the edge. */
   node?: DenormalizedTableField | null;
 }
-/** A `NotificationsModule` edge in the connection. */
-export interface NotificationsModuleEdge {
-  cursor?: string | null;
-  /** The `NotificationsModule` at the end of the edge. */
-  node?: NotificationsModule | null;
-}
 /** A `Email` edge in the connection. */
 export interface EmailEdge {
   cursor?: string | null;
@@ -19671,6 +19701,12 @@ export interface PolicyEdge {
   cursor?: string | null;
   /** The `Policy` at the end of the edge. */
   node?: Policy | null;
+}
+/** A `NotificationsModule` edge in the connection. */
+export interface NotificationsModuleEdge {
+  cursor?: string | null;
+  /** The `NotificationsModule` at the end of the edge. */
+  node?: NotificationsModule | null;
 }
 /** A `PermissionsModule` edge in the connection. */
 export interface PermissionsModuleEdge {

@@ -1576,13 +1576,18 @@ export interface NotificationsModule {
   schemaId?: string | null;
   privateSchemaId?: string | null;
   notificationsTableId?: string | null;
-  eventsTableId?: string | null;
+  readStateTableId?: string | null;
   preferencesTableId?: string | null;
   channelsTableId?: string | null;
   deliveryLogTableId?: string | null;
   ownerTableId?: string | null;
   userSettingsTableId?: string | null;
   organizationSettingsTableId?: string | null;
+  hasChannels?: boolean | null;
+  hasPreferences?: boolean | null;
+  hasSettingsExtension?: boolean | null;
+  hasDigestMetadata?: boolean | null;
+  hasSubscriptions?: boolean | null;
 }
 /** Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. */
 export interface DatabaseProvisionModule {
@@ -2797,12 +2802,12 @@ export interface NotificationsModuleRelations {
   channelsTableByChannelsTableId?: Table | null;
   database?: Database | null;
   deliveryLogTableByDeliveryLogTableId?: Table | null;
-  eventsTableByEventsTableId?: Table | null;
   notificationsTableByNotificationsTableId?: Table | null;
   organizationSettingsTableByOrganizationSettingsTableId?: Table | null;
   ownerTable?: Table | null;
   preferencesTableByPreferencesTableId?: Table | null;
   privateSchema?: Schema | null;
+  readStateTableByReadStateTableId?: Table | null;
   schema?: Schema | null;
   userSettingsTableByUserSettingsTableId?: Table | null;
 }
@@ -5447,13 +5452,18 @@ export type NotificationsModuleSelect = {
   schemaId?: boolean;
   privateSchemaId?: boolean;
   notificationsTableId?: boolean;
-  eventsTableId?: boolean;
+  readStateTableId?: boolean;
   preferencesTableId?: boolean;
   channelsTableId?: boolean;
   deliveryLogTableId?: boolean;
   ownerTableId?: boolean;
   userSettingsTableId?: boolean;
   organizationSettingsTableId?: boolean;
+  hasChannels?: boolean;
+  hasPreferences?: boolean;
+  hasSettingsExtension?: boolean;
+  hasDigestMetadata?: boolean;
+  hasSubscriptions?: boolean;
   channelsTableByChannelsTableId?: {
     select: TableSelect;
   };
@@ -5461,9 +5471,6 @@ export type NotificationsModuleSelect = {
     select: DatabaseSelect;
   };
   deliveryLogTableByDeliveryLogTableId?: {
-    select: TableSelect;
-  };
-  eventsTableByEventsTableId?: {
     select: TableSelect;
   };
   notificationsTableByNotificationsTableId?: {
@@ -5480,6 +5487,9 @@ export type NotificationsModuleSelect = {
   };
   privateSchema?: {
     select: SchemaSelect;
+  };
+  readStateTableByReadStateTableId?: {
+    select: TableSelect;
   };
   schema?: {
     select: SchemaSelect;
@@ -9609,8 +9619,8 @@ export interface NotificationsModuleFilter {
   privateSchemaId?: UUIDFilter;
   /** Filter by the object’s `notificationsTableId` field. */
   notificationsTableId?: UUIDFilter;
-  /** Filter by the object’s `eventsTableId` field. */
-  eventsTableId?: UUIDFilter;
+  /** Filter by the object’s `readStateTableId` field. */
+  readStateTableId?: UUIDFilter;
   /** Filter by the object’s `preferencesTableId` field. */
   preferencesTableId?: UUIDFilter;
   /** Filter by the object’s `channelsTableId` field. */
@@ -9623,6 +9633,16 @@ export interface NotificationsModuleFilter {
   userSettingsTableId?: UUIDFilter;
   /** Filter by the object’s `organizationSettingsTableId` field. */
   organizationSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `hasChannels` field. */
+  hasChannels?: BooleanFilter;
+  /** Filter by the object’s `hasPreferences` field. */
+  hasPreferences?: BooleanFilter;
+  /** Filter by the object’s `hasSettingsExtension` field. */
+  hasSettingsExtension?: BooleanFilter;
+  /** Filter by the object’s `hasDigestMetadata` field. */
+  hasDigestMetadata?: BooleanFilter;
+  /** Filter by the object’s `hasSubscriptions` field. */
+  hasSubscriptions?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: NotificationsModuleFilter[];
   /** Checks for any expressions in this list. */
@@ -9631,12 +9651,14 @@ export interface NotificationsModuleFilter {
   not?: NotificationsModuleFilter;
   /** Filter by the object’s `channelsTableByChannelsTableId` relation. */
   channelsTableByChannelsTableId?: TableFilter;
+  /** A related `channelsTableByChannelsTableId` exists. */
+  channelsTableByChannelsTableIdExists?: boolean;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `deliveryLogTableByDeliveryLogTableId` relation. */
   deliveryLogTableByDeliveryLogTableId?: TableFilter;
-  /** Filter by the object’s `eventsTableByEventsTableId` relation. */
-  eventsTableByEventsTableId?: TableFilter;
+  /** A related `deliveryLogTableByDeliveryLogTableId` exists. */
+  deliveryLogTableByDeliveryLogTableIdExists?: boolean;
   /** Filter by the object’s `notificationsTableByNotificationsTableId` relation. */
   notificationsTableByNotificationsTableId?: TableFilter;
   /** Filter by the object’s `organizationSettingsTableByOrganizationSettingsTableId` relation. */
@@ -9647,8 +9669,12 @@ export interface NotificationsModuleFilter {
   ownerTable?: TableFilter;
   /** Filter by the object’s `preferencesTableByPreferencesTableId` relation. */
   preferencesTableByPreferencesTableId?: TableFilter;
+  /** A related `preferencesTableByPreferencesTableId` exists. */
+  preferencesTableByPreferencesTableIdExists?: boolean;
   /** Filter by the object’s `privateSchema` relation. */
   privateSchema?: SchemaFilter;
+  /** Filter by the object’s `readStateTableByReadStateTableId` relation. */
+  readStateTableByReadStateTableId?: TableFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
   /** Filter by the object’s `userSettingsTableByUserSettingsTableId` relation. */
@@ -13124,8 +13150,8 @@ export type NotificationsModuleOrderBy =
   | 'PRIVATE_SCHEMA_ID_DESC'
   | 'NOTIFICATIONS_TABLE_ID_ASC'
   | 'NOTIFICATIONS_TABLE_ID_DESC'
-  | 'EVENTS_TABLE_ID_ASC'
-  | 'EVENTS_TABLE_ID_DESC'
+  | 'READ_STATE_TABLE_ID_ASC'
+  | 'READ_STATE_TABLE_ID_DESC'
   | 'PREFERENCES_TABLE_ID_ASC'
   | 'PREFERENCES_TABLE_ID_DESC'
   | 'CHANNELS_TABLE_ID_ASC'
@@ -13137,7 +13163,17 @@ export type NotificationsModuleOrderBy =
   | 'USER_SETTINGS_TABLE_ID_ASC'
   | 'USER_SETTINGS_TABLE_ID_DESC'
   | 'ORGANIZATION_SETTINGS_TABLE_ID_ASC'
-  | 'ORGANIZATION_SETTINGS_TABLE_ID_DESC';
+  | 'ORGANIZATION_SETTINGS_TABLE_ID_DESC'
+  | 'HAS_CHANNELS_ASC'
+  | 'HAS_CHANNELS_DESC'
+  | 'HAS_PREFERENCES_ASC'
+  | 'HAS_PREFERENCES_DESC'
+  | 'HAS_SETTINGS_EXTENSION_ASC'
+  | 'HAS_SETTINGS_EXTENSION_DESC'
+  | 'HAS_DIGEST_METADATA_ASC'
+  | 'HAS_DIGEST_METADATA_DESC'
+  | 'HAS_SUBSCRIPTIONS_ASC'
+  | 'HAS_SUBSCRIPTIONS_DESC';
 export type DatabaseProvisionModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -16614,13 +16650,18 @@ export interface CreateNotificationsModuleInput {
     schemaId?: string;
     privateSchemaId?: string;
     notificationsTableId?: string;
-    eventsTableId?: string;
+    readStateTableId?: string;
     preferencesTableId?: string;
     channelsTableId?: string;
     deliveryLogTableId?: string;
     ownerTableId?: string;
     userSettingsTableId?: string;
     organizationSettingsTableId?: string;
+    hasChannels?: boolean;
+    hasPreferences?: boolean;
+    hasSettingsExtension?: boolean;
+    hasDigestMetadata?: boolean;
+    hasSubscriptions?: boolean;
   };
 }
 export interface NotificationsModulePatch {
@@ -16628,13 +16669,18 @@ export interface NotificationsModulePatch {
   schemaId?: string | null;
   privateSchemaId?: string | null;
   notificationsTableId?: string | null;
-  eventsTableId?: string | null;
+  readStateTableId?: string | null;
   preferencesTableId?: string | null;
   channelsTableId?: string | null;
   deliveryLogTableId?: string | null;
   ownerTableId?: string | null;
   userSettingsTableId?: string | null;
   organizationSettingsTableId?: string | null;
+  hasChannels?: boolean | null;
+  hasPreferences?: boolean | null;
+  hasSettingsExtension?: boolean | null;
+  hasDigestMetadata?: boolean | null;
+  hasSubscriptions?: boolean | null;
 }
 export interface UpdateNotificationsModuleInput {
   clientMutationId?: string;
@@ -23019,8 +23065,8 @@ export interface NotificationsModuleFilter {
   privateSchemaId?: UUIDFilter;
   /** Filter by the object’s `notificationsTableId` field. */
   notificationsTableId?: UUIDFilter;
-  /** Filter by the object’s `eventsTableId` field. */
-  eventsTableId?: UUIDFilter;
+  /** Filter by the object’s `readStateTableId` field. */
+  readStateTableId?: UUIDFilter;
   /** Filter by the object’s `preferencesTableId` field. */
   preferencesTableId?: UUIDFilter;
   /** Filter by the object’s `channelsTableId` field. */
@@ -23033,6 +23079,16 @@ export interface NotificationsModuleFilter {
   userSettingsTableId?: UUIDFilter;
   /** Filter by the object’s `organizationSettingsTableId` field. */
   organizationSettingsTableId?: UUIDFilter;
+  /** Filter by the object’s `hasChannels` field. */
+  hasChannels?: BooleanFilter;
+  /** Filter by the object’s `hasPreferences` field. */
+  hasPreferences?: BooleanFilter;
+  /** Filter by the object’s `hasSettingsExtension` field. */
+  hasSettingsExtension?: BooleanFilter;
+  /** Filter by the object’s `hasDigestMetadata` field. */
+  hasDigestMetadata?: BooleanFilter;
+  /** Filter by the object’s `hasSubscriptions` field. */
+  hasSubscriptions?: BooleanFilter;
   /** Checks for all expressions in this list. */
   and?: NotificationsModuleFilter[];
   /** Checks for any expressions in this list. */
@@ -23041,12 +23097,14 @@ export interface NotificationsModuleFilter {
   not?: NotificationsModuleFilter;
   /** Filter by the object’s `channelsTableByChannelsTableId` relation. */
   channelsTableByChannelsTableId?: TableFilter;
+  /** A related `channelsTableByChannelsTableId` exists. */
+  channelsTableByChannelsTableIdExists?: boolean;
   /** Filter by the object’s `database` relation. */
   database?: DatabaseFilter;
   /** Filter by the object’s `deliveryLogTableByDeliveryLogTableId` relation. */
   deliveryLogTableByDeliveryLogTableId?: TableFilter;
-  /** Filter by the object’s `eventsTableByEventsTableId` relation. */
-  eventsTableByEventsTableId?: TableFilter;
+  /** A related `deliveryLogTableByDeliveryLogTableId` exists. */
+  deliveryLogTableByDeliveryLogTableIdExists?: boolean;
   /** Filter by the object’s `notificationsTableByNotificationsTableId` relation. */
   notificationsTableByNotificationsTableId?: TableFilter;
   /** Filter by the object’s `organizationSettingsTableByOrganizationSettingsTableId` relation. */
@@ -23057,8 +23115,12 @@ export interface NotificationsModuleFilter {
   ownerTable?: TableFilter;
   /** Filter by the object’s `preferencesTableByPreferencesTableId` relation. */
   preferencesTableByPreferencesTableId?: TableFilter;
+  /** A related `preferencesTableByPreferencesTableId` exists. */
+  preferencesTableByPreferencesTableIdExists?: boolean;
   /** Filter by the object’s `privateSchema` relation. */
   privateSchema?: SchemaFilter;
+  /** Filter by the object’s `readStateTableByReadStateTableId` relation. */
+  readStateTableByReadStateTableId?: TableFilter;
   /** Filter by the object’s `schema` relation. */
   schema?: SchemaFilter;
   /** Filter by the object’s `userSettingsTableByUserSettingsTableId` relation. */

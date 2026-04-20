@@ -2554,16 +2554,21 @@ CRUD operations for NotificationsModule records.
 | `schemaId` | UUID |
 | `privateSchemaId` | UUID |
 | `notificationsTableId` | UUID |
-| `eventsTableId` | UUID |
+| `readStateTableId` | UUID |
 | `preferencesTableId` | UUID |
 | `channelsTableId` | UUID |
 | `deliveryLogTableId` | UUID |
 | `ownerTableId` | UUID |
 | `userSettingsTableId` | UUID |
 | `organizationSettingsTableId` | UUID |
+| `hasChannels` | Boolean |
+| `hasPreferences` | Boolean |
+| `hasSettingsExtension` | Boolean |
+| `hasDigestMetadata` | Boolean |
+| `hasSubscriptions` | Boolean |
 
 **Required create fields:** `databaseId`
-**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `notificationsTableId`, `eventsTableId`, `preferencesTableId`, `channelsTableId`, `deliveryLogTableId`, `ownerTableId`, `userSettingsTableId`, `organizationSettingsTableId`
+**Optional create fields (backend defaults):** `schemaId`, `privateSchemaId`, `notificationsTableId`, `readStateTableId`, `preferencesTableId`, `channelsTableId`, `deliveryLogTableId`, `ownerTableId`, `userSettingsTableId`, `organizationSettingsTableId`, `hasChannels`, `hasPreferences`, `hasSettingsExtension`, `hasDigestMetadata`, `hasSubscriptions`
 
 ### `database-provision-module`
 
