@@ -7,7 +7,7 @@ Composable relation provisioning: creates FK fields, indexes, unique constraints
 ## Usage
 
 ```bash
-csdk provision-relation --input.clientMutationId <String> --input.databaseId <UUID> --input.relationType <String> --input.sourceTableId <UUID> --input.targetTableId <UUID> --input.fieldName <String> --input.deleteAction <String> --input.isRequired <Boolean> --input.apiRequired <Boolean> --input.createIndex <Boolean> --input.junctionTableId <UUID> --input.junctionTableName <String> --input.junctionSchemaId <UUID> --input.sourceFieldName <String> --input.targetFieldName <String> --input.useCompositeKey <Boolean> --input.exposeInApi <Boolean> --input.nodes <JSON> --input.grants <JSON> --input.grantRoles <String> --input.policies <JSON>
+csdk provision-relation --input.clientMutationId <String> --input.databaseId <UUID> --input.relationType <String> --input.sourceTableId <UUID> --input.targetTableId <UUID> --input.fieldName <String> --input.deleteAction <String> --input.isRequired <Boolean> --input.apiRequired <Boolean> --input.createIndex <Boolean> --input.junctionTableId <UUID> --input.junctionTableName <String> --input.junctionSchemaId <UUID> --input.sourceFieldName <String> --input.targetFieldName <String> --input.useCompositeKey <Boolean> --input.exposeInApi <Boolean> --input.nodes <JSON> --input.grants <JSON> --input.policies <JSON>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk provision-relation --input.clientMutationId <String> --input.databaseId <UU
 ### Run provisionRelation
 
 ```bash
-csdk provision-relation --input.clientMutationId <String> --input.databaseId <UUID> --input.relationType <String> --input.sourceTableId <UUID> --input.targetTableId <UUID> --input.fieldName <String> --input.deleteAction <String> --input.isRequired <Boolean> --input.apiRequired <Boolean> --input.createIndex <Boolean> --input.junctionTableId <UUID> --input.junctionTableName <String> --input.junctionSchemaId <UUID> --input.sourceFieldName <String> --input.targetFieldName <String> --input.useCompositeKey <Boolean> --input.exposeInApi <Boolean> --input.nodes <JSON> --input.grants <JSON> --input.grantRoles <String> --input.policies <JSON>
+csdk provision-relation --input.clientMutationId <String> --input.databaseId <UUID> --input.relationType <String> --input.sourceTableId <UUID> --input.targetTableId <UUID> --input.fieldName <String> --input.deleteAction <String> --input.isRequired <Boolean> --input.apiRequired <Boolean> --input.createIndex <Boolean> --input.junctionTableId <UUID> --input.junctionTableName <String> --input.junctionSchemaId <UUID> --input.sourceFieldName <String> --input.targetFieldName <String> --input.useCompositeKey <Boolean> --input.exposeInApi <Boolean> --input.nodes <JSON> --input.grants <JSON> --input.policies <JSON>
 ```

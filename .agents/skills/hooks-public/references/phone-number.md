@@ -7,8 +7,8 @@ User phone numbers with country code, verification, and primary-number managemen
 ## Usage
 
 ```typescript
-usePhoneNumbersQuery({ selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
-usePhoneNumberQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
+usePhoneNumbersQuery({ selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } } })
+usePhoneNumberQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } } })
 useCreatePhoneNumberMutation({ selection: { fields: { id: true } } })
 useUpdatePhoneNumberMutation({ selection: { fields: { id: true } } })
 useDeletePhoneNumberMutation({})
@@ -20,7 +20,7 @@ useDeletePhoneNumberMutation({})
 
 ```typescript
 const { data, isLoading } = usePhoneNumbersQuery({
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = usePhoneNumbersQuery({
 const { mutate } = useCreatePhoneNumberMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+mutate({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```

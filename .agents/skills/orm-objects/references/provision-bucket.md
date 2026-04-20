@@ -10,7 +10,7 @@ and lifecycle settings.
 ## Usage
 
 ```typescript
-db.mutation.provisionBucket({ input: { bucketKey: '<String>' } }).execute()
+db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute()
 ```
 
 ## Examples
@@ -18,5 +18,5 @@ db.mutation.provisionBucket({ input: { bucketKey: '<String>' } }).execute()
 ### Run provisionBucket
 
 ```typescript
-const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>' } }).execute();
+const result = await db.mutation.provisionBucket({ input: { bucketKey: '<String>', ownerId: '<UUID>' } }).execute();
 ```

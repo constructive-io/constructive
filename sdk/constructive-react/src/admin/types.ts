@@ -172,6 +172,15 @@ export interface AppMembershipDefault {
   isApproved: boolean | null;
   isVerified: boolean | null;
 }
+export interface OrgMembershipDefault {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  isApproved: boolean | null;
+  entityId: string | null;
+}
 export interface OrgClaimedInvite {
   id: string | null;
   data: unknown | null;
@@ -201,17 +210,6 @@ export interface OrgChartEdge {
   positionTitle: string | null;
   positionLevel: number | null;
 }
-export interface OrgMembershipDefault {
-  id: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-  isApproved: boolean | null;
-  entityId: string | null;
-  deleteMemberCascadeGroups: boolean | null;
-  createGroupsCascadeMembers: boolean | null;
-}
 export interface OrgMemberProfile {
   id: string | null;
   createdAt: string | null;
@@ -224,6 +222,20 @@ export interface OrgMemberProfile {
   title: string | null;
   bio: string | null;
   profilePicture: ConstructiveInternalTypeImage | null;
+}
+export interface OrgMembershipSetting {
+  id: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  entityId: string | null;
+  deleteMemberCascadeChildren: boolean | null;
+  createChildCascadeOwners: boolean | null;
+  createChildCascadeAdmins: boolean | null;
+  createChildCascadeMembers: boolean | null;
+  allowExternalMembers: boolean | null;
+  populateMemberEmail: boolean | null;
 }
 export interface AppLevel {
   id: string | null;

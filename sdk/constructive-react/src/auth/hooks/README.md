@@ -47,11 +47,18 @@ function App() {
 | `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
+| `useWebauthnCredentialsQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useWebauthnCredentialQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useCreateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useUpdateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useDeleteWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
 | `useAuditLogsQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useAuditLogQuery` | Query | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useCreateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useUpdateAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
 | `useDeleteAuditLogMutation` | Mutation | Append-only audit log of authentication events (sign-in, sign-up, password changes, etc.) |
+| `useIdentityProvidersQuery` | Query | List all identityProviders |
+| `useCreateIdentityProviderMutation` | Mutation | Create a identityProvider |
 | `useRoleTypesQuery` | Query | List all roleTypes |
 | `useRoleTypeQuery` | Query | Get one roleType |
 | `useCreateRoleTypeMutation` | Mutation | Create a roleType |
@@ -85,12 +92,12 @@ function App() {
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useResetPasswordMutation` | Mutation | resetPassword |
-| `useCreateApiKeyMutation` | Mutation | createApiKey |
 | `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useSignUpMutation` | Mutation | signUp |
 | `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
 | `useSignInMutation` | Mutation | signIn |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
+| `useCreateApiKeyMutation` | Mutation | createApiKey |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useRequestUploadUrlMutation` | Mutation | Request a presigned URL for uploading a file directly to S3.
@@ -112,20 +119,20 @@ and lifecycle settings. |
 ```typescript
 // List all emails
 const { data, isLoading } = useEmailsQuery({
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one email
 const { data: item } = useEmailQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a email
 const { mutate: create } = useCreateEmailMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+create({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```
 
 ### PhoneNumber
@@ -133,20 +140,20 @@ create({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary
 ```typescript
 // List all phoneNumbers
 const { data, isLoading } = usePhoneNumbersQuery({
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one phoneNumber
 const { data: item } = usePhoneNumberQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a phoneNumber
 const { mutate: create } = useCreatePhoneNumberMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+create({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```
 
 ### CryptoAddress
@@ -154,20 +161,41 @@ create({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Bo
 ```typescript
 // List all cryptoAddresses
 const { data, isLoading } = useCryptoAddressesQuery({
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one cryptoAddress
 const { data: item } = useCryptoAddressQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a cryptoAddress
 const { mutate: create } = useCreateCryptoAddressMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+create({ ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
+```
+
+### WebauthnCredential
+
+```typescript
+// List all webauthnCredentials
+const { data, isLoading } = useWebauthnCredentialsQuery({
+  selection: { fields: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one webauthnCredential
+const { data: item } = useWebauthnCredentialQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a webauthnCredential
+const { mutate: create } = useCreateWebauthnCredentialMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', webauthnUserId: '<String>', transports: '<String>', credentialDeviceType: '<String>', backupEligible: '<Boolean>', backupState: '<Boolean>', name: '<String>', lastUsedAt: '<Datetime>' });
 ```
 
 ### AuditLog
@@ -189,6 +217,21 @@ const { mutate: create } = useCreateAuditLogMutation({
   selection: { fields: { id: true } },
 });
 create({ event: '<String>', actorId: '<UUID>', origin: '<Origin>', userAgent: '<String>', ipAddress: '<InternetAddress>', success: '<Boolean>' });
+```
+
+### IdentityProvider
+
+```typescript
+// List all identityProviders
+const { data, isLoading } = useIdentityProvidersQuery({
+  selection: { fields: { slug: true, kind: true, displayName: true, enabled: true, isBuiltIn: true } },
+});
+
+// Create a identityProvider
+const { mutate: create } = useCreateIdentityProviderMutation({
+  selection: { fields: { id: true } },
+});
+create({ slug: '<String>', kind: '<String>', displayName: '<String>', enabled: '<Boolean>', isBuiltIn: '<Boolean>' });
 ```
 
 ### RoleType
@@ -438,17 +481,6 @@ resetPassword
   |----------|------|
   | `input` | ResetPasswordInput (required) |
 
-### `useCreateApiKeyMutation`
-
-createApiKey
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | CreateApiKeyInput (required) |
-
 ### `useSignInCrossOriginMutation`
 
 signInCrossOrigin
@@ -503,6 +535,17 @@ extendTokenExpires
   | Argument | Type |
   |----------|------|
   | `input` | ExtendTokenExpiresInput (required) |
+
+### `useCreateApiKeyMutation`
+
+createApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | CreateApiKeyInput (required) |
 
 ### `useForgotPasswordMutation`
 

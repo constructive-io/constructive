@@ -7,8 +7,8 @@ Cryptocurrency wallet addresses owned by users, with network-specific validation
 ## Usage
 
 ```typescript
-useCryptoAddressesQuery({ selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
-useCryptoAddressQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } } })
+useCryptoAddressesQuery({ selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } } })
+useCryptoAddressQuery({ id: '<UUID>', selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } } })
 useCreateCryptoAddressMutation({ selection: { fields: { id: true } } })
 useUpdateCryptoAddressMutation({ selection: { fields: { id: true } } })
 useDeleteCryptoAddressMutation({})
@@ -20,7 +20,7 @@ useDeleteCryptoAddressMutation({})
 
 ```typescript
 const { data, isLoading } = useCryptoAddressesQuery({
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useCryptoAddressesQuery({
 const { mutate } = useCreateCryptoAddressMutation({
   selection: { fields: { id: true } },
 });
-mutate({ ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+mutate({ ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```

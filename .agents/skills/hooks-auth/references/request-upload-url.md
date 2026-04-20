@@ -10,7 +10,7 @@ existing file ID and deduplicated=true with no uploadUrl.
 ## Usage
 
 ```typescript
-const { mutate } = useRequestUploadUrlMutation(); mutate({ input: { bucketKey: '<String>', contentHash: '<String>', contentType: '<String>', size: '<Int>', filename: '<String>' } });
+const { mutate } = useRequestUploadUrlMutation(); mutate({ input: '<RequestUploadUrlInput>' });
 ```
 
 ## Examples
@@ -19,5 +19,5 @@ const { mutate } = useRequestUploadUrlMutation(); mutate({ input: { bucketKey: '
 
 ```typescript
 const { mutate, isLoading } = useRequestUploadUrlMutation();
-mutate({ input: { bucketKey: '<String>', contentHash: '<String>', contentType: '<String>', size: '<Int>', filename: '<String>' } });
+mutate({ input: '<RequestUploadUrlInput>' });
 ```

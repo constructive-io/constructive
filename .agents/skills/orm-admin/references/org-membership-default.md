@@ -9,7 +9,7 @@ Default membership settings per entity, controlling initial approval and verific
 ```typescript
 db.orgMembershipDefault.findMany({ select: { id: true } }).execute()
 db.orgMembershipDefault.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.orgMembershipDefault.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' }, select: { id: true } }).execute()
+db.orgMembershipDefault.create({ data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>' }, select: { id: true } }).execute()
 db.orgMembershipDefault.update({ where: { id: '<UUID>' }, data: { createdBy: '<UUID>' }, select: { id: true } }).execute()
 db.orgMembershipDefault.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.orgMembershipDefault.findMany({
 
 ```typescript
 const item = await db.orgMembershipDefault.create({
-  data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' },
+  data: { createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>' },
   select: { id: true }
 }).execute();
 ```

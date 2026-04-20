@@ -18,7 +18,9 @@ import {
   emailKeys,
   phoneNumberKeys,
   cryptoAddressKeys,
+  webauthnCredentialKeys,
   auditLogKeys,
+  identityProviderKeys,
   roleTypeKeys,
   userConnectedAccountKeys,
   userKeys,
@@ -91,6 +93,23 @@ export const invalidate = {
         queryKey: cryptoAddressKeys.detail(id),
       }),
   },
+  /** Invalidate webauthnCredential queries */ webauthnCredential: {
+    /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.all,
+      }),
+    /** Invalidate webauthnCredential list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnCredential */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.detail(id),
+      }),
+  },
   /** Invalidate auditLog queries */ auditLog: {
     /** Invalidate all auditLog queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -103,6 +122,23 @@ export const invalidate = {
     /** Invalidate a specific auditLog */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: auditLogKeys.detail(id),
+      }),
+  },
+  /** Invalidate identityProvider queries */ identityProvider: {
+    /** Invalidate all identityProvider queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.all,
+      }),
+    /** Invalidate identityProvider list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvider */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.detail(id),
       }),
   },
   /** Invalidate roleType queries */ roleType: {
@@ -184,9 +220,25 @@ export const remove = {
       queryKey: cryptoAddressKeys.detail(id),
     });
   },
+  /** Remove webauthnCredential from cache */ webauthnCredential: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnCredentialKeys.detail(id),
+    });
+  },
   /** Remove auditLog from cache */ auditLog: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: auditLogKeys.detail(id),
+    });
+  },
+  /** Remove identityProvider from cache */ identityProvider: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: identityProviderKeys.detail(id),
     });
   },
   /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {

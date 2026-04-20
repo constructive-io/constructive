@@ -9,7 +9,9 @@ import authCmd from './commands/auth';
 import emailCmd from './commands/email';
 import phoneNumberCmd from './commands/phone-number';
 import cryptoAddressCmd from './commands/crypto-address';
+import webauthnCredentialCmd from './commands/webauthn-credential';
 import auditLogCmd from './commands/audit-log';
+import identityProviderCmd from './commands/identity-provider';
 import roleTypeCmd from './commands/role-type';
 import userConnectedAccountCmd from './commands/user-connected-account';
 import userCmd from './commands/user';
@@ -31,12 +33,12 @@ import setPasswordCmd from './commands/set-password';
 import verifyEmailCmd from './commands/verify-email';
 import provisionNewUserCmd from './commands/provision-new-user';
 import resetPasswordCmd from './commands/reset-password';
-import createApiKeyCmd from './commands/create-api-key';
 import signInCrossOriginCmd from './commands/sign-in-cross-origin';
 import signUpCmd from './commands/sign-up';
 import requestCrossOriginTokenCmd from './commands/request-cross-origin-token';
 import signInCmd from './commands/sign-in';
 import extendTokenExpiresCmd from './commands/extend-token-expires';
+import createApiKeyCmd from './commands/create-api-key';
 import forgotPasswordCmd from './commands/forgot-password';
 import sendVerificationEmailCmd from './commands/send-verification-email';
 import requestUploadUrlCmd from './commands/request-upload-url';
@@ -55,7 +57,9 @@ const createCommandMap: () => Record<
   email: emailCmd,
   'phone-number': phoneNumberCmd,
   'crypto-address': cryptoAddressCmd,
+  'webauthn-credential': webauthnCredentialCmd,
   'audit-log': auditLogCmd,
+  'identity-provider': identityProviderCmd,
   'role-type': roleTypeCmd,
   'user-connected-account': userConnectedAccountCmd,
   user: userCmd,
@@ -77,12 +81,12 @@ const createCommandMap: () => Record<
   'verify-email': verifyEmailCmd,
   'provision-new-user': provisionNewUserCmd,
   'reset-password': resetPasswordCmd,
-  'create-api-key': createApiKeyCmd,
   'sign-in-cross-origin': signInCrossOriginCmd,
   'sign-up': signUpCmd,
   'request-cross-origin-token': requestCrossOriginTokenCmd,
   'sign-in': signInCmd,
   'extend-token-expires': extendTokenExpiresCmd,
+  'create-api-key': createApiKeyCmd,
   'forgot-password': forgotPasswordCmd,
   'send-verification-email': sendVerificationEmailCmd,
   'request-upload-url': requestUploadUrlCmd,
@@ -90,7 +94,7 @@ const createCommandMap: () => Record<
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  audit-log            auditLog CRUD operations\n  role-type            roleType CRUD operations\n  user-connected-account userConnectedAccount CRUD operations\n  user                 user CRUD operations\n  current-user-agent   currentUserAgent\n  current-ip-address   currentIpAddress\n  current-user-id      currentUserId\n  require-step-up      requireStepUp\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  disconnect-account   disconnectAccount\n  revoke-api-key       revokeApiKey\n  revoke-session       revokeSession\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  provision-new-user   provisionNewUser\n  reset-password       resetPassword\n  create-api-key       createApiKey\n  sign-in-cross-origin signInCrossOrigin\n  sign-up              signUp\n  request-cross-origin-token requestCrossOriginToken\n  sign-in              signIn\n  extend-token-expires extendTokenExpires\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  confirm-upload       Confirm that a file has been uploaded to S3.\nVerifies the object exists in S3, checks content-type,\nand transitions the file status from 'pending' to 'ready'.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  webauthn-credential  webauthnCredential CRUD operations\n  audit-log            auditLog CRUD operations\n  identity-provider    identityProvider CRUD operations\n  role-type            roleType CRUD operations\n  user-connected-account userConnectedAccount CRUD operations\n  user                 user CRUD operations\n  current-user-agent   currentUserAgent\n  current-ip-address   currentIpAddress\n  current-user-id      currentUserId\n  require-step-up      requireStepUp\n  current-user         currentUser\n  sign-out             signOut\n  send-account-deletion-email sendAccountDeletionEmail\n  check-password       checkPassword\n  disconnect-account   disconnectAccount\n  revoke-api-key       revokeApiKey\n  revoke-session       revokeSession\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  provision-new-user   provisionNewUser\n  reset-password       resetPassword\n  sign-in-cross-origin signInCrossOrigin\n  sign-up              signUp\n  request-cross-origin-token requestCrossOriginToken\n  sign-in              signIn\n  extend-token-expires extendTokenExpires\n  create-api-key       createApiKey\n  forgot-password      forgotPassword\n  send-verification-email sendVerificationEmail\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  confirm-upload       Confirm that a file has been uploaded to S3.\nVerifies the object exists in S3, checks content-type,\nand transitions the file status from 'pending' to 'ready'.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

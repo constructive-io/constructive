@@ -9,7 +9,7 @@ User email addresses with verification and primary-email management
 ```typescript
 db.email.findMany({ select: { id: true } }).execute()
 db.email.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.email.create({ data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>' }, select: { id: true } }).execute()
+db.email.create({ data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' }, select: { id: true } }).execute()
 db.email.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
 db.email.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.email.findMany({
 
 ```typescript
 const item = await db.email.create({
-  data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>' },
+  data: { ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' },
   select: { id: true }
 }).execute();
 ```
