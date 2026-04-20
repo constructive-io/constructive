@@ -4,6 +4,7 @@ export * from './data';
 export * from './relation';
 export * from './view';
 export * from './blueprint-types.generated';
+export * from './module-presets';
 
 import type { NodeTypeDefinition } from './types';
 import * as authz from './authz';
