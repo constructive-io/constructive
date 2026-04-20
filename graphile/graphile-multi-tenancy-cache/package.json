@@ -1,0 +1,58 @@
+{
+  "name": "graphile-multi-tenancy-cache",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Template-based multi-tenancy cache for PostGraphile v5 — shares instances across tenants with identical schemas",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "postgraphile",
+    "graphile",
+    "multi-tenancy",
+    "cache",
+    "template",
+    "constructive",
+    "v5"
+  ],
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "dependencies": {
+    "@pgpmjs/logger": "workspace:^",
+    "express": "^5.2.1",
+    "grafserv": "1.0.0",
+    "graphile-config": "1.0.0",
+    "pg": "^8.11.3",
+    "pg-env": "workspace:^",
+    "pg-introspection": "1.0.0",
+    "pgsql-deparser": "^17.18.2",
+    "pgsql-parser": "^17.9.14",
+    "postgraphile": "5.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/pg": "^8.10.9",
+    "makage": "^0.3.0",
+    "ts-node": "^10.9.2"
+  }
+}

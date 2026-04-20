@@ -42,6 +42,8 @@ export interface ApiOptions {
   isPublic?: boolean;
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
+  /** Enable multi-tenancy cache (template-based instance sharing across tenants) */
+  useMultiTenancyCache?: boolean;
 }
 
 /**

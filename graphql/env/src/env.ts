@@ -27,6 +27,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
     API_ANON_ROLE,
     API_ROLE_NAME,
     API_DEFAULT_DATABASE_ID,
+    USE_MULTI_TENANCY_CACHE,
   } = env;
 
   return {
@@ -50,6 +51,7 @@ export const getGraphQLEnvVars = (env: NodeJS.ProcessEnv = process.env): Partial
       ...(API_ANON_ROLE && { anonRole: API_ANON_ROLE }),
       ...(API_ROLE_NAME && { roleName: API_ROLE_NAME }),
       ...(API_DEFAULT_DATABASE_ID && { defaultDatabaseId: API_DEFAULT_DATABASE_ID }),
+      ...(USE_MULTI_TENANCY_CACHE && { useMultiTenancyCache: parseEnvBoolean(USE_MULTI_TENANCY_CACHE) }),
     },
   };
 };
