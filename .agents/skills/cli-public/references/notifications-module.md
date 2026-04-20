@@ -12,8 +12,8 @@ csdk notifications-module list --where.<field>.<op> <value> --orderBy <values>
 csdk notifications-module list --limit 10 --after <cursor>
 csdk notifications-module find-first --where.<field>.<op> <value>
 csdk notifications-module get --id <UUID>
-csdk notifications-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--notificationsTableId <UUID>] [--eventsTableId <UUID>] [--preferencesTableId <UUID>] [--channelsTableId <UUID>] [--deliveryLogTableId <UUID>] [--ownerTableId <UUID>] [--userSettingsTableId <UUID>] [--organizationSettingsTableId <UUID>]
-csdk notifications-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--notificationsTableId <UUID>] [--eventsTableId <UUID>] [--preferencesTableId <UUID>] [--channelsTableId <UUID>] [--deliveryLogTableId <UUID>] [--ownerTableId <UUID>] [--userSettingsTableId <UUID>] [--organizationSettingsTableId <UUID>]
+csdk notifications-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--notificationsTableId <UUID>] [--readStateTableId <UUID>] [--preferencesTableId <UUID>] [--channelsTableId <UUID>] [--deliveryLogTableId <UUID>] [--ownerTableId <UUID>] [--userSettingsTableId <UUID>] [--organizationSettingsTableId <UUID>] [--hasChannels <Boolean>] [--hasPreferences <Boolean>] [--hasSettingsExtension <Boolean>] [--hasDigestMetadata <Boolean>] [--hasSubscriptions <Boolean>]
+csdk notifications-module update --id <UUID> [--databaseId <UUID>] [--schemaId <UUID>] [--privateSchemaId <UUID>] [--notificationsTableId <UUID>] [--readStateTableId <UUID>] [--preferencesTableId <UUID>] [--channelsTableId <UUID>] [--deliveryLogTableId <UUID>] [--ownerTableId <UUID>] [--userSettingsTableId <UUID>] [--organizationSettingsTableId <UUID>] [--hasChannels <Boolean>] [--hasPreferences <Boolean>] [--hasSettingsExtension <Boolean>] [--hasDigestMetadata <Boolean>] [--hasSubscriptions <Boolean>]
 csdk notifications-module delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk notifications-module list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a notificationsModule
 
 ```bash
-csdk notifications-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--notificationsTableId <UUID>] [--eventsTableId <UUID>] [--preferencesTableId <UUID>] [--channelsTableId <UUID>] [--deliveryLogTableId <UUID>] [--ownerTableId <UUID>] [--userSettingsTableId <UUID>] [--organizationSettingsTableId <UUID>]
+csdk notifications-module create --databaseId <UUID> [--schemaId <UUID>] [--privateSchemaId <UUID>] [--notificationsTableId <UUID>] [--readStateTableId <UUID>] [--preferencesTableId <UUID>] [--channelsTableId <UUID>] [--deliveryLogTableId <UUID>] [--ownerTableId <UUID>] [--userSettingsTableId <UUID>] [--organizationSettingsTableId <UUID>] [--hasChannels <Boolean>] [--hasPreferences <Boolean>] [--hasSettingsExtension <Boolean>] [--hasDigestMetadata <Boolean>] [--hasSubscriptions <Boolean>]
 ```
 
 ### Get a notificationsModule by id
