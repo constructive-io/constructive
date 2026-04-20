@@ -642,12 +642,16 @@ function buildBlueprintEntityTableProvision(): t.ExportNamedDeclaration {
         'Custom fields (columns) to add to the entity table. Forwarded to secure_table_provision as-is.'
       ),
       addJSDoc(
-        optionalProp('grant_privileges', t.tsArrayType(t.tsUnknownKeyword())),
-        'Privilege grants for the entity table as [verb, columns] tuples (e.g. [["select","*"],["insert","*"]]). Forwarded to secure_table_provision as-is.'
-      ),
-      addJSDoc(
-        optionalProp('grant_roles', t.tsArrayType(t.tsStringKeyword())),
-        'Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Defaults to ["authenticated"].'
+        optionalProp(
+          'grants',
+          t.tsArrayType(
+            t.tsTypeLiteral([
+              requiredProp('roles', t.tsArrayType(t.tsStringKeyword())),
+              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword())),
+            ])
+          )
+        ),
+        'Unified grant objects for the entity table. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples. Forwarded to secure_table_provision as-is. Defaults to [].'
       ),
       addJSDoc(
         optionalProp(
@@ -749,12 +753,16 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
         'RLS policies for this table.'
       ),
       addJSDoc(
-        optionalProp('grant_roles', t.tsArrayType(t.tsStringKeyword())),
-        'Database roles to grant privileges to. Defaults to ["authenticated"].'
-      ),
-      addJSDoc(
-        optionalProp('grants', t.tsArrayType(t.tsUnknownKeyword())),
-        'Privilege grants as [verb, column] tuples or objects. Defaults to empty (no grants — callers must explicitly specify).'
+        optionalProp(
+          'grants',
+          t.tsArrayType(
+            t.tsTypeLiteral([
+              requiredProp('roles', t.tsArrayType(t.tsStringKeyword())),
+              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword())),
+            ])
+          )
+        ),
+        'Unified grant objects. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples (e.g. [["select","*"]]). Enables per-role targeting. Defaults to [].'
       ),
       addJSDoc(
         optionalProp('use_rls', t.tsBooleanKeyword()),

@@ -13,7 +13,7 @@ exports[`test case empty array fields emit empty array literal 1`] = `
   id,
   node_type,
   fields,
-  grant_roles
+  out_fields
 ) VALUES
   ('450e3b3b-b68d-4abc-990c-65cb8a1dcdb4', 'DataTimestamps', '{}', '{}');"
 `;
@@ -76,10 +76,9 @@ exports[`test case null array fields emit empty array literal instead of NULL 1`
   id,
   node_type,
   fields,
-  grant_privileges,
   out_fields
 ) VALUES
-  ('450e3b3b-b68d-4abc-990c-65cb8a1dcdb4', 'DataTimestamps', '{}', '{}', '{}');"
+  ('450e3b3b-b68d-4abc-990c-65cb8a1dcdb4', 'DataTimestamps', '{}', '{}');"
 `;
 
 exports[`test case test case 1`] = `Promise {}`;

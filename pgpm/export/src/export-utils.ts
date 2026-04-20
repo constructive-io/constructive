@@ -985,14 +985,9 @@ export const META_TABLE_CONFIG: Record<string, TableConfig> = {
       node_type: 'text',
       use_rls: 'boolean',
       node_data: 'jsonb',
-      grant_roles: 'text[]',
       fields: 'jsonb[]',
-      grant_privileges: 'jsonb[]',
-      policy_type: 'text',
-      policy_privileges: 'text[]',
-      policy_role: 'text',
-      policy_permissive: 'boolean',
-      policy_data: 'jsonb',
+      grants: 'jsonb',
+      policies: 'jsonb',
       out_fields: 'uuid[]'
     }
   },
