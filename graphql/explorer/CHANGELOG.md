@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.12.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.12.6...@constructive-io/graphql-explorer@4.12.7) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-explorer
+
 ## [4.12.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-explorer@4.12.5...@constructive-io/graphql-explorer@4.12.6) (2026-04-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-explorer
