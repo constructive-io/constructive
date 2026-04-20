@@ -610,22 +610,22 @@ export interface RelationManyToManyParams {
   nodes?: {
     [key: string]: unknown;
   }[];
-  /* Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Default: [authenticated] */
-  grant_roles?: string[];
-  /* Privilege grants for the junction table as [verb, columns] tuples (e.g. [['select','*'],['insert','*']]). Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns */
-  grant_privileges?: string[][];
-  /* RLS policy type for the junction table. Forwarded to secure_table_provision as-is. NULL means no policy. */
-  policy_type?: string;
-  /* Privileges the policy applies to. Forwarded to secure_table_provision as-is. NULL means derived from grant_privileges verbs. */
-  policy_privileges?: string[];
-  /* Database role the policy targets. Forwarded to secure_table_provision as-is. NULL means falls back to first grant_role. */
-  policy_role?: string;
-  /* Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Forwarded to secure_table_provision as-is. */
-  policy_permissive?: boolean;
-  /* Policy configuration forwarded to secure_table_provision as-is. Structure varies by policy_type. */
-  policy_data?: {
-    [key: string]: unknown;
-  };
+  /* Unified grant objects for the junction table. Each entry is { roles: string[], privileges: string[][] }. Forwarded to secure_table_provision as-is. Default: [] */
+  grants?: {
+    roles: string[];
+    privileges: string[][];
+  }[];
+  /* RLS policy objects for the junction table. Each entry has $type (Authz* generator), optional data, privileges, policy_role, permissive, policy_name. Forwarded to secure_table_provision as-is. Default: [] */
+  policies?: {
+    $type: string;
+    data?: {
+      [key: string]: unknown;
+    };
+    privileges?: string[];
+    policy_role?: string;
+    permissive?: boolean;
+    policy_name?: string;
+  }[];
 }
 /** Declares a spatial predicate between two existing geometry/geography columns. Inserts a metaschema_public.spatial_relation row; the sync_spatial_relation_tags trigger then projects a @spatialRelation smart tag onto the owner column so graphile-postgis' PostgisSpatialRelationsPlugin can expose it as a cross-table filter in GraphQL. Metadata-only: both source_field and target_field must already exist on their tables. Idempotent on (source_table_id, name). One direction per tag — author two RelationSpatial entries if symmetry is desired. */
 export interface RelationSpatialParams {
@@ -838,10 +838,11 @@ export interface BlueprintEntityTableProvision {
   nodes?: BlueprintNode[];
   /** Custom fields (columns) to add to the entity table. Forwarded to secure_table_provision as-is. */
   fields?: BlueprintField[];
-  /** Privilege grants for the entity table as [verb, columns] tuples (e.g. [["select","*"],["insert","*"]]). Forwarded to secure_table_provision as-is. */
-  grant_privileges?: unknown[];
-  /** Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Defaults to ["authenticated"]. */
-  grant_roles?: string[];
+  /** Unified grant objects for the entity table. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples. Forwarded to secure_table_provision as-is. Defaults to []. */
+  grants?: {
+    roles: string[];
+    privileges: unknown[];
+  }[];
   /** RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op). */
   policies?: BlueprintPolicy[];
 }
@@ -1075,10 +1076,11 @@ export interface BlueprintTable {
   fields?: BlueprintField[];
   /** RLS policies for this table. */
   policies?: BlueprintPolicy[];
-  /** Database roles to grant privileges to. Defaults to ["authenticated"]. */
-  grant_roles?: string[];
-  /** Privilege grants as [verb, column] tuples or objects. Defaults to empty (no grants — callers must explicitly specify). */
-  grants?: unknown[];
+  /** Unified grant objects. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples (e.g. [["select","*"]]). Enables per-role targeting. Defaults to []. */
+  grants?: {
+    roles: string[];
+    privileges: unknown[];
+  }[];
   /** Whether to enable RLS on this table. Defaults to true. */
   use_rls?: boolean;
   /** Table-level indexes (table_name inherited from parent). */

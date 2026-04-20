@@ -229,7 +229,6 @@ it('null array fields emit empty array literal instead of NULL', async () => {
       id: 'uuid',
       node_type: 'text',
       fields: 'jsonb[]',
-      grant_privileges: 'jsonb[]',
       out_fields: 'uuid[]'
     }
   });
@@ -239,7 +238,6 @@ it('null array fields emit empty array literal instead of NULL', async () => {
       id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
       node_type: 'DataTimestamps',
       fields: null,
-      grant_privileges: null,
       out_fields: null
     }
   ]);
@@ -259,7 +257,7 @@ it('empty array fields emit empty array literal', async () => {
       id: 'uuid',
       node_type: 'text',
       fields: 'jsonb[]',
-      grant_roles: 'text[]'
+      out_fields: 'uuid[]'
     }
   });
 
@@ -268,7 +266,7 @@ it('empty array fields emit empty array literal', async () => {
       id: '450e3b3b-b68d-4abc-990c-65cb8a1dcdb4',
       node_type: 'DataTimestamps',
       fields: [],
-      grant_roles: []
+      out_fields: []
     }
   ]);
 
