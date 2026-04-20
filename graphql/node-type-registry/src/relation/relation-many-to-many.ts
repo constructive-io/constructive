@@ -48,46 +48,33 @@ export const RelationManyToMany: NodeTypeDefinition = {
         },
         "description": "Array of node objects for field creation on junction table. Each object has a $type key (e.g. DataId, DataEntityMembership) and optional data keys. Forwarded to secure_table_provision as-is. Empty array means no additional fields."
       },
-      "grant_roles": {
+      "grants": {
         "type": "array",
         "items": {
-          "type": "string"
+          "type": "object",
+          "properties": {
+            "roles": { "type": "array", "items": { "type": "string" } },
+            "privileges": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } }
+          },
+          "required": ["roles", "privileges"]
         },
-        "description": "Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Default: [authenticated]"
+        "description": "Unified grant objects for the junction table. Each entry is { roles: string[], privileges: string[][] }. Forwarded to secure_table_provision as-is. Default: []"
       },
-      "grant_privileges": {
+      "policies": {
         "type": "array",
         "items": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "type": "object",
+          "properties": {
+            "$type": { "type": "string" },
+            "data": { "type": "object" },
+            "privileges": { "type": "array", "items": { "type": "string" } },
+            "policy_role": { "type": "string" },
+            "permissive": { "type": "boolean" },
+            "policy_name": { "type": "string" }
+          },
+          "required": ["$type"]
         },
-        "description": "Privilege grants for the junction table as [verb, columns] tuples (e.g. [['select','*'],['insert','*']]). Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns"
-      },
-      "policy_type": {
-        "type": "string",
-        "description": "RLS policy type for the junction table. Forwarded to secure_table_provision as-is. NULL means no policy."
-      },
-      "policy_privileges": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "description": "Privileges the policy applies to. Forwarded to secure_table_provision as-is. NULL means derived from grant_privileges verbs."
-      },
-      "policy_role": {
-        "type": "string",
-        "description": "Database role the policy targets. Forwarded to secure_table_provision as-is. NULL means falls back to first grant_role."
-      },
-      "policy_permissive": {
-        "type": "boolean",
-        "description": "Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Forwarded to secure_table_provision as-is.",
-        "default": true
-      },
-      "policy_data": {
-        "type": "object",
-        "description": "Policy configuration forwarded to secure_table_provision as-is. Structure varies by policy_type."
+        "description": "RLS policy objects for the junction table. Each entry has $type (Authz* generator), optional data, privileges, policy_role, permissive, policy_name. Forwarded to secure_table_provision as-is. Default: []"
       }
     },
     "required": [
