@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.16.0...node-type-registry@0.17.0) (2026-04-20)
+
+### Features
+
+- **node-type-registry:** add module presets ([a81e845](https://github.com/constructive-io/constructive/commit/a81e845093ff676961dcd049fa1beeda94e85b72))
+
 # [0.16.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.14.0...node-type-registry@0.16.0) (2026-04-18)
 
 ### Features

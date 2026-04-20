@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.6...@constructive-io/graphql-server@4.19.0) (2026-04-20)
+
+### Features
+
+- **graphile:** propagate jwt.claims.session_id to pgSettings ([41ab24d](https://github.com/constructive-io/constructive/commit/41ab24dc07e5a54a4690570d801b743440f584f0)), closes [constructive-io/constructive-db#908](https://github.com/constructive-io/constructive-db/issues/908)
+
 ## [4.18.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.5...@constructive-io/graphql-server@4.18.6) (2026-04-19)
 
 **Note:** Version bump only for package @constructive-io/graphql-server
