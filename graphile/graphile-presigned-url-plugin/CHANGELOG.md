@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.3](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.2...graphile-presigned-url-plugin@0.6.3) (2026-04-20)
+
+### Bug Fixes
+
+- use Grafast plan() instead of resolve() for downloadUrl field ([b06932e](https://github.com/constructive-io/constructive/commit/b06932ecfc32426ceed822ced320728aed69eff0))
+
 ## [0.6.2](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.1...graphile-presigned-url-plugin@0.6.2) (2026-04-19)
 
 ### Bug Fixes

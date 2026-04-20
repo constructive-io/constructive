@@ -1,6 +1,6 @@
 {
   "name": "introspectron",
-  "version": "4.11.7",
+  "version": "4.11.8",
   "description": "introspect your Postgres database and generate an SDK",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
