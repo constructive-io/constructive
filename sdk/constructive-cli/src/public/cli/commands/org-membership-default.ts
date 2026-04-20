@@ -23,8 +23,6 @@ const fieldSchema: FieldSchema = {
   updatedBy: 'uuid',
   isApproved: 'boolean',
   entityId: 'uuid',
-  deleteMemberCascadeGroups: 'boolean',
-  createGroupsCascadeMembers: 'boolean',
 };
 const usage =
   '\norg-membership-default <command>\n\nCommands:\n  list                  List orgMembershipDefault records\n  find-first            Find first matching orgMembershipDefault record\n  get                   Get a orgMembershipDefault by ID\n  create                Create a new orgMembershipDefault\n  update                Update an existing orgMembershipDefault\n  delete                Delete a orgMembershipDefault\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
@@ -84,8 +82,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedBy: true,
       isApproved: true,
       entityId: true,
-      deleteMemberCascadeGroups: true,
-      createGroupsCascadeMembers: true,
     };
     const findManyArgs = parseFindManyArgs<
       FindManyArgs<
@@ -117,8 +113,6 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedBy: true,
       isApproved: true,
       entityId: true,
-      deleteMemberCascadeGroups: true,
-      createGroupsCascadeMembers: true,
     };
     const findFirstArgs = parseFindFirstArgs<
       FindFirstArgs<OrgMembershipDefaultSelect, OrgMembershipDefaultFilter> & {
@@ -158,8 +152,6 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           updatedBy: true,
           isApproved: true,
           entityId: true,
-          deleteMemberCascadeGroups: true,
-          createGroupsCascadeMembers: true,
         },
       })
       .execute();
@@ -202,20 +194,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'entityId',
         required: true,
       },
-      {
-        type: 'boolean',
-        name: 'deleteMemberCascadeGroups',
-        message: 'deleteMemberCascadeGroups',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'boolean',
-        name: 'createGroupsCascadeMembers',
-        message: 'createGroupsCascadeMembers',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -230,8 +208,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           updatedBy: cleanedData.updatedBy,
           isApproved: cleanedData.isApproved,
           entityId: cleanedData.entityId,
-          deleteMemberCascadeGroups: cleanedData.deleteMemberCascadeGroups,
-          createGroupsCascadeMembers: cleanedData.createGroupsCascadeMembers,
         },
         select: {
           id: true,
@@ -241,8 +217,6 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           updatedBy: true,
           isApproved: true,
           entityId: true,
-          deleteMemberCascadeGroups: true,
-          createGroupsCascadeMembers: true,
         },
       })
       .execute();
@@ -291,20 +265,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         message: 'entityId',
         required: false,
       },
-      {
-        type: 'boolean',
-        name: 'deleteMemberCascadeGroups',
-        message: 'deleteMemberCascadeGroups',
-        required: false,
-        skipPrompt: true,
-      },
-      {
-        type: 'boolean',
-        name: 'createGroupsCascadeMembers',
-        message: 'createGroupsCascadeMembers',
-        required: false,
-        skipPrompt: true,
-      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as OrgMembershipDefaultPatch;
@@ -319,8 +279,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           updatedBy: cleanedData.updatedBy,
           isApproved: cleanedData.isApproved,
           entityId: cleanedData.entityId,
-          deleteMemberCascadeGroups: cleanedData.deleteMemberCascadeGroups,
-          createGroupsCascadeMembers: cleanedData.createGroupsCascadeMembers,
         },
         select: {
           id: true,
@@ -330,8 +288,6 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           updatedBy: true,
           isApproved: true,
           entityId: true,
-          deleteMemberCascadeGroups: true,
-          createGroupsCascadeMembers: true,
         },
       })
       .execute();

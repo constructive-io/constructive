@@ -10,7 +10,7 @@ existing file ID and deduplicated=true with no uploadUrl.
 ## Usage
 
 ```typescript
-db.mutation.requestUploadUrl({ input: { bucketKey: '<String>', contentHash: '<String>', contentType: '<String>', size: '<Int>', filename: '<String>' } }).execute()
+db.mutation.requestUploadUrl({ input: '<RequestUploadUrlInput>' }).execute()
 ```
 
 ## Examples
@@ -18,5 +18,5 @@ db.mutation.requestUploadUrl({ input: { bucketKey: '<String>', contentHash: '<St
 ### Run requestUploadUrl
 
 ```typescript
-const result = await db.mutation.requestUploadUrl({ input: { bucketKey: '<String>', contentHash: '<String>', contentType: '<String>', size: '<Int>', filename: '<String>' } }).execute();
+const result = await db.mutation.requestUploadUrl({ input: '<RequestUploadUrlInput>' }).execute();
 ```

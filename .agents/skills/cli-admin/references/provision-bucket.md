@@ -10,7 +10,7 @@ and lifecycle settings.
 ## Usage
 
 ```bash
-csdk provision-bucket --input.bucketKey <String>
+csdk provision-bucket --input.bucketKey <String> --input.ownerId <UUID>
 ```
 
 ## Examples
@@ -18,5 +18,5 @@ csdk provision-bucket --input.bucketKey <String>
 ### Run provisionBucket
 
 ```bash
-csdk provision-bucket --input.bucketKey <String>
+csdk provision-bucket --input.bucketKey <String> --input.ownerId <UUID>
 ```

@@ -1,13 +1,13 @@
 ---
 name: cli-admin
-description: CLI tool (csdk) for the admin API — provides CRUD commands for 33 tables and 16 custom operations
+description: CLI tool (csdk) for the admin API — provides CRUD commands for 34 tables and 16 custom operations
 ---
 
 # cli-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-CLI tool (csdk) for the admin API — provides CRUD commands for 33 tables and 16 custom operations
+CLI tool (csdk) for the admin API — provides CRUD commands for 34 tables and 16 custom operations
 
 ## Usage
 
@@ -79,11 +79,12 @@ See the `references/` directory for detailed per-entity API documentation:
 - [membership-type](references/membership-type.md)
 - [app-grant](references/app-grant.md)
 - [app-membership-default](references/app-membership-default.md)
+- [org-membership-default](references/org-membership-default.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
-- [org-membership-default](references/org-membership-default.md)
 - [org-member-profile](references/org-member-profile.md)
+- [org-membership-setting](references/org-membership-setting.md)
 - [app-level](references/app-level.md)
 - [app-invite](references/app-invite.md)
 - [org-invite](references/org-invite.md)

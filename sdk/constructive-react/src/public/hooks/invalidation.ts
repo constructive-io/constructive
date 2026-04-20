@@ -44,6 +44,7 @@ import {
   secureTableProvisionKeys,
   relationProvisionKeys,
   sessionSecretsModuleKeys,
+  identityProvidersModuleKeys,
   schemaGrantKeys,
   defaultPrivilegeKeys,
   enumKeys,
@@ -83,6 +84,8 @@ import {
   storageModuleKeys,
   entityTypeProvisionKeys,
   webauthnCredentialsModuleKeys,
+  webauthnAuthModuleKeys,
+  notificationsModuleKeys,
   databaseProvisionModuleKeys,
   appAdminGrantKeys,
   appOwnerGrantKeys,
@@ -104,12 +107,14 @@ import {
   emailKeys,
   phoneNumberKeys,
   cryptoAddressKeys,
+  webauthnCredentialKeys,
   appInviteKeys,
   appClaimedInviteKeys,
   orgInviteKeys,
   orgClaimedInviteKeys,
   auditLogKeys,
   appPermissionDefaultKeys,
+  identityProviderKeys,
   refKeys,
   storeKeys,
   roleTypeKeys,
@@ -119,12 +124,13 @@ import {
   devicesModuleKeys,
   userConnectedAccountKeys,
   appMembershipDefaultKeys,
+  orgMembershipDefaultKeys,
   commitKeys,
   rateLimitsModuleKeys,
   membershipTypeKeys,
-  orgMembershipDefaultKeys,
   rlsModuleKeys,
   sqlActionKeys,
+  orgMembershipSettingKeys,
   userKeys,
   astMigrationKeys,
   appMembershipKeys,
@@ -611,6 +617,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: sessionSecretsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate identityProvidersModule queries */ identityProvidersModule: {
+    /** Invalidate all identityProvidersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.all,
+      }),
+    /** Invalidate identityProvidersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvidersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.detail(id),
       }),
   },
   /** Invalidate schemaGrant queries */ schemaGrant: {
@@ -1261,6 +1284,40 @@ export const invalidate = {
         queryKey: webauthnCredentialsModuleKeys.detail(id),
       }),
   },
+  /** Invalidate webauthnAuthModule queries */ webauthnAuthModule: {
+    /** Invalidate all webauthnAuthModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.all,
+      }),
+    /** Invalidate webauthnAuthModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnAuthModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate notificationsModule queries */ notificationsModule: {
+    /** Invalidate all notificationsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.all,
+      }),
+    /** Invalidate notificationsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific notificationsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate databaseProvisionModule queries */ databaseProvisionModule: {
     /** Invalidate all databaseProvisionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1597,6 +1654,23 @@ export const invalidate = {
         queryKey: cryptoAddressKeys.detail(id),
       }),
   },
+  /** Invalidate webauthnCredential queries */ webauthnCredential: {
+    /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.all,
+      }),
+    /** Invalidate webauthnCredential list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnCredential */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialKeys.detail(id),
+      }),
+  },
   /** Invalidate appInvite queries */ appInvite: {
     /** Invalidate all appInvite queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1694,6 +1768,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: appPermissionDefaultKeys.detail(id),
+      }),
+  },
+  /** Invalidate identityProvider queries */ identityProvider: {
+    /** Invalidate all identityProvider queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.all,
+      }),
+    /** Invalidate identityProvider list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvider */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.detail(id),
       }),
   },
   /** Invalidate ref queries */ ref: {
@@ -1840,6 +1931,23 @@ export const invalidate = {
         queryKey: appMembershipDefaultKeys.detail(id),
       }),
   },
+  /** Invalidate orgMembershipDefault queries */ orgMembershipDefault: {
+    /** Invalidate all orgMembershipDefault queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipDefaultKeys.all,
+      }),
+    /** Invalidate orgMembershipDefault list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipDefaultKeys.lists(),
+      }),
+    /** Invalidate a specific orgMembershipDefault */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipDefaultKeys.detail(id),
+      }),
+  },
   /** Invalidate commit queries */ commit: {
     /** Invalidate all commit queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1888,23 +1996,6 @@ export const invalidate = {
         queryKey: membershipTypeKeys.detail(id),
       }),
   },
-  /** Invalidate orgMembershipDefault queries */ orgMembershipDefault: {
-    /** Invalidate all orgMembershipDefault queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgMembershipDefaultKeys.all,
-      }),
-    /** Invalidate orgMembershipDefault list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: orgMembershipDefaultKeys.lists(),
-      }),
-    /** Invalidate a specific orgMembershipDefault */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: orgMembershipDefaultKeys.detail(id),
-      }),
-  },
   /** Invalidate rlsModule queries */ rlsModule: {
     /** Invalidate all rlsModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1937,6 +2028,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: sqlActionKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgMembershipSetting queries */ orgMembershipSetting: {
+    /** Invalidate all orgMembershipSetting queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipSettingKeys.all,
+      }),
+    /** Invalidate orgMembershipSetting list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipSettingKeys.lists(),
+      }),
+    /** Invalidate a specific orgMembershipSetting */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipSettingKeys.detail(id),
       }),
   },
   /** Invalidate user queries */ user: {
@@ -2211,6 +2319,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: sessionSecretsModuleKeys.detail(id),
+    });
+  },
+  /** Remove identityProvidersModule from cache */ identityProvidersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: identityProvidersModuleKeys.detail(id),
     });
   },
   /** Remove schemaGrant from cache */ schemaGrant: (
@@ -2498,6 +2614,22 @@ export const remove = {
       queryKey: webauthnCredentialsModuleKeys.detail(id),
     });
   },
+  /** Remove webauthnAuthModule from cache */ webauthnAuthModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove notificationsModule from cache */ notificationsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: notificationsModuleKeys.detail(id),
+    });
+  },
   /** Remove databaseProvisionModule from cache */ databaseProvisionModule: (
     queryClient: QueryClient,
     id: string | number
@@ -2642,6 +2774,14 @@ export const remove = {
       queryKey: cryptoAddressKeys.detail(id),
     });
   },
+  /** Remove webauthnCredential from cache */ webauthnCredential: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnCredentialKeys.detail(id),
+    });
+  },
   /** Remove appInvite from cache */ appInvite: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: appInviteKeys.detail(id),
@@ -2679,6 +2819,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: appPermissionDefaultKeys.detail(id),
+    });
+  },
+  /** Remove identityProvider from cache */ identityProvider: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: identityProviderKeys.detail(id),
     });
   },
   /** Remove ref from cache */ ref: (queryClient: QueryClient, id: string | number) => {
@@ -2744,6 +2892,14 @@ export const remove = {
       queryKey: appMembershipDefaultKeys.detail(id),
     });
   },
+  /** Remove orgMembershipDefault from cache */ orgMembershipDefault: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgMembershipDefaultKeys.detail(id),
+    });
+  },
   /** Remove commit from cache */ commit: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: commitKeys.detail(id),
@@ -2765,14 +2921,6 @@ export const remove = {
       queryKey: membershipTypeKeys.detail(id),
     });
   },
-  /** Remove orgMembershipDefault from cache */ orgMembershipDefault: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: orgMembershipDefaultKeys.detail(id),
-    });
-  },
   /** Remove rlsModule from cache */ rlsModule: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: rlsModuleKeys.detail(id),
@@ -2781,6 +2929,14 @@ export const remove = {
   /** Remove sqlAction from cache */ sqlAction: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: sqlActionKeys.detail(id),
+    });
+  },
+  /** Remove orgMembershipSetting from cache */ orgMembershipSetting: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgMembershipSettingKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

@@ -12,8 +12,8 @@ csdk phone-number list --where.<field>.<op> <value> --orderBy <values>
 csdk phone-number list --limit 10 --after <cursor>
 csdk phone-number find-first --where.<field>.<op> <value>
 csdk phone-number get --id <UUID>
-csdk phone-number create --cc <String> --number <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
-csdk phone-number update --id <UUID> [--ownerId <UUID>] [--cc <String>] [--number <String>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
+csdk phone-number create --cc <String> --number <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
+csdk phone-number update --id <UUID> [--ownerId <UUID>] [--cc <String>] [--number <String>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
 csdk phone-number delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk phone-number list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a phoneNumber
 
 ```bash
-csdk phone-number create --cc <String> --number <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
+csdk phone-number create --cc <String> --number <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
 ```
 
 ### Get a phoneNumber by id

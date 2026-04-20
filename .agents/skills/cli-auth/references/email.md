@@ -12,8 +12,8 @@ csdk email list --where.<field>.<op> <value> --orderBy <values>
 csdk email list --limit 10 --after <cursor>
 csdk email find-first --where.<field>.<op> <value>
 csdk email get --id <UUID>
-csdk email create --email <Email> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
-csdk email update --id <UUID> [--ownerId <UUID>] [--email <Email>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
+csdk email create --email <Email> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
+csdk email update --id <UUID> [--ownerId <UUID>] [--email <Email>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
 csdk email delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk email list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a email
 
 ```bash
-csdk email create --email <Email> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
+csdk email create --email <Email> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
 ```
 
 ### Get a email by id

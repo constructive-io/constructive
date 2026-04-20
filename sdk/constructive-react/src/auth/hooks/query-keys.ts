@@ -46,6 +46,15 @@ export const cryptoAddressKeys = {
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...cryptoAddressKeys.details(), id] as const,
 } as const;
+export const webauthnCredentialKeys = {
+  /** All webauthnCredential queries */ all: ['webauthncredential'] as const,
+  /** List query keys */ lists: () => [...webauthnCredentialKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...webauthnCredentialKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...webauthnCredentialKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...webauthnCredentialKeys.details(), id] as const,
+} as const;
 export const auditLogKeys = {
   /** All auditLog queries */ all: ['auditlog'] as const,
   /** List query keys */ lists: () => [...auditLogKeys.all, 'list'] as const,
@@ -54,6 +63,15 @@ export const auditLogKeys = {
   /** Detail query keys */ details: () => [...auditLogKeys.all, 'detail'] as const,
   /** Detail query key for specific item */ detail: (id: string | number) =>
     [...auditLogKeys.details(), id] as const,
+} as const;
+export const identityProviderKeys = {
+  /** All identityProvider queries */ all: ['identityprovider'] as const,
+  /** List query keys */ lists: () => [...identityProviderKeys.all, 'list'] as const,
+  /** List query key with variables */ list: (variables?: object) =>
+    [...identityProviderKeys.lists(), variables] as const,
+  /** Detail query keys */ details: () => [...identityProviderKeys.all, 'detail'] as const,
+  /** Detail query key for specific item */ detail: (id: string | number) =>
+    [...identityProviderKeys.details(), id] as const,
 } as const;
 export const roleTypeKeys = {
   /** All roleType queries */ all: ['roletype'] as const,
@@ -121,7 +139,9 @@ export const queryKeys = {
   email: emailKeys,
   phoneNumber: phoneNumberKeys,
   cryptoAddress: cryptoAddressKeys,
+  webauthnCredential: webauthnCredentialKeys,
   auditLog: auditLogKeys,
+  identityProvider: identityProviderKeys,
   roleType: roleTypeKeys,
   userConnectedAccount: userConnectedAccountKeys,
   user: userKeys,

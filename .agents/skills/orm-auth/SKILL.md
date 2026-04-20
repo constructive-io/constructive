@@ -1,13 +1,13 @@
 ---
 name: orm-auth
-description: ORM client for the auth API — provides typed CRUD operations for 7 tables and 29 custom operations
+description: ORM client for the auth API — provides typed CRUD operations for 9 tables and 29 custom operations
 ---
 
 # orm-auth
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the auth API — provides typed CRUD operations for 7 tables and 29 custom operations
+ORM client for the auth API — provides typed CRUD operations for 9 tables and 29 custom operations
 
 ## Usage
 
@@ -15,7 +15,7 @@ ORM client for the auth API — provides typed CRUD operations for 7 tables and 
 // Import the ORM client
 import { db } from './orm';
 
-// Available models: email, phoneNumber, cryptoAddress, auditLog, roleType, userConnectedAccount, user
+// Available models: email, phoneNumber, cryptoAddress, webauthnCredential, auditLog, identityProvider, roleType, userConnectedAccount, ...
 db.<model>.findMany({ select: { id: true } }).execute()
 db.<model>.findOne({ id: '<UUID>', select: { id: true } }).execute()
 db.<model>.create({ data: { ... }, select: { id: true } }).execute()
@@ -40,7 +40,9 @@ See the `references/` directory for detailed per-entity API documentation:
 - [email](references/email.md)
 - [phone-number](references/phone-number.md)
 - [crypto-address](references/crypto-address.md)
+- [webauthn-credential](references/webauthn-credential.md)
 - [audit-log](references/audit-log.md)
+- [identity-provider](references/identity-provider.md)
 - [role-type](references/role-type.md)
 - [user-connected-account](references/user-connected-account.md)
 - [user](references/user.md)
@@ -62,12 +64,12 @@ See the `references/` directory for detailed per-entity API documentation:
 - [verify-email](references/verify-email.md)
 - [provision-new-user](references/provision-new-user.md)
 - [reset-password](references/reset-password.md)
-- [create-api-key](references/create-api-key.md)
 - [sign-in-cross-origin](references/sign-in-cross-origin.md)
 - [sign-up](references/sign-up.md)
 - [request-cross-origin-token](references/request-cross-origin-token.md)
 - [sign-in](references/sign-in.md)
 - [extend-token-expires](references/extend-token-expires.md)
+- [create-api-key](references/create-api-key.md)
 - [forgot-password](references/forgot-password.md)
 - [send-verification-email](references/send-verification-email.md)
 - [request-upload-url](references/request-upload-url.md)

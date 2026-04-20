@@ -1,13 +1,13 @@
 ---
 name: orm-public
-description: ORM client for the public API — provides typed CRUD operations for 114 tables and 72 custom operations
+description: ORM client for the public API — provides typed CRUD operations for 120 tables and 72 custom operations
 ---
 
 # orm-public
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the public API — provides typed CRUD operations for 114 tables and 72 custom operations
+ORM client for the public API — provides typed CRUD operations for 120 tables and 72 custom operations
 
 ## Usage
 
@@ -66,6 +66,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [secure-table-provision](references/secure-table-provision.md)
 - [relation-provision](references/relation-provision.md)
 - [session-secrets-module](references/session-secrets-module.md)
+- [identity-providers-module](references/identity-providers-module.md)
 - [schema-grant](references/schema-grant.md)
 - [default-privilege](references/default-privilege.md)
 - [enum](references/enum.md)
@@ -105,6 +106,8 @@ See the `references/` directory for detailed per-entity API documentation:
 - [storage-module](references/storage-module.md)
 - [entity-type-provision](references/entity-type-provision.md)
 - [webauthn-credentials-module](references/webauthn-credentials-module.md)
+- [webauthn-auth-module](references/webauthn-auth-module.md)
+- [notifications-module](references/notifications-module.md)
 - [database-provision-module](references/database-provision-module.md)
 - [app-admin-grant](references/app-admin-grant.md)
 - [app-owner-grant](references/app-owner-grant.md)
@@ -126,12 +129,14 @@ See the `references/` directory for detailed per-entity API documentation:
 - [email](references/email.md)
 - [phone-number](references/phone-number.md)
 - [crypto-address](references/crypto-address.md)
+- [webauthn-credential](references/webauthn-credential.md)
 - [app-invite](references/app-invite.md)
 - [app-claimed-invite](references/app-claimed-invite.md)
 - [org-invite](references/org-invite.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
 - [audit-log](references/audit-log.md)
 - [app-permission-default](references/app-permission-default.md)
+- [identity-provider](references/identity-provider.md)
 - [ref](references/ref.md)
 - [store](references/store.md)
 - [role-type](references/role-type.md)
@@ -141,12 +146,13 @@ See the `references/` directory for detailed per-entity API documentation:
 - [devices-module](references/devices-module.md)
 - [user-connected-account](references/user-connected-account.md)
 - [app-membership-default](references/app-membership-default.md)
+- [org-membership-default](references/org-membership-default.md)
 - [commit](references/commit.md)
 - [rate-limits-module](references/rate-limits-module.md)
 - [membership-type](references/membership-type.md)
-- [org-membership-default](references/org-membership-default.md)
 - [rls-module](references/rls-module.md)
 - [sql-action](references/sql-action.md)
+- [org-membership-setting](references/org-membership-setting.md)
 - [user](references/user.md)
 - [ast-migration](references/ast-migration.md)
 - [app-membership](references/app-membership.md)
@@ -196,7 +202,6 @@ See the `references/` directory for detailed per-entity API documentation:
 - [reset-password](references/reset-password.md)
 - [remove-node-at-path](references/remove-node-at-path.md)
 - [copy-template-to-blueprint](references/copy-template-to-blueprint.md)
-- [create-api-key](references/create-api-key.md)
 - [provision-spatial-relation](references/provision-spatial-relation.md)
 - [bootstrap-user](references/bootstrap-user.md)
 - [set-field-order](references/set-field-order.md)
@@ -214,6 +219,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [sign-in-cross-origin](references/sign-in-cross-origin.md)
 - [create-user-database](references/create-user-database.md)
 - [extend-token-expires](references/extend-token-expires.md)
+- [create-api-key](references/create-api-key.md)
 - [sign-up](references/sign-up.md)
 - [request-cross-origin-token](references/request-cross-origin-token.md)
 - [sign-in](references/sign-in.md)

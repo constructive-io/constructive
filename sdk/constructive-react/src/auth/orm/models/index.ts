@@ -6,7 +6,9 @@
 export { EmailModel } from './email';
 export { PhoneNumberModel } from './phoneNumber';
 export { CryptoAddressModel } from './cryptoAddress';
+export { WebauthnCredentialModel } from './webauthnCredential';
 export { AuditLogModel } from './auditLog';
+export { IdentityProviderModel } from './identityProvider';
 export { RoleTypeModel } from './roleType';
 export { UserConnectedAccountModel } from './userConnectedAccount';
 export { UserModel } from './user';

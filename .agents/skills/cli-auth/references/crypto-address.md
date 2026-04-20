@@ -12,8 +12,8 @@ csdk crypto-address list --where.<field>.<op> <value> --orderBy <values>
 csdk crypto-address list --limit 10 --after <cursor>
 csdk crypto-address find-first --where.<field>.<op> <value>
 csdk crypto-address get --id <UUID>
-csdk crypto-address create --address <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
-csdk crypto-address update --id <UUID> [--ownerId <UUID>] [--address <String>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
+csdk crypto-address create --address <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
+csdk crypto-address update --id <UUID> [--ownerId <UUID>] [--address <String>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
 csdk crypto-address delete --id <UUID>
 ```
 
@@ -58,7 +58,7 @@ csdk crypto-address list --where.id.equalTo <value> --orderBy ID_ASC
 ### Create a cryptoAddress
 
 ```bash
-csdk crypto-address create --address <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>]
+csdk crypto-address create --address <String> [--ownerId <UUID>] [--isVerified <Boolean>] [--isPrimary <Boolean>] [--name <String>]
 ```
 
 ### Get a cryptoAddress by id
