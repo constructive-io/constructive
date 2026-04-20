@@ -113,13 +113,14 @@ function buildEmbedder(config: EmbedderConfig): EmbedderFunction | null {
  * @param embedder - The resolved embedder function
  * @returns The modified where clause
  */
-export async function autoEmbedWhere(
-  where: Record<string, unknown>,
+export async function autoEmbedWhere<T extends object>(
+  where: T,
   vectorFieldNames: string[],
   embedder: EmbedderFunction,
-): Promise<Record<string, unknown>> {
+): Promise<T> {
+  const rec = where as unknown as Record<string, unknown>;
   for (const fieldName of vectorFieldNames) {
-    const fieldValue = where[fieldName];
+    const fieldValue = rec[fieldName];
     if (fieldValue && typeof fieldValue === 'object') {
       const input = fieldValue as Record<string, unknown>;
       // If 'vector' is a string, embed it
@@ -132,7 +133,7 @@ export async function autoEmbedWhere(
       // Shorthand: --where.vectorEmbedding "text" with --auto-embed
       // becomes { vector: [embedded], metric: 'COSINE' }
       const embedding = await embedder(fieldValue);
-      where[fieldName] = { vector: embedding };
+      rec[fieldName] = { vector: embedding };
     }
   }
   return where;
@@ -157,17 +158,18 @@ export async function autoEmbedWhere(
  * @param embedder - The resolved embedder function
  * @returns The modified data object with text values replaced by vectors
  */
-export async function autoEmbedInput(
-  data: Record<string, unknown>,
+export async function autoEmbedInput<T extends object>(
+  data: T,
   vectorFieldNames: string[],
   embedder: EmbedderFunction,
-): Promise<Record<string, unknown>> {
+): Promise<T> {
+  const rec = data as unknown as Record<string, unknown>;
   for (const fieldName of vectorFieldNames) {
-    const fieldValue = data[fieldName];
+    const fieldValue = rec[fieldName];
     if (typeof fieldValue === 'string') {
       // Text string → embed to vector array
       const embedding = await embedder(fieldValue);
-      data[fieldName] = embedding;
+      rec[fieldName] = embedding;
     }
     // If it's already an array (pre-computed vector), leave it as-is
   }

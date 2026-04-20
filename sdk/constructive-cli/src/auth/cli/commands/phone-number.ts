@@ -22,6 +22,7 @@ const fieldSchema: FieldSchema = {
   number: 'string',
   isVerified: 'boolean',
   isPrimary: 'boolean',
+  name: 'string',
   createdAt: 'string',
   updatedAt: 'string',
 };
@@ -82,11 +83,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       number: true,
       isVerified: true,
       isPrimary: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<PhoneNumberSelect, PhoneNumberFilter, never, PhoneNumberOrderBy> & {
+      FindManyArgs<PhoneNumberSelect, PhoneNumberFilter, PhoneNumberOrderBy> & {
         select: PhoneNumberSelect;
       }
     >(argv, defaultSelect);
@@ -110,11 +112,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       number: true,
       isVerified: true,
       isPrimary: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<PhoneNumberSelect, PhoneNumberFilter, never> & {
+      FindFirstArgs<PhoneNumberSelect, PhoneNumberFilter> & {
         select: PhoneNumberSelect;
       }
     >(argv, defaultSelect);
@@ -150,6 +153,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           number: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -200,6 +204,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -215,6 +226,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           number: cleanedData.number,
           isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          name: cleanedData.name,
         },
         select: {
           id: true,
@@ -223,6 +235,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           number: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -279,6 +292,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as PhoneNumberPatch;
@@ -294,6 +314,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           number: cleanedData.number,
           isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          name: cleanedData.name,
         },
         select: {
           id: true,
@@ -302,6 +323,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           number: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },

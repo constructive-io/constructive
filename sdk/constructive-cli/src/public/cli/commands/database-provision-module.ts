@@ -101,7 +101,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         DatabaseProvisionModuleSelect,
         DatabaseProvisionModuleFilter,
-        never,
         DatabaseProvisionModuleOrderBy
       > & {
         select: DatabaseProvisionModuleSelect;
@@ -137,7 +136,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       completedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter, never> & {
+      FindFirstArgs<DatabaseProvisionModuleSelect, DatabaseProvisionModuleFilter> & {
         select: DatabaseProvisionModuleSelect;
       }
     >(argv, defaultSelect);

@@ -88,7 +88,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       playStoreLink: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<AppSelect, AppFilter, never, AppOrderBy> & {
+      FindManyArgs<AppSelect, AppFilter, AppOrderBy> & {
         select: AppSelect;
       }
     >(argv, defaultSelect);
@@ -117,7 +117,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       playStoreLink: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<AppSelect, AppFilter, never> & {
+      FindFirstArgs<AppSelect, AppFilter> & {
         select: AppSelect;
       }
     >(argv, defaultSelect);

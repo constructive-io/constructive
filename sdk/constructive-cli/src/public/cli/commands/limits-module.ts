@@ -106,7 +106,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       actorTableId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<LimitsModuleSelect, LimitsModuleFilter, never, LimitsModuleOrderBy> & {
+      FindManyArgs<LimitsModuleSelect, LimitsModuleFilter, LimitsModuleOrderBy> & {
         select: LimitsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -144,7 +144,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       actorTableId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<LimitsModuleSelect, LimitsModuleFilter, never> & {
+      FindFirstArgs<LimitsModuleSelect, LimitsModuleFilter> & {
         select: LimitsModuleSelect;
       }
     >(argv, defaultSelect);

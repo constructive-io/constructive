@@ -8,7 +8,7 @@ export interface BucketConfig {
   key: string;
   type: 'public' | 'private' | 'temp';
   is_public: boolean;
-  owner_id: string;
+  owner_id: string | null;
   allowed_mime_types: string[] | null;
   max_file_size: number | null;
 }
@@ -34,6 +34,15 @@ export interface StorageModuleConfig {
   /** Upload requests table name */
   uploadRequestsTableName: string;
 
+  // --- Scope identity ---
+
+  /** Membership type (NULL for app-level, non-NULL for entity-scoped) */
+  membershipType: number | null;
+  /** Entity table ID for entity-scoped storage (NULL for app-level) */
+  entityTableId: string | null;
+  /** Qualified entity table name for ownerId lookups (NULL for app-level) */
+  entityQualifiedName: string | null;
+
   // --- S3 connection config (NULL in DB = use global env/plugin defaults) ---
 
   /** S3-compatible API endpoint URL (per-database override) */
@@ -42,6 +51,8 @@ export interface StorageModuleConfig {
   publicUrlPrefix: string | null;
   /** Storage provider type: 'minio', 's3', 'gcs', etc. (per-database override) */
   provider: string | null;
+  /** CORS allowed origins (per-database override, NULL = use global fallback) */
+  allowedOrigins: string[] | null;
 
   // --- Per-database configurable settings ---
 
@@ -63,6 +74,13 @@ export interface StorageModuleConfig {
 export interface RequestUploadUrlInput {
   /** Bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped uploads.
+   * Omit for app-level (database-wide) storage.
+   * When provided, resolves the storage module for the entity type
+   * that owns this entity instance (e.g., a data room ID, team ID).
+   */
+  ownerId?: string;
   /** SHA-256 content hash computed by the client */
   contentHash: string;
   /** MIME type of the file */
@@ -136,9 +154,58 @@ export interface S3Config {
 export type S3ConfigOrGetter = S3Config | (() => S3Config);
 
 /**
+ * Function to derive the actual S3 bucket name for a given database.
+ *
+ * When provided, the presigned URL plugin calls this on every request
+ * to determine which S3 bucket to use — enabling per-database bucket
+ * isolation. If not provided, falls back to `s3Config.bucket` (global).
+ *
+ * @param databaseId - The metaschema database UUID
+ * @returns The S3 bucket name for this database
+ */
+export type BucketNameResolver = (databaseId: string) => string;
+
+/**
+ * Callback to lazily provision an S3 bucket on first use.
+ *
+ * Called by the presigned URL plugin before generating a presigned PUT URL
+ * when the bucket has not been seen before (tracked in an in-memory cache).
+ * The implementation should create and fully configure the S3 bucket
+ * (privacy policies, CORS, lifecycle rules, etc.) — or no-op if the
+ * bucket already exists.
+ *
+ * @param bucketName - The S3 bucket name to provision
+ * @param accessType - The logical bucket type ('public', 'private', 'temp')
+ * @param databaseId - The metaschema database UUID
+ * @param allowedOrigins - Per-database CORS origins (from storage_module), or null to use global fallback
+ */
+export type EnsureBucketProvisioned = (
+  bucketName: string,
+  accessType: 'public' | 'private' | 'temp',
+  databaseId: string,
+  allowedOrigins: string[] | null,
+) => Promise<void>;
+
+/**
  * Plugin options for the presigned URL plugin.
  */
 export interface PresignedUrlPluginOptions {
   /** S3 configuration (concrete or lazy getter) */
   s3: S3ConfigOrGetter;
+
+  /**
+   * Optional function to resolve S3 bucket name per-database.
+   * When set, each database gets its own S3 bucket instead of sharing
+   * the global `s3Config.bucket`. The S3 credentials (client) remain shared.
+   */
+  resolveBucketName?: BucketNameResolver;
+
+  /**
+   * Optional callback to lazily provision an S3 bucket on first upload.
+   * When set, the plugin calls this before generating a presigned PUT URL
+   * for any S3 bucket it hasn't seen yet (tracked in an in-memory cache).
+   * This enables graceful bucket creation without requiring buckets to
+   * exist at database provisioning time.
+   */
+  ensureBucketProvisioned?: EnsureBucketProvisioned;
 }

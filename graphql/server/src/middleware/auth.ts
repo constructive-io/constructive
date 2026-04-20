@@ -9,6 +9,20 @@ import './types'; // for Request type
 const log = new Logger('auth');
 const isDev = () => getNodeEnv() === 'development';
 
+/** Default cookie name for session tokens. */
+const SESSION_COOKIE_NAME = 'constructive_session';
+
+/**
+ * Extract a named cookie value from the raw Cookie header.
+ * Avoids pulling in cookie-parser as a dependency.
+ */
+const parseCookieToken = (req: Request, cookieName: string): string | undefined => {
+  const header = req.headers.cookie;
+  if (!header) return undefined;
+  const match = header.split(';').find((c) => c.trim().startsWith(`${cookieName}=`));
+  return match ? decodeURIComponent(match.split('=')[1].trim()) : undefined;
+};
+
 export const createAuthenticateMiddleware = (
   opts: PgpmOptions
 ): RequestHandler => {
@@ -60,8 +74,15 @@ export const createAuthenticateMiddleware = (
           `authType=${authType ?? 'none'}, hasToken=${!!authToken}`
       );
 
-      if (authType?.toLowerCase() === 'bearer' && authToken) {
-        log.info('[auth] Processing bearer token authentication');
+      // Resolve the credential: prefer Bearer header, fall back to session cookie
+      const cookieToken = parseCookieToken(req, SESSION_COOKIE_NAME);
+      const effectiveToken = (authType?.toLowerCase() === 'bearer' && authToken)
+        ? authToken
+        : cookieToken;
+      const tokenSource = (authType?.toLowerCase() === 'bearer' && authToken) ? 'bearer' : (cookieToken ? 'cookie' : 'none');
+
+      if (effectiveToken) {
+        log.info(`[auth] Processing ${tokenSource} authentication`);
         const context: Record<string, any> = {
           'jwt.claims.ip_address': req.clientIp,
         };
@@ -81,7 +102,7 @@ export const createAuthenticateMiddleware = (
             client: pool,
             context,
             query: authQuery,
-            variables: [authToken],
+            variables: [effectiveToken],
           });
 
           log.info(`[auth] Query result: rowCount=${result?.rowCount}`);
@@ -111,7 +132,7 @@ export const createAuthenticateMiddleware = (
           return;
         }
       } else {
-        log.info('[auth] No bearer token provided, using anonymous auth');
+        log.info('[auth] No credential provided (no bearer token or session cookie), using anonymous auth');
       }
 
       req.token = token;

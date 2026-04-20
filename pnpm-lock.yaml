@@ -176,6 +176,9 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
+      '@pgsql/quotes':
+        specifier: ^17.1.0
+        version: 17.1.0
       grafast:
         specifier: 1.0.0
         version: 1.0.0(graphql@16.13.0)
@@ -268,6 +271,62 @@ importers:
       '@types/node':
         specifier: ^22.19.11
         version: 22.19.11
+      graphile-test:
+        specifier: workspace:^
+        version: link:../graphile-test/dist
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
+    publishDirectory: dist
+
+  graphile/graphile-llm:
+    dependencies:
+      '@agentic-kit/ollama':
+        specifier: ^1.0.3
+        version: 1.0.3(encoding@0.1.13)
+      '@constructive-io/graphql-env':
+        specifier: workspace:^
+        version: link:../../graphql/env/dist
+      '@dataplan/pg':
+        specifier: 1.0.0
+        version: 1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0)
+      grafast:
+        specifier: 1.0.0
+        version: 1.0.0(graphql@16.13.0)
+      graphile-build:
+        specifier: 5.0.0
+        version: 5.0.0(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)
+      graphile-build-pg:
+        specifier: 5.0.0
+        version: 5.0.0(@dataplan/pg@1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0))(grafast@1.0.0(graphql@16.13.0))(graphile-build@5.0.0(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0)(tamedevil@0.1.0)
+      graphile-config:
+        specifier: 1.0.0
+        version: 1.0.0
+      graphile-utils:
+        specifier: 5.0.0
+        version: 5.0.0(@dataplan/pg@1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0))(grafast@1.0.0(graphql@16.13.0))(graphile-build-pg@5.0.0(@dataplan/pg@1.0.0(@dataplan/json@1.0.0(grafast@1.0.0(graphql@16.13.0)))(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0))(grafast@1.0.0(graphql@16.13.0))(graphile-build@5.0.0(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(pg-sql2@5.0.0)(pg@8.20.0)(tamedevil@0.1.0))(graphile-build@5.0.0(grafast@1.0.0(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0))(graphile-config@1.0.0)(graphql@16.13.0)(tamedevil@0.1.0)
+      graphql:
+        specifier: 16.13.0
+        version: 16.13.0
+      pg-sql2:
+        specifier: 5.0.0
+        version: 5.0.0
+      postgraphile:
+        specifier: 5.0.0
+        version: 5.0.0(0c2cedda320a650bce7ee949e4b7e993)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.19.11
+        version: 22.19.15
+      graphile-connection-filter:
+        specifier: workspace:^
+        version: link:../graphile-connection-filter/dist
+      graphile-search:
+        specifier: workspace:^
+        version: link:../graphile-search/dist
       graphile-test:
         specifier: workspace:^
         version: link:../graphile-test/dist
@@ -384,6 +443,9 @@ importers:
       '@pgpmjs/logger':
         specifier: workspace:^
         version: link:../../pgpm/logger/dist
+      '@pgsql/quotes':
+        specifier: ^17.1.0
+        version: 17.1.0
       grafast:
         specifier: 1.0.0
         version: 1.0.0(graphql@16.13.0)
@@ -542,6 +604,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1009.0
         version: 3.1009.0
+      '@constructive-io/bucket-provisioner':
+        specifier: workspace:^
+        version: link:../../packages/bucket-provisioner/dist
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../../graphql/env/dist
@@ -1027,7 +1092,7 @@ importers:
         version: link:../../postgres/pgsql-test/dist
       ts-jest:
         specifier: ^29.1.0
-        version: 29.4.6(@babel/core@7.29.0)(@jest/transform@30.3.0)(@jest/types@30.3.0)(babel-jest@30.3.0(@babel/core@7.29.0))(jest-util@30.3.0)(jest@30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3)))(typescript@5.9.3)
+        version: 29.4.6(@babel/core@7.29.0)(@jest/transform@30.3.0)(@jest/types@30.3.0)(babel-jest@30.3.0(@babel/core@7.29.0))(jest-util@30.3.0)(jest@30.3.0(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)))(typescript@5.9.3)
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
@@ -1680,8 +1745,8 @@ importers:
         specifier: ^0.18.0
         version: 0.18.0
       '@pgpm/metaschema-modules':
-        specifier: ^0.18.0
-        version: 0.18.0
+        specifier: ^0.21.1
+        version: 0.21.1
       '@pgpm/metaschema-schema':
         specifier: ^0.18.0
         version: 0.18.0
@@ -4350,14 +4415,23 @@ packages:
   '@pgpm/database-jobs@0.18.0':
     resolution: {integrity: sha512-3LX7ZQJQEMHd4POG2I2xPzMFR2X6LwvuxJAMpLhcc/I4P3EbEyEig6rPpsyDr9uabRjgUWfZDz05w6cW8X4KwA==}
 
+  '@pgpm/database-jobs@0.21.0':
+    resolution: {integrity: sha512-TN6Uddyq5PJMQ7P+dJOCl0xwyIW1Hv8PkJmRshMNljzt0OVu4Mq8YR5gNkTDveGGHdYCDyP0vhCrpty9aQld6g==}
+
   '@pgpm/inflection@0.18.0':
     resolution: {integrity: sha512-gHfxI6l/+cE9zY5ea6BjVjNcb9VKIavqRXGVyw16Fy0n4HgCmxF8ccZFFPq46JXfakNSk3cPTHDYvvWQaAlIPA==}
 
-  '@pgpm/metaschema-modules@0.18.0':
-    resolution: {integrity: sha512-bSawB8SJJWGRpQjazJR4MYL6zMmI7dqdUtmw9O9jj7NqGXbZDLqrfUYOzxDbThJ/4BI49fJba19Qiz94Ys/CCg==}
+  '@pgpm/inflection@0.21.0':
+    resolution: {integrity: sha512-tb1OQCQp1i5SjT04CCN27ptGQcDXidVZrDB8SJsdZZrz6Rcl0WStf4t50z5CSUebg8RJxkpiF4VNpv583RCuhQ==}
+
+  '@pgpm/metaschema-modules@0.21.1':
+    resolution: {integrity: sha512-6RTHN+PcxmTma7k7uHPZdjtN92P3kkqndXxu2acuSOpXi1sxrN5nNSNgi2r42ovl92B8MKy4r7SyF5DUlQwD1A==}
 
   '@pgpm/metaschema-schema@0.18.0':
     resolution: {integrity: sha512-joIBoYegI4ZQFFPW7w0HhNXMT+sXnmSytX8YBxGgi5XZqjE2aQdtZcWBIiwZa3MjqU7mYN2xlZt5gPmo/IzLMw==}
+
+  '@pgpm/metaschema-schema@0.21.0':
+    resolution: {integrity: sha512-kRfVyysGOrGcZEElcAJWaX9Xx2f5fMPtI4rmAxI11vJ0axYUcqtI+9fyp7McwqXnIHr0ShR28jvwqUGaZherJw==}
 
   '@pgpm/services@0.18.0':
     resolution: {integrity: sha512-YedLEVdgwkHden55uaZaO8O3HACEiIvblYmPFsQk1ivHwzw1l0KUv6WT5+idwMC/SOsexH/Xq8ckSSM84ErWtQ==}
@@ -4365,8 +4439,14 @@ packages:
   '@pgpm/types@0.18.0':
     resolution: {integrity: sha512-w6pfcS5HuJ2IGfyn74mGChl0nhNBIbxdu6sarlARGveZFHvBkTIPKEezA524sLKhUHda84YWuExEhCUd6N/AqQ==}
 
+  '@pgpm/types@0.21.0':
+    resolution: {integrity: sha512-F5ph4z7JWwKVcy/CmAgodEIXqXCwSgv0ESVxIV2spdl01RgNi0SdKuHqVJnjp8rbHHUtlCPRj/UlAopUSpIIOg==}
+
   '@pgpm/verify@0.18.0':
     resolution: {integrity: sha512-7XtY+hj9CbYb0ZhD0LJRp+TErtYS2z0FZbdkMNM7UabEwz05VLlS/lXbdtn5hksbUq6dkIxwxQ2mfFpATPpqDQ==}
+
+  '@pgpm/verify@0.21.0':
+    resolution: {integrity: sha512-z4iiwEUrUR+aIvxfu4+HefitVPLtypXdbyEkbNJ//EMsnzturo6wzxT1e60w/Xp29AzF6m5OaJ0djc6lzr9hTw==}
 
   '@pgsql/quotes@17.1.0':
     resolution: {integrity: sha512-J/H+LcrENBpYgL45WW6aTjb5Yk4tX4+AmB2/k8KZa+Zh3wiCtqmNIag+HZz5HmWaF6EZK9ZGC95NBD1fs+rUvg==}
@@ -11444,41 +11524,6 @@ snapshots:
       - supports-color
       - ts-node
 
-  '@jest/core@30.3.0(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3))':
-    dependencies:
-      '@jest/console': 30.3.0
-      '@jest/pattern': 30.0.1
-      '@jest/reporters': 30.3.0
-      '@jest/test-result': 30.3.0
-      '@jest/transform': 30.3.0
-      '@jest/types': 30.3.0
-      '@types/node': 22.19.15
-      ansi-escapes: 4.3.2
-      chalk: 4.1.2
-      ci-info: 4.4.0
-      exit-x: 0.2.2
-      graceful-fs: 4.2.11
-      jest-changed-files: 30.3.0
-      jest-config: 30.3.0(@types/node@22.19.15)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3))
-      jest-haste-map: 30.3.0
-      jest-message-util: 30.3.0
-      jest-regex-util: 30.0.1
-      jest-resolve: 30.3.0
-      jest-resolve-dependencies: 30.3.0
-      jest-runner: 30.3.0
-      jest-runtime: 30.3.0
-      jest-snapshot: 30.3.0
-      jest-util: 30.3.0
-      jest-validate: 30.3.0
-      jest-watcher: 30.3.0
-      pretty-format: 30.3.0
-      slash: 3.0.0
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - esbuild-register
-      - supports-color
-      - ts-node
-
   '@jest/diff-sequences@30.0.1': {}
 
   '@jest/diff-sequences@30.3.0': {}
@@ -12121,14 +12166,22 @@ snapshots:
     dependencies:
       '@pgpm/verify': 0.18.0
 
+  '@pgpm/database-jobs@0.21.0':
+    dependencies:
+      '@pgpm/verify': 0.21.0
+
   '@pgpm/inflection@0.18.0':
     dependencies:
       '@pgpm/verify': 0.18.0
 
-  '@pgpm/metaschema-modules@0.18.0':
+  '@pgpm/inflection@0.21.0':
     dependencies:
-      '@pgpm/metaschema-schema': 0.18.0
-      '@pgpm/verify': 0.18.0
+      '@pgpm/verify': 0.21.0
+
+  '@pgpm/metaschema-modules@0.21.1':
+    dependencies:
+      '@pgpm/metaschema-schema': 0.21.0
+      '@pgpm/verify': 0.21.0
 
   '@pgpm/metaschema-schema@0.18.0':
     dependencies:
@@ -12136,6 +12189,13 @@ snapshots:
       '@pgpm/inflection': 0.18.0
       '@pgpm/types': 0.18.0
       '@pgpm/verify': 0.18.0
+
+  '@pgpm/metaschema-schema@0.21.0':
+    dependencies:
+      '@pgpm/database-jobs': 0.21.0
+      '@pgpm/inflection': 0.21.0
+      '@pgpm/types': 0.21.0
+      '@pgpm/verify': 0.21.0
 
   '@pgpm/services@0.18.0':
     dependencies:
@@ -12146,7 +12206,13 @@ snapshots:
     dependencies:
       '@pgpm/verify': 0.18.0
 
+  '@pgpm/types@0.21.0':
+    dependencies:
+      '@pgpm/verify': 0.21.0
+
   '@pgpm/verify@0.18.0': {}
+
+  '@pgpm/verify@0.21.0': {}
 
   '@pgsql/quotes@17.1.0': {}
 
@@ -15665,25 +15731,6 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-cli@30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3)):
-    dependencies:
-      '@jest/core': 30.3.0(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3))
-      '@jest/test-result': 30.3.0
-      '@jest/types': 30.3.0
-      chalk: 4.1.2
-      exit-x: 0.2.2
-      import-local: 3.2.0
-      jest-config: 30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3))
-      jest-util: 30.3.0
-      jest-validate: 30.3.0
-      yargs: 17.7.2
-    transitivePeerDependencies:
-      - '@types/node'
-      - babel-plugin-macros
-      - esbuild-register
-      - supports-color
-      - ts-node
-
   jest-config@30.3.0(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3)):
     dependencies:
       '@babel/core': 7.29.0
@@ -15744,70 +15791,6 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.19.15
       ts-node: 10.9.2(@types/node@22.19.11)(typescript@5.9.3)
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - supports-color
-
-  jest-config@30.3.0(@types/node@22.19.15)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3)):
-    dependencies:
-      '@babel/core': 7.29.0
-      '@jest/get-type': 30.1.0
-      '@jest/pattern': 30.0.1
-      '@jest/test-sequencer': 30.3.0
-      '@jest/types': 30.3.0
-      babel-jest: 30.3.0(@babel/core@7.29.0)
-      chalk: 4.1.2
-      ci-info: 4.4.0
-      deepmerge: 4.3.1
-      glob: 10.5.0
-      graceful-fs: 4.2.11
-      jest-circus: 30.3.0
-      jest-docblock: 30.2.0
-      jest-environment-node: 30.3.0
-      jest-regex-util: 30.0.1
-      jest-resolve: 30.3.0
-      jest-runner: 30.3.0
-      jest-util: 30.3.0
-      jest-validate: 30.3.0
-      parse-json: 5.2.0
-      pretty-format: 30.3.0
-      slash: 3.0.0
-      strip-json-comments: 3.1.1
-    optionalDependencies:
-      '@types/node': 22.19.15
-      ts-node: 10.9.2(@types/node@25.5.0)(typescript@5.9.3)
-    transitivePeerDependencies:
-      - babel-plugin-macros
-      - supports-color
-
-  jest-config@30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3)):
-    dependencies:
-      '@babel/core': 7.29.0
-      '@jest/get-type': 30.1.0
-      '@jest/pattern': 30.0.1
-      '@jest/test-sequencer': 30.3.0
-      '@jest/types': 30.3.0
-      babel-jest: 30.3.0(@babel/core@7.29.0)
-      chalk: 4.1.2
-      ci-info: 4.4.0
-      deepmerge: 4.3.1
-      glob: 10.5.0
-      graceful-fs: 4.2.11
-      jest-circus: 30.3.0
-      jest-docblock: 30.2.0
-      jest-environment-node: 30.3.0
-      jest-regex-util: 30.0.1
-      jest-resolve: 30.3.0
-      jest-runner: 30.3.0
-      jest-util: 30.3.0
-      jest-validate: 30.3.0
-      parse-json: 5.2.0
-      pretty-format: 30.3.0
-      slash: 3.0.0
-      strip-json-comments: 3.1.1
-    optionalDependencies:
-      '@types/node': 25.5.0
-      ts-node: 10.9.2(@types/node@25.5.0)(typescript@5.9.3)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -16085,19 +16068,6 @@ snapshots:
       '@jest/types': 30.3.0
       import-local: 3.2.0
       jest-cli: 30.3.0(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
-    transitivePeerDependencies:
-      - '@types/node'
-      - babel-plugin-macros
-      - esbuild-register
-      - supports-color
-      - ts-node
-
-  jest@30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3)):
-    dependencies:
-      '@jest/core': 30.3.0(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3))
-      '@jest/types': 30.3.0
-      import-local: 3.2.0
-      jest-cli: 30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3))
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -18534,26 +18504,6 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       handlebars: 4.7.8
       jest: 30.3.0(@types/node@22.19.11)(ts-node@10.9.2(@types/node@22.19.11)(typescript@5.9.3))
-      json5: 2.2.3
-      lodash.memoize: 4.1.2
-      make-error: 1.3.6
-      semver: 7.7.4
-      type-fest: 4.41.0
-      typescript: 5.9.3
-      yargs-parser: 21.1.1
-    optionalDependencies:
-      '@babel/core': 7.29.0
-      '@jest/transform': 30.3.0
-      '@jest/types': 30.3.0
-      babel-jest: 30.3.0(@babel/core@7.29.0)
-      jest-util: 30.3.0
-
-  ts-jest@29.4.6(@babel/core@7.29.0)(@jest/transform@30.3.0)(@jest/types@30.3.0)(babel-jest@30.3.0(@babel/core@7.29.0))(jest-util@30.3.0)(jest@30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3)))(typescript@5.9.3):
-    dependencies:
-      bs-logger: 0.2.6
-      fast-json-stable-stringify: 2.1.0
-      handlebars: 4.7.8
-      jest: 30.3.0(@types/node@25.5.0)(ts-node@10.9.2(@types/node@25.5.0)(typescript@5.9.3))
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6

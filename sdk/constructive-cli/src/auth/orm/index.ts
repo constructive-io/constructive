@@ -8,9 +8,11 @@ import type { OrmClientConfig } from './client';
 import { EmailModel } from './models/email';
 import { PhoneNumberModel } from './models/phoneNumber';
 import { CryptoAddressModel } from './models/cryptoAddress';
-import { ConnectedAccountModel } from './models/connectedAccount';
+import { WebauthnCredentialModel } from './models/webauthnCredential';
 import { AuditLogModel } from './models/auditLog';
+import { IdentityProviderModel } from './models/identityProvider';
 import { RoleTypeModel } from './models/roleType';
+import { UserConnectedAccountModel } from './models/userConnectedAccount';
 import { UserModel } from './models/user';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
@@ -51,9 +53,11 @@ export function createClient(config: OrmClientConfig) {
     email: new EmailModel(client),
     phoneNumber: new PhoneNumberModel(client),
     cryptoAddress: new CryptoAddressModel(client),
-    connectedAccount: new ConnectedAccountModel(client),
+    webauthnCredential: new WebauthnCredentialModel(client),
     auditLog: new AuditLogModel(client),
+    identityProvider: new IdentityProviderModel(client),
     roleType: new RoleTypeModel(client),
+    userConnectedAccount: new UserConnectedAccountModel(client),
     user: new UserModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),

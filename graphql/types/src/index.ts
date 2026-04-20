@@ -22,3 +22,10 @@ export {
   GraphQLError,
   QueryResult
 } from './adapter';
+
+// Export LLM types
+export {
+  LlmOptions,
+  LlmEmbedderOptions,
+  LlmChatOptions
+} from './llm';

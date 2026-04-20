@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class ViewRuleModel {
   constructor(private client: OrmClient) {}
   findMany<S extends ViewRuleSelect>(
-    args: FindManyArgs<S, ViewRuleFilter, never, ViewRuleOrderBy> & {
+    args: FindManyArgs<S, ViewRuleFilter, ViewRuleOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewRuleSelect>
   ): QueryBuilder<{

@@ -1,6 +1,6 @@
 {
   "name": "@constructive-io/upload-client",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Client-side presigned URL upload utilities for Constructive",
   "main": "index.js",

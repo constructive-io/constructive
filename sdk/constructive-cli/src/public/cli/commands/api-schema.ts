@@ -78,7 +78,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       apiId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<ApiSchemaSelect, ApiSchemaFilter, never, ApiSchemaOrderBy> & {
+      FindManyArgs<ApiSchemaSelect, ApiSchemaFilter, ApiSchemaOrderBy> & {
         select: ApiSchemaSelect;
       }
     >(argv, defaultSelect);
@@ -102,7 +102,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       apiId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<ApiSchemaSelect, ApiSchemaFilter, never> & {
+      FindFirstArgs<ApiSchemaSelect, ApiSchemaFilter> & {
         select: ApiSchemaSelect;
       }
     >(argv, defaultSelect);

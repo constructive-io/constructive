@@ -84,7 +84,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isPublic: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<ApiSelect, ApiFilter, never, ApiOrderBy> & {
+      FindManyArgs<ApiSelect, ApiFilter, ApiOrderBy> & {
         select: ApiSelect;
       }
     >(argv, defaultSelect);
@@ -111,7 +111,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isPublic: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<ApiSelect, ApiFilter, never> & {
+      FindFirstArgs<ApiSelect, ApiFilter> & {
         select: ApiSelect;
       }
     >(argv, defaultSelect);

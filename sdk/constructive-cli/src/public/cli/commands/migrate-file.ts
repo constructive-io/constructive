@@ -70,7 +70,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       upload: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<MigrateFileSelect, MigrateFileFilter, never, MigrateFileOrderBy> & {
+      FindManyArgs<MigrateFileSelect, MigrateFileFilter, MigrateFileOrderBy> & {
         select: MigrateFileSelect;
       }
     >(argv, defaultSelect);
@@ -93,7 +93,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       upload: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<MigrateFileSelect, MigrateFileFilter, never> & {
+      FindFirstArgs<MigrateFileSelect, MigrateFileFilter> & {
         select: MigrateFileSelect;
       }
     >(argv, defaultSelect);

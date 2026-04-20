@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.17.0...node-type-registry@0.17.1) (2026-04-20)
+
+**Note:** Version bump only for package node-type-registry
+
+# [0.17.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.16.0...node-type-registry@0.17.0) (2026-04-20)
+
+### Features
+
+- **node-type-registry:** add module presets ([a81e845](https://github.com/constructive-io/constructive/commit/a81e845093ff676961dcd049fa1beeda94e85b72))
+
+# [0.16.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.14.0...node-type-registry@0.16.0) (2026-04-18)
+
+### Features
+
+- **node-type-registry:** add source_field/target_field to RelationSpatial BlueprintRelation arm (v0.15.0) ([6e028c0](https://github.com/constructive-io/constructive/commit/6e028c069e6a64625e8b34b921e7c22f4edba133))
+
+# [0.14.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.12.0...node-type-registry@0.14.0) (2026-04-18)
+
+### Features
+
+- **node-type-registry:** add RelationSpatial node type (v0.13.0) ([39d99c2](https://github.com/constructive-io/constructive/commit/39d99c2b35d9bc932238dd5a710f070f4d65fdbe)), closes [#844](https://github.com/constructive-io/constructive/issues/844)
+- **node-type-registry:** add table_provision to BlueprintMembershipType ([10bf488](https://github.com/constructive-io/constructive/commit/10bf488d86e8bc13567cc24f67e5beb1249d39d4)), closes [#824](https://github.com/constructive-io/constructive/issues/824)
+
+# [0.12.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.11.0...node-type-registry@0.12.0) (2026-04-17)
+
+### Features
+
+- register AuthzNotReadOnly policy type in node-type-registry ([4b7ef34](https://github.com/constructive-io/constructive/commit/4b7ef3429393a5877365cb99f29bc8173fe33f05)), closes [#814](https://github.com/constructive-io/constructive/issues/814)
+
+# [0.11.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.10.1...node-type-registry@0.11.0) (2026-04-16)
+
+### Features
+
+- add BlueprintMembershipType interface for Phase 0 entity type provisioning ([c99433d](https://github.com/constructive-io/constructive/commit/c99433d5cdcc485c8f37c9186d74c08a1a42f350))
+- add entity_type field to all 5 authz policy types ([e1f185d](https://github.com/constructive-io/constructive/commit/e1f185d23aa74db67346cdadd261c5e72891c4c8)), closes [#816](https://github.com/constructive-io/constructive/issues/816)
+
 ## [0.10.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.10.0...node-type-registry@0.10.1) (2026-04-04)
 
 **Note:** Version bump only for package node-type-registry

@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class UniqueConstraintModel {
   constructor(private client: OrmClient) {}
   findMany<S extends UniqueConstraintSelect>(
-    args: FindManyArgs<S, UniqueConstraintFilter, never, UniqueConstraintOrderBy> & {
+    args: FindManyArgs<S, UniqueConstraintFilter, UniqueConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, UniqueConstraintSelect>
   ): QueryBuilder<{

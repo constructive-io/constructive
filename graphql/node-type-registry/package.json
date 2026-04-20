@@ -1,6 +1,6 @@
 {
   "name": "node-type-registry",
-  "version": "0.10.1",
+  "version": "0.17.1",
   "description": "Node type definitions for the Constructive blueprint system. Single source of truth for all Authz*, Data*, Relation*, and View* node types.",
   "author": "Constructive <developers@constructive.io>",
   "main": "index.js",
@@ -27,7 +27,6 @@
     "lint": "eslint . --fix",
     "test": "jest",
     "test:watch": "jest --watch",
-    "generate:seed": "ts-node src/codegen/generate-seed.ts",
     "generate:types": "ts-node src/codegen/generate-types.ts"
   },
   "dependencies": {

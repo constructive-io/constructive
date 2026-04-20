@@ -7,7 +7,7 @@ React Query mutation hook for signIn
 ## Usage
 
 ```typescript
-const { mutate } = useSignInMutation(); mutate({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } });
+const { mutate } = useSignInMutation(); mutate({ input: '<SignInInput>' });
 ```
 
 ## Examples
@@ -16,5 +16,5 @@ const { mutate } = useSignInMutation(); mutate({ input: { email: '<String>', pas
 
 ```typescript
 const { mutate, isLoading } = useSignInMutation();
-mutate({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } });
+mutate({ input: '<SignInInput>' });
 ```

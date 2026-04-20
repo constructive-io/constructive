@@ -106,7 +106,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       prefix: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<ProfilesModuleSelect, ProfilesModuleFilter, never, ProfilesModuleOrderBy> & {
+      FindManyArgs<ProfilesModuleSelect, ProfilesModuleFilter, ProfilesModuleOrderBy> & {
         select: ProfilesModuleSelect;
       }
     >(argv, defaultSelect);
@@ -144,7 +144,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       prefix: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<ProfilesModuleSelect, ProfilesModuleFilter, never> & {
+      FindFirstArgs<ProfilesModuleSelect, ProfilesModuleFilter> & {
         select: ProfilesModuleSelect;
       }
     >(argv, defaultSelect);

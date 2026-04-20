@@ -109,7 +109,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         ForeignKeyConstraintSelect,
         ForeignKeyConstraintFilter,
-        never,
         ForeignKeyConstraintOrderBy
       > & {
         select: ForeignKeyConstraintSelect;
@@ -149,7 +148,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter, never> & {
+      FindFirstArgs<ForeignKeyConstraintSelect, ForeignKeyConstraintFilter> & {
         select: ForeignKeyConstraintSelect;
       }
     >(argv, defaultSelect);

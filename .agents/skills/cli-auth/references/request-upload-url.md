@@ -10,7 +10,7 @@ existing file ID and deduplicated=true with no uploadUrl.
 ## Usage
 
 ```bash
-csdk request-upload-url --input.bucketKey <String> --input.contentHash <String> --input.contentType <String> --input.size <Int> --input.filename <String>
+csdk request-upload-url --input.bucketKey <String> --input.ownerId <UUID> --input.contentHash <String> --input.contentType <String> --input.size <Int> --input.filename <String>
 ```
 
 ## Examples
@@ -18,5 +18,5 @@ csdk request-upload-url --input.bucketKey <String> --input.contentHash <String> 
 ### Run requestUploadUrl
 
 ```bash
-csdk request-upload-url --input.bucketKey <String> --input.contentHash <String> --input.contentType <String> --input.size <Int> --input.filename <String>
+csdk request-upload-url --input.bucketKey <String> --input.ownerId <UUID> --input.contentHash <String> --input.contentType <String> --input.size <Int> --input.filename <String>
 ```

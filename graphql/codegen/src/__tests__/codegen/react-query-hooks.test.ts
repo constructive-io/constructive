@@ -342,44 +342,14 @@ describe('Regression: FindManyArgs TCondition type arg', () => {
   // This caused TOrderBy to land in the TCondition slot, defaulting TOrderBy to `never`
   // and breaking all hook orderBy params.
 
-  it('includes Condition type in imports and re-exports when condition is enabled', () => {
+  it('does not include Condition type in generated hooks', () => {
     const result = generateListQueryHook(simpleUserTable, {
       reactQueryEnabled: true,
       useCentralizedKeys: true,
-      condition: true,
     });
-    expect(result.content).toContain('UserCondition');
-    expect(result.content).toMatch(
-      /import type \{[^}]*UserCondition[^}]*\} from "\.\.\/\.\.\/orm\/input-types"/,
-    );
-    expect(result.content).toMatch(
-      /export type \{[^}]*UserCondition[^}]*\} from "\.\.\/\.\.\/orm\/input-types"/,
-    );
-  });
-
-  it('includes Condition type in FindManyArgs type arguments', () => {
-    const result = generateListQueryHook(simpleUserTable, {
-      reactQueryEnabled: true,
-      useCentralizedKeys: false,
-      condition: true,
-    });
-    // FindManyArgs should have 4 type args: unknown, UserFilter, UserCondition, UsersOrderBy
-    expect(result.content).toMatch(
-      /FindManyArgs<unknown, UserFilter, UserCondition, UsersOrderBy>/,
-    );
-  });
-
-  it('omits Condition type when condition is disabled', () => {
-    const result = generateListQueryHook(simpleUserTable, {
-      reactQueryEnabled: true,
-      useCentralizedKeys: false,
-      condition: false,
-    });
-    // FindManyArgs should have 4 type args with never for TCondition: unknown, UserFilter, never, UsersOrderBy
-    expect(result.content).toMatch(
-      /FindManyArgs<unknown, UserFilter, never, UsersOrderBy>/,
-    );
+    // Condition types should NOT appear in generated hooks
     expect(result.content).not.toContain('UserCondition');
+    expect(result.content).not.toContain('condition');
   });
 });
 

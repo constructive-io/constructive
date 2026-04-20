@@ -106,8 +106,8 @@ type User {
     orderBy: [CryptoAddressOrderBy!] = [PRIMARY_KEY_ASC]
   ): CryptoAddressConnection!
 
-  """Reads and enables pagination through a set of `ConnectedAccount`."""
-  ownedConnectedAccounts(
+  """Reads and enables pagination through a set of `WebauthnCredential`."""
+  ownedWebauthnCredentials(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -129,11 +129,11 @@ type User {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ConnectedAccountFilter
+    where: WebauthnCredentialFilter
 
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountConnection!
+    """The method to use when ordering `WebauthnCredential`."""
+    orderBy: [WebauthnCredentialOrderBy!] = [PRIMARY_KEY_ASC]
+  ): WebauthnCredentialConnection!
 
   """Reads and enables pagination through a set of `AuditLog`."""
   auditLogsByActorId(
@@ -229,6 +229,9 @@ type Email {
 
   """Whether this is the user's primary email address"""
   isPrimary: Boolean!
+
+  """Optional user-provided label for this email (e.g. "Work", "Personal")."""
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 
@@ -283,6 +286,9 @@ input EmailFilter {
 
   """Filter by the object’s `isPrimary` field."""
   isPrimary: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -520,6 +526,138 @@ input BooleanFilter {
 }
 
 """
+A filter to be used against String fields. All fields are combined with a logical ‘and.’
+"""
+input StringFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: String
+
+  """Not equal to the specified value."""
+  notEqualTo: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: String
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: String
+
+  """Included in the specified list."""
+  in: [String!]
+
+  """Not included in the specified list."""
+  notIn: [String!]
+
+  """Less than the specified value."""
+  lessThan: String
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: String
+
+  """Greater than the specified value."""
+  greaterThan: String
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: String
+
+  """Contains the specified string (case-sensitive)."""
+  includes: String
+
+  """Does not contain the specified string (case-sensitive)."""
+  notIncludes: String
+
+  """Contains the specified string (case-insensitive)."""
+  includesInsensitive: String
+
+  """Does not contain the specified string (case-insensitive)."""
+  notIncludesInsensitive: String
+
+  """Starts with the specified string (case-sensitive)."""
+  startsWith: String
+
+  """Does not start with the specified string (case-sensitive)."""
+  notStartsWith: String
+
+  """Starts with the specified string (case-insensitive)."""
+  startsWithInsensitive: String
+
+  """Does not start with the specified string (case-insensitive)."""
+  notStartsWithInsensitive: String
+
+  """Ends with the specified string (case-sensitive)."""
+  endsWith: String
+
+  """Does not end with the specified string (case-sensitive)."""
+  notEndsWith: String
+
+  """Ends with the specified string (case-insensitive)."""
+  endsWithInsensitive: String
+
+  """Does not end with the specified string (case-insensitive)."""
+  notEndsWithInsensitive: String
+
+  """
+  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  like: String
+
+  """
+  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLike: String
+
+  """
+  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  likeInsensitive: String
+
+  """
+  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
+  """
+  notLikeInsensitive: String
+
+  """Equal to the specified value (case-insensitive)."""
+  equalToInsensitive: String
+
+  """Not equal to the specified value (case-insensitive)."""
+  notEqualToInsensitive: String
+
+  """
+  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  distinctFromInsensitive: String
+
+  """
+  Equal to the specified value, treating null like an ordinary value (case-insensitive).
+  """
+  notDistinctFromInsensitive: String
+
+  """Included in the specified list (case-insensitive)."""
+  inInsensitive: [String!]
+
+  """Not included in the specified list (case-insensitive)."""
+  notInInsensitive: [String!]
+
+  """Less than the specified value (case-insensitive)."""
+  lessThanInsensitive: String
+
+  """Less than or equal to the specified value (case-insensitive)."""
+  lessThanOrEqualToInsensitive: String
+
+  """Greater than the specified value (case-insensitive)."""
+  greaterThanInsensitive: String
+
+  """Greater than or equal to the specified value (case-insensitive)."""
+  greaterThanOrEqualToInsensitive: String
+}
+
+"""
 A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’
 """
 input DatetimeFilter {
@@ -619,11 +757,11 @@ input UserFilter {
   """`ownedCryptoAddresses` exist."""
   ownedCryptoAddressesExist: Boolean
 
-  """Filter by the object’s `ownedConnectedAccounts` relation."""
-  ownedConnectedAccounts: UserToManyConnectedAccountFilter
+  """Filter by the object’s `ownedWebauthnCredentials` relation."""
+  ownedWebauthnCredentials: UserToManyWebauthnCredentialFilter
 
-  """`ownedConnectedAccounts` exist."""
-  ownedConnectedAccountsExist: Boolean
+  """`ownedWebauthnCredentials` exist."""
+  ownedWebauthnCredentialsExist: Boolean
 
   """Filter by the object’s `auditLogsByActorId` relation."""
   auditLogsByActorId: UserToManyAuditLogFilter
@@ -954,138 +1092,6 @@ input RoleTypeFilter {
 }
 
 """
-A filter to be used against String fields. All fields are combined with a logical ‘and.’
-"""
-input StringFilter {
-  """
-  Is null (if `true` is specified) or is not null (if `false` is specified).
-  """
-  isNull: Boolean
-
-  """Equal to the specified value."""
-  equalTo: String
-
-  """Not equal to the specified value."""
-  notEqualTo: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value.
-  """
-  distinctFrom: String
-
-  """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: String
-
-  """Included in the specified list."""
-  in: [String!]
-
-  """Not included in the specified list."""
-  notIn: [String!]
-
-  """Less than the specified value."""
-  lessThan: String
-
-  """Less than or equal to the specified value."""
-  lessThanOrEqualTo: String
-
-  """Greater than the specified value."""
-  greaterThan: String
-
-  """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: String
-
-  """Contains the specified string (case-sensitive)."""
-  includes: String
-
-  """Does not contain the specified string (case-sensitive)."""
-  notIncludes: String
-
-  """Contains the specified string (case-insensitive)."""
-  includesInsensitive: String
-
-  """Does not contain the specified string (case-insensitive)."""
-  notIncludesInsensitive: String
-
-  """Starts with the specified string (case-sensitive)."""
-  startsWith: String
-
-  """Does not start with the specified string (case-sensitive)."""
-  notStartsWith: String
-
-  """Starts with the specified string (case-insensitive)."""
-  startsWithInsensitive: String
-
-  """Does not start with the specified string (case-insensitive)."""
-  notStartsWithInsensitive: String
-
-  """Ends with the specified string (case-sensitive)."""
-  endsWith: String
-
-  """Does not end with the specified string (case-sensitive)."""
-  notEndsWith: String
-
-  """Ends with the specified string (case-insensitive)."""
-  endsWithInsensitive: String
-
-  """Does not end with the specified string (case-insensitive)."""
-  notEndsWithInsensitive: String
-
-  """
-  Matches the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  like: String
-
-  """
-  Does not match the specified pattern (case-sensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLike: String
-
-  """
-  Matches the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  likeInsensitive: String
-
-  """
-  Does not match the specified pattern (case-insensitive). An underscore (_) matches any single character; a percent sign (%) matches any sequence of zero or more characters.
-  """
-  notLikeInsensitive: String
-
-  """Equal to the specified value (case-insensitive)."""
-  equalToInsensitive: String
-
-  """Not equal to the specified value (case-insensitive)."""
-  notEqualToInsensitive: String
-
-  """
-  Not equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  distinctFromInsensitive: String
-
-  """
-  Equal to the specified value, treating null like an ordinary value (case-insensitive).
-  """
-  notDistinctFromInsensitive: String
-
-  """Included in the specified list (case-insensitive)."""
-  inInsensitive: [String!]
-
-  """Not included in the specified list (case-insensitive)."""
-  notInInsensitive: [String!]
-
-  """Less than the specified value (case-insensitive)."""
-  lessThanInsensitive: String
-
-  """Less than or equal to the specified value (case-insensitive)."""
-  lessThanOrEqualToInsensitive: String
-
-  """Greater than the specified value (case-insensitive)."""
-  greaterThanInsensitive: String
-
-  """Greater than or equal to the specified value (case-insensitive)."""
-  greaterThanOrEqualToInsensitive: String
-}
-
-"""
 A filter to be used against many `Email` object types. All fields are combined with a logical ‘and.’
 """
 input UserToManyEmailFilter {
@@ -1134,6 +1140,9 @@ input PhoneNumberFilter {
 
   """Filter by the object’s `isPrimary` field."""
   isPrimary: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -1187,6 +1196,9 @@ input CryptoAddressFilter {
   """Filter by the object’s `isPrimary` field."""
   isPrimary: BooleanFilter
 
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
 
@@ -1207,40 +1219,58 @@ input CryptoAddressFilter {
 }
 
 """
-A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’
+A filter to be used against many `WebauthnCredential` object types. All fields are combined with a logical ‘and.’
 """
-input UserToManyConnectedAccountFilter {
+input UserToManyWebauthnCredentialFilter {
   """Filters to entities where at least one related entity matches."""
-  some: ConnectedAccountFilter
+  some: WebauthnCredentialFilter
 
   """Filters to entities where every related entity matches."""
-  every: ConnectedAccountFilter
+  every: WebauthnCredentialFilter
 
   """Filters to entities where no related entity matches."""
-  none: ConnectedAccountFilter
+  none: WebauthnCredentialFilter
 }
 
 """
-A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’
+A filter to be used against `WebauthnCredential` object types. All fields are combined with a logical ‘and.’
 """
-input ConnectedAccountFilter {
+input WebauthnCredentialFilter {
   """Filter by the object’s `id` field."""
   id: UUIDFilter
 
   """Filter by the object’s `ownerId` field."""
   ownerId: UUIDFilter
 
-  """Filter by the object’s `service` field."""
-  service: StringFilter
+  """Filter by the object’s `credentialId` field."""
+  credentialId: StringFilter
 
-  """Filter by the object’s `identifier` field."""
-  identifier: StringFilter
+  """Filter by the object’s `publicKey` field."""
+  publicKey: Base64EncodedBinaryFilter
 
-  """Filter by the object’s `details` field."""
-  details: JSONFilter
+  """Filter by the object’s `signCount` field."""
+  signCount: BigIntFilter
 
-  """Filter by the object’s `isVerified` field."""
-  isVerified: BooleanFilter
+  """Filter by the object’s `webauthnUserId` field."""
+  webauthnUserId: StringFilter
+
+  """Filter by the object’s `transports` field."""
+  transports: StringListFilter
+
+  """Filter by the object’s `credentialDeviceType` field."""
+  credentialDeviceType: StringFilter
+
+  """Filter by the object’s `backupEligible` field."""
+  backupEligible: BooleanFilter
+
+  """Filter by the object’s `backupState` field."""
+  backupState: BooleanFilter
+
+  """Filter by the object’s `name` field."""
+  name: StringFilter
+
+  """Filter by the object’s `lastUsedAt` field."""
+  lastUsedAt: DatetimeFilter
 
   """Filter by the object’s `createdAt` field."""
   createdAt: DatetimeFilter
@@ -1249,79 +1279,162 @@ input ConnectedAccountFilter {
   updatedAt: DatetimeFilter
 
   """Checks for all expressions in this list."""
-  and: [ConnectedAccountFilter!]
+  and: [WebauthnCredentialFilter!]
 
   """Checks for any expressions in this list."""
-  or: [ConnectedAccountFilter!]
+  or: [WebauthnCredentialFilter!]
 
   """Negates the expression."""
-  not: ConnectedAccountFilter
+  not: WebauthnCredentialFilter
 
   """Filter by the object’s `owner` relation."""
   owner: UserFilter
 }
 
 """
-A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+A filter to be used against Base64EncodedBinary fields. All fields are combined with a logical ‘and.’
 """
-input JSONFilter {
+input Base64EncodedBinaryFilter {
   """
   Is null (if `true` is specified) or is not null (if `false` is specified).
   """
   isNull: Boolean
 
   """Equal to the specified value."""
-  equalTo: JSON
+  equalTo: Base64EncodedBinary
 
   """Not equal to the specified value."""
-  notEqualTo: JSON
+  notEqualTo: Base64EncodedBinary
 
   """
   Not equal to the specified value, treating null like an ordinary value.
   """
-  distinctFrom: JSON
+  distinctFrom: Base64EncodedBinary
 
   """Equal to the specified value, treating null like an ordinary value."""
-  notDistinctFrom: JSON
+  notDistinctFrom: Base64EncodedBinary
 
   """Included in the specified list."""
-  in: [JSON!]
+  in: [Base64EncodedBinary!]
 
   """Not included in the specified list."""
-  notIn: [JSON!]
+  notIn: [Base64EncodedBinary!]
+}
+
+"""Binary data encoded using Base64"""
+scalar Base64EncodedBinary
+
+"""
+A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’
+"""
+input BigIntFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: BigInt
+
+  """Not equal to the specified value."""
+  notEqualTo: BigInt
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: BigInt
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: BigInt
+
+  """Included in the specified list."""
+  in: [BigInt!]
+
+  """Not included in the specified list."""
+  notIn: [BigInt!]
 
   """Less than the specified value."""
-  lessThan: JSON
+  lessThan: BigInt
 
   """Less than or equal to the specified value."""
-  lessThanOrEqualTo: JSON
+  lessThanOrEqualTo: BigInt
 
   """Greater than the specified value."""
-  greaterThan: JSON
+  greaterThan: BigInt
 
   """Greater than or equal to the specified value."""
-  greaterThanOrEqualTo: JSON
-
-  """Contains the specified JSON."""
-  contains: JSON
-
-  """Contains the specified key."""
-  containsKey: String
-
-  """Contains all of the specified keys."""
-  containsAllKeys: [String!]
-
-  """Contains any of the specified keys."""
-  containsAnyKeys: [String!]
-
-  """Contained by the specified JSON."""
-  containedBy: JSON
+  greaterThanOrEqualTo: BigInt
 }
 
 """
-Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
 """
-scalar JSON
+scalar BigInt
+
+"""
+A filter to be used against String List fields. All fields are combined with a logical ‘and.’
+"""
+input StringListFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: [String]
+
+  """Not equal to the specified value."""
+  notEqualTo: [String]
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: [String]
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: [String]
+
+  """Less than the specified value."""
+  lessThan: [String]
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: [String]
+
+  """Greater than the specified value."""
+  greaterThan: [String]
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: [String]
+
+  """Contains the specified list of values."""
+  contains: [String]
+
+  """Contained by the specified list of values."""
+  containedBy: [String]
+
+  """Overlaps the specified list of values."""
+  overlaps: [String]
+
+  """Any array item is equal to the specified value."""
+  anyEqualTo: String
+
+  """Any array item is not equal to the specified value."""
+  anyNotEqualTo: String
+
+  """Any array item is less than the specified value."""
+  anyLessThan: String
+
+  """Any array item is less than or equal to the specified value."""
+  anyLessThanOrEqualTo: String
+
+  """Any array item is greater than the specified value."""
+  anyGreaterThan: String
+
+  """Any array item is greater than or equal to the specified value."""
+  anyGreaterThanOrEqualTo: String
+}
 
 """
 A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’
@@ -1587,6 +1700,8 @@ enum EmailOrderBy {
   IS_VERIFIED_DESC
   IS_PRIMARY_ASC
   IS_PRIMARY_DESC
+  NAME_ASC
+  NAME_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -1628,6 +1743,11 @@ type PhoneNumber {
 
   """Whether this is the user's primary phone number"""
   isPrimary: Boolean!
+
+  """
+  Optional user-provided label for this phone number (e.g. "Mobile", "Work").
+  """
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 
@@ -1661,6 +1781,8 @@ enum PhoneNumberOrderBy {
   IS_VERIFIED_DESC
   IS_PRIMARY_ASC
   IS_PRIMARY_DESC
+  NAME_ASC
+  NAME_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -1701,6 +1823,11 @@ type CryptoAddress {
 
   """Whether this is the user's primary cryptocurrency address"""
   isPrimary: Boolean!
+
+  """
+  Optional user-provided label for this address (e.g. "Main wallet", "Hardware wallet").
+  """
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 
@@ -1732,67 +1859,103 @@ enum CryptoAddressOrderBy {
   IS_VERIFIED_DESC
   IS_PRIMARY_ASC
   IS_PRIMARY_DESC
+  NAME_ASC
+  NAME_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
 }
 
-"""A connection to a list of `ConnectedAccount` values."""
-type ConnectedAccountConnection {
-  """A list of `ConnectedAccount` objects."""
-  nodes: [ConnectedAccount]!
+"""A connection to a list of `WebauthnCredential` values."""
+type WebauthnCredentialConnection {
+  """A list of `WebauthnCredential` objects."""
+  nodes: [WebauthnCredential]!
 
   """
-  A list of edges which contains the `ConnectedAccount` and cursor to aid in pagination.
+  A list of edges which contains the `WebauthnCredential` and cursor to aid in pagination.
   """
-  edges: [ConnectedAccountEdge]!
+  edges: [WebauthnCredentialEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """
-  The count of *all* `ConnectedAccount` you could get from the connection.
+  The count of *all* `WebauthnCredential` you could get from the connection.
   """
   totalCount: Int!
 }
 
 """
-OAuth and social login connections linking external service accounts to users
+WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object.
 """
-type ConnectedAccount {
+type WebauthnCredential {
   id: UUID!
   ownerId: UUID!
 
-  """The service used, e.g. `twitter` or `github`."""
-  service: String!
+  """
+  Base64url-encoded credential ID returned by the authenticator. Globally unique per WebAuthn spec.
+  """
+  credentialId: String!
 
-  """A unique identifier for the user within the service"""
-  identifier: String!
+  """COSE-encoded public key bytes from the authenticator attestation."""
+  publicKey: Base64EncodedBinary!
 
-  """Additional profile details extracted from this login method"""
-  details: JSON!
+  """
+  Monotonic signature counter. Strict-increase check during sign-in detects cloned credentials. 0 means the authenticator does not implement a counter.
+  """
+  signCount: BigInt!
 
-  """Whether this connected account has been verified"""
-  isVerified: Boolean!
+  """
+  Random per-user handle sent to authenticators as user.id. Privacy-preserving; NOT the internal user UUID.
+  """
+  webauthnUserId: String!
+
+  """
+  Authenticator transport hints (e.g. usb, nfc, ble, internal, hybrid). Used to hint browser UI during sign-in.
+  """
+  transports: [String]
+
+  """
+  Either 'singleDevice' (hardware-bound) or 'multiDevice' (synced passkey). Enforced by CHECK constraint below.
+  """
+  credentialDeviceType: String!
+
+  """
+  Whether this credential is eligible for backup (syncing) per the authenticator's flags at registration.
+  """
+  backupEligible: Boolean!
+
+  """Current backup state; updated on each successful sign-in assertion."""
+  backupState: Boolean!
+
+  """
+  User-provided label for this credential (e.g. "YubiKey 5C", "iPhone 15"). Renamed via rename_passkey.
+  """
+  name: String
+
+  """
+  Timestamp of the most recent successful sign-in assertion using this credential.
+  """
+  lastUsedAt: Datetime
   createdAt: Datetime
   updatedAt: Datetime
 
-  """Reads a single `User` that is related to this `ConnectedAccount`."""
+  """Reads a single `User` that is related to this `WebauthnCredential`."""
   owner: User
 }
 
-"""A `ConnectedAccount` edge in the connection."""
-type ConnectedAccountEdge {
+"""A `WebauthnCredential` edge in the connection."""
+type WebauthnCredentialEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The `ConnectedAccount` at the end of the edge."""
-  node: ConnectedAccount
+  """The `WebauthnCredential` at the end of the edge."""
+  node: WebauthnCredential
 }
 
-"""Methods to use when ordering `ConnectedAccount`."""
-enum ConnectedAccountOrderBy {
+"""Methods to use when ordering `WebauthnCredential`."""
+enum WebauthnCredentialOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
@@ -1800,14 +1963,26 @@ enum ConnectedAccountOrderBy {
   ID_DESC
   OWNER_ID_ASC
   OWNER_ID_DESC
-  SERVICE_ASC
-  SERVICE_DESC
-  IDENTIFIER_ASC
-  IDENTIFIER_DESC
-  DETAILS_ASC
-  DETAILS_DESC
-  IS_VERIFIED_ASC
-  IS_VERIFIED_DESC
+  CREDENTIAL_ID_ASC
+  CREDENTIAL_ID_DESC
+  PUBLIC_KEY_ASC
+  PUBLIC_KEY_DESC
+  SIGN_COUNT_ASC
+  SIGN_COUNT_DESC
+  WEBAUTHN_USER_ID_ASC
+  WEBAUTHN_USER_ID_DESC
+  TRANSPORTS_ASC
+  TRANSPORTS_DESC
+  CREDENTIAL_DEVICE_TYPE_ASC
+  CREDENTIAL_DEVICE_TYPE_DESC
+  BACKUP_ELIGIBLE_ASC
+  BACKUP_ELIGIBLE_DESC
+  BACKUP_STATE_ASC
+  BACKUP_STATE_DESC
+  NAME_ASC
+  NAME_DESC
+  LAST_USED_AT_ASC
+  LAST_USED_AT_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   UPDATED_AT_ASC
@@ -1896,6 +2071,86 @@ enum AuditLogOrderBy {
   CREATED_AT_DESC
 }
 
+"""A connection to a list of `IdentityProvider` values."""
+type IdentityProviderConnection {
+  """A list of `IdentityProvider` objects."""
+  nodes: [IdentityProvider]!
+
+  """
+  A list of edges which contains the `IdentityProvider` and cursor to aid in pagination.
+  """
+  edges: [IdentityProviderEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `IdentityProvider` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type IdentityProvider {
+  slug: String
+  kind: String
+  displayName: String
+  enabled: Boolean
+  isBuiltIn: Boolean
+}
+
+"""A `IdentityProvider` edge in the connection."""
+type IdentityProviderEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `IdentityProvider` at the end of the edge."""
+  node: IdentityProvider
+}
+
+"""
+A filter to be used against `IdentityProvider` object types. All fields are combined with a logical ‘and.’
+"""
+input IdentityProviderFilter {
+  """Filter by the object’s `slug` field."""
+  slug: StringFilter
+
+  """Filter by the object’s `kind` field."""
+  kind: StringFilter
+
+  """Filter by the object’s `displayName` field."""
+  displayName: StringFilter
+
+  """Filter by the object’s `enabled` field."""
+  enabled: BooleanFilter
+
+  """Filter by the object’s `isBuiltIn` field."""
+  isBuiltIn: BooleanFilter
+
+  """Checks for all expressions in this list."""
+  and: [IdentityProviderFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [IdentityProviderFilter!]
+
+  """Negates the expression."""
+  not: IdentityProviderFilter
+}
+
+"""Methods to use when ordering `IdentityProvider`."""
+enum IdentityProviderOrderBy {
+  NATURAL
+  SLUG_ASC
+  SLUG_DESC
+  KIND_ASC
+  KIND_DESC
+  DISPLAY_NAME_ASC
+  DISPLAY_NAME_DESC
+  ENABLED_ASC
+  ENABLED_DESC
+  IS_BUILT_IN_ASC
+  IS_BUILT_IN_DESC
+}
+
 """A connection to a list of `RoleType` values."""
 type RoleTypeConnection {
   """A list of `RoleType` objects."""
@@ -1931,6 +2186,166 @@ enum RoleTypeOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
+}
+
+"""A connection to a list of `UserConnectedAccount` values."""
+type UserConnectedAccountConnection {
+  """A list of `UserConnectedAccount` objects."""
+  nodes: [UserConnectedAccount]!
+
+  """
+  A list of edges which contains the `UserConnectedAccount` and cursor to aid in pagination.
+  """
+  edges: [UserConnectedAccountEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `UserConnectedAccount` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type UserConnectedAccount {
+  id: UUID
+  ownerId: UUID
+  service: String
+  identifier: String
+  details: JSON
+  isVerified: Boolean
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""
+Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""A `UserConnectedAccount` edge in the connection."""
+type UserConnectedAccountEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `UserConnectedAccount` at the end of the edge."""
+  node: UserConnectedAccount
+}
+
+"""
+A filter to be used against `UserConnectedAccount` object types. All fields are combined with a logical ‘and.’
+"""
+input UserConnectedAccountFilter {
+  """Filter by the object’s `id` field."""
+  id: UUIDFilter
+
+  """Filter by the object’s `ownerId` field."""
+  ownerId: UUIDFilter
+
+  """Filter by the object’s `service` field."""
+  service: StringFilter
+
+  """Filter by the object’s `identifier` field."""
+  identifier: StringFilter
+
+  """Filter by the object’s `details` field."""
+  details: JSONFilter
+
+  """Filter by the object’s `isVerified` field."""
+  isVerified: BooleanFilter
+
+  """Filter by the object’s `createdAt` field."""
+  createdAt: DatetimeFilter
+
+  """Filter by the object’s `updatedAt` field."""
+  updatedAt: DatetimeFilter
+
+  """Checks for all expressions in this list."""
+  and: [UserConnectedAccountFilter!]
+
+  """Checks for any expressions in this list."""
+  or: [UserConnectedAccountFilter!]
+
+  """Negates the expression."""
+  not: UserConnectedAccountFilter
+}
+
+"""
+A filter to be used against JSON fields. All fields are combined with a logical ‘and.’
+"""
+input JSONFilter {
+  """
+  Is null (if `true` is specified) or is not null (if `false` is specified).
+  """
+  isNull: Boolean
+
+  """Equal to the specified value."""
+  equalTo: JSON
+
+  """Not equal to the specified value."""
+  notEqualTo: JSON
+
+  """
+  Not equal to the specified value, treating null like an ordinary value.
+  """
+  distinctFrom: JSON
+
+  """Equal to the specified value, treating null like an ordinary value."""
+  notDistinctFrom: JSON
+
+  """Included in the specified list."""
+  in: [JSON!]
+
+  """Not included in the specified list."""
+  notIn: [JSON!]
+
+  """Less than the specified value."""
+  lessThan: JSON
+
+  """Less than or equal to the specified value."""
+  lessThanOrEqualTo: JSON
+
+  """Greater than the specified value."""
+  greaterThan: JSON
+
+  """Greater than or equal to the specified value."""
+  greaterThanOrEqualTo: JSON
+
+  """Contains the specified JSON."""
+  contains: JSON
+
+  """Contains the specified key."""
+  containsKey: String
+
+  """Contains all of the specified keys."""
+  containsAllKeys: [String!]
+
+  """Contains any of the specified keys."""
+  containsAnyKeys: [String!]
+
+  """Contained by the specified JSON."""
+  containedBy: JSON
+}
+
+"""Methods to use when ordering `UserConnectedAccount`."""
+enum UserConnectedAccountOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  OWNER_ID_ASC
+  OWNER_ID_DESC
+  SERVICE_ASC
+  SERVICE_DESC
+  IDENTIFIER_ASC
+  IDENTIFIER_DESC
+  DETAILS_ASC
+  DETAILS_DESC
+  IS_VERIFIED_ASC
+  IS_VERIFIED_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
 }
 
 """A connection to a list of `User` values."""
@@ -2209,6 +2624,131 @@ input CheckPasswordInput {
   password: String
 }
 
+"""The output of our `disconnectAccount` mutation."""
+type DisconnectAccountPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `disconnectAccount` mutation."""
+input DisconnectAccountInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  accountId: UUID!
+}
+
+"""The output of our `revokeApiKey` mutation."""
+type RevokeApiKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `revokeApiKey` mutation."""
+input RevokeApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  keyId: UUID!
+}
+
+"""The output of our `revokeSession` mutation."""
+type RevokeSessionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `revokeSession` mutation."""
+input RevokeSessionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  sessionId: UUID!
+}
+
+"""The output of our `verifyPassword` mutation."""
+type VerifyPasswordPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `verifyPassword` mutation."""
+input VerifyPasswordInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  password: String!
+}
+
+"""The output of our `verifyTotp` mutation."""
+type VerifyTotpPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `verifyTotp` mutation."""
+input VerifyTotpInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  totpValue: String!
+}
+
 """The output of our `confirmDeleteAccount` mutation."""
 type ConfirmDeleteAccountPayload {
   """
@@ -2287,6 +2827,32 @@ input VerifyEmailInput {
   token: String
 }
 
+"""The output of our `provisionNewUser` mutation."""
+type ProvisionNewUserPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: UUID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `provisionNewUser` mutation."""
+input ProvisionNewUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  password: String
+}
+
 """The output of our `resetPassword` mutation."""
 type ResetPasswordPayload {
   """
@@ -2314,14 +2880,14 @@ input ResetPasswordInput {
   newPassword: String
 }
 
-"""The output of our `signInOneTimeToken` mutation."""
-type SignInOneTimeTokenPayload {
+"""The output of our `signInCrossOrigin` mutation."""
+type SignInCrossOriginPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: SignInOneTimeTokenRecord
+  result: SignInCrossOriginRecord
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2329,7 +2895,7 @@ type SignInOneTimeTokenPayload {
   query: Query
 }
 
-type SignInOneTimeTokenRecord {
+type SignInCrossOriginRecord {
   id: UUID
   userId: UUID
   accessToken: String
@@ -2338,8 +2904,8 @@ type SignInOneTimeTokenRecord {
   totpEnabled: Boolean
 }
 
-"""All input for the `signInOneTimeToken` mutation."""
-input SignInOneTimeTokenInput {
+"""All input for the `signInCrossOrigin` mutation."""
+input SignInCrossOriginInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -2347,44 +2913,6 @@ input SignInOneTimeTokenInput {
   clientMutationId: String
   token: String
   credentialKind: String
-}
-
-"""The output of our `signIn` mutation."""
-type SignInPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: SignInRecord
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type SignInRecord {
-  id: UUID
-  userId: UUID
-  accessToken: String
-  accessTokenExpiresAt: Datetime
-  isVerified: Boolean
-  totpEnabled: Boolean
-}
-
-"""All input for the `signIn` mutation."""
-input SignInInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  email: String
-  password: String
-  rememberMe: Boolean
-  credentialKind: String
-  csrfToken: String
 }
 
 """The output of our `signUp` mutation."""
@@ -2425,8 +2953,8 @@ input SignUpInput {
   csrfToken: String
 }
 
-"""The output of our `oneTimeToken` mutation."""
-type OneTimeTokenPayload {
+"""The output of our `requestCrossOriginToken` mutation."""
+type RequestCrossOriginTokenPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
@@ -2440,8 +2968,8 @@ type OneTimeTokenPayload {
   query: Query
 }
 
-"""All input for the `oneTimeToken` mutation."""
-input OneTimeTokenInput {
+"""All input for the `requestCrossOriginToken` mutation."""
+input RequestCrossOriginTokenInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -2451,6 +2979,47 @@ input OneTimeTokenInput {
   password: String
   origin: ConstructiveInternalTypeOrigin
   rememberMe: Boolean
+}
+
+"""The output of our `signIn` mutation."""
+type SignInPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: SignInRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type SignInRecord {
+  id: UUID
+  userId: UUID
+  accessToken: String
+  accessTokenExpiresAt: Datetime
+  isVerified: Boolean
+  totpEnabled: Boolean
+  mfaRequired: Boolean
+  mfaChallengeToken: String
+}
+
+"""All input for the `signIn` mutation."""
+input SignInInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String
+  password: String
+  rememberMe: Boolean
+  credentialKind: String
+  csrfToken: String
+  deviceToken: String
 }
 
 """The output of our `extendTokenExpires` mutation."""
@@ -2511,6 +3080,40 @@ input IntervalInput {
   years: Int
 }
 
+"""The output of our `createApiKey` mutation."""
+type CreateApiKeyPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: CreateApiKeyRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type CreateApiKeyRecord {
+  apiKey: String
+  keyId: UUID
+  expiresAt: Datetime
+}
+
+"""All input for the `createApiKey` mutation."""
+input CreateApiKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  keyName: String
+  accessLevel: String
+  mfaLevel: String
+  expiresIn: IntervalInput
+}
+
 """The output of our `forgotPassword` mutation."""
 type ForgotPasswordPayload {
   """
@@ -2560,14 +3163,16 @@ input SendVerificationEmailInput {
   email: ConstructiveInternalTypeEmail
 }
 
-"""The output of our `verifyPassword` mutation."""
-type VerifyPasswordPayload {
+"""The output of our create `IdentityProvider` mutation."""
+type CreateIdentityProviderPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: Session
+
+  """The `IdentityProvider` that was created by this mutation."""
+  identityProvider: IdentityProvider
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2575,93 +3180,25 @@ type VerifyPasswordPayload {
   query: Query
 }
 
-"""
-Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state
-"""
-type Session {
-  id: UUID!
-
-  """References the authenticated user; NULL for anonymous sessions"""
-  userId: UUID
-
-  """Whether this is an anonymous session (no authenticated user)"""
-  isAnonymous: Boolean!
-
-  """When this session expires and can no longer be used for authentication"""
-  expiresAt: Datetime!
-
-  """
-  When this session was explicitly revoked (soft delete); NULL means active
-  """
-  revokedAt: Datetime
-
-  """
-  The origin (protocol + host) from which the session was created, used for fingerprint validation
-  """
-  origin: ConstructiveInternalTypeOrigin
-
-  """
-  IP address from which the session was created, used for strict fingerprint validation
-  """
-  ip: InternetAddress
-
-  """
-  User-Agent string from the client, used for strict fingerprint validation
-  """
-  uagent: String
-
-  """
-  Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation)
-  """
-  fingerprintMode: String!
-
-  """Timestamp of last password re-verification for step-up authentication"""
-  lastPasswordVerified: Datetime
-
-  """Timestamp of last MFA verification for step-up authentication"""
-  lastMfaVerified: Datetime
-
-  """
-  Secret used to generate and validate CSRF tokens for cookie-based sessions
-  """
-  csrfSecret: String
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""All input for the `verifyPassword` mutation."""
-input VerifyPasswordInput {
+"""All input for the create `IdentityProvider` mutation."""
+input CreateIdentityProviderInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  password: String!
+
+  """The `IdentityProvider` to be created by this mutation."""
+  identityProvider: IdentityProviderInput!
 }
 
-"""The output of our `verifyTotp` mutation."""
-type VerifyTotpPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: Session
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `verifyTotp` mutation."""
-input VerifyTotpInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  totpValue: String!
+"""An input for mutations affecting `IdentityProvider`"""
+input IdentityProviderInput {
+  slug: String
+  kind: String
+  displayName: String
+  enabled: Boolean
+  isBuiltIn: Boolean
 }
 
 """The output of our create `RoleType` mutation."""
@@ -2755,6 +3292,11 @@ input CryptoAddressInput {
 
   """Whether this is the user's primary cryptocurrency address"""
   isPrimary: Boolean
+
+  """
+  Optional user-provided label for this address (e.g. "Main wallet", "Hardware wallet").
+  """
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -2810,60 +3352,51 @@ input PhoneNumberInput {
 
   """Whether this is the user's primary phone number"""
   isPrimary: Boolean
+
+  """
+  Optional user-provided label for this phone number (e.g. "Mobile", "Work").
+  """
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 }
 
-"""The output of our create `ConnectedAccount` mutation."""
-type CreateConnectedAccountPayload {
+"""The output of our create `UserConnectedAccount` mutation."""
+type CreateUserConnectedAccountPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `ConnectedAccount` that was created by this mutation."""
-  connectedAccount: ConnectedAccount
+  """The `UserConnectedAccount` that was created by this mutation."""
+  userConnectedAccount: UserConnectedAccount
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
 }
 
-"""All input for the create `ConnectedAccount` mutation."""
-input CreateConnectedAccountInput {
+"""All input for the create `UserConnectedAccount` mutation."""
+input CreateUserConnectedAccountInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The `ConnectedAccount` to be created by this mutation."""
-  connectedAccount: ConnectedAccountInput!
+  """The `UserConnectedAccount` to be created by this mutation."""
+  userConnectedAccount: UserConnectedAccountInput!
 }
 
-"""An input for mutations affecting `ConnectedAccount`"""
-input ConnectedAccountInput {
+"""An input for mutations affecting `UserConnectedAccount`"""
+input UserConnectedAccountInput {
   id: UUID
   ownerId: UUID
-
-  """The service used, e.g. `twitter` or `github`."""
-  service: String!
-
-  """A unique identifier for the user within the service"""
-  identifier: String!
-
-  """Additional profile details extracted from this login method"""
-  details: JSON!
-
-  """Whether this connected account has been verified"""
+  service: String
+  identifier: String
+  details: JSON
   isVerified: Boolean
   createdAt: Datetime
   updatedAt: Datetime
@@ -2980,6 +3513,9 @@ input EmailInput {
 
   """Whether this is the user's primary email address"""
   isPrimary: Boolean
+
+  """Optional user-provided label for this email (e.g. "Work", "Personal")."""
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -3026,6 +3562,95 @@ input UserInput {
   displayName: String
   profilePicture: ConstructiveInternalTypeImage
   type: Int
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `WebauthnCredential` mutation."""
+type CreateWebauthnCredentialPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `WebauthnCredential` that was created by this mutation."""
+  webauthnCredential: WebauthnCredential
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `WebauthnCredential`. May be used by Relay 1."""
+  webauthnCredentialEdge(
+    """The method to use when ordering `WebauthnCredential`."""
+    orderBy: [WebauthnCredentialOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): WebauthnCredentialEdge
+}
+
+"""All input for the create `WebauthnCredential` mutation."""
+input CreateWebauthnCredentialInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `WebauthnCredential` to be created by this mutation."""
+  webauthnCredential: WebauthnCredentialInput!
+}
+
+"""An input for mutations affecting `WebauthnCredential`"""
+input WebauthnCredentialInput {
+  id: UUID
+  ownerId: UUID
+
+  """
+  Base64url-encoded credential ID returned by the authenticator. Globally unique per WebAuthn spec.
+  """
+  credentialId: String!
+
+  """COSE-encoded public key bytes from the authenticator attestation."""
+  publicKey: Base64EncodedBinary!
+
+  """
+  Monotonic signature counter. Strict-increase check during sign-in detects cloned credentials. 0 means the authenticator does not implement a counter.
+  """
+  signCount: BigInt
+
+  """
+  Random per-user handle sent to authenticators as user.id. Privacy-preserving; NOT the internal user UUID.
+  """
+  webauthnUserId: String!
+
+  """
+  Authenticator transport hints (e.g. usb, nfc, ble, internal, hybrid). Used to hint browser UI during sign-in.
+  """
+  transports: [String]
+
+  """
+  Either 'singleDevice' (hardware-bound) or 'multiDevice' (synced passkey). Enforced by CHECK constraint below.
+  """
+  credentialDeviceType: String!
+
+  """
+  Whether this credential is eligible for backup (syncing) per the authenticator's flags at registration.
+  """
+  backupEligible: Boolean
+
+  """Current backup state; updated on each successful sign-in assertion."""
+  backupState: Boolean
+
+  """
+  User-provided label for this credential (e.g. "YubiKey 5C", "iPhone 15"). Renamed via rename_passkey.
+  """
+  name: String
+
+  """
+  Timestamp of the most recent successful sign-in assertion using this credential.
+  """
+  lastUsedAt: Datetime
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -3131,6 +3756,11 @@ input CryptoAddressPatch {
 
   """Whether this is the user's primary cryptocurrency address"""
   isPrimary: Boolean
+
+  """
+  Optional user-provided label for this address (e.g. "Main wallet", "Hardware wallet").
+  """
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -3191,66 +3821,11 @@ input PhoneNumberPatch {
 
   """Whether this is the user's primary phone number"""
   isPrimary: Boolean
-  createdAt: Datetime
-  updatedAt: Datetime
-}
-
-"""The output of our update `ConnectedAccount` mutation."""
-type UpdateConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` that was updated by this mutation."""
-  connectedAccount: ConnectedAccount
 
   """
-  Our root query field type. Allows us to run any query from our mutation payload.
+  Optional user-provided label for this phone number (e.g. "Mobile", "Work").
   """
-  query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
-}
-
-"""All input for the `updateConnectedAccount` mutation."""
-input UpdateConnectedAccountInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `ConnectedAccount` being updated.
-  """
-  connectedAccountPatch: ConnectedAccountPatch!
-}
-
-"""
-Represents an update to a `ConnectedAccount`. Fields that are set will be updated.
-"""
-input ConnectedAccountPatch {
-  id: UUID
-  ownerId: UUID
-
-  """The service used, e.g. `twitter` or `github`."""
-  service: String
-
-  """A unique identifier for the user within the service"""
-  identifier: String
-
-  """Additional profile details extracted from this login method"""
-  details: JSON
-
-  """Whether this connected account has been verified"""
-  isVerified: Boolean
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -3376,6 +3951,9 @@ input EmailPatch {
 
   """Whether this is the user's primary email address"""
   isPrimary: Boolean
+
+  """Optional user-provided label for this email (e.g. "Work", "Personal")."""
+  name: String
   createdAt: Datetime
   updatedAt: Datetime
 }
@@ -3434,6 +4012,100 @@ input UserPatch {
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+"""The output of our update `WebauthnCredential` mutation."""
+type UpdateWebauthnCredentialPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `WebauthnCredential` that was updated by this mutation."""
+  webauthnCredential: WebauthnCredential
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `WebauthnCredential`. May be used by Relay 1."""
+  webauthnCredentialEdge(
+    """The method to use when ordering `WebauthnCredential`."""
+    orderBy: [WebauthnCredentialOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): WebauthnCredentialEdge
+}
+
+"""All input for the `updateWebauthnCredential` mutation."""
+input UpdateWebauthnCredentialInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `WebauthnCredential` being updated.
+  """
+  webauthnCredentialPatch: WebauthnCredentialPatch!
+}
+
+"""
+Represents an update to a `WebauthnCredential`. Fields that are set will be updated.
+"""
+input WebauthnCredentialPatch {
+  id: UUID
+  ownerId: UUID
+
+  """
+  Base64url-encoded credential ID returned by the authenticator. Globally unique per WebAuthn spec.
+  """
+  credentialId: String
+
+  """COSE-encoded public key bytes from the authenticator attestation."""
+  publicKey: Base64EncodedBinary
+
+  """
+  Monotonic signature counter. Strict-increase check during sign-in detects cloned credentials. 0 means the authenticator does not implement a counter.
+  """
+  signCount: BigInt
+
+  """
+  Random per-user handle sent to authenticators as user.id. Privacy-preserving; NOT the internal user UUID.
+  """
+  webauthnUserId: String
+
+  """
+  Authenticator transport hints (e.g. usb, nfc, ble, internal, hybrid). Used to hint browser UI during sign-in.
+  """
+  transports: [String]
+
+  """
+  Either 'singleDevice' (hardware-bound) or 'multiDevice' (synced passkey). Enforced by CHECK constraint below.
+  """
+  credentialDeviceType: String
+
+  """
+  Whether this credential is eligible for backup (syncing) per the authenticator's flags at registration.
+  """
+  backupEligible: Boolean
+
+  """Current backup state; updated on each successful sign-in assertion."""
+  backupState: Boolean
+
+  """
+  User-provided label for this credential (e.g. "YubiKey 5C", "iPhone 15"). Renamed via rename_passkey.
+  """
+  name: String
+
+  """
+  Timestamp of the most recent successful sign-in assertion using this credential.
+  """
+  lastUsedAt: Datetime
+  createdAt: Datetime
+  updatedAt: Datetime
+}
 
 """The output of our delete `RoleType` mutation."""
 type DeleteRoleTypePayload {
@@ -3526,39 +4198,6 @@ type DeletePhoneNumberPayload {
 
 """All input for the `deletePhoneNumber` mutation."""
 input DeletePhoneNumberInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
-"""The output of our delete `ConnectedAccount` mutation."""
-type DeleteConnectedAccountPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `ConnectedAccount` that was deleted by this mutation."""
-  connectedAccount: ConnectedAccount
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `ConnectedAccount`. May be used by Relay 1."""
-  connectedAccountEdge(
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountEdge
-}
-
-"""All input for the `deleteConnectedAccount` mutation."""
-input DeleteConnectedAccountInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3666,9 +4305,50 @@ input DeleteUserInput {
   id: UUID!
 }
 
+"""The output of our delete `WebauthnCredential` mutation."""
+type DeleteWebauthnCredentialPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `WebauthnCredential` that was deleted by this mutation."""
+  webauthnCredential: WebauthnCredential
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `WebauthnCredential`. May be used by Relay 1."""
+  webauthnCredentialEdge(
+    """The method to use when ordering `WebauthnCredential`."""
+    orderBy: [WebauthnCredentialOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): WebauthnCredentialEdge
+}
+
+"""All input for the `deleteWebauthnCredential` mutation."""
+input DeleteWebauthnCredentialInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
 input RequestUploadUrlInput {
   """Bucket key (e.g., "public", "private")"""
   bucketKey: String!
+
+  """
+  Owner entity ID for entity-scoped uploads.
+  Omit for app-level (database-wide) storage.
+  When provided, resolves the storage module for the entity type
+  that owns this entity instance (e.g., a data room ID, team ID).
+  """
+  ownerId: UUID
 
   """SHA-256 content hash computed by the client (hex-encoded, 64 chars)"""
   contentHash: String!
@@ -3718,10 +4398,40 @@ type ConfirmUploadPayload {
 
 """The root query type which gives access points into the data universe."""
 type Query {
-  currentIpAddress: InternetAddress
   currentUserAgent: String
+  currentIpAddress: InternetAddress
   currentUserId: UUID
+  requireStepUp(stepUpType: String): Boolean
   currentUser: User
+
+  """Reads and enables pagination through a set of `IdentityProvider`."""
+  identityProviders(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: IdentityProviderFilter
+
+    """The method to use when ordering `IdentityProvider`."""
+    orderBy: [IdentityProviderOrderBy!] = [NATURAL]
+  ): IdentityProviderConnection
 
   """Reads and enables pagination through a set of `RoleType`."""
   roleTypes(
@@ -3810,8 +4520,8 @@ type Query {
     orderBy: [PhoneNumberOrderBy!] = [PRIMARY_KEY_ASC]
   ): PhoneNumberConnection
 
-  """Reads and enables pagination through a set of `ConnectedAccount`."""
-  connectedAccounts(
+  """Reads and enables pagination through a set of `UserConnectedAccount`."""
+  userConnectedAccounts(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -3833,11 +4543,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: ConnectedAccountFilter
+    where: UserConnectedAccountFilter
 
-    """The method to use when ordering `ConnectedAccount`."""
-    orderBy: [ConnectedAccountOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ConnectedAccountConnection
+    """The method to use when ordering `UserConnectedAccount`."""
+    orderBy: [UserConnectedAccountOrderBy!] = [NATURAL]
+  ): UserConnectedAccountConnection
 
   """Reads and enables pagination through a set of `AuditLog`."""
   auditLogs(
@@ -3926,6 +4636,35 @@ type Query {
     orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserConnection
 
+  """Reads and enables pagination through a set of `WebauthnCredential`."""
+  webauthnCredentials(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: WebauthnCredentialFilter
+
+    """The method to use when ordering `WebauthnCredential`."""
+    orderBy: [WebauthnCredentialOrderBy!] = [PRIMARY_KEY_ASC]
+  ): WebauthnCredentialConnection
+
   """
   Metadata about the database schema, including tables, fields, indexes, and constraints. Useful for code generation tools.
   """
@@ -3954,6 +4693,36 @@ type Mutation {
     """
     input: CheckPasswordInput!
   ): CheckPasswordPayload
+  disconnectAccount(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DisconnectAccountInput!
+  ): DisconnectAccountPayload
+  revokeApiKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RevokeApiKeyInput!
+  ): RevokeApiKeyPayload
+  revokeSession(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: RevokeSessionInput!
+  ): RevokeSessionPayload
+  verifyPassword(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyPasswordInput!
+  ): VerifyPasswordPayload
+  verifyTotp(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: VerifyTotpInput!
+  ): VerifyTotpPayload
   confirmDeleteAccount(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3972,42 +4741,54 @@ type Mutation {
     """
     input: VerifyEmailInput!
   ): VerifyEmailPayload
+  provisionNewUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ProvisionNewUserInput!
+  ): ProvisionNewUserPayload
   resetPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ResetPasswordInput!
   ): ResetPasswordPayload
-  signInOneTimeToken(
+  signInCrossOrigin(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: SignInOneTimeTokenInput!
-  ): SignInOneTimeTokenPayload
-  signIn(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: SignInInput!
-  ): SignInPayload
+    input: SignInCrossOriginInput!
+  ): SignInCrossOriginPayload
   signUp(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: SignUpInput!
   ): SignUpPayload
-  oneTimeToken(
+  requestCrossOriginToken(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: OneTimeTokenInput!
-  ): OneTimeTokenPayload
+    input: RequestCrossOriginTokenInput!
+  ): RequestCrossOriginTokenPayload
+  signIn(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: SignInInput!
+  ): SignInPayload
   extendTokenExpires(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ExtendTokenExpiresInput!
   ): ExtendTokenExpiresPayload
+  createApiKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateApiKeyInput!
+  ): CreateApiKeyPayload
   forgotPassword(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4020,18 +4801,14 @@ type Mutation {
     """
     input: SendVerificationEmailInput!
   ): SendVerificationEmailPayload
-  verifyPassword(
+
+  """Creates a single `IdentityProvider`."""
+  createIdentityProvider(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: VerifyPasswordInput!
-  ): VerifyPasswordPayload
-  verifyTotp(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: VerifyTotpInput!
-  ): VerifyTotpPayload
+    input: CreateIdentityProviderInput!
+  ): CreateIdentityProviderPayload
 
   """Creates a single `RoleType`."""
   createRoleType(
@@ -4057,13 +4834,13 @@ type Mutation {
     input: CreatePhoneNumberInput!
   ): CreatePhoneNumberPayload
 
-  """Creates a single `ConnectedAccount`."""
-  createConnectedAccount(
+  """Creates a single `UserConnectedAccount`."""
+  createUserConnectedAccount(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateConnectedAccountInput!
-  ): CreateConnectedAccountPayload
+    input: CreateUserConnectedAccountInput!
+  ): CreateUserConnectedAccountPayload
 
   """Creates a single `AuditLog`."""
   createAuditLog(
@@ -4089,6 +4866,14 @@ type Mutation {
     input: CreateUserInput!
   ): CreateUserPayload
 
+  """Creates a single `WebauthnCredential`."""
+  createWebauthnCredential(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateWebauthnCredentialInput!
+  ): CreateWebauthnCredentialPayload
+
   """Updates a single `RoleType` using a unique key and a patch."""
   updateRoleType(
     """
@@ -4112,14 +4897,6 @@ type Mutation {
     """
     input: UpdatePhoneNumberInput!
   ): UpdatePhoneNumberPayload
-
-  """Updates a single `ConnectedAccount` using a unique key and a patch."""
-  updateConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateConnectedAccountInput!
-  ): UpdateConnectedAccountPayload
 
   """Updates a single `AuditLog` using a unique key and a patch."""
   updateAuditLog(
@@ -4145,6 +4922,14 @@ type Mutation {
     input: UpdateUserInput!
   ): UpdateUserPayload
 
+  """Updates a single `WebauthnCredential` using a unique key and a patch."""
+  updateWebauthnCredential(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateWebauthnCredentialInput!
+  ): UpdateWebauthnCredentialPayload
+
   """Deletes a single `RoleType` using a unique key."""
   deleteRoleType(
     """
@@ -4169,14 +4954,6 @@ type Mutation {
     input: DeletePhoneNumberInput!
   ): DeletePhoneNumberPayload
 
-  """Deletes a single `ConnectedAccount` using a unique key."""
-  deleteConnectedAccount(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteConnectedAccountInput!
-  ): DeleteConnectedAccountPayload
-
   """Deletes a single `AuditLog` using a unique key."""
   deleteAuditLog(
     """
@@ -4200,6 +4977,14 @@ type Mutation {
     """
     input: DeleteUserInput!
   ): DeleteUserPayload
+
+  """Deletes a single `WebauthnCredential` using a unique key."""
+  deleteWebauthnCredential(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteWebauthnCredentialInput!
+  ): DeleteWebauthnCredentialPayload
 
   """
   Request a presigned URL for uploading a file directly to S3.
@@ -4243,6 +5028,12 @@ type Mutation {
 input ProvisionBucketInput {
   """The logical bucket key (e.g., "public", "private")"""
   bucketKey: String!
+
+  """
+  Owner entity ID for entity-scoped bucket provisioning.
+  Omit for app-level (database-wide) storage.
+  """
+  ownerId: UUID
 }
 
 type ProvisionBucketPayload {

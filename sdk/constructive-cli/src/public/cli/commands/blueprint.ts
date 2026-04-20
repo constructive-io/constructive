@@ -94,7 +94,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<BlueprintSelect, BlueprintFilter, never, BlueprintOrderBy> & {
+      FindManyArgs<BlueprintSelect, BlueprintFilter, BlueprintOrderBy> & {
         select: BlueprintSelect;
       }
     >(argv, defaultSelect);
@@ -126,7 +126,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<BlueprintSelect, BlueprintFilter, never> & {
+      FindFirstArgs<BlueprintSelect, BlueprintFilter> & {
         select: BlueprintSelect;
       }
     >(argv, defaultSelect);

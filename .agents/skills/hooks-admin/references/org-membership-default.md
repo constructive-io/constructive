@@ -7,8 +7,8 @@ Default membership settings per entity, controlling initial approval and verific
 ## Usage
 
 ```typescript
-useOrgMembershipDefaultsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } } })
-useOrgMembershipDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } } })
+useOrgMembershipDefaultsQuery({ selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } } })
+useOrgMembershipDefaultQuery({ id: '<UUID>', selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } } })
 useCreateOrgMembershipDefaultMutation({ selection: { fields: { id: true } } })
 useUpdateOrgMembershipDefaultMutation({ selection: { fields: { id: true } } })
 useDeleteOrgMembershipDefaultMutation({})
@@ -20,7 +20,7 @@ useDeleteOrgMembershipDefaultMutation({})
 
 ```typescript
 const { data, isLoading } = useOrgMembershipDefaultsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } },
 });
 ```
 
@@ -30,5 +30,5 @@ const { data, isLoading } = useOrgMembershipDefaultsQuery({
 const { mutate } = useCreateOrgMembershipDefaultMutation({
   selection: { fields: { id: true } },
 });
-mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' });
+mutate({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>' });
 ```

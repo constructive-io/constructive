@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DomainModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DomainSelect>(
-    args: FindManyArgs<S, DomainFilter, never, DomainOrderBy> & {
+    args: FindManyArgs<S, DomainFilter, DomainOrderBy> & {
       select: S;
     } & StrictSelect<S, DomainSelect>
   ): QueryBuilder<{

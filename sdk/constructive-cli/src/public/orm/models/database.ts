@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class DatabaseModel {
   constructor(private client: OrmClient) {}
   findMany<S extends DatabaseSelect>(
-    args: FindManyArgs<S, DatabaseFilter, never, DatabaseOrderBy> & {
+    args: FindManyArgs<S, DatabaseFilter, DatabaseOrderBy> & {
       select: S;
     } & StrictSelect<S, DatabaseSelect>
   ): QueryBuilder<{

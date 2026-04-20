@@ -1,6 +1,6 @@
 {
   "name": "pg-query-context",
-  "version": "2.9.2",
+  "version": "2.10.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "pg query context",
   "main": "index.js",

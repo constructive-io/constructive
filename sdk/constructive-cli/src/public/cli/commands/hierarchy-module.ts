@@ -110,7 +110,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       createdAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<HierarchyModuleSelect, HierarchyModuleFilter, never, HierarchyModuleOrderBy> & {
+      FindManyArgs<HierarchyModuleSelect, HierarchyModuleFilter, HierarchyModuleOrderBy> & {
         select: HierarchyModuleSelect;
       }
     >(argv, defaultSelect);
@@ -150,7 +150,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       createdAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<HierarchyModuleSelect, HierarchyModuleFilter, never> & {
+      FindFirstArgs<HierarchyModuleSelect, HierarchyModuleFilter> & {
         select: HierarchyModuleSelect;
       }
     >(argv, defaultSelect);

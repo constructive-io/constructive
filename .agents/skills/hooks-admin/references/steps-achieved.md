@@ -7,7 +7,7 @@ React Query query hook for stepsAchieved
 ## Usage
 
 ```typescript
-useStepsAchievedQuery({ vlevel: '<String>', vroleId: '<UUID>' })
+useStepsAchievedQuery({ level: '<String>', roleId: '<UUID>' })
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ useStepsAchievedQuery({ vlevel: '<String>', vroleId: '<UUID>' })
 ### Use useStepsAchievedQuery
 
 ```typescript
-const { data, isLoading } = useStepsAchievedQuery({ vlevel: '<String>', vroleId: '<UUID>' });
+const { data, isLoading } = useStepsAchievedQuery({ level: '<String>', roleId: '<UUID>' });
 ```

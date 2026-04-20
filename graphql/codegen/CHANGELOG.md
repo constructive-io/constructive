@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.30.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.8...@constructive-io/graphql-codegen@4.30.9) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.30.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.7...@constructive-io/graphql-codegen@4.30.8) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.30.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.6...@constructive-io/graphql-codegen@4.30.7) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.30.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.5...@constructive-io/graphql-codegen@4.30.6) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.30.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.4...@constructive-io/graphql-codegen@4.30.5) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.30.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.3...@constructive-io/graphql-codegen@4.30.4) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.30.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.2...@constructive-io/graphql-codegen@4.30.3) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.30.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.1...@constructive-io/graphql-codegen@4.30.2) (2026-04-18)
+
+### Bug Fixes
+
+- **codegen/cli:** make autoEmbedWhere/autoEmbedInput generic in embedder template ([c5f7369](https://github.com/constructive-io/constructive/commit/c5f7369772b19e0adbbec519a9967c2c564f04b3)), closes [constructive-io/agentic-db#29](https://github.com/constructive-io/agentic-db/issues/29)
+
+## [4.30.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.0...@constructive-io/graphql-codegen@4.30.1) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+# [4.30.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.29.3...@constructive-io/graphql-codegen@4.30.0) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.29.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.29.2...@constructive-io/graphql-codegen@4.29.3) (2026-04-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.29.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.29.1...@constructive-io/graphql-codegen@4.29.2) (2026-04-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
+## [4.29.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.29.0...@constructive-io/graphql-codegen@4.29.1) (2026-04-10)
+
+### Bug Fixes
+
+- **codegen:** remove condition generation from ORM codegen ([28ad7e9](https://github.com/constructive-io/constructive/commit/28ad7e9b58853db5d623a8a23369de94e663c783))
+
+# [4.29.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.28.6...@constructive-io/graphql-codegen@4.29.0) (2026-04-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-codegen
+
 ## [4.28.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.28.5...@constructive-io/graphql-codegen@4.28.6) (2026-04-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

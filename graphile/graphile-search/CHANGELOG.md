@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.4](https://github.com/constructive-io/constructive/compare/graphile-search@1.7.3...graphile-search@1.7.4) (2026-04-20)
+
+**Note:** Version bump only for package graphile-search
+
+## [1.7.3](https://github.com/constructive-io/constructive/compare/graphile-search@1.7.2...graphile-search@1.7.3) (2026-04-20)
+
+**Note:** Version bump only for package graphile-search
+
+## [1.7.2](https://github.com/constructive-io/constructive/compare/graphile-search@1.7.1...graphile-search@1.7.2) (2026-04-19)
+
+**Note:** Version bump only for package graphile-search
+
+## [1.7.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.7.0...graphile-search@1.7.1) (2026-04-18)
+
+**Note:** Version bump only for package graphile-search
+
+# [1.7.0](https://github.com/constructive-io/constructive/compare/graphile-search@1.6.1...graphile-search@1.7.0) (2026-04-18)
+
+**Note:** Version bump only for package graphile-search
+
+## [1.6.1](https://github.com/constructive-io/constructive/compare/graphile-search@1.6.0...graphile-search@1.6.1) (2026-04-11)
+
+**Note:** Version bump only for package graphile-search
+
+# [1.6.0](https://github.com/constructive-io/constructive/compare/graphile-search@1.5.10...graphile-search@1.6.0) (2026-04-09)
+
+**Note:** Version bump only for package graphile-search
+
 ## [1.5.10](https://github.com/constructive-io/constructive/compare/graphile-search@1.5.9...graphile-search@1.5.10) (2026-04-04)
 
 **Note:** Version bump only for package graphile-search

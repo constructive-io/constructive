@@ -29,30 +29,38 @@ csdk auth set-token <your-token>
 | `email` | email CRUD operations |
 | `phone-number` | phoneNumber CRUD operations |
 | `crypto-address` | cryptoAddress CRUD operations |
-| `connected-account` | connectedAccount CRUD operations |
+| `webauthn-credential` | webauthnCredential CRUD operations |
 | `audit-log` | auditLog CRUD operations |
+| `identity-provider` | identityProvider CRUD operations |
 | `role-type` | roleType CRUD operations |
+| `user-connected-account` | userConnectedAccount CRUD operations |
 | `user` | user CRUD operations |
-| `current-ip-address` | currentIpAddress |
 | `current-user-agent` | currentUserAgent |
+| `current-ip-address` | currentIpAddress |
 | `current-user-id` | currentUserId |
+| `require-step-up` | requireStepUp |
 | `current-user` | currentUser |
 | `sign-out` | signOut |
 | `send-account-deletion-email` | sendAccountDeletionEmail |
 | `check-password` | checkPassword |
+| `disconnect-account` | disconnectAccount |
+| `revoke-api-key` | revokeApiKey |
+| `revoke-session` | revokeSession |
+| `verify-password` | verifyPassword |
+| `verify-totp` | verifyTotp |
 | `confirm-delete-account` | confirmDeleteAccount |
 | `set-password` | setPassword |
 | `verify-email` | verifyEmail |
+| `provision-new-user` | provisionNewUser |
 | `reset-password` | resetPassword |
-| `sign-in-one-time-token` | signInOneTimeToken |
-| `sign-in` | signIn |
+| `sign-in-cross-origin` | signInCrossOrigin |
 | `sign-up` | signUp |
-| `one-time-token` | oneTimeToken |
+| `request-cross-origin-token` | requestCrossOriginToken |
+| `sign-in` | signIn |
 | `extend-token-expires` | extendTokenExpires |
+| `create-api-key` | createApiKey |
 | `forgot-password` | forgotPassword |
 | `send-verification-email` | sendVerificationEmail |
-| `verify-password` | verifyPassword |
-| `verify-totp` | verifyTotp |
 | `request-upload-url` | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
@@ -128,11 +136,12 @@ CRUD operations for Email records.
 | `email` | Email |
 | `isVerified` | Boolean |
 | `isPrimary` | Boolean |
+| `name` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `email`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`, `name`
 
 ### `phone-number`
 
@@ -157,11 +166,12 @@ CRUD operations for PhoneNumber records.
 | `number` | String |
 | `isVerified` | Boolean |
 | `isPrimary` | Boolean |
+| `name` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `cc`, `number`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`, `name`
 
 ### `crypto-address`
 
@@ -185,24 +195,25 @@ CRUD operations for CryptoAddress records.
 | `address` | String |
 | `isVerified` | Boolean |
 | `isPrimary` | Boolean |
+| `name` | String |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
 **Required create fields:** `address`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`
+**Optional create fields (backend defaults):** `ownerId`, `isVerified`, `isPrimary`, `name`
 
-### `connected-account`
+### `webauthn-credential`
 
-CRUD operations for ConnectedAccount records.
+CRUD operations for WebauthnCredential records.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List all connectedAccount records |
-| `find-first` | Find first matching connectedAccount record |
-| `get` | Get a connectedAccount by id |
-| `create` | Create a new connectedAccount |
-| `update` | Update an existing connectedAccount |
-| `delete` | Delete a connectedAccount |
+| `list` | List all webauthnCredential records |
+| `find-first` | Find first matching webauthnCredential record |
+| `get` | Get a webauthnCredential by id |
+| `create` | Create a new webauthnCredential |
+| `update` | Update an existing webauthnCredential |
+| `delete` | Delete a webauthnCredential |
 
 **Fields:**
 
@@ -210,15 +221,21 @@ CRUD operations for ConnectedAccount records.
 |-------|------|
 | `id` | UUID |
 | `ownerId` | UUID |
-| `service` | String |
-| `identifier` | String |
-| `details` | JSON |
-| `isVerified` | Boolean |
+| `credentialId` | String |
+| `publicKey` | Base64EncodedBinary |
+| `signCount` | BigInt |
+| `webauthnUserId` | String |
+| `transports` | String |
+| `credentialDeviceType` | String |
+| `backupEligible` | Boolean |
+| `backupState` | Boolean |
+| `name` | String |
+| `lastUsedAt` | Datetime |
 | `createdAt` | Datetime |
 | `updatedAt` | Datetime |
 
-**Required create fields:** `service`, `identifier`, `details`
-**Optional create fields (backend defaults):** `ownerId`, `isVerified`
+**Required create fields:** `credentialId`, `publicKey`, `webauthnUserId`, `credentialDeviceType`
+**Optional create fields (backend defaults):** `ownerId`, `signCount`, `transports`, `backupEligible`, `backupState`, `name`, `lastUsedAt`
 
 ### `audit-log`
 
@@ -249,6 +266,31 @@ CRUD operations for AuditLog records.
 **Required create fields:** `event`, `success`
 **Optional create fields (backend defaults):** `actorId`, `origin`, `userAgent`, `ipAddress`
 
+### `identity-provider`
+
+CRUD operations for IdentityProvider records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all identityProvider records |
+| `find-first` | Find first matching identityProvider record |
+| `get` | Get a identityProvider by id |
+| `create` | Create a new identityProvider |
+| `update` | Update an existing identityProvider |
+| `delete` | Delete a identityProvider |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `slug` | String |
+| `kind` | String |
+| `displayName` | String |
+| `enabled` | Boolean |
+| `isBuiltIn` | Boolean |
+
+**Optional create fields (backend defaults):** `slug`, `kind`, `displayName`, `enabled`, `isBuiltIn`
+
 ### `role-type`
 
 CRUD operations for RoleType records.
@@ -270,6 +312,34 @@ CRUD operations for RoleType records.
 | `name` | String |
 
 **Required create fields:** `name`
+
+### `user-connected-account`
+
+CRUD operations for UserConnectedAccount records.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all userConnectedAccount records |
+| `find-first` | Find first matching userConnectedAccount record |
+| `get` | Get a userConnectedAccount by id |
+| `create` | Create a new userConnectedAccount |
+| `update` | Update an existing userConnectedAccount |
+| `delete` | Delete a userConnectedAccount |
+
+**Fields:**
+
+| Field | Type |
+|-------|------|
+| `id` | UUID |
+| `ownerId` | UUID |
+| `service` | String |
+| `identifier` | String |
+| `details` | JSON |
+| `isVerified` | Boolean |
+| `createdAt` | Datetime |
+| `updatedAt` | Datetime |
+
+**Optional create fields (backend defaults):** `ownerId`, `service`, `identifier`, `details`, `isVerified`
 
 ### `user`
 
@@ -331,16 +401,16 @@ csdk user search "query" --limit 10 --select id,title,searchScore
 
 ## Custom Operations
 
-### `current-ip-address`
+### `current-user-agent`
 
-currentIpAddress
+currentUserAgent
 
 - **Type:** query
 - **Arguments:** none
 
-### `current-user-agent`
+### `current-ip-address`
 
-currentUserAgent
+currentIpAddress
 
 - **Type:** query
 - **Arguments:** none
@@ -351,6 +421,17 @@ currentUserId
 
 - **Type:** query
 - **Arguments:** none
+
+### `require-step-up`
+
+requireStepUp
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--stepUpType` | String |
 
 ### `current-user`
 
@@ -393,6 +474,66 @@ checkPassword
   | `--input.clientMutationId` | String |
   | `--input.password` | String |
 
+### `disconnect-account`
+
+disconnectAccount
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.accountId` | UUID (required) |
+
+### `revoke-api-key`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.keyId` | UUID (required) |
+
+### `revoke-session`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.sessionId` | UUID (required) |
+
+### `verify-password`
+
+verifyPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.password` | String (required) |
+
+### `verify-totp`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.totpValue` | String (required) |
+
 ### `confirm-delete-account`
 
 confirmDeleteAccount
@@ -432,6 +573,19 @@ verifyEmail
   | `--input.emailId` | UUID |
   | `--input.token` | String |
 
+### `provision-new-user`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+
 ### `reset-password`
 
 resetPassword
@@ -446,9 +600,9 @@ resetPassword
   | `--input.resetToken` | String |
   | `--input.newPassword` | String |
 
-### `sign-in-one-time-token`
+### `sign-in-cross-origin`
 
-signInOneTimeToken
+signInCrossOrigin
 
 - **Type:** mutation
 - **Arguments:**
@@ -458,22 +612,6 @@ signInOneTimeToken
   | `--input.clientMutationId` | String |
   | `--input.token` | String |
   | `--input.credentialKind` | String |
-
-### `sign-in`
-
-signIn
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.email` | String |
-  | `--input.password` | String |
-  | `--input.rememberMe` | Boolean |
-  | `--input.credentialKind` | String |
-  | `--input.csrfToken` | String |
 
 ### `sign-up`
 
@@ -491,9 +629,9 @@ signUp
   | `--input.credentialKind` | String |
   | `--input.csrfToken` | String |
 
-### `one-time-token`
+### `request-cross-origin-token`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
@@ -506,6 +644,23 @@ oneTimeToken
   | `--input.origin` | Origin |
   | `--input.rememberMe` | Boolean |
 
+### `sign-in`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.email` | String |
+  | `--input.password` | String |
+  | `--input.rememberMe` | Boolean |
+  | `--input.credentialKind` | String |
+  | `--input.csrfToken` | String |
+  | `--input.deviceToken` | String |
+
 ### `extend-token-expires`
 
 extendTokenExpires
@@ -517,6 +672,21 @@ extendTokenExpires
   |----------|------|
   | `--input.clientMutationId` | String |
   | `--input.amount` | IntervalInput |
+
+### `create-api-key`
+
+createApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `--input.clientMutationId` | String |
+  | `--input.keyName` | String |
+  | `--input.accessLevel` | String |
+  | `--input.mfaLevel` | String |
+  | `--input.expiresIn` | IntervalInput |
 
 ### `forgot-password`
 
@@ -542,30 +712,6 @@ sendVerificationEmail
   | `--input.clientMutationId` | String |
   | `--input.email` | Email |
 
-### `verify-password`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.password` | String (required) |
-
-### `verify-totp`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `--input.clientMutationId` | String |
-  | `--input.totpValue` | String (required) |
-
 ### `request-upload-url`
 
 Request a presigned URL for uploading a file directly to S3.
@@ -579,6 +725,7 @@ existing file ID and deduplicated=true with no uploadUrl.
   | Argument | Type |
   |----------|------|
   | `--input.bucketKey` | String (required) |
+  | `--input.ownerId` | UUID |
   | `--input.contentHash` | String (required) |
   | `--input.contentType` | String (required) |
   | `--input.size` | Int (required) |
@@ -610,6 +757,7 @@ and lifecycle settings.
   | Argument | Type |
   |----------|------|
   | `--input.bucketKey` | String (required) |
+  | `--input.ownerId` | UUID |
 
 ## Output
 

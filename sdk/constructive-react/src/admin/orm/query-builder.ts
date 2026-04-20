@@ -189,13 +189,12 @@ export function buildSelections(
 // Document Builders
 // ============================================================================
 
-export function buildFindManyDocument<TSelect, TWhere, TCondition = never>(
+export function buildFindManyDocument<TSelect, TWhere>(
   operationName: string,
   queryField: string,
   select: TSelect,
   args: {
     where?: TWhere;
-    condition?: TCondition;
     orderBy?: string[];
     first?: number;
     last?: number;
@@ -205,8 +204,7 @@ export function buildFindManyDocument<TSelect, TWhere, TCondition = never>(
   },
   filterTypeName: string,
   orderByTypeName: string,
-  connectionFieldsMap?: Record<string, Record<string, string>>,
-  conditionTypeName?: string
+  connectionFieldsMap?: Record<string, Record<string, string>>
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
@@ -216,16 +214,6 @@ export function buildFindManyDocument<TSelect, TWhere, TCondition = never>(
   const queryArgs: ArgumentNode[] = [];
   const variables: Record<string, unknown> = {};
 
-  addVariable(
-    {
-      varName: 'condition',
-      typeName: conditionTypeName,
-      value: args.condition,
-    },
-    variableDefinitions,
-    queryArgs,
-    variables
-  );
   addVariable(
     {
       varName: 'where',
@@ -301,14 +289,13 @@ export function buildFindManyDocument<TSelect, TWhere, TCondition = never>(
   return { document: print(document), variables };
 }
 
-export function buildFindFirstDocument<TSelect, TWhere, TCondition = never>(
+export function buildFindFirstDocument<TSelect, TWhere>(
   operationName: string,
   queryField: string,
   select: TSelect,
-  args: { where?: TWhere; condition?: TCondition },
+  args: { where?: TWhere },
   filterTypeName: string,
-  connectionFieldsMap?: Record<string, Record<string, string>>,
-  conditionTypeName?: string
+  connectionFieldsMap?: Record<string, Record<string, string>>
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
     ? buildSelections(select as Record<string, unknown>, connectionFieldsMap, operationName)
@@ -321,16 +308,6 @@ export function buildFindFirstDocument<TSelect, TWhere, TCondition = never>(
   // Always add first: 1 for findFirst
   addVariable(
     { varName: 'first', typeName: 'Int', value: 1 },
-    variableDefinitions,
-    queryArgs,
-    variables
-  );
-  addVariable(
-    {
-      varName: 'condition',
-      typeName: conditionTypeName,
-      value: args.condition,
-    },
     variableDefinitions,
     queryArgs,
     variables

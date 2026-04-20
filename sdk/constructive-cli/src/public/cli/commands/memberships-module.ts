@@ -26,6 +26,8 @@ const fieldSchema: FieldSchema = {
   membersTableName: 'string',
   membershipDefaultsTableId: 'uuid',
   membershipDefaultsTableName: 'string',
+  membershipSettingsTableId: 'uuid',
+  membershipSettingsTableName: 'string',
   grantsTableId: 'uuid',
   grantsTableName: 'string',
   actorTableId: 'uuid',
@@ -47,6 +49,7 @@ const fieldSchema: FieldSchema = {
   entityIdsByMask: 'string',
   entityIdsByPerm: 'string',
   entityIdsFunction: 'string',
+  memberProfilesTableId: 'uuid',
 };
 const usage =
   '\nmemberships-module <command>\n\nCommands:\n  list                  List membershipsModule records\n  find-first            Find first matching membershipsModule record\n  get                   Get a membershipsModule by ID\n  create                Create a new membershipsModule\n  update                Update an existing membershipsModule\n  delete                Delete a membershipsModule\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
@@ -109,6 +112,8 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       membersTableName: true,
       membershipDefaultsTableId: true,
       membershipDefaultsTableName: true,
+      membershipSettingsTableId: true,
+      membershipSettingsTableName: true,
       grantsTableId: true,
       grantsTableName: true,
       actorTableId: true,
@@ -130,14 +135,10 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       entityIdsByMask: true,
       entityIdsByPerm: true,
       entityIdsFunction: true,
+      memberProfilesTableId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<
-        MembershipsModuleSelect,
-        MembershipsModuleFilter,
-        never,
-        MembershipsModuleOrderBy
-      > & {
+      FindManyArgs<MembershipsModuleSelect, MembershipsModuleFilter, MembershipsModuleOrderBy> & {
         select: MembershipsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -165,6 +166,8 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       membersTableName: true,
       membershipDefaultsTableId: true,
       membershipDefaultsTableName: true,
+      membershipSettingsTableId: true,
+      membershipSettingsTableName: true,
       grantsTableId: true,
       grantsTableName: true,
       actorTableId: true,
@@ -186,9 +189,10 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       entityIdsByMask: true,
       entityIdsByPerm: true,
       entityIdsFunction: true,
+      memberProfilesTableId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<MembershipsModuleSelect, MembershipsModuleFilter, never> & {
+      FindFirstArgs<MembershipsModuleSelect, MembershipsModuleFilter> & {
         select: MembershipsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -228,6 +232,8 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           membersTableName: true,
           membershipDefaultsTableId: true,
           membershipDefaultsTableName: true,
+          membershipSettingsTableId: true,
+          membershipSettingsTableName: true,
           grantsTableId: true,
           grantsTableName: true,
           actorTableId: true,
@@ -249,6 +255,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           entityIdsByMask: true,
           entityIdsByPerm: true,
           entityIdsFunction: true,
+          memberProfilesTableId: true,
         },
       })
       .execute();
@@ -323,6 +330,20 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         type: 'text',
         name: 'membershipDefaultsTableName',
         message: 'membershipDefaultsTableName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'membershipSettingsTableId',
+        message: 'membershipSettingsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'membershipSettingsTableName',
+        message: 'membershipSettingsTableName',
         required: false,
         skipPrompt: true,
       },
@@ -472,6 +493,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'memberProfilesTableId',
+        message: 'memberProfilesTableId',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(
@@ -491,6 +519,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           membersTableName: cleanedData.membersTableName,
           membershipDefaultsTableId: cleanedData.membershipDefaultsTableId,
           membershipDefaultsTableName: cleanedData.membershipDefaultsTableName,
+          membershipSettingsTableId: cleanedData.membershipSettingsTableId,
+          membershipSettingsTableName: cleanedData.membershipSettingsTableName,
           grantsTableId: cleanedData.grantsTableId,
           grantsTableName: cleanedData.grantsTableName,
           actorTableId: cleanedData.actorTableId,
@@ -512,6 +542,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           entityIdsByMask: cleanedData.entityIdsByMask,
           entityIdsByPerm: cleanedData.entityIdsByPerm,
           entityIdsFunction: cleanedData.entityIdsFunction,
+          memberProfilesTableId: cleanedData.memberProfilesTableId,
         },
         select: {
           id: true,
@@ -524,6 +555,8 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           membersTableName: true,
           membershipDefaultsTableId: true,
           membershipDefaultsTableName: true,
+          membershipSettingsTableId: true,
+          membershipSettingsTableName: true,
           grantsTableId: true,
           grantsTableName: true,
           actorTableId: true,
@@ -545,6 +578,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           entityIdsByMask: true,
           entityIdsByPerm: true,
           entityIdsFunction: true,
+          memberProfilesTableId: true,
         },
       })
       .execute();
@@ -630,6 +664,20 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'text',
+        name: 'membershipSettingsTableId',
+        message: 'membershipSettingsTableId',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
+        name: 'membershipSettingsTableName',
+        message: 'membershipSettingsTableName',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'text',
         name: 'grantsTableId',
         message: 'grantsTableId',
         required: false,
@@ -774,6 +822,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'memberProfilesTableId',
+        message: 'memberProfilesTableId',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as MembershipsModulePatch;
@@ -793,6 +848,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           membersTableName: cleanedData.membersTableName,
           membershipDefaultsTableId: cleanedData.membershipDefaultsTableId,
           membershipDefaultsTableName: cleanedData.membershipDefaultsTableName,
+          membershipSettingsTableId: cleanedData.membershipSettingsTableId,
+          membershipSettingsTableName: cleanedData.membershipSettingsTableName,
           grantsTableId: cleanedData.grantsTableId,
           grantsTableName: cleanedData.grantsTableName,
           actorTableId: cleanedData.actorTableId,
@@ -814,6 +871,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           entityIdsByMask: cleanedData.entityIdsByMask,
           entityIdsByPerm: cleanedData.entityIdsByPerm,
           entityIdsFunction: cleanedData.entityIdsFunction,
+          memberProfilesTableId: cleanedData.memberProfilesTableId,
         },
         select: {
           id: true,
@@ -826,6 +884,8 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           membersTableName: true,
           membershipDefaultsTableId: true,
           membershipDefaultsTableName: true,
+          membershipSettingsTableId: true,
+          membershipSettingsTableName: true,
           grantsTableId: true,
           grantsTableName: true,
           actorTableId: true,
@@ -847,6 +907,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           entityIdsByMask: true,
           entityIdsByPerm: true,
           entityIdsFunction: true,
+          memberProfilesTableId: true,
         },
       })
       .execute();

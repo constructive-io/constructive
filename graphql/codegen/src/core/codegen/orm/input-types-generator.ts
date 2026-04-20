@@ -23,7 +23,6 @@ import { BASE_FILTER_TYPE_NAMES, SCALAR_NAMES, scalarToFilterType, scalarToTsTyp
 import { getTypeBaseName } from '../type-resolver';
 import {
   getCreateInputTypeName,
-  getConditionTypeName,
   getFilterTypeName,
   getGeneratedFileHeader,
   getOrderByTypeName,
@@ -324,8 +323,7 @@ const SCALAR_FILTER_CONFIGS: ScalarFilterConfig[] = [
   },
   { name: 'FullTextFilter', tsType: 'string', operators: ['fulltext'] },
   // VectorFilter: equality/distinct operators for vector columns on Filter types.
-  // Similarity search uses condition types (embeddingNearby), not filters, but
-  // connection-filter may still generate a filter for vector columns. This ensures
+  // connection-filter may generate a filter for vector columns. This ensures
   // the generated type uses number[] rather than being silently omitted.
   { name: 'VectorFilter', tsType: 'number[]', operators: ['equality', 'distinct'] },
   // List filters (for array fields like string[], int[], uuid[])
@@ -1156,91 +1154,6 @@ function generateTableFilterTypes(
 }
 
 // ============================================================================
-// Condition Types Generator (AST-based)
-// ============================================================================
-
-/**
- * Build properties for a table condition interface
- * Condition types are simpler than Filter types - they use direct value equality.
- *
- * Also merges any extra fields from the GraphQL schema's condition type
- * (e.g., plugin-injected fields like vectorEmbedding from VectorSearchPlugin)
- * that are not derived from the table's own columns.
- */
-function buildTableConditionProperties(
-  table: Table,
-  typeRegistry?: TypeRegistry,
-): InterfaceProperty[] {
-  const properties: InterfaceProperty[] = [];
-  const generatedFieldNames = new Set<string>();
-
-  for (const field of table.fields) {
-    const fieldType =
-      typeof field.type === 'string' ? field.type : field.type.gqlType;
-    if (isRelationField(field.name, table)) continue;
-
-    // Condition types use the raw scalar type (nullable)
-    const tsType = scalarToTsType(fieldType, { unknownScalar: 'unknown' });
-    properties.push({
-      name: field.name,
-      type: `${tsType} | null`,
-      optional: true,
-    });
-    generatedFieldNames.add(field.name);
-  }
-
-  // Merge any additional fields from the schema's condition type
-  // (e.g., plugin-added fields like vectorEmbedding from VectorSearchPlugin)
-  if (typeRegistry) {
-    const conditionTypeName = getConditionTypeName(table);
-    const conditionType = typeRegistry.get(conditionTypeName);
-    if (
-      conditionType?.kind === 'INPUT_OBJECT' &&
-      conditionType.inputFields
-    ) {
-      for (const field of conditionType.inputFields) {
-        if (generatedFieldNames.has(field.name)) continue;
-
-        const tsType = typeRefToTs(field.type);
-        properties.push({
-          name: field.name,
-          type: tsType,
-          optional: true,
-          description: stripSmartComments(field.description, true),
-        });
-      }
-    }
-  }
-
-  return properties;
-}
-
-/**
- * Generate table condition type statements
- */
-function generateTableConditionTypes(
-  tables: Table[],
-  typeRegistry?: TypeRegistry,
-): t.Statement[] {
-  const statements: t.Statement[] = [];
-
-  for (const table of tables) {
-    const conditionName = getConditionTypeName(table);
-    statements.push(
-      createExportedInterface(
-        conditionName,
-        buildTableConditionProperties(table, typeRegistry),
-      ),
-    );
-  }
-
-  if (statements.length > 0) {
-    addSectionComment(statements, 'Table Condition Types');
-  }
-  return statements;
-}
-
-// ============================================================================
 // OrderBy Types Generator (AST-based)
 // ============================================================================
 
@@ -2033,51 +1946,6 @@ function collectFilterExtraInputTypes(
   return extraTypes;
 }
 
-/**
- * Collect extra input type names referenced by plugin-injected condition fields.
- *
- * When plugins (like VectorSearchPlugin) inject fields into condition types,
- * they reference types (like VectorNearbyInput, VectorMetric) that also need
- * to be generated. This function discovers those types by comparing the
- * schema's condition type fields against the table's own columns.
- */
-function collectConditionExtraInputTypes(
-  tables: Table[],
-  typeRegistry: TypeRegistry,
-): Set<string> {
-  const extraTypes = new Set<string>();
-
-  for (const table of tables) {
-    const conditionTypeName = getConditionTypeName(table);
-    const conditionType = typeRegistry.get(conditionTypeName);
-    if (
-      !conditionType ||
-      conditionType.kind !== 'INPUT_OBJECT' ||
-      !conditionType.inputFields
-    ) {
-      continue;
-    }
-
-    const tableFieldNames = new Set(
-      table.fields
-        .filter((f) => !isRelationField(f.name, table))
-        .map((f) => f.name),
-    );
-
-    for (const field of conditionType.inputFields) {
-      if (tableFieldNames.has(field.name)) continue;
-
-      // Collect the base type name of this extra field
-      const baseName = getTypeBaseName(field.type);
-      if (baseName && !SCALAR_NAMES.has(baseName)) {
-        extraTypes.add(baseName);
-      }
-    }
-  }
-
-  return extraTypes;
-}
-
 // ============================================================================
 // Main Generator (AST-based)
 // ============================================================================
@@ -2091,9 +1959,7 @@ export function generateInputTypesFile(
   tables?: Table[],
   usedPayloadTypes?: Set<string>,
   comments: boolean = true,
-  options?: { condition?: boolean },
 ): GeneratedInputTypesFile {
-  const conditionEnabled = options?.condition === true;
   const statements: t.Statement[] = [];
   const tablesList = tables ?? [];
   const hasTables = tablesList.length > 0;
@@ -2129,13 +1995,6 @@ export function generateInputTypesFile(
     // capturing plugin-injected filter fields (e.g., bm25, tsvector, trgm, vector, geom)
     statements.push(...generateTableFilterTypes(tablesList, typeRegistry));
 
-    // 4b. Table condition types (simple equality filter)
-    // Pass typeRegistry to merge plugin-injected condition fields
-    // (e.g., vectorEmbedding from VectorSearchPlugin)
-    if (conditionEnabled) {
-      statements.push(...generateTableConditionTypes(tablesList, typeRegistry));
-    }
-
     // 5. OrderBy types
     // Pass typeRegistry to merge plugin-injected orderBy values
     // (e.g., EMBEDDING_DISTANCE_ASC/DESC from VectorSearchPlugin)
@@ -2150,7 +2009,7 @@ export function generateInputTypesFile(
   statements.push(...generateConnectionFieldsMap(tablesList, tableByName));
 
   // 7. Custom input types from TypeRegistry
-  // Also include any extra types referenced by plugin-injected filter/condition fields
+  // Also include any extra types referenced by plugin-injected filter fields
   const mergedUsedInputTypes = new Set(usedInputTypes);
   if (hasTables) {
     const filterExtraTypes = collectFilterExtraInputTypes(
@@ -2158,15 +2017,6 @@ export function generateInputTypesFile(
       typeRegistry,
     );
     for (const typeName of filterExtraTypes) {
-      mergedUsedInputTypes.add(typeName);
-    }
-  }
-  if (hasTables && conditionEnabled) {
-    const conditionExtraTypes = collectConditionExtraInputTypes(
-      tablesList,
-      typeRegistry,
-    );
-    for (const typeName of conditionExtraTypes) {
       mergedUsedInputTypes.add(typeName);
     }
   }

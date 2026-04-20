@@ -1,13 +1,13 @@
 ---
 name: orm-admin
-description: ORM client for the admin API — provides typed CRUD operations for 32 tables and 16 custom operations
+description: ORM client for the admin API — provides typed CRUD operations for 34 tables and 16 custom operations
 ---
 
 # orm-admin
 
 <!-- @constructive-io/graphql-codegen - DO NOT EDIT -->
 
-ORM client for the admin API — provides typed CRUD operations for 32 tables and 16 custom operations
+ORM client for the admin API — provides typed CRUD operations for 34 tables and 16 custom operations
 
 ## Usage
 
@@ -51,24 +51,26 @@ See the `references/` directory for detailed per-entity API documentation:
 - [org-limit-default](references/org-limit-default.md)
 - [org-admin-grant](references/org-admin-grant.md)
 - [org-owner-grant](references/org-owner-grant.md)
-- [membership-type](references/membership-type.md)
 - [app-limit](references/app-limit.md)
 - [app-achievement](references/app-achievement.md)
 - [app-step](references/app-step.md)
-- [claimed-invite](references/claimed-invite.md)
+- [app-claimed-invite](references/app-claimed-invite.md)
 - [org-chart-edge-grant](references/org-chart-edge-grant.md)
 - [org-limit](references/org-limit.md)
+- [membership-type](references/membership-type.md)
 - [app-grant](references/app-grant.md)
 - [app-membership-default](references/app-membership-default.md)
+- [org-membership-default](references/org-membership-default.md)
 - [org-claimed-invite](references/org-claimed-invite.md)
 - [org-grant](references/org-grant.md)
 - [org-chart-edge](references/org-chart-edge.md)
-- [org-membership-default](references/org-membership-default.md)
+- [org-member-profile](references/org-member-profile.md)
+- [org-membership-setting](references/org-membership-setting.md)
 - [app-level](references/app-level.md)
-- [invite](references/invite.md)
+- [app-invite](references/app-invite.md)
+- [org-invite](references/org-invite.md)
 - [app-membership](references/app-membership.md)
 - [org-membership](references/org-membership.md)
-- [org-invite](references/org-invite.md)
 - [app-permissions-get-padded-mask](references/app-permissions-get-padded-mask.md)
 - [org-permissions-get-padded-mask](references/org-permissions-get-padded-mask.md)
 - [org-is-manager-of](references/org-is-manager-of.md)
@@ -80,7 +82,7 @@ See the `references/` directory for detailed per-entity API documentation:
 - [app-permissions-get-by-mask](references/app-permissions-get-by-mask.md)
 - [org-permissions-get-by-mask](references/org-permissions-get-by-mask.md)
 - [steps-required](references/steps-required.md)
-- [submit-invite-code](references/submit-invite-code.md)
+- [submit-app-invite-code](references/submit-app-invite-code.md)
 - [submit-org-invite-code](references/submit-org-invite-code.md)
 - [request-upload-url](references/request-upload-url.md)
 - [confirm-upload](references/confirm-upload.md)

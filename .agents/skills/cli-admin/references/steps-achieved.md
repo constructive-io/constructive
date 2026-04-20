@@ -7,7 +7,7 @@ Execute the stepsAchieved query
 ## Usage
 
 ```bash
-csdk steps-achieved --vlevel <String> --vroleId <UUID>
+csdk steps-achieved --level <String> --roleId <UUID>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk steps-achieved --vlevel <String> --vroleId <UUID>
 ### Run stepsAchieved
 
 ```bash
-csdk steps-achieved --vlevel <String> --vroleId <UUID>
+csdk steps-achieved --level <String> --roleId <UUID>
 ```

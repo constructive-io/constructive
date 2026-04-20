@@ -25,12 +25,14 @@ const fieldSchema: FieldSchema = {
   isBanned: 'boolean',
   isDisabled: 'boolean',
   isActive: 'boolean',
+  isExternal: 'boolean',
   isOwner: 'boolean',
   isAdmin: 'boolean',
   permissions: 'string',
   granted: 'string',
   actorId: 'uuid',
   entityId: 'uuid',
+  isReadOnly: 'boolean',
   profileId: 'uuid',
 };
 const usage =
@@ -93,16 +95,18 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isBanned: true,
       isDisabled: true,
       isActive: true,
+      isExternal: true,
       isOwner: true,
       isAdmin: true,
       permissions: true,
       granted: true,
       actorId: true,
       entityId: true,
+      isReadOnly: true,
       profileId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<OrgMembershipSelect, OrgMembershipFilter, never, OrgMembershipOrderBy> & {
+      FindManyArgs<OrgMembershipSelect, OrgMembershipFilter, OrgMembershipOrderBy> & {
         select: OrgMembershipSelect;
       }
     >(argv, defaultSelect);
@@ -129,16 +133,18 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isBanned: true,
       isDisabled: true,
       isActive: true,
+      isExternal: true,
       isOwner: true,
       isAdmin: true,
       permissions: true,
       granted: true,
       actorId: true,
       entityId: true,
+      isReadOnly: true,
       profileId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<OrgMembershipSelect, OrgMembershipFilter, never> & {
+      FindFirstArgs<OrgMembershipSelect, OrgMembershipFilter> & {
         select: OrgMembershipSelect;
       }
     >(argv, defaultSelect);
@@ -177,12 +183,14 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           isBanned: true,
           isDisabled: true,
           isActive: true,
+          isExternal: true,
           isOwner: true,
           isAdmin: true,
           permissions: true,
           granted: true,
           actorId: true,
           entityId: true,
+          isReadOnly: true,
           profileId: true,
         },
       })
@@ -243,6 +251,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'boolean',
+        name: 'isExternal',
+        message: 'isExternal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
         name: 'isOwner',
         message: 'isOwner',
         required: false,
@@ -282,6 +297,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: true,
       },
       {
+        type: 'boolean',
+        name: 'isReadOnly',
+        message: 'isReadOnly',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'profileId',
         message: 'profileId',
@@ -304,12 +326,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isBanned: cleanedData.isBanned,
           isDisabled: cleanedData.isDisabled,
           isActive: cleanedData.isActive,
+          isExternal: cleanedData.isExternal,
           isOwner: cleanedData.isOwner,
           isAdmin: cleanedData.isAdmin,
           permissions: cleanedData.permissions,
           granted: cleanedData.granted,
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
+          isReadOnly: cleanedData.isReadOnly,
           profileId: cleanedData.profileId,
         },
         select: {
@@ -322,12 +346,14 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isBanned: true,
           isDisabled: true,
           isActive: true,
+          isExternal: true,
           isOwner: true,
           isAdmin: true,
           permissions: true,
           granted: true,
           actorId: true,
           entityId: true,
+          isReadOnly: true,
           profileId: true,
         },
       })
@@ -394,6 +420,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'boolean',
+        name: 'isExternal',
+        message: 'isExternal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
         name: 'isOwner',
         message: 'isOwner',
         required: false,
@@ -433,6 +466,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
       },
       {
+        type: 'boolean',
+        name: 'isReadOnly',
+        message: 'isReadOnly',
+        required: false,
+        skipPrompt: true,
+      },
+      {
         type: 'text',
         name: 'profileId',
         message: 'profileId',
@@ -455,12 +495,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isBanned: cleanedData.isBanned,
           isDisabled: cleanedData.isDisabled,
           isActive: cleanedData.isActive,
+          isExternal: cleanedData.isExternal,
           isOwner: cleanedData.isOwner,
           isAdmin: cleanedData.isAdmin,
           permissions: cleanedData.permissions,
           granted: cleanedData.granted,
           actorId: cleanedData.actorId,
           entityId: cleanedData.entityId,
+          isReadOnly: cleanedData.isReadOnly,
           profileId: cleanedData.profileId,
         },
         select: {
@@ -473,12 +515,14 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isBanned: true,
           isDisabled: true,
           isActive: true,
+          isExternal: true,
           isOwner: true,
           isAdmin: true,
           permissions: true,
           granted: true,
           actorId: true,
           entityId: true,
+          isReadOnly: true,
           profileId: true,
         },
       })

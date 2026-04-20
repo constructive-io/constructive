@@ -27,6 +27,7 @@ import {
   tableKeys,
   checkConstraintKeys,
   fieldKeys,
+  spatialRelationKeys,
   foreignKeyConstraintKeys,
   fullTextSearchKeys,
   indexKeys,
@@ -40,9 +41,10 @@ import {
   viewGrantKeys,
   viewRuleKeys,
   embeddingChunkKeys,
-  tableTemplateModuleKeys,
   secureTableProvisionKeys,
   relationProvisionKeys,
+  sessionSecretsModuleKeys,
+  identityProvidersModuleKeys,
   schemaGrantKeys,
   defaultPrivilegeKeys,
   enumKeys,
@@ -80,6 +82,10 @@ import {
   blueprintTemplateKeys,
   blueprintConstructionKeys,
   storageModuleKeys,
+  entityTypeProvisionKeys,
+  webauthnCredentialsModuleKeys,
+  webauthnAuthModuleKeys,
+  notificationsModuleKeys,
   databaseProvisionModuleKeys,
   appAdminGrantKeys,
   appOwnerGrantKeys,
@@ -88,6 +94,7 @@ import {
   orgMemberKeys,
   orgAdminGrantKeys,
   orgOwnerGrantKeys,
+  orgMemberProfileKeys,
   orgGrantKeys,
   orgChartEdgeKeys,
   orgChartEdgeGrantKeys,
@@ -100,25 +107,30 @@ import {
   emailKeys,
   phoneNumberKeys,
   cryptoAddressKeys,
-  connectedAccountKeys,
-  inviteKeys,
-  claimedInviteKeys,
+  webauthnCredentialKeys,
+  appInviteKeys,
+  appClaimedInviteKeys,
   orgInviteKeys,
   orgClaimedInviteKeys,
   auditLogKeys,
   appPermissionDefaultKeys,
+  identityProviderKeys,
   refKeys,
   storeKeys,
   roleTypeKeys,
   migrateFileKeys,
   appLimitDefaultKeys,
   orgLimitDefaultKeys,
-  membershipTypeKeys,
+  devicesModuleKeys,
+  userConnectedAccountKeys,
   appMembershipDefaultKeys,
-  commitKeys,
   orgMembershipDefaultKeys,
+  commitKeys,
+  rateLimitsModuleKeys,
+  membershipTypeKeys,
   rlsModuleKeys,
   sqlActionKeys,
+  orgMembershipSettingKeys,
   userKeys,
   astMigrationKeys,
   appMembershipKeys,
@@ -333,6 +345,23 @@ export const invalidate = {
         queryKey: fieldKeys.detail(id),
       }),
   },
+  /** Invalidate spatialRelation queries */ spatialRelation: {
+    /** Invalidate all spatialRelation queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: spatialRelationKeys.all,
+      }),
+    /** Invalidate spatialRelation list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: spatialRelationKeys.lists(),
+      }),
+    /** Invalidate a specific spatialRelation */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: spatialRelationKeys.detail(id),
+      }),
+  },
   /** Invalidate foreignKeyConstraint queries */ foreignKeyConstraint: {
     /** Invalidate all foreignKeyConstraint queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -539,23 +568,6 @@ export const invalidate = {
         queryKey: embeddingChunkKeys.detail(id),
       }),
   },
-  /** Invalidate tableTemplateModule queries */ tableTemplateModule: {
-    /** Invalidate all tableTemplateModule queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: tableTemplateModuleKeys.all,
-      }),
-    /** Invalidate tableTemplateModule list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: tableTemplateModuleKeys.lists(),
-      }),
-    /** Invalidate a specific tableTemplateModule */ detail: (
-      queryClient: QueryClient,
-      id: string | number
-    ) =>
-      queryClient.invalidateQueries({
-        queryKey: tableTemplateModuleKeys.detail(id),
-      }),
-  },
   /** Invalidate secureTableProvision queries */ secureTableProvision: {
     /** Invalidate all secureTableProvision queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -588,6 +600,40 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: relationProvisionKeys.detail(id),
+      }),
+  },
+  /** Invalidate sessionSecretsModule queries */ sessionSecretsModule: {
+    /** Invalidate all sessionSecretsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionSecretsModuleKeys.all,
+      }),
+    /** Invalidate sessionSecretsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionSecretsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific sessionSecretsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: sessionSecretsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate identityProvidersModule queries */ identityProvidersModule: {
+    /** Invalidate all identityProvidersModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.all,
+      }),
+    /** Invalidate identityProvidersModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvidersModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProvidersModuleKeys.detail(id),
       }),
   },
   /** Invalidate schemaGrant queries */ schemaGrant: {
@@ -1204,6 +1250,74 @@ export const invalidate = {
         queryKey: storageModuleKeys.detail(id),
       }),
   },
+  /** Invalidate entityTypeProvision queries */ entityTypeProvision: {
+    /** Invalidate all entityTypeProvision queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.all,
+      }),
+    /** Invalidate entityTypeProvision list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.lists(),
+      }),
+    /** Invalidate a specific entityTypeProvision */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: entityTypeProvisionKeys.detail(id),
+      }),
+  },
+  /** Invalidate webauthnCredentialsModule queries */ webauthnCredentialsModule: {
+    /** Invalidate all webauthnCredentialsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialsModuleKeys.all,
+      }),
+    /** Invalidate webauthnCredentialsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnCredentialsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnCredentialsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate webauthnAuthModule queries */ webauthnAuthModule: {
+    /** Invalidate all webauthnAuthModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.all,
+      }),
+    /** Invalidate webauthnAuthModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.lists(),
+      }),
+    /** Invalidate a specific webauthnAuthModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: webauthnAuthModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate notificationsModule queries */ notificationsModule: {
+    /** Invalidate all notificationsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.all,
+      }),
+    /** Invalidate notificationsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific notificationsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: notificationsModuleKeys.detail(id),
+      }),
+  },
   /** Invalidate databaseProvisionModule queries */ databaseProvisionModule: {
     /** Invalidate all databaseProvisionModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1335,6 +1449,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: orgOwnerGrantKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgMemberProfile queries */ orgMemberProfile: {
+    /** Invalidate all orgMemberProfile queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMemberProfileKeys.all,
+      }),
+    /** Invalidate orgMemberProfile list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMemberProfileKeys.lists(),
+      }),
+    /** Invalidate a specific orgMemberProfile */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMemberProfileKeys.detail(id),
       }),
   },
   /** Invalidate orgGrant queries */ orgGrant: {
@@ -1523,52 +1654,55 @@ export const invalidate = {
         queryKey: cryptoAddressKeys.detail(id),
       }),
   },
-  /** Invalidate connectedAccount queries */ connectedAccount: {
-    /** Invalidate all connectedAccount queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate webauthnCredential queries */ webauthnCredential: {
+    /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.all,
+        queryKey: webauthnCredentialKeys.all,
       }),
-    /** Invalidate connectedAccount list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate webauthnCredential list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.lists(),
+        queryKey: webauthnCredentialKeys.lists(),
       }),
-    /** Invalidate a specific connectedAccount */ detail: (
+    /** Invalidate a specific webauthnCredential */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.detail(id),
+        queryKey: webauthnCredentialKeys.detail(id),
       }),
   },
-  /** Invalidate invite queries */ invite: {
-    /** Invalidate all invite queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate appInvite queries */ appInvite: {
+    /** Invalidate all appInvite queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: inviteKeys.all,
+        queryKey: appInviteKeys.all,
       }),
-    /** Invalidate invite list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate appInvite list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: inviteKeys.lists(),
+        queryKey: appInviteKeys.lists(),
       }),
-    /** Invalidate a specific invite */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: inviteKeys.detail(id),
-      }),
-  },
-  /** Invalidate claimedInvite queries */ claimedInvite: {
-    /** Invalidate all claimedInvite queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: claimedInviteKeys.all,
-      }),
-    /** Invalidate claimedInvite list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: claimedInviteKeys.lists(),
-      }),
-    /** Invalidate a specific claimedInvite */ detail: (
+    /** Invalidate a specific appInvite */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: claimedInviteKeys.detail(id),
+        queryKey: appInviteKeys.detail(id),
+      }),
+  },
+  /** Invalidate appClaimedInvite queries */ appClaimedInvite: {
+    /** Invalidate all appClaimedInvite queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: appClaimedInviteKeys.all,
+      }),
+    /** Invalidate appClaimedInvite list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: appClaimedInviteKeys.lists(),
+      }),
+    /** Invalidate a specific appClaimedInvite */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: appClaimedInviteKeys.detail(id),
       }),
   },
   /** Invalidate orgInvite queries */ orgInvite: {
@@ -1634,6 +1768,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: appPermissionDefaultKeys.detail(id),
+      }),
+  },
+  /** Invalidate identityProvider queries */ identityProvider: {
+    /** Invalidate all identityProvider queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.all,
+      }),
+    /** Invalidate identityProvider list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvider */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.detail(id),
       }),
   },
   /** Invalidate ref queries */ ref: {
@@ -1729,21 +1880,38 @@ export const invalidate = {
         queryKey: orgLimitDefaultKeys.detail(id),
       }),
   },
-  /** Invalidate membershipType queries */ membershipType: {
-    /** Invalidate all membershipType queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate devicesModule queries */ devicesModule: {
+    /** Invalidate all devicesModule queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: membershipTypeKeys.all,
+        queryKey: devicesModuleKeys.all,
       }),
-    /** Invalidate membershipType list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate devicesModule list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: membershipTypeKeys.lists(),
+        queryKey: devicesModuleKeys.lists(),
       }),
-    /** Invalidate a specific membershipType */ detail: (
+    /** Invalidate a specific devicesModule */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: membershipTypeKeys.detail(id),
+        queryKey: devicesModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate userConnectedAccount queries */ userConnectedAccount: {
+    /** Invalidate all userConnectedAccount queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.all,
+      }),
+    /** Invalidate userConnectedAccount list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.lists(),
+      }),
+    /** Invalidate a specific userConnectedAccount */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.detail(id),
       }),
   },
   /** Invalidate appMembershipDefault queries */ appMembershipDefault: {
@@ -1763,20 +1931,6 @@ export const invalidate = {
         queryKey: appMembershipDefaultKeys.detail(id),
       }),
   },
-  /** Invalidate commit queries */ commit: {
-    /** Invalidate all commit queries */ all: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.all,
-      }),
-    /** Invalidate commit list queries */ lists: (queryClient: QueryClient) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.lists(),
-      }),
-    /** Invalidate a specific commit */ detail: (queryClient: QueryClient, id: string | number) =>
-      queryClient.invalidateQueries({
-        queryKey: commitKeys.detail(id),
-      }),
-  },
   /** Invalidate orgMembershipDefault queries */ orgMembershipDefault: {
     /** Invalidate all orgMembershipDefault queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -1792,6 +1946,54 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: orgMembershipDefaultKeys.detail(id),
+      }),
+  },
+  /** Invalidate commit queries */ commit: {
+    /** Invalidate all commit queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: commitKeys.all,
+      }),
+    /** Invalidate commit list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: commitKeys.lists(),
+      }),
+    /** Invalidate a specific commit */ detail: (queryClient: QueryClient, id: string | number) =>
+      queryClient.invalidateQueries({
+        queryKey: commitKeys.detail(id),
+      }),
+  },
+  /** Invalidate rateLimitsModule queries */ rateLimitsModule: {
+    /** Invalidate all rateLimitsModule queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitsModuleKeys.all,
+      }),
+    /** Invalidate rateLimitsModule list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitsModuleKeys.lists(),
+      }),
+    /** Invalidate a specific rateLimitsModule */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: rateLimitsModuleKeys.detail(id),
+      }),
+  },
+  /** Invalidate membershipType queries */ membershipType: {
+    /** Invalidate all membershipType queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypeKeys.all,
+      }),
+    /** Invalidate membershipType list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypeKeys.lists(),
+      }),
+    /** Invalidate a specific membershipType */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: membershipTypeKeys.detail(id),
       }),
   },
   /** Invalidate rlsModule queries */ rlsModule: {
@@ -1826,6 +2028,23 @@ export const invalidate = {
     ) =>
       queryClient.invalidateQueries({
         queryKey: sqlActionKeys.detail(id),
+      }),
+  },
+  /** Invalidate orgMembershipSetting queries */ orgMembershipSetting: {
+    /** Invalidate all orgMembershipSetting queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipSettingKeys.all,
+      }),
+    /** Invalidate orgMembershipSetting list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipSettingKeys.lists(),
+      }),
+    /** Invalidate a specific orgMembershipSetting */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: orgMembershipSettingKeys.detail(id),
       }),
   },
   /** Invalidate user queries */ user: {
@@ -1987,6 +2206,14 @@ export const remove = {
       queryKey: fieldKeys.detail(id),
     });
   },
+  /** Remove spatialRelation from cache */ spatialRelation: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: spatialRelationKeys.detail(id),
+    });
+  },
   /** Remove foreignKeyConstraint from cache */ foreignKeyConstraint: (
     queryClient: QueryClient,
     id: string | number
@@ -2070,14 +2297,6 @@ export const remove = {
       queryKey: embeddingChunkKeys.detail(id),
     });
   },
-  /** Remove tableTemplateModule from cache */ tableTemplateModule: (
-    queryClient: QueryClient,
-    id: string | number
-  ) => {
-    queryClient.removeQueries({
-      queryKey: tableTemplateModuleKeys.detail(id),
-    });
-  },
   /** Remove secureTableProvision from cache */ secureTableProvision: (
     queryClient: QueryClient,
     id: string | number
@@ -2092,6 +2311,22 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: relationProvisionKeys.detail(id),
+    });
+  },
+  /** Remove sessionSecretsModule from cache */ sessionSecretsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: sessionSecretsModuleKeys.detail(id),
+    });
+  },
+  /** Remove identityProvidersModule from cache */ identityProvidersModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: identityProvidersModuleKeys.detail(id),
     });
   },
   /** Remove schemaGrant from cache */ schemaGrant: (
@@ -2363,6 +2598,38 @@ export const remove = {
       queryKey: storageModuleKeys.detail(id),
     });
   },
+  /** Remove entityTypeProvision from cache */ entityTypeProvision: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: entityTypeProvisionKeys.detail(id),
+    });
+  },
+  /** Remove webauthnCredentialsModule from cache */ webauthnCredentialsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnCredentialsModuleKeys.detail(id),
+    });
+  },
+  /** Remove webauthnAuthModule from cache */ webauthnAuthModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: webauthnAuthModuleKeys.detail(id),
+    });
+  },
+  /** Remove notificationsModule from cache */ notificationsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: notificationsModuleKeys.detail(id),
+    });
+  },
   /** Remove databaseProvisionModule from cache */ databaseProvisionModule: (
     queryClient: QueryClient,
     id: string | number
@@ -2419,6 +2686,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: orgOwnerGrantKeys.detail(id),
+    });
+  },
+  /** Remove orgMemberProfile from cache */ orgMemberProfile: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgMemberProfileKeys.detail(id),
     });
   },
   /** Remove orgGrant from cache */ orgGrant: (queryClient: QueryClient, id: string | number) => {
@@ -2499,25 +2774,25 @@ export const remove = {
       queryKey: cryptoAddressKeys.detail(id),
     });
   },
-  /** Remove connectedAccount from cache */ connectedAccount: (
+  /** Remove webauthnCredential from cache */ webauthnCredential: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: connectedAccountKeys.detail(id),
+      queryKey: webauthnCredentialKeys.detail(id),
     });
   },
-  /** Remove invite from cache */ invite: (queryClient: QueryClient, id: string | number) => {
+  /** Remove appInvite from cache */ appInvite: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
-      queryKey: inviteKeys.detail(id),
+      queryKey: appInviteKeys.detail(id),
     });
   },
-  /** Remove claimedInvite from cache */ claimedInvite: (
+  /** Remove appClaimedInvite from cache */ appClaimedInvite: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: claimedInviteKeys.detail(id),
+      queryKey: appClaimedInviteKeys.detail(id),
     });
   },
   /** Remove orgInvite from cache */ orgInvite: (queryClient: QueryClient, id: string | number) => {
@@ -2544,6 +2819,14 @@ export const remove = {
   ) => {
     queryClient.removeQueries({
       queryKey: appPermissionDefaultKeys.detail(id),
+    });
+  },
+  /** Remove identityProvider from cache */ identityProvider: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: identityProviderKeys.detail(id),
     });
   },
   /** Remove ref from cache */ ref: (queryClient: QueryClient, id: string | number) => {
@@ -2585,12 +2868,20 @@ export const remove = {
       queryKey: orgLimitDefaultKeys.detail(id),
     });
   },
-  /** Remove membershipType from cache */ membershipType: (
+  /** Remove devicesModule from cache */ devicesModule: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: membershipTypeKeys.detail(id),
+      queryKey: devicesModuleKeys.detail(id),
+    });
+  },
+  /** Remove userConnectedAccount from cache */ userConnectedAccount: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userConnectedAccountKeys.detail(id),
     });
   },
   /** Remove appMembershipDefault from cache */ appMembershipDefault: (
@@ -2601,17 +2892,33 @@ export const remove = {
       queryKey: appMembershipDefaultKeys.detail(id),
     });
   },
-  /** Remove commit from cache */ commit: (queryClient: QueryClient, id: string | number) => {
-    queryClient.removeQueries({
-      queryKey: commitKeys.detail(id),
-    });
-  },
   /** Remove orgMembershipDefault from cache */ orgMembershipDefault: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
       queryKey: orgMembershipDefaultKeys.detail(id),
+    });
+  },
+  /** Remove commit from cache */ commit: (queryClient: QueryClient, id: string | number) => {
+    queryClient.removeQueries({
+      queryKey: commitKeys.detail(id),
+    });
+  },
+  /** Remove rateLimitsModule from cache */ rateLimitsModule: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: rateLimitsModuleKeys.detail(id),
+    });
+  },
+  /** Remove membershipType from cache */ membershipType: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: membershipTypeKeys.detail(id),
     });
   },
   /** Remove rlsModule from cache */ rlsModule: (queryClient: QueryClient, id: string | number) => {
@@ -2622,6 +2929,14 @@ export const remove = {
   /** Remove sqlAction from cache */ sqlAction: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: sqlActionKeys.detail(id),
+    });
+  },
+  /** Remove orgMembershipSetting from cache */ orgMembershipSetting: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: orgMembershipSettingKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

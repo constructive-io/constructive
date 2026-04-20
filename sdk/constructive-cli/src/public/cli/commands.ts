@@ -18,6 +18,7 @@ import schemaCmd from './commands/schema';
 import tableCmd from './commands/table';
 import checkConstraintCmd from './commands/check-constraint';
 import fieldCmd from './commands/field';
+import spatialRelationCmd from './commands/spatial-relation';
 import foreignKeyConstraintCmd from './commands/foreign-key-constraint';
 import fullTextSearchCmd from './commands/full-text-search';
 import indexCmd from './commands/index';
@@ -31,9 +32,10 @@ import viewTableCmd from './commands/view-table';
 import viewGrantCmd from './commands/view-grant';
 import viewRuleCmd from './commands/view-rule';
 import embeddingChunkCmd from './commands/embedding-chunk';
-import tableTemplateModuleCmd from './commands/table-template-module';
 import secureTableProvisionCmd from './commands/secure-table-provision';
 import relationProvisionCmd from './commands/relation-provision';
+import sessionSecretsModuleCmd from './commands/session-secrets-module';
+import identityProvidersModuleCmd from './commands/identity-providers-module';
 import schemaGrantCmd from './commands/schema-grant';
 import defaultPrivilegeCmd from './commands/default-privilege';
 import enumCmd from './commands/enum';
@@ -71,6 +73,10 @@ import blueprintCmd from './commands/blueprint';
 import blueprintTemplateCmd from './commands/blueprint-template';
 import blueprintConstructionCmd from './commands/blueprint-construction';
 import storageModuleCmd from './commands/storage-module';
+import entityTypeProvisionCmd from './commands/entity-type-provision';
+import webauthnCredentialsModuleCmd from './commands/webauthn-credentials-module';
+import webauthnAuthModuleCmd from './commands/webauthn-auth-module';
+import notificationsModuleCmd from './commands/notifications-module';
 import databaseProvisionModuleCmd from './commands/database-provision-module';
 import appAdminGrantCmd from './commands/app-admin-grant';
 import appOwnerGrantCmd from './commands/app-owner-grant';
@@ -79,6 +85,7 @@ import orgMembershipCmd from './commands/org-membership';
 import orgMemberCmd from './commands/org-member';
 import orgAdminGrantCmd from './commands/org-admin-grant';
 import orgOwnerGrantCmd from './commands/org-owner-grant';
+import orgMemberProfileCmd from './commands/org-member-profile';
 import orgGrantCmd from './commands/org-grant';
 import orgChartEdgeCmd from './commands/org-chart-edge';
 import orgChartEdgeGrantCmd from './commands/org-chart-edge-grant';
@@ -91,36 +98,43 @@ import appLevelCmd from './commands/app-level';
 import emailCmd from './commands/email';
 import phoneNumberCmd from './commands/phone-number';
 import cryptoAddressCmd from './commands/crypto-address';
-import connectedAccountCmd from './commands/connected-account';
-import inviteCmd from './commands/invite';
-import claimedInviteCmd from './commands/claimed-invite';
+import webauthnCredentialCmd from './commands/webauthn-credential';
+import appInviteCmd from './commands/app-invite';
+import appClaimedInviteCmd from './commands/app-claimed-invite';
 import orgInviteCmd from './commands/org-invite';
 import orgClaimedInviteCmd from './commands/org-claimed-invite';
 import auditLogCmd from './commands/audit-log';
 import appPermissionDefaultCmd from './commands/app-permission-default';
+import identityProviderCmd from './commands/identity-provider';
 import refCmd from './commands/ref';
 import storeCmd from './commands/store';
 import roleTypeCmd from './commands/role-type';
 import migrateFileCmd from './commands/migrate-file';
 import appLimitDefaultCmd from './commands/app-limit-default';
 import orgLimitDefaultCmd from './commands/org-limit-default';
-import membershipTypeCmd from './commands/membership-type';
+import devicesModuleCmd from './commands/devices-module';
+import userConnectedAccountCmd from './commands/user-connected-account';
 import appMembershipDefaultCmd from './commands/app-membership-default';
-import commitCmd from './commands/commit';
 import orgMembershipDefaultCmd from './commands/org-membership-default';
+import commitCmd from './commands/commit';
+import rateLimitsModuleCmd from './commands/rate-limits-module';
+import membershipTypeCmd from './commands/membership-type';
 import rlsModuleCmd from './commands/rls-module';
 import sqlActionCmd from './commands/sql-action';
+import orgMembershipSettingCmd from './commands/org-membership-setting';
 import userCmd from './commands/user';
 import astMigrationCmd from './commands/ast-migration';
 import appMembershipCmd from './commands/app-membership';
 import hierarchyModuleCmd from './commands/hierarchy-module';
 import currentUserIdCmd from './commands/current-user-id';
-import currentIpAddressCmd from './commands/current-ip-address';
 import currentUserAgentCmd from './commands/current-user-agent';
+import currentIpAddressCmd from './commands/current-ip-address';
+import requireStepUpCmd from './commands/require-step-up';
 import appPermissionsGetPaddedMaskCmd from './commands/app-permissions-get-padded-mask';
 import orgPermissionsGetPaddedMaskCmd from './commands/org-permissions-get-padded-mask';
 import stepsAchievedCmd from './commands/steps-achieved';
 import revParseCmd from './commands/rev-parse';
+import resolveBlueprintFieldCmd from './commands/resolve-blueprint-field';
 import orgIsManagerOfCmd from './commands/org-is-manager-of';
 import appPermissionsGetMaskCmd from './commands/app-permissions-get-mask';
 import orgPermissionsGetMaskCmd from './commands/org-permissions-get-mask';
@@ -139,7 +153,12 @@ import signOutCmd from './commands/sign-out';
 import acceptDatabaseTransferCmd from './commands/accept-database-transfer';
 import cancelDatabaseTransferCmd from './commands/cancel-database-transfer';
 import rejectDatabaseTransferCmd from './commands/reject-database-transfer';
-import submitInviteCodeCmd from './commands/submit-invite-code';
+import disconnectAccountCmd from './commands/disconnect-account';
+import revokeApiKeyCmd from './commands/revoke-api-key';
+import revokeSessionCmd from './commands/revoke-session';
+import verifyPasswordCmd from './commands/verify-password';
+import verifyTotpCmd from './commands/verify-totp';
+import submitAppInviteCodeCmd from './commands/submit-app-invite-code';
 import submitOrgInviteCodeCmd from './commands/submit-org-invite-code';
 import checkPasswordCmd from './commands/check-password';
 import confirmDeleteAccountCmd from './commands/confirm-delete-account';
@@ -148,9 +167,11 @@ import verifyEmailCmd from './commands/verify-email';
 import freezeObjectsCmd from './commands/freeze-objects';
 import initEmptyRepoCmd from './commands/init-empty-repo';
 import constructBlueprintCmd from './commands/construct-blueprint';
+import provisionNewUserCmd from './commands/provision-new-user';
 import resetPasswordCmd from './commands/reset-password';
 import removeNodeAtPathCmd from './commands/remove-node-at-path';
 import copyTemplateToBlueprintCmd from './commands/copy-template-to-blueprint';
+import provisionSpatialRelationCmd from './commands/provision-spatial-relation';
 import bootstrapUserCmd from './commands/bootstrap-user';
 import setFieldOrderCmd from './commands/set-field-order';
 import provisionUniqueConstraintCmd from './commands/provision-unique-constraint';
@@ -164,17 +185,16 @@ import updateNodeAtPathCmd from './commands/update-node-at-path';
 import setAndCommitCmd from './commands/set-and-commit';
 import provisionRelationCmd from './commands/provision-relation';
 import applyRlsCmd from './commands/apply-rls';
-import signInOneTimeTokenCmd from './commands/sign-in-one-time-token';
+import signInCrossOriginCmd from './commands/sign-in-cross-origin';
 import createUserDatabaseCmd from './commands/create-user-database';
 import extendTokenExpiresCmd from './commands/extend-token-expires';
-import signInCmd from './commands/sign-in';
+import createApiKeyCmd from './commands/create-api-key';
 import signUpCmd from './commands/sign-up';
-import oneTimeTokenCmd from './commands/one-time-token';
+import requestCrossOriginTokenCmd from './commands/request-cross-origin-token';
+import signInCmd from './commands/sign-in';
 import provisionTableCmd from './commands/provision-table';
 import sendVerificationEmailCmd from './commands/send-verification-email';
 import forgotPasswordCmd from './commands/forgot-password';
-import verifyPasswordCmd from './commands/verify-password';
-import verifyTotpCmd from './commands/verify-totp';
 import requestUploadUrlCmd from './commands/request-upload-url';
 import confirmUploadCmd from './commands/confirm-upload';
 import provisionBucketCmd from './commands/provision-bucket';
@@ -200,6 +220,7 @@ const createCommandMap: () => Record<
   table: tableCmd,
   'check-constraint': checkConstraintCmd,
   field: fieldCmd,
+  'spatial-relation': spatialRelationCmd,
   'foreign-key-constraint': foreignKeyConstraintCmd,
   'full-text-search': fullTextSearchCmd,
   index: indexCmd,
@@ -213,9 +234,10 @@ const createCommandMap: () => Record<
   'view-grant': viewGrantCmd,
   'view-rule': viewRuleCmd,
   'embedding-chunk': embeddingChunkCmd,
-  'table-template-module': tableTemplateModuleCmd,
   'secure-table-provision': secureTableProvisionCmd,
   'relation-provision': relationProvisionCmd,
+  'session-secrets-module': sessionSecretsModuleCmd,
+  'identity-providers-module': identityProvidersModuleCmd,
   'schema-grant': schemaGrantCmd,
   'default-privilege': defaultPrivilegeCmd,
   enum: enumCmd,
@@ -253,6 +275,10 @@ const createCommandMap: () => Record<
   'blueprint-template': blueprintTemplateCmd,
   'blueprint-construction': blueprintConstructionCmd,
   'storage-module': storageModuleCmd,
+  'entity-type-provision': entityTypeProvisionCmd,
+  'webauthn-credentials-module': webauthnCredentialsModuleCmd,
+  'webauthn-auth-module': webauthnAuthModuleCmd,
+  'notifications-module': notificationsModuleCmd,
   'database-provision-module': databaseProvisionModuleCmd,
   'app-admin-grant': appAdminGrantCmd,
   'app-owner-grant': appOwnerGrantCmd,
@@ -261,6 +287,7 @@ const createCommandMap: () => Record<
   'org-member': orgMemberCmd,
   'org-admin-grant': orgAdminGrantCmd,
   'org-owner-grant': orgOwnerGrantCmd,
+  'org-member-profile': orgMemberProfileCmd,
   'org-grant': orgGrantCmd,
   'org-chart-edge': orgChartEdgeCmd,
   'org-chart-edge-grant': orgChartEdgeGrantCmd,
@@ -273,36 +300,43 @@ const createCommandMap: () => Record<
   email: emailCmd,
   'phone-number': phoneNumberCmd,
   'crypto-address': cryptoAddressCmd,
-  'connected-account': connectedAccountCmd,
-  invite: inviteCmd,
-  'claimed-invite': claimedInviteCmd,
+  'webauthn-credential': webauthnCredentialCmd,
+  'app-invite': appInviteCmd,
+  'app-claimed-invite': appClaimedInviteCmd,
   'org-invite': orgInviteCmd,
   'org-claimed-invite': orgClaimedInviteCmd,
   'audit-log': auditLogCmd,
   'app-permission-default': appPermissionDefaultCmd,
+  'identity-provider': identityProviderCmd,
   ref: refCmd,
   store: storeCmd,
   'role-type': roleTypeCmd,
   'migrate-file': migrateFileCmd,
   'app-limit-default': appLimitDefaultCmd,
   'org-limit-default': orgLimitDefaultCmd,
-  'membership-type': membershipTypeCmd,
+  'devices-module': devicesModuleCmd,
+  'user-connected-account': userConnectedAccountCmd,
   'app-membership-default': appMembershipDefaultCmd,
-  commit: commitCmd,
   'org-membership-default': orgMembershipDefaultCmd,
+  commit: commitCmd,
+  'rate-limits-module': rateLimitsModuleCmd,
+  'membership-type': membershipTypeCmd,
   'rls-module': rlsModuleCmd,
   'sql-action': sqlActionCmd,
+  'org-membership-setting': orgMembershipSettingCmd,
   user: userCmd,
   'ast-migration': astMigrationCmd,
   'app-membership': appMembershipCmd,
   'hierarchy-module': hierarchyModuleCmd,
   'current-user-id': currentUserIdCmd,
-  'current-ip-address': currentIpAddressCmd,
   'current-user-agent': currentUserAgentCmd,
+  'current-ip-address': currentIpAddressCmd,
+  'require-step-up': requireStepUpCmd,
   'app-permissions-get-padded-mask': appPermissionsGetPaddedMaskCmd,
   'org-permissions-get-padded-mask': orgPermissionsGetPaddedMaskCmd,
   'steps-achieved': stepsAchievedCmd,
   'rev-parse': revParseCmd,
+  'resolve-blueprint-field': resolveBlueprintFieldCmd,
   'org-is-manager-of': orgIsManagerOfCmd,
   'app-permissions-get-mask': appPermissionsGetMaskCmd,
   'org-permissions-get-mask': orgPermissionsGetMaskCmd,
@@ -321,7 +355,12 @@ const createCommandMap: () => Record<
   'accept-database-transfer': acceptDatabaseTransferCmd,
   'cancel-database-transfer': cancelDatabaseTransferCmd,
   'reject-database-transfer': rejectDatabaseTransferCmd,
-  'submit-invite-code': submitInviteCodeCmd,
+  'disconnect-account': disconnectAccountCmd,
+  'revoke-api-key': revokeApiKeyCmd,
+  'revoke-session': revokeSessionCmd,
+  'verify-password': verifyPasswordCmd,
+  'verify-totp': verifyTotpCmd,
+  'submit-app-invite-code': submitAppInviteCodeCmd,
   'submit-org-invite-code': submitOrgInviteCodeCmd,
   'check-password': checkPasswordCmd,
   'confirm-delete-account': confirmDeleteAccountCmd,
@@ -330,9 +369,11 @@ const createCommandMap: () => Record<
   'freeze-objects': freezeObjectsCmd,
   'init-empty-repo': initEmptyRepoCmd,
   'construct-blueprint': constructBlueprintCmd,
+  'provision-new-user': provisionNewUserCmd,
   'reset-password': resetPasswordCmd,
   'remove-node-at-path': removeNodeAtPathCmd,
   'copy-template-to-blueprint': copyTemplateToBlueprintCmd,
+  'provision-spatial-relation': provisionSpatialRelationCmd,
   'bootstrap-user': bootstrapUserCmd,
   'set-field-order': setFieldOrderCmd,
   'provision-unique-constraint': provisionUniqueConstraintCmd,
@@ -346,23 +387,22 @@ const createCommandMap: () => Record<
   'set-and-commit': setAndCommitCmd,
   'provision-relation': provisionRelationCmd,
   'apply-rls': applyRlsCmd,
-  'sign-in-one-time-token': signInOneTimeTokenCmd,
+  'sign-in-cross-origin': signInCrossOriginCmd,
   'create-user-database': createUserDatabaseCmd,
   'extend-token-expires': extendTokenExpiresCmd,
-  'sign-in': signInCmd,
+  'create-api-key': createApiKeyCmd,
   'sign-up': signUpCmd,
-  'one-time-token': oneTimeTokenCmd,
+  'request-cross-origin-token': requestCrossOriginTokenCmd,
+  'sign-in': signInCmd,
   'provision-table': provisionTableCmd,
   'send-verification-email': sendVerificationEmailCmd,
   'forgot-password': forgotPasswordCmd,
-  'verify-password': verifyPasswordCmd,
-  'verify-totp': verifyTotpCmd,
   'request-upload-url': requestUploadUrlCmd,
   'confirm-upload': confirmUploadCmd,
   'provision-bucket': provisionBucketCmd,
 });
 const usage =
-  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  object               object CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  database             database CRUD operations\n  schema               schema CRUD operations\n  table                table CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  field                field CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  index                index CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view                 view CRUD operations\n  view-table           viewTable CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  embedding-chunk      embeddingChunk CRUD operations\n  table-template-module tableTemplateModule CRUD operations\n  secure-table-provision secureTableProvision CRUD operations\n  relation-provision   relationProvision CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  enum                 enum CRUD operations\n  api-schema           apiSchema CRUD operations\n  api-module           apiModule CRUD operations\n  domain               domain CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  database-transfer    databaseTransfer CRUD operations\n  api                  api CRUD operations\n  site                 site CRUD operations\n  app                  app CRUD operations\n  connected-accounts-module connectedAccountsModule CRUD operations\n  crypto-addresses-module cryptoAddressesModule CRUD operations\n  crypto-auth-module   cryptoAuthModule CRUD operations\n  default-ids-module   defaultIdsModule CRUD operations\n  denormalized-table-field denormalizedTableField CRUD operations\n  emails-module        emailsModule CRUD operations\n  encrypted-secrets-module encryptedSecretsModule CRUD operations\n  invites-module       invitesModule CRUD operations\n  levels-module        levelsModule CRUD operations\n  limits-module        limitsModule CRUD operations\n  membership-types-module membershipTypesModule CRUD operations\n  memberships-module   membershipsModule CRUD operations\n  permissions-module   permissionsModule CRUD operations\n  phone-numbers-module phoneNumbersModule CRUD operations\n  profiles-module      profilesModule CRUD operations\n  secrets-module       secretsModule CRUD operations\n  sessions-module      sessionsModule CRUD operations\n  user-auth-module     userAuthModule CRUD operations\n  users-module         usersModule CRUD operations\n  blueprint            blueprint CRUD operations\n  blueprint-template   blueprintTemplate CRUD operations\n  blueprint-construction blueprintConstruction CRUD operations\n  storage-module       storageModule CRUD operations\n  database-provision-module databaseProvisionModule CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-grant            appGrant CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-member           orgMember CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-limit            appLimit CRUD operations\n  org-limit            orgLimit CRUD operations\n  app-step             appStep CRUD operations\n  app-achievement      appAchievement CRUD operations\n  app-level            appLevel CRUD operations\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  connected-account    connectedAccount CRUD operations\n  invite               invite CRUD operations\n  claimed-invite       claimedInvite CRUD operations\n  org-invite           orgInvite CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  audit-log            auditLog CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  role-type            roleType CRUD operations\n  migrate-file         migrateFile CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  membership-type      membershipType CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  commit               commit CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  rls-module           rlsModule CRUD operations\n  sql-action           sqlAction CRUD operations\n  user                 user CRUD operations\n  ast-migration        astMigration CRUD operations\n  app-membership       appMembership CRUD operations\n  hierarchy-module     hierarchyModule CRUD operations\n  current-user-id      currentUserId\n  current-ip-address   currentIpAddress\n  current-user-agent   currentUserAgent\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  steps-achieved       stepsAchieved\n  rev-parse            revParse\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  resolve-blueprint-table Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  get-all-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-path-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-object-at-path   getObjectAtPath\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  current-user         currentUser\n  send-account-deletion-email sendAccountDeletionEmail\n  sign-out             signOut\n  accept-database-transfer acceptDatabaseTransfer\n  cancel-database-transfer cancelDatabaseTransfer\n  reject-database-transfer rejectDatabaseTransfer\n  submit-invite-code   submitInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  check-password       checkPassword\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  freeze-objects       freezeObjects\n  init-empty-repo      initEmptyRepo\n  construct-blueprint  Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure.\n  reset-password       resetPassword\n  remove-node-at-path  removeNodeAtPath\n  copy-template-to-blueprint Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.\n  bootstrap-user       bootstrapUser\n  set-field-order      setFieldOrder\n  provision-unique-constraint Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.\n  provision-full-text-search Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.\n  provision-index      Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.\n  set-data-at-path     setDataAtPath\n  set-props-and-commit setPropsAndCommit\n  provision-database-with-user provisionDatabaseWithUser\n  insert-node-at-path  insertNodeAtPath\n  update-node-at-path  updateNodeAtPath\n  set-and-commit       setAndCommit\n  provision-relation   Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).\n  apply-rls            applyRls\n  sign-in-one-time-token signInOneTimeToken\n  create-user-database Creates a new user database with all required modules, permissions, and RLS policies.\n\nParameters:\n  - database_name: Name for the new database (required)\n  - owner_id: UUID of the owner user (required)\n  - include_invites: Include invite system (default: true)\n  - include_groups: Include group-level memberships (default: false)\n  - include_levels: Include levels/achievements (default: false)\n  - bitlen: Bit length for permission masks (default: 64)\n  - tokens_expiration: Token expiration interval (default: 30 days)\n\nReturns the database_id UUID of the newly created database.\n\nExample usage:\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups\n\n  extend-token-expires extendTokenExpires\n  sign-in              signIn\n  sign-up              signUp\n  one-time-token       oneTimeToken\n  provision-table      Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).\n  send-verification-email sendVerificationEmail\n  forgot-password      forgotPassword\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  confirm-upload       Confirm that a file has been uploaded to S3.\nVerifies the object exists in S3, checks content-type,\nand transitions the file status from 'pending' to 'ready'.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
+  "\ncsdk <command>\n\nCommands:\n  context               Manage API contexts\n  auth                  Manage authentication\n  org-get-managers-record orgGetManagersRecord CRUD operations\n  org-get-subordinates-record orgGetSubordinatesRecord CRUD operations\n  get-all-record       getAllRecord CRUD operations\n  object               object CRUD operations\n  app-permission       appPermission CRUD operations\n  org-permission       orgPermission CRUD operations\n  app-level-requirement appLevelRequirement CRUD operations\n  database             database CRUD operations\n  schema               schema CRUD operations\n  table                table CRUD operations\n  check-constraint     checkConstraint CRUD operations\n  field                field CRUD operations\n  spatial-relation     spatialRelation CRUD operations\n  foreign-key-constraint foreignKeyConstraint CRUD operations\n  full-text-search     fullTextSearch CRUD operations\n  index                index CRUD operations\n  policy               policy CRUD operations\n  primary-key-constraint primaryKeyConstraint CRUD operations\n  table-grant          tableGrant CRUD operations\n  trigger              trigger CRUD operations\n  unique-constraint    uniqueConstraint CRUD operations\n  view                 view CRUD operations\n  view-table           viewTable CRUD operations\n  view-grant           viewGrant CRUD operations\n  view-rule            viewRule CRUD operations\n  embedding-chunk      embeddingChunk CRUD operations\n  secure-table-provision secureTableProvision CRUD operations\n  relation-provision   relationProvision CRUD operations\n  session-secrets-module sessionSecretsModule CRUD operations\n  identity-providers-module identityProvidersModule CRUD operations\n  schema-grant         schemaGrant CRUD operations\n  default-privilege    defaultPrivilege CRUD operations\n  enum                 enum CRUD operations\n  api-schema           apiSchema CRUD operations\n  api-module           apiModule CRUD operations\n  domain               domain CRUD operations\n  site-metadatum       siteMetadatum CRUD operations\n  site-module          siteModule CRUD operations\n  site-theme           siteTheme CRUD operations\n  trigger-function     triggerFunction CRUD operations\n  database-transfer    databaseTransfer CRUD operations\n  api                  api CRUD operations\n  site                 site CRUD operations\n  app                  app CRUD operations\n  connected-accounts-module connectedAccountsModule CRUD operations\n  crypto-addresses-module cryptoAddressesModule CRUD operations\n  crypto-auth-module   cryptoAuthModule CRUD operations\n  default-ids-module   defaultIdsModule CRUD operations\n  denormalized-table-field denormalizedTableField CRUD operations\n  emails-module        emailsModule CRUD operations\n  encrypted-secrets-module encryptedSecretsModule CRUD operations\n  invites-module       invitesModule CRUD operations\n  levels-module        levelsModule CRUD operations\n  limits-module        limitsModule CRUD operations\n  membership-types-module membershipTypesModule CRUD operations\n  memberships-module   membershipsModule CRUD operations\n  permissions-module   permissionsModule CRUD operations\n  phone-numbers-module phoneNumbersModule CRUD operations\n  profiles-module      profilesModule CRUD operations\n  secrets-module       secretsModule CRUD operations\n  sessions-module      sessionsModule CRUD operations\n  user-auth-module     userAuthModule CRUD operations\n  users-module         usersModule CRUD operations\n  blueprint            blueprint CRUD operations\n  blueprint-template   blueprintTemplate CRUD operations\n  blueprint-construction blueprintConstruction CRUD operations\n  storage-module       storageModule CRUD operations\n  entity-type-provision entityTypeProvision CRUD operations\n  webauthn-credentials-module webauthnCredentialsModule CRUD operations\n  webauthn-auth-module webauthnAuthModule CRUD operations\n  notifications-module notificationsModule CRUD operations\n  database-provision-module databaseProvisionModule CRUD operations\n  app-admin-grant      appAdminGrant CRUD operations\n  app-owner-grant      appOwnerGrant CRUD operations\n  app-grant            appGrant CRUD operations\n  org-membership       orgMembership CRUD operations\n  org-member           orgMember CRUD operations\n  org-admin-grant      orgAdminGrant CRUD operations\n  org-owner-grant      orgOwnerGrant CRUD operations\n  org-member-profile   orgMemberProfile CRUD operations\n  org-grant            orgGrant CRUD operations\n  org-chart-edge       orgChartEdge CRUD operations\n  org-chart-edge-grant orgChartEdgeGrant CRUD operations\n  org-permission-default orgPermissionDefault CRUD operations\n  app-limit            appLimit CRUD operations\n  org-limit            orgLimit CRUD operations\n  app-step             appStep CRUD operations\n  app-achievement      appAchievement CRUD operations\n  app-level            appLevel CRUD operations\n  email                email CRUD operations\n  phone-number         phoneNumber CRUD operations\n  crypto-address       cryptoAddress CRUD operations\n  webauthn-credential  webauthnCredential CRUD operations\n  app-invite           appInvite CRUD operations\n  app-claimed-invite   appClaimedInvite CRUD operations\n  org-invite           orgInvite CRUD operations\n  org-claimed-invite   orgClaimedInvite CRUD operations\n  audit-log            auditLog CRUD operations\n  app-permission-default appPermissionDefault CRUD operations\n  identity-provider    identityProvider CRUD operations\n  ref                  ref CRUD operations\n  store                store CRUD operations\n  role-type            roleType CRUD operations\n  migrate-file         migrateFile CRUD operations\n  app-limit-default    appLimitDefault CRUD operations\n  org-limit-default    orgLimitDefault CRUD operations\n  devices-module       devicesModule CRUD operations\n  user-connected-account userConnectedAccount CRUD operations\n  app-membership-default appMembershipDefault CRUD operations\n  org-membership-default orgMembershipDefault CRUD operations\n  commit               commit CRUD operations\n  rate-limits-module   rateLimitsModule CRUD operations\n  membership-type      membershipType CRUD operations\n  rls-module           rlsModule CRUD operations\n  sql-action           sqlAction CRUD operations\n  org-membership-setting orgMembershipSetting CRUD operations\n  user                 user CRUD operations\n  ast-migration        astMigration CRUD operations\n  app-membership       appMembership CRUD operations\n  hierarchy-module     hierarchyModule CRUD operations\n  current-user-id      currentUserId\n  current-user-agent   currentUserAgent\n  current-ip-address   currentIpAddress\n  require-step-up      requireStepUp\n  app-permissions-get-padded-mask appPermissionsGetPaddedMask\n  org-permissions-get-padded-mask orgPermissionsGetPaddedMask\n  steps-achieved       stepsAchieved\n  rev-parse            revParse\n  resolve-blueprint-field Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. \"location\") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.\n  org-is-manager-of    orgIsManagerOf\n  app-permissions-get-mask appPermissionsGetMask\n  org-permissions-get-mask orgPermissionsGetMask\n  resolve-blueprint-table Resolves a table_name (with optional schema_name) to a table_id. Resolution order: (1) if schema_name provided, exact lookup via metaschema_public.schema.name + metaschema_public.table; (2) check local table_map (tables created in current blueprint); (3) search metaschema_public.table by name across all schemas; (4) if multiple matches, throw ambiguous error asking for schema_name; (5) if no match, throw not-found error.\n  app-permissions-get-mask-by-names appPermissionsGetMaskByNames\n  org-permissions-get-mask-by-names orgPermissionsGetMaskByNames\n  get-all-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-path-objects-from-root Reads and enables pagination through a set of `Object`.\n  get-object-at-path   getObjectAtPath\n  app-permissions-get-by-mask Reads and enables pagination through a set of `AppPermission`.\n  org-permissions-get-by-mask Reads and enables pagination through a set of `OrgPermission`.\n  steps-required       Reads and enables pagination through a set of `AppLevelRequirement`.\n  current-user         currentUser\n  send-account-deletion-email sendAccountDeletionEmail\n  sign-out             signOut\n  accept-database-transfer acceptDatabaseTransfer\n  cancel-database-transfer cancelDatabaseTransfer\n  reject-database-transfer rejectDatabaseTransfer\n  disconnect-account   disconnectAccount\n  revoke-api-key       revokeApiKey\n  revoke-session       revokeSession\n  verify-password      verifyPassword\n  verify-totp          verifyTotp\n  submit-app-invite-code submitAppInviteCode\n  submit-org-invite-code submitOrgInviteCode\n  check-password       checkPassword\n  confirm-delete-account confirmDeleteAccount\n  set-password         setPassword\n  verify-email         verifyEmail\n  freeze-objects       freezeObjects\n  init-empty-repo      initEmptyRepo\n  construct-blueprint  Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Six phases: (0) entity_type_provision for each membership_type entry \u2014 provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level indexes/fts/unique_constraints are deferred to phases 3-5 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.\n  provision-new-user   provisionNewUser\n  reset-password       resetPassword\n  remove-node-at-path  removeNodeAtPath\n  copy-template-to-blueprint Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID.\n  provision-spatial-relation Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin \u2194 param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist \u2014 this is a metadata-only insert.\n  bootstrap-user       bootstrapUser\n  set-field-order      setFieldOrder\n  provision-unique-constraint Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists.\n  provision-full-text-search Creates a full-text search configuration on a table. Accepts a jsonb definition with field (tsvector column name) and sources (array of {field, weight, lang}). Graceful: skips if FTS config already exists for the same (table_id, field_id). Returns the fts_id.\n  provision-index      Creates an index on a table. Accepts a jsonb definition with columns (array of names or single column string), access_method (default BTREE), is_unique, op_classes, options, and name (auto-generated if omitted). Graceful: skips if an index with the same (table_id, field_ids, access_method) already exists. Returns the index_id.\n  set-data-at-path     setDataAtPath\n  set-props-and-commit setPropsAndCommit\n  provision-database-with-user provisionDatabaseWithUser\n  insert-node-at-path  insertNodeAtPath\n  update-node-at-path  updateNodeAtPath\n  set-and-commit       setAndCommit\n  provision-relation   Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id).\n  apply-rls            applyRls\n  sign-in-cross-origin signInCrossOrigin\n  create-user-database Creates a new user database with all required modules, permissions, and RLS policies.\n\nParameters:\n  - database_name: Name for the new database (required)\n  - owner_id: UUID of the owner user (required)\n  - include_invites: Include invite system (default: true)\n  - include_groups: Include group-level memberships (default: false)\n  - include_levels: Include levels/achievements (default: false)\n  - bitlen: Bit length for permission masks (default: 64)\n  - tokens_expiration: Token expiration interval (default: 30 days)\n\nReturns the database_id UUID of the newly created database.\n\nExample usage:\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid);\n  SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups\n\n  extend-token-expires extendTokenExpires\n  create-api-key       createApiKey\n  sign-up              signUp\n  request-cross-origin-token requestCrossOriginToken\n  sign-in              signIn\n  provision-table      Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields).\n  send-verification-email sendVerificationEmail\n  forgot-password      forgotPassword\n  request-upload-url   Request a presigned URL for uploading a file directly to S3.\nClient computes SHA-256 of the file content and provides it here.\nIf a file with the same hash already exists (dedup), returns the\nexisting file ID and deduplicated=true with no uploadUrl.\n  confirm-upload       Confirm that a file has been uploaded to S3.\nVerifies the object exists in S3, checks content-type,\nand transitions the file status from 'pending' to 'ready'.\n  provision-bucket     Provision an S3 bucket for a logical bucket in the database.\nReads the bucket config via RLS, then creates and configures\nthe S3 bucket with the appropriate privacy policies, CORS rules,\nand lifecycle settings.\n\n  --help, -h            Show this help message\n  --version, -v         Show version\n";
 export const commands = async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,

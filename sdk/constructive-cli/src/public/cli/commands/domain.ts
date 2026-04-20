@@ -82,7 +82,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       domain: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<DomainSelect, DomainFilter, never, DomainOrderBy> & {
+      FindManyArgs<DomainSelect, DomainFilter, DomainOrderBy> & {
         select: DomainSelect;
       }
     >(argv, defaultSelect);
@@ -108,7 +108,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       domain: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<DomainSelect, DomainFilter, never> & {
+      FindFirstArgs<DomainSelect, DomainFilter> & {
         select: DomainSelect;
       }
     >(argv, defaultSelect);

@@ -16,10 +16,9 @@ export interface PageInfo {
   endCursor?: string | null;
 }
 
-export interface FindManyArgs<TSelect, TWhere, TCondition = never, TOrderBy = never> {
+export interface FindManyArgs<TSelect, TWhere, TOrderBy = never> {
   select?: TSelect;
   where?: TWhere;
-  condition?: TCondition;
   orderBy?: TOrderBy[];
   first?: number;
   last?: number;
@@ -28,10 +27,9 @@ export interface FindManyArgs<TSelect, TWhere, TCondition = never, TOrderBy = ne
   offset?: number;
 }
 
-export interface FindFirstArgs<TSelect, TWhere, TCondition = never> {
+export interface FindFirstArgs<TSelect, TWhere> {
   select?: TSelect;
   where?: TWhere;
-  condition?: TCondition;
 }
 
 export interface CreateArgs<TSelect, TData> {

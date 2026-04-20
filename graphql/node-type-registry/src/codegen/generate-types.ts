@@ -537,13 +537,34 @@ function buildRelationTypes(
   relationNodes: NodeTypeDefinition[]
 ): t.ExportNamedDeclaration[] {
   const relationMembers: t.TSType[] = relationNodes.map((nt) => {
-    const baseType = t.tsTypeLiteral([
+    const baseMembers: t.TSTypeElement[] = [
       requiredProp('$type', strLit(nt.name)),
       requiredProp('source_table', t.tsStringKeyword()),
       requiredProp('target_table', t.tsStringKeyword()),
       optionalProp('source_schema_name', t.tsStringKeyword()),
       optionalProp('target_schema_name', t.tsStringKeyword()),
-    ]);
+    ];
+
+    // RelationSpatial is the only relation type that references *existing*
+    // columns rather than creating FK/junction fields. Its blueprint JSON
+    // therefore needs source_field / target_field (column *names* resolved
+    // server-side by resolve_blueprint_field), which have no ID-space
+    // equivalent in parameter_schema. Surface them here so blueprint authors
+    // get autocomplete without a cast.
+    if (nt.name === 'RelationSpatial') {
+      baseMembers.push(
+        addJSDoc(
+          requiredProp('source_field', t.tsStringKeyword()),
+          'Name of the geometry/geography column on source_table that carries the @spatialRelation smart tag.'
+        ),
+        addJSDoc(
+          requiredProp('target_field', t.tsStringKeyword()),
+          'Name of the geometry/geography column on target_table that the predicate is evaluated against.'
+        )
+      );
+    }
+
+    const baseType = t.tsTypeLiteral(baseMembers);
 
     return t.tsIntersectionType([
       baseType,
@@ -599,6 +620,106 @@ function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
   );
 }
 
+function buildBlueprintEntityTableProvision(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintEntityTableProvision', [
+      addJSDoc(
+        optionalProp('use_rls', t.tsBooleanKeyword()),
+        'Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'nodes',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintNode')))
+        ),
+        'Node objects applied to the entity table for field creation (e.g., DataTimestamps, DataPeoplestamps). Forwarded to secure_table_provision as-is.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'fields',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintField')))
+        ),
+        'Custom fields (columns) to add to the entity table. Forwarded to secure_table_provision as-is.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'grants',
+          t.tsArrayType(
+            t.tsTypeLiteral([
+              requiredProp('roles', t.tsArrayType(t.tsStringKeyword())),
+              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword())),
+            ])
+          )
+        ),
+        'Unified grant objects for the entity table. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples. Forwarded to secure_table_provision as-is. Defaults to [].'
+      ),
+      addJSDoc(
+        optionalProp(
+          'policies',
+          t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
+        ),
+        'RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op).'
+      ),
+    ]),
+    'Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely.'
+  );
+}
+
+function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
+  return addJSDoc(
+    exportInterface('BlueprintMembershipType', [
+      addJSDoc(
+        requiredProp('name', t.tsStringKeyword()),
+        'Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database.'
+      ),
+      addJSDoc(
+        requiredProp('prefix', t.tsStringKeyword()),
+        'Short prefix for generated objects (e.g., "dr", "ch", "dept"). Used in table/trigger naming.'
+      ),
+      addJSDoc(
+        optionalProp('description', t.tsStringKeyword()),
+        'Human-readable description of this entity type.'
+      ),
+      addJSDoc(
+        optionalProp('parent_entity', t.tsStringKeyword()),
+        'Parent entity type name. Defaults to "org".'
+      ),
+      addJSDoc(
+        optionalProp('table_name', t.tsStringKeyword()),
+        'Custom table name for the entity table. Defaults to name-derived convention.'
+      ),
+      addJSDoc(
+        optionalProp('is_visible', t.tsBooleanKeyword()),
+        'Whether parent-entity members can see child entities via the default parent_member SELECT policy. Gates one of the five default policies. No-op when table_provision is supplied. Defaults to true.'
+      ),
+      addJSDoc(
+        optionalProp('has_limits', t.tsBooleanKeyword()),
+        'Whether to provision a limits module for this entity type. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('has_profiles', t.tsBooleanKeyword()),
+        'Whether to provision a profiles module for this entity type. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('has_levels', t.tsBooleanKeyword()),
+        'Whether to provision a levels module for this entity type. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('skip_entity_policies', t.tsBooleanKeyword()),
+        'Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'table_provision',
+          t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+        ),
+        'Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible).'
+      ),
+    ]),
+    'A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
+  );
+}
+
 function buildBlueprintTable(): t.ExportNamedDeclaration {
   return addJSDoc(
     exportInterface('BlueprintTable', [
@@ -632,12 +753,16 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
         'RLS policies for this table.'
       ),
       addJSDoc(
-        optionalProp('grant_roles', t.tsArrayType(t.tsStringKeyword())),
-        'Database roles to grant privileges to. Defaults to ["authenticated"].'
-      ),
-      addJSDoc(
-        optionalProp('grants', t.tsArrayType(t.tsUnknownKeyword())),
-        'Privilege grants as [verb, column] tuples or objects. Defaults to empty (no grants — callers must explicitly specify).'
+        optionalProp(
+          'grants',
+          t.tsArrayType(
+            t.tsTypeLiteral([
+              requiredProp('roles', t.tsArrayType(t.tsStringKeyword())),
+              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword())),
+            ])
+          )
+        ),
+        'Unified grant objects. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples (e.g. [["select","*"]]). Enables per-role targeting. Defaults to [].'
       ),
       addJSDoc(
         optionalProp('use_rls', t.tsBooleanKeyword()),
@@ -711,6 +836,15 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
         ),
         'Unique constraints on table columns.'
       ),
+      addJSDoc(
+        optionalProp(
+          'membership_types',
+          t.tsArrayType(
+            t.tsTypeReference(t.identifier('BlueprintMembershipType'))
+          )
+        ),
+        'Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security.'
+      ),
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
   );
@@ -782,6 +916,8 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintTableIndex());
   statements.push(buildBlueprintUniqueConstraint());
   statements.push(buildBlueprintTableUniqueConstraint());
+  statements.push(buildBlueprintEntityTableProvision());
+  statements.push(buildBlueprintMembershipType());
 
   // -- Node types discriminated union --
   statements.push(

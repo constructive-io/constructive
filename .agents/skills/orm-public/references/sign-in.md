@@ -7,7 +7,7 @@ Execute the signIn mutation
 ## Usage
 
 ```typescript
-db.mutation.signIn({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } }).execute()
+db.mutation.signIn({ input: '<SignInInput>' }).execute()
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ db.mutation.signIn({ input: { email: '<String>', password: '<String>', rememberM
 ### Run signIn
 
 ```typescript
-const result = await db.mutation.signIn({ input: { email: '<String>', password: '<String>', rememberMe: '<Boolean>', credentialKind: '<String>', csrfToken: '<String>' } }).execute();
+const result = await db.mutation.signIn({ input: '<SignInInput>' }).execute();
 ```

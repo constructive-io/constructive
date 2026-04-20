@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class FullTextSearchModel {
   constructor(private client: OrmClient) {}
   findMany<S extends FullTextSearchSelect>(
-    args: FindManyArgs<S, FullTextSearchFilter, never, FullTextSearchOrderBy> & {
+    args: FindManyArgs<S, FullTextSearchFilter, FullTextSearchOrderBy> & {
       select: S;
     } & StrictSelect<S, FullTextSearchSelect>
   ): QueryBuilder<{

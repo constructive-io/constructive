@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AppMembershipDefaultModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AppMembershipDefaultSelect>(
-    args: FindManyArgs<S, AppMembershipDefaultFilter, never, AppMembershipDefaultOrderBy> & {
+    args: FindManyArgs<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, AppMembershipDefaultSelect>
   ): QueryBuilder<{

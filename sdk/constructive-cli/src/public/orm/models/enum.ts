@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class EnumModel {
   constructor(private client: OrmClient) {}
   findMany<S extends EnumSelect>(
-    args: FindManyArgs<S, EnumFilter, never, EnumOrderBy> & {
+    args: FindManyArgs<S, EnumFilter, EnumOrderBy> & {
       select: S;
     } & StrictSelect<S, EnumSelect>
   ): QueryBuilder<{

@@ -7,7 +7,7 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 ## Usage
 
 ```bash
-csdk steps-required --vlevel <String> --vroleId <UUID> --first <Int> --offset <Int> --after <Cursor>
+csdk steps-required --level <String> --roleId <UUID> --first <Int> --offset <Int> --after <Cursor>
 ```
 
 ## Examples
@@ -15,5 +15,5 @@ csdk steps-required --vlevel <String> --vroleId <UUID> --first <Int> --offset <I
 ### Run stepsRequired
 
 ```bash
-csdk steps-required --vlevel <String> --vroleId <UUID> --first <Int> --offset <Int> --after <Cursor>
+csdk steps-required --level <String> --roleId <UUID> --first <Int> --offset <Int> --after <Cursor>
 ```

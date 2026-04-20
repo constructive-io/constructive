@@ -236,34 +236,49 @@ describe('PostGIS operator factory (createPostgisOperatorFactory)', () => {
 
   describe('SQL generation', () => {
     describe('function-based operators', () => {
-      it('generates schema-qualified SQL for public schema', () => {
+      // The input-binding contract (regression guard for #724): every
+      // operator must wrap the GeoJSON input with ST_GeomFromGeoJSON(...)
+      // — PostgreSQL's geometry_in / geography_in parsers reject raw
+      // GeoJSON text. The compiled SQL must therefore always contain the
+      // schema-qualified function call binding the JSON-encoded input as
+      // `::text` before any further casting.
+
+      it('wraps input with ST_GeomFromGeoJSON (public schema)', () => {
         const { registered } = runFactory({ schemaName: 'public' });
         const containsOp = registered.find(r => r.operatorName === 'contains');
         expect(containsOp).toBeDefined();
 
         const i = sql.identifier('col');
         const v = sql.identifier('val');
-        const result = containsOp!.resolve(i, v, null, null, {
+        const input = { type: 'Point', coordinates: [-122.4194, 37.7749] };
+        const result = containsOp!.resolve(i, v, input, null, {
           fieldName: null,
           operatorName: 'contains'
         });
         const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"public"."st_contains"("col", "val")');
+        expect(compiled.text).toBe(
+          '"public"."st_contains"("col", "public"."st_geomfromgeojson"($1::text))'
+        );
+        expect(compiled.values).toEqual([JSON.stringify(input)]);
       });
 
-      it('generates schema-qualified SQL for non-public schema', () => {
+      it('wraps input with ST_GeomFromGeoJSON (non-public schema)', () => {
         const { registered } = runFactory({ schemaName: 'postgis' });
         const containsOp = registered.find(r => r.operatorName === 'contains');
         expect(containsOp).toBeDefined();
 
         const i = sql.identifier('col');
         const v = sql.identifier('val');
-        const result = containsOp!.resolve(i, v, null, null, {
+        const input = { type: 'Point', coordinates: [-122.4194, 37.7749] };
+        const result = containsOp!.resolve(i, v, input, null, {
           fieldName: null,
           operatorName: 'contains'
         });
         const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"postgis"."st_contains"("col", "val")');
+        expect(compiled.text).toBe(
+          '"postgis"."st_contains"("col", "postgis"."st_geomfromgeojson"($1::text))'
+        );
+        expect(compiled.values).toEqual([JSON.stringify(input)]);
       });
 
       it('lowercases function names in SQL', () => {
@@ -273,89 +288,86 @@ describe('PostGIS operator factory (createPostgisOperatorFactory)', () => {
 
         const i = sql.identifier('a');
         const v = sql.identifier('b');
-        const result = op3d!.resolve(i, v, null, null, {
+        const input = { type: 'Point', coordinates: [-122.4194, 37.7749, 254] };
+        const result = op3d!.resolve(i, v, input, null, {
           fieldName: null,
           operatorName: 'intersects3D'
         });
         const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"public"."st_3dintersects"("a", "b")');
+        expect(compiled.text).toBe(
+          '"public"."st_3dintersects"("a", "public"."st_geomfromgeojson"($1::text))'
+        );
+      });
+
+      it('casts to geography when the operator is registered on a geography type', () => {
+        const { registered } = runFactory();
+        // `intersects` is registered for both geometry and geography. We
+        // want the geography variant to append `::geography` after the
+        // ST_GeomFromGeoJSON wrap so PostGIS picks the geography overload.
+        const geogIntersects = registered.find(
+          r => r.operatorName === 'intersects' && r.typeName === 'GeographyPoint'
+        );
+        expect(geogIntersects).toBeDefined();
+
+        const i = sql.identifier('col');
+        const v = sql.identifier('val');
+        const input = { type: 'Point', coordinates: [-122.4194, 37.7749] };
+        const result = geogIntersects!.resolve(i, v, input, null, {
+          fieldName: null,
+          operatorName: 'intersects'
+        });
+        const compiled = sql.compile(result);
+        expect(compiled.text).toBe(
+          '"public"."st_intersects"("col", "public"."st_geomfromgeojson"($1::text)::"public"."geography")'
+        );
       });
     });
 
     describe('SQL operator-based operators', () => {
-      it('generates correct SQL for = operator', () => {
+      const runOp = (operatorName: string) => {
         const { registered } = runFactory();
-        const exactOp = registered.find(r => r.operatorName === 'exactlyEquals');
-        expect(exactOp).toBeDefined();
+        const op = registered.find(r => r.operatorName === operatorName);
+        expect(op).toBeDefined();
 
-        const i = sql.identifier('col');
-        const v = sql.identifier('val');
-        const result = exactOp!.resolve(i, v, null, null, {
-          fieldName: null,
-          operatorName: 'exactlyEquals'
-        });
-        const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"col" = "val"');
+        const input = { type: 'Point', coordinates: [-122.4194, 37.7749] };
+        const result = op!.resolve(
+          sql.identifier('col'),
+          sql.identifier('val'),
+          input,
+          null,
+          { fieldName: null, operatorName }
+        );
+        return sql.compile(result);
+      };
+
+      it('generates correct SQL for = operator', () => {
+        expect(runOp('exactlyEquals').text).toBe(
+          '"col" = "public"."st_geomfromgeojson"($1::text)'
+        );
       });
 
       it('generates correct SQL for && operator', () => {
-        const { registered } = runFactory();
-        const bboxOp = registered.find(r => r.operatorName === 'bboxIntersects2D');
-        expect(bboxOp).toBeDefined();
-
-        const i = sql.identifier('col');
-        const v = sql.identifier('val');
-        const result = bboxOp!.resolve(i, v, null, null, {
-          fieldName: null,
-          operatorName: 'bboxIntersects2D'
-        });
-        const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"col" && "val"');
+        expect(runOp('bboxIntersects2D').text).toBe(
+          '"col" && "public"."st_geomfromgeojson"($1::text)'
+        );
       });
 
       it('generates correct SQL for ~ operator', () => {
-        const { registered } = runFactory();
-        const bboxContainsOp = registered.find(r => r.operatorName === 'bboxContains');
-        expect(bboxContainsOp).toBeDefined();
-
-        const i = sql.identifier('col');
-        const v = sql.identifier('val');
-        const result = bboxContainsOp!.resolve(i, v, null, null, {
-          fieldName: null,
-          operatorName: 'bboxContains'
-        });
-        const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"col" ~ "val"');
+        expect(runOp('bboxContains').text).toBe(
+          '"col" ~ "public"."st_geomfromgeojson"($1::text)'
+        );
       });
 
       it('generates correct SQL for ~= operator', () => {
-        const { registered } = runFactory();
-        const bboxEqOp = registered.find(r => r.operatorName === 'bboxEquals');
-        expect(bboxEqOp).toBeDefined();
-
-        const i = sql.identifier('col');
-        const v = sql.identifier('val');
-        const result = bboxEqOp!.resolve(i, v, null, null, {
-          fieldName: null,
-          operatorName: 'bboxEquals'
-        });
-        const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"col" ~= "val"');
+        expect(runOp('bboxEquals').text).toBe(
+          '"col" ~= "public"."st_geomfromgeojson"($1::text)'
+        );
       });
 
       it('generates correct SQL for &&& operator', () => {
-        const { registered } = runFactory();
-        const ndOp = registered.find(r => r.operatorName === 'bboxIntersectsND');
-        expect(ndOp).toBeDefined();
-
-        const i = sql.identifier('col');
-        const v = sql.identifier('val');
-        const result = ndOp!.resolve(i, v, null, null, {
-          fieldName: null,
-          operatorName: 'bboxIntersectsND'
-        });
-        const compiled = sql.compile(result);
-        expect(compiled.text).toBe('"col" &&& "val"');
+        expect(runOp('bboxIntersectsND').text).toBe(
+          '"col" &&& "public"."st_geomfromgeojson"($1::text)'
+        );
       });
     });
   });

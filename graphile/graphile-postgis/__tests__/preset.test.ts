@@ -7,10 +7,15 @@ import { PostgisGeometryFieldsPlugin } from '../src/plugins/geometry-fields';
 import { PostgisMeasurementFieldsPlugin } from '../src/plugins/measurement-fields';
 import { PostgisTransformationFieldsPlugin } from '../src/plugins/transformation-functions';
 import { PostgisAggregatePlugin } from '../src/plugins/aggregate-functions';
+import { PostgisSpatialRelationsPlugin } from '../src/plugins/spatial-relations';
 
 describe('GraphilePostgisPreset', () => {
-  it('should include all 8 plugins', () => {
-    expect(GraphilePostgisPreset.plugins).toHaveLength(8);
+  it('should include all 9 plugins', () => {
+    expect(GraphilePostgisPreset.plugins).toHaveLength(9);
+  });
+
+  it('should include PostgisSpatialRelationsPlugin', () => {
+    expect(GraphilePostgisPreset.plugins).toContain(PostgisSpatialRelationsPlugin);
   });
 
   it('should include PostgisCodecPlugin', () => {

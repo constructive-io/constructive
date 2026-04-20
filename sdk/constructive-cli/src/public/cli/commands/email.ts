@@ -21,6 +21,7 @@ const fieldSchema: FieldSchema = {
   email: 'string',
   isVerified: 'boolean',
   isPrimary: 'boolean',
+  name: 'string',
   createdAt: 'string',
   updatedAt: 'string',
 };
@@ -80,11 +81,12 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       email: true,
       isVerified: true,
       isPrimary: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<EmailSelect, EmailFilter, never, EmailOrderBy> & {
+      FindManyArgs<EmailSelect, EmailFilter, EmailOrderBy> & {
         select: EmailSelect;
       }
     >(argv, defaultSelect);
@@ -107,11 +109,12 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       email: true,
       isVerified: true,
       isPrimary: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<EmailSelect, EmailFilter, never> & {
+      FindFirstArgs<EmailSelect, EmailFilter> & {
         select: EmailSelect;
       }
     >(argv, defaultSelect);
@@ -146,6 +149,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           email: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -190,6 +194,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as CreateEmailInput['email'];
@@ -201,6 +212,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           email: cleanedData.email,
           isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          name: cleanedData.name,
         },
         select: {
           id: true,
@@ -208,6 +220,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           email: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -258,6 +271,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         required: false,
         skipPrompt: true,
       },
+      {
+        type: 'text',
+        name: 'name',
+        message: 'name',
+        required: false,
+        skipPrompt: true,
+      },
     ]);
     const answers = coerceAnswers(rawAnswers, fieldSchema);
     const cleanedData = stripUndefined(answers, fieldSchema) as EmailPatch;
@@ -272,6 +292,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           email: cleanedData.email,
           isVerified: cleanedData.isVerified,
           isPrimary: cleanedData.isPrimary,
+          name: cleanedData.name,
         },
         select: {
           id: true,
@@ -279,6 +300,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           email: true,
           isVerified: true,
           isPrimary: true,
+          name: true,
           createdAt: true,
           updatedAt: true,
         },

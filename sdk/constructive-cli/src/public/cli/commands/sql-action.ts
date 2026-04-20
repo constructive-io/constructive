@@ -90,7 +90,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       actorId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<SqlActionSelect, SqlActionFilter, never, SqlActionOrderBy> & {
+      FindManyArgs<SqlActionSelect, SqlActionFilter, SqlActionOrderBy> & {
         select: SqlActionSelect;
       }
     >(argv, defaultSelect);
@@ -123,7 +123,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       actorId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<SqlActionSelect, SqlActionFilter, never> & {
+      FindFirstArgs<SqlActionSelect, SqlActionFilter> & {
         select: SqlActionSelect;
       }
     >(argv, defaultSelect);

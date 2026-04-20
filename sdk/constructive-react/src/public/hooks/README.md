@@ -83,6 +83,11 @@ function App() {
 | `useCreateFieldMutation` | Mutation | Create a field |
 | `useUpdateFieldMutation` | Mutation | Update a field |
 | `useDeleteFieldMutation` | Mutation | Delete a field |
+| `useSpatialRelationsQuery` | Query | List all spatialRelations |
+| `useSpatialRelationQuery` | Query | Get one spatialRelation |
+| `useCreateSpatialRelationMutation` | Mutation | Create a spatialRelation |
+| `useUpdateSpatialRelationMutation` | Mutation | Update a spatialRelation |
+| `useDeleteSpatialRelationMutation` | Mutation | Delete a spatialRelation |
 | `useForeignKeyConstraintsQuery` | Query | List all foreignKeyConstraints |
 | `useForeignKeyConstraintQuery` | Query | Get one foreignKeyConstraint |
 | `useCreateForeignKeyConstraintMutation` | Mutation | Create a foreignKeyConstraint |
@@ -148,16 +153,11 @@ function App() {
 | `useCreateEmbeddingChunkMutation` | Mutation | Create a embeddingChunk |
 | `useUpdateEmbeddingChunkMutation` | Mutation | Update a embeddingChunk |
 | `useDeleteEmbeddingChunkMutation` | Mutation | Delete a embeddingChunk |
-| `useTableTemplateModulesQuery` | Query | List all tableTemplateModules |
-| `useTableTemplateModuleQuery` | Query | Get one tableTemplateModule |
-| `useCreateTableTemplateModuleMutation` | Mutation | Create a tableTemplateModule |
-| `useUpdateTableTemplateModuleMutation` | Mutation | Update a tableTemplateModule |
-| `useDeleteTableTemplateModuleMutation` | Mutation | Delete a tableTemplateModule |
-| `useSecureTableProvisionsQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useSecureTableProvisionQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useCreateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useUpdateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
-| `useDeleteSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grant_privileges, (3) create RLS policies via policy_type. Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useSecureTableProvisionsQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useSecureTableProvisionQuery` | Query | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useCreateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useUpdateSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
+| `useDeleteSecureTableProvisionMutation` | Mutation | Provisions security, fields, grants, and policies onto a table. Each row can independently: (1) create fields via nodes[] array (supporting multiple Data* modules per row), (2) grant privileges via grants[] array (supporting per-role privilege targeting), (3) create RLS policies via policies[] array (supporting multiple Authz* policies per row). Multiple rows can target the same table to compose different concerns. All three concerns are optional and independent. |
 | `useRelationProvisionsQuery` | Query | Provisions relational structure between tables. Supports four relation types:
      - RelationBelongsTo: adds a FK field on the source table referencing the target table (child perspective: "tasks belongs to projects" -> tasks.project_id).
      - RelationHasMany: adds a FK field on the target table referencing the source table (parent perspective: "projects has many tasks" -> tasks.project_id). Inverse of BelongsTo.
@@ -198,6 +198,16 @@ function App() {
      This is a one-and-done structural provisioner. To layer additional security onto junction tables after creation, use secure_table_provision directly.
      All operations are graceful: existing fields, FK constraints, and unique constraints are reused if found.
      The trigger never injects values the caller did not provide. All security config is forwarded to secure_table_provision as-is. |
+| `useSessionSecretsModulesQuery` | Query | Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users. |
+| `useSessionSecretsModuleQuery` | Query | Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users. |
+| `useCreateSessionSecretsModuleMutation` | Mutation | Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users. |
+| `useUpdateSessionSecretsModuleMutation` | Mutation | Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users. |
+| `useDeleteSessionSecretsModuleMutation` | Mutation | Config row for the session_secrets_module, which provisions a DB-private, session-scoped ephemeral key-value store for challenges, nonces, and one-time tokens that must never be readable by end users. |
+| `useIdentityProvidersModulesQuery` | Query | Config row for the identity_providers_module, which provisions a per-database identity_providers config table holding OAuth2 / OIDC (and future SAML) provider definitions: protocol kind, endpoint URLs, encrypted client secret, scopes, audience validation, PKCE, and email-handling flags. Built-in providers (google, github, apple, ...) are seeded as is_built_in=true rows; custom providers use slugs of the form custom:<slug>. |
+| `useIdentityProvidersModuleQuery` | Query | Config row for the identity_providers_module, which provisions a per-database identity_providers config table holding OAuth2 / OIDC (and future SAML) provider definitions: protocol kind, endpoint URLs, encrypted client secret, scopes, audience validation, PKCE, and email-handling flags. Built-in providers (google, github, apple, ...) are seeded as is_built_in=true rows; custom providers use slugs of the form custom:<slug>. |
+| `useCreateIdentityProvidersModuleMutation` | Mutation | Config row for the identity_providers_module, which provisions a per-database identity_providers config table holding OAuth2 / OIDC (and future SAML) provider definitions: protocol kind, endpoint URLs, encrypted client secret, scopes, audience validation, PKCE, and email-handling flags. Built-in providers (google, github, apple, ...) are seeded as is_built_in=true rows; custom providers use slugs of the form custom:<slug>. |
+| `useUpdateIdentityProvidersModuleMutation` | Mutation | Config row for the identity_providers_module, which provisions a per-database identity_providers config table holding OAuth2 / OIDC (and future SAML) provider definitions: protocol kind, endpoint URLs, encrypted client secret, scopes, audience validation, PKCE, and email-handling flags. Built-in providers (google, github, apple, ...) are seeded as is_built_in=true rows; custom providers use slugs of the form custom:<slug>. |
+| `useDeleteIdentityProvidersModuleMutation` | Mutation | Config row for the identity_providers_module, which provisions a per-database identity_providers config table holding OAuth2 / OIDC (and future SAML) provider definitions: protocol kind, endpoint URLs, encrypted client secret, scopes, audience validation, PKCE, and email-handling flags. Built-in providers (google, github, apple, ...) are seeded as is_built_in=true rows; custom providers use slugs of the form custom:<slug>. |
 | `useSchemaGrantsQuery` | Query | List all schemaGrants |
 | `useSchemaGrantQuery` | Query | Get one schemaGrant |
 | `useCreateSchemaGrantMutation` | Mutation | Create a schemaGrant |
@@ -383,6 +393,61 @@ function App() {
 | `useCreateStorageModuleMutation` | Mutation | Create a storageModule |
 | `useUpdateStorageModuleMutation` | Mutation | Update a storageModule |
 | `useDeleteStorageModuleMutation` | Mutation | Delete a storageModule |
+| `useEntityTypeProvisionsQuery` | Query | Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
+     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
+     via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
+     Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
+     Set table_provision to a single jsonb object (using the same shape as provision_table() /
+     blueprint tables[] entries) to replace the defaults with your own; set skip_entity_policies=true
+     as an escape hatch to apply zero policies. |
+| `useEntityTypeProvisionQuery` | Query | Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
+     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
+     via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
+     Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
+     Set table_provision to a single jsonb object (using the same shape as provision_table() /
+     blueprint tables[] entries) to replace the defaults with your own; set skip_entity_policies=true
+     as an escape hatch to apply zero policies. |
+| `useCreateEntityTypeProvisionMutation` | Mutation | Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
+     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
+     via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
+     Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
+     Set table_provision to a single jsonb object (using the same shape as provision_table() /
+     blueprint tables[] entries) to replace the defaults with your own; set skip_entity_policies=true
+     as an escape hatch to apply zero policies. |
+| `useUpdateEntityTypeProvisionMutation` | Mutation | Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
+     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
+     via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
+     Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
+     Set table_provision to a single jsonb object (using the same shape as provision_table() /
+     blueprint tables[] entries) to replace the defaults with your own; set skip_entity_policies=true
+     as an escape hatch to apply zero policies. |
+| `useDeleteEntityTypeProvisionMutation` | Mutation | Provisions a new membership entity type. Each INSERT creates an entity table, registers a membership type,
+     and installs the required modules (permissions, memberships, limits) plus optional modules (profiles, levels, invites).
+     Uses provision_membership_table() internally. Graceful: duplicate (database_id, prefix) pairs are silently skipped
+     via the unique constraint (use INSERT ... ON CONFLICT DO NOTHING).
+     Policy behavior: by default the five entity-table RLS policies are applied (gated by is_visible).
+     Set table_provision to a single jsonb object (using the same shape as provision_table() /
+     blueprint tables[] entries) to replace the defaults with your own; set skip_entity_policies=true
+     as an escape hatch to apply zero policies. |
+| `useWebauthnCredentialsModulesQuery` | Query | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
+| `useWebauthnCredentialsModuleQuery` | Query | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
+| `useCreateWebauthnCredentialsModuleMutation` | Mutation | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
+| `useUpdateWebauthnCredentialsModuleMutation` | Mutation | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
+| `useDeleteWebauthnCredentialsModuleMutation` | Mutation | Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. |
+| `useWebauthnAuthModulesQuery` | Query | List all webauthnAuthModules |
+| `useWebauthnAuthModuleQuery` | Query | Get one webauthnAuthModule |
+| `useCreateWebauthnAuthModuleMutation` | Mutation | Create a webauthnAuthModule |
+| `useUpdateWebauthnAuthModuleMutation` | Mutation | Update a webauthnAuthModule |
+| `useDeleteWebauthnAuthModuleMutation` | Mutation | Delete a webauthnAuthModule |
+| `useNotificationsModulesQuery` | Query | List all notificationsModules |
+| `useNotificationsModuleQuery` | Query | Get one notificationsModule |
+| `useCreateNotificationsModuleMutation` | Mutation | Create a notificationsModule |
+| `useUpdateNotificationsModuleMutation` | Mutation | Update a notificationsModule |
+| `useDeleteNotificationsModuleMutation` | Mutation | Delete a notificationsModule |
 | `useDatabaseProvisionModulesQuery` | Query | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
 | `useDatabaseProvisionModuleQuery` | Query | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
 | `useCreateDatabaseProvisionModuleMutation` | Mutation | Tracks database provisioning requests and their status. The BEFORE INSERT trigger creates the database and sets database_id before RLS policies are evaluated. |
@@ -423,6 +488,11 @@ function App() {
 | `useCreateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useUpdateOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
 | `useDeleteOrgOwnerGrantMutation` | Mutation | Records of ownership transfers and grants between members |
+| `useOrgMemberProfilesQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useOrgMemberProfileQuery` | Query | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useCreateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useUpdateOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
+| `useDeleteOrgMemberProfileMutation` | Mutation | Per-membership profile information visible to other entity members (display name, email, title, bio, avatar) |
 | `useOrgGrantsQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
 | `useOrgGrantQuery` | Query | Records of individual permission grants and revocations for members via bitmask |
 | `useCreateOrgGrantMutation` | Mutation | Records of individual permission grants and revocations for members via bitmask |
@@ -483,21 +553,21 @@ function App() {
 | `useCreateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useUpdateCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
 | `useDeleteCryptoAddressMutation` | Mutation | Cryptocurrency wallet addresses owned by users, with network-specific validation and verification |
-| `useConnectedAccountsQuery` | Query | OAuth and social login connections linking external service accounts to users |
-| `useConnectedAccountQuery` | Query | OAuth and social login connections linking external service accounts to users |
-| `useCreateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
-| `useUpdateConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
-| `useDeleteConnectedAccountMutation` | Mutation | OAuth and social login connections linking external service accounts to users |
-| `useInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useCreateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useUpdateInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useDeleteInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
-| `useClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
-| `useClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
-| `useCreateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useUpdateClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
-| `useDeleteClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useWebauthnCredentialsQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useWebauthnCredentialQuery` | Query | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useCreateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useUpdateWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useDeleteWebauthnCredentialMutation` | Mutation | WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. |
+| `useAppInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useAppInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useCreateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useUpdateAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useDeleteAppInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
+| `useAppClaimedInvitesQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useAppClaimedInviteQuery` | Query | Records of successfully claimed invitations, linking senders to receivers |
+| `useCreateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useUpdateAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
+| `useDeleteAppClaimedInviteMutation` | Mutation | Records of successfully claimed invitations, linking senders to receivers |
 | `useOrgInvitesQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useOrgInviteQuery` | Query | Invitation records sent to prospective members via email, with token-based redemption and expiration |
 | `useCreateOrgInviteMutation` | Mutation | Invitation records sent to prospective members via email, with token-based redemption and expiration |
@@ -518,6 +588,8 @@ function App() {
 | `useCreateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useUpdateAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
 | `useDeleteAppPermissionDefaultMutation` | Mutation | Stores the default permission bitmask assigned to new members upon joining |
+| `useIdentityProvidersQuery` | Query | List all identityProviders |
+| `useCreateIdentityProviderMutation` | Mutation | Create a identityProvider |
 | `useRefsQuery` | Query | A ref is a data structure for pointing to a commit. |
 | `useRefQuery` | Query | A ref is a data structure for pointing to a commit. |
 | `useCreateRefMutation` | Mutation | A ref is a data structure for pointing to a commit. |
@@ -548,26 +620,41 @@ function App() {
 | `useCreateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useUpdateOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
 | `useDeleteOrgLimitDefaultMutation` | Mutation | Default maximum values for each named limit, applied when no per-actor override exists |
-| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
-| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDevicesModulesQuery` | Query | List all devicesModules |
+| `useDevicesModuleQuery` | Query | Get one devicesModule |
+| `useCreateDevicesModuleMutation` | Mutation | Create a devicesModule |
+| `useUpdateDevicesModuleMutation` | Mutation | Update a devicesModule |
+| `useDeleteDevicesModuleMutation` | Mutation | Delete a devicesModule |
+| `useUserConnectedAccountsQuery` | Query | List all userConnectedAccounts |
+| `useUserConnectedAccountQuery` | Query | Get one userConnectedAccount |
+| `useCreateUserConnectedAccountMutation` | Mutation | Create a userConnectedAccount |
+| `useUpdateUserConnectedAccountMutation` | Mutation | Update a userConnectedAccount |
+| `useDeleteUserConnectedAccountMutation` | Mutation | Delete a userConnectedAccount |
 | `useAppMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useAppMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteAppMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
-| `useCommitsQuery` | Query | A commit records changes to the repository. |
-| `useCommitQuery` | Query | A commit records changes to the repository. |
-| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
-| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
 | `useOrgMembershipDefaultsQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useOrgMembershipDefaultQuery` | Query | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useCreateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useUpdateOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
 | `useDeleteOrgMembershipDefaultMutation` | Mutation | Default membership settings per entity, controlling initial approval and verification state for new members |
+| `useCommitsQuery` | Query | A commit records changes to the repository. |
+| `useCommitQuery` | Query | A commit records changes to the repository. |
+| `useCreateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useUpdateCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useDeleteCommitMutation` | Mutation | A commit records changes to the repository. |
+| `useRateLimitsModulesQuery` | Query | List all rateLimitsModules |
+| `useRateLimitsModuleQuery` | Query | Get one rateLimitsModule |
+| `useCreateRateLimitsModuleMutation` | Mutation | Create a rateLimitsModule |
+| `useUpdateRateLimitsModuleMutation` | Mutation | Update a rateLimitsModule |
+| `useDeleteRateLimitsModuleMutation` | Mutation | Delete a rateLimitsModule |
+| `useMembershipTypesQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useMembershipTypeQuery` | Query | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useCreateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useUpdateMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
+| `useDeleteMembershipTypeMutation` | Mutation | Defines the different scopes of membership (e.g. App Member, Organization Member, Group Member) |
 | `useRlsModulesQuery` | Query | List all rlsModules |
 | `useRlsModuleQuery` | Query | Get one rlsModule |
 | `useCreateRlsModuleMutation` | Mutation | Create a rlsModule |
@@ -578,6 +665,11 @@ function App() {
 | `useCreateSqlActionMutation` | Mutation | Create a sqlAction |
 | `useUpdateSqlActionMutation` | Mutation | Update a sqlAction |
 | `useDeleteSqlActionMutation` | Mutation | Delete a sqlAction |
+| `useOrgMembershipSettingsQuery` | Query | Per-entity settings for the memberships module |
+| `useOrgMembershipSettingQuery` | Query | Per-entity settings for the memberships module |
+| `useCreateOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
+| `useUpdateOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
+| `useDeleteOrgMembershipSettingMutation` | Mutation | Per-entity settings for the memberships module |
 | `useUsersQuery` | Query | List all users |
 | `useUserQuery` | Query | Get one user |
 | `useCreateUserMutation` | Mutation | Create a user |
@@ -599,12 +691,14 @@ function App() {
 | `useUpdateHierarchyModuleMutation` | Mutation | Update a hierarchyModule |
 | `useDeleteHierarchyModuleMutation` | Mutation | Delete a hierarchyModule |
 | `useCurrentUserIdQuery` | Query | currentUserId |
-| `useCurrentIpAddressQuery` | Query | currentIpAddress |
 | `useCurrentUserAgentQuery` | Query | currentUserAgent |
+| `useCurrentIpAddressQuery` | Query | currentIpAddress |
+| `useRequireStepUpQuery` | Query | requireStepUp |
 | `useAppPermissionsGetPaddedMaskQuery` | Query | appPermissionsGetPaddedMask |
 | `useOrgPermissionsGetPaddedMaskQuery` | Query | orgPermissionsGetPaddedMask |
 | `useStepsAchievedQuery` | Query | stepsAchieved |
 | `useRevParseQuery` | Query | revParse |
+| `useResolveBlueprintFieldQuery` | Query | Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this. |
 | `useOrgIsManagerOfQuery` | Query | orgIsManagerOf |
 | `useAppPermissionsGetMaskQuery` | Query | appPermissionsGetMask |
 | `useOrgPermissionsGetMaskQuery` | Query | orgPermissionsGetMask |
@@ -623,7 +717,12 @@ function App() {
 | `useAcceptDatabaseTransferMutation` | Mutation | acceptDatabaseTransfer |
 | `useCancelDatabaseTransferMutation` | Mutation | cancelDatabaseTransfer |
 | `useRejectDatabaseTransferMutation` | Mutation | rejectDatabaseTransfer |
-| `useSubmitInviteCodeMutation` | Mutation | submitInviteCode |
+| `useDisconnectAccountMutation` | Mutation | disconnectAccount |
+| `useRevokeApiKeyMutation` | Mutation | revokeApiKey |
+| `useRevokeSessionMutation` | Mutation | revokeSession |
+| `useVerifyPasswordMutation` | Mutation | verifyPassword |
+| `useVerifyTotpMutation` | Mutation | verifyTotp |
+| `useSubmitAppInviteCodeMutation` | Mutation | submitAppInviteCode |
 | `useSubmitOrgInviteCodeMutation` | Mutation | submitOrgInviteCode |
 | `useCheckPasswordMutation` | Mutation | checkPassword |
 | `useConfirmDeleteAccountMutation` | Mutation | confirmDeleteAccount |
@@ -631,10 +730,12 @@ function App() {
 | `useVerifyEmailMutation` | Mutation | verifyEmail |
 | `useFreezeObjectsMutation` | Mutation | freezeObjects |
 | `useInitEmptyRepoMutation` | Mutation | initEmptyRepo |
-| `useConstructBlueprintMutation` | Mutation | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure. |
+| `useConstructBlueprintMutation` | Mutation | Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Six phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level indexes/fts/unique_constraints are deferred to phases 3-5 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure. |
+| `useProvisionNewUserMutation` | Mutation | provisionNewUser |
 | `useResetPasswordMutation` | Mutation | resetPassword |
 | `useRemoveNodeAtPathMutation` | Mutation | removeNodeAtPath |
 | `useCopyTemplateToBlueprintMutation` | Mutation | Creates a new blueprint by copying a template definition. Checks visibility: owners can always copy their own templates, others require public visibility. Increments the template copy_count. Returns the new blueprint ID. |
+| `useProvisionSpatialRelationMutation` | Mutation | Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert. |
 | `useBootstrapUserMutation` | Mutation | bootstrapUser |
 | `useSetFieldOrderMutation` | Mutation | setFieldOrder |
 | `useProvisionUniqueConstraintMutation` | Mutation | Creates a unique constraint on a table. Accepts a jsonb definition with columns (array of field names). Graceful: skips if the exact same unique constraint already exists. |
@@ -648,7 +749,7 @@ function App() {
 | `useSetAndCommitMutation` | Mutation | setAndCommit |
 | `useProvisionRelationMutation` | Mutation | Composable relation provisioning: creates FK fields, indexes, unique constraints, and junction tables depending on the relation_type. Supports RelationBelongsTo, RelationHasOne, RelationHasMany, and RelationManyToMany. ManyToMany uses provision_table() internally for junction table creation with full node/grant/policy support. All operations are graceful (skip existing). Returns (out_field_id, out_junction_table_id, out_source_field_id, out_target_field_id). |
 | `useApplyRlsMutation` | Mutation | applyRls |
-| `useSignInOneTimeTokenMutation` | Mutation | signInOneTimeToken |
+| `useSignInCrossOriginMutation` | Mutation | signInCrossOrigin |
 | `useCreateUserDatabaseMutation` | Mutation | Creates a new user database with all required modules, permissions, and RLS policies.
 
 Parameters:
@@ -667,14 +768,13 @@ Example usage:
   SELECT metaschema_public.create_user_database('my_app', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid, true, true);  -- with invites and groups
  |
 | `useExtendTokenExpiresMutation` | Mutation | extendTokenExpires |
-| `useSignInMutation` | Mutation | signIn |
+| `useCreateApiKeyMutation` | Mutation | createApiKey |
 | `useSignUpMutation` | Mutation | signUp |
-| `useOneTimeTokenMutation` | Mutation | oneTimeToken |
+| `useRequestCrossOriginTokenMutation` | Mutation | requestCrossOriginToken |
+| `useSignInMutation` | Mutation | signIn |
 | `useProvisionTableMutation` | Mutation | Composable table provisioning: creates or finds a table, then creates fields (so Data* modules can reference them), applies N nodes (Data* modules), enables RLS, creates grants, creates N policies, and optionally creates table-level indexes/full_text_searches/unique_constraints. All operations are graceful (skip existing). Accepts multiple nodes and multiple policies per call, unlike secure_table_provision which is limited to one of each. Returns (out_table_id, out_fields). |
 | `useSendVerificationEmailMutation` | Mutation | sendVerificationEmail |
 | `useForgotPasswordMutation` | Mutation | forgotPassword |
-| `useVerifyPasswordMutation` | Mutation | verifyPassword |
-| `useVerifyTotpMutation` | Mutation | verifyTotp |
 | `useRequestUploadUrlMutation` | Mutation | Request a presigned URL for uploading a file directly to S3.
 Client computes SHA-256 of the file content and provides it here.
 If a file with the same hash already exists (dedup), returns the
@@ -921,6 +1021,27 @@ const { mutate: create } = useCreateFieldMutation({
   selection: { fields: { id: true } },
 });
 create({ databaseId: '<UUID>', tableId: '<UUID>', name: '<String>', label: '<String>', description: '<String>', smartTags: '<JSON>', isRequired: '<Boolean>', apiRequired: '<Boolean>', defaultValue: '<String>', defaultValueAst: '<JSON>', type: '<String>', fieldOrder: '<Int>', regexp: '<String>', chk: '<JSON>', chkExpr: '<JSON>', min: '<Float>', max: '<Float>', tags: '<String>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>' });
+```
+
+### SpatialRelation
+
+```typescript
+// List all spatialRelations
+const { data, isLoading } = useSpatialRelationsQuery({
+  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one spatialRelation
+const { data: item } = useSpatialRelationQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, tableId: true, fieldId: true, refTableId: true, refFieldId: true, name: true, operator: true, paramName: true, category: true, module: true, scope: true, tags: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a spatialRelation
+const { mutate: create } = useCreateSpatialRelationMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', tableId: '<UUID>', fieldId: '<UUID>', refTableId: '<UUID>', refFieldId: '<UUID>', name: '<String>', operator: '<String>', paramName: '<String>', category: '<ObjectCategory>', module: '<String>', scope: '<Int>', tags: '<String>' });
 ```
 
 ### ForeignKeyConstraint
@@ -1196,46 +1317,25 @@ const { mutate: create } = useCreateEmbeddingChunkMutation({
 create({ databaseId: '<UUID>', tableId: '<UUID>', embeddingFieldId: '<UUID>', chunksTableId: '<UUID>', chunksTableName: '<String>', contentFieldName: '<String>', dimensions: '<Int>', metric: '<String>', chunkSize: '<Int>', chunkOverlap: '<Int>', chunkStrategy: '<String>', metadataFields: '<JSON>', enqueueChunkingJob: '<Boolean>', chunkingTaskName: '<String>', parentFkFieldId: '<UUID>' });
 ```
 
-### TableTemplateModule
-
-```typescript
-// List all tableTemplateModules
-const { data, isLoading } = useTableTemplateModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } },
-});
-
-// Get one tableTemplateModule
-const { data: item } = useTableTemplateModuleQuery({
-  id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true, nodeType: true, data: true } },
-});
-
-// Create a tableTemplateModule
-const { mutate: create } = useCreateTableTemplateModuleMutation({
-  selection: { fields: { id: true } },
-});
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>', nodeType: '<String>', data: '<JSON>' });
-```
-
 ### SecureTableProvision
 
 ```typescript
 // List all secureTableProvisions
 const { data, isLoading } = useSecureTableProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grants: true, policies: true, outFields: true } },
 });
 
 // Get one secureTableProvision
 const { data: item } = useSecureTableProvisionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFields: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, nodes: true, useRls: true, fields: true, grants: true, policies: true, outFields: true } },
 });
 
 // Create a secureTableProvision
 const { mutate: create } = useCreateSecureTableProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodes: '<JSON>', useRls: '<Boolean>', fields: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFields: '<UUID>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', nodes: '<JSON>', useRls: '<Boolean>', fields: '<JSON>', grants: '<JSON>', policies: '<JSON>', outFields: '<UUID>' });
 ```
 
 ### RelationProvision
@@ -1243,20 +1343,62 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName:
 ```typescript
 // List all relationProvisions
 const { data, isLoading } = useRelationProvisionsQuery({
-  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grants: true, policies: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
 });
 
 // Get one relationProvision
 const { data: item } = useRelationProvisionQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grantRoles: true, grantPrivileges: true, policyType: true, policyPrivileges: true, policyRole: true, policyPermissive: true, policyName: true, policyData: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
+  selection: { fields: { id: true, databaseId: true, relationType: true, sourceTableId: true, targetTableId: true, fieldName: true, deleteAction: true, isRequired: true, apiRequired: true, junctionTableId: true, junctionTableName: true, junctionSchemaId: true, sourceFieldName: true, targetFieldName: true, useCompositeKey: true, createIndex: true, exposeInApi: true, nodes: true, grants: true, policies: true, outFieldId: true, outJunctionTableId: true, outSourceFieldId: true, outTargetFieldId: true } },
 });
 
 // Create a relationProvision
 const { mutate: create } = useCreateRelationProvisionMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', relationType: '<String>', sourceTableId: '<UUID>', targetTableId: '<UUID>', fieldName: '<String>', deleteAction: '<String>', isRequired: '<Boolean>', apiRequired: '<Boolean>', junctionTableId: '<UUID>', junctionTableName: '<String>', junctionSchemaId: '<UUID>', sourceFieldName: '<String>', targetFieldName: '<String>', useCompositeKey: '<Boolean>', createIndex: '<Boolean>', exposeInApi: '<Boolean>', nodes: '<JSON>', grantRoles: '<String>', grantPrivileges: '<JSON>', policyType: '<String>', policyPrivileges: '<String>', policyRole: '<String>', policyPermissive: '<Boolean>', policyName: '<String>', policyData: '<JSON>', outFieldId: '<UUID>', outJunctionTableId: '<UUID>', outSourceFieldId: '<UUID>', outTargetFieldId: '<UUID>' });
+create({ databaseId: '<UUID>', relationType: '<String>', sourceTableId: '<UUID>', targetTableId: '<UUID>', fieldName: '<String>', deleteAction: '<String>', isRequired: '<Boolean>', apiRequired: '<Boolean>', junctionTableId: '<UUID>', junctionTableName: '<String>', junctionSchemaId: '<UUID>', sourceFieldName: '<String>', targetFieldName: '<String>', useCompositeKey: '<Boolean>', createIndex: '<Boolean>', exposeInApi: '<Boolean>', nodes: '<JSON>', grants: '<JSON>', policies: '<JSON>', outFieldId: '<UUID>', outJunctionTableId: '<UUID>', outSourceFieldId: '<UUID>', outTargetFieldId: '<UUID>' });
+```
+
+### SessionSecretsModule
+
+```typescript
+// List all sessionSecretsModules
+const { data, isLoading } = useSessionSecretsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, sessionsTableId: true } },
+});
+
+// Get one sessionSecretsModule
+const { data: item } = useSessionSecretsModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, tableId: true, tableName: true, sessionsTableId: true } },
+});
+
+// Create a sessionSecretsModule
+const { mutate: create } = useCreateSessionSecretsModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>', sessionsTableId: '<UUID>' });
+```
+
+### IdentityProvidersModule
+
+```typescript
+// List all identityProvidersModules
+const { data, isLoading } = useIdentityProvidersModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true } },
+});
+
+// Get one identityProvidersModule
+const { data: item } = useIdentityProvidersModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, tableName: true } },
+});
+
+// Create a identityProvidersModule
+const { mutate: create } = useCreateIdentityProvidersModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', tableName: '<String>' });
 ```
 
 ### SchemaGrant
@@ -1789,20 +1931,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', tableId: '<UUID>', tableName:
 ```typescript
 // List all membershipsModules
 const { data, isLoading } = useMembershipsModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, membershipSettingsTableId: true, membershipSettingsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, memberProfilesTableId: true } },
 });
 
 // Get one membershipsModule
 const { data: item } = useMembershipsModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, membershipsTableId: true, membershipsTableName: true, membersTableId: true, membersTableName: true, membershipDefaultsTableId: true, membershipDefaultsTableName: true, membershipSettingsTableId: true, membershipSettingsTableName: true, grantsTableId: true, grantsTableName: true, actorTableId: true, limitsTableId: true, defaultLimitsTableId: true, permissionsTableId: true, defaultPermissionsTableId: true, sprtTableId: true, adminGrantsTableId: true, adminGrantsTableName: true, ownerGrantsTableId: true, ownerGrantsTableName: true, membershipType: true, entityTableId: true, entityTableOwnerId: true, prefix: true, actorMaskCheck: true, actorPermCheck: true, entityIdsByMask: true, entityIdsByPerm: true, entityIdsFunction: true, memberProfilesTableId: true } },
 });
 
 // Create a membershipsModule
 const { mutate: create } = useCreateMembershipsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', membershipsTableId: '<UUID>', membershipsTableName: '<String>', membersTableId: '<UUID>', membersTableName: '<String>', membershipDefaultsTableId: '<UUID>', membershipDefaultsTableName: '<String>', grantsTableId: '<UUID>', grantsTableName: '<String>', actorTableId: '<UUID>', limitsTableId: '<UUID>', defaultLimitsTableId: '<UUID>', permissionsTableId: '<UUID>', defaultPermissionsTableId: '<UUID>', sprtTableId: '<UUID>', adminGrantsTableId: '<UUID>', adminGrantsTableName: '<String>', ownerGrantsTableId: '<UUID>', ownerGrantsTableName: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', entityTableOwnerId: '<UUID>', prefix: '<String>', actorMaskCheck: '<String>', actorPermCheck: '<String>', entityIdsByMask: '<String>', entityIdsByPerm: '<String>', entityIdsFunction: '<String>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', membershipsTableId: '<UUID>', membershipsTableName: '<String>', membersTableId: '<UUID>', membersTableName: '<String>', membershipDefaultsTableId: '<UUID>', membershipDefaultsTableName: '<String>', membershipSettingsTableId: '<UUID>', membershipSettingsTableName: '<String>', grantsTableId: '<UUID>', grantsTableName: '<String>', actorTableId: '<UUID>', limitsTableId: '<UUID>', defaultLimitsTableId: '<UUID>', permissionsTableId: '<UUID>', defaultPermissionsTableId: '<UUID>', sprtTableId: '<UUID>', adminGrantsTableId: '<UUID>', adminGrantsTableName: '<String>', ownerGrantsTableId: '<UUID>', ownerGrantsTableName: '<String>', membershipType: '<Int>', entityTableId: '<UUID>', entityTableOwnerId: '<UUID>', prefix: '<String>', actorMaskCheck: '<String>', actorPermCheck: '<String>', entityIdsByMask: '<String>', entityIdsByPerm: '<String>', entityIdsFunction: '<String>', memberProfilesTableId: '<UUID>' });
 ```
 
 ### PermissionsModule
@@ -1915,20 +2057,20 @@ create({ databaseId: '<UUID>', schemaId: '<UUID>', sessionsTableId: '<UUID>', se
 ```typescript
 // List all userAuthModules
 const { data, isLoading } = useUserAuthModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInCrossOriginFunction: true, requestCrossOriginTokenFunction: true, extendTokenExpires: true } },
 });
 
 // Get one userAuthModule
 const { data: item } = useUserAuthModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInOneTimeTokenFunction: true, oneTimeTokenFunction: true, extendTokenExpires: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, emailsTableId: true, usersTableId: true, secretsTableId: true, encryptedTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, auditsTableId: true, auditsTableName: true, signInFunction: true, signUpFunction: true, signOutFunction: true, setPasswordFunction: true, resetPasswordFunction: true, forgotPasswordFunction: true, sendVerificationEmailFunction: true, verifyEmailFunction: true, verifyPasswordFunction: true, checkPasswordFunction: true, sendAccountDeletionEmailFunction: true, deleteAccountFunction: true, signInCrossOriginFunction: true, requestCrossOriginTokenFunction: true, extendTokenExpires: true } },
 });
 
 // Create a userAuthModule
 const { mutate: create } = useCreateUserAuthModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', emailsTableId: '<UUID>', usersTableId: '<UUID>', secretsTableId: '<UUID>', encryptedTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', auditsTableId: '<UUID>', auditsTableName: '<String>', signInFunction: '<String>', signUpFunction: '<String>', signOutFunction: '<String>', setPasswordFunction: '<String>', resetPasswordFunction: '<String>', forgotPasswordFunction: '<String>', sendVerificationEmailFunction: '<String>', verifyEmailFunction: '<String>', verifyPasswordFunction: '<String>', checkPasswordFunction: '<String>', sendAccountDeletionEmailFunction: '<String>', deleteAccountFunction: '<String>', signInOneTimeTokenFunction: '<String>', oneTimeTokenFunction: '<String>', extendTokenExpires: '<String>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', emailsTableId: '<UUID>', usersTableId: '<UUID>', secretsTableId: '<UUID>', encryptedTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', auditsTableId: '<UUID>', auditsTableName: '<String>', signInFunction: '<String>', signUpFunction: '<String>', signOutFunction: '<String>', setPasswordFunction: '<String>', resetPasswordFunction: '<String>', forgotPasswordFunction: '<String>', sendVerificationEmailFunction: '<String>', verifyEmailFunction: '<String>', verifyPasswordFunction: '<String>', checkPasswordFunction: '<String>', sendAccountDeletionEmailFunction: '<String>', deleteAccountFunction: '<String>', signInCrossOriginFunction: '<String>', requestCrossOriginTokenFunction: '<String>', extendTokenExpires: '<String>' });
 ```
 
 ### UsersModule
@@ -2020,20 +2162,104 @@ create({ blueprintId: '<UUID>', databaseId: '<UUID>', schemaId: '<UUID>', status
 ```typescript
 // List all storageModules
 const { data, isLoading } = useStorageModulesQuery({
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, membershipType: true, policies: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
 });
 
 // Get one storageModule
 const { data: item } = useStorageModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, bucketsTableId: true, filesTableId: true, uploadRequestsTableId: true, bucketsTableName: true, filesTableName: true, uploadRequestsTableName: true, membershipType: true, policies: true, entityTableId: true, endpoint: true, publicUrlPrefix: true, provider: true, allowedOrigins: true, uploadUrlExpirySeconds: true, downloadUrlExpirySeconds: true, defaultMaxFileSize: true, maxFilenameLength: true, cacheTtlSeconds: true } },
 });
 
 // Create a storageModule
 const { mutate: create } = useCreateStorageModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', uploadRequestsTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', uploadRequestsTableName: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', bucketsTableId: '<UUID>', filesTableId: '<UUID>', uploadRequestsTableId: '<UUID>', bucketsTableName: '<String>', filesTableName: '<String>', uploadRequestsTableName: '<String>', membershipType: '<Int>', policies: '<String>', entityTableId: '<UUID>', endpoint: '<String>', publicUrlPrefix: '<String>', provider: '<String>', allowedOrigins: '<String>', uploadUrlExpirySeconds: '<Int>', downloadUrlExpirySeconds: '<Int>', defaultMaxFileSize: '<BigInt>', maxFilenameLength: '<Int>', cacheTtlSeconds: '<Int>' });
+```
+
+### EntityTypeProvision
+
+```typescript
+// List all entityTypeProvisions
+const { data, isLoading } = useEntityTypeProvisionsQuery({
+  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true } },
+});
+
+// Get one entityTypeProvision
+const { data: item } = useEntityTypeProvisionQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, name: true, prefix: true, description: true, parentEntity: true, tableName: true, isVisible: true, hasLimits: true, hasProfiles: true, hasLevels: true, hasStorage: true, storageConfig: true, skipEntityPolicies: true, tableProvision: true, outMembershipType: true, outEntityTableId: true, outEntityTableName: true, outInstalledModules: true, outStorageModuleId: true, outBucketsTableId: true, outFilesTableId: true } },
+});
+
+// Create a entityTypeProvision
+const { mutate: create } = useCreateEntityTypeProvisionMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', name: '<String>', prefix: '<String>', description: '<String>', parentEntity: '<String>', tableName: '<String>', isVisible: '<Boolean>', hasLimits: '<Boolean>', hasProfiles: '<Boolean>', hasLevels: '<Boolean>', hasStorage: '<Boolean>', storageConfig: '<JSON>', skipEntityPolicies: '<Boolean>', tableProvision: '<JSON>', outMembershipType: '<Int>', outEntityTableId: '<UUID>', outEntityTableName: '<String>', outInstalledModules: '<String>', outStorageModuleId: '<UUID>', outBucketsTableId: '<UUID>', outFilesTableId: '<UUID>' });
+```
+
+### WebauthnCredentialsModule
+
+```typescript
+// List all webauthnCredentialsModules
+const { data, isLoading } = useWebauthnCredentialsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+});
+
+// Get one webauthnCredentialsModule
+const { data: item } = useWebauthnCredentialsModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, tableId: true, ownerTableId: true, tableName: true } },
+});
+
+// Create a webauthnCredentialsModule
+const { mutate: create } = useCreateWebauthnCredentialsModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', tableId: '<UUID>', ownerTableId: '<UUID>', tableName: '<String>' });
+```
+
+### WebauthnAuthModule
+
+```typescript
+// List all webauthnAuthModules
+const { data, isLoading } = useWebauthnAuthModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, usersTableId: true, credentialsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, sessionSecretsTableId: true, authSettingsTableId: true, rpId: true, rpName: true, originAllowlist: true, attestationType: true, requireUserVerification: true, residentKey: true, challengeExpiry: true } },
+});
+
+// Get one webauthnAuthModule
+const { data: item } = useWebauthnAuthModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, usersTableId: true, credentialsTableId: true, sessionsTableId: true, sessionCredentialsTableId: true, sessionSecretsTableId: true, authSettingsTableId: true, rpId: true, rpName: true, originAllowlist: true, attestationType: true, requireUserVerification: true, residentKey: true, challengeExpiry: true } },
+});
+
+// Create a webauthnAuthModule
+const { mutate: create } = useCreateWebauthnAuthModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', usersTableId: '<UUID>', credentialsTableId: '<UUID>', sessionsTableId: '<UUID>', sessionCredentialsTableId: '<UUID>', sessionSecretsTableId: '<UUID>', authSettingsTableId: '<UUID>', rpId: '<String>', rpName: '<String>', originAllowlist: '<String>', attestationType: '<String>', requireUserVerification: '<Boolean>', residentKey: '<String>', challengeExpiry: '<Interval>' });
+```
+
+### NotificationsModule
+
+```typescript
+// List all notificationsModules
+const { data, isLoading } = useNotificationsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, notificationsTableId: true, eventsTableId: true, preferencesTableId: true, channelsTableId: true, deliveryLogTableId: true, ownerTableId: true, userSettingsTableId: true, organizationSettingsTableId: true } },
+});
+
+// Get one notificationsModule
+const { data: item } = useNotificationsModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, notificationsTableId: true, eventsTableId: true, preferencesTableId: true, channelsTableId: true, deliveryLogTableId: true, ownerTableId: true, userSettingsTableId: true, organizationSettingsTableId: true } },
+});
+
+// Create a notificationsModule
+const { mutate: create } = useCreateNotificationsModuleMutation({
+  selection: { fields: { id: true } },
+});
+create({ databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', notificationsTableId: '<UUID>', eventsTableId: '<UUID>', preferencesTableId: '<UUID>', channelsTableId: '<UUID>', deliveryLogTableId: '<UUID>', ownerTableId: '<UUID>', userSettingsTableId: '<UUID>', organizationSettingsTableId: '<UUID>' });
 ```
 
 ### DatabaseProvisionModule
@@ -2125,20 +2351,20 @@ create({ permissions: '<BitString>', isGrant: '<Boolean>', actorId: '<UUID>', gr
 ```typescript
 // List all orgMemberships
 const { data, isLoading } = useOrgMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, profileId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, isReadOnly: true, profileId: true } },
 });
 
 // Get one orgMembership
 const { data: item } = useOrgMembershipQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, profileId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, entityId: true, isReadOnly: true, profileId: true } },
 });
 
 // Create a orgMembership
 const { mutate: create } = useCreateOrgMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', entityId: '<UUID>', profileId: '<UUID>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isActive: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', entityId: '<UUID>', isReadOnly: '<Boolean>', profileId: '<UUID>' });
 ```
 
 ### OrgMember
@@ -2202,6 +2428,27 @@ const { mutate: create } = useCreateOrgOwnerGrantMutation({
   selection: { fields: { id: true } },
 });
 create({ isGrant: '<Boolean>', actorId: '<UUID>', entityId: '<UUID>', grantorId: '<UUID>' });
+```
+
+### OrgMemberProfile
+
+```typescript
+// List all orgMemberProfiles
+const { data, isLoading } = useOrgMemberProfilesQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
+});
+
+// Get one orgMemberProfile
+const { data: item } = useOrgMemberProfileQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, membershipId: true, entityId: true, actorId: true, displayName: true, email: true, title: true, bio: true, profilePicture: true } },
+});
+
+// Create a orgMemberProfile
+const { mutate: create } = useCreateOrgMemberProfileMutation({
+  selection: { fields: { id: true } },
+});
+create({ membershipId: '<UUID>', entityId: '<UUID>', actorId: '<UUID>', displayName: '<String>', email: '<String>', title: '<String>', bio: '<String>', profilePicture: '<Image>' });
 ```
 
 ### OrgGrant
@@ -2398,20 +2645,20 @@ create({ name: '<String>', description: '<String>', image: '<Image>', ownerId: '
 ```typescript
 // List all emails
 const { data, isLoading } = useEmailsQuery({
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one email
 const { data: item } = useEmailQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, email: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a email
 const { mutate: create } = useCreateEmailMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+create({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```
 
 ### PhoneNumber
@@ -2419,20 +2666,20 @@ create({ ownerId: '<UUID>', email: '<Email>', isVerified: '<Boolean>', isPrimary
 ```typescript
 // List all phoneNumbers
 const { data, isLoading } = usePhoneNumbersQuery({
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one phoneNumber
 const { data: item } = usePhoneNumberQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, cc: true, number: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a phoneNumber
 const { mutate: create } = useCreatePhoneNumberMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+create({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```
 
 ### CryptoAddress
@@ -2440,80 +2687,80 @@ create({ ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Bo
 ```typescript
 // List all cryptoAddresses
 const { data, isLoading } = useCryptoAddressesQuery({
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Get one cryptoAddress
 const { data: item } = useCryptoAddressQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, address: true, isVerified: true, isPrimary: true, name: true, createdAt: true, updatedAt: true } },
 });
 
 // Create a cryptoAddress
 const { mutate: create } = useCreateCryptoAddressMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' });
+create({ ownerId: '<UUID>', address: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' });
 ```
 
-### ConnectedAccount
+### WebauthnCredential
 
 ```typescript
-// List all connectedAccounts
-const { data, isLoading } = useConnectedAccountsQuery({
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+// List all webauthnCredentials
+const { data, isLoading } = useWebauthnCredentialsQuery({
+  selection: { fields: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Get one connectedAccount
-const { data: item } = useConnectedAccountQuery({
+// Get one webauthnCredential
+const { data: item } = useWebauthnCredentialQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+  selection: { fields: { id: true, ownerId: true, credentialId: true, publicKey: true, signCount: true, webauthnUserId: true, transports: true, credentialDeviceType: true, backupEligible: true, backupState: true, name: true, lastUsedAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Create a connectedAccount
-const { mutate: create } = useCreateConnectedAccountMutation({
+// Create a webauthnCredential
+const { mutate: create } = useCreateWebauthnCredentialMutation({
   selection: { fields: { id: true } },
 });
-create({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
+create({ ownerId: '<UUID>', credentialId: '<String>', publicKey: '<Base64EncodedBinary>', signCount: '<BigInt>', webauthnUserId: '<String>', transports: '<String>', credentialDeviceType: '<String>', backupEligible: '<Boolean>', backupState: '<Boolean>', name: '<String>', lastUsedAt: '<Datetime>' });
 ```
 
-### Invite
+### AppInvite
 
 ```typescript
-// List all invites
-const { data, isLoading } = useInvitesQuery({
+// List all appInvites
+const { data, isLoading } = useAppInvitesQuery({
   selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Get one invite
-const { data: item } = useInviteQuery({
+// Get one appInvite
+const { data: item } = useAppInviteQuery({
   id: '<UUID>',
   selection: { fields: { id: true, email: true, senderId: true, inviteToken: true, inviteValid: true, inviteLimit: true, inviteCount: true, multiple: true, data: true, expiresAt: true, createdAt: true, updatedAt: true } },
 });
 
-// Create a invite
-const { mutate: create } = useCreateInviteMutation({
+// Create a appInvite
+const { mutate: create } = useCreateAppInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ email: '<Email>', senderId: '<UUID>', inviteToken: '<String>', inviteValid: '<Boolean>', inviteLimit: '<Int>', inviteCount: '<Int>', multiple: '<Boolean>', data: '<JSON>', expiresAt: '<Datetime>' });
 ```
 
-### ClaimedInvite
+### AppClaimedInvite
 
 ```typescript
-// List all claimedInvites
-const { data, isLoading } = useClaimedInvitesQuery({
+// List all appClaimedInvites
+const { data, isLoading } = useAppClaimedInvitesQuery({
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } },
 });
 
-// Get one claimedInvite
-const { data: item } = useClaimedInviteQuery({
+// Get one appClaimedInvite
+const { data: item } = useAppClaimedInviteQuery({
   id: '<UUID>',
   selection: { fields: { id: true, data: true, senderId: true, receiverId: true, createdAt: true, updatedAt: true } },
 });
 
-// Create a claimedInvite
-const { mutate: create } = useCreateClaimedInviteMutation({
+// Create a appClaimedInvite
+const { mutate: create } = useCreateAppClaimedInviteMutation({
   selection: { fields: { id: true } },
 });
 create({ data: '<JSON>', senderId: '<UUID>', receiverId: '<UUID>' });
@@ -2601,6 +2848,21 @@ const { mutate: create } = useCreateAppPermissionDefaultMutation({
   selection: { fields: { id: true } },
 });
 create({ permissions: '<BitString>' });
+```
+
+### IdentityProvider
+
+```typescript
+// List all identityProviders
+const { data, isLoading } = useIdentityProvidersQuery({
+  selection: { fields: { slug: true, kind: true, displayName: true, enabled: true, isBuiltIn: true } },
+});
+
+// Create a identityProvider
+const { mutate: create } = useCreateIdentityProviderMutation({
+  selection: { fields: { id: true } },
+});
+create({ slug: '<String>', kind: '<String>', displayName: '<String>', enabled: '<Boolean>', isBuiltIn: '<Boolean>' });
 ```
 
 ### Ref
@@ -2729,25 +2991,46 @@ const { mutate: create } = useCreateOrgLimitDefaultMutation({
 create({ name: '<String>', max: '<Int>' });
 ```
 
-### MembershipType
+### DevicesModule
 
 ```typescript
-// List all membershipTypes
-const { data, isLoading } = useMembershipTypesQuery({
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
+// List all devicesModules
+const { data, isLoading } = useDevicesModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } },
 });
 
-// Get one membershipType
-const { data: item } = useMembershipTypeQuery({
-  id: '<Int>',
-  selection: { fields: { id: true, name: true, description: true, prefix: true } },
+// Get one devicesModule
+const { data: item } = useDevicesModuleQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, databaseId: true, schemaId: true, userDevicesTableId: true, deviceSettingsTableId: true, userDevicesTable: true, deviceSettingsTable: true } },
 });
 
-// Create a membershipType
-const { mutate: create } = useCreateMembershipTypeMutation({
+// Create a devicesModule
+const { mutate: create } = useCreateDevicesModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ name: '<String>', description: '<String>', prefix: '<String>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', userDevicesTableId: '<UUID>', deviceSettingsTableId: '<UUID>', userDevicesTable: '<String>', deviceSettingsTable: '<String>' });
+```
+
+### UserConnectedAccount
+
+```typescript
+// List all userConnectedAccounts
+const { data, isLoading } = useUserConnectedAccountsQuery({
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+});
+
+// Get one userConnectedAccount
+const { data: item } = useUserConnectedAccountQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, ownerId: true, service: true, identifier: true, details: true, isVerified: true, createdAt: true, updatedAt: true } },
+});
+
+// Create a userConnectedAccount
+const { mutate: create } = useCreateUserConnectedAccountMutation({
+  selection: { fields: { id: true } },
+});
+create({ ownerId: '<UUID>', service: '<String>', identifier: '<String>', details: '<JSON>', isVerified: '<Boolean>' });
 ```
 
 ### AppMembershipDefault
@@ -2771,6 +3054,27 @@ const { mutate: create } = useCreateAppMembershipDefaultMutation({
 create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isVerified: '<Boolean>' });
 ```
 
+### OrgMembershipDefault
+
+```typescript
+// List all orgMembershipDefaults
+const { data, isLoading } = useOrgMembershipDefaultsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } },
+});
+
+// Get one orgMembershipDefault
+const { data: item } = useOrgMembershipDefaultQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true } },
+});
+
+// Create a orgMembershipDefault
+const { mutate: create } = useCreateOrgMembershipDefaultMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>' });
+```
+
 ### Commit
 
 ```typescript
@@ -2792,25 +3096,46 @@ const { mutate: create } = useCreateCommitMutation({
 create({ message: '<String>', databaseId: '<UUID>', storeId: '<UUID>', parentIds: '<UUID>', authorId: '<UUID>', committerId: '<UUID>', treeId: '<UUID>', date: '<Datetime>' });
 ```
 
-### OrgMembershipDefault
+### RateLimitsModule
 
 ```typescript
-// List all orgMembershipDefaults
-const { data, isLoading } = useOrgMembershipDefaultsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } },
+// List all rateLimitsModules
+const { data, isLoading } = useRateLimitsModulesQuery({
+  selection: { fields: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } },
 });
 
-// Get one orgMembershipDefault
-const { data: item } = useOrgMembershipDefaultQuery({
+// Get one rateLimitsModule
+const { data: item } = useRateLimitsModuleQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, entityId: true, deleteMemberCascadeGroups: true, createGroupsCascadeMembers: true } },
+  selection: { fields: { id: true, databaseId: true, schemaId: true, rateLimitSettingsTableId: true, ipRateLimitsTableId: true, rateLimitsTableId: true, rateLimitSettingsTable: true, ipRateLimitsTable: true, rateLimitsTable: true } },
 });
 
-// Create a orgMembershipDefault
-const { mutate: create } = useCreateOrgMembershipDefaultMutation({
+// Create a rateLimitsModule
+const { mutate: create } = useCreateRateLimitsModuleMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', entityId: '<UUID>', deleteMemberCascadeGroups: '<Boolean>', createGroupsCascadeMembers: '<Boolean>' });
+create({ databaseId: '<UUID>', schemaId: '<UUID>', rateLimitSettingsTableId: '<UUID>', ipRateLimitsTableId: '<UUID>', rateLimitsTableId: '<UUID>', rateLimitSettingsTable: '<String>', ipRateLimitsTable: '<String>', rateLimitsTable: '<String>' });
+```
+
+### MembershipType
+
+```typescript
+// List all membershipTypes
+const { data, isLoading } = useMembershipTypesQuery({
+  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
+});
+
+// Get one membershipType
+const { data: item } = useMembershipTypeQuery({
+  id: '<Int>',
+  selection: { fields: { id: true, name: true, description: true, prefix: true, parentMembershipType: true, hasUsersTableEntry: true } },
+});
+
+// Create a membershipType
+const { mutate: create } = useCreateMembershipTypeMutation({
+  selection: { fields: { id: true } },
+});
+create({ name: '<String>', description: '<String>', prefix: '<String>', parentMembershipType: '<Int>', hasUsersTableEntry: '<Boolean>' });
 ```
 
 ### RlsModule
@@ -2853,6 +3178,27 @@ const { mutate: create } = useCreateSqlActionMutation({
   selection: { fields: { id: true } },
 });
 create({ name: '<String>', databaseId: '<UUID>', deploy: '<String>', deps: '<String>', payload: '<JSON>', content: '<String>', revert: '<String>', verify: '<String>', action: '<String>', actionId: '<UUID>', actorId: '<UUID>' });
+```
+
+### OrgMembershipSetting
+
+```typescript
+// List all orgMembershipSettings
+const { data, isLoading } = useOrgMembershipSettingsQuery({
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, populateMemberEmail: true } },
+});
+
+// Get one orgMembershipSetting
+const { data: item } = useOrgMembershipSettingQuery({
+  id: '<UUID>',
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, entityId: true, deleteMemberCascadeChildren: true, createChildCascadeOwners: true, createChildCascadeAdmins: true, createChildCascadeMembers: true, allowExternalMembers: true, populateMemberEmail: true } },
+});
+
+// Create a orgMembershipSetting
+const { mutate: create } = useCreateOrgMembershipSettingMutation({
+  selection: { fields: { id: true } },
+});
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', entityId: '<UUID>', deleteMemberCascadeChildren: '<Boolean>', createChildCascadeOwners: '<Boolean>', createChildCascadeAdmins: '<Boolean>', createChildCascadeMembers: '<Boolean>', allowExternalMembers: '<Boolean>', populateMemberEmail: '<Boolean>' });
 ```
 
 ### User
@@ -2902,20 +3248,20 @@ create({ databaseId: '<UUID>', name: '<String>', requires: '<String>', payload: 
 ```typescript
 // List all appMemberships
 const { data, isLoading } = useAppMembershipsQuery({
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
 });
 
 // Get one appMembership
 const { data: item } = useAppMembershipQuery({
   id: '<UUID>',
-  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
+  selection: { fields: { id: true, createdAt: true, updatedAt: true, createdBy: true, updatedBy: true, isApproved: true, isBanned: true, isDisabled: true, isVerified: true, isActive: true, isExternal: true, isOwner: true, isAdmin: true, permissions: true, granted: true, actorId: true, profileId: true } },
 });
 
 // Create a appMembership
 const { mutate: create } = useCreateAppMembershipMutation({
   selection: { fields: { id: true } },
 });
-create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
+create({ createdBy: '<UUID>', updatedBy: '<UUID>', isApproved: '<Boolean>', isBanned: '<Boolean>', isDisabled: '<Boolean>', isVerified: '<Boolean>', isActive: '<Boolean>', isExternal: '<Boolean>', isOwner: '<Boolean>', isAdmin: '<Boolean>', permissions: '<BitString>', granted: '<BitString>', actorId: '<UUID>', profileId: '<UUID>' });
 ```
 
 ### HierarchyModule
@@ -2948,6 +3294,13 @@ currentUserId
 - **Type:** query
 - **Arguments:** none
 
+### `useCurrentUserAgentQuery`
+
+currentUserAgent
+
+- **Type:** query
+- **Arguments:** none
+
 ### `useCurrentIpAddressQuery`
 
 currentIpAddress
@@ -2955,12 +3308,16 @@ currentIpAddress
 - **Type:** query
 - **Arguments:** none
 
-### `useCurrentUserAgentQuery`
+### `useRequireStepUpQuery`
 
-currentUserAgent
+requireStepUp
 
 - **Type:** query
-- **Arguments:** none
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `stepUpType` | String |
 
 ### `useAppPermissionsGetPaddedMaskQuery`
 
@@ -2993,8 +3350,8 @@ stepsAchieved
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
 
 ### `useRevParseQuery`
 
@@ -3008,6 +3365,19 @@ revParse
   | `dbId` | UUID |
   | `storeId` | UUID |
   | `refname` | String |
+
+### `useResolveBlueprintFieldQuery`
+
+Resolves a field_name within a given table_id to a field_id. Throws if no match is found. Used by construct_blueprint to translate user-authored field names (e.g. "location") into field UUIDs for downstream provisioning procedures. table_id must already be resolved (via resolve_blueprint_table) before calling this.
+
+- **Type:** query
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `databaseId` | UUID |
+  | `tableId` | UUID |
+  | `fieldName` | String |
 
 ### `useOrgIsManagerOfQuery`
 
@@ -3164,8 +3534,8 @@ Reads and enables pagination through a set of `AppLevelRequirement`.
 
   | Argument | Type |
   |----------|------|
-  | `vlevel` | String |
-  | `vroleId` | UUID |
+  | `level` | String |
+  | `roleId` | UUID |
   | `first` | Int |
   | `offset` | Int |
   | `after` | Cursor |
@@ -3232,16 +3602,71 @@ rejectDatabaseTransfer
   |----------|------|
   | `input` | RejectDatabaseTransferInput (required) |
 
-### `useSubmitInviteCodeMutation`
+### `useDisconnectAccountMutation`
 
-submitInviteCode
+disconnectAccount
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SubmitInviteCodeInput (required) |
+  | `input` | DisconnectAccountInput (required) |
+
+### `useRevokeApiKeyMutation`
+
+revokeApiKey
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeApiKeyInput (required) |
+
+### `useRevokeSessionMutation`
+
+revokeSession
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | RevokeSessionInput (required) |
+
+### `useVerifyPasswordMutation`
+
+verifyPassword
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyPasswordInput (required) |
+
+### `useVerifyTotpMutation`
+
+verifyTotp
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | VerifyTotpInput (required) |
+
+### `useSubmitAppInviteCodeMutation`
+
+submitAppInviteCode
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SubmitAppInviteCodeInput (required) |
 
 ### `useSubmitOrgInviteCodeMutation`
 
@@ -3322,7 +3747,7 @@ initEmptyRepo
 
 ### `useConstructBlueprintMutation`
 
-Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Five phases: (1) provision_table() for each table with all nodes[], fields[], policies[], grants, and table-level indexes/fts/unique_constraints in a single call, (2) provision_relation() for each relation, (3) provision_index() for top-level indexes, (4) provision_full_text_search() for top-level FTS, (5) provision_unique_constraint() for top-level unique constraints. Tables are identified by table_name with optional per-table schema_name. Relations use $type for relation_type with source_table/target_table. Returns the construction record ID on success, NULL on failure.
+Executes a blueprint definition by delegating to provision_* procedures. Creates a blueprint_construction record to track the attempt. Six phases: (0) entity_type_provision for each membership_type entry — provisions entity tables, membership modules, and security, (1) provision_table() for each table with nodes[], fields[], policies[], and grants (table-level indexes/fts/unique_constraints are deferred), (2) provision_relation() for each relation, (3) provision_index() for top-level + deferred indexes, (4) provision_full_text_search() for top-level + deferred FTS, (5) provision_unique_constraint() for top-level + deferred unique constraints. Phase 0 entity tables are added to the table_map so subsequent phases can reference them by name. Table-level indexes/fts/unique_constraints are deferred to phases 3-5 so they can reference columns created by relations in phase 2. Returns the construction record ID on success, NULL on failure.
 
 - **Type:** mutation
 - **Arguments:**
@@ -3330,6 +3755,17 @@ Executes a blueprint definition by delegating to provision_* procedures. Creates
   | Argument | Type |
   |----------|------|
   | `input` | ConstructBlueprintInput (required) |
+
+### `useProvisionNewUserMutation`
+
+provisionNewUser
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionNewUserInput (required) |
 
 ### `useResetPasswordMutation`
 
@@ -3363,6 +3799,17 @@ Creates a new blueprint by copying a template definition. Checks visibility: own
   | Argument | Type |
   |----------|------|
   | `input` | CopyTemplateToBlueprintInput (required) |
+
+### `useProvisionSpatialRelationMutation`
+
+Idempotent provisioner for metaschema_public.spatial_relation. Inserts a row declaring a spatial predicate between two geometry/geography columns (owner and target). Called from construct_blueprint when a relation entry has $type=RelationSpatial. Graceful: re-running with the same (source_table_id, name) returns the existing id without modifying the row. Operator whitelist and st_dwithin ↔ param_name pairing are enforced by the spatial_relation table CHECKs. Both fields must already exist — this is a metadata-only insert.
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | ProvisionSpatialRelationInput (required) |
 
 ### `useBootstrapUserMutation`
 
@@ -3507,16 +3954,16 @@ applyRls
   |----------|------|
   | `input` | ApplyRlsInput (required) |
 
-### `useSignInOneTimeTokenMutation`
+### `useSignInCrossOriginMutation`
 
-signInOneTimeToken
+signInCrossOrigin
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInOneTimeTokenInput (required) |
+  | `input` | SignInCrossOriginInput (required) |
 
 ### `useCreateUserDatabaseMutation`
 
@@ -3556,16 +4003,16 @@ extendTokenExpires
   |----------|------|
   | `input` | ExtendTokenExpiresInput (required) |
 
-### `useSignInMutation`
+### `useCreateApiKeyMutation`
 
-signIn
+createApiKey
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | SignInInput (required) |
+  | `input` | CreateApiKeyInput (required) |
 
 ### `useSignUpMutation`
 
@@ -3578,16 +4025,27 @@ signUp
   |----------|------|
   | `input` | SignUpInput (required) |
 
-### `useOneTimeTokenMutation`
+### `useRequestCrossOriginTokenMutation`
 
-oneTimeToken
+requestCrossOriginToken
 
 - **Type:** mutation
 - **Arguments:**
 
   | Argument | Type |
   |----------|------|
-  | `input` | OneTimeTokenInput (required) |
+  | `input` | RequestCrossOriginTokenInput (required) |
+
+### `useSignInMutation`
+
+signIn
+
+- **Type:** mutation
+- **Arguments:**
+
+  | Argument | Type |
+  |----------|------|
+  | `input` | SignInInput (required) |
 
 ### `useProvisionTableMutation`
 
@@ -3621,28 +4079,6 @@ forgotPassword
   | Argument | Type |
   |----------|------|
   | `input` | ForgotPasswordInput (required) |
-
-### `useVerifyPasswordMutation`
-
-verifyPassword
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyPasswordInput (required) |
-
-### `useVerifyTotpMutation`
-
-verifyTotp
-
-- **Type:** mutation
-- **Arguments:**
-
-  | Argument | Type |
-  |----------|------|
-  | `input` | VerifyTotpInput (required) |
 
 ### `useRequestUploadUrlMutation`
 

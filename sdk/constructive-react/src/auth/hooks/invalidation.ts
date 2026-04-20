@@ -18,9 +18,11 @@ import {
   emailKeys,
   phoneNumberKeys,
   cryptoAddressKeys,
-  connectedAccountKeys,
+  webauthnCredentialKeys,
   auditLogKeys,
+  identityProviderKeys,
   roleTypeKeys,
+  userConnectedAccountKeys,
   userKeys,
 } from './query-keys';
 /**
@@ -91,21 +93,21 @@ export const invalidate = {
         queryKey: cryptoAddressKeys.detail(id),
       }),
   },
-  /** Invalidate connectedAccount queries */ connectedAccount: {
-    /** Invalidate all connectedAccount queries */ all: (queryClient: QueryClient) =>
+  /** Invalidate webauthnCredential queries */ webauthnCredential: {
+    /** Invalidate all webauthnCredential queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.all,
+        queryKey: webauthnCredentialKeys.all,
       }),
-    /** Invalidate connectedAccount list queries */ lists: (queryClient: QueryClient) =>
+    /** Invalidate webauthnCredential list queries */ lists: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.lists(),
+        queryKey: webauthnCredentialKeys.lists(),
       }),
-    /** Invalidate a specific connectedAccount */ detail: (
+    /** Invalidate a specific webauthnCredential */ detail: (
       queryClient: QueryClient,
       id: string | number
     ) =>
       queryClient.invalidateQueries({
-        queryKey: connectedAccountKeys.detail(id),
+        queryKey: webauthnCredentialKeys.detail(id),
       }),
   },
   /** Invalidate auditLog queries */ auditLog: {
@@ -122,6 +124,23 @@ export const invalidate = {
         queryKey: auditLogKeys.detail(id),
       }),
   },
+  /** Invalidate identityProvider queries */ identityProvider: {
+    /** Invalidate all identityProvider queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.all,
+      }),
+    /** Invalidate identityProvider list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.lists(),
+      }),
+    /** Invalidate a specific identityProvider */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: identityProviderKeys.detail(id),
+      }),
+  },
   /** Invalidate roleType queries */ roleType: {
     /** Invalidate all roleType queries */ all: (queryClient: QueryClient) =>
       queryClient.invalidateQueries({
@@ -134,6 +153,23 @@ export const invalidate = {
     /** Invalidate a specific roleType */ detail: (queryClient: QueryClient, id: string | number) =>
       queryClient.invalidateQueries({
         queryKey: roleTypeKeys.detail(id),
+      }),
+  },
+  /** Invalidate userConnectedAccount queries */ userConnectedAccount: {
+    /** Invalidate all userConnectedAccount queries */ all: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.all,
+      }),
+    /** Invalidate userConnectedAccount list queries */ lists: (queryClient: QueryClient) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.lists(),
+      }),
+    /** Invalidate a specific userConnectedAccount */ detail: (
+      queryClient: QueryClient,
+      id: string | number
+    ) =>
+      queryClient.invalidateQueries({
+        queryKey: userConnectedAccountKeys.detail(id),
       }),
   },
   /** Invalidate user queries */ user: {
@@ -184,12 +220,12 @@ export const remove = {
       queryKey: cryptoAddressKeys.detail(id),
     });
   },
-  /** Remove connectedAccount from cache */ connectedAccount: (
+  /** Remove webauthnCredential from cache */ webauthnCredential: (
     queryClient: QueryClient,
     id: string | number
   ) => {
     queryClient.removeQueries({
-      queryKey: connectedAccountKeys.detail(id),
+      queryKey: webauthnCredentialKeys.detail(id),
     });
   },
   /** Remove auditLog from cache */ auditLog: (queryClient: QueryClient, id: string | number) => {
@@ -197,9 +233,25 @@ export const remove = {
       queryKey: auditLogKeys.detail(id),
     });
   },
+  /** Remove identityProvider from cache */ identityProvider: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: identityProviderKeys.detail(id),
+    });
+  },
   /** Remove roleType from cache */ roleType: (queryClient: QueryClient, id: string | number) => {
     queryClient.removeQueries({
       queryKey: roleTypeKeys.detail(id),
+    });
+  },
+  /** Remove userConnectedAccount from cache */ userConnectedAccount: (
+    queryClient: QueryClient,
+    id: string | number
+  ) => {
+    queryClient.removeQueries({
+      queryKey: userConnectedAccountKeys.detail(id),
     });
   },
   /** Remove user from cache */ user: (queryClient: QueryClient, id: string | number) => {

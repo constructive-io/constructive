@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.16.3](https://github.com/constructive-io/constructive/compare/pgpm@4.16.2...pgpm@4.16.3) (2026-04-20)
+
+**Note:** Version bump only for package pgpm
+
+## [4.16.2](https://github.com/constructive-io/constructive/compare/pgpm@4.16.1...pgpm@4.16.2) (2026-04-20)
+
+**Note:** Version bump only for package pgpm
+
+## [4.16.1](https://github.com/constructive-io/constructive/compare/pgpm@4.16.0...pgpm@4.16.1) (2026-04-19)
+
+**Note:** Version bump only for package pgpm
+
+# [4.16.0](https://github.com/constructive-io/constructive/compare/pgpm@4.15.0...pgpm@4.16.0) (2026-04-18)
+
+**Note:** Version bump only for package pgpm
+
+# [4.15.0](https://github.com/constructive-io/constructive/compare/pgpm@4.14.1...pgpm@4.15.0) (2026-04-16)
+
+### Features
+
+- **pgpm:** add --ollama and --gpu flags to pgpm docker ([822a015](https://github.com/constructive-io/constructive/commit/822a0151cec9107454e086517947ad3573ae4aa0))
+
+## [4.14.1](https://github.com/constructive-io/constructive/compare/pgpm@4.14.0...pgpm@4.14.1) (2026-04-14)
+
+### Bug Fixes
+
+- expose MinIO console UI on port 9001 ([1867f1d](https://github.com/constructive-io/constructive/commit/1867f1db6e8489e927cae315d97496107e7d40dd))
+
+# [4.14.0](https://github.com/constructive-io/constructive/compare/pgpm@4.13.0...pgpm@4.14.0) (2026-04-11)
+
+### Bug Fixes
+
+- **pgpm:** update display.ts docker help text to use --minio instead of --include ([3b405cb](https://github.com/constructive-io/constructive/commit/3b405cbfac7cddb0b73ee3adc1276098acaa5e05))
+
+### Features
+
+- **pgpm:** replace --include with --minio flag for docker command ([44c1507](https://github.com/constructive-io/constructive/commit/44c1507e0241997d31d4845c104cac7e98d708c2))
+
+# [4.13.0](https://github.com/constructive-io/constructive/compare/pgpm@4.12.0...pgpm@4.13.0) (2026-04-11)
+
+### Features
+
+- **pgpm:** add --minio flag to pgpm env for CDN/S3 environment variables ([ddeae21](https://github.com/constructive-io/constructive/commit/ddeae21d8fddca8b31f1f3bdca1b29078131077a))
+
+# [4.12.0](https://github.com/constructive-io/constructive/compare/pgpm@4.11.1...pgpm@4.12.0) (2026-04-11)
+
+### Features
+
+- **pgpm:** add --include flag for additional Docker services (minio) ([693c26a](https://github.com/constructive-io/constructive/commit/693c26a4b0d015aacf9073f17306cd8c72efcef8))
+- **pgpm:** add named volume support for additional services ([46961a2](https://github.com/constructive-io/constructive/commit/46961a266b28271e6bbe17ff4f5c01bf6b53e15a))
+
+## [4.11.1](https://github.com/constructive-io/constructive/compare/pgpm@4.11.0...pgpm@4.11.1) (2026-04-11)
+
+**Note:** Version bump only for package pgpm
+
+# [4.11.0](https://github.com/constructive-io/constructive/compare/pgpm@4.10.8...pgpm@4.11.0) (2026-04-09)
+
+**Note:** Version bump only for package pgpm
+
 ## [4.10.8](https://github.com/constructive-io/constructive/compare/pgpm@4.10.7...pgpm@4.10.8) (2026-04-04)
 
 **Note:** Version bump only for package pgpm

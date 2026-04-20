@@ -231,6 +231,7 @@ export interface UUIDListFilter {
   anyGreaterThanOrEqualTo?: string;
 }
 // ============ Custom Scalar Types ============
+export type Base64EncodedBinary = unknown;
 export type ConstructiveInternalTypeEmail = unknown;
 export type ConstructiveInternalTypeImage = unknown;
 export type ConstructiveInternalTypeOrigin = unknown;
@@ -245,6 +246,8 @@ export interface Email {
   isVerified?: boolean | null;
   /** Whether this is the user's primary email address */
   isPrimary?: boolean | null;
+  /** Optional user-provided label for this email (e.g. "Work", "Personal"). */
+  name?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -260,6 +263,8 @@ export interface PhoneNumber {
   isVerified?: boolean | null;
   /** Whether this is the user's primary phone number */
   isPrimary?: boolean | null;
+  /** Optional user-provided label for this phone number (e.g. "Mobile", "Work"). */
+  name?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -273,21 +278,35 @@ export interface CryptoAddress {
   isVerified?: boolean | null;
   /** Whether this is the user's primary cryptocurrency address */
   isPrimary?: boolean | null;
+  /** Optional user-provided label for this address (e.g. "Main wallet", "Hardware wallet"). */
+  name?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
-/** OAuth and social login connections linking external service accounts to users */
-export interface ConnectedAccount {
+/** WebAuthn/passkey credentials owned by users. One row per registered authenticator (security key, device biometric, synced passkey). Schema mirrors SimpleWebAuthn's canonical Passkey object. */
+export interface WebauthnCredential {
   id: string;
   ownerId?: string | null;
-  /** The service used, e.g. `twitter` or `github`. */
-  service?: string | null;
-  /** A unique identifier for the user within the service */
-  identifier?: string | null;
-  /** Additional profile details extracted from this login method */
-  details?: Record<string, unknown> | null;
-  /** Whether this connected account has been verified */
-  isVerified?: boolean | null;
+  /** Base64url-encoded credential ID returned by the authenticator. Globally unique per WebAuthn spec. */
+  credentialId?: string | null;
+  /** COSE-encoded public key bytes from the authenticator attestation. */
+  publicKey?: Base64EncodedBinary | null;
+  /** Monotonic signature counter. Strict-increase check during sign-in detects cloned credentials. 0 means the authenticator does not implement a counter. */
+  signCount?: string | null;
+  /** Random per-user handle sent to authenticators as user.id. Privacy-preserving; NOT the internal user UUID. */
+  webauthnUserId?: string | null;
+  /** Authenticator transport hints (e.g. usb, nfc, ble, internal, hybrid). Used to hint browser UI during sign-in. */
+  transports?: string[] | null;
+  /** Either 'singleDevice' (hardware-bound) or 'multiDevice' (synced passkey). Enforced by CHECK constraint below. */
+  credentialDeviceType?: string | null;
+  /** Whether this credential is eligible for backup (syncing) per the authenticator's flags at registration. */
+  backupEligible?: boolean | null;
+  /** Current backup state; updated on each successful sign-in assertion. */
+  backupState?: boolean | null;
+  /** User-provided label for this credential (e.g. "YubiKey 5C", "iPhone 15"). Renamed via rename_passkey. */
+  name?: string | null;
+  /** Timestamp of the most recent successful sign-in assertion using this credential. */
+  lastUsedAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -309,9 +328,26 @@ export interface AuditLog {
   /** Timestamp when the audit event was recorded */
   createdAt?: string | null;
 }
+export interface IdentityProvider {
+  slug?: string | null;
+  kind?: string | null;
+  displayName?: string | null;
+  enabled?: boolean | null;
+  isBuiltIn?: boolean | null;
+}
 export interface RoleType {
   id: number;
   name?: string | null;
+}
+export interface UserConnectedAccount {
+  id: string;
+  ownerId?: string | null;
+  service?: string | null;
+  identifier?: string | null;
+  details?: Record<string, unknown> | null;
+  isVerified?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 export interface User {
   id: string;
@@ -351,28 +387,33 @@ export interface PhoneNumberRelations {
 export interface CryptoAddressRelations {
   owner?: User | null;
 }
-export interface ConnectedAccountRelations {
+export interface WebauthnCredentialRelations {
   owner?: User | null;
 }
 export interface AuditLogRelations {
   actor?: User | null;
 }
+export interface IdentityProviderRelations {}
 export interface RoleTypeRelations {}
+export interface UserConnectedAccountRelations {}
 export interface UserRelations {
   roleType?: RoleType | null;
   ownedEmails?: ConnectionResult<Email>;
   ownedPhoneNumbers?: ConnectionResult<PhoneNumber>;
   ownedCryptoAddresses?: ConnectionResult<CryptoAddress>;
-  ownedConnectedAccounts?: ConnectionResult<ConnectedAccount>;
+  ownedWebauthnCredentials?: ConnectionResult<WebauthnCredential>;
   auditLogsByActorId?: ConnectionResult<AuditLog>;
 }
 // ============ Entity Types With Relations ============
 export type EmailWithRelations = Email & EmailRelations;
 export type PhoneNumberWithRelations = PhoneNumber & PhoneNumberRelations;
 export type CryptoAddressWithRelations = CryptoAddress & CryptoAddressRelations;
-export type ConnectedAccountWithRelations = ConnectedAccount & ConnectedAccountRelations;
+export type WebauthnCredentialWithRelations = WebauthnCredential & WebauthnCredentialRelations;
 export type AuditLogWithRelations = AuditLog & AuditLogRelations;
+export type IdentityProviderWithRelations = IdentityProvider & IdentityProviderRelations;
 export type RoleTypeWithRelations = RoleType & RoleTypeRelations;
+export type UserConnectedAccountWithRelations = UserConnectedAccount &
+  UserConnectedAccountRelations;
 export type UserWithRelations = User & UserRelations;
 // ============ Entity Select Types ============
 export type EmailSelect = {
@@ -381,6 +422,7 @@ export type EmailSelect = {
   email?: boolean;
   isVerified?: boolean;
   isPrimary?: boolean;
+  name?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   owner?: {
@@ -394,6 +436,7 @@ export type PhoneNumberSelect = {
   number?: boolean;
   isVerified?: boolean;
   isPrimary?: boolean;
+  name?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   owner?: {
@@ -406,19 +449,26 @@ export type CryptoAddressSelect = {
   address?: boolean;
   isVerified?: boolean;
   isPrimary?: boolean;
+  name?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   owner?: {
     select: UserSelect;
   };
 };
-export type ConnectedAccountSelect = {
+export type WebauthnCredentialSelect = {
   id?: boolean;
   ownerId?: boolean;
-  service?: boolean;
-  identifier?: boolean;
-  details?: boolean;
-  isVerified?: boolean;
+  credentialId?: boolean;
+  publicKey?: boolean;
+  signCount?: boolean;
+  webauthnUserId?: boolean;
+  transports?: boolean;
+  credentialDeviceType?: boolean;
+  backupEligible?: boolean;
+  backupState?: boolean;
+  name?: boolean;
+  lastUsedAt?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
   owner?: {
@@ -438,9 +488,26 @@ export type AuditLogSelect = {
     select: UserSelect;
   };
 };
+export type IdentityProviderSelect = {
+  slug?: boolean;
+  kind?: boolean;
+  displayName?: boolean;
+  enabled?: boolean;
+  isBuiltIn?: boolean;
+};
 export type RoleTypeSelect = {
   id?: boolean;
   name?: boolean;
+};
+export type UserConnectedAccountSelect = {
+  id?: boolean;
+  ownerId?: boolean;
+  service?: boolean;
+  identifier?: boolean;
+  details?: boolean;
+  isVerified?: boolean;
+  createdAt?: boolean;
+  updatedAt?: boolean;
 };
 export type UserSelect = {
   id?: boolean;
@@ -475,11 +542,11 @@ export type UserSelect = {
     filter?: CryptoAddressFilter;
     orderBy?: CryptoAddressOrderBy[];
   };
-  ownedConnectedAccounts?: {
-    select: ConnectedAccountSelect;
+  ownedWebauthnCredentials?: {
+    select: WebauthnCredentialSelect;
     first?: number;
-    filter?: ConnectedAccountFilter;
-    orderBy?: ConnectedAccountOrderBy[];
+    filter?: WebauthnCredentialFilter;
+    orderBy?: WebauthnCredentialOrderBy[];
   };
   auditLogsByActorId?: {
     select: AuditLogSelect;
@@ -500,6 +567,8 @@ export interface EmailFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -526,6 +595,8 @@ export interface PhoneNumberFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -550,6 +621,8 @@ export interface CryptoAddressFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -563,29 +636,41 @@ export interface CryptoAddressFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-export interface ConnectedAccountFilter {
+export interface WebauthnCredentialFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
-  /** Filter by the object’s `service` field. */
-  service?: StringFilter;
-  /** Filter by the object’s `identifier` field. */
-  identifier?: StringFilter;
-  /** Filter by the object’s `details` field. */
-  details?: JSONFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
+  /** Filter by the object’s `credentialId` field. */
+  credentialId?: StringFilter;
+  /** Filter by the object’s `publicKey` field. */
+  publicKey?: Base64EncodedBinaryFilter;
+  /** Filter by the object’s `signCount` field. */
+  signCount?: BigIntFilter;
+  /** Filter by the object’s `webauthnUserId` field. */
+  webauthnUserId?: StringFilter;
+  /** Filter by the object’s `transports` field. */
+  transports?: StringListFilter;
+  /** Filter by the object’s `credentialDeviceType` field. */
+  credentialDeviceType?: StringFilter;
+  /** Filter by the object’s `backupEligible` field. */
+  backupEligible?: BooleanFilter;
+  /** Filter by the object’s `backupState` field. */
+  backupState?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `lastUsedAt` field. */
+  lastUsedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: ConnectedAccountFilter[];
+  and?: WebauthnCredentialFilter[];
   /** Checks for any expressions in this list. */
-  or?: ConnectedAccountFilter[];
+  or?: WebauthnCredentialFilter[];
   /** Negates the expression. */
-  not?: ConnectedAccountFilter;
+  not?: WebauthnCredentialFilter;
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
@@ -617,6 +702,24 @@ export interface AuditLogFilter {
   /** A related `actor` exists. */
   actorExists?: boolean;
 }
+export interface IdentityProviderFilter {
+  /** Filter by the object’s `slug` field. */
+  slug?: StringFilter;
+  /** Filter by the object’s `kind` field. */
+  kind?: StringFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `enabled` field. */
+  enabled?: BooleanFilter;
+  /** Filter by the object’s `isBuiltIn` field. */
+  isBuiltIn?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: IdentityProviderFilter[];
+  /** Checks for any expressions in this list. */
+  or?: IdentityProviderFilter[];
+  /** Negates the expression. */
+  not?: IdentityProviderFilter;
+}
 export interface RoleTypeFilter {
   /** Filter by the object’s `id` field. */
   id?: IntFilter;
@@ -628,6 +731,30 @@ export interface RoleTypeFilter {
   or?: RoleTypeFilter[];
   /** Negates the expression. */
   not?: RoleTypeFilter;
+}
+export interface UserConnectedAccountFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `service` field. */
+  service?: StringFilter;
+  /** Filter by the object’s `identifier` field. */
+  identifier?: StringFilter;
+  /** Filter by the object’s `details` field. */
+  details?: JSONFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserConnectedAccountFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserConnectedAccountFilter[];
+  /** Negates the expression. */
+  not?: UserConnectedAccountFilter;
 }
 export interface UserFilter {
   /** Filter by the object’s `id` field. */
@@ -666,10 +793,10 @@ export interface UserFilter {
   ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
   /** `ownedCryptoAddresses` exist. */
   ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedConnectedAccounts` relation. */
-  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
-  /** `ownedConnectedAccounts` exist. */
-  ownedConnectedAccountsExist?: boolean;
+  /** Filter by the object’s `ownedWebauthnCredentials` relation. */
+  ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
+  /** `ownedWebauthnCredentials` exist. */
+  ownedWebauthnCredentialsExist?: boolean;
   /** Filter by the object’s `auditLogsByActorId` relation. */
   auditLogsByActorId?: UserToManyAuditLogFilter;
   /** `auditLogsByActorId` exist. */
@@ -701,6 +828,8 @@ export type EmailOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_PRIMARY_ASC'
   | 'IS_PRIMARY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -721,6 +850,8 @@ export type PhoneNumberOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_PRIMARY_ASC'
   | 'IS_PRIMARY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -739,11 +870,13 @@ export type CryptoAddressOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_PRIMARY_ASC'
   | 'IS_PRIMARY_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-export type ConnectedAccountOrderBy =
+export type WebauthnCredentialOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -751,14 +884,26 @@ export type ConnectedAccountOrderBy =
   | 'ID_DESC'
   | 'OWNER_ID_ASC'
   | 'OWNER_ID_DESC'
-  | 'SERVICE_ASC'
-  | 'SERVICE_DESC'
-  | 'IDENTIFIER_ASC'
-  | 'IDENTIFIER_DESC'
-  | 'DETAILS_ASC'
-  | 'DETAILS_DESC'
-  | 'IS_VERIFIED_ASC'
-  | 'IS_VERIFIED_DESC'
+  | 'CREDENTIAL_ID_ASC'
+  | 'CREDENTIAL_ID_DESC'
+  | 'PUBLIC_KEY_ASC'
+  | 'PUBLIC_KEY_DESC'
+  | 'SIGN_COUNT_ASC'
+  | 'SIGN_COUNT_DESC'
+  | 'WEBAUTHN_USER_ID_ASC'
+  | 'WEBAUTHN_USER_ID_DESC'
+  | 'TRANSPORTS_ASC'
+  | 'TRANSPORTS_DESC'
+  | 'CREDENTIAL_DEVICE_TYPE_ASC'
+  | 'CREDENTIAL_DEVICE_TYPE_DESC'
+  | 'BACKUP_ELIGIBLE_ASC'
+  | 'BACKUP_ELIGIBLE_DESC'
+  | 'BACKUP_STATE_ASC'
+  | 'BACKUP_STATE_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'LAST_USED_AT_ASC'
+  | 'LAST_USED_AT_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
@@ -783,6 +928,18 @@ export type AuditLogOrderBy =
   | 'SUCCESS_DESC'
   | 'CREATED_AT_ASC'
   | 'CREATED_AT_DESC';
+export type IdentityProviderOrderBy =
+  | 'NATURAL'
+  | 'SLUG_ASC'
+  | 'SLUG_DESC'
+  | 'KIND_ASC'
+  | 'KIND_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'ENABLED_ASC'
+  | 'ENABLED_DESC'
+  | 'IS_BUILT_IN_ASC'
+  | 'IS_BUILT_IN_DESC';
 export type RoleTypeOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -791,6 +948,24 @@ export type RoleTypeOrderBy =
   | 'ID_DESC'
   | 'NAME_ASC'
   | 'NAME_DESC';
+export type UserConnectedAccountOrderBy =
+  | 'NATURAL'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'OWNER_ID_ASC'
+  | 'OWNER_ID_DESC'
+  | 'SERVICE_ASC'
+  | 'SERVICE_DESC'
+  | 'IDENTIFIER_ASC'
+  | 'IDENTIFIER_DESC'
+  | 'DETAILS_ASC'
+  | 'DETAILS_DESC'
+  | 'IS_VERIFIED_ASC'
+  | 'IS_VERIFIED_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC';
 export type UserOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -825,6 +1000,7 @@ export interface CreateEmailInput {
     email: ConstructiveInternalTypeEmail;
     isVerified?: boolean;
     isPrimary?: boolean;
+    name?: string;
   };
 }
 export interface EmailPatch {
@@ -832,6 +1008,7 @@ export interface EmailPatch {
   email?: ConstructiveInternalTypeEmail | null;
   isVerified?: boolean | null;
   isPrimary?: boolean | null;
+  name?: string | null;
 }
 export interface UpdateEmailInput {
   clientMutationId?: string;
@@ -850,6 +1027,7 @@ export interface CreatePhoneNumberInput {
     number: string;
     isVerified?: boolean;
     isPrimary?: boolean;
+    name?: string;
   };
 }
 export interface PhoneNumberPatch {
@@ -858,6 +1036,7 @@ export interface PhoneNumberPatch {
   number?: string | null;
   isVerified?: boolean | null;
   isPrimary?: boolean | null;
+  name?: string | null;
 }
 export interface UpdatePhoneNumberInput {
   clientMutationId?: string;
@@ -875,6 +1054,7 @@ export interface CreateCryptoAddressInput {
     address: string;
     isVerified?: boolean;
     isPrimary?: boolean;
+    name?: string;
   };
 }
 export interface CryptoAddressPatch {
@@ -882,6 +1062,7 @@ export interface CryptoAddressPatch {
   address?: string | null;
   isVerified?: boolean | null;
   isPrimary?: boolean | null;
+  name?: string | null;
 }
 export interface UpdateCryptoAddressInput {
   clientMutationId?: string;
@@ -892,29 +1073,41 @@ export interface DeleteCryptoAddressInput {
   clientMutationId?: string;
   id: string;
 }
-export interface CreateConnectedAccountInput {
+export interface CreateWebauthnCredentialInput {
   clientMutationId?: string;
-  connectedAccount: {
+  webauthnCredential: {
     ownerId?: string;
-    service: string;
-    identifier: string;
-    details: Record<string, unknown>;
-    isVerified?: boolean;
+    credentialId: string;
+    publicKey: Base64EncodedBinary;
+    signCount?: string;
+    webauthnUserId: string;
+    transports?: string[];
+    credentialDeviceType: string;
+    backupEligible?: boolean;
+    backupState?: boolean;
+    name?: string;
+    lastUsedAt?: string;
   };
 }
-export interface ConnectedAccountPatch {
+export interface WebauthnCredentialPatch {
   ownerId?: string | null;
-  service?: string | null;
-  identifier?: string | null;
-  details?: Record<string, unknown> | null;
-  isVerified?: boolean | null;
+  credentialId?: string | null;
+  publicKey?: Base64EncodedBinary | null;
+  signCount?: string | null;
+  webauthnUserId?: string | null;
+  transports?: string[] | null;
+  credentialDeviceType?: string | null;
+  backupEligible?: boolean | null;
+  backupState?: boolean | null;
+  name?: string | null;
+  lastUsedAt?: string | null;
 }
-export interface UpdateConnectedAccountInput {
+export interface UpdateWebauthnCredentialInput {
   clientMutationId?: string;
   id: string;
-  connectedAccountPatch: ConnectedAccountPatch;
+  webauthnCredentialPatch: WebauthnCredentialPatch;
 }
-export interface DeleteConnectedAccountInput {
+export interface DeleteWebauthnCredentialInput {
   clientMutationId?: string;
   id: string;
 }
@@ -946,6 +1139,32 @@ export interface DeleteAuditLogInput {
   clientMutationId?: string;
   id: string;
 }
+export interface CreateIdentityProviderInput {
+  clientMutationId?: string;
+  identityProvider: {
+    slug?: string;
+    kind?: string;
+    displayName?: string;
+    enabled?: boolean;
+    isBuiltIn?: boolean;
+  };
+}
+export interface IdentityProviderPatch {
+  slug?: string | null;
+  kind?: string | null;
+  displayName?: string | null;
+  enabled?: boolean | null;
+  isBuiltIn?: boolean | null;
+}
+export interface UpdateIdentityProviderInput {
+  clientMutationId?: string;
+  id: string;
+  identityProviderPatch: IdentityProviderPatch;
+}
+export interface DeleteIdentityProviderInput {
+  clientMutationId?: string;
+  id: string;
+}
 export interface CreateRoleTypeInput {
   clientMutationId?: string;
   roleType: {
@@ -963,6 +1182,32 @@ export interface UpdateRoleTypeInput {
 export interface DeleteRoleTypeInput {
   clientMutationId?: string;
   id: number;
+}
+export interface CreateUserConnectedAccountInput {
+  clientMutationId?: string;
+  userConnectedAccount: {
+    ownerId?: string;
+    service?: string;
+    identifier?: string;
+    details?: Record<string, unknown>;
+    isVerified?: boolean;
+  };
+}
+export interface UserConnectedAccountPatch {
+  ownerId?: string | null;
+  service?: string | null;
+  identifier?: string | null;
+  details?: Record<string, unknown> | null;
+  isVerified?: boolean | null;
+}
+export interface UpdateUserConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
+  userConnectedAccountPatch: UserConnectedAccountPatch;
+}
+export interface DeleteUserConnectedAccountInput {
+  clientMutationId?: string;
+  id: string;
 }
 export interface CreateUserInput {
   clientMutationId?: string;
@@ -995,7 +1240,7 @@ export const connectionFieldsMap = {
     ownedEmails: 'Email',
     ownedPhoneNumbers: 'PhoneNumber',
     ownedCryptoAddresses: 'CryptoAddress',
-    ownedConnectedAccounts: 'ConnectedAccount',
+    ownedWebauthnCredentials: 'WebauthnCredential',
     auditLogsByActorId: 'AuditLog',
   },
 } as Record<string, Record<string, string>>;
@@ -1009,6 +1254,26 @@ export interface SendAccountDeletionEmailInput {
 export interface CheckPasswordInput {
   clientMutationId?: string;
   password?: string;
+}
+export interface DisconnectAccountInput {
+  clientMutationId?: string;
+  accountId: string;
+}
+export interface RevokeApiKeyInput {
+  clientMutationId?: string;
+  keyId: string;
+}
+export interface RevokeSessionInput {
+  clientMutationId?: string;
+  sessionId: string;
+}
+export interface VerifyPasswordInput {
+  clientMutationId?: string;
+  password: string;
+}
+export interface VerifyTotpInput {
+  clientMutationId?: string;
+  totpValue: string;
 }
 export interface ConfirmDeleteAccountInput {
   clientMutationId?: string;
@@ -1025,24 +1290,21 @@ export interface VerifyEmailInput {
   emailId?: string;
   token?: string;
 }
+export interface ProvisionNewUserInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+}
 export interface ResetPasswordInput {
   clientMutationId?: string;
   roleId?: string;
   resetToken?: string;
   newPassword?: string;
 }
-export interface SignInOneTimeTokenInput {
+export interface SignInCrossOriginInput {
   clientMutationId?: string;
   token?: string;
   credentialKind?: string;
-}
-export interface SignInInput {
-  clientMutationId?: string;
-  email?: string;
-  password?: string;
-  rememberMe?: boolean;
-  credentialKind?: string;
-  csrfToken?: string;
 }
 export interface SignUpInput {
   clientMutationId?: string;
@@ -1052,16 +1314,32 @@ export interface SignUpInput {
   credentialKind?: string;
   csrfToken?: string;
 }
-export interface OneTimeTokenInput {
+export interface RequestCrossOriginTokenInput {
   clientMutationId?: string;
   email?: string;
   password?: string;
   origin?: ConstructiveInternalTypeOrigin;
   rememberMe?: boolean;
 }
+export interface SignInInput {
+  clientMutationId?: string;
+  email?: string;
+  password?: string;
+  rememberMe?: boolean;
+  credentialKind?: string;
+  csrfToken?: string;
+  deviceToken?: string;
+}
 export interface ExtendTokenExpiresInput {
   clientMutationId?: string;
   amount?: IntervalInput;
+}
+export interface CreateApiKeyInput {
+  clientMutationId?: string;
+  keyName?: string;
+  accessLevel?: string;
+  mfaLevel?: string;
+  expiresIn?: IntervalInput;
 }
 export interface ForgotPasswordInput {
   clientMutationId?: string;
@@ -1071,17 +1349,16 @@ export interface SendVerificationEmailInput {
   clientMutationId?: string;
   email?: ConstructiveInternalTypeEmail;
 }
-export interface VerifyPasswordInput {
-  clientMutationId?: string;
-  password: string;
-}
-export interface VerifyTotpInput {
-  clientMutationId?: string;
-  totpValue: string;
-}
 export interface RequestUploadUrlInput {
   /** Bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped uploads.
+   * Omit for app-level (database-wide) storage.
+   * When provided, resolves the storage module for the entity type
+   * that owns this entity instance (e.g., a data room ID, team ID).
+   */
+  ownerId?: string;
   /** SHA-256 content hash computed by the client (hex-encoded, 64 chars) */
   contentHash: string;
   /** MIME type of the file (e.g., "image/png") */
@@ -1098,6 +1375,11 @@ export interface ConfirmUploadInput {
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped bucket provisioning.
+   * Omit for app-level (database-wide) storage.
+   */
+  ownerId?: string;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -1175,6 +1457,23 @@ export interface ConstructiveInternalTypeEmailFilter {
   greaterThanInsensitive?: ConstructiveInternalTypeEmail;
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
+}
+/** A filter to be used against Base64EncodedBinary fields. All fields are combined with a logical ‘and.’ */
+export interface Base64EncodedBinaryFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: Base64EncodedBinary;
+  /** Not equal to the specified value. */
+  notEqualTo?: Base64EncodedBinary;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: Base64EncodedBinary;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: Base64EncodedBinary;
+  /** Included in the specified list. */
+  in?: Base64EncodedBinary[];
+  /** Not included in the specified list. */
+  notIn?: Base64EncodedBinary[];
 }
 /** A filter to be used against ConstructiveInternalTypeOrigin fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeOriginFilter {
@@ -1396,14 +1695,14 @@ export interface UserToManyCryptoAddressFilter {
   /** Filters to entities where no related entity matches. */
   none?: CryptoAddressFilter;
 }
-/** A filter to be used against many `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
-export interface UserToManyConnectedAccountFilter {
+/** A filter to be used against many `WebauthnCredential` object types. All fields are combined with a logical ‘and.’ */
+export interface UserToManyWebauthnCredentialFilter {
   /** Filters to entities where at least one related entity matches. */
-  some?: ConnectedAccountFilter;
+  some?: WebauthnCredentialFilter;
   /** Filters to entities where every related entity matches. */
-  every?: ConnectedAccountFilter;
+  every?: WebauthnCredentialFilter;
   /** Filters to entities where no related entity matches. */
-  none?: ConnectedAccountFilter;
+  none?: WebauthnCredentialFilter;
 }
 /** A filter to be used against many `AuditLog` object types. All fields are combined with a logical ‘and.’ */
 export interface UserToManyAuditLogFilter {
@@ -1452,6 +1751,8 @@ export interface EmailFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -1479,6 +1780,8 @@ export interface PhoneNumberFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -1504,6 +1807,8 @@ export interface CryptoAddressFilter {
   isVerified?: BooleanFilter;
   /** Filter by the object’s `isPrimary` field. */
   isPrimary?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
@@ -1517,30 +1822,42 @@ export interface CryptoAddressFilter {
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
-/** A filter to be used against `ConnectedAccount` object types. All fields are combined with a logical ‘and.’ */
-export interface ConnectedAccountFilter {
+/** A filter to be used against `WebauthnCredential` object types. All fields are combined with a logical ‘and.’ */
+export interface WebauthnCredentialFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `ownerId` field. */
   ownerId?: UUIDFilter;
-  /** Filter by the object’s `service` field. */
-  service?: StringFilter;
-  /** Filter by the object’s `identifier` field. */
-  identifier?: StringFilter;
-  /** Filter by the object’s `details` field. */
-  details?: JSONFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
+  /** Filter by the object’s `credentialId` field. */
+  credentialId?: StringFilter;
+  /** Filter by the object’s `publicKey` field. */
+  publicKey?: Base64EncodedBinaryFilter;
+  /** Filter by the object’s `signCount` field. */
+  signCount?: BigIntFilter;
+  /** Filter by the object’s `webauthnUserId` field. */
+  webauthnUserId?: StringFilter;
+  /** Filter by the object’s `transports` field. */
+  transports?: StringListFilter;
+  /** Filter by the object’s `credentialDeviceType` field. */
+  credentialDeviceType?: StringFilter;
+  /** Filter by the object’s `backupEligible` field. */
+  backupEligible?: BooleanFilter;
+  /** Filter by the object’s `backupState` field. */
+  backupState?: BooleanFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `lastUsedAt` field. */
+  lastUsedAt?: DatetimeFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: ConnectedAccountFilter[];
+  and?: WebauthnCredentialFilter[];
   /** Checks for any expressions in this list. */
-  or?: ConnectedAccountFilter[];
+  or?: WebauthnCredentialFilter[];
   /** Negates the expression. */
-  not?: ConnectedAccountFilter;
+  not?: WebauthnCredentialFilter;
   /** Filter by the object’s `owner` relation. */
   owner?: UserFilter;
 }
@@ -1623,89 +1940,6 @@ export interface BooleanFilter {
   /** Greater than or equal to the specified value. */
   greaterThanOrEqualTo?: boolean;
 }
-/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
-export interface DatetimeFilter {
-  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
-  isNull?: boolean;
-  /** Equal to the specified value. */
-  equalTo?: string;
-  /** Not equal to the specified value. */
-  notEqualTo?: string;
-  /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: string;
-  /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: string;
-  /** Included in the specified list. */
-  in?: string[];
-  /** Not included in the specified list. */
-  notIn?: string[];
-  /** Less than the specified value. */
-  lessThan?: string;
-  /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: string;
-  /** Greater than the specified value. */
-  greaterThan?: string;
-  /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: string;
-}
-/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
-export interface UserFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `username` field. */
-  username?: StringTrgmFilter;
-  /** Filter by the object’s `displayName` field. */
-  displayName?: StringTrgmFilter;
-  /** Filter by the object’s `profilePicture` field. */
-  profilePicture?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `searchTsv` field. */
-  searchTsv?: FullTextFilter;
-  /** Filter by the object’s `type` field. */
-  type?: IntFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: UserFilter[];
-  /** Checks for any expressions in this list. */
-  or?: UserFilter[];
-  /** Negates the expression. */
-  not?: UserFilter;
-  /** Filter by the object’s `roleType` relation. */
-  roleType?: RoleTypeFilter;
-  /** Filter by the object’s `ownedEmails` relation. */
-  ownedEmails?: UserToManyEmailFilter;
-  /** `ownedEmails` exist. */
-  ownedEmailsExist?: boolean;
-  /** Filter by the object’s `ownedPhoneNumbers` relation. */
-  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
-  /** `ownedPhoneNumbers` exist. */
-  ownedPhoneNumbersExist?: boolean;
-  /** Filter by the object’s `ownedCryptoAddresses` relation. */
-  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
-  /** `ownedCryptoAddresses` exist. */
-  ownedCryptoAddressesExist?: boolean;
-  /** Filter by the object’s `ownedConnectedAccounts` relation. */
-  ownedConnectedAccounts?: UserToManyConnectedAccountFilter;
-  /** `ownedConnectedAccounts` exist. */
-  ownedConnectedAccountsExist?: boolean;
-  /** Filter by the object’s `auditLogsByActorId` relation. */
-  auditLogsByActorId?: UserToManyAuditLogFilter;
-  /** `auditLogsByActorId` exist. */
-  auditLogsByActorIdExist?: boolean;
-  /** TSV search on the `search_tsv` column. */
-  tsvSearchTsv?: string;
-  /** TRGM search on the `display_name` column. */
-  trgmDisplayName?: TrgmSearchInput;
-  /**
-   * Composite unified search. Provide a search string and it will be dispatched to
-   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
-   * simultaneously. Rows matching ANY algorithm are returned. All matching score
-   * fields are populated.
-   */
-  unifiedSearch?: string;
-}
 /** A filter to be used against String fields. All fields are combined with a logical ‘and.’ */
 export interface StringFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
@@ -1783,40 +2017,152 @@ export interface StringFilter {
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: string;
 }
-/** A filter to be used against JSON fields. All fields are combined with a logical ‘and.’ */
-export interface JSONFilter {
+/** A filter to be used against Datetime fields. All fields are combined with a logical ‘and.’ */
+export interface DatetimeFilter {
   /** Is null (if `true` is specified) or is not null (if `false` is specified). */
   isNull?: boolean;
   /** Equal to the specified value. */
-  equalTo?: Record<string, unknown>;
+  equalTo?: string;
   /** Not equal to the specified value. */
-  notEqualTo?: Record<string, unknown>;
+  notEqualTo?: string;
   /** Not equal to the specified value, treating null like an ordinary value. */
-  distinctFrom?: Record<string, unknown>;
+  distinctFrom?: string;
   /** Equal to the specified value, treating null like an ordinary value. */
-  notDistinctFrom?: Record<string, unknown>;
+  notDistinctFrom?: string;
   /** Included in the specified list. */
-  in?: Record<string, unknown>[];
+  in?: string[];
   /** Not included in the specified list. */
-  notIn?: Record<string, unknown>[];
+  notIn?: string[];
   /** Less than the specified value. */
-  lessThan?: Record<string, unknown>;
+  lessThan?: string;
   /** Less than or equal to the specified value. */
-  lessThanOrEqualTo?: Record<string, unknown>;
+  lessThanOrEqualTo?: string;
   /** Greater than the specified value. */
-  greaterThan?: Record<string, unknown>;
+  greaterThan?: string;
   /** Greater than or equal to the specified value. */
-  greaterThanOrEqualTo?: Record<string, unknown>;
-  /** Contains the specified JSON. */
-  contains?: Record<string, unknown>;
-  /** Contains the specified key. */
-  containsKey?: string;
-  /** Contains all of the specified keys. */
-  containsAllKeys?: string[];
-  /** Contains any of the specified keys. */
-  containsAnyKeys?: string[];
-  /** Contained by the specified JSON. */
-  containedBy?: Record<string, unknown>;
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against `User` object types. All fields are combined with a logical ‘and.’ */
+export interface UserFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `username` field. */
+  username?: StringTrgmFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringTrgmFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `searchTsv` field. */
+  searchTsv?: FullTextFilter;
+  /** Filter by the object’s `type` field. */
+  type?: IntFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: UserFilter[];
+  /** Checks for any expressions in this list. */
+  or?: UserFilter[];
+  /** Negates the expression. */
+  not?: UserFilter;
+  /** Filter by the object’s `roleType` relation. */
+  roleType?: RoleTypeFilter;
+  /** Filter by the object’s `ownedEmails` relation. */
+  ownedEmails?: UserToManyEmailFilter;
+  /** `ownedEmails` exist. */
+  ownedEmailsExist?: boolean;
+  /** Filter by the object’s `ownedPhoneNumbers` relation. */
+  ownedPhoneNumbers?: UserToManyPhoneNumberFilter;
+  /** `ownedPhoneNumbers` exist. */
+  ownedPhoneNumbersExist?: boolean;
+  /** Filter by the object’s `ownedCryptoAddresses` relation. */
+  ownedCryptoAddresses?: UserToManyCryptoAddressFilter;
+  /** `ownedCryptoAddresses` exist. */
+  ownedCryptoAddressesExist?: boolean;
+  /** Filter by the object’s `ownedWebauthnCredentials` relation. */
+  ownedWebauthnCredentials?: UserToManyWebauthnCredentialFilter;
+  /** `ownedWebauthnCredentials` exist. */
+  ownedWebauthnCredentialsExist?: boolean;
+  /** Filter by the object’s `auditLogsByActorId` relation. */
+  auditLogsByActorId?: UserToManyAuditLogFilter;
+  /** `auditLogsByActorId` exist. */
+  auditLogsByActorIdExist?: boolean;
+  /** TSV search on the `search_tsv` column. */
+  tsvSearchTsv?: string;
+  /** TRGM search on the `display_name` column. */
+  trgmDisplayName?: TrgmSearchInput;
+  /**
+   * Composite unified search. Provide a search string and it will be dispatched to
+   * all text-compatible search algorithms (tsvector, BM25, pg_trgm)
+   * simultaneously. Rows matching ANY algorithm are returned. All matching score
+   * fields are populated.
+   */
+  unifiedSearch?: string;
+}
+/** A filter to be used against BigInt fields. All fields are combined with a logical ‘and.’ */
+export interface BigIntFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string;
+  /** Not equal to the specified value. */
+  notEqualTo?: string;
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string;
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string;
+  /** Included in the specified list. */
+  in?: string[];
+  /** Not included in the specified list. */
+  notIn?: string[];
+  /** Less than the specified value. */
+  lessThan?: string;
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string;
+  /** Greater than the specified value. */
+  greaterThan?: string;
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string;
+}
+/** A filter to be used against String List fields. All fields are combined with a logical ‘and.’ */
+export interface StringListFilter {
+  /** Is null (if `true` is specified) or is not null (if `false` is specified). */
+  isNull?: boolean;
+  /** Equal to the specified value. */
+  equalTo?: string[];
+  /** Not equal to the specified value. */
+  notEqualTo?: string[];
+  /** Not equal to the specified value, treating null like an ordinary value. */
+  distinctFrom?: string[];
+  /** Equal to the specified value, treating null like an ordinary value. */
+  notDistinctFrom?: string[];
+  /** Less than the specified value. */
+  lessThan?: string[];
+  /** Less than or equal to the specified value. */
+  lessThanOrEqualTo?: string[];
+  /** Greater than the specified value. */
+  greaterThan?: string[];
+  /** Greater than or equal to the specified value. */
+  greaterThanOrEqualTo?: string[];
+  /** Contains the specified list of values. */
+  contains?: string[];
+  /** Contained by the specified list of values. */
+  containedBy?: string[];
+  /** Overlaps the specified list of values. */
+  overlaps?: string[];
+  /** Any array item is equal to the specified value. */
+  anyEqualTo?: string;
+  /** Any array item is not equal to the specified value. */
+  anyNotEqualTo?: string;
+  /** Any array item is less than the specified value. */
+  anyLessThan?: string;
+  /** Any array item is less than or equal to the specified value. */
+  anyLessThanOrEqualTo?: string;
+  /** Any array item is greater than the specified value. */
+  anyGreaterThan?: string;
+  /** Any array item is greater than or equal to the specified value. */
+  anyGreaterThanOrEqualTo?: string;
 }
 /** A filter to be used against InternetAddress fields. All fields are combined with a logical ‘and.’ */
 export interface InternetAddressFilter {
@@ -1931,6 +2277,46 @@ export interface CheckPasswordPayload {
 export type CheckPasswordPayloadSelect = {
   clientMutationId?: boolean;
 };
+export interface DisconnectAccountPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type DisconnectAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RevokeApiKeyPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RevokeApiKeyPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface RevokeSessionPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type RevokeSessionPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface VerifyPasswordPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type VerifyPasswordPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
+export interface VerifyTotpPayload {
+  clientMutationId?: string | null;
+  result?: boolean | null;
+}
+export type VerifyTotpPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ConfirmDeleteAccountPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -1955,6 +2341,14 @@ export type VerifyEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
+export interface ProvisionNewUserPayload {
+  clientMutationId?: string | null;
+  result?: string | null;
+}
+export type ProvisionNewUserPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: boolean;
+};
 export interface ResetPasswordPayload {
   clientMutationId?: string | null;
   result?: boolean | null;
@@ -1963,24 +2357,14 @@ export type ResetPasswordPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
 };
-export interface SignInOneTimeTokenPayload {
+export interface SignInCrossOriginPayload {
   clientMutationId?: string | null;
-  result?: SignInOneTimeTokenRecord | null;
+  result?: SignInCrossOriginRecord | null;
 }
-export type SignInOneTimeTokenPayloadSelect = {
+export type SignInCrossOriginPayloadSelect = {
   clientMutationId?: boolean;
   result?: {
-    select: SignInOneTimeTokenRecordSelect;
-  };
-};
-export interface SignInPayload {
-  clientMutationId?: string | null;
-  result?: SignInRecord | null;
-}
-export type SignInPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: SignInRecordSelect;
+    select: SignInCrossOriginRecordSelect;
   };
 };
 export interface SignUpPayload {
@@ -1993,13 +2377,23 @@ export type SignUpPayloadSelect = {
     select: SignUpRecordSelect;
   };
 };
-export interface OneTimeTokenPayload {
+export interface RequestCrossOriginTokenPayload {
   clientMutationId?: string | null;
   result?: string | null;
 }
-export type OneTimeTokenPayloadSelect = {
+export type RequestCrossOriginTokenPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
+};
+export interface SignInPayload {
+  clientMutationId?: string | null;
+  result?: SignInRecord | null;
+}
+export type SignInPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: SignInRecordSelect;
+  };
 };
 export interface ExtendTokenExpiresPayload {
   clientMutationId?: string | null;
@@ -2009,6 +2403,16 @@ export type ExtendTokenExpiresPayloadSelect = {
   clientMutationId?: boolean;
   result?: {
     select: ExtendTokenExpiresRecordSelect;
+  };
+};
+export interface CreateApiKeyPayload {
+  clientMutationId?: string | null;
+  result?: CreateApiKeyRecord | null;
+}
+export type CreateApiKeyPayloadSelect = {
+  clientMutationId?: boolean;
+  result?: {
+    select: CreateApiKeyRecordSelect;
   };
 };
 export interface ForgotPasswordPayload {
@@ -2024,26 +2428,6 @@ export interface SendVerificationEmailPayload {
 export type SendVerificationEmailPayloadSelect = {
   clientMutationId?: boolean;
   result?: boolean;
-};
-export interface VerifyPasswordPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
-}
-export type VerifyPasswordPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: SessionSelect;
-  };
-};
-export interface VerifyTotpPayload {
-  clientMutationId?: string | null;
-  result?: Session | null;
-}
-export type VerifyTotpPayloadSelect = {
-  clientMutationId?: boolean;
-  result?: {
-    select: SessionSelect;
-  };
 };
 export interface RequestUploadUrlPayload {
   /** Presigned PUT URL (null if file was deduplicated) */
@@ -2234,49 +2618,49 @@ export type DeleteCryptoAddressPayloadSelect = {
     select: CryptoAddressEdgeSelect;
   };
 };
-export interface CreateConnectedAccountPayload {
+export interface CreateWebauthnCredentialPayload {
   clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was created by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
+  /** The `WebauthnCredential` that was created by this mutation. */
+  webauthnCredential?: WebauthnCredential | null;
+  webauthnCredentialEdge?: WebauthnCredentialEdge | null;
 }
-export type CreateConnectedAccountPayloadSelect = {
+export type CreateWebauthnCredentialPayloadSelect = {
   clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
+  webauthnCredential?: {
+    select: WebauthnCredentialSelect;
   };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
+  webauthnCredentialEdge?: {
+    select: WebauthnCredentialEdgeSelect;
   };
 };
-export interface UpdateConnectedAccountPayload {
+export interface UpdateWebauthnCredentialPayload {
   clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was updated by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
+  /** The `WebauthnCredential` that was updated by this mutation. */
+  webauthnCredential?: WebauthnCredential | null;
+  webauthnCredentialEdge?: WebauthnCredentialEdge | null;
 }
-export type UpdateConnectedAccountPayloadSelect = {
+export type UpdateWebauthnCredentialPayloadSelect = {
   clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
+  webauthnCredential?: {
+    select: WebauthnCredentialSelect;
   };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
+  webauthnCredentialEdge?: {
+    select: WebauthnCredentialEdgeSelect;
   };
 };
-export interface DeleteConnectedAccountPayload {
+export interface DeleteWebauthnCredentialPayload {
   clientMutationId?: string | null;
-  /** The `ConnectedAccount` that was deleted by this mutation. */
-  connectedAccount?: ConnectedAccount | null;
-  connectedAccountEdge?: ConnectedAccountEdge | null;
+  /** The `WebauthnCredential` that was deleted by this mutation. */
+  webauthnCredential?: WebauthnCredential | null;
+  webauthnCredentialEdge?: WebauthnCredentialEdge | null;
 }
-export type DeleteConnectedAccountPayloadSelect = {
+export type DeleteWebauthnCredentialPayloadSelect = {
   clientMutationId?: boolean;
-  connectedAccount?: {
-    select: ConnectedAccountSelect;
+  webauthnCredential?: {
+    select: WebauthnCredentialSelect;
   };
-  connectedAccountEdge?: {
-    select: ConnectedAccountEdgeSelect;
+  webauthnCredentialEdge?: {
+    select: WebauthnCredentialEdgeSelect;
   };
 };
 export interface CreateAuditLogPayload {
@@ -2324,6 +2708,17 @@ export type DeleteAuditLogPayloadSelect = {
     select: AuditLogEdgeSelect;
   };
 };
+export interface CreateIdentityProviderPayload {
+  clientMutationId?: string | null;
+  /** The `IdentityProvider` that was created by this mutation. */
+  identityProvider?: IdentityProvider | null;
+}
+export type CreateIdentityProviderPayloadSelect = {
+  clientMutationId?: boolean;
+  identityProvider?: {
+    select: IdentityProviderSelect;
+  };
+};
 export interface CreateRoleTypePayload {
   clientMutationId?: string | null;
   /** The `RoleType` that was created by this mutation. */
@@ -2367,6 +2762,17 @@ export type DeleteRoleTypePayloadSelect = {
   };
   roleTypeEdge?: {
     select: RoleTypeEdgeSelect;
+  };
+};
+export interface CreateUserConnectedAccountPayload {
+  clientMutationId?: string | null;
+  /** The `UserConnectedAccount` that was created by this mutation. */
+  userConnectedAccount?: UserConnectedAccount | null;
+}
+export type CreateUserConnectedAccountPayloadSelect = {
+  clientMutationId?: boolean;
+  userConnectedAccount?: {
+    select: UserConnectedAccountSelect;
   };
 };
 export interface CreateUserPayload {
@@ -2414,7 +2820,7 @@ export type DeleteUserPayloadSelect = {
     select: UserEdgeSelect;
   };
 };
-export interface SignInOneTimeTokenRecord {
+export interface SignInCrossOriginRecord {
   id?: string | null;
   userId?: string | null;
   accessToken?: string | null;
@@ -2422,23 +2828,7 @@ export interface SignInOneTimeTokenRecord {
   isVerified?: boolean | null;
   totpEnabled?: boolean | null;
 }
-export type SignInOneTimeTokenRecordSelect = {
-  id?: boolean;
-  userId?: boolean;
-  accessToken?: boolean;
-  accessTokenExpiresAt?: boolean;
-  isVerified?: boolean;
-  totpEnabled?: boolean;
-};
-export interface SignInRecord {
-  id?: string | null;
-  userId?: string | null;
-  accessToken?: string | null;
-  accessTokenExpiresAt?: string | null;
-  isVerified?: boolean | null;
-  totpEnabled?: boolean | null;
-}
-export type SignInRecordSelect = {
+export type SignInCrossOriginRecordSelect = {
   id?: boolean;
   userId?: boolean;
   accessToken?: boolean;
@@ -2462,6 +2852,26 @@ export type SignUpRecordSelect = {
   isVerified?: boolean;
   totpEnabled?: boolean;
 };
+export interface SignInRecord {
+  id?: string | null;
+  userId?: string | null;
+  accessToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  isVerified?: boolean | null;
+  totpEnabled?: boolean | null;
+  mfaRequired?: boolean | null;
+  mfaChallengeToken?: string | null;
+}
+export type SignInRecordSelect = {
+  id?: boolean;
+  userId?: boolean;
+  accessToken?: boolean;
+  accessTokenExpiresAt?: boolean;
+  isVerified?: boolean;
+  totpEnabled?: boolean;
+  mfaRequired?: boolean;
+  mfaChallengeToken?: boolean;
+};
 export interface ExtendTokenExpiresRecord {
   id?: string | null;
   sessionId?: string | null;
@@ -2472,49 +2882,15 @@ export type ExtendTokenExpiresRecordSelect = {
   sessionId?: boolean;
   expiresAt?: boolean;
 };
-/** Tracks user authentication sessions with expiration, fingerprinting, and step-up verification state */
-export interface Session {
-  id: string;
-  /** References the authenticated user; NULL for anonymous sessions */
-  userId?: string | null;
-  /** Whether this is an anonymous session (no authenticated user) */
-  isAnonymous: boolean;
-  /** When this session expires and can no longer be used for authentication */
-  expiresAt: string;
-  /** When this session was explicitly revoked (soft delete); NULL means active */
-  revokedAt?: string | null;
-  /** The origin (protocol + host) from which the session was created, used for fingerprint validation */
-  origin?: ConstructiveInternalTypeOrigin | null;
-  /** IP address from which the session was created, used for strict fingerprint validation */
-  ip?: string | null;
-  /** User-Agent string from the client, used for strict fingerprint validation */
-  uagent?: string | null;
-  /** Session validation mode: strict (origin+ip+uagent), lax (origin only), or none (no validation) */
-  fingerprintMode: string;
-  /** Timestamp of last password re-verification for step-up authentication */
-  lastPasswordVerified?: string | null;
-  /** Timestamp of last MFA verification for step-up authentication */
-  lastMfaVerified?: string | null;
-  /** Secret used to generate and validate CSRF tokens for cookie-based sessions */
-  csrfSecret?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
+export interface CreateApiKeyRecord {
+  apiKey?: string | null;
+  keyId?: string | null;
+  expiresAt?: string | null;
 }
-export type SessionSelect = {
-  id?: boolean;
-  userId?: boolean;
-  isAnonymous?: boolean;
+export type CreateApiKeyRecordSelect = {
+  apiKey?: boolean;
+  keyId?: boolean;
   expiresAt?: boolean;
-  revokedAt?: boolean;
-  origin?: boolean;
-  ip?: boolean;
-  uagent?: boolean;
-  fingerprintMode?: boolean;
-  lastPasswordVerified?: boolean;
-  lastMfaVerified?: boolean;
-  csrfSecret?: boolean;
-  createdAt?: boolean;
-  updatedAt?: boolean;
 };
 /** A `Email` edge in the connection. */
 export interface EmailEdge {
@@ -2552,16 +2928,16 @@ export type CryptoAddressEdgeSelect = {
     select: CryptoAddressSelect;
   };
 };
-/** A `ConnectedAccount` edge in the connection. */
-export interface ConnectedAccountEdge {
+/** A `WebauthnCredential` edge in the connection. */
+export interface WebauthnCredentialEdge {
   cursor?: string | null;
-  /** The `ConnectedAccount` at the end of the edge. */
-  node?: ConnectedAccount | null;
+  /** The `WebauthnCredential` at the end of the edge. */
+  node?: WebauthnCredential | null;
 }
-export type ConnectedAccountEdgeSelect = {
+export type WebauthnCredentialEdgeSelect = {
   cursor?: boolean;
   node?: {
-    select: ConnectedAccountSelect;
+    select: WebauthnCredentialSelect;
   };
 };
 /** A `AuditLog` edge in the connection. */

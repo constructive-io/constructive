@@ -122,7 +122,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       actorTableId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<LevelsModuleSelect, LevelsModuleFilter, never, LevelsModuleOrderBy> & {
+      FindManyArgs<LevelsModuleSelect, LevelsModuleFilter, LevelsModuleOrderBy> & {
         select: LevelsModuleSelect;
       }
     >(argv, defaultSelect);
@@ -168,7 +168,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       actorTableId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<LevelsModuleSelect, LevelsModuleFilter, never> & {
+      FindFirstArgs<LevelsModuleSelect, LevelsModuleFilter> & {
         select: LevelsModuleSelect;
       }
     >(argv, defaultSelect);

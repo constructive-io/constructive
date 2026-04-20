@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class TriggerModel {
   constructor(private client: OrmClient) {}
   findMany<S extends TriggerSelect>(
-    args: FindManyArgs<S, TriggerFilter, never, TriggerOrderBy> & {
+    args: FindManyArgs<S, TriggerFilter, TriggerOrderBy> & {
       select: S;
     } & StrictSelect<S, TriggerSelect>
   ): QueryBuilder<{

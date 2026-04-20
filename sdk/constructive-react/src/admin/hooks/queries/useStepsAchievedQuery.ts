@@ -19,7 +19,7 @@ export const stepsAchievedQueryKey = customQueryKeys.stepsAchieved;
  *
  * @example
  * ```tsx
- * const { data, isLoading } = useStepsAchievedQuery({ variables: { vlevel, vroleId } });
+ * const { data, isLoading } = useStepsAchievedQuery({ variables: { level, roleId } });
  *
  * if (data?.stepsAchieved) {
  *   console.log(data.stepsAchieved);
@@ -76,7 +76,7 @@ export function useStepsAchievedQuery<
  *
  * @example
  * ```ts
- * const data = await fetchStepsAchievedQuery({ variables: { vlevel, vroleId } });
+ * const data = await fetchStepsAchievedQuery({ variables: { level, roleId } });
  * ```
  */
 export async function fetchStepsAchievedQuery(params?: { variables?: StepsAchievedVariables }) {
@@ -88,7 +88,7 @@ export async function fetchStepsAchievedQuery(params?: { variables?: StepsAchiev
  *
  * @example
  * ```ts
- * await prefetchStepsAchievedQuery(queryClient, { variables: { vlevel, vroleId } });
+ * await prefetchStepsAchievedQuery(queryClient, { variables: { level, roleId } });
  * ```
  */
 export async function prefetchStepsAchievedQuery(

@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class TableGrantModel {
   constructor(private client: OrmClient) {}
   findMany<S extends TableGrantSelect>(
-    args: FindManyArgs<S, TableGrantFilter, never, TableGrantOrderBy> & {
+    args: FindManyArgs<S, TableGrantFilter, TableGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, TableGrantSelect>
   ): QueryBuilder<{

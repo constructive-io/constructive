@@ -372,8 +372,10 @@ export interface AuthzDirectOwnerAnyParams {
 }
 /** Membership check that verifies the user has membership (optionally with specific permission) without binding to any entity from the row. Uses EXISTS subquery against SPRT table. */
 export interface AuthzMembershipParams {
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
-  membership_type: number | string;
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
+  membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check (ORed together into mask) */
@@ -387,8 +389,10 @@ export interface AuthzMembershipParams {
 export interface AuthzEntityMembershipParams {
   /* Column name referencing the entity (e.g., entity_id, org_id) */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* Single permission name to check (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check (ORed together into mask) */
@@ -402,8 +406,10 @@ export interface AuthzEntityMembershipParams {
 export interface AuthzRelatedEntityMembershipParams {
   /* Column name on protected table referencing the join table */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* UUID of the join table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
   /* Schema of the join table (or use obj_table_id) */
@@ -486,12 +492,21 @@ export interface AuthzCompositeParams {
     }[];
   };
 }
+/** Restrictive policy that blocks read-only members from mutations. Checks actor_id + is_read_only IS NOT TRUE on the SPRT. Designed to run as a restrictive counterpart after a permissive AuthzEntityMembership policy has already verified membership. */
+export interface AuthzNotReadOnlyParams {
+  /* Column name referencing the entity (e.g., entity_id, org_id) */
+  entity_field: string;
+  /* Scope: 2=org, 3+=dynamic entity types. Must be >= 2 (entity-scoped). */
+  membership_type?: number | string;
+}
 /** Peer visibility through shared entity membership. Authorizes access to user-owned rows when the owner and current user are both members of the same entity. Self-joins the SPRT table to find peers. */
 export interface AuthzPeerOwnershipParams {
   /* Column name on protected table referencing the owning user (e.g., owner_id) */
   owner_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* Single permission name to check on the current user membership (resolved to bitstring mask) */
   permission?: string;
   /* Multiple permission names to check on the current user membership (ORed together into mask) */
@@ -505,8 +520,10 @@ export interface AuthzPeerOwnershipParams {
 export interface AuthzRelatedPeerOwnershipParams {
   /* Column name on protected table referencing the related table (e.g., message_id) */
   entity_field: string;
-  /* Scope: 1=app, 2=org, 3=group (or string name resolved via membership_types_module) */
+  /* Scope: 1=app, 2=org, 3+=dynamic entity types (or string name resolved via membership_types_module) */
   membership_type?: number | string;
+  /* Entity type prefix (e.g. 'channel', 'department'). Resolved to membership_type integer via memberships_module lookup. Use instead of membership_type for readability. */
+  entity_type?: string;
   /* UUID of the related table (alternative to obj_schema/obj_table) */
   obj_table_id?: string;
   /* Schema of the related table (or use obj_table_id) */
@@ -593,22 +610,39 @@ export interface RelationManyToManyParams {
   nodes?: {
     [key: string]: unknown;
   }[];
-  /* Database roles to grant privileges to. Forwarded to secure_table_provision as-is. Default: [authenticated] */
-  grant_roles?: string[];
-  /* Privilege grants for the junction table as [verb, columns] tuples (e.g. [['select','*'],['insert','*']]). Forwarded to secure_table_provision as-is. Default: select/insert/delete for all columns */
-  grant_privileges?: string[][];
-  /* RLS policy type for the junction table. Forwarded to secure_table_provision as-is. NULL means no policy. */
-  policy_type?: string;
-  /* Privileges the policy applies to. Forwarded to secure_table_provision as-is. NULL means derived from grant_privileges verbs. */
-  policy_privileges?: string[];
-  /* Database role the policy targets. Forwarded to secure_table_provision as-is. NULL means falls back to first grant_role. */
-  policy_role?: string;
-  /* Whether the policy is PERMISSIVE (true) or RESTRICTIVE (false). Forwarded to secure_table_provision as-is. */
-  policy_permissive?: boolean;
-  /* Policy configuration forwarded to secure_table_provision as-is. Structure varies by policy_type. */
-  policy_data?: {
-    [key: string]: unknown;
-  };
+  /* Unified grant objects for the junction table. Each entry is { roles: string[], privileges: string[][] }. Forwarded to secure_table_provision as-is. Default: [] */
+  grants?: {
+    roles: string[];
+    privileges: string[][];
+  }[];
+  /* RLS policy objects for the junction table. Each entry has $type (Authz* generator), optional data, privileges, policy_role, permissive, policy_name. Forwarded to secure_table_provision as-is. Default: [] */
+  policies?: {
+    $type: string;
+    data?: {
+      [key: string]: unknown;
+    };
+    privileges?: string[];
+    policy_role?: string;
+    permissive?: boolean;
+    policy_name?: string;
+  }[];
+}
+/** Declares a spatial predicate between two existing geometry/geography columns. Inserts a metaschema_public.spatial_relation row; the sync_spatial_relation_tags trigger then projects a @spatialRelation smart tag onto the owner column so graphile-postgis' PostgisSpatialRelationsPlugin can expose it as a cross-table filter in GraphQL. Metadata-only: both source_field and target_field must already exist on their tables. Idempotent on (source_table_id, name). One direction per tag — author two RelationSpatial entries if symmetry is desired. */
+export interface RelationSpatialParams {
+  /* Table that owns the relation (the @spatialRelation tag is emitted on the owner column of this table) */
+  source_table_id: string;
+  /* Geometry/geography column on source_table that carries the @spatialRelation smart tag */
+  source_field_id: string;
+  /* Table being referenced by the spatial predicate */
+  target_table_id: string;
+  /* Geometry/geography column on target_table that the predicate is evaluated against */
+  target_field_id: string;
+  /* Relation name (stable, snake_case). Becomes the generated filter field name in GraphQL (e.g. nearby_clinic). Unique per (source_table_id, name) — idempotency key. */
+  name: string;
+  /* PostGIS spatial predicate. One of the 8 whitelisted operators. st_dwithin requires param_name. */
+  operator: "st_contains" | "st_within" | "st_intersects" | "st_covers" | "st_coveredby" | "st_overlaps" | "st_touches" | "st_dwithin";
+  /* Parameter name for parametric operators (currently only st_dwithin, which needs a distance argument). Must be NULL for all other operators. Enforced by table CHECK. */
+  param_name?: string;
 }
 /**
  * ===========================================================================
@@ -699,7 +733,7 @@ export interface BlueprintField {
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzNotReadOnly" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -796,6 +830,47 @@ export interface BlueprintTableUniqueConstraint {
   /** Optional schema name override. */
   schema_name?: string;
 }
+/** Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
+export interface BlueprintEntityTableProvision {
+  /** Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true. */
+  use_rls?: boolean;
+  /** Node objects applied to the entity table for field creation (e.g., DataTimestamps, DataPeoplestamps). Forwarded to secure_table_provision as-is. */
+  nodes?: BlueprintNode[];
+  /** Custom fields (columns) to add to the entity table. Forwarded to secure_table_provision as-is. */
+  fields?: BlueprintField[];
+  /** Unified grant objects for the entity table. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples. Forwarded to secure_table_provision as-is. Defaults to []. */
+  grants?: {
+    roles: string[];
+    privileges: unknown[];
+  }[];
+  /** RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op). */
+  policies?: BlueprintPolicy[];
+}
+/** A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision. */
+export interface BlueprintMembershipType {
+  /** Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database. */
+  name: string;
+  /** Short prefix for generated objects (e.g., "dr", "ch", "dept"). Used in table/trigger naming. */
+  prefix: string;
+  /** Human-readable description of this entity type. */
+  description?: string;
+  /** Parent entity type name. Defaults to "org". */
+  parent_entity?: string;
+  /** Custom table name for the entity table. Defaults to name-derived convention. */
+  table_name?: string;
+  /** Whether parent-entity members can see child entities via the default parent_member SELECT policy. Gates one of the five default policies. No-op when table_provision is supplied. Defaults to true. */
+  is_visible?: boolean;
+  /** Whether to provision a limits module for this entity type. Defaults to false. */
+  has_limits?: boolean;
+  /** Whether to provision a profiles module for this entity type. Defaults to false. */
+  has_profiles?: boolean;
+  /** Whether to provision a levels module for this entity type. Defaults to false. */
+  has_levels?: boolean;
+  /** Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false. */
+  skip_entity_policies?: boolean;
+  /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
+  table_provision?: BlueprintEntityTableProvision;
+}
 /**
  * ===========================================================================
  * Node types -- discriminated union for nodes[] entries
@@ -803,7 +878,7 @@ export interface BlueprintTableUniqueConstraint {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "DataCompositeField" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
+export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzNotReadOnly" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "DataCompositeField" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
   $type: "AuthzDirectOwner";
@@ -844,6 +919,9 @@ export type BlueprintNodeObject = {
 } | {
   $type: "AuthzComposite";
   data: AuthzCompositeParams;
+} | {
+  $type: "AuthzNotReadOnly";
+  data: AuthzNotReadOnlyParams;
 } | {
   $type: "AuthzPeerOwnership";
   data: AuthzPeerOwnershipParams;
@@ -971,7 +1049,15 @@ export type BlueprintRelation = {
   target_table: string;
   source_schema_name?: string;
   target_schema_name?: string;
-} & Partial<RelationManyToManyParams>;
+} & Partial<RelationManyToManyParams> | {
+  $type: "RelationSpatial";
+  source_table: string;
+  target_table: string;
+  source_schema_name?: string;
+  target_schema_name?: string;
+  /** Name of the geometry/geography column on source_table that carries the @spatialRelation smart tag. */source_field: string;
+  /** Name of the geometry/geography column on target_table that the predicate is evaluated against. */target_field: string;
+} & Partial<RelationSpatialParams>;
 /**
  * ===========================================================================
  * Blueprint table and definition
@@ -990,10 +1076,11 @@ export interface BlueprintTable {
   fields?: BlueprintField[];
   /** RLS policies for this table. */
   policies?: BlueprintPolicy[];
-  /** Database roles to grant privileges to. Defaults to ["authenticated"]. */
-  grant_roles?: string[];
-  /** Privilege grants as [verb, column] tuples or objects. Defaults to empty (no grants — callers must explicitly specify). */
-  grants?: unknown[];
+  /** Unified grant objects. Each entry is { roles: string[], privileges: unknown[] } where privileges are [verb, columns] tuples (e.g. [["select","*"]]). Enables per-role targeting. Defaults to []. */
+  grants?: {
+    roles: string[];
+    privileges: unknown[];
+  }[];
   /** Whether to enable RLS on this table. Defaults to true. */
   use_rls?: boolean;
   /** Table-level indexes (table_name inherited from parent). */
@@ -1015,4 +1102,6 @@ export interface BlueprintDefinition {
   full_text_searches?: BlueprintFullTextSearch[];
   /** Unique constraints on table columns. */
   unique_constraints?: BlueprintUniqueConstraint[];
+  /** Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security. */
+  membership_types?: BlueprintMembershipType[];
 }

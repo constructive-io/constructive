@@ -7,7 +7,9 @@
 import type {
   AppAchievement,
   AppAdminGrant,
+  AppClaimedInvite,
   AppGrant,
+  AppInvite,
   AppLevel,
   AppLevelRequirement,
   AppLimit,
@@ -18,8 +20,6 @@ import type {
   AppPermission,
   AppPermissionDefault,
   AppStep,
-  ClaimedInvite,
-  Invite,
   MembershipType,
   OrgAdminGrant,
   OrgChartEdge,
@@ -32,8 +32,10 @@ import type {
   OrgLimit,
   OrgLimitDefault,
   OrgMember,
+  OrgMemberProfile,
   OrgMembership,
   OrgMembershipDefault,
+  OrgMembershipSetting,
   OrgOwnerGrant,
   OrgPermission,
   OrgPermissionDefault,
@@ -184,19 +186,6 @@ export type OrgOwnerGrantOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `MembershipType`. */
-export type MembershipTypeOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'DESCRIPTION_ASC'
-  | 'DESCRIPTION_DESC'
-  | 'PREFIX_ASC'
-  | 'PREFIX_DESC';
 /** Methods to use when ordering `AppPermission`. */
 export type AppPermissionOrderBy =
   | 'NATURAL'
@@ -276,8 +265,8 @@ export type AppStepOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `ClaimedInvite`. */
-export type ClaimedInviteOrderBy =
+/** Methods to use when ordering `AppClaimedInvite`. */
+export type AppClaimedInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -333,6 +322,23 @@ export type OrgLimitOrderBy =
   | 'MAX_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC';
+/** Methods to use when ordering `MembershipType`. */
+export type MembershipTypeOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'DESCRIPTION_ASC'
+  | 'DESCRIPTION_DESC'
+  | 'PREFIX_ASC'
+  | 'PREFIX_DESC'
+  | 'PARENT_MEMBERSHIP_TYPE_ASC'
+  | 'PARENT_MEMBERSHIP_TYPE_DESC'
+  | 'HAS_USERS_TABLE_ENTRY_ASC'
+  | 'HAS_USERS_TABLE_ENTRY_DESC';
 /** Methods to use when ordering `AppGrant`. */
 export type AppGrantOrderBy =
   | 'NATURAL'
@@ -371,6 +377,25 @@ export type AppMembershipDefaultOrderBy =
   | 'IS_APPROVED_DESC'
   | 'IS_VERIFIED_ASC'
   | 'IS_VERIFIED_DESC';
+/** Methods to use when ordering `OrgMembershipDefault`. */
+export type OrgMembershipDefaultOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'CREATED_BY_ASC'
+  | 'CREATED_BY_DESC'
+  | 'UPDATED_BY_ASC'
+  | 'UPDATED_BY_DESC'
+  | 'IS_APPROVED_ASC'
+  | 'IS_APPROVED_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `OrgClaimedInvite`. */
 export type OrgClaimedInviteOrderBy =
   | 'NATURAL'
@@ -453,8 +478,35 @@ export type AppLevelRequirementOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `OrgMembershipDefault`. */
-export type OrgMembershipDefaultOrderBy =
+/** Methods to use when ordering `OrgMemberProfile`. */
+export type OrgMemberProfileOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'MEMBERSHIP_ID_ASC'
+  | 'MEMBERSHIP_ID_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC'
+  | 'ACTOR_ID_ASC'
+  | 'ACTOR_ID_DESC'
+  | 'DISPLAY_NAME_ASC'
+  | 'DISPLAY_NAME_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'TITLE_ASC'
+  | 'TITLE_DESC'
+  | 'BIO_ASC'
+  | 'BIO_DESC'
+  | 'PROFILE_PICTURE_ASC'
+  | 'PROFILE_PICTURE_DESC';
+/** Methods to use when ordering `OrgMembershipSetting`. */
+export type OrgMembershipSettingOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -468,14 +520,20 @@ export type OrgMembershipDefaultOrderBy =
   | 'CREATED_BY_DESC'
   | 'UPDATED_BY_ASC'
   | 'UPDATED_BY_DESC'
-  | 'IS_APPROVED_ASC'
-  | 'IS_APPROVED_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_ASC'
-  | 'DELETE_MEMBER_CASCADE_GROUPS_DESC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_ASC'
-  | 'CREATE_GROUPS_CASCADE_MEMBERS_DESC';
+  | 'DELETE_MEMBER_CASCADE_CHILDREN_ASC'
+  | 'DELETE_MEMBER_CASCADE_CHILDREN_DESC'
+  | 'CREATE_CHILD_CASCADE_OWNERS_ASC'
+  | 'CREATE_CHILD_CASCADE_OWNERS_DESC'
+  | 'CREATE_CHILD_CASCADE_ADMINS_ASC'
+  | 'CREATE_CHILD_CASCADE_ADMINS_DESC'
+  | 'CREATE_CHILD_CASCADE_MEMBERS_ASC'
+  | 'CREATE_CHILD_CASCADE_MEMBERS_DESC'
+  | 'ALLOW_EXTERNAL_MEMBERS_ASC'
+  | 'ALLOW_EXTERNAL_MEMBERS_DESC'
+  | 'POPULATE_MEMBER_EMAIL_ASC'
+  | 'POPULATE_MEMBER_EMAIL_DESC';
 /** Methods to use when ordering `AppLevel`. */
 export type AppLevelOrderBy =
   | 'NATURAL'
@@ -495,8 +553,8 @@ export type AppLevelOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
-/** Methods to use when ordering `Invite`. */
-export type InviteOrderBy =
+/** Methods to use when ordering `AppInvite`. */
+export type AppInviteOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
   | 'PRIMARY_KEY_DESC'
@@ -524,6 +582,39 @@ export type InviteOrderBy =
   | 'CREATED_AT_DESC'
   | 'UPDATED_AT_ASC'
   | 'UPDATED_AT_DESC';
+/** Methods to use when ordering `OrgInvite`. */
+export type OrgInviteOrderBy =
+  | 'NATURAL'
+  | 'PRIMARY_KEY_ASC'
+  | 'PRIMARY_KEY_DESC'
+  | 'ID_ASC'
+  | 'ID_DESC'
+  | 'EMAIL_ASC'
+  | 'EMAIL_DESC'
+  | 'SENDER_ID_ASC'
+  | 'SENDER_ID_DESC'
+  | 'RECEIVER_ID_ASC'
+  | 'RECEIVER_ID_DESC'
+  | 'INVITE_TOKEN_ASC'
+  | 'INVITE_TOKEN_DESC'
+  | 'INVITE_VALID_ASC'
+  | 'INVITE_VALID_DESC'
+  | 'INVITE_LIMIT_ASC'
+  | 'INVITE_LIMIT_DESC'
+  | 'INVITE_COUNT_ASC'
+  | 'INVITE_COUNT_DESC'
+  | 'MULTIPLE_ASC'
+  | 'MULTIPLE_DESC'
+  | 'DATA_ASC'
+  | 'DATA_DESC'
+  | 'EXPIRES_AT_ASC'
+  | 'EXPIRES_AT_DESC'
+  | 'CREATED_AT_ASC'
+  | 'CREATED_AT_DESC'
+  | 'UPDATED_AT_ASC'
+  | 'UPDATED_AT_DESC'
+  | 'ENTITY_ID_ASC'
+  | 'ENTITY_ID_DESC';
 /** Methods to use when ordering `AppMembership`. */
 export type AppMembershipOrderBy =
   | 'NATURAL'
@@ -549,6 +640,8 @@ export type AppMembershipOrderBy =
   | 'IS_VERIFIED_DESC'
   | 'IS_ACTIVE_ASC'
   | 'IS_ACTIVE_DESC'
+  | 'IS_EXTERNAL_ASC'
+  | 'IS_EXTERNAL_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
@@ -584,6 +677,8 @@ export type OrgMembershipOrderBy =
   | 'IS_DISABLED_DESC'
   | 'IS_ACTIVE_ASC'
   | 'IS_ACTIVE_DESC'
+  | 'IS_EXTERNAL_ASC'
+  | 'IS_EXTERNAL_DESC'
   | 'IS_OWNER_ASC'
   | 'IS_OWNER_DESC'
   | 'IS_ADMIN_ASC'
@@ -596,41 +691,10 @@ export type OrgMembershipOrderBy =
   | 'ACTOR_ID_DESC'
   | 'ENTITY_ID_ASC'
   | 'ENTITY_ID_DESC'
+  | 'IS_READ_ONLY_ASC'
+  | 'IS_READ_ONLY_DESC'
   | 'PROFILE_ID_ASC'
   | 'PROFILE_ID_DESC';
-/** Methods to use when ordering `OrgInvite`. */
-export type OrgInviteOrderBy =
-  | 'NATURAL'
-  | 'PRIMARY_KEY_ASC'
-  | 'PRIMARY_KEY_DESC'
-  | 'ID_ASC'
-  | 'ID_DESC'
-  | 'EMAIL_ASC'
-  | 'EMAIL_DESC'
-  | 'SENDER_ID_ASC'
-  | 'SENDER_ID_DESC'
-  | 'RECEIVER_ID_ASC'
-  | 'RECEIVER_ID_DESC'
-  | 'INVITE_TOKEN_ASC'
-  | 'INVITE_TOKEN_DESC'
-  | 'INVITE_VALID_ASC'
-  | 'INVITE_VALID_DESC'
-  | 'INVITE_LIMIT_ASC'
-  | 'INVITE_LIMIT_DESC'
-  | 'INVITE_COUNT_ASC'
-  | 'INVITE_COUNT_DESC'
-  | 'MULTIPLE_ASC'
-  | 'MULTIPLE_DESC'
-  | 'DATA_ASC'
-  | 'DATA_DESC'
-  | 'EXPIRES_AT_ASC'
-  | 'EXPIRES_AT_DESC'
-  | 'CREATED_AT_ASC'
-  | 'CREATED_AT_DESC'
-  | 'UPDATED_AT_ASC'
-  | 'UPDATED_AT_DESC'
-  | 'ENTITY_ID_ASC'
-  | 'ENTITY_ID_DESC';
 /** A filter to be used against `OrgMember` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgMemberFilter {
   /** Filter by the object’s `id` field. */
@@ -794,23 +858,6 @@ export interface OrgOwnerGrantFilter {
   /** Negates the expression. */
   not?: OrgOwnerGrantFilter;
 }
-/** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
-export interface MembershipTypeFilter {
-  /** Filter by the object’s `id` field. */
-  id?: IntFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `prefix` field. */
-  prefix?: StringFilter;
-  /** Checks for all expressions in this list. */
-  and?: MembershipTypeFilter[];
-  /** Checks for any expressions in this list. */
-  or?: MembershipTypeFilter[];
-  /** Negates the expression. */
-  not?: MembershipTypeFilter;
-}
 /** A filter to be used against `AppPermission` object types. All fields are combined with a logical ‘and.’ */
 export interface AppPermissionFilter {
   /** Filter by the object’s `id` field. */
@@ -910,8 +957,8 @@ export interface AppStepFilter {
   /** Negates the expression. */
   not?: AppStepFilter;
 }
-/** A filter to be used against `ClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
-export interface ClaimedInviteFilter {
+/** A filter to be used against `AppClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface AppClaimedInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `senderId` field. */
@@ -923,11 +970,11 @@ export interface ClaimedInviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: ClaimedInviteFilter[];
+  and?: AppClaimedInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: ClaimedInviteFilter[];
+  or?: AppClaimedInviteFilter[];
   /** Negates the expression. */
-  not?: ClaimedInviteFilter;
+  not?: AppClaimedInviteFilter;
 }
 /** A filter to be used against `OrgChartEdgeGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgChartEdgeGrantFilter {
@@ -977,6 +1024,27 @@ export interface OrgLimitFilter {
   /** Negates the expression. */
   not?: OrgLimitFilter;
 }
+/** A filter to be used against `MembershipType` object types. All fields are combined with a logical ‘and.’ */
+export interface MembershipTypeFilter {
+  /** Filter by the object’s `id` field. */
+  id?: IntFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `prefix` field. */
+  prefix?: StringFilter;
+  /** Filter by the object’s `parentMembershipType` field. */
+  parentMembershipType?: IntFilter;
+  /** Filter by the object’s `hasUsersTableEntry` field. */
+  hasUsersTableEntry?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: MembershipTypeFilter[];
+  /** Checks for any expressions in this list. */
+  or?: MembershipTypeFilter[];
+  /** Negates the expression. */
+  not?: MembershipTypeFilter;
+}
 /** A filter to be used against `AppGrant` object types. All fields are combined with a logical ‘and.’ */
 export interface AppGrantFilter {
   /** Filter by the object’s `id` field. */
@@ -1022,6 +1090,29 @@ export interface AppMembershipDefaultFilter {
   or?: AppMembershipDefaultFilter[];
   /** Negates the expression. */
   not?: AppMembershipDefaultFilter;
+}
+/** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipDefaultFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipDefaultFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipDefaultFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipDefaultFilter;
 }
 /** A filter to be used against `OrgClaimedInvite` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgClaimedInviteFilter {
@@ -1119,55 +1210,38 @@ export interface AppLevelRequirementFilter {
   /** Negates the expression. */
   not?: AppLevelRequirementFilter;
 }
-/** A filter to be used against `OrgMembershipDefault` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgMembershipDefaultFilter {
+/** A filter to be used against `OrgMemberProfile` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMemberProfileFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `createdAt` field. */
   createdAt?: DatetimeFilter;
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `isApproved` field. */
-  isApproved?: BooleanFilter;
+  /** Filter by the object’s `membershipId` field. */
+  membershipId?: UUIDFilter;
   /** Filter by the object’s `entityId` field. */
   entityId?: UUIDFilter;
-  /** Filter by the object’s `deleteMemberCascadeGroups` field. */
-  deleteMemberCascadeGroups?: BooleanFilter;
-  /** Filter by the object’s `createGroupsCascadeMembers` field. */
-  createGroupsCascadeMembers?: BooleanFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `displayName` field. */
+  displayName?: StringFilter;
+  /** Filter by the object’s `email` field. */
+  email?: StringFilter;
+  /** Filter by the object’s `title` field. */
+  title?: StringFilter;
+  /** Filter by the object’s `bio` field. */
+  bio?: StringFilter;
+  /** Filter by the object’s `profilePicture` field. */
+  profilePicture?: ConstructiveInternalTypeImageFilter;
   /** Checks for all expressions in this list. */
-  and?: OrgMembershipDefaultFilter[];
+  and?: OrgMemberProfileFilter[];
   /** Checks for any expressions in this list. */
-  or?: OrgMembershipDefaultFilter[];
+  or?: OrgMemberProfileFilter[];
   /** Negates the expression. */
-  not?: OrgMembershipDefaultFilter;
-}
-/** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
-export interface AppLevelFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `name` field. */
-  name?: StringFilter;
-  /** Filter by the object’s `description` field. */
-  description?: StringFilter;
-  /** Filter by the object’s `image` field. */
-  image?: ConstructiveInternalTypeImageFilter;
-  /** Filter by the object’s `ownerId` field. */
-  ownerId?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppLevelFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppLevelFilter[];
-  /** Negates the expression. */
-  not?: AppLevelFilter;
+  not?: OrgMemberProfileFilter;
+  /** Filter by the object’s `membership` relation. */
+  membership?: OrgMembershipFilter;
 }
 /** A filter to be used against ConstructiveInternalTypeImage fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeImageFilter {
@@ -1204,8 +1278,113 @@ export interface ConstructiveInternalTypeImageFilter {
   /** Contained by the specified JSON. */
   containedBy?: ConstructiveInternalTypeImage;
 }
-/** A filter to be used against `Invite` object types. All fields are combined with a logical ‘and.’ */
-export interface InviteFilter {
+/** A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isExternal` field. */
+  isExternal?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `isReadOnly` field. */
+  isReadOnly?: BooleanFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipFilter;
+  /** Filter by the object’s `orgMemberProfileByMembershipId` relation. */
+  orgMemberProfileByMembershipId?: OrgMemberProfileFilter;
+  /** A related `orgMemberProfileByMembershipId` exists. */
+  orgMemberProfileByMembershipIdExists?: boolean;
+}
+/** A filter to be used against `OrgMembershipSetting` object types. All fields are combined with a logical ‘and.’ */
+export interface OrgMembershipSettingFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `entityId` field. */
+  entityId?: UUIDFilter;
+  /** Filter by the object’s `deleteMemberCascadeChildren` field. */
+  deleteMemberCascadeChildren?: BooleanFilter;
+  /** Filter by the object’s `createChildCascadeOwners` field. */
+  createChildCascadeOwners?: BooleanFilter;
+  /** Filter by the object’s `createChildCascadeAdmins` field. */
+  createChildCascadeAdmins?: BooleanFilter;
+  /** Filter by the object’s `createChildCascadeMembers` field. */
+  createChildCascadeMembers?: BooleanFilter;
+  /** Filter by the object’s `allowExternalMembers` field. */
+  allowExternalMembers?: BooleanFilter;
+  /** Filter by the object’s `populateMemberEmail` field. */
+  populateMemberEmail?: BooleanFilter;
+  /** Checks for all expressions in this list. */
+  and?: OrgMembershipSettingFilter[];
+  /** Checks for any expressions in this list. */
+  or?: OrgMembershipSettingFilter[];
+  /** Negates the expression. */
+  not?: OrgMembershipSettingFilter;
+}
+/** A filter to be used against `AppLevel` object types. All fields are combined with a logical ‘and.’ */
+export interface AppLevelFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `name` field. */
+  name?: StringFilter;
+  /** Filter by the object’s `description` field. */
+  description?: StringFilter;
+  /** Filter by the object’s `image` field. */
+  image?: ConstructiveInternalTypeImageFilter;
+  /** Filter by the object’s `ownerId` field. */
+  ownerId?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppLevelFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppLevelFilter[];
+  /** Negates the expression. */
+  not?: AppLevelFilter;
+}
+/** A filter to be used against `AppInvite` object types. All fields are combined with a logical ‘and.’ */
+export interface AppInviteFilter {
   /** Filter by the object’s `id` field. */
   id?: UUIDFilter;
   /** Filter by the object’s `email` field. */
@@ -1229,11 +1408,11 @@ export interface InviteFilter {
   /** Filter by the object’s `updatedAt` field. */
   updatedAt?: DatetimeFilter;
   /** Checks for all expressions in this list. */
-  and?: InviteFilter[];
+  and?: AppInviteFilter[];
   /** Checks for any expressions in this list. */
-  or?: InviteFilter[];
+  or?: AppInviteFilter[];
   /** Negates the expression. */
-  not?: InviteFilter;
+  not?: AppInviteFilter;
 }
 /** A filter to be used against ConstructiveInternalTypeEmail fields. All fields are combined with a logical ‘and.’ */
 export interface ConstructiveInternalTypeEmailFilter {
@@ -1312,88 +1491,6 @@ export interface ConstructiveInternalTypeEmailFilter {
   /** Greater than or equal to the specified value (case-insensitive). */
   greaterThanOrEqualToInsensitive?: ConstructiveInternalTypeEmail;
 }
-/** A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’ */
-export interface AppMembershipFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `isApproved` field. */
-  isApproved?: BooleanFilter;
-  /** Filter by the object’s `isBanned` field. */
-  isBanned?: BooleanFilter;
-  /** Filter by the object’s `isDisabled` field. */
-  isDisabled?: BooleanFilter;
-  /** Filter by the object’s `isVerified` field. */
-  isVerified?: BooleanFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `isOwner` field. */
-  isOwner?: BooleanFilter;
-  /** Filter by the object’s `isAdmin` field. */
-  isAdmin?: BooleanFilter;
-  /** Filter by the object’s `permissions` field. */
-  permissions?: BitStringFilter;
-  /** Filter by the object’s `granted` field. */
-  granted?: BitStringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `profileId` field. */
-  profileId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: AppMembershipFilter[];
-  /** Checks for any expressions in this list. */
-  or?: AppMembershipFilter[];
-  /** Negates the expression. */
-  not?: AppMembershipFilter;
-}
-/** A filter to be used against `OrgMembership` object types. All fields are combined with a logical ‘and.’ */
-export interface OrgMembershipFilter {
-  /** Filter by the object’s `id` field. */
-  id?: UUIDFilter;
-  /** Filter by the object’s `createdAt` field. */
-  createdAt?: DatetimeFilter;
-  /** Filter by the object’s `updatedAt` field. */
-  updatedAt?: DatetimeFilter;
-  /** Filter by the object’s `createdBy` field. */
-  createdBy?: UUIDFilter;
-  /** Filter by the object’s `updatedBy` field. */
-  updatedBy?: UUIDFilter;
-  /** Filter by the object’s `isApproved` field. */
-  isApproved?: BooleanFilter;
-  /** Filter by the object’s `isBanned` field. */
-  isBanned?: BooleanFilter;
-  /** Filter by the object’s `isDisabled` field. */
-  isDisabled?: BooleanFilter;
-  /** Filter by the object’s `isActive` field. */
-  isActive?: BooleanFilter;
-  /** Filter by the object’s `isOwner` field. */
-  isOwner?: BooleanFilter;
-  /** Filter by the object’s `isAdmin` field. */
-  isAdmin?: BooleanFilter;
-  /** Filter by the object’s `permissions` field. */
-  permissions?: BitStringFilter;
-  /** Filter by the object’s `granted` field. */
-  granted?: BitStringFilter;
-  /** Filter by the object’s `actorId` field. */
-  actorId?: UUIDFilter;
-  /** Filter by the object’s `entityId` field. */
-  entityId?: UUIDFilter;
-  /** Filter by the object’s `profileId` field. */
-  profileId?: UUIDFilter;
-  /** Checks for all expressions in this list. */
-  and?: OrgMembershipFilter[];
-  /** Checks for any expressions in this list. */
-  or?: OrgMembershipFilter[];
-  /** Negates the expression. */
-  not?: OrgMembershipFilter;
-}
 /** A filter to be used against `OrgInvite` object types. All fields are combined with a logical ‘and.’ */
 export interface OrgInviteFilter {
   /** Filter by the object’s `id` field. */
@@ -1429,7 +1526,50 @@ export interface OrgInviteFilter {
   /** Negates the expression. */
   not?: OrgInviteFilter;
 }
-export interface SubmitInviteCodeInput {
+/** A filter to be used against `AppMembership` object types. All fields are combined with a logical ‘and.’ */
+export interface AppMembershipFilter {
+  /** Filter by the object’s `id` field. */
+  id?: UUIDFilter;
+  /** Filter by the object’s `createdAt` field. */
+  createdAt?: DatetimeFilter;
+  /** Filter by the object’s `updatedAt` field. */
+  updatedAt?: DatetimeFilter;
+  /** Filter by the object’s `createdBy` field. */
+  createdBy?: UUIDFilter;
+  /** Filter by the object’s `updatedBy` field. */
+  updatedBy?: UUIDFilter;
+  /** Filter by the object’s `isApproved` field. */
+  isApproved?: BooleanFilter;
+  /** Filter by the object’s `isBanned` field. */
+  isBanned?: BooleanFilter;
+  /** Filter by the object’s `isDisabled` field. */
+  isDisabled?: BooleanFilter;
+  /** Filter by the object’s `isVerified` field. */
+  isVerified?: BooleanFilter;
+  /** Filter by the object’s `isActive` field. */
+  isActive?: BooleanFilter;
+  /** Filter by the object’s `isExternal` field. */
+  isExternal?: BooleanFilter;
+  /** Filter by the object’s `isOwner` field. */
+  isOwner?: BooleanFilter;
+  /** Filter by the object’s `isAdmin` field. */
+  isAdmin?: BooleanFilter;
+  /** Filter by the object’s `permissions` field. */
+  permissions?: BitStringFilter;
+  /** Filter by the object’s `granted` field. */
+  granted?: BitStringFilter;
+  /** Filter by the object’s `actorId` field. */
+  actorId?: UUIDFilter;
+  /** Filter by the object’s `profileId` field. */
+  profileId?: UUIDFilter;
+  /** Checks for all expressions in this list. */
+  and?: AppMembershipFilter[];
+  /** Checks for any expressions in this list. */
+  or?: AppMembershipFilter[];
+  /** Negates the expression. */
+  not?: AppMembershipFilter;
+}
+export interface SubmitAppInviteCodeInput {
   clientMutationId?: string;
   token?: string;
 }
@@ -1570,22 +1710,6 @@ export interface OrgOwnerGrantInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateMembershipTypeInput {
-  clientMutationId?: string;
-  /** The `MembershipType` to be created by this mutation. */
-  membershipType: MembershipTypeInput;
-}
-/** An input for mutations affecting `MembershipType` */
-export interface MembershipTypeInput {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** Human-readable name of the membership type */
-  name: string;
-  /** Description of what this membership type represents */
-  description: string;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix: string;
-}
 export interface CreateAppPermissionInput {
   clientMutationId?: string;
   /** The `AppPermission` to be created by this mutation. */
@@ -1669,13 +1793,13 @@ export interface AppStepInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateClaimedInviteInput {
+export interface CreateAppClaimedInviteInput {
   clientMutationId?: string;
-  /** The `ClaimedInvite` to be created by this mutation. */
-  claimedInvite: ClaimedInviteInput;
+  /** The `AppClaimedInvite` to be created by this mutation. */
+  appClaimedInvite: AppClaimedInviteInput;
 }
-/** An input for mutations affecting `ClaimedInvite` */
-export interface ClaimedInviteInput {
+/** An input for mutations affecting `AppClaimedInvite` */
+export interface AppClaimedInviteInput {
   id?: string;
   /** Optional JSON payload captured at the time the invite was claimed */
   data?: unknown;
@@ -1729,6 +1853,26 @@ export interface OrgLimitInput {
   max?: number;
   entityId: string;
 }
+export interface CreateMembershipTypeInput {
+  clientMutationId?: string;
+  /** The `MembershipType` to be created by this mutation. */
+  membershipType: MembershipTypeInput;
+}
+/** An input for mutations affecting `MembershipType` */
+export interface MembershipTypeInput {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** Human-readable name of the membership type */
+  name: string;
+  /** Description of what this membership type represents */
+  description: string;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix: string;
+  /** Parent membership type ID for SPRT cascade chain (e.g. type 2 parent=1, type 3 parent=2) */
+  parentMembershipType?: number;
+  /** When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs */
+  hasUsersTableEntry?: boolean;
+}
 export interface CreateAppGrantInput {
   clientMutationId?: string;
   /** The `AppGrant` to be created by this mutation. */
@@ -1763,6 +1907,23 @@ export interface AppMembershipDefaultInput {
   isApproved?: boolean;
   /** Whether new members are automatically verified upon joining */
   isVerified?: boolean;
+}
+export interface CreateOrgMembershipDefaultInput {
+  clientMutationId?: string;
+  /** The `OrgMembershipDefault` to be created by this mutation. */
+  orgMembershipDefault: OrgMembershipDefaultInput;
+}
+/** An input for mutations affecting `OrgMembershipDefault` */
+export interface OrgMembershipDefaultInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether new members are automatically approved upon joining */
+  isApproved?: boolean;
+  /** References the entity these membership defaults apply to */
+  entityId: string;
 }
 export interface CreateOrgClaimedInviteInput {
   clientMutationId?: string;
@@ -1844,26 +2005,59 @@ export interface AppLevelRequirementInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateOrgMembershipDefaultInput {
+export interface CreateOrgMemberProfileInput {
   clientMutationId?: string;
-  /** The `OrgMembershipDefault` to be created by this mutation. */
-  orgMembershipDefault: OrgMembershipDefaultInput;
+  /** The `OrgMemberProfile` to be created by this mutation. */
+  orgMemberProfile: OrgMemberProfileInput;
 }
-/** An input for mutations affecting `OrgMembershipDefault` */
-export interface OrgMembershipDefaultInput {
+/** An input for mutations affecting `OrgMemberProfile` */
+export interface OrgMemberProfileInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** References the membership this profile belongs to (1:1) */
+  membershipId: string;
+  /** References the entity this profile belongs to (used for RLS lookups) */
+  entityId: string;
+  /** References the user who owns this profile (for self-edit RLS) */
+  actorId: string;
+  /** Display name shown to other entity members */
+  displayName?: string;
+  /** Email address visible to other entity members (auto-populated from verified primary email) */
+  email?: string;
+  /** Job title or role description visible to other entity members */
+  title?: string;
+  /** Short biography visible to other entity members */
+  bio?: string;
+  /** Profile picture visible to other entity members */
+  profilePicture?: ConstructiveInternalTypeImage;
+}
+export interface CreateOrgMembershipSettingInput {
+  clientMutationId?: string;
+  /** The `OrgMembershipSetting` to be created by this mutation. */
+  orgMembershipSetting: OrgMembershipSettingInput;
+}
+/** An input for mutations affecting `OrgMembershipSetting` */
+export interface OrgMembershipSettingInput {
   id?: string;
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
-  /** Whether new members are automatically approved upon joining */
-  isApproved?: boolean;
-  /** References the entity these membership defaults apply to */
+  /** References the entity these settings apply to */
   entityId: string;
-  /** When an org member is deleted, whether to cascade-remove their group memberships */
-  deleteMemberCascadeGroups?: boolean;
-  /** When a group is created, whether to auto-add existing org members as group members */
-  createGroupsCascadeMembers?: boolean;
+  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
+  deleteMemberCascadeChildren?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
+  createChildCascadeOwners?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
+  createChildCascadeAdmins?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
+  createChildCascadeMembers?: boolean;
+  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
+  allowExternalMembers?: boolean;
+  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
+  populateMemberEmail?: boolean;
 }
 export interface CreateAppLevelInput {
   clientMutationId?: string;
@@ -1884,13 +2078,13 @@ export interface AppLevelInput {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface CreateInviteInput {
+export interface CreateAppInviteInput {
   clientMutationId?: string;
-  /** The `Invite` to be created by this mutation. */
-  invite: InviteInput;
+  /** The `AppInvite` to be created by this mutation. */
+  appInvite: AppInviteInput;
 }
-/** An input for mutations affecting `Invite` */
-export interface InviteInput {
+/** An input for mutations affecting `AppInvite` */
+export interface AppInviteInput {
   id?: string;
   /** Email address of the invited recipient */
   email?: ConstructiveInternalTypeEmail;
@@ -1912,74 +2106,6 @@ export interface InviteInput {
   expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface CreateAppMembershipInput {
-  clientMutationId?: string;
-  /** The `AppMembership` to be created by this mutation. */
-  appMembership: AppMembershipInput;
-}
-/** An input for mutations affecting `AppMembership` */
-export interface AppMembershipInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Whether this member has been verified (e.g. email confirmation) */
-  isVerified?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId: string;
-  profileId?: string;
-}
-export interface CreateOrgMembershipInput {
-  clientMutationId?: string;
-  /** The `OrgMembership` to be created by this mutation. */
-  orgMembership: OrgMembershipInput;
-}
-/** An input for mutations affecting `OrgMembership` */
-export interface OrgMembershipInput {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId: string;
-  /** References the entity (org or group) this membership belongs to */
-  entityId: string;
-  profileId?: string;
 }
 export interface CreateOrgInviteInput {
   clientMutationId?: string;
@@ -2012,6 +2138,80 @@ export interface OrgInviteInput {
   createdAt?: string;
   updatedAt?: string;
   entityId: string;
+}
+export interface CreateAppMembershipInput {
+  clientMutationId?: string;
+  /** The `AppMembership` to be created by this mutation. */
+  appMembership: AppMembershipInput;
+}
+/** An input for mutations affecting `AppMembership` */
+export interface AppMembershipInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Whether this member has been verified (e.g. email confirmation) */
+  isVerified?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
+  isExternal?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId: string;
+  profileId?: string;
+}
+export interface CreateOrgMembershipInput {
+  clientMutationId?: string;
+  /** The `OrgMembership` to be created by this mutation. */
+  orgMembership: OrgMembershipInput;
+}
+/** An input for mutations affecting `OrgMembership` */
+export interface OrgMembershipInput {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
+  isExternal?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId: string;
+  /** References the entity (org or group) this membership belongs to */
+  entityId: string;
+  /** Whether this member has read-only access (blocks mutations when true) */
+  isReadOnly?: boolean;
+  profileId?: string;
 }
 export interface UpdateOrgMemberInput {
   clientMutationId?: string;
@@ -2155,24 +2355,6 @@ export interface OrgOwnerGrantPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateMembershipTypeInput {
-  clientMutationId?: string;
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-  /** An object where the defined keys will be set on the `MembershipType` being updated. */
-  membershipTypePatch: MembershipTypePatch;
-}
-/** Represents an update to a `MembershipType`. Fields that are set will be updated. */
-export interface MembershipTypePatch {
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id?: number;
-  /** Human-readable name of the membership type */
-  name?: string;
-  /** Description of what this membership type represents */
-  description?: string;
-  /** Short prefix used to namespace tables and functions for this membership scope */
-  prefix?: string;
-}
 export interface UpdateAppPermissionInput {
   clientMutationId?: string;
   id: string;
@@ -2261,14 +2443,14 @@ export interface AppStepPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateClaimedInviteInput {
+export interface UpdateAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `ClaimedInvite` being updated. */
-  claimedInvitePatch: ClaimedInvitePatch;
+  /** An object where the defined keys will be set on the `AppClaimedInvite` being updated. */
+  appClaimedInvitePatch: AppClaimedInvitePatch;
 }
-/** Represents an update to a `ClaimedInvite`. Fields that are set will be updated. */
-export interface ClaimedInvitePatch {
+/** Represents an update to a `AppClaimedInvite`. Fields that are set will be updated. */
+export interface AppClaimedInvitePatch {
   id?: string;
   /** Optional JSON payload captured at the time the invite was claimed */
   data?: unknown;
@@ -2324,6 +2506,28 @@ export interface OrgLimitPatch {
   max?: number;
   entityId?: string;
 }
+export interface UpdateMembershipTypeInput {
+  clientMutationId?: string;
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+  /** An object where the defined keys will be set on the `MembershipType` being updated. */
+  membershipTypePatch: MembershipTypePatch;
+}
+/** Represents an update to a `MembershipType`. Fields that are set will be updated. */
+export interface MembershipTypePatch {
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id?: number;
+  /** Human-readable name of the membership type */
+  name?: string;
+  /** Description of what this membership type represents */
+  description?: string;
+  /** Short prefix used to namespace tables and functions for this membership scope */
+  prefix?: string;
+  /** Parent membership type ID for SPRT cascade chain (e.g. type 2 parent=1, type 3 parent=2) */
+  parentMembershipType?: number;
+  /** When true, entities of this membership type get a one-to-one ID in the users table and a corresponding role_type entry, enabling them to own resources via owner_id FKs */
+  hasUsersTableEntry?: boolean;
+}
 export interface UpdateAppGrantInput {
   clientMutationId?: string;
   id: string;
@@ -2360,6 +2564,24 @@ export interface AppMembershipDefaultPatch {
   isApproved?: boolean;
   /** Whether new members are automatically verified upon joining */
   isVerified?: boolean;
+}
+export interface UpdateOrgMembershipDefaultInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgMembershipDefault` being updated. */
+  orgMembershipDefaultPatch: OrgMembershipDefaultPatch;
+}
+/** Represents an update to a `OrgMembershipDefault`. Fields that are set will be updated. */
+export interface OrgMembershipDefaultPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether new members are automatically approved upon joining */
+  isApproved?: boolean;
+  /** References the entity these membership defaults apply to */
+  entityId?: string;
 }
 export interface UpdateOrgClaimedInviteInput {
   clientMutationId?: string;
@@ -2445,27 +2667,63 @@ export interface AppLevelRequirementPatch {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface UpdateOrgMembershipDefaultInput {
+export interface UpdateOrgMemberProfileInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `OrgMembershipDefault` being updated. */
-  orgMembershipDefaultPatch: OrgMembershipDefaultPatch;
+  /** An object where the defined keys will be set on the `OrgMemberProfile` being updated. */
+  orgMemberProfilePatch: OrgMemberProfilePatch;
 }
-/** Represents an update to a `OrgMembershipDefault`. Fields that are set will be updated. */
-export interface OrgMembershipDefaultPatch {
+/** Represents an update to a `OrgMemberProfile`. Fields that are set will be updated. */
+export interface OrgMemberProfilePatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  /** References the membership this profile belongs to (1:1) */
+  membershipId?: string;
+  /** References the entity this profile belongs to (used for RLS lookups) */
+  entityId?: string;
+  /** References the user who owns this profile (for self-edit RLS) */
+  actorId?: string;
+  /** Display name shown to other entity members */
+  displayName?: string;
+  /** Email address visible to other entity members (auto-populated from verified primary email) */
+  email?: string;
+  /** Job title or role description visible to other entity members */
+  title?: string;
+  /** Short biography visible to other entity members */
+  bio?: string;
+  /** Profile picture visible to other entity members */
+  profilePicture?: ConstructiveInternalTypeImage;
+  /** Upload for Profile picture visible to other entity members */
+  profilePictureUpload?: File;
+}
+export interface UpdateOrgMembershipSettingInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgMembershipSetting` being updated. */
+  orgMembershipSettingPatch: OrgMembershipSettingPatch;
+}
+/** Represents an update to a `OrgMembershipSetting`. Fields that are set will be updated. */
+export interface OrgMembershipSettingPatch {
   id?: string;
   createdAt?: string;
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
-  /** Whether new members are automatically approved upon joining */
-  isApproved?: boolean;
-  /** References the entity these membership defaults apply to */
+  /** References the entity these settings apply to */
   entityId?: string;
-  /** When an org member is deleted, whether to cascade-remove their group memberships */
-  deleteMemberCascadeGroups?: boolean;
-  /** When a group is created, whether to auto-add existing org members as group members */
-  createGroupsCascadeMembers?: boolean;
+  /** When a member is deleted, whether to cascade-remove their descendant-entity memberships */
+  deleteMemberCascadeChildren?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level owners as child-entity owners */
+  createChildCascadeOwners?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level admins as child-entity admins */
+  createChildCascadeAdmins?: boolean;
+  /** When a child entity is created, whether to auto-add existing org-level members (non-admin, non-owner) as child-entity members */
+  createChildCascadeMembers?: boolean;
+  /** Whether descendants of this org may admit members who are not already org members (outside-collaborators toggle) */
+  allowExternalMembers?: boolean;
+  /** Whether member_profiles.email is snapshot on join and kept synced with the user's primary email. When FALSE, the email field is left blank and never synced from the user's primary email. */
+  populateMemberEmail?: boolean;
 }
 export interface UpdateAppLevelInput {
   clientMutationId?: string;
@@ -2489,14 +2747,14 @@ export interface AppLevelPatch {
   /** Upload for Badge or icon image associated with this level */
   imageUpload?: File;
 }
-export interface UpdateInviteInput {
+export interface UpdateAppInviteInput {
   clientMutationId?: string;
   id: string;
-  /** An object where the defined keys will be set on the `Invite` being updated. */
-  invitePatch: InvitePatch;
+  /** An object where the defined keys will be set on the `AppInvite` being updated. */
+  appInvitePatch: AppInvitePatch;
 }
-/** Represents an update to a `Invite`. Fields that are set will be updated. */
-export interface InvitePatch {
+/** Represents an update to a `AppInvite`. Fields that are set will be updated. */
+export interface AppInvitePatch {
   id?: string;
   /** Email address of the invited recipient */
   email?: ConstructiveInternalTypeEmail;
@@ -2518,76 +2776,6 @@ export interface InvitePatch {
   expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-export interface UpdateAppMembershipInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `AppMembership` being updated. */
-  appMembershipPatch: AppMembershipPatch;
-}
-/** Represents an update to a `AppMembership`. Fields that are set will be updated. */
-export interface AppMembershipPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Whether this member has been verified (e.g. email confirmation) */
-  isVerified?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId?: string;
-  profileId?: string;
-}
-export interface UpdateOrgMembershipInput {
-  clientMutationId?: string;
-  id: string;
-  /** An object where the defined keys will be set on the `OrgMembership` being updated. */
-  orgMembershipPatch: OrgMembershipPatch;
-}
-/** Represents an update to a `OrgMembership`. Fields that are set will be updated. */
-export interface OrgMembershipPatch {
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
-  /** Whether this membership has been approved by an admin */
-  isApproved?: boolean;
-  /** Whether this member has been banned from the entity */
-  isBanned?: boolean;
-  /** Whether this membership is temporarily disabled */
-  isDisabled?: boolean;
-  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
-  isActive?: boolean;
-  /** Whether the actor is the owner of this entity */
-  isOwner?: boolean;
-  /** Whether the actor has admin privileges on this entity */
-  isAdmin?: boolean;
-  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
-  permissions?: string;
-  /** Bitmask of permissions directly granted to this member (not from profiles) */
-  granted?: string;
-  /** References the user who holds this membership */
-  actorId?: string;
-  /** References the entity (org or group) this membership belongs to */
-  entityId?: string;
-  profileId?: string;
 }
 export interface UpdateOrgInviteInput {
   clientMutationId?: string;
@@ -2621,6 +2809,82 @@ export interface OrgInvitePatch {
   createdAt?: string;
   updatedAt?: string;
   entityId?: string;
+}
+export interface UpdateAppMembershipInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `AppMembership` being updated. */
+  appMembershipPatch: AppMembershipPatch;
+}
+/** Represents an update to a `AppMembership`. Fields that are set will be updated. */
+export interface AppMembershipPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Whether this member has been verified (e.g. email confirmation) */
+  isVerified?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
+  isExternal?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId?: string;
+  profileId?: string;
+}
+export interface UpdateOrgMembershipInput {
+  clientMutationId?: string;
+  id: string;
+  /** An object where the defined keys will be set on the `OrgMembership` being updated. */
+  orgMembershipPatch: OrgMembershipPatch;
+}
+/** Represents an update to a `OrgMembership`. Fields that are set will be updated. */
+export interface OrgMembershipPatch {
+  id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  /** Whether this membership has been approved by an admin */
+  isApproved?: boolean;
+  /** Whether this member has been banned from the entity */
+  isBanned?: boolean;
+  /** Whether this membership is temporarily disabled */
+  isDisabled?: boolean;
+  /** Computed field indicating the membership is approved, verified, not banned, and not disabled */
+  isActive?: boolean;
+  /** Whether this member is external (not a member of the parent scope). External members may have restricted permissions. */
+  isExternal?: boolean;
+  /** Whether the actor is the owner of this entity */
+  isOwner?: boolean;
+  /** Whether the actor has admin privileges on this entity */
+  isAdmin?: boolean;
+  /** Aggregated permission bitmask combining profile-based and directly granted permissions */
+  permissions?: string;
+  /** Bitmask of permissions directly granted to this member (not from profiles) */
+  granted?: string;
+  /** References the user who holds this membership */
+  actorId?: string;
+  /** References the entity (org or group) this membership belongs to */
+  entityId?: string;
+  /** Whether this member has read-only access (blocks mutations when true) */
+  isReadOnly?: boolean;
+  profileId?: string;
 }
 export interface DeleteOrgMemberInput {
   clientMutationId?: string;
@@ -2658,11 +2922,6 @@ export interface DeleteOrgOwnerGrantInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteMembershipTypeInput {
-  clientMutationId?: string;
-  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
-  id: number;
-}
 export interface DeleteAppPermissionInput {
   clientMutationId?: string;
   id: string;
@@ -2683,7 +2942,7 @@ export interface DeleteAppStepInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteClaimedInviteInput {
+export interface DeleteAppClaimedInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2695,11 +2954,20 @@ export interface DeleteOrgLimitInput {
   clientMutationId?: string;
   id: string;
 }
+export interface DeleteMembershipTypeInput {
+  clientMutationId?: string;
+  /** Integer identifier for the membership type (1=App, 2=Organization, 3=Group) */
+  id: number;
+}
 export interface DeleteAppGrantInput {
   clientMutationId?: string;
   id: string;
 }
 export interface DeleteAppMembershipDefaultInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgMembershipDefaultInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2719,7 +2987,11 @@ export interface DeleteAppLevelRequirementInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteOrgMembershipDefaultInput {
+export interface DeleteOrgMemberProfileInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgMembershipSettingInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2727,7 +2999,11 @@ export interface DeleteAppLevelInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteInviteInput {
+export interface DeleteAppInviteInput {
+  clientMutationId?: string;
+  id: string;
+}
+export interface DeleteOrgInviteInput {
   clientMutationId?: string;
   id: string;
 }
@@ -2739,13 +3015,16 @@ export interface DeleteOrgMembershipInput {
   clientMutationId?: string;
   id: string;
 }
-export interface DeleteOrgInviteInput {
-  clientMutationId?: string;
-  id: string;
-}
 export interface RequestUploadUrlInput {
   /** Bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped uploads.
+   * Omit for app-level (database-wide) storage.
+   * When provided, resolves the storage module for the entity type
+   * that owns this entity instance (e.g., a data room ID, team ID).
+   */
+  ownerId?: string;
   /** SHA-256 content hash computed by the client (hex-encoded, 64 chars) */
   contentHash: string;
   /** MIME type of the file (e.g., "image/png") */
@@ -2762,6 +3041,11 @@ export interface ConfirmUploadInput {
 export interface ProvisionBucketInput {
   /** The logical bucket key (e.g., "public", "private") */
   bucketKey: string;
+  /**
+   * Owner entity ID for entity-scoped bucket provisioning.
+   * Omit for app-level (database-wide) storage.
+   */
+  ownerId?: string;
 }
 /** A connection to a list of `OrgGetManagersRecord` values. */
 export interface OrgGetManagersConnection {
@@ -2861,13 +3145,6 @@ export interface OrgOwnerGrantConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `MembershipType` values. */
-export interface MembershipTypeConnection {
-  nodes: MembershipType[];
-  edges: MembershipTypeEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** A connection to a list of `AppLimit` values. */
 export interface AppLimitConnection {
   nodes: AppLimit[];
@@ -2889,10 +3166,10 @@ export interface AppStepConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `ClaimedInvite` values. */
-export interface ClaimedInviteConnection {
-  nodes: ClaimedInvite[];
-  edges: ClaimedInviteEdge[];
+/** A connection to a list of `AppClaimedInvite` values. */
+export interface AppClaimedInviteConnection {
+  nodes: AppClaimedInvite[];
+  edges: AppClaimedInviteEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2910,6 +3187,13 @@ export interface OrgLimitConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
+/** A connection to a list of `MembershipType` values. */
+export interface MembershipTypeConnection {
+  nodes: MembershipType[];
+  edges: MembershipTypeEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
 /** A connection to a list of `AppGrant` values. */
 export interface AppGrantConnection {
   nodes: AppGrant[];
@@ -2921,6 +3205,13 @@ export interface AppGrantConnection {
 export interface AppMembershipDefaultConnection {
   nodes: AppMembershipDefault[];
   edges: AppMembershipDefaultEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgMembershipDefault` values. */
+export interface OrgMembershipDefaultConnection {
+  nodes: OrgMembershipDefault[];
+  edges: OrgMembershipDefaultEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2945,10 +3236,17 @@ export interface OrgChartEdgeConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgMembershipDefault` values. */
-export interface OrgMembershipDefaultConnection {
-  nodes: OrgMembershipDefault[];
-  edges: OrgMembershipDefaultEdge[];
+/** A connection to a list of `OrgMemberProfile` values. */
+export interface OrgMemberProfileConnection {
+  nodes: OrgMemberProfile[];
+  edges: OrgMemberProfileEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgMembershipSetting` values. */
+export interface OrgMembershipSettingConnection {
+  nodes: OrgMembershipSetting[];
+  edges: OrgMembershipSettingEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2959,10 +3257,17 @@ export interface AppLevelConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `Invite` values. */
-export interface InviteConnection {
-  nodes: Invite[];
-  edges: InviteEdge[];
+/** A connection to a list of `AppInvite` values. */
+export interface AppInviteConnection {
+  nodes: AppInvite[];
+  edges: AppInviteEdge[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+/** A connection to a list of `OrgInvite` values. */
+export interface OrgInviteConnection {
+  nodes: OrgInvite[];
+  edges: OrgInviteEdge[];
   pageInfo: PageInfo;
   totalCount: number;
 }
@@ -2980,18 +3285,11 @@ export interface OrgMembershipConnection {
   pageInfo: PageInfo;
   totalCount: number;
 }
-/** A connection to a list of `OrgInvite` values. */
-export interface OrgInviteConnection {
-  nodes: OrgInvite[];
-  edges: OrgInviteEdge[];
-  pageInfo: PageInfo;
-  totalCount: number;
-}
 /** Root meta schema type */
 export interface MetaSchema {
   tables: MetaTable[];
 }
-export interface SubmitInviteCodePayload {
+export interface SubmitAppInviteCodePayload {
   clientMutationId?: string | null;
   result?: boolean | null;
 }
@@ -3053,12 +3351,6 @@ export interface CreateOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
-export interface CreateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was created by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
 export interface CreateAppPermissionPayload {
   clientMutationId?: string | null;
   /** The `AppPermission` that was created by this mutation. */
@@ -3089,11 +3381,11 @@ export interface CreateAppStepPayload {
   appStep?: AppStep | null;
   appStepEdge?: AppStepEdge | null;
 }
-export interface CreateClaimedInvitePayload {
+export interface CreateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was created by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was created by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
 export interface CreateOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
@@ -3107,6 +3399,12 @@ export interface CreateOrgLimitPayload {
   orgLimit?: OrgLimit | null;
   orgLimitEdge?: OrgLimitEdge | null;
 }
+export interface CreateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was created by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
 export interface CreateAppGrantPayload {
   clientMutationId?: string | null;
   /** The `AppGrant` that was created by this mutation. */
@@ -3118,6 +3416,12 @@ export interface CreateAppMembershipDefaultPayload {
   /** The `AppMembershipDefault` that was created by this mutation. */
   appMembershipDefault?: AppMembershipDefault | null;
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
+}
+export interface CreateOrgMembershipDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipDefault` that was created by this mutation. */
+  orgMembershipDefault?: OrgMembershipDefault | null;
+  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
 }
 export interface CreateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -3143,11 +3447,17 @@ export interface CreateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface CreateOrgMembershipDefaultPayload {
+export interface CreateOrgMemberProfilePayload {
   clientMutationId?: string | null;
-  /** The `OrgMembershipDefault` that was created by this mutation. */
-  orgMembershipDefault?: OrgMembershipDefault | null;
-  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
+  /** The `OrgMemberProfile` that was created by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface CreateOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was created by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface CreateAppLevelPayload {
   clientMutationId?: string | null;
@@ -3155,11 +3465,17 @@ export interface CreateAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface CreateInvitePayload {
+export interface CreateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was created by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was created by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
+}
+export interface CreateOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was created by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface CreateAppMembershipPayload {
   clientMutationId?: string | null;
@@ -3172,12 +3488,6 @@ export interface CreateOrgMembershipPayload {
   /** The `OrgMembership` that was created by this mutation. */
   orgMembership?: OrgMembership | null;
   orgMembershipEdge?: OrgMembershipEdge | null;
-}
-export interface CreateOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was created by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface UpdateOrgMemberPayload {
   clientMutationId?: string | null;
@@ -3233,12 +3543,6 @@ export interface UpdateOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
-export interface UpdateMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was updated by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
 export interface UpdateAppPermissionPayload {
   clientMutationId?: string | null;
   /** The `AppPermission` that was updated by this mutation. */
@@ -3269,11 +3573,11 @@ export interface UpdateAppStepPayload {
   appStep?: AppStep | null;
   appStepEdge?: AppStepEdge | null;
 }
-export interface UpdateClaimedInvitePayload {
+export interface UpdateAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was updated by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was updated by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
 export interface UpdateOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
@@ -3287,6 +3591,12 @@ export interface UpdateOrgLimitPayload {
   orgLimit?: OrgLimit | null;
   orgLimitEdge?: OrgLimitEdge | null;
 }
+export interface UpdateMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was updated by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
 export interface UpdateAppGrantPayload {
   clientMutationId?: string | null;
   /** The `AppGrant` that was updated by this mutation. */
@@ -3298,6 +3608,12 @@ export interface UpdateAppMembershipDefaultPayload {
   /** The `AppMembershipDefault` that was updated by this mutation. */
   appMembershipDefault?: AppMembershipDefault | null;
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
+}
+export interface UpdateOrgMembershipDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipDefault` that was updated by this mutation. */
+  orgMembershipDefault?: OrgMembershipDefault | null;
+  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
 }
 export interface UpdateOrgClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -3323,11 +3639,17 @@ export interface UpdateAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface UpdateOrgMembershipDefaultPayload {
+export interface UpdateOrgMemberProfilePayload {
   clientMutationId?: string | null;
-  /** The `OrgMembershipDefault` that was updated by this mutation. */
-  orgMembershipDefault?: OrgMembershipDefault | null;
-  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
+  /** The `OrgMemberProfile` that was updated by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface UpdateOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was updated by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface UpdateAppLevelPayload {
   clientMutationId?: string | null;
@@ -3335,11 +3657,17 @@ export interface UpdateAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface UpdateInvitePayload {
+export interface UpdateAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was updated by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was updated by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
+}
+export interface UpdateOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was updated by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface UpdateAppMembershipPayload {
   clientMutationId?: string | null;
@@ -3352,12 +3680,6 @@ export interface UpdateOrgMembershipPayload {
   /** The `OrgMembership` that was updated by this mutation. */
   orgMembership?: OrgMembership | null;
   orgMembershipEdge?: OrgMembershipEdge | null;
-}
-export interface UpdateOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was updated by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface DeleteOrgMemberPayload {
   clientMutationId?: string | null;
@@ -3413,12 +3735,6 @@ export interface DeleteOrgOwnerGrantPayload {
   orgOwnerGrant?: OrgOwnerGrant | null;
   orgOwnerGrantEdge?: OrgOwnerGrantEdge | null;
 }
-export interface DeleteMembershipTypePayload {
-  clientMutationId?: string | null;
-  /** The `MembershipType` that was deleted by this mutation. */
-  membershipType?: MembershipType | null;
-  membershipTypeEdge?: MembershipTypeEdge | null;
-}
 export interface DeleteAppPermissionPayload {
   clientMutationId?: string | null;
   /** The `AppPermission` that was deleted by this mutation. */
@@ -3449,11 +3765,11 @@ export interface DeleteAppStepPayload {
   appStep?: AppStep | null;
   appStepEdge?: AppStepEdge | null;
 }
-export interface DeleteClaimedInvitePayload {
+export interface DeleteAppClaimedInvitePayload {
   clientMutationId?: string | null;
-  /** The `ClaimedInvite` that was deleted by this mutation. */
-  claimedInvite?: ClaimedInvite | null;
-  claimedInviteEdge?: ClaimedInviteEdge | null;
+  /** The `AppClaimedInvite` that was deleted by this mutation. */
+  appClaimedInvite?: AppClaimedInvite | null;
+  appClaimedInviteEdge?: AppClaimedInviteEdge | null;
 }
 export interface DeleteOrgChartEdgeGrantPayload {
   clientMutationId?: string | null;
@@ -3467,6 +3783,12 @@ export interface DeleteOrgLimitPayload {
   orgLimit?: OrgLimit | null;
   orgLimitEdge?: OrgLimitEdge | null;
 }
+export interface DeleteMembershipTypePayload {
+  clientMutationId?: string | null;
+  /** The `MembershipType` that was deleted by this mutation. */
+  membershipType?: MembershipType | null;
+  membershipTypeEdge?: MembershipTypeEdge | null;
+}
 export interface DeleteAppGrantPayload {
   clientMutationId?: string | null;
   /** The `AppGrant` that was deleted by this mutation. */
@@ -3478,6 +3800,12 @@ export interface DeleteAppMembershipDefaultPayload {
   /** The `AppMembershipDefault` that was deleted by this mutation. */
   appMembershipDefault?: AppMembershipDefault | null;
   appMembershipDefaultEdge?: AppMembershipDefaultEdge | null;
+}
+export interface DeleteOrgMembershipDefaultPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipDefault` that was deleted by this mutation. */
+  orgMembershipDefault?: OrgMembershipDefault | null;
+  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
 }
 export interface DeleteOrgClaimedInvitePayload {
   clientMutationId?: string | null;
@@ -3503,11 +3831,17 @@ export interface DeleteAppLevelRequirementPayload {
   appLevelRequirement?: AppLevelRequirement | null;
   appLevelRequirementEdge?: AppLevelRequirementEdge | null;
 }
-export interface DeleteOrgMembershipDefaultPayload {
+export interface DeleteOrgMemberProfilePayload {
   clientMutationId?: string | null;
-  /** The `OrgMembershipDefault` that was deleted by this mutation. */
-  orgMembershipDefault?: OrgMembershipDefault | null;
-  orgMembershipDefaultEdge?: OrgMembershipDefaultEdge | null;
+  /** The `OrgMemberProfile` that was deleted by this mutation. */
+  orgMemberProfile?: OrgMemberProfile | null;
+  orgMemberProfileEdge?: OrgMemberProfileEdge | null;
+}
+export interface DeleteOrgMembershipSettingPayload {
+  clientMutationId?: string | null;
+  /** The `OrgMembershipSetting` that was deleted by this mutation. */
+  orgMembershipSetting?: OrgMembershipSetting | null;
+  orgMembershipSettingEdge?: OrgMembershipSettingEdge | null;
 }
 export interface DeleteAppLevelPayload {
   clientMutationId?: string | null;
@@ -3515,11 +3849,17 @@ export interface DeleteAppLevelPayload {
   appLevel?: AppLevel | null;
   appLevelEdge?: AppLevelEdge | null;
 }
-export interface DeleteInvitePayload {
+export interface DeleteAppInvitePayload {
   clientMutationId?: string | null;
-  /** The `Invite` that was deleted by this mutation. */
-  invite?: Invite | null;
-  inviteEdge?: InviteEdge | null;
+  /** The `AppInvite` that was deleted by this mutation. */
+  appInvite?: AppInvite | null;
+  appInviteEdge?: AppInviteEdge | null;
+}
+export interface DeleteOrgInvitePayload {
+  clientMutationId?: string | null;
+  /** The `OrgInvite` that was deleted by this mutation. */
+  orgInvite?: OrgInvite | null;
+  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface DeleteAppMembershipPayload {
   clientMutationId?: string | null;
@@ -3532,12 +3872,6 @@ export interface DeleteOrgMembershipPayload {
   /** The `OrgMembership` that was deleted by this mutation. */
   orgMembership?: OrgMembership | null;
   orgMembershipEdge?: OrgMembershipEdge | null;
-}
-export interface DeleteOrgInvitePayload {
-  clientMutationId?: string | null;
-  /** The `OrgInvite` that was deleted by this mutation. */
-  orgInvite?: OrgInvite | null;
-  orgInviteEdge?: OrgInviteEdge | null;
 }
 export interface RequestUploadUrlPayload {
   /** Presigned PUT URL (null if file was deduplicated) */
@@ -3668,12 +4002,6 @@ export interface OrgOwnerGrantEdge {
   /** The `OrgOwnerGrant` at the end of the edge. */
   node?: OrgOwnerGrant | null;
 }
-/** A `MembershipType` edge in the connection. */
-export interface MembershipTypeEdge {
-  cursor?: string | null;
-  /** The `MembershipType` at the end of the edge. */
-  node?: MembershipType | null;
-}
 /** A `AppLimit` edge in the connection. */
 export interface AppLimitEdge {
   cursor?: string | null;
@@ -3692,11 +4020,11 @@ export interface AppStepEdge {
   /** The `AppStep` at the end of the edge. */
   node?: AppStep | null;
 }
-/** A `ClaimedInvite` edge in the connection. */
-export interface ClaimedInviteEdge {
+/** A `AppClaimedInvite` edge in the connection. */
+export interface AppClaimedInviteEdge {
   cursor?: string | null;
-  /** The `ClaimedInvite` at the end of the edge. */
-  node?: ClaimedInvite | null;
+  /** The `AppClaimedInvite` at the end of the edge. */
+  node?: AppClaimedInvite | null;
 }
 /** A `OrgChartEdgeGrant` edge in the connection. */
 export interface OrgChartEdgeGrantEdge {
@@ -3710,6 +4038,12 @@ export interface OrgLimitEdge {
   /** The `OrgLimit` at the end of the edge. */
   node?: OrgLimit | null;
 }
+/** A `MembershipType` edge in the connection. */
+export interface MembershipTypeEdge {
+  cursor?: string | null;
+  /** The `MembershipType` at the end of the edge. */
+  node?: MembershipType | null;
+}
 /** A `AppGrant` edge in the connection. */
 export interface AppGrantEdge {
   cursor?: string | null;
@@ -3721,6 +4055,12 @@ export interface AppMembershipDefaultEdge {
   cursor?: string | null;
   /** The `AppMembershipDefault` at the end of the edge. */
   node?: AppMembershipDefault | null;
+}
+/** A `OrgMembershipDefault` edge in the connection. */
+export interface OrgMembershipDefaultEdge {
+  cursor?: string | null;
+  /** The `OrgMembershipDefault` at the end of the edge. */
+  node?: OrgMembershipDefault | null;
 }
 /** A `OrgClaimedInvite` edge in the connection. */
 export interface OrgClaimedInviteEdge {
@@ -3740,11 +4080,17 @@ export interface OrgChartEdgeEdge {
   /** The `OrgChartEdge` at the end of the edge. */
   node?: OrgChartEdge | null;
 }
-/** A `OrgMembershipDefault` edge in the connection. */
-export interface OrgMembershipDefaultEdge {
+/** A `OrgMemberProfile` edge in the connection. */
+export interface OrgMemberProfileEdge {
   cursor?: string | null;
-  /** The `OrgMembershipDefault` at the end of the edge. */
-  node?: OrgMembershipDefault | null;
+  /** The `OrgMemberProfile` at the end of the edge. */
+  node?: OrgMemberProfile | null;
+}
+/** A `OrgMembershipSetting` edge in the connection. */
+export interface OrgMembershipSettingEdge {
+  cursor?: string | null;
+  /** The `OrgMembershipSetting` at the end of the edge. */
+  node?: OrgMembershipSetting | null;
 }
 /** A `AppLevel` edge in the connection. */
 export interface AppLevelEdge {
@@ -3752,11 +4098,17 @@ export interface AppLevelEdge {
   /** The `AppLevel` at the end of the edge. */
   node?: AppLevel | null;
 }
-/** A `Invite` edge in the connection. */
-export interface InviteEdge {
+/** A `AppInvite` edge in the connection. */
+export interface AppInviteEdge {
   cursor?: string | null;
-  /** The `Invite` at the end of the edge. */
-  node?: Invite | null;
+  /** The `AppInvite` at the end of the edge. */
+  node?: AppInvite | null;
+}
+/** A `OrgInvite` edge in the connection. */
+export interface OrgInviteEdge {
+  cursor?: string | null;
+  /** The `OrgInvite` at the end of the edge. */
+  node?: OrgInvite | null;
 }
 /** A `AppMembership` edge in the connection. */
 export interface AppMembershipEdge {
@@ -3769,12 +4121,6 @@ export interface OrgMembershipEdge {
   cursor?: string | null;
   /** The `OrgMembership` at the end of the edge. */
   node?: OrgMembership | null;
-}
-/** A `OrgInvite` edge in the connection. */
-export interface OrgInviteEdge {
-  cursor?: string | null;
-  /** The `OrgInvite` at the end of the edge. */
-  node?: OrgInvite | null;
 }
 /** Information about a database table */
 export interface MetaTable {

@@ -87,7 +87,6 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       FindManyArgs<
         AppMembershipDefaultSelect,
         AppMembershipDefaultFilter,
-        never,
         AppMembershipDefaultOrderBy
       > & {
         select: AppMembershipDefaultSelect;
@@ -116,7 +115,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isVerified: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<AppMembershipDefaultSelect, AppMembershipDefaultFilter, never> & {
+      FindFirstArgs<AppMembershipDefaultSelect, AppMembershipDefaultFilter> & {
         select: AppMembershipDefaultSelect;
       }
     >(argv, defaultSelect);

@@ -106,7 +106,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       updatedAt: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<EmbeddingChunkSelect, EmbeddingChunkFilter, never, EmbeddingChunkOrderBy> & {
+      FindManyArgs<EmbeddingChunkSelect, EmbeddingChunkFilter, EmbeddingChunkOrderBy> & {
         select: EmbeddingChunkSelect;
       }
     >(argv, defaultSelect);
@@ -144,7 +144,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       updatedAt: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<EmbeddingChunkSelect, EmbeddingChunkFilter, never> & {
+      FindFirstArgs<EmbeddingChunkSelect, EmbeddingChunkFilter> & {
         select: EmbeddingChunkSelect;
       }
     >(argv, defaultSelect);

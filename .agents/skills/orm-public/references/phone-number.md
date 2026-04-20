@@ -9,7 +9,7 @@ User phone numbers with country code, verification, and primary-number managemen
 ```typescript
 db.phoneNumber.findMany({ select: { id: true } }).execute()
 db.phoneNumber.findOne({ id: '<UUID>', select: { id: true } }).execute()
-db.phoneNumber.create({ data: { ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' }, select: { id: true } }).execute()
+db.phoneNumber.create({ data: { ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' }, select: { id: true } }).execute()
 db.phoneNumber.update({ where: { id: '<UUID>' }, data: { ownerId: '<UUID>' }, select: { id: true } }).execute()
 db.phoneNumber.delete({ where: { id: '<UUID>' } }).execute()
 ```
@@ -28,7 +28,7 @@ const items = await db.phoneNumber.findMany({
 
 ```typescript
 const item = await db.phoneNumber.create({
-  data: { ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>' },
+  data: { ownerId: '<UUID>', cc: '<String>', number: '<String>', isVerified: '<Boolean>', isPrimary: '<Boolean>', name: '<String>' },
   select: { id: true }
 }).execute();
 ```

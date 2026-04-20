@@ -3,6 +3,74 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.12.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.8...graphql-server-test@2.12.9) (2026-04-20)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.12.8](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.7...graphql-server-test@2.12.8) (2026-04-20)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.12.7](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.6...graphql-server-test@2.12.7) (2026-04-20)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.12.6](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.5...graphql-server-test@2.12.6) (2026-04-19)
+
+### Bug Fixes
+
+- remove non-existent 'size' column from upload_requests INSERT ([da7d796](https://github.com/constructive-io/constructive/commit/da7d796be36a054864dc5bfa78c19f1c96e62dc2))
+
+## [2.12.5](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.4...graphql-server-test@2.12.5) (2026-04-19)
+
+### Bug Fixes
+
+- update test fixture files table to use mime_type (no content_hash) ([7c1abf9](https://github.com/constructive-io/constructive/commit/7c1abf9293115589b381cc875c461bd1b92d630c))
+
+## [2.12.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.3...graphql-server-test@2.12.4) (2026-04-19)
+
+### Bug Fixes
+
+- add membership_type column to test fixture storage_module table ([f3bd2fc](https://github.com/constructive-io/constructive/commit/f3bd2fc89b13faf511e807d4e1d93b80109661ca))
+- correct snapshot UUID position and ProvisionBucketInput description ([37b5856](https://github.com/constructive-io/constructive/commit/37b5856e2a3a6661c51210960a4949158fc7710e))
+- update introspection snapshots for ownerId field additions ([da81af9](https://github.com/constructive-io/constructive/commit/da81af952bd417d1022ee08e2051bc4943e28d92))
+
+## [2.12.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.2...graphql-server-test@2.12.3) (2026-04-18)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.12.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.1...graphql-server-test@2.12.2) (2026-04-18)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.12.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.0...graphql-server-test@2.12.1) (2026-04-18)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [2.12.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.11.4...graphql-server-test@2.12.0) (2026-04-18)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.11.4](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.11.3...graphql-server-test@2.11.4) (2026-04-16)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.11.3](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.11.2...graphql-server-test@2.11.3) (2026-04-14)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.11.2](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.11.1...graphql-server-test@2.11.2) (2026-04-11)
+
+**Note:** Version bump only for package graphql-server-test
+
+## [2.11.1](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.11.0...graphql-server-test@2.11.1) (2026-04-10)
+
+**Note:** Version bump only for package graphql-server-test
+
+# [2.11.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.10.12...graphql-server-test@2.11.0) (2026-04-09)
+
+**Note:** Version bump only for package graphql-server-test
+
 ## [2.10.12](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.10.11...graphql-server-test@2.10.12) (2026-04-04)
 
 **Note:** Version bump only for package graphql-server-test

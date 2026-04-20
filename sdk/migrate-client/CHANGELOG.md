@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.5.1...@pgpmjs/migrate-client@0.5.2) (2026-04-20)
+
+**Note:** Version bump only for package @pgpmjs/migrate-client
+
+## [0.5.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.5.0...@pgpmjs/migrate-client@0.5.1) (2026-04-19)
+
+**Note:** Version bump only for package @pgpmjs/migrate-client
+
+# [0.5.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.4.1...@pgpmjs/migrate-client@0.5.0) (2026-04-18)
+
+**Note:** Version bump only for package @pgpmjs/migrate-client
+
+## [0.4.1](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.4.0...@pgpmjs/migrate-client@0.4.1) (2026-04-11)
+
+**Note:** Version bump only for package @pgpmjs/migrate-client
+
+# [0.4.0](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.3.7...@pgpmjs/migrate-client@0.4.0) (2026-04-09)
+
+**Note:** Version bump only for package @pgpmjs/migrate-client
+
 ## [0.3.7](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.3.6...@pgpmjs/migrate-client@0.3.7) (2026-04-04)
 
 **Note:** Version bump only for package @pgpmjs/migrate-client

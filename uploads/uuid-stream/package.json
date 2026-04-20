@@ -1,6 +1,6 @@
 {
   "name": "uuid-stream",
-  "version": "2.10.2",
+  "version": "2.11.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "A Transform stream that generates RFC-compliant UUID v5.",
   "main": "index.js",

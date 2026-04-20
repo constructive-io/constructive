@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.9](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.8...graphql-orm-test@0.6.9) (2026-04-20)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.8](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.7...graphql-orm-test@0.6.8) (2026-04-20)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.7](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.6...graphql-orm-test@0.6.7) (2026-04-20)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.6](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.5...graphql-orm-test@0.6.6) (2026-04-19)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.5](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.4...graphql-orm-test@0.6.5) (2026-04-19)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.4](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.3...graphql-orm-test@0.6.4) (2026-04-19)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.3](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.2...graphql-orm-test@0.6.3) (2026-04-18)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.2](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.1...graphql-orm-test@0.6.2) (2026-04-18)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.6.1](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.6.0...graphql-orm-test@0.6.1) (2026-04-18)
+
+**Note:** Version bump only for package graphql-orm-test
+
+# [0.6.0](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.5.3...graphql-orm-test@0.6.0) (2026-04-18)
+
+### Bug Fixes
+
+- **graphile-postgis:** emit ST\_<op>(owner, target) — directional operand order ([4265d02](https://github.com/constructive-io/constructive/commit/4265d02b4138f6de08df98b223e2d48fb03f8e05))
+
+### Features
+
+- **graphile-postgis:** PostgisSpatialRelationsPlugin — cross-table spatial filters via [@spatial](https://github.com/spatial)Relation smart tags ([16ad9f9](https://github.com/constructive-io/constructive/commit/16ad9f9c580b915a567a53abbd75f8ae8305a554)), closes [constructive-io/constructive-planning#728](https://github.com/constructive-io/constructive-planning/issues/728)
+
+## [0.5.3](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.5.2...graphql-orm-test@0.5.3) (2026-04-14)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.5.2](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.5.1...graphql-orm-test@0.5.2) (2026-04-11)
+
+**Note:** Version bump only for package graphql-orm-test
+
+## [0.5.1](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.5.0...graphql-orm-test@0.5.1) (2026-04-10)
+
+**Note:** Version bump only for package graphql-orm-test
+
+# [0.5.0](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.4.20...graphql-orm-test@0.5.0) (2026-04-09)
+
+**Note:** Version bump only for package graphql-orm-test
+
 ## [0.4.20](https://github.com/constructive-io/constructive/compare/graphql-orm-test@0.4.19...graphql-orm-test@0.4.20) (2026-04-04)
 
 **Note:** Version bump only for package graphql-orm-test

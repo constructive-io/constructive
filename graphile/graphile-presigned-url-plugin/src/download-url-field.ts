@@ -11,12 +11,19 @@
  *   COMMENT ON TABLE files IS E'@storageFiles\nStorage files table';
  *
  * This is explicit and reliable — no duck-typing on column names.
+ *
+ * IMPORTANT: Uses Grafast plan() instead of traditional resolve().
+ * In PostGraphile V5, Grafast's planning system does not invoke traditional
+ * resolve functions on PG table type fields — it plans them as column
+ * lookups. Since downloadUrl is a computed field (not a real column),
+ * the plan() function is required for Grafast to execute the S3 signing.
  */
 
 import type { GraphileConfig } from 'graphile-config';
+import { context as grafastContext, lambda, object } from 'grafast';
 import { Logger } from '@pgpmjs/logger';
 
-import type { PresignedUrlPluginOptions, S3Config } from './types';
+import type { PresignedUrlPluginOptions, S3Config, StorageModuleConfig } from './types';
 import { generatePresignedGetUrl } from './s3-signer';
 import { getStorageModuleConfig } from './storage-module-cache';
 
@@ -44,13 +51,39 @@ function resolveS3(options: PresignedUrlPluginOptions): S3Config {
   return options.s3;
 }
 
+/**
+ * Build a per-database S3Config by overlaying storage_module overrides
+ * onto the global S3Config. Same logic as plugin.ts resolveS3ForDatabase.
+ */
+function resolveS3ForDatabase(
+  options: PresignedUrlPluginOptions,
+  storageConfig: StorageModuleConfig,
+  databaseId: string,
+): S3Config {
+  const globalS3 = resolveS3(options);
+  const bucket = options.resolveBucketName
+    ? options.resolveBucketName(databaseId)
+    : globalS3.bucket;
+  const publicUrlPrefix = storageConfig.publicUrlPrefix ?? globalS3.publicUrlPrefix;
+
+  if (bucket === globalS3.bucket && publicUrlPrefix === globalS3.publicUrlPrefix) {
+    return globalS3;
+  }
+
+  return {
+    ...globalS3,
+    bucket,
+    ...(publicUrlPrefix != null ? { publicUrlPrefix } : {}),
+  };
+}
+
 export function createDownloadUrlPlugin(
   options: PresignedUrlPluginOptions,
 ): GraphileConfig.Plugin {
 
   return {
     name: 'PresignedUrlDownloadPlugin',
-    version: '0.1.0',
+    version: '0.2.0',
     description: 'Adds downloadUrl computed field to File types tagged with @storageFiles',
 
     schema: {
@@ -87,56 +120,71 @@ export function createDownloadUrlPlugin(
                     'URL to download this file. For public files, returns the public URL. ' +
                     'For private files, returns a time-limited presigned URL.',
                   type: GraphQLString,
-                  async resolve(parent: any, _args: any, context: any) {
-                    const key = parent.key || parent.get?.('key');
-                    const isPublic = parent.is_public ?? parent.get?.('is_public');
-                    const filename = parent.filename || parent.get?.('filename');
-                    const status = parent.status || parent.get?.('status');
+                  plan($parent: any) {
+                    // Access file attributes from the parent PgSelectSingleStep
+                    const $key = $parent.get('key');
+                    const $isPublic = $parent.get('is_public');
+                    const $filename = $parent.get('filename');
+                    const $status = $parent.get('status');
 
-                    if (!key) return null;
+                    // Access GraphQL context for per-database config resolution
+                    const $withPgClient = (grafastContext() as any).get('withPgClient');
+                    const $pgSettings = (grafastContext() as any).get('pgSettings');
 
-                    // Only provide download URLs for ready/processed files
-                    if (status !== 'ready' && status !== 'processed') {
-                      return null;
-                    }
+                    const $combined = object({
+                      key: $key,
+                      isPublic: $isPublic,
+                      filename: $filename,
+                      status: $status,
+                      withPgClient: $withPgClient,
+                      pgSettings: $pgSettings,
+                    });
 
-                    const s3 = resolveS3(options);
+                    return lambda($combined, async ({ key, isPublic, filename, status, withPgClient, pgSettings }: any) => {
+                      if (!key) return null;
 
-                    if (isPublic && s3.publicUrlPrefix) {
-                      // Public file: return direct URL
-                      return `${s3.publicUrlPrefix}/${key}`;
-                    }
-
-                    // Resolve download URL expiry from storage module config (per-database)
-                    let downloadUrlExpirySeconds = 3600; // fallback default
-                    try {
-                      const withPgClient = context.pgSettings
-                        ? context.withPgClient
-                        : null;
-                      if (withPgClient) {
-                        const config = await withPgClient(null, async (pgClient: any) => {
-                          const dbResult = await pgClient.query(
-                            `SELECT jwt_private.current_database_id() AS id`,
-                          );
-                          const databaseId = dbResult.rows[0]?.id;
-                          if (!databaseId) return null;
-                          return getStorageModuleConfig(pgClient, databaseId);
-                        });
-                        if (config) {
-                          downloadUrlExpirySeconds = config.downloadUrlExpirySeconds;
-                        }
+                      // Only provide download URLs for ready/processed files
+                      if (status !== 'ready' && status !== 'processed') {
+                        return null;
                       }
-                    } catch {
-                      // Fall back to default if config lookup fails
-                    }
 
-                    // Private file: generate presigned GET URL
-                    return generatePresignedGetUrl(
-                      resolveS3(options),
-                      key,
-                      downloadUrlExpirySeconds,
-                      filename || undefined,
-                    );
+                      // Resolve per-database config (bucket, publicUrlPrefix, expiry)
+                      let s3ForDb = resolveS3(options); // fallback to global
+                      let downloadUrlExpirySeconds = 3600; // fallback default
+                      try {
+                        if (withPgClient && pgSettings) {
+                          const resolved = await withPgClient(null, async (pgClient: any) => {
+                            const dbResult = await pgClient.query({
+                              text: `SELECT jwt_private.current_database_id() AS id`,
+                            });
+                            const databaseId = dbResult.rows[0]?.id;
+                            if (!databaseId) return null;
+                            const config = await getStorageModuleConfig(pgClient, databaseId);
+                            if (!config) return null;
+                            return { config, databaseId };
+                          });
+                          if (resolved) {
+                            downloadUrlExpirySeconds = resolved.config.downloadUrlExpirySeconds;
+                            s3ForDb = resolveS3ForDatabase(options, resolved.config, resolved.databaseId);
+                          }
+                        }
+                      } catch {
+                        // Fall back to global config if lookup fails
+                      }
+
+                      if (isPublic && s3ForDb.publicUrlPrefix) {
+                        // Public file: return direct CDN URL (per-database prefix)
+                        return `${s3ForDb.publicUrlPrefix}/${key}`;
+                      }
+
+                      // Private file: generate presigned GET URL (per-database bucket)
+                      return generatePresignedGetUrl(
+                        s3ForDb,
+                        key,
+                        downloadUrlExpirySeconds,
+                        filename || undefined,
+                      );
+                    });
                   },
                 },
               ),

@@ -425,6 +425,7 @@ existing file ID and deduplicated=true with no uploadUrl.
   | Argument | Type |
   |----------|------|
   | `--input.bucketKey` | String (required) |
+  | `--input.ownerId` | UUID |
   | `--input.contentHash` | String (required) |
   | `--input.contentType` | String (required) |
   | `--input.size` | Int (required) |
@@ -456,6 +457,7 @@ and lifecycle settings.
   | Argument | Type |
   |----------|------|
   | `--input.bucketKey` | String (required) |
+  | `--input.ownerId` | UUID |
 
 ## Output
 

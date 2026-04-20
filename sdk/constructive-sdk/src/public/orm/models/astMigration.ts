@@ -37,7 +37,7 @@ import { connectionFieldsMap } from '../input-types';
 export class AstMigrationModel {
   constructor(private client: OrmClient) {}
   findMany<S extends AstMigrationSelect>(
-    args: FindManyArgs<S, AstMigrationFilter, never, AstMigrationOrderBy> & {
+    args: FindManyArgs<S, AstMigrationFilter, AstMigrationOrderBy> & {
       select: S;
     } & StrictSelect<S, AstMigrationSelect>
   ): QueryBuilder<{

@@ -3,6 +3,74 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.19.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.19.1...@constructive-io/graphql-server@4.19.2) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.19.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.19.0...@constructive-io/graphql-server@4.19.1) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.6...@constructive-io/graphql-server@4.19.0) (2026-04-20)
+
+### Features
+
+- **graphile:** propagate jwt.claims.session_id to pgSettings ([41ab24d](https://github.com/constructive-io/constructive/commit/41ab24dc07e5a54a4690570d801b743440f584f0)), closes [constructive-io/constructive-db#908](https://github.com/constructive-io/constructive-db/issues/908)
+
+## [4.18.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.5...@constructive-io/graphql-server@4.18.6) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.18.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.4...@constructive-io/graphql-server@4.18.5) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.18.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.3...@constructive-io/graphql-server@4.18.4) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.18.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.2...@constructive-io/graphql-server@4.18.3) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.18.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.1...@constructive-io/graphql-server@4.18.2) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.18.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.18.0...@constructive-io/graphql-server@4.18.1) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.17.0...@constructive-io/graphql-server@4.18.0) (2026-04-18)
+
+### Bug Fixes
+
+- discover auth settings via metaschema modules, remove CORS migration ([28884c2](https://github.com/constructive-io/constructive/commit/28884c2f3497608c33533fce2a112fe838ba4d7e))
+- use public metaschema tables for auth settings discovery ([17dbfc3](https://github.com/constructive-io/constructive/commit/17dbfc34d46df956c9e79a7f8bb40b2ce83b5c92))
+
+### Features
+
+- Part C server auth enforcement - access_level, cookie auth, CORS migration, reCAPTCHA ([a23123f](https://github.com/constructive-io/constructive/commit/a23123fe9e1733290e067503be5e0d18559e137b))
+- propagate kind + access_level as JWT claims in pgSettings ([788fdfe](https://github.com/constructive-io/constructive/commit/788fdfed6ccae525e1ba8183b691df25d6e16f53))
+
+# [4.17.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.16.2...@constructive-io/graphql-server@4.17.0) (2026-04-16)
+
+### Features
+
+- add missing SAFE_ERROR_CODES for rate limiting and auth errors ([1ca4712](https://github.com/constructive-io/constructive/commit/1ca4712cafe095755d430386e94b6d6048fd9c50))
+
+## [4.16.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.16.1...@constructive-io/graphql-server@4.16.2) (2026-04-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+## [4.16.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.16.0...@constructive-io/graphql-server@4.16.1) (2026-04-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
+# [4.16.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.15.16...@constructive-io/graphql-server@4.16.0) (2026-04-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-server
+
 ## [4.15.16](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.15.15...@constructive-io/graphql-server@4.15.16) (2026-04-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

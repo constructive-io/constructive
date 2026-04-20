@@ -26,6 +26,7 @@ const fieldSchema: FieldSchema = {
   isDisabled: 'boolean',
   isVerified: 'boolean',
   isActive: 'boolean',
+  isExternal: 'boolean',
   isOwner: 'boolean',
   isAdmin: 'boolean',
   permissions: 'string',
@@ -94,6 +95,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       isDisabled: true,
       isVerified: true,
       isActive: true,
+      isExternal: true,
       isOwner: true,
       isAdmin: true,
       permissions: true,
@@ -102,7 +104,7 @@ async function handleList(argv: Partial<Record<string, unknown>>, _prompter: Inq
       profileId: true,
     };
     const findManyArgs = parseFindManyArgs<
-      FindManyArgs<AppMembershipSelect, AppMembershipFilter, never, AppMembershipOrderBy> & {
+      FindManyArgs<AppMembershipSelect, AppMembershipFilter, AppMembershipOrderBy> & {
         select: AppMembershipSelect;
       }
     >(argv, defaultSelect);
@@ -130,6 +132,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isDisabled: true,
       isVerified: true,
       isActive: true,
+      isExternal: true,
       isOwner: true,
       isAdmin: true,
       permissions: true,
@@ -138,7 +141,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       profileId: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<AppMembershipSelect, AppMembershipFilter, never> & {
+      FindFirstArgs<AppMembershipSelect, AppMembershipFilter> & {
         select: AppMembershipSelect;
       }
     >(argv, defaultSelect);
@@ -178,6 +181,7 @@ async function handleGet(argv: Partial<Record<string, unknown>>, prompter: Inqui
           isDisabled: true,
           isVerified: true,
           isActive: true,
+          isExternal: true,
           isOwner: true,
           isAdmin: true,
           permissions: true,
@@ -250,6 +254,13 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'boolean',
+        name: 'isExternal',
+        message: 'isExternal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
         name: 'isOwner',
         message: 'isOwner',
         required: false,
@@ -306,6 +317,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isDisabled: cleanedData.isDisabled,
           isVerified: cleanedData.isVerified,
           isActive: cleanedData.isActive,
+          isExternal: cleanedData.isExternal,
           isOwner: cleanedData.isOwner,
           isAdmin: cleanedData.isAdmin,
           permissions: cleanedData.permissions,
@@ -324,6 +336,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
           isDisabled: true,
           isVerified: true,
           isActive: true,
+          isExternal: true,
           isOwner: true,
           isAdmin: true,
           permissions: true,
@@ -402,6 +415,13 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
       },
       {
         type: 'boolean',
+        name: 'isExternal',
+        message: 'isExternal',
+        required: false,
+        skipPrompt: true,
+      },
+      {
+        type: 'boolean',
         name: 'isOwner',
         message: 'isOwner',
         required: false,
@@ -458,6 +478,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isDisabled: cleanedData.isDisabled,
           isVerified: cleanedData.isVerified,
           isActive: cleanedData.isActive,
+          isExternal: cleanedData.isExternal,
           isOwner: cleanedData.isOwner,
           isAdmin: cleanedData.isAdmin,
           permissions: cleanedData.permissions,
@@ -476,6 +497,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
           isDisabled: true,
           isVerified: true,
           isActive: true,
+          isExternal: true,
           isOwner: true,
           isAdmin: true,
           permissions: true,

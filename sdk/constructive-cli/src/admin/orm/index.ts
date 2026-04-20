@@ -19,24 +19,26 @@ import { AppLimitDefaultModel } from './models/appLimitDefault';
 import { OrgLimitDefaultModel } from './models/orgLimitDefault';
 import { OrgAdminGrantModel } from './models/orgAdminGrant';
 import { OrgOwnerGrantModel } from './models/orgOwnerGrant';
-import { MembershipTypeModel } from './models/membershipType';
 import { AppLimitModel } from './models/appLimit';
 import { AppAchievementModel } from './models/appAchievement';
 import { AppStepModel } from './models/appStep';
-import { ClaimedInviteModel } from './models/claimedInvite';
+import { AppClaimedInviteModel } from './models/appClaimedInvite';
 import { OrgChartEdgeGrantModel } from './models/orgChartEdgeGrant';
 import { OrgLimitModel } from './models/orgLimit';
+import { MembershipTypeModel } from './models/membershipType';
 import { AppGrantModel } from './models/appGrant';
 import { AppMembershipDefaultModel } from './models/appMembershipDefault';
+import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
 import { OrgClaimedInviteModel } from './models/orgClaimedInvite';
 import { OrgGrantModel } from './models/orgGrant';
 import { OrgChartEdgeModel } from './models/orgChartEdge';
-import { OrgMembershipDefaultModel } from './models/orgMembershipDefault';
+import { OrgMemberProfileModel } from './models/orgMemberProfile';
+import { OrgMembershipSettingModel } from './models/orgMembershipSetting';
 import { AppLevelModel } from './models/appLevel';
-import { InviteModel } from './models/invite';
+import { AppInviteModel } from './models/appInvite';
+import { OrgInviteModel } from './models/orgInvite';
 import { AppMembershipModel } from './models/appMembership';
 import { OrgMembershipModel } from './models/orgMembership';
-import { OrgInviteModel } from './models/orgInvite';
 import { createQueryOperations } from './query';
 import { createMutationOperations } from './mutation';
 export type { OrmClientConfig, QueryResult, GraphQLError, GraphQLAdapter } from './client';
@@ -87,24 +89,26 @@ export function createClient(config: OrmClientConfig) {
     orgLimitDefault: new OrgLimitDefaultModel(client),
     orgAdminGrant: new OrgAdminGrantModel(client),
     orgOwnerGrant: new OrgOwnerGrantModel(client),
-    membershipType: new MembershipTypeModel(client),
     appLimit: new AppLimitModel(client),
     appAchievement: new AppAchievementModel(client),
     appStep: new AppStepModel(client),
-    claimedInvite: new ClaimedInviteModel(client),
+    appClaimedInvite: new AppClaimedInviteModel(client),
     orgChartEdgeGrant: new OrgChartEdgeGrantModel(client),
     orgLimit: new OrgLimitModel(client),
+    membershipType: new MembershipTypeModel(client),
     appGrant: new AppGrantModel(client),
     appMembershipDefault: new AppMembershipDefaultModel(client),
+    orgMembershipDefault: new OrgMembershipDefaultModel(client),
     orgClaimedInvite: new OrgClaimedInviteModel(client),
     orgGrant: new OrgGrantModel(client),
     orgChartEdge: new OrgChartEdgeModel(client),
-    orgMembershipDefault: new OrgMembershipDefaultModel(client),
+    orgMemberProfile: new OrgMemberProfileModel(client),
+    orgMembershipSetting: new OrgMembershipSettingModel(client),
     appLevel: new AppLevelModel(client),
-    invite: new InviteModel(client),
+    appInvite: new AppInviteModel(client),
+    orgInvite: new OrgInviteModel(client),
     appMembership: new AppMembershipModel(client),
     orgMembership: new OrgMembershipModel(client),
-    orgInvite: new OrgInviteModel(client),
     query: createQueryOperations(client),
     mutation: createMutationOperations(client),
   };

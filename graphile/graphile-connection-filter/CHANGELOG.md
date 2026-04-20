@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.4](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.5.3...graphile-connection-filter@1.5.4) (2026-04-20)
+
+**Note:** Version bump only for package graphile-connection-filter
+
+## [1.5.3](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.5.2...graphile-connection-filter@1.5.3) (2026-04-20)
+
+**Note:** Version bump only for package graphile-connection-filter
+
+## [1.5.2](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.5.1...graphile-connection-filter@1.5.2) (2026-04-19)
+
+**Note:** Version bump only for package graphile-connection-filter
+
+## [1.5.1](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.5.0...graphile-connection-filter@1.5.1) (2026-04-18)
+
+### Bug Fixes
+
+- **graphile-postgis:** camelCase [@spatial](https://github.com/spatial)Relation field + PascalCase filter type ([78610ae](https://github.com/constructive-io/constructive/commit/78610ae9750f93c322e834c4751a170a5fdfc19d))
+
+# [1.5.0](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.4.1...graphile-connection-filter@1.5.0) (2026-04-18)
+
+**Note:** Version bump only for package graphile-connection-filter
+
+## [1.4.1](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.4.0...graphile-connection-filter@1.4.1) (2026-04-11)
+
+**Note:** Version bump only for package graphile-connection-filter
+
+# [1.4.0](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.3.8...graphile-connection-filter@1.4.0) (2026-04-09)
+
+**Note:** Version bump only for package graphile-connection-filter
+
 ## [1.3.8](https://github.com/constructive-io/constructive/compare/graphile-connection-filter@1.3.7...graphile-connection-filter@1.3.8) (2026-04-04)
 
 **Note:** Version bump only for package graphile-connection-filter

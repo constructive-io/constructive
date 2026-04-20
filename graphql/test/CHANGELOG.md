@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.11.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.7...@constructive-io/graphql-test@4.11.8) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.11.7](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.6...@constructive-io/graphql-test@4.11.7) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.11.6](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.5...@constructive-io/graphql-test@4.11.6) (2026-04-20)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.11.5](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.4...@constructive-io/graphql-test@4.11.5) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.11.4](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.3...@constructive-io/graphql-test@4.11.4) (2026-04-19)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.11.3](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.2...@constructive-io/graphql-test@4.11.3) (2026-04-19)
+
+### Bug Fixes
+
+- correct snapshot UUID position and ProvisionBucketInput description ([37b5856](https://github.com/constructive-io/constructive/commit/37b5856e2a3a6661c51210960a4949158fc7710e))
+- remove leading space in ProvisionBucketInput ownerId description snapshot ([a759376](https://github.com/constructive-io/constructive/commit/a759376f44296e3b79939afae73d60bf024a53a3))
+- update introspection snapshots for ownerId field additions ([da81af9](https://github.com/constructive-io/constructive/commit/da81af952bd417d1022ee08e2051bc4943e28d92))
+
+## [4.11.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.1...@constructive-io/graphql-test@4.11.2) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.11.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.11.0...@constructive-io/graphql-test@4.11.1) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+# [4.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.10.2...@constructive-io/graphql-test@4.11.0) (2026-04-18)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.10.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.10.1...@constructive-io/graphql-test@4.10.2) (2026-04-14)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+## [4.10.1](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.10.0...@constructive-io/graphql-test@4.10.1) (2026-04-11)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
+# [4.10.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.9.16...@constructive-io/graphql-test@4.10.0) (2026-04-09)
+
+**Note:** Version bump only for package @constructive-io/graphql-test
+
 ## [4.9.16](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-test@4.9.15...@constructive-io/graphql-test@4.9.16) (2026-04-04)
 
 **Note:** Version bump only for package @constructive-io/graphql-test

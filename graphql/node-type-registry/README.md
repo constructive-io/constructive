@@ -82,11 +82,3 @@ cd graphql/node-type-registry && pnpm generate:types
 ```
 
 This produces `src/blueprint-types.generated.ts` from the TS node type source of truth.
-
-## Codegen: SQL seed
-
-Generate SQL seed scripts for `node_type_registry` table:
-
-```bash
-cd graphql/node-type-registry && pnpm generate:seed --pgpm ../../constructive-db/packages/metaschema
-```
