@@ -123,6 +123,61 @@ The value is stored as a canonical plain-text key rather than a truncated hash, 
 
 Schema order is preserved. `['a', 'b']` and `['b', 'a']` intentionally produce different buildKeys.
 
+Examples:
+
+- A buildKey is a canonical string derived from connection identity, schemas, and role inputs:
+
+```json
+{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["services_public"],"anonRole":"administrator","roleName":"administrator"}
+```
+
+- Different route keys can still share the same handler when they resolve to the same build inputs:
+
+```text
+svc_key: tenant-a.example.com
+svc_key: tenant-b.example.com
+svc_key: api:main-db:services-api
+svc_key: schemata:main-db:services_public
+```
+
+  Each route key is first resolved into the inputs that matter for handler construction:
+
+  - `dbname`
+  - `schemas`
+  - `anonRole`
+  - `roleName`
+
+  These then feed into the buildKey:
+
+```json
+{"conn":"<host>:<port>/<dbname>@<user>","schemas":[...],"anonRole":"...","roleName":"..."}
+```
+
+  Different route keys only share a `buildKey` if they ultimately resolve to the same:
+
+  - `conn`
+  - `schemas`
+  - `anonRole`
+  - `roleName`
+
+  In practice, the resolution rules differ by path:
+
+  - domain lookup / `X-Api-Name` usually resolve roles from the API record
+  - `X-Schemata` uses administrator defaults and takes schemas directly from the header
+
+  For example, `api:main-db:services-api` and `schemata:main-db:services_public`
+  only share a handler if the `services-api` lookup ultimately resolves to the
+  same schema list and the same role settings. In many deployments, they do not.
+
+- Schema order matters, so these produce different buildKeys:
+
+```json
+{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["services_public","metaschema_public"],"anonRole":"administrator","roleName":"administrator"}
+{"conn":"127.0.0.1:5432/mydb@postgres","schemas":["metaschema_public","services_public"],"anonRole":"administrator","roleName":"administrator"}
+```
+
+- Different database connections also produce different buildKeys, even when schema names match.
+
 ## How the handler cache works
 
 At runtime the cache maintains three main indexes:
