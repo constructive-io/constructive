@@ -32,6 +32,7 @@
     "@0no-co/graphql.web": "^1.2.0",
     "@agentic-kit/ollama": "^1.0.3",
     "@constructive-io/graphql-codegen": "workspace:^",
+    "@constructive-io/graphql-query": "workspace:^",
     "@types/express": "^5.0.6",
     "@types/pg": "^8.18.0",
     "@types/supertest": "^7.2.0",

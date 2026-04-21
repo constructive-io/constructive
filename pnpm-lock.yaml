@@ -1370,6 +1370,9 @@ importers:
       '@constructive-io/graphql-codegen':
         specifier: workspace:^
         version: link:../codegen/dist
+      '@constructive-io/graphql-query':
+        specifier: workspace:^
+        version: link:../query/dist
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
