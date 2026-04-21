@@ -14913,8 +14913,8 @@ input NotificationsModuleFilter {
   """Filter by the object’s `notificationsTableId` field."""
   notificationsTableId: UUIDFilter
 
-  """Filter by the object’s `eventsTableId` field."""
-  eventsTableId: UUIDFilter
+  """Filter by the object’s `readStateTableId` field."""
+  readStateTableId: UUIDFilter
 
   """Filter by the object’s `preferencesTableId` field."""
   preferencesTableId: UUIDFilter
@@ -14934,6 +14934,21 @@ input NotificationsModuleFilter {
   """Filter by the object’s `organizationSettingsTableId` field."""
   organizationSettingsTableId: UUIDFilter
 
+  """Filter by the object’s `hasChannels` field."""
+  hasChannels: BooleanFilter
+
+  """Filter by the object’s `hasPreferences` field."""
+  hasPreferences: BooleanFilter
+
+  """Filter by the object’s `hasSettingsExtension` field."""
+  hasSettingsExtension: BooleanFilter
+
+  """Filter by the object’s `hasDigestMetadata` field."""
+  hasDigestMetadata: BooleanFilter
+
+  """Filter by the object’s `hasSubscriptions` field."""
+  hasSubscriptions: BooleanFilter
+
   """Checks for all expressions in this list."""
   and: [NotificationsModuleFilter!]
 
@@ -14946,6 +14961,9 @@ input NotificationsModuleFilter {
   """Filter by the object’s `channelsTableByChannelsTableId` relation."""
   channelsTableByChannelsTableId: TableFilter
 
+  """A related `channelsTableByChannelsTableId` exists."""
+  channelsTableByChannelsTableIdExists: Boolean
+
   """Filter by the object’s `database` relation."""
   database: DatabaseFilter
 
@@ -14954,8 +14972,8 @@ input NotificationsModuleFilter {
   """
   deliveryLogTableByDeliveryLogTableId: TableFilter
 
-  """Filter by the object’s `eventsTableByEventsTableId` relation."""
-  eventsTableByEventsTableId: TableFilter
+  """A related `deliveryLogTableByDeliveryLogTableId` exists."""
+  deliveryLogTableByDeliveryLogTableIdExists: Boolean
 
   """
   Filter by the object’s `notificationsTableByNotificationsTableId` relation.
@@ -14980,8 +14998,14 @@ input NotificationsModuleFilter {
   """
   preferencesTableByPreferencesTableId: TableFilter
 
+  """A related `preferencesTableByPreferencesTableId` exists."""
+  preferencesTableByPreferencesTableIdExists: Boolean
+
   """Filter by the object’s `privateSchema` relation."""
   privateSchema: SchemaFilter
+
+  """Filter by the object’s `readStateTableByReadStateTableId` relation."""
+  readStateTableByReadStateTableId: TableFilter
 
   """Filter by the object’s `schema` relation."""
   schema: SchemaFilter
@@ -21523,13 +21547,18 @@ type NotificationsModule {
   schemaId: UUID!
   privateSchemaId: UUID!
   notificationsTableId: UUID!
-  eventsTableId: UUID!
-  preferencesTableId: UUID!
-  channelsTableId: UUID!
-  deliveryLogTableId: UUID!
+  readStateTableId: UUID!
+  preferencesTableId: UUID
+  channelsTableId: UUID
+  deliveryLogTableId: UUID
   ownerTableId: UUID!
   userSettingsTableId: UUID
   organizationSettingsTableId: UUID
+  hasChannels: Boolean!
+  hasPreferences: Boolean!
+  hasSettingsExtension: Boolean!
+  hasDigestMetadata: Boolean!
+  hasSubscriptions: Boolean!
 
   """Reads a single `Table` that is related to this `NotificationsModule`."""
   channelsTableByChannelsTableId: Table
@@ -21541,9 +21570,6 @@ type NotificationsModule {
 
   """Reads a single `Table` that is related to this `NotificationsModule`."""
   deliveryLogTableByDeliveryLogTableId: Table
-
-  """Reads a single `Table` that is related to this `NotificationsModule`."""
-  eventsTableByEventsTableId: Table
 
   """Reads a single `Table` that is related to this `NotificationsModule`."""
   notificationsTableByNotificationsTableId: Table
@@ -21559,6 +21585,9 @@ type NotificationsModule {
 
   """Reads a single `Schema` that is related to this `NotificationsModule`."""
   privateSchema: Schema
+
+  """Reads a single `Table` that is related to this `NotificationsModule`."""
+  readStateTableByReadStateTableId: Table
 
   """Reads a single `Schema` that is related to this `NotificationsModule`."""
   schema: Schema
@@ -21591,8 +21620,8 @@ enum NotificationsModuleOrderBy {
   PRIVATE_SCHEMA_ID_DESC
   NOTIFICATIONS_TABLE_ID_ASC
   NOTIFICATIONS_TABLE_ID_DESC
-  EVENTS_TABLE_ID_ASC
-  EVENTS_TABLE_ID_DESC
+  READ_STATE_TABLE_ID_ASC
+  READ_STATE_TABLE_ID_DESC
   PREFERENCES_TABLE_ID_ASC
   PREFERENCES_TABLE_ID_DESC
   CHANNELS_TABLE_ID_ASC
@@ -21605,6 +21634,16 @@ enum NotificationsModuleOrderBy {
   USER_SETTINGS_TABLE_ID_DESC
   ORGANIZATION_SETTINGS_TABLE_ID_ASC
   ORGANIZATION_SETTINGS_TABLE_ID_DESC
+  HAS_CHANNELS_ASC
+  HAS_CHANNELS_DESC
+  HAS_PREFERENCES_ASC
+  HAS_PREFERENCES_DESC
+  HAS_SETTINGS_EXTENSION_ASC
+  HAS_SETTINGS_EXTENSION_DESC
+  HAS_DIGEST_METADATA_ASC
+  HAS_DIGEST_METADATA_DESC
+  HAS_SUBSCRIPTIONS_ASC
+  HAS_SUBSCRIPTIONS_DESC
 }
 
 """A connection to a list of `DatabaseProvisionModule` values."""
@@ -31101,57 +31140,6 @@ input DenormalizedTableFieldInput {
   funcOrder: Int
 }
 
-"""The output of our create `NotificationsModule` mutation."""
-type CreateNotificationsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `NotificationsModule` that was created by this mutation."""
-  notificationsModule: NotificationsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `NotificationsModule`. May be used by Relay 1."""
-  notificationsModuleEdge(
-    """The method to use when ordering `NotificationsModule`."""
-    orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): NotificationsModuleEdge
-}
-
-"""All input for the create `NotificationsModule` mutation."""
-input CreateNotificationsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `NotificationsModule` to be created by this mutation."""
-  notificationsModule: NotificationsModuleInput!
-}
-
-"""An input for mutations affecting `NotificationsModule`"""
-input NotificationsModuleInput {
-  id: UUID
-  databaseId: UUID!
-  schemaId: UUID
-  privateSchemaId: UUID
-  notificationsTableId: UUID
-  eventsTableId: UUID
-  preferencesTableId: UUID
-  channelsTableId: UUID
-  deliveryLogTableId: UUID
-  ownerTableId: UUID
-  userSettingsTableId: UUID
-  organizationSettingsTableId: UUID
-}
-
 """The output of our create `Email` mutation."""
 type CreateEmailPayload {
   """
@@ -32424,6 +32412,62 @@ input PolicyInput {
   tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our create `NotificationsModule` mutation."""
+type CreateNotificationsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NotificationsModule` that was created by this mutation."""
+  notificationsModule: NotificationsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NotificationsModule`. May be used by Relay 1."""
+  notificationsModuleEdge(
+    """The method to use when ordering `NotificationsModule`."""
+    orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NotificationsModuleEdge
+}
+
+"""All input for the create `NotificationsModule` mutation."""
+input CreateNotificationsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `NotificationsModule` to be created by this mutation."""
+  notificationsModule: NotificationsModuleInput!
+}
+
+"""An input for mutations affecting `NotificationsModule`"""
+input NotificationsModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  notificationsTableId: UUID
+  readStateTableId: UUID
+  preferencesTableId: UUID
+  channelsTableId: UUID
+  deliveryLogTableId: UUID
+  ownerTableId: UUID
+  userSettingsTableId: UUID
+  organizationSettingsTableId: UUID
+  hasChannels: Boolean
+  hasPreferences: Boolean
+  hasSettingsExtension: Boolean
+  hasDigestMetadata: Boolean
+  hasSubscriptions: Boolean
 }
 
 """The output of our create `PermissionsModule` mutation."""
@@ -38154,62 +38198,6 @@ input DenormalizedTableFieldPatch {
   funcOrder: Int
 }
 
-"""The output of our update `NotificationsModule` mutation."""
-type UpdateNotificationsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `NotificationsModule` that was updated by this mutation."""
-  notificationsModule: NotificationsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `NotificationsModule`. May be used by Relay 1."""
-  notificationsModuleEdge(
-    """The method to use when ordering `NotificationsModule`."""
-    orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): NotificationsModuleEdge
-}
-
-"""All input for the `updateNotificationsModule` mutation."""
-input UpdateNotificationsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `NotificationsModule` being updated.
-  """
-  notificationsModulePatch: NotificationsModulePatch!
-}
-
-"""
-Represents an update to a `NotificationsModule`. Fields that are set will be updated.
-"""
-input NotificationsModulePatch {
-  id: UUID
-  databaseId: UUID
-  schemaId: UUID
-  privateSchemaId: UUID
-  notificationsTableId: UUID
-  eventsTableId: UUID
-  preferencesTableId: UUID
-  channelsTableId: UUID
-  deliveryLogTableId: UUID
-  ownerTableId: UUID
-  userSettingsTableId: UUID
-  organizationSettingsTableId: UUID
-}
-
 """The output of our update `Email` mutation."""
 type UpdateEmailPayload {
   """
@@ -39507,6 +39495,67 @@ input PolicyPatch {
   tags: [String]
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our update `NotificationsModule` mutation."""
+type UpdateNotificationsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NotificationsModule` that was updated by this mutation."""
+  notificationsModule: NotificationsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NotificationsModule`. May be used by Relay 1."""
+  notificationsModuleEdge(
+    """The method to use when ordering `NotificationsModule`."""
+    orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NotificationsModuleEdge
+}
+
+"""All input for the `updateNotificationsModule` mutation."""
+input UpdateNotificationsModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `NotificationsModule` being updated.
+  """
+  notificationsModulePatch: NotificationsModulePatch!
+}
+
+"""
+Represents an update to a `NotificationsModule`. Fields that are set will be updated.
+"""
+input NotificationsModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  notificationsTableId: UUID
+  readStateTableId: UUID
+  preferencesTableId: UUID
+  channelsTableId: UUID
+  deliveryLogTableId: UUID
+  ownerTableId: UUID
+  userSettingsTableId: UUID
+  organizationSettingsTableId: UUID
+  hasChannels: Boolean
+  hasPreferences: Boolean
+  hasSettingsExtension: Boolean
+  hasDigestMetadata: Boolean
+  hasSubscriptions: Boolean
 }
 
 """The output of our update `PermissionsModule` mutation."""
@@ -43735,39 +43784,6 @@ input DeleteDenormalizedTableFieldInput {
   id: UUID!
 }
 
-"""The output of our delete `NotificationsModule` mutation."""
-type DeleteNotificationsModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `NotificationsModule` that was deleted by this mutation."""
-  notificationsModule: NotificationsModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `NotificationsModule`. May be used by Relay 1."""
-  notificationsModuleEdge(
-    """The method to use when ordering `NotificationsModule`."""
-    orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): NotificationsModuleEdge
-}
-
-"""All input for the `deleteNotificationsModule` mutation."""
-input DeleteNotificationsModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-}
-
 """The output of our delete `Email` mutation."""
 type DeleteEmailPayload {
   """
@@ -44426,6 +44442,39 @@ type DeletePolicyPayload {
 
 """All input for the `deletePolicy` mutation."""
 input DeletePolicyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""The output of our delete `NotificationsModule` mutation."""
+type DeleteNotificationsModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `NotificationsModule` that was deleted by this mutation."""
+  notificationsModule: NotificationsModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `NotificationsModule`. May be used by Relay 1."""
+  notificationsModuleEdge(
+    """The method to use when ordering `NotificationsModule`."""
+    orderBy: [NotificationsModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): NotificationsModuleEdge
+}
+
+"""All input for the `deleteNotificationsModule` mutation."""
+input DeleteNotificationsModuleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -47498,35 +47547,6 @@ type Query {
     orderBy: [DenormalizedTableFieldOrderBy!] = [PRIMARY_KEY_ASC]
   ): DenormalizedTableFieldConnection
 
-  """Reads and enables pagination through a set of `NotificationsModule`."""
-  notificationsModules(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A filter to be used in determining which values should be returned by the collection.
-    """
-    where: NotificationsModuleFilter
-
-    """The method to use when ordering `NotificationsModule`."""
-    orderBy: [NotificationsModuleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): NotificationsModuleConnection
-
   """Reads and enables pagination through a set of `Email`."""
   emails(
     """Only read the first `n` values of the set."""
@@ -48166,6 +48186,35 @@ type Query {
     """The method to use when ordering `Policy`."""
     orderBy: [PolicyOrderBy!] = [PRIMARY_KEY_ASC]
   ): PolicyConnection
+
+  """Reads and enables pagination through a set of `NotificationsModule`."""
+  notificationsModules(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A filter to be used in determining which values should be returned by the collection.
+    """
+    where: NotificationsModuleFilter
+
+    """The method to use when ordering `NotificationsModule`."""
+    orderBy: [NotificationsModuleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NotificationsModuleConnection
 
   """Reads and enables pagination through a set of `PermissionsModule`."""
   permissionsModules(
@@ -49708,14 +49757,6 @@ type Mutation {
     input: CreateDenormalizedTableFieldInput!
   ): CreateDenormalizedTableFieldPayload
 
-  """Creates a single `NotificationsModule`."""
-  createNotificationsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateNotificationsModuleInput!
-  ): CreateNotificationsModulePayload
-
   """Creates a single `Email`."""
   createEmail(
     """
@@ -49891,6 +49932,14 @@ type Mutation {
     """
     input: CreatePolicyInput!
   ): CreatePolicyPayload
+
+  """Creates a single `NotificationsModule`."""
+  createNotificationsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateNotificationsModuleInput!
+  ): CreateNotificationsModulePayload
 
   """Creates a single `PermissionsModule`."""
   createPermissionsModule(
@@ -50646,14 +50695,6 @@ type Mutation {
     input: UpdateDenormalizedTableFieldInput!
   ): UpdateDenormalizedTableFieldPayload
 
-  """Updates a single `NotificationsModule` using a unique key and a patch."""
-  updateNotificationsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateNotificationsModuleInput!
-  ): UpdateNotificationsModulePayload
-
   """Updates a single `Email` using a unique key and a patch."""
   updateEmail(
     """
@@ -50821,6 +50862,14 @@ type Mutation {
     """
     input: UpdatePolicyInput!
   ): UpdatePolicyPayload
+
+  """Updates a single `NotificationsModule` using a unique key and a patch."""
+  updateNotificationsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateNotificationsModuleInput!
+  ): UpdateNotificationsModulePayload
 
   """Updates a single `PermissionsModule` using a unique key and a patch."""
   updatePermissionsModule(
@@ -51552,14 +51601,6 @@ type Mutation {
     input: DeleteDenormalizedTableFieldInput!
   ): DeleteDenormalizedTableFieldPayload
 
-  """Deletes a single `NotificationsModule` using a unique key."""
-  deleteNotificationsModule(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteNotificationsModuleInput!
-  ): DeleteNotificationsModulePayload
-
   """Deletes a single `Email` using a unique key."""
   deleteEmail(
     """
@@ -51719,6 +51760,14 @@ type Mutation {
     """
     input: DeletePolicyInput!
   ): DeletePolicyPayload
+
+  """Deletes a single `NotificationsModule` using a unique key."""
+  deleteNotificationsModule(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteNotificationsModuleInput!
+  ): DeleteNotificationsModulePayload
 
   """Deletes a single `PermissionsModule` using a unique key."""
   deletePermissionsModule(

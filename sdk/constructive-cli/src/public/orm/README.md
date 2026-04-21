@@ -2906,25 +2906,30 @@ CRUD operations for NotificationsModule records.
 | `schemaId` | UUID | Yes |
 | `privateSchemaId` | UUID | Yes |
 | `notificationsTableId` | UUID | Yes |
-| `eventsTableId` | UUID | Yes |
+| `readStateTableId` | UUID | Yes |
 | `preferencesTableId` | UUID | Yes |
 | `channelsTableId` | UUID | Yes |
 | `deliveryLogTableId` | UUID | Yes |
 | `ownerTableId` | UUID | Yes |
 | `userSettingsTableId` | UUID | Yes |
 | `organizationSettingsTableId` | UUID | Yes |
+| `hasChannels` | Boolean | Yes |
+| `hasPreferences` | Boolean | Yes |
+| `hasSettingsExtension` | Boolean | Yes |
+| `hasDigestMetadata` | Boolean | Yes |
+| `hasSubscriptions` | Boolean | Yes |
 
 **Operations:**
 
 ```typescript
 // List all notificationsModule records
-const items = await db.notificationsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, notificationsTableId: true, eventsTableId: true, preferencesTableId: true, channelsTableId: true, deliveryLogTableId: true, ownerTableId: true, userSettingsTableId: true, organizationSettingsTableId: true } }).execute();
+const items = await db.notificationsModule.findMany({ select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, notificationsTableId: true, readStateTableId: true, preferencesTableId: true, channelsTableId: true, deliveryLogTableId: true, ownerTableId: true, userSettingsTableId: true, organizationSettingsTableId: true, hasChannels: true, hasPreferences: true, hasSettingsExtension: true, hasDigestMetadata: true, hasSubscriptions: true } }).execute();
 
 // Get one by id
-const item = await db.notificationsModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, notificationsTableId: true, eventsTableId: true, preferencesTableId: true, channelsTableId: true, deliveryLogTableId: true, ownerTableId: true, userSettingsTableId: true, organizationSettingsTableId: true } }).execute();
+const item = await db.notificationsModule.findOne({ id: '<UUID>', select: { id: true, databaseId: true, schemaId: true, privateSchemaId: true, notificationsTableId: true, readStateTableId: true, preferencesTableId: true, channelsTableId: true, deliveryLogTableId: true, ownerTableId: true, userSettingsTableId: true, organizationSettingsTableId: true, hasChannels: true, hasPreferences: true, hasSettingsExtension: true, hasDigestMetadata: true, hasSubscriptions: true } }).execute();
 
 // Create
-const created = await db.notificationsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', notificationsTableId: '<UUID>', eventsTableId: '<UUID>', preferencesTableId: '<UUID>', channelsTableId: '<UUID>', deliveryLogTableId: '<UUID>', ownerTableId: '<UUID>', userSettingsTableId: '<UUID>', organizationSettingsTableId: '<UUID>' }, select: { id: true } }).execute();
+const created = await db.notificationsModule.create({ data: { databaseId: '<UUID>', schemaId: '<UUID>', privateSchemaId: '<UUID>', notificationsTableId: '<UUID>', readStateTableId: '<UUID>', preferencesTableId: '<UUID>', channelsTableId: '<UUID>', deliveryLogTableId: '<UUID>', ownerTableId: '<UUID>', userSettingsTableId: '<UUID>', organizationSettingsTableId: '<UUID>', hasChannels: '<Boolean>', hasPreferences: '<Boolean>', hasSettingsExtension: '<Boolean>', hasDigestMetadata: '<Boolean>', hasSubscriptions: '<Boolean>' }, select: { id: true } }).execute();
 
 // Update
 const updated = await db.notificationsModule.update({ where: { id: '<UUID>' }, data: { databaseId: '<UUID>' }, select: { id: true } }).execute();

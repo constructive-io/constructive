@@ -947,13 +947,18 @@ export interface NotificationsModule {
   schemaId: string | null;
   privateSchemaId: string | null;
   notificationsTableId: string | null;
-  eventsTableId: string | null;
+  readStateTableId: string | null;
   preferencesTableId: string | null;
   channelsTableId: string | null;
   deliveryLogTableId: string | null;
   ownerTableId: string | null;
   userSettingsTableId: string | null;
   organizationSettingsTableId: string | null;
+  hasChannels: boolean | null;
+  hasPreferences: boolean | null;
+  hasSettingsExtension: boolean | null;
+  hasDigestMetadata: boolean | null;
+  hasSubscriptions: boolean | null;
 }
 export interface DatabaseProvisionModule {
   id: string | null;
