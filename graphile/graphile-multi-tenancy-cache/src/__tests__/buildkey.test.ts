@@ -10,8 +10,6 @@
  *  - shutdown clears all state
  */
 
-import { createHash } from 'node:crypto';
-
 // We test computeBuildKey directly and use mocks for the orchestrator functions
 // that depend on PostGraphile.
 
@@ -51,10 +49,17 @@ describe('computeBuildKey', () => {
     expect(k1).toBe(k2);
   });
 
-  it('should produce a 16-char hex string', () => {
+  it('should produce a canonical JSON string', () => {
     const pool = makeMockPool();
     const key = computeBuildKey(pool, ['public'], 'anon', 'authenticated');
-    expect(key).toMatch(/^[0-9a-f]{16}$/);
+    expect(key).toBe(
+      JSON.stringify({
+        conn: 'localhost:5432/testdb@postgres',
+        schemas: ['public'],
+        anonRole: 'anon',
+        roleName: 'authenticated',
+      }),
+    );
   });
 
   it('should differ when schemas differ', () => {
@@ -651,7 +656,14 @@ describe('connectionString-based pool identity', () => {
     // Some consumers might create pools with explicit fields instead of connectionString
     const pool = { options: { host: 'myhost', port: 5432, database: 'mydb', user: 'myuser' } } as unknown as import('pg').Pool;
     const key = computeBuildKey(pool, ['public'], 'anon', 'auth');
-    expect(key).toMatch(/^[0-9a-f]{16}$/);
+    expect(key).toBe(
+      JSON.stringify({
+        conn: 'myhost:5432/mydb@myuser',
+        schemas: ['public'],
+        anonRole: 'anon',
+        roleName: 'auth',
+      }),
+    );
   });
 });
 

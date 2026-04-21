@@ -1,8 +1,9 @@
 /**
  * Multi-tenancy cache orchestrator.
  *
- * Caches one independent PostGraphile handler per **buildKey** (derived from
- * the inputs that materially affect Graphile handler construction).
+ * Caches one independent PostGraphile handler per **buildKey** (a canonical
+ * string derived from the inputs that materially affect Graphile handler
+ * construction).
  *
  * Multiple svc_key values with identical build inputs share the same handler.
  * svc_key remains the request routing key and flush targeting key.
@@ -15,7 +16,6 @@
  *   databaseIdToBuildKeys: databaseId → Set<buildKey>
  */
 
-import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { Logger } from '@pgpmjs/logger';
 import express from 'express';
@@ -52,6 +52,13 @@ export interface MultiTenancyCacheStats {
   svcKeyMappings: number;
   databaseIdMappings: number;
   inflightCreations: number;
+}
+
+interface BuildKeyParts {
+  conn: string;
+  schemas: string[];
+  anonRole: string;
+  roleName: string;
 }
 
 // --- Internal state ---
@@ -163,6 +170,10 @@ function getPoolIdentity(pool: Pool): string {
  *   - svc_key (routing-only)
  *   - databaseId (metadata-only)
  *   - token data, host/domain, transient headers
+ *
+ * The buildKey is intentionally stored as a canonical plain-text string
+ * rather than a truncated hash so there is no collision risk between
+ * different tenant build inputs.
  */
 export function computeBuildKey(
   pool: Pool,
@@ -170,13 +181,13 @@ export function computeBuildKey(
   anonRole: string,
   roleName: string,
 ): string {
-  const input = JSON.stringify({
+  const input: BuildKeyParts = {
     conn: getPoolIdentity(pool),
     schemas,
     anonRole,
     roleName,
-  });
-  return createHash('sha256').update(input).digest('hex').slice(0, 16);
+  };
+  return JSON.stringify(input);
 }
 
 // --- Index management ---

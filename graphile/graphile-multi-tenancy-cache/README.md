@@ -100,7 +100,7 @@ process.on('SIGTERM', async () => {
 | Concept | Meaning |
 |--------|---------|
 | `svc_key` | Request routing key. Used to look up which cached handler the current request should hit. |
-| `buildKey` | Handler identity. Computed from the inputs that materially affect Graphile instance construction. |
+| `buildKey` | Handler identity. A canonical string computed from the inputs that materially affect Graphile instance construction. |
 | `databaseId` | Metadata/flush key. Used to evict all handlers associated with a database. |
 
 ### What goes into the buildKey
@@ -118,6 +118,8 @@ It does **not** include:
 - `databaseId`
 - request host/domain
 - auth tokens or transient headers
+
+The value is stored as a canonical plain-text key rather than a truncated hash, so different build inputs cannot collide onto the same handler key.
 
 Schema order is preserved. `['a', 'b']` and `['b', 'a']` intentionally produce different buildKeys.
 
