@@ -15,5 +15,11 @@ export { GraphQLTest } from './graphile-test';
 export * from './get-connections';
 export { seed, snapshot } from 'pgsql-test';
 
+// Re-export low-level DB connection utilities for advanced two-phase patterns
+// (e.g. provision first, then build GraphQL schema over dynamic tables).
+export { getConnections as getDbConnections } from 'pgsql-test';
+export type { GetConnectionResult, GetConnectionOpts } from 'pgsql-test';
+export type { PgTestClient } from 'pgsql-test/test-client';
+
 // Export GraphQL test adapter for SDK integration
 export { GraphQLTestAdapter } from './adapter';
