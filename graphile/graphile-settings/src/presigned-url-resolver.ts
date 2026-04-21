@@ -11,7 +11,7 @@
  * Follows the same lazy-init pattern as upload-resolver.ts.
  */
 
-import { S3Client } from '@aws-sdk/client-s3';
+import { createS3Client } from '@constructive-io/s3-utils';
 import { getEnvOptions } from '@constructive-io/graphql-env';
 import { Logger } from '@pgpmjs/logger';
 import type { S3Config, BucketNameResolver, EnsureBucketProvisioned } from 'graphile-presigned-url-plugin';
@@ -66,10 +66,12 @@ export function getPresignedUrlS3Config(): S3Config {
     `[presigned-url-resolver] Initializing: bucket=${bucketName} endpoint=${endpoint}`,
   );
 
-  const client = new S3Client({
+  const client = createS3Client({
+    provider: (cdn.provider || 'minio') as any,
     region: awsRegion,
-    credentials: { accessKeyId: awsAccessKey, secretAccessKey: awsSecretKey },
-    ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
+    accessKeyId: awsAccessKey,
+    secretAccessKey: awsSecretKey,
+    ...(endpoint ? { endpoint } : {}),
   });
 
   s3Config = {
