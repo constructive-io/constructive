@@ -1,5 +1,5 @@
 /**
- * Unit tests for buildKey-based handler caching (v4-buildkey).
+ * Unit tests for buildKey-based handler caching.
  *
  * Tests cover:
  *  - buildKey computation determinism and sensitivity

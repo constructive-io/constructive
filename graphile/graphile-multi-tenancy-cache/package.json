@@ -2,7 +2,7 @@
   "name": "graphile-multi-tenancy-cache",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Template-based multi-tenancy cache for PostGraphile v5 — shares instances across tenants with identical schemas",
+  "description": "Multi-tenancy cache utilities for PostGraphile — exact-match buildKey handler reuse with introspection-cache helpers",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -30,9 +30,9 @@
     "graphile",
     "multi-tenancy",
     "cache",
-    "template",
-    "constructive",
-    "v5"
+    "buildkey",
+    "introspection",
+    "constructive"
   ],
   "bugs": {
     "url": "https://github.com/constructive-io/constructive/issues"

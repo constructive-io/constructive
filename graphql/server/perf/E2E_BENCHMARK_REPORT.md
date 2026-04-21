@@ -1,155 +1,151 @@
-# E2E Multi-Tenancy Cache Benchmark Report
+# Multi-Tenancy Cache Stress Test Report
+
+This document captures the stress-test results for the current multi-tenancy caching strategy.
+
+The optimization logic evaluated here is:
+
+- introspection caching
+- exact-match buildKey handler reuse
+- perf stress testing of the old vs new request path
 
 ## Test Configuration
 
 | Parameter | Value |
 |---|---|
-| **Mode** | `apiIsPublic=false` (header-based routing via `X-Schemata` + `X-Database-Id`) |
-| **Tenants (k)** | 20 |
-| **Duration** | 5 minutes (300s) per mode |
-| **Workers** | 8 concurrent |
-| **Schema** | `services_public` |
-| **Server** | Constructive GraphQL server (PR #3 branch, linked Crystal PR #5) |
-| **Database** | PostgreSQL 18 via pgpm (`constructive-local` deployed) |
+| **Server** | Constructive GraphQL server |
+| **Database** | PostgreSQL on localhost:5432, `postgres_perf` |
 | **Node.js** | `NODE_ENV=development` |
-| **Old approach GRAPHILE_CACHE_MAX** | 120 (enlarged to prevent cache eviction churn — gives old approach best-case performance) |
+| **Mode comparison** | OLD = dedicated instances (`GRAPHILE_CACHE_MAX` tuned); NEW = `USE_MULTI_TENANCY_CACHE=true` |
+| **Benchmark tool** | `e2e-benchmark.ts` through Express -> PostGraphile -> Grafast -> PostgreSQL |
+| **Query mix** | ListApis (40%), ListApps (20%), ListDomains (20%), Introspection (10%), MetaQuery (10%) |
 
-## Query Mix
+## Stress Matrix
 
-| Operation | Weight | Description |
-|---|---|---|
-| `ListApis` | 40% | `{ apis(first: 10) { nodes { id name dbname isPublic } totalCount } }` |
-| `ListApps` | 20% | `{ apps(first: 10) { nodes { id name databaseId } totalCount } }` |
-| `ListDomains` | 20% | `{ domains(first: 10) { nodes { id domain subdomain } totalCount } }` |
-| `Introspection` | 10% | `{ __schema { queryType { name } mutationType { name } types { name kind } } }` |
-| `MetaQuery` | 10% | `{ _meta { tables { name schemaName fields { name } } } }` |
+| # | Test | K | Workers | Duration | Schema Variants | Extras |
+|---|------|---|---------|----------|-----------------|--------|
+| 1 | High-K scale | 100 | 10 | 5 min | `SCHEMA_VARIANTS=4` | `MULTI_ENDPOINT=true` |
+| 2 | High concurrency | 30 | 10 | 5 min | `SCHEMA_VARIANTS=4` | `MULTI_ENDPOINT=true` |
+| 3 | Flush under load | 30 | 10 | 5 min | `SCHEMA_VARIANTS=4` | `CHAOS_FLUSH=true FLUSH_INTERVAL=30` |
+| 4 | Mixed buildKeys (max divergence) | 30 | 10 | 5 min | `SCHEMA_VARIANTS=8` | — |
+| 5 | Soak | 30 | 10 | 2 hr | `SCHEMA_VARIANTS=4` | `CHAOS_FLUSH=true FLUSH_INTERVAL=60` |
+| 6 | Startup burst | 30 | 10 | 1 min | `SCHEMA_VARIANTS=4` | `BURST_START=true` |
 
-All queries are real GraphQL HTTP requests through the full Express → PostGraphile → Grafast pipeline.
+Each test was run in OLD mode and NEW mode.
 
-## Throughput & Latency
+## Results Summary
 
-| Metric | Dedicated (Old, CACHE_MAX=120) | Multi-tenant (New) | Delta |
-|---|---|---|---|
-| **Total Queries** | 212,052 | 234,125 | **+10.4%** |
-| **Errors** | 0 | 0 | — |
-| **QPS** | 706 | 780 | **+10.5%** |
-| **p50 Latency** | 11ms | 11ms | same |
-| **p95 Latency** | 23ms | 16ms | **-30.4% (7ms faster)** |
-| **p99 Latency** | 42ms | 29ms | **-31.0% (13ms faster)** |
+### Throughput and Memory
 
-> **Note:** The old approach was given `GRAPHILE_CACHE_MAX=120` (6× the number of tenants) to eliminate
-> cache eviction churn entirely. This represents the **best-case scenario** for the dedicated-instance
-> approach. Even with this advantage, the multi-tenancy cache still outperforms it across every metric.
+| # | Test | OLD QPS | NEW QPS | QPS Delta | OLD Heap Delta | NEW Heap Delta | Heap Saved | svc_keys | Errors |
+|---|------|---------|---------|-----------|----------------|----------------|------------|----------|--------|
+| 1 | High-K | 697 | 772 | +11% | 1,502 MB | 191 MB | -87% | 400 | 0 |
+| 2 | High concurrency | 717 | 731 | +2% | 648 MB | 262 MB | -60% | 120 | 0 |
+| 3 | Flush under load | 689 | 738 | +7% | 1,019 MB | 220 MB | -78% | 120 | 0 |
+| 4 | Mixed buildKeys | 730 | 760 | +4% | 950 MB | 51 MB | -95% | 240 | 0 |
+| 5 | Soak | 733 | 763 | +4% | 856 MB | 560 MB | -35% | 120 | 0 |
+| 6 | Startup burst | 728 | 746 | +2% | 1,216 MB | 264 MB | -78% | 120 | 0 |
 
-## Server-Side Memory
+### Latency
 
-Both snapshots captured from the server's `/debug/memory` endpoint before and after the 5-minute sustained load.
+| # | Test | OLD p50 | NEW p50 | OLD p95 | NEW p95 | OLD p99 | NEW p99 |
+|---|------|---------|---------|---------|---------|---------|---------|
+| 1 | High-K | 14 ms | 14 ms | 21 ms | 19 ms | 25 ms | 21 ms |
+| 2 | High concurrency | 15 ms | 15 ms | 21 ms | 21 ms | 25 ms | 24 ms |
+| 3 | Flush under load | 15 ms | 14 ms | 23 ms | 21 ms | 30 ms | 25 ms |
+| 4 | Mixed buildKeys | 14 ms | 14 ms | 21 ms | 20 ms | 25 ms | 23 ms |
+| 5 | Soak | 15 ms | 14 ms | 21 ms | 20 ms | 24 ms | 23 ms |
+| 6 | Startup burst | 14 ms | 14 ms | 21 ms | 20 ms | 25 ms | 25 ms |
 
-| Metric | Dedicated (Old, CACHE_MAX=120) | Multi-tenant (New) | Delta |
-|---|---|---|---|
-| **Heap Start** | 321.8 MB | 321.8 MB | same |
-| **Heap End** | 1,597.8 MB | 656.1 MB | **-941.7 MB (-58.9%)** |
-| **Heap Growth** | +1,276.0 MB | +334.3 MB | **-941.7 MB (73.8% less growth)** |
-| **RSS Start** | 421.2 MB | 421.2 MB | same |
-| **RSS End** | 2,118.4 MB | 1,265.9 MB | **-852.5 MB (-40.2%)** |
-| **RSS Growth** | +1,697.2 MB | +844.8 MB | **-852.4 MB (50.2% less growth)** |
-| **External (end)** | 173.7 MB | 159.7 MB | -14.1 MB (-8.1%) |
+### Soak Detail
 
-> **RSS** (Resident Set Size) is the total physical RAM the server process occupies, as reported by the OS.
-> It includes heap, external buffers, code segments, stacks, and shared libraries. RSS is what matters for
-> production capacity planning — it's the real memory footprint.
-
-### Cache Internals
-
-| Metric | Dedicated (Old) | Multi-tenant (New) |
-|---|---|---|
-| Graphile Cache entries | 20/120 (all tenants cached) | 0/15 (bypassed entirely) |
-| Svc Cache entries | 20/25 | 20/25 |
-| PostGraphile Builds (started) | 20 | **0** (template reuse) |
-| PostGraphile Builds (succeeded) | 20 | **0** |
-| Build Time (total) | 112ms | **0ms** |
-
-> Even with `GRAPHILE_CACHE_MAX=120` (no eviction churn), the old approach still grows **1.3 GB heap**
-> and **1.7 GB RSS** over 5 minutes — each of the 20 dedicated PostGraphile instances maintains its own
-> operation plan cache, compiled schema, and V8 closures. The new approach grows **3.8× less heap** and
-> **2× less RSS** because all 20 tenants share a single compiled template with one operation plan cache.
-
-## Cold Start (per-tenant schema build)
-
-| Metric | Dedicated (Old) | Multi-tenant (New) | Delta |
-|---|---|---|---|
-| 1st tenant | 873ms | 1,372ms | +57% (full template build) |
-| 2nd+ tenant avg | 412ms | **7ms** | **98.3% faster** |
-| Last tenant | 489ms | 5ms | **-99%** |
+| Metric | OLD | NEW |
+|--------|-----|-----|
+| Total queries | 5,281,481 | 5,493,698 |
+| QPS | 733 | 763 |
+| Errors | 0 | 0 |
+| Chaos flush events | 119 | 119 |
+| Flush errors | 0 | 0 |
+| Avg flush latency | 23 ms | 23 ms |
 
 ## Analysis
 
-### Why GRAPHILE_CACHE_MAX matters for the old approach
+### Why the heap savings are so large
 
-Without enlarging `GRAPHILE_CACHE_MAX`, the legacy graphile-cache uses an LRU with `max=15` entries by default. With 20 tenants, the cache constantly evicts and rebuilds PostGraphile schema instances, causing:
+The dominant effect is exact-match buildKey deduplication combined with cached introspection state.
 
-- **1,110+ schema builds** triggered by eviction churn over 5 minutes
-- QPS drops to **~13** because requests are blocked on schema rebuilds
-- Heap peaks at **1.8 GB** and never reclaims
-- p50 latency rises to **212ms**, p99 to **2,559ms**
+In OLD mode, every `svc_key` keeps its own PostGraphile instance, compiled schema, and runtime caches.
+In NEW mode, `svc_key`s that resolve to the same build inputs share a single handler.
 
-By setting `GRAPHILE_CACHE_MAX=120`, all 20 tenants fit in cache with room to spare. This eliminates churn and gives the old approach its best-case performance (~706 QPS, 11ms p50).
+Those build inputs are:
 
-### Why the new approach still wins
+- connection identity
+- schema set
+- `anonRole`
+- `roleName`
 
-Even when the old approach runs at its best (no eviction churn), the multi-tenancy cache delivers:
+This means the memory benefit depends on the ratio between:
 
-- **+10.5% higher QPS** (780 vs 706) — shared template means less per-request overhead
-- **30% lower tail latency** (p95: 16ms vs 23ms, p99: 29ms vs 42ms) — no per-tenant instance lookup variance
-- **98.3% faster tenant onboarding** (7ms vs 412ms avg cold start for 2nd+ tenants) — template reuse vs full schema build
-- **Zero PostGraphile builds during sustained load** — all operation plans compiled once and shared
+- total `svc_key`s observed by the benchmark
+- distinct buildKeys that actually need handlers
 
-### Scaling implications
+When many keys collapse onto a small set of buildKeys, heap savings become dramatic.
 
-At production scale (k=100+), the old approach would need `GRAPHILE_CACHE_MAX=600+` to avoid churn, consuming proportionally more memory for 100 separate PostGraphile instances. The new approach scales with O(1) templates regardless of tenant count — memory grows only for the lightweight `svcCache` entries (~few KB each).
+### Why throughput gains are smaller than heap gains
 
-## How to Reproduce
+The benchmark exercises full HTTP traffic through Express, PostGraphile, Grafast, and PostgreSQL. That means request execution is still dominated by network and query work, not only handler reuse.
 
-```bash
-# Start PostgreSQL
-pgpm docker start --image docker.io/constructiveio/postgres-plus:18
-eval "$(pgpm env)"
-pgpm deploy --yes --package constructive-local --recursive
+The new path still wins because:
 
-# Run the orchestrated benchmark (starts both modes automatically)
-cd graphql/server
-bash run-e2e-benchmark.sh 20 300 8
-# Args: K=20 tenants, DURATION=300s, WORKERS=8
+- fewer handlers means less GC pressure
+- repeated introspection/bootstrap work is reduced
+- working-set size is smaller under load
+- hot handlers stay reused across many route keys
 
-# Or run individual modes manually:
-# OLD mode (with enlarged cache):
-GRAPHILE_CACHE_MAX=120 MODE=old K=20 DURATION=300 WORKERS=8 npx ts-node e2e-benchmark.ts
+At higher `K` and higher `svc_key` fanout, these effects become more visible.
 
-# NEW mode (start server with USE_MULTI_TENANCY_CACHE=true):
-MODE=new K=20 DURATION=300 WORKERS=8 npx ts-node e2e-benchmark.ts
-```
+### Why the soak run saves less heap than the short runs
 
-## Files
+The 2-hour soak includes repeated flushes. That means both modes spend time destroying and rebuilding runtime state instead of converging to a steady-state heap profile.
 
-- `graphql/server/e2e-benchmark.ts` — Benchmark script (real GraphQL HTTP requests)
-- `graphql/server/run-e2e-benchmark.sh` — Orchestrator (runs both modes, compares results)
-- `graphql/server/perf/E2E_BENCHMARK_REPORT.md` — This report
-- `graphql/server/perf/results/e2e-benchmark-old-k20.json` — Raw OLD mode results
-- `graphql/server/perf/results/e2e-benchmark-new-k20.json` — Raw NEW mode results
+The new mode still uses less memory, but the gap narrows because:
 
-### Migrated perf framework scripts (from attachment)
+- handlers are repeatedly evicted
+- rebuilt handlers temporarily increase active memory
+- steady-state reuse is interrupted by churn
 
-- `graphql/server/perf/common.mjs` — Core utilities (HTTP helpers, CLI arg parsing, file I/O)
-- `graphql/server/perf/phase1-preflight.mjs` — Preflight validation (server health, token pool, keyspace)
-- `graphql/server/perf/phase2-load.mjs` — Sustained load generation with cache activity tracking
-- `graphql/server/perf/run-k-sweep.mjs` — K-value sweep orchestrator
-- `graphql/server/perf/run-comparison.sh` — Bash orchestrator for old vs new comparison
-- `graphql/server/perf/run-test-spec.mjs` — Phase orchestrator (spawns phase1 + phase2)
-- `graphql/server/perf/build-token-pool.mjs` — Token pool builder
-- `graphql/server/perf/build-keyspace-profiles.mjs` — Keyspace expansion
-- `graphql/server/perf/build-business-op-profiles.mjs` — Business operation profiles
-- `graphql/server/perf/seed-real-multitenant.mjs` — Real tenant provisioning
-- `graphql/server/perf/reset-business-test-data.mjs` — Test data reset
-- `graphql/server/perf/prepare-public-test-access.mjs` — Public access setup
-- `graphql/server/perf/public-test-access-lib.mjs` — RLS policy helpers
-- `graphql/server/perf/README.md` — Perf framework documentation
+### Stability under concurrency and churn
+
+The stress runs validate the runtime fixes added around the buildKey path:
+
+- deferred registration prevents failed in-flight creation from leaving orphaned mappings
+- rebinding cleanup prevents stale buildKey entries from becoming unreachable leaks
+- the `svc_key` epoch guard prevents stale completions from overwriting newer bindings
+
+The 2-hour soak is the strongest signal here: millions of queries, repeated flushes, and no observed request errors.
+
+## What Drives the Results
+
+| Factor | Heap Impact | QPS Impact | Stability Impact |
+|--------|-------------|------------|------------------|
+| buildKey deduplication | dominant | moderate | — |
+| introspection caching | secondary | secondary | — |
+| reduced GC pressure | secondary | primary at higher fanout | — |
+| deferred registration | leak prevention | — | critical |
+| rebinding cleanup | leak prevention | — | critical |
+| epoch guard | — | — | critical |
+
+## Conclusion
+
+The current strategy of introspection caching plus exact-match buildKey handler reuse delivers substantial memory savings while preserving stable throughput and correctness under load.
+
+For this workload pattern, the results show:
+
+- large heap savings when many `svc_key`s collapse onto few buildKeys
+- modest but consistent QPS gains
+- stable long-running behavior under repeated flush churn
+- no need to reintroduce template sharing or SQL rewriting to get meaningful wins from handler reuse
+
+## Notes
+
+- This file is a results document for the current evaluation cycle.
+- For current script entrypoints and workflow guidance, use `README.md` in the same directory.

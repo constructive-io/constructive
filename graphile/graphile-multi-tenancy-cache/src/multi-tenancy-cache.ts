@@ -1,5 +1,5 @@
 /**
- * Multi-tenancy cache orchestrator (v4-buildkey).
+ * Multi-tenancy cache orchestrator.
  *
  * Caches one independent PostGraphile handler per **buildKey** (derived from
  * the inputs that materially affect Graphile handler construction).
@@ -105,7 +105,7 @@ export interface MultiTenancyCacheConfig {
  */
 export function configureMultiTenancyCache(config: MultiTenancyCacheConfig): void {
   presetBuilder = config.basePresetBuilder;
-  log.info('Multi-tenancy cache configured (v4-buildkey — buildKey-based handler caching)');
+  log.info('Multi-tenancy cache configured (buildKey-based handler caching)');
 }
 
 // --- BuildKey computation ---

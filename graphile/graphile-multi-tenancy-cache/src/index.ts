@@ -18,7 +18,7 @@ export type {
   MultiTenancyCacheConfig,
 } from './multi-tenancy-cache';
 
-// --- Introspection cache (kept as module/test base — not required for v4 runtime) ---
+// --- Introspection cache (kept as module/test base — not required for the handler runtime) ---
 export {
   getOrCreateIntrospection,
   invalidateIntrospection,
@@ -32,7 +32,7 @@ export type {
   IntrospectionCacheStats,
 } from './introspection-cache';
 
-// --- Utilities (kept as module base — not required for v4 runtime) ---
+// --- Utilities (kept as module base — not required for the handler runtime) ---
 export { getSchemaFingerprint } from './utils/fingerprint';
 export type { MinimalIntrospection } from './utils/fingerprint';
 export { fetchIntrospection, parseIntrospection, fetchAndParseIntrospection } from './utils/introspection-query';

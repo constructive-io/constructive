@@ -76,7 +76,7 @@ export const flushService = async (
     });
   }
 
-  // v4-buildkey: flush all handlers associated with this databaseId via index
+  // Flush all handlers associated with this databaseId via index
   if (multiTenancyEnabled) {
     flushByDatabaseId(databaseId);
   }
