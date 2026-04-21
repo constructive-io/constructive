@@ -16,7 +16,7 @@ import { getConnectionsObject, seed } from 'graphile-test';
 import type { GraphQLQueryFnObj } from 'graphile-test';
 import type { PgTestClient } from 'pgsql-test';
 import { ConstructivePreset } from 'graphile-settings';
-import { runCodegenAndLoad } from './helpers/codegen-helper';
+import { runCodegenAndLoad } from '@constructive-io/graphql-test';
 import { GraphileTestAdapter } from './helpers/graphile-adapter';
 
 jest.setTimeout(120000);

@@ -34,7 +34,9 @@
     "makage": "^0.3.0"
   },
   "dependencies": {
+    "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-env": "workspace:^",
+    "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@pgpmjs/types": "workspace:^",
     "grafast": "1.0.0",
@@ -47,7 +49,8 @@
     "mock-req": "^0.2.0",
     "pg": "^8.20.0",
     "pgsql-test": "workspace:^",
-    "postgraphile": "5.0.0"
+    "postgraphile": "5.0.0",
+    "typescript": "^5.0.0"
   },
   "keywords": [
     "testing",

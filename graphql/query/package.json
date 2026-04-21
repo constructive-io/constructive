@@ -29,6 +29,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@0no-co/graphql.web": "^1.1.2",
+    "@constructive-io/graphql-types": "workspace:^",
     "ajv": "^8.18.0",
     "gql-ast": "workspace:^",
     "grafast": "1.0.0",
