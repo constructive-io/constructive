@@ -9,7 +9,7 @@
  */
 
 import { parseType, print } from '@constructive-io/graphql-query/runtime';
-import * as t from '@constructive-io/graphql-query/runtime';
+import * as t from 'gql-ast';
 import type {
   ArgumentNode,
   EnumValueNode,

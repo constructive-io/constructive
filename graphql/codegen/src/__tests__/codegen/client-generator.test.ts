@@ -73,7 +73,7 @@ describe('client-generator', () => {
       expect(result.content).toContain('buildCreateDocument');
       expect(result.content).toContain('buildUpdateDocument');
       expect(result.content).toContain('buildDeleteDocument');
-      expect(result.content).toContain("import * as t from '@constructive-io/graphql-query/runtime'");
+      expect(result.content).toContain("import * as t from 'gql-ast'");
     });
   });
 
