@@ -2,7 +2,7 @@
   "name": "graphile-multi-tenancy-cache",
   "version": "0.1.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Multi-tenancy cache utilities for PostGraphile — exact-match buildKey handler reuse with introspection-cache helpers",
+  "description": "Multi-tenancy cache utilities for PostGraphile — exact-match buildKey handler reuse",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -31,7 +31,6 @@
     "multi-tenancy",
     "cache",
     "buildkey",
-    "introspection",
     "constructive"
   ],
   "bugs": {
@@ -43,10 +42,6 @@
     "grafserv": "1.0.0",
     "graphile-config": "1.0.0",
     "pg": "^8.11.3",
-    "pg-env": "workspace:^",
-    "pg-introspection": "1.0.0",
-    "pgsql-deparser": "^17.18.2",
-    "pgsql-parser": "^17.9.14",
     "postgraphile": "5.0.0"
   },
   "devDependencies": {

@@ -201,6 +201,8 @@ const summarizeCacheRedundancy = (
   { topFingerprints = 10, topKeys = 5, topKeyKinds = 5, topTenants = 5 } = {},
 ) => {
   const entries = Array.isArray(snapshotJson?.graphileCacheEntries) ? snapshotJson.graphileCacheEntries : [];
+  // `fingerprint` here comes from old-mode graphile-cache snapshot metadata.
+  // It is a perf comparison input, not part of the current buildKey runtime path.
   const cacheSize = asCount(snapshotJson?.graphileCache?.size ?? entries.length);
   const byFingerprint = new Map();
   const byKeyKind = new Map();

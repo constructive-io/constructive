@@ -355,18 +355,6 @@ importers:
       pg:
         specifier: ^8.11.3
         version: 8.20.0
-      pg-env:
-        specifier: workspace:^
-        version: link:../../postgres/pg-env/dist
-      pg-introspection:
-        specifier: 1.0.0
-        version: 1.0.0
-      pgsql-deparser:
-        specifier: ^17.18.2
-        version: 17.18.2
-      pgsql-parser:
-        specifier: ^17.9.14
-        version: 17.9.14
       postgraphile:
         specifier: 5.0.0
         version: 5.0.0(f35d86129e8192df0ebe9574df8f7655)

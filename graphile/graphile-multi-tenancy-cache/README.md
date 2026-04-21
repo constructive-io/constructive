@@ -12,14 +12,14 @@
    <a href="https://www.npmjs.com/package/graphile-multi-tenancy-cache"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=graphile%2Fgraphile-multi-tenancy-cache%2Fpackage.json"/></a>
 </p>
 
-Multi-tenancy cache utilities for PostGraphile. This package combines an exact-match buildKey handler cache with introspection-cache helpers for Constructive's GraphQL server runtime.
+Multi-tenancy cache utilities for PostGraphile. This package implements exact-match buildKey-based handler reuse for Constructive's GraphQL server runtime.
 
-The current runtime model is intentionally conservative:
+The runtime model is intentionally conservative:
 
 - reuse handlers only when build inputs match exactly
 - no template sharing
 - no SQL rewrite
-- no fingerprint-based handler reuse in the request path
+- no fingerprint-based handler reuse
 
 ## Table of contents
 
@@ -28,7 +28,6 @@ The current runtime model is intentionally conservative:
 - [Features](#features)
 - [Core concepts](#core-concepts)
 - [How the handler cache works](#how-the-handler-cache-works)
-- [Introspection cache](#introspection-cache)
 - [API](#api)
 - [License](#license)
 
@@ -94,7 +93,6 @@ process.on('SIGTERM', async () => {
 - **Safe rebinding** — reassigning a `svc_key` to a new `buildKey` cleans up unreachable handlers and stale indexes
 - **Targeted flush APIs** — evict by `svc_key` or by `databaseId`
 - **Handler lifecycle management** — graceful disposal and full shutdown support
-- **Introspection cache helpers** — separate connection-and-schema keyed cache for parsed introspection results
 - **Diagnostics-friendly** — exposes cache stats and `svc_key -> buildKey` lookup helpers
 
 ## Core concepts
@@ -158,32 +156,7 @@ The package supports:
 - flushing all handlers associated with a `databaseId`
 - full shutdown and disposal of cached handlers
 
-## Introspection cache
-
-The package also exports a separate introspection cache module.
-
-This cache is keyed by:
-
-- connection key
-- sorted schema list
-
-It stores:
-
-- raw introspection payload
-- parsed introspection structure
-- a fingerprint derived from the parsed result
-
-This is useful for:
-
-- diagnostics
-- perf tooling
-- supporting workflows that need repeated `pg_catalog` introspection
-
-Important: the current runtime does **not** rely on introspection fingerprints to decide handler reuse. Handler reuse is exact-match on build inputs only.
-
 ## API
-
-### Handler cache orchestrator
 
 | Export | Purpose |
 |--------|---------|
@@ -196,25 +169,6 @@ Important: the current runtime does **not** rely on introspection fingerprints t
 | `shutdownMultiTenancyCache()` | Dispose handlers and clear all internal state. |
 | `computeBuildKey(pool, schemas, anonRole, roleName)` | Compute the exact-match handler identity. |
 | `getBuildKeyForSvcKey(svcKey)` | Resolve the buildKey currently mapped to a route key. |
-
-### Introspection cache
-
-| Export | Purpose |
-|--------|---------|
-| `getOrCreateIntrospection(pool, schemas, connectionKey)` | Get or build a cached introspection result. |
-| `invalidateIntrospection(connectionKey, schemas?)` | Invalidate one or all entries for a connection key. |
-| `clearIntrospectionCache()` | Clear the introspection cache completely. |
-| `getIntrospectionCacheStats()` | Return introspection cache stats. |
-| `getConnectionKey(pool)` | Derive the connection cache key for a pool. |
-
-### Lower-level utilities
-
-| Export | Purpose |
-|--------|---------|
-| `getSchemaFingerprint(...)` | Fingerprint helper over parsed introspection data. |
-| `fetchIntrospection(...)` | Fetch raw introspection from PostgreSQL. |
-| `parseIntrospection(...)` | Parse introspection payload into the normalized structure used by this package. |
-| `fetchAndParseIntrospection(...)` | Convenience helper for fetch + parse. |
 
 ## License
 

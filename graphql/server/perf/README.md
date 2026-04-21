@@ -4,7 +4,6 @@ This directory contains the performance tooling for the GraphQL server.
 
 The current optimization model being exercised is:
 
-- introspection caching
 - exact-match buildKey handler reuse
 - no template sharing
 - no SQL rewrite
@@ -73,6 +72,8 @@ The intended usage is:
 2. Add extra provisioned variant tables for selected tenants with `--dbpm-shape-variants`.
 3. Keep the main CRUD workload pointed only at the original business table.
 4. Use `summarize-shapes.mjs` to inspect structural divergence without relying on raw GraphQL introspection names.
+
+`summarize-shapes.mjs` is a perf-local diagnostic. It is not part of the runtime handler reuse mechanism.
 
 ## Quick Start
 

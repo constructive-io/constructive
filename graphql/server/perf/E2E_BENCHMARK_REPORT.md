@@ -4,7 +4,6 @@ This document captures the stress-test results for the current multi-tenancy cac
 
 The optimization logic evaluated here is:
 
-- introspection caching
 - exact-match buildKey handler reuse
 - perf stress testing of the old vs new request path
 
@@ -71,7 +70,7 @@ Each test was run in OLD mode and NEW mode.
 
 ### Why the heap savings are so large
 
-The dominant effect is exact-match buildKey deduplication combined with cached introspection state.
+The dominant effect is exact-match buildKey deduplication.
 
 In OLD mode, every `svc_key` keeps its own PostGraphile instance, compiled schema, and runtime caches.
 In NEW mode, `svc_key`s that resolve to the same build inputs share a single handler.
@@ -97,7 +96,6 @@ The benchmark exercises full HTTP traffic through Express, PostGraphile, Grafast
 The new path still wins because:
 
 - fewer handlers means less GC pressure
-- repeated introspection/bootstrap work is reduced
 - working-set size is smaller under load
 - hot handlers stay reused across many route keys
 
@@ -128,7 +126,6 @@ The 2-hour soak is the strongest signal here: millions of queries, repeated flus
 | Factor | Heap Impact | QPS Impact | Stability Impact |
 |--------|-------------|------------|------------------|
 | buildKey deduplication | dominant | moderate | — |
-| introspection caching | secondary | secondary | — |
 | reduced GC pressure | secondary | primary at higher fanout | — |
 | deferred registration | leak prevention | — | critical |
 | rebinding cleanup | leak prevention | — | critical |
@@ -136,7 +133,7 @@ The 2-hour soak is the strongest signal here: millions of queries, repeated flus
 
 ## Conclusion
 
-The current strategy of introspection caching plus exact-match buildKey handler reuse delivers substantial memory savings while preserving stable throughput and correctness under load.
+The current strategy of exact-match buildKey handler reuse delivers substantial memory savings while preserving stable throughput and correctness under load.
 
 For this workload pattern, the results show:
 
