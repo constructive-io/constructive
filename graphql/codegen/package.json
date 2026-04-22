@@ -29,6 +29,18 @@
   "main": "index.js",
   "module": "index.mjs",
   "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./orm": {
+      "import": "./esm/core/codegen/orm/index.js",
+      "require": "./core/codegen/orm/index.js",
+      "types": "./core/codegen/orm/index.d.ts"
+    }
+  },
   "bin": {
     "graphql-codegen": "cli/index.js"
   },

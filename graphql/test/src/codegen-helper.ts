@@ -32,15 +32,7 @@ import {
 } from '@constructive-io/graphql-query';
 import type { Table } from '@constructive-io/graphql-query';
 
-// generateOrm is not re-exported from the public barrel — resolve via dist
-const codegenRoot = path.dirname(
-  require.resolve('@constructive-io/graphql-codegen'),
-);
-const { generateOrm } = require(
-  path.join(codegenRoot, 'core/codegen/orm/index.js'),
-) as {
-  generateOrm: (opts: any) => { files: { path: string; content: string }[] };
-};
+import { generateOrm } from '@constructive-io/graphql-codegen/orm';
 
 export interface CodegenResult {
   /** Factory function to create an ORM client from a GraphQLAdapter */
