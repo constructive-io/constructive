@@ -31,8 +31,8 @@ import * as ts from 'typescript';
 import { getConnections, seed } from '../src';
 import type { ServerInfo } from '../src/types';
 import type { Table } from '@constructive-io/graphql-codegen';
-import { generateCli } from '@constructive-io/graphql-codegen/core/codegen/cli';
-import { generateOrm } from '@constructive-io/graphql-codegen/core/codegen/orm';
+import { generateCli } from '@constructive-io/graphql-codegen/cli';
+import { generateOrm } from '@constructive-io/graphql-codegen/orm';
 
 jest.setTimeout(120000);
 
