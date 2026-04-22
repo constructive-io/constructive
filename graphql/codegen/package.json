@@ -46,6 +46,12 @@
       "types": "./core/codegen/cli/index.d.ts"
     }
   },
+  "typesVersions": {
+    "*": {
+      "orm": ["core/codegen/orm/index.d.ts"],
+      "cli": ["core/codegen/cli/index.d.ts"]
+    }
+  },
   "bin": {
     "graphql-codegen": "cli/index.js"
   },
