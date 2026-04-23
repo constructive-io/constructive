@@ -14,11 +14,6 @@ export const DataDirectOwner: NodeTypeDefinition = {
         "description": "Column name for owner ID",
         "default": "owner_id"
       },
-      "include_id": {
-        "type": "boolean",
-        "description": "If true, also adds a UUID primary key column with auto-generation",
-        "default": true
-      },
       "include_user_fk": {
         "type": "boolean",
         "description": "If true, adds a foreign key constraint from owner_id to the users table",

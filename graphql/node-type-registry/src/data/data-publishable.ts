@@ -8,13 +8,7 @@ export const DataPublishable: NodeTypeDefinition = {
   "description": "Adds publish state columns (is_published, published_at) for content visibility. Enables AuthzPublishable and AuthzTemporal authorization.",
   "parameter_schema": {
     "type": "object",
-    "properties": {
-      "include_id": {
-        "type": "boolean",
-        "description": "If true, also adds a UUID primary key column with auto-generation",
-        "default": true
-      }
-    }
+    "properties": {}
   },
   "tags": [
     "publishing",
