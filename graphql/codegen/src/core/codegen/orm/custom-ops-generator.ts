@@ -10,6 +10,7 @@ import type { Argument, Operation } from '../../../types/schema';
 import { addJSDocComment, generateCode } from '../babel-ast';
 import { NON_SELECT_TYPES, getSelectTypeName } from '../select-helpers';
 import {
+  getBaseTypeKind,
   getTypeBaseName,
   isTypeRequired,
   scalarToTsType,
@@ -32,13 +33,15 @@ function collectInputTypeNamesFromOps(operations: Operation[]): string[] {
   for (const op of operations) {
     for (const arg of op.args) {
       const baseName = getTypeBaseName(arg.type);
-      if (
-        baseName &&
-        (baseName.endsWith('Input') ||
-          baseName.endsWith('Filter') ||
-          baseName.endsWith('OrderBy') ||
-          baseName.endsWith('Condition'))
-      ) {
+      if (!baseName) continue;
+      const baseKind = getBaseTypeKind(arg.type);
+      const isInputShape =
+        baseKind === 'INPUT_OBJECT' ||
+        baseName.endsWith('Input') ||
+        baseName.endsWith('Filter') ||
+        baseName.endsWith('OrderBy') ||
+        baseName.endsWith('Condition');
+      if (isInputShape || baseKind === 'ENUM') {
         inputTypes.add(baseName);
       }
     }

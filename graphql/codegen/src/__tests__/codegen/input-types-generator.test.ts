@@ -863,6 +863,39 @@ describe('collectInputTypeNames', () => {
 
     expect(result.has('UserFilter')).toBe(true);
   });
+
+  it('collects ENUM arg type names without Input/Filter suffix', () => {
+    const operations = [
+      {
+        args: [
+          { name: 'role', type: createTypeRef('ENUM', 'UserRole') },
+          {
+            name: 'status',
+            type: createNonNull(createTypeRef('ENUM', 'AccountStatus')),
+          },
+        ] as Argument[],
+      },
+    ];
+
+    const result = collectInputTypeNames(operations);
+
+    expect(result.has('UserRole')).toBe(true);
+    expect(result.has('AccountStatus')).toBe(true);
+  });
+
+  it('collects INPUT_OBJECT arg type names without suffix match', () => {
+    const operations = [
+      {
+        args: [
+          { name: 'custom', type: createTypeRef('INPUT_OBJECT', 'CustomPatch') },
+        ] as Argument[],
+      },
+    ];
+
+    const result = collectInputTypeNames(operations);
+
+    expect(result.has('CustomPatch')).toBe(true);
+  });
 });
 
 describe('collectPayloadTypeNames', () => {

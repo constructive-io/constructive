@@ -1,97 +1,11 @@
-/**
- * Node HTTP Adapter for Node.js applications
- *
- * Implements the GraphQLAdapter interface using node:http / node:https
- * instead of the Fetch API. This solves two Node.js limitations:
- *
- * 1. DNS: Node.js cannot resolve *.localhost subdomains (ENOTFOUND).
- *    Browsers handle this automatically, but Node requires manual resolution.
- *
- * 2. Host header: The Fetch API treats "Host" as a forbidden request header
- *    and silently drops it. The Constructive GraphQL server uses Host-header
- *    subdomain routing (enableServicesApi), so this header must be preserved.
- *
- * By using node:http.request directly, both issues are bypassed cleanly
- * without any global patching.
- */
-
-import http from 'node:http';
-import https from 'node:https';
-
 import type {
   GraphQLAdapter,
   GraphQLError,
   QueryResult,
 } from '@constructive-io/graphql-types';
 
-interface HttpResponse {
-  statusCode: number;
-  statusMessage: string;
-  data: string;
-}
+import { fetch } from './fetch';
 
-/**
- * Check if a hostname is a localhost subdomain that needs special handling.
- * Returns true for *.localhost (e.g. auth.localhost) but not bare "localhost".
- */
-function isLocalhostSubdomain(hostname: string): boolean {
-  return hostname.endsWith('.localhost') && hostname !== 'localhost';
-}
-
-/**
- * Make an HTTP/HTTPS request using native Node modules.
- * Supports optional AbortSignal for request cancellation.
- */
-function makeRequest(
-  url: URL,
-  options: http.RequestOptions,
-  body: string,
-  signal?: AbortSignal,
-): Promise<HttpResponse> {
-  return new Promise((resolve, reject) => {
-    if (signal?.aborted) {
-      reject(new Error('The operation was aborted'));
-      return;
-    }
-
-    const protocol = url.protocol === 'https:' ? https : http;
-
-    const req = protocol.request(url, options, (res) => {
-      let data = '';
-      res.setEncoding('utf8');
-      res.on('data', (chunk: string) => {
-        data += chunk;
-      });
-      res.on('end', () => {
-        resolve({
-          statusCode: res.statusCode || 0,
-          statusMessage: res.statusMessage || '',
-          data,
-        });
-      });
-    });
-
-    req.on('error', reject);
-
-    if (signal) {
-      const onAbort = () => {
-        req.destroy(new Error('The operation was aborted'));
-      };
-      signal.addEventListener('abort', onAbort, { once: true });
-      req.on('close', () => {
-        signal.removeEventListener('abort', onAbort);
-      });
-    }
-
-    req.write(body);
-    req.end();
-  });
-}
-
-/**
- * Options for individual execute calls.
- * Allows per-request header overrides and request cancellation.
- */
 export interface NodeHttpExecuteOptions {
   /** Additional headers to include in this request only */
   headers?: Record<string, string>;
@@ -100,29 +14,24 @@ export interface NodeHttpExecuteOptions {
 }
 
 /**
- * GraphQL adapter that uses node:http/node:https for requests.
+ * GraphQL adapter that uses Node's native HTTP for requests.
  *
- * Handles *.localhost subdomains by rewriting the hostname to "localhost"
- * and injecting the original Host header for server-side subdomain routing.
+ * Preserved for backwards compatibility. New code should prefer:
  *
- * @example
- * ```typescript
- * import { NodeHttpAdapter } from '@constructive-io/node';
+ *   import { fetch } from '@constructive-io/node';
+ *   auth.createClient({ endpoint, fetch });
  *
- * const adapter = new NodeHttpAdapter('http://auth.localhost:3000/graphql');
- * const db = createClient({ adapter });
- * ```
+ * The adapter now delegates to that same `fetch` internally, so behaviour
+ * (`*.localhost` rewriting, Host header preservation) matches exactly.
  */
 export class NodeHttpAdapter implements GraphQLAdapter {
   private headers: Record<string, string>;
-  private url: URL;
 
   constructor(
     private endpoint: string,
     headers?: Record<string, string>,
   ) {
     this.headers = headers ?? {};
-    this.url = new URL(endpoint);
   }
 
   async execute<T>(
@@ -130,67 +39,41 @@ export class NodeHttpAdapter implements GraphQLAdapter {
     variables?: Record<string, unknown>,
     options?: NodeHttpExecuteOptions,
   ): Promise<QueryResult<T>> {
-    const requestUrl = new URL(this.url.href);
-    const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...this.headers,
-      ...options?.headers,
-    };
-
-    // For *.localhost subdomains, rewrite hostname and inject Host header
-    if (isLocalhostSubdomain(requestUrl.hostname)) {
-      requestHeaders['Host'] = requestUrl.host;
-      requestUrl.hostname = 'localhost';
-    }
-
-    const body = JSON.stringify({
-      query: document,
-      variables: variables ?? {},
+    const response = await fetch(this.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ...this.headers,
+        ...options?.headers,
+      },
+      body: JSON.stringify({
+        query: document,
+        variables: variables ?? {},
+      }),
+      signal: options?.signal,
     });
 
-    const requestOptions: http.RequestOptions = {
-      method: 'POST',
-      headers: requestHeaders,
-    };
-
-    const response = await makeRequest(
-      requestUrl,
-      requestOptions,
-      body,
-      options?.signal,
-    );
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
+    if (!response.ok) {
       return {
         ok: false,
         data: null,
         errors: [
-          {
-            message: `HTTP ${response.statusCode}: ${response.statusMessage}`,
-          },
+          { message: `HTTP ${response.status}: ${response.statusText}` },
         ],
       };
     }
 
-    const json = JSON.parse(response.data) as {
+    const json = (await response.json()) as {
       data?: T;
       errors?: GraphQLError[];
     };
 
     if (json.errors && json.errors.length > 0) {
-      return {
-        ok: false,
-        data: null,
-        errors: json.errors,
-      };
+      return { ok: false, data: null, errors: json.errors };
     }
 
-    return {
-      ok: true,
-      data: json.data as T,
-      errors: undefined,
-    };
+    return { ok: true, data: json.data as T, errors: undefined };
   }
 
   setHeaders(headers: Record<string, string>): void {

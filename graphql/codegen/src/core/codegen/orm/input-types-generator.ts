@@ -20,7 +20,7 @@ import type {
 } from '../../../types/schema';
 import { addJSDocComment, addLineComment, generateCode } from '../babel-ast';
 import { BASE_FILTER_TYPE_NAMES, SCALAR_NAMES, scalarToFilterType, scalarToTsType } from '../scalars';
-import { getTypeBaseName } from '../type-resolver';
+import { getBaseTypeKind, getTypeBaseName } from '../type-resolver';
 import {
   getCreateInputTypeName,
   getFilterTypeName,
@@ -1521,10 +1521,14 @@ export function collectInputTypeNames(
 
   function collectFromTypeRef(typeRef: Argument['type']) {
     const baseName = getTypeBaseName(typeRef);
-    if (baseName && baseName.endsWith('Input')) {
-      inputTypes.add(baseName);
-    }
-    if (baseName && baseName.endsWith('Filter')) {
+    if (!baseName) return;
+    const baseKind = getBaseTypeKind(typeRef);
+    if (
+      baseName.endsWith('Input') ||
+      baseName.endsWith('Filter') ||
+      baseKind === 'INPUT_OBJECT' ||
+      baseKind === 'ENUM'
+    ) {
       inputTypes.add(baseName);
     }
   }

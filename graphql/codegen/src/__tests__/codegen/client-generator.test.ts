@@ -60,6 +60,30 @@ describe('client-generator', () => {
       expect(result.content).toContain('QueryResult<T>');
       expect(result.content).toContain('GraphQLRequestError');
     });
+
+    it('exposes an optional fetch injection in OrmClientConfig (issue #754)', () => {
+      const result = generateOrmClientFile();
+
+      expect(result.content).toContain('fetch?: typeof globalThis.fetch');
+      expect(result.content).toContain('config.fetch');
+    });
+
+    it('bakes in isomorphic default fetch with Node quirks handling (issue #754)', () => {
+      const result = generateOrmClientFile();
+
+      // Browser/runtime detection short-circuits first
+      expect(result.content).toContain("g.document");
+      // Node-only code path uses bundler-opaque dynamic import
+      expect(result.content).toContain("new Function('s', 'return import(s)')");
+      expect(result.content).toContain("'node:http'");
+      expect(result.content).toContain("'node:https'");
+      // *.localhost rewrite + Host header preservation
+      expect(result.content).toContain(".endsWith('.localhost')");
+      expect(result.content).toContain("requestUrl.hostname = 'localhost'");
+      expect(result.content).toContain("headers['host'] = url.host");
+      // Execute uses the resolved default when no fetchFn is injected
+      expect(result.content).toContain('await resolveDefaultFetch()');
+    });
   });
 
   describe('generateQueryBuilderFile', () => {

@@ -2,7 +2,7 @@
   "name": "@constructive-io/node",
   "version": "0.10.10",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Constructive SDK for Node.js - Drop-in replacement for @constructive-io/sdk with Node.js HTTP adapter",
+  "description": "DEPRECATED — use @constructive-io/sdk directly. Node-specific quirks (*.localhost, Host header) are now handled by the generated SDK itself.",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
