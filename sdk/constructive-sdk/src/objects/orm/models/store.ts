@@ -70,13 +70,11 @@ export class StoreModel {
     });
   }
   findFirst<S extends StoreSelect>(
-    args: FindFirstArgs<S, StoreFilter> & {
+    args: FindFirstArgs<S, StoreFilter, StoreOrderBy> & {
       select: S;
     } & StrictSelect<S, StoreSelect>
   ): QueryBuilder<{
-    stores: {
-      nodes: InferSelectResult<StoreWithRelations, S>[];
-    };
+    store: InferSelectResult<StoreWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Store',
@@ -84,17 +82,26 @@ export class StoreModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'StoreFilter',
+      'StoreOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Store',
-      fieldName: 'stores',
+      fieldName: 'store',
       document,
       variables,
+      transform: (data: {
+        stores?: {
+          nodes?: InferSelectResult<StoreWithRelations, S>[];
+        };
+      }) => ({
+        store: data.stores?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends StoreSelect>(

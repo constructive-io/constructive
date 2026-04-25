@@ -72,13 +72,11 @@ export class AppMembershipDefaultModel {
     });
   }
   findFirst<S extends AppMembershipDefaultSelect>(
-    args: FindFirstArgs<S, AppMembershipDefaultFilter> & {
+    args: FindFirstArgs<S, AppMembershipDefaultFilter, AppMembershipDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, AppMembershipDefaultSelect>
   ): QueryBuilder<{
-    appMembershipDefaults: {
-      nodes: InferSelectResult<AppMembershipDefaultWithRelations, S>[];
-    };
+    appMembershipDefault: InferSelectResult<AppMembershipDefaultWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppMembershipDefault',
@@ -86,17 +84,26 @@ export class AppMembershipDefaultModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppMembershipDefaultFilter',
+      'AppMembershipDefaultOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppMembershipDefault',
-      fieldName: 'appMembershipDefaults',
+      fieldName: 'appMembershipDefault',
       document,
       variables,
+      transform: (data: {
+        appMembershipDefaults?: {
+          nodes?: InferSelectResult<AppMembershipDefaultWithRelations, S>[];
+        };
+      }) => ({
+        appMembershipDefault: data.appMembershipDefaults?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppMembershipDefaultSelect>(

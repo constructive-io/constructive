@@ -72,13 +72,11 @@ export class OrgPermissionDefaultModel {
     });
   }
   findFirst<S extends OrgPermissionDefaultSelect>(
-    args: FindFirstArgs<S, OrgPermissionDefaultFilter> & {
+    args: FindFirstArgs<S, OrgPermissionDefaultFilter, OrgPermissionDefaultOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgPermissionDefaultSelect>
   ): QueryBuilder<{
-    orgPermissionDefaults: {
-      nodes: InferSelectResult<OrgPermissionDefaultWithRelations, S>[];
-    };
+    orgPermissionDefault: InferSelectResult<OrgPermissionDefaultWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgPermissionDefault',
@@ -86,17 +84,26 @@ export class OrgPermissionDefaultModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgPermissionDefaultFilter',
+      'OrgPermissionDefaultOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgPermissionDefault',
-      fieldName: 'orgPermissionDefaults',
+      fieldName: 'orgPermissionDefault',
       document,
       variables,
+      transform: (data: {
+        orgPermissionDefaults?: {
+          nodes?: InferSelectResult<OrgPermissionDefaultWithRelations, S>[];
+        };
+      }) => ({
+        orgPermissionDefault: data.orgPermissionDefaults?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgPermissionDefaultSelect>(

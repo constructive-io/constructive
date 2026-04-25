@@ -70,13 +70,11 @@ export class NotificationsModuleModel {
     });
   }
   findFirst<S extends NotificationsModuleSelect>(
-    args: FindFirstArgs<S, NotificationsModuleFilter> & {
+    args: FindFirstArgs<S, NotificationsModuleFilter, NotificationsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, NotificationsModuleSelect>
   ): QueryBuilder<{
-    notificationsModules: {
-      nodes: InferSelectResult<NotificationsModuleWithRelations, S>[];
-    };
+    notificationsModule: InferSelectResult<NotificationsModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'NotificationsModule',
@@ -84,17 +82,26 @@ export class NotificationsModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'NotificationsModuleFilter',
+      'NotificationsModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'NotificationsModule',
-      fieldName: 'notificationsModules',
+      fieldName: 'notificationsModule',
       document,
       variables,
+      transform: (data: {
+        notificationsModules?: {
+          nodes?: InferSelectResult<NotificationsModuleWithRelations, S>[];
+        };
+      }) => ({
+        notificationsModule: data.notificationsModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends NotificationsModuleSelect>(

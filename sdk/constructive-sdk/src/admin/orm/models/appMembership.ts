@@ -70,13 +70,11 @@ export class AppMembershipModel {
     });
   }
   findFirst<S extends AppMembershipSelect>(
-    args: FindFirstArgs<S, AppMembershipFilter> & {
+    args: FindFirstArgs<S, AppMembershipFilter, AppMembershipOrderBy> & {
       select: S;
     } & StrictSelect<S, AppMembershipSelect>
   ): QueryBuilder<{
-    appMemberships: {
-      nodes: InferSelectResult<AppMembershipWithRelations, S>[];
-    };
+    appMembership: InferSelectResult<AppMembershipWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppMembership',
@@ -84,17 +82,26 @@ export class AppMembershipModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppMembershipFilter',
+      'AppMembershipOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppMembership',
-      fieldName: 'appMemberships',
+      fieldName: 'appMembership',
       document,
       variables,
+      transform: (data: {
+        appMemberships?: {
+          nodes?: InferSelectResult<AppMembershipWithRelations, S>[];
+        };
+      }) => ({
+        appMembership: data.appMemberships?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppMembershipSelect>(

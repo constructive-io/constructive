@@ -70,13 +70,11 @@ export class AppStepModel {
     });
   }
   findFirst<S extends AppStepSelect>(
-    args: FindFirstArgs<S, AppStepFilter> & {
+    args: FindFirstArgs<S, AppStepFilter, AppStepOrderBy> & {
       select: S;
     } & StrictSelect<S, AppStepSelect>
   ): QueryBuilder<{
-    appSteps: {
-      nodes: InferSelectResult<AppStepWithRelations, S>[];
-    };
+    appStep: InferSelectResult<AppStepWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppStep',
@@ -84,17 +82,26 @@ export class AppStepModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppStepFilter',
+      'AppStepOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppStep',
-      fieldName: 'appSteps',
+      fieldName: 'appStep',
       document,
       variables,
+      transform: (data: {
+        appSteps?: {
+          nodes?: InferSelectResult<AppStepWithRelations, S>[];
+        };
+      }) => ({
+        appStep: data.appSteps?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppStepSelect>(

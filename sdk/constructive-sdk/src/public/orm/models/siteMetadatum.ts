@@ -70,13 +70,11 @@ export class SiteMetadatumModel {
     });
   }
   findFirst<S extends SiteMetadatumSelect>(
-    args: FindFirstArgs<S, SiteMetadatumFilter> & {
+    args: FindFirstArgs<S, SiteMetadatumFilter, SiteMetadatumOrderBy> & {
       select: S;
     } & StrictSelect<S, SiteMetadatumSelect>
   ): QueryBuilder<{
-    siteMetadata: {
-      nodes: InferSelectResult<SiteMetadatumWithRelations, S>[];
-    };
+    siteMetadatum: InferSelectResult<SiteMetadatumWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SiteMetadatum',
@@ -84,17 +82,26 @@ export class SiteMetadatumModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SiteMetadatumFilter',
+      'SiteMetadatumOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SiteMetadatum',
-      fieldName: 'siteMetadata',
+      fieldName: 'siteMetadatum',
       document,
       variables,
+      transform: (data: {
+        siteMetadata?: {
+          nodes?: InferSelectResult<SiteMetadatumWithRelations, S>[];
+        };
+      }) => ({
+        siteMetadatum: data.siteMetadata?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SiteMetadatumSelect>(

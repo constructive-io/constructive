@@ -70,13 +70,11 @@ export class AstMigrationModel {
     });
   }
   findFirst<S extends AstMigrationSelect>(
-    args: FindFirstArgs<S, AstMigrationFilter> & {
+    args: FindFirstArgs<S, AstMigrationFilter, AstMigrationOrderBy> & {
       select: S;
     } & StrictSelect<S, AstMigrationSelect>
   ): QueryBuilder<{
-    astMigrations: {
-      nodes: InferSelectResult<AstMigrationWithRelations, S>[];
-    };
+    astMigration: InferSelectResult<AstMigrationWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AstMigration',
@@ -84,17 +82,26 @@ export class AstMigrationModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AstMigrationFilter',
+      'AstMigrationOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AstMigration',
-      fieldName: 'astMigrations',
+      fieldName: 'astMigration',
       document,
       variables,
+      transform: (data: {
+        astMigrations?: {
+          nodes?: InferSelectResult<AstMigrationWithRelations, S>[];
+        };
+      }) => ({
+        astMigration: data.astMigrations?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AstMigrationSelect>(

@@ -70,13 +70,11 @@ export class OrgClaimedInviteModel {
     });
   }
   findFirst<S extends OrgClaimedInviteSelect>(
-    args: FindFirstArgs<S, OrgClaimedInviteFilter> & {
+    args: FindFirstArgs<S, OrgClaimedInviteFilter, OrgClaimedInviteOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgClaimedInviteSelect>
   ): QueryBuilder<{
-    orgClaimedInvites: {
-      nodes: InferSelectResult<OrgClaimedInviteWithRelations, S>[];
-    };
+    orgClaimedInvite: InferSelectResult<OrgClaimedInviteWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgClaimedInvite',
@@ -84,17 +82,26 @@ export class OrgClaimedInviteModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgClaimedInviteFilter',
+      'OrgClaimedInviteOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgClaimedInvite',
-      fieldName: 'orgClaimedInvites',
+      fieldName: 'orgClaimedInvite',
       document,
       variables,
+      transform: (data: {
+        orgClaimedInvites?: {
+          nodes?: InferSelectResult<OrgClaimedInviteWithRelations, S>[];
+        };
+      }) => ({
+        orgClaimedInvite: data.orgClaimedInvites?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgClaimedInviteSelect>(

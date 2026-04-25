@@ -70,13 +70,11 @@ export class SpatialRelationModel {
     });
   }
   findFirst<S extends SpatialRelationSelect>(
-    args: FindFirstArgs<S, SpatialRelationFilter> & {
+    args: FindFirstArgs<S, SpatialRelationFilter, SpatialRelationOrderBy> & {
       select: S;
     } & StrictSelect<S, SpatialRelationSelect>
   ): QueryBuilder<{
-    spatialRelations: {
-      nodes: InferSelectResult<SpatialRelationWithRelations, S>[];
-    };
+    spatialRelation: InferSelectResult<SpatialRelationWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SpatialRelation',
@@ -84,17 +82,26 @@ export class SpatialRelationModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SpatialRelationFilter',
+      'SpatialRelationOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SpatialRelation',
-      fieldName: 'spatialRelations',
+      fieldName: 'spatialRelation',
       document,
       variables,
+      transform: (data: {
+        spatialRelations?: {
+          nodes?: InferSelectResult<SpatialRelationWithRelations, S>[];
+        };
+      }) => ({
+        spatialRelation: data.spatialRelations?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SpatialRelationSelect>(

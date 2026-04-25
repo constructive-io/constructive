@@ -72,13 +72,11 @@ export class DatabaseProvisionModuleModel {
     });
   }
   findFirst<S extends DatabaseProvisionModuleSelect>(
-    args: FindFirstArgs<S, DatabaseProvisionModuleFilter> & {
+    args: FindFirstArgs<S, DatabaseProvisionModuleFilter, DatabaseProvisionModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, DatabaseProvisionModuleSelect>
   ): QueryBuilder<{
-    databaseProvisionModules: {
-      nodes: InferSelectResult<DatabaseProvisionModuleWithRelations, S>[];
-    };
+    databaseProvisionModule: InferSelectResult<DatabaseProvisionModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'DatabaseProvisionModule',
@@ -86,17 +84,26 @@ export class DatabaseProvisionModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DatabaseProvisionModuleFilter',
+      'DatabaseProvisionModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'DatabaseProvisionModule',
-      fieldName: 'databaseProvisionModules',
+      fieldName: 'databaseProvisionModule',
       document,
       variables,
+      transform: (data: {
+        databaseProvisionModules?: {
+          nodes?: InferSelectResult<DatabaseProvisionModuleWithRelations, S>[];
+        };
+      }) => ({
+        databaseProvisionModule: data.databaseProvisionModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DatabaseProvisionModuleSelect>(

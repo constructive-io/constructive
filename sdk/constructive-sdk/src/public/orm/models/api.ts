@@ -70,13 +70,11 @@ export class ApiModel {
     });
   }
   findFirst<S extends ApiSelect>(
-    args: FindFirstArgs<S, ApiFilter> & {
+    args: FindFirstArgs<S, ApiFilter, ApiOrderBy> & {
       select: S;
     } & StrictSelect<S, ApiSelect>
   ): QueryBuilder<{
-    apis: {
-      nodes: InferSelectResult<ApiWithRelations, S>[];
-    };
+    api: InferSelectResult<ApiWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Api',
@@ -84,17 +82,26 @@ export class ApiModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ApiFilter',
+      'ApiOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Api',
-      fieldName: 'apis',
+      fieldName: 'api',
       document,
       variables,
+      transform: (data: {
+        apis?: {
+          nodes?: InferSelectResult<ApiWithRelations, S>[];
+        };
+      }) => ({
+        api: data.apis?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ApiSelect>(

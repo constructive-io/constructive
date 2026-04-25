@@ -70,13 +70,11 @@ export class EntityTypeProvisionModel {
     });
   }
   findFirst<S extends EntityTypeProvisionSelect>(
-    args: FindFirstArgs<S, EntityTypeProvisionFilter> & {
+    args: FindFirstArgs<S, EntityTypeProvisionFilter, EntityTypeProvisionOrderBy> & {
       select: S;
     } & StrictSelect<S, EntityTypeProvisionSelect>
   ): QueryBuilder<{
-    entityTypeProvisions: {
-      nodes: InferSelectResult<EntityTypeProvisionWithRelations, S>[];
-    };
+    entityTypeProvision: InferSelectResult<EntityTypeProvisionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'EntityTypeProvision',
@@ -84,17 +82,26 @@ export class EntityTypeProvisionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'EntityTypeProvisionFilter',
+      'EntityTypeProvisionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'EntityTypeProvision',
-      fieldName: 'entityTypeProvisions',
+      fieldName: 'entityTypeProvision',
       document,
       variables,
+      transform: (data: {
+        entityTypeProvisions?: {
+          nodes?: InferSelectResult<EntityTypeProvisionWithRelations, S>[];
+        };
+      }) => ({
+        entityTypeProvision: data.entityTypeProvisions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends EntityTypeProvisionSelect>(

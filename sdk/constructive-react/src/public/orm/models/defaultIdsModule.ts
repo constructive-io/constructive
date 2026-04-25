@@ -70,13 +70,11 @@ export class DefaultIdsModuleModel {
     });
   }
   findFirst<S extends DefaultIdsModuleSelect>(
-    args: FindFirstArgs<S, DefaultIdsModuleFilter> & {
+    args: FindFirstArgs<S, DefaultIdsModuleFilter, DefaultIdsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, DefaultIdsModuleSelect>
   ): QueryBuilder<{
-    defaultIdsModules: {
-      nodes: InferSelectResult<DefaultIdsModuleWithRelations, S>[];
-    };
+    defaultIdsModule: InferSelectResult<DefaultIdsModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'DefaultIdsModule',
@@ -84,17 +82,26 @@ export class DefaultIdsModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DefaultIdsModuleFilter',
+      'DefaultIdsModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'DefaultIdsModule',
-      fieldName: 'defaultIdsModules',
+      fieldName: 'defaultIdsModule',
       document,
       variables,
+      transform: (data: {
+        defaultIdsModules?: {
+          nodes?: InferSelectResult<DefaultIdsModuleWithRelations, S>[];
+        };
+      }) => ({
+        defaultIdsModule: data.defaultIdsModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DefaultIdsModuleSelect>(

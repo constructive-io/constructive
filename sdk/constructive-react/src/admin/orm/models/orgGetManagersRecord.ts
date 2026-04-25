@@ -70,13 +70,11 @@ export class OrgGetManagersRecordModel {
     });
   }
   findFirst<S extends OrgGetManagersRecordSelect>(
-    args: FindFirstArgs<S, OrgGetManagersRecordFilter> & {
+    args: FindFirstArgs<S, OrgGetManagersRecordFilter, OrgGetManagersRecordsOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgGetManagersRecordSelect>
   ): QueryBuilder<{
-    orgGetManagers: {
-      nodes: InferSelectResult<OrgGetManagersRecordWithRelations, S>[];
-    };
+    orgGetManagersRecord: InferSelectResult<OrgGetManagersRecordWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgGetManagersRecord',
@@ -84,17 +82,26 @@ export class OrgGetManagersRecordModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgGetManagersRecordFilter',
+      'OrgGetManagersRecordsOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgGetManagersRecord',
-      fieldName: 'orgGetManagers',
+      fieldName: 'orgGetManagersRecord',
       document,
       variables,
+      transform: (data: {
+        orgGetManagers?: {
+          nodes?: InferSelectResult<OrgGetManagersRecordWithRelations, S>[];
+        };
+      }) => ({
+        orgGetManagersRecord: data.orgGetManagers?.nodes?.[0] ?? null,
+      }),
     });
   }
   create<S extends OrgGetManagersRecordSelect>(

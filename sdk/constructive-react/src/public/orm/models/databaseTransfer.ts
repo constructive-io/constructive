@@ -70,13 +70,11 @@ export class DatabaseTransferModel {
     });
   }
   findFirst<S extends DatabaseTransferSelect>(
-    args: FindFirstArgs<S, DatabaseTransferFilter> & {
+    args: FindFirstArgs<S, DatabaseTransferFilter, DatabaseTransferOrderBy> & {
       select: S;
     } & StrictSelect<S, DatabaseTransferSelect>
   ): QueryBuilder<{
-    databaseTransfers: {
-      nodes: InferSelectResult<DatabaseTransferWithRelations, S>[];
-    };
+    databaseTransfer: InferSelectResult<DatabaseTransferWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'DatabaseTransfer',
@@ -84,17 +82,26 @@ export class DatabaseTransferModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DatabaseTransferFilter',
+      'DatabaseTransferOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'DatabaseTransfer',
-      fieldName: 'databaseTransfers',
+      fieldName: 'databaseTransfer',
       document,
       variables,
+      transform: (data: {
+        databaseTransfers?: {
+          nodes?: InferSelectResult<DatabaseTransferWithRelations, S>[];
+        };
+      }) => ({
+        databaseTransfer: data.databaseTransfers?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DatabaseTransferSelect>(

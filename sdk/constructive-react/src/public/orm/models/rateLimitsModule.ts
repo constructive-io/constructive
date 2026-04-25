@@ -70,13 +70,11 @@ export class RateLimitsModuleModel {
     });
   }
   findFirst<S extends RateLimitsModuleSelect>(
-    args: FindFirstArgs<S, RateLimitsModuleFilter> & {
+    args: FindFirstArgs<S, RateLimitsModuleFilter, RateLimitsModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, RateLimitsModuleSelect>
   ): QueryBuilder<{
-    rateLimitsModules: {
-      nodes: InferSelectResult<RateLimitsModuleWithRelations, S>[];
-    };
+    rateLimitsModule: InferSelectResult<RateLimitsModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'RateLimitsModule',
@@ -84,17 +82,26 @@ export class RateLimitsModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'RateLimitsModuleFilter',
+      'RateLimitsModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'RateLimitsModule',
-      fieldName: 'rateLimitsModules',
+      fieldName: 'rateLimitsModule',
       document,
       variables,
+      transform: (data: {
+        rateLimitsModules?: {
+          nodes?: InferSelectResult<RateLimitsModuleWithRelations, S>[];
+        };
+      }) => ({
+        rateLimitsModule: data.rateLimitsModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends RateLimitsModuleSelect>(

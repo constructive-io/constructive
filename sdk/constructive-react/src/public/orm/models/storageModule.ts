@@ -70,13 +70,11 @@ export class StorageModuleModel {
     });
   }
   findFirst<S extends StorageModuleSelect>(
-    args: FindFirstArgs<S, StorageModuleFilter> & {
+    args: FindFirstArgs<S, StorageModuleFilter, StorageModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, StorageModuleSelect>
   ): QueryBuilder<{
-    storageModules: {
-      nodes: InferSelectResult<StorageModuleWithRelations, S>[];
-    };
+    storageModule: InferSelectResult<StorageModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'StorageModule',
@@ -84,17 +82,26 @@ export class StorageModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'StorageModuleFilter',
+      'StorageModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'StorageModule',
-      fieldName: 'storageModules',
+      fieldName: 'storageModule',
       document,
       variables,
+      transform: (data: {
+        storageModules?: {
+          nodes?: InferSelectResult<StorageModuleWithRelations, S>[];
+        };
+      }) => ({
+        storageModule: data.storageModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends StorageModuleSelect>(

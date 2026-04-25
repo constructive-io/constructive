@@ -70,13 +70,11 @@ export class AuditLogModel {
     });
   }
   findFirst<S extends AuditLogSelect>(
-    args: FindFirstArgs<S, AuditLogFilter> & {
+    args: FindFirstArgs<S, AuditLogFilter, AuditLogOrderBy> & {
       select: S;
     } & StrictSelect<S, AuditLogSelect>
   ): QueryBuilder<{
-    auditLogs: {
-      nodes: InferSelectResult<AuditLogWithRelations, S>[];
-    };
+    auditLog: InferSelectResult<AuditLogWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AuditLog',
@@ -84,17 +82,26 @@ export class AuditLogModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AuditLogFilter',
+      'AuditLogOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AuditLog',
-      fieldName: 'auditLogs',
+      fieldName: 'auditLog',
       document,
       variables,
+      transform: (data: {
+        auditLogs?: {
+          nodes?: InferSelectResult<AuditLogWithRelations, S>[];
+        };
+      }) => ({
+        auditLog: data.auditLogs?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AuditLogSelect>(

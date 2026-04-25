@@ -70,13 +70,11 @@ export class AppAchievementModel {
     });
   }
   findFirst<S extends AppAchievementSelect>(
-    args: FindFirstArgs<S, AppAchievementFilter> & {
+    args: FindFirstArgs<S, AppAchievementFilter, AppAchievementOrderBy> & {
       select: S;
     } & StrictSelect<S, AppAchievementSelect>
   ): QueryBuilder<{
-    appAchievements: {
-      nodes: InferSelectResult<AppAchievementWithRelations, S>[];
-    };
+    appAchievement: InferSelectResult<AppAchievementWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppAchievement',
@@ -84,17 +82,26 @@ export class AppAchievementModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppAchievementFilter',
+      'AppAchievementOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppAchievement',
-      fieldName: 'appAchievements',
+      fieldName: 'appAchievement',
       document,
       variables,
+      transform: (data: {
+        appAchievements?: {
+          nodes?: InferSelectResult<AppAchievementWithRelations, S>[];
+        };
+      }) => ({
+        appAchievement: data.appAchievements?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppAchievementSelect>(

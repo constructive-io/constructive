@@ -70,13 +70,11 @@ export class AppLevelModel {
     });
   }
   findFirst<S extends AppLevelSelect>(
-    args: FindFirstArgs<S, AppLevelFilter> & {
+    args: FindFirstArgs<S, AppLevelFilter, AppLevelOrderBy> & {
       select: S;
     } & StrictSelect<S, AppLevelSelect>
   ): QueryBuilder<{
-    appLevels: {
-      nodes: InferSelectResult<AppLevelWithRelations, S>[];
-    };
+    appLevel: InferSelectResult<AppLevelWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'AppLevel',
@@ -84,17 +82,26 @@ export class AppLevelModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'AppLevelFilter',
+      'AppLevelOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'AppLevel',
-      fieldName: 'appLevels',
+      fieldName: 'appLevel',
       document,
       variables,
+      transform: (data: {
+        appLevels?: {
+          nodes?: InferSelectResult<AppLevelWithRelations, S>[];
+        };
+      }) => ({
+        appLevel: data.appLevels?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends AppLevelSelect>(

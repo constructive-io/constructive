@@ -70,13 +70,11 @@ export class SqlActionModel {
     });
   }
   findFirst<S extends SqlActionSelect>(
-    args: FindFirstArgs<S, SqlActionFilter> & {
+    args: FindFirstArgs<S, SqlActionFilter, SqlActionOrderBy> & {
       select: S;
     } & StrictSelect<S, SqlActionSelect>
   ): QueryBuilder<{
-    sqlActions: {
-      nodes: InferSelectResult<SqlActionWithRelations, S>[];
-    };
+    sqlAction: InferSelectResult<SqlActionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SqlAction',
@@ -84,17 +82,26 @@ export class SqlActionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SqlActionFilter',
+      'SqlActionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SqlAction',
-      fieldName: 'sqlActions',
+      fieldName: 'sqlAction',
       document,
       variables,
+      transform: (data: {
+        sqlActions?: {
+          nodes?: InferSelectResult<SqlActionWithRelations, S>[];
+        };
+      }) => ({
+        sqlAction: data.sqlActions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SqlActionSelect>(

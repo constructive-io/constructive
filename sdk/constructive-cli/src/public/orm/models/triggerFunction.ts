@@ -70,13 +70,11 @@ export class TriggerFunctionModel {
     });
   }
   findFirst<S extends TriggerFunctionSelect>(
-    args: FindFirstArgs<S, TriggerFunctionFilter> & {
+    args: FindFirstArgs<S, TriggerFunctionFilter, TriggerFunctionOrderBy> & {
       select: S;
     } & StrictSelect<S, TriggerFunctionSelect>
   ): QueryBuilder<{
-    triggerFunctions: {
-      nodes: InferSelectResult<TriggerFunctionWithRelations, S>[];
-    };
+    triggerFunction: InferSelectResult<TriggerFunctionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'TriggerFunction',
@@ -84,17 +82,26 @@ export class TriggerFunctionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'TriggerFunctionFilter',
+      'TriggerFunctionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'TriggerFunction',
-      fieldName: 'triggerFunctions',
+      fieldName: 'triggerFunction',
       document,
       variables,
+      transform: (data: {
+        triggerFunctions?: {
+          nodes?: InferSelectResult<TriggerFunctionWithRelations, S>[];
+        };
+      }) => ({
+        triggerFunction: data.triggerFunctions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends TriggerFunctionSelect>(

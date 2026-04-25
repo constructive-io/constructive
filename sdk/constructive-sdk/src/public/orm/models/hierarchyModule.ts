@@ -70,13 +70,11 @@ export class HierarchyModuleModel {
     });
   }
   findFirst<S extends HierarchyModuleSelect>(
-    args: FindFirstArgs<S, HierarchyModuleFilter> & {
+    args: FindFirstArgs<S, HierarchyModuleFilter, HierarchyModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, HierarchyModuleSelect>
   ): QueryBuilder<{
-    hierarchyModules: {
-      nodes: InferSelectResult<HierarchyModuleWithRelations, S>[];
-    };
+    hierarchyModule: InferSelectResult<HierarchyModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'HierarchyModule',
@@ -84,17 +82,26 @@ export class HierarchyModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'HierarchyModuleFilter',
+      'HierarchyModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'HierarchyModule',
-      fieldName: 'hierarchyModules',
+      fieldName: 'hierarchyModule',
       document,
       variables,
+      transform: (data: {
+        hierarchyModules?: {
+          nodes?: InferSelectResult<HierarchyModuleWithRelations, S>[];
+        };
+      }) => ({
+        hierarchyModule: data.hierarchyModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends HierarchyModuleSelect>(
