@@ -520,7 +520,7 @@ function buildFindManyArgsType(table: Table): t.TSType {
 
 /**
  * Build the FindFirstArgs type instantiation for a table:
- * FindFirstArgs<SelectType, FilterType> & { select: SelectType }
+ * FindFirstArgs<SelectType, FilterType, OrderByType> & { select: SelectType }
  *
  * The intersection with { select: SelectType } makes select required,
  * matching what the ORM's findFirst method expects.
@@ -529,11 +529,13 @@ function buildFindFirstArgsType(table: Table): t.TSType {
   const { typeName } = getTableNames(table);
   const selectTypeName = `${typeName}Select`;
   const whereTypeName = getFilterTypeName(table);
+  const orderByTypeName = getOrderByTypeName(table);
   const findFirstType = t.tsTypeReference(
     t.identifier('FindFirstArgs'),
     t.tsTypeParameterInstantiation([
       t.tsTypeReference(t.identifier(selectTypeName)),
       t.tsTypeReference(t.identifier(whereTypeName)),
+      t.tsTypeReference(t.identifier(orderByTypeName)),
     ]),
   );
   // Intersect with { select: SelectType } to make select required
@@ -1483,6 +1485,7 @@ export function generateTableCommand(table: Table, options?: TableCommandOptions
     '  --select <fields>     Comma-separated list of fields to return',
     '  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)',
     '  --condition.<f>.<op>  Condition filter (dot-notation)',
+    '  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)',
     '',
   );
   if (hasSearchFields) {

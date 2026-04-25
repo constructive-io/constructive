@@ -311,8 +311,9 @@ export function buildFindFirstDocument<TSelect, TWhere>(
   operationName: string,
   queryField: string,
   select: TSelect,
-  args: { where?: TWhere },
+  args: { where?: TWhere; orderBy?: string[] },
   filterTypeName: string,
+  orderByTypeName: string,
   connectionFieldsMap?: Record<string, Record<string, string>>,
 ): { document: string; variables: Record<string, unknown> } {
   const selections = select
@@ -339,6 +340,16 @@ export function buildFindFirstDocument<TSelect, TWhere>(
       varName: 'where',
       typeName: filterTypeName,
       value: args.where,
+    },
+    variableDefinitions,
+    queryArgs,
+    variables,
+  );
+  addVariable(
+    {
+      varName: 'orderBy',
+      typeName: '[' + orderByTypeName + '!]',
+      value: args.orderBy?.length ? args.orderBy : undefined,
     },
     variableDefinitions,
     queryArgs,

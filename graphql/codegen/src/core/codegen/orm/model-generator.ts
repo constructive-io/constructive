@@ -440,6 +440,7 @@ export function generateModelFile(
     const findFirstTypeArgs: Array<(sel: t.TSType) => t.TSType> = [
       (sel: t.TSType) => sel,
       () => t.tsTypeReference(t.identifier(whereTypeName)),
+      () => t.tsTypeReference(t.identifier(orderByTypeName)),
     ];
     const argsType = (sel: t.TSType) =>
       t.tsTypeReference(
@@ -455,23 +456,17 @@ export function generateModelFile(
           t.tsTypeParameterInstantiation([
             t.tsTypeLiteral([
               t.tsPropertySignature(
-                t.identifier(pluralQueryName),
+                t.identifier(singleResultFieldName),
                 t.tsTypeAnnotation(
-                  t.tsTypeLiteral([
-                    t.tsPropertySignature(
-                      t.identifier('nodes'),
-                      t.tsTypeAnnotation(
-                        t.tsArrayType(
-                          t.tsTypeReference(
-                            t.identifier('InferSelectResult'),
-                            t.tsTypeParameterInstantiation([
-                              t.tsTypeReference(t.identifier(relationTypeName)),
-                              sel,
-                            ]),
-                          ),
-                        ),
-                      ),
+                  t.tsUnionType([
+                    t.tsTypeReference(
+                      t.identifier('InferSelectResult'),
+                      t.tsTypeParameterInstantiation([
+                        t.tsTypeReference(t.identifier(relationTypeName)),
+                        sel,
+                      ]),
                     ),
+                    t.tsNullKeyword(),
                   ]),
                 ),
               ),
@@ -502,6 +497,21 @@ export function generateModelFile(
           true,
         ),
       ),
+      t.objectProperty(
+        t.identifier('orderBy'),
+        t.tsAsExpression(
+          t.optionalMemberExpression(
+            t.identifier('args'),
+            t.identifier('orderBy'),
+            false,
+            true,
+          ),
+          t.tsUnionType([
+            t.tsArrayType(t.tsStringKeyword()),
+            t.tsUndefinedKeyword(),
+          ]),
+        ),
+      ),
     ];
     const bodyArgs = [
       t.stringLiteral(typeName),
@@ -509,8 +519,53 @@ export function generateModelFile(
       selectExpr,
       t.objectExpression(findFirstObjProps),
       t.stringLiteral(whereTypeName),
+      t.stringLiteral(orderByTypeName),
       t.identifier('connectionFieldsMap'),
     ];
+    const transformDataParam = t.identifier('data');
+    const transformedNodesProp = t.tsPropertySignature(
+      t.identifier('nodes'),
+      t.tsTypeAnnotation(
+        t.tsArrayType(
+          t.tsTypeReference(
+            t.identifier('InferSelectResult'),
+            t.tsTypeParameterInstantiation([
+              t.tsTypeReference(t.identifier(relationTypeName)),
+              sRef(),
+            ]),
+          ),
+        ),
+      ),
+    );
+    transformedNodesProp.optional = true;
+    const transformedCollectionProp = t.tsPropertySignature(
+      t.identifier(pluralQueryName),
+      t.tsTypeAnnotation(t.tsTypeLiteral([transformedNodesProp])),
+    );
+    transformedCollectionProp.optional = true;
+    transformDataParam.typeAnnotation = t.tsTypeAnnotation(
+      t.tsTypeLiteral([transformedCollectionProp]),
+    );
+    const firstNodeExpr = t.optionalMemberExpression(
+      t.optionalMemberExpression(
+        t.memberExpression(t.identifier('data'), t.identifier(pluralQueryName)),
+        t.identifier('nodes'),
+        false,
+        true,
+      ),
+      t.numericLiteral(0),
+      true,
+      true,
+    );
+    const transformFn = t.arrowFunctionExpression(
+      [transformDataParam],
+      t.objectExpression([
+        t.objectProperty(
+          t.stringLiteral(singleResultFieldName),
+          t.logicalExpression('??', firstNodeExpr, t.nullLiteral()),
+        ),
+      ]),
+    );
     classBody.push(
       createClassMethod(
         'findFirst',
@@ -522,7 +577,8 @@ export function generateModelFile(
           bodyArgs,
           'query',
           typeName,
-          pluralQueryName,
+          singleResultFieldName,
+          [t.objectProperty(t.identifier('transform'), transformFn)],
         ),
       ),
     );
