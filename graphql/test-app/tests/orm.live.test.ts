@@ -175,7 +175,24 @@ if (!liveEnv) {
           },
         })
         .unwrap();
-      assert.ok(Array.isArray(firstResult.users.nodes), 'findFirst should return users.nodes array');
+      assert.ok(
+        firstResult.user === null || typeof firstResult.user === 'object',
+        'findFirst should return a single user object (or null), not an array'
+      );
+      if (firstResult.user) {
+        assert.equal(typeof firstResult.user.id, 'string', 'findFirst result should expose scalar id');
+      }
+
+      const orderedResult = await client.user
+        .findFirst({
+          select: { id: true, username: true },
+          orderBy: ['CREATED_AT_DESC'],
+        })
+        .unwrap();
+      assert.ok(
+        orderedResult.user === null || typeof orderedResult.user === 'object',
+        'findFirst with orderBy should return a single user object (or null)'
+      );
 
       const currentUserResult = await client.query
         .currentUser({
