@@ -287,9 +287,10 @@ export interface FindManyArgs<TSelect, TWhere, TOrderBy = never> {
   offset?: number;
 }
 
-export interface FindFirstArgs<TSelect, TWhere> {
+export interface FindFirstArgs<TSelect, TWhere, TOrderBy = never> {
   select?: TSelect;
   where?: TWhere;
+  orderBy?: TOrderBy[];
 }
 
 export interface CreateArgs<TSelect, TData> {
