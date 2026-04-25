@@ -39,26 +39,32 @@ export class UserModel {
       variables
     });
   }
-  findFirst<S extends UserSelect>(args: FindFirstArgs<S, UserFilter> & {
+  findFirst<S extends UserSelect>(args: FindFirstArgs<S, UserFilter, UsersOrderBy> & {
     select: S;
   } & StrictSelect<S, UserSelect>): QueryBuilder<{
-    users: {
-      nodes: InferSelectResult<UserWithRelations, S>[];
-    };
+    user: InferSelectResult<UserWithRelations, S> | null;
   }> {
     const {
       document,
       variables
     } = buildFindFirstDocument("User", "users", args.select, {
-      where: args?.where
-    }, "UserFilter", connectionFieldsMap);
+      where: args?.where,
+      orderBy: args?.orderBy as string[] | undefined
+    }, "UserFilter", "UsersOrderBy", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
       operationName: "User",
-      fieldName: "users",
+      fieldName: "user",
       document,
-      variables
+      variables,
+      transform: (data: {
+        users?: {
+          nodes?: InferSelectResult<UserWithRelations, S>[];
+        };
+      }) => ({
+        "user": data.users?.nodes?.[0] ?? null
+      })
     });
   }
   findOne<S extends UserSelect>(args: {
@@ -188,26 +194,32 @@ export class AuditLogModel {
       variables
     });
   }
-  findFirst<S extends AuditLogSelect>(args: FindFirstArgs<S, AuditLogFilter> & {
+  findFirst<S extends AuditLogSelect>(args: FindFirstArgs<S, AuditLogFilter, AuditLogsOrderBy> & {
     select: S;
   } & StrictSelect<S, AuditLogSelect>): QueryBuilder<{
-    auditLogs: {
-      nodes: InferSelectResult<AuditLogWithRelations, S>[];
-    };
+    auditLog: InferSelectResult<AuditLogWithRelations, S> | null;
   }> {
     const {
       document,
       variables
     } = buildFindFirstDocument("AuditLog", "auditLogs", args.select, {
-      where: args?.where
-    }, "AuditLogFilter", connectionFieldsMap);
+      where: args?.where,
+      orderBy: args?.orderBy as string[] | undefined
+    }, "AuditLogFilter", "AuditLogsOrderBy", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
       operationName: "AuditLog",
-      fieldName: "auditLogs",
+      fieldName: "auditLog",
       document,
-      variables
+      variables,
+      transform: (data: {
+        auditLogs?: {
+          nodes?: InferSelectResult<AuditLogWithRelations, S>[];
+        };
+      }) => ({
+        "auditLog": data.auditLogs?.nodes?.[0] ?? null
+      })
     });
   }
   findOne<S extends AuditLogSelect>(args: {
@@ -291,26 +303,32 @@ export class OrganizationModel {
       variables
     });
   }
-  findFirst<S extends OrganizationSelect>(args: FindFirstArgs<S, OrganizationFilter> & {
+  findFirst<S extends OrganizationSelect>(args: FindFirstArgs<S, OrganizationFilter, OrganizationsOrderBy> & {
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
-    allOrganizations: {
-      nodes: InferSelectResult<OrganizationWithRelations, S>[];
-    };
+    organizationById: InferSelectResult<OrganizationWithRelations, S> | null;
   }> {
     const {
       document,
       variables
     } = buildFindFirstDocument("Organization", "allOrganizations", args.select, {
-      where: args?.where
-    }, "OrganizationFilter", connectionFieldsMap);
+      where: args?.where,
+      orderBy: args?.orderBy as string[] | undefined
+    }, "OrganizationFilter", "OrganizationsOrderBy", connectionFieldsMap);
     return new QueryBuilder({
       client: this.client,
       operation: "query",
       operationName: "Organization",
-      fieldName: "allOrganizations",
+      fieldName: "organizationById",
       document,
-      variables
+      variables,
+      transform: (data: {
+        allOrganizations?: {
+          nodes?: InferSelectResult<OrganizationWithRelations, S>[];
+        };
+      }) => ({
+        "organizationById": data.allOrganizations?.nodes?.[0] ?? null
+      })
     });
   }
   findOne<S extends OrganizationSelect>(args: {

@@ -707,7 +707,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -781,7 +781,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isElectric: true,
       createdAt: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter> & {
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter, CarsOrderBy> & {
       select: CarSelect;
     }>(argv, defaultSelect);
     const client = getClient();
@@ -1172,7 +1172,7 @@ const fieldSchema: FieldSchema = {
   name: "string",
   licenseNumber: "string"
 };
-const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  find-first            Find first matching driver record\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ndriver <command>\\n\\nCommands:\\n  list                  List driver records\\n  find-first            Find first matching driver record\\n  get                   Get a driver by ID\\n  create                Create a new driver\\n  update                Update an existing driver\\n  delete                Delete a driver\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -1240,7 +1240,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       name: true,
       licenseNumber: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<DriverSelect, DriverFilter> & {
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<DriverSelect, DriverFilter, DriversOrderBy> & {
       select: DriverSelect;
     }>(argv, defaultSelect);
     const client = getClient();
@@ -3208,7 +3208,7 @@ const fieldSchema: FieldSchema = {
   email: "string",
   name: "string"
 };
-const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  find-first            Find first matching user record\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nuser <command>\\n\\nCommands:\\n  list                  List user records\\n  find-first            Find first matching user record\\n  get                   Get a user by ID\\n  create                Create a new user\\n  update                Update an existing user\\n  delete                Delete a user\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3276,7 +3276,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       email: true,
       name: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<UserSelect, UserFilter> & {
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<UserSelect, UserFilter, UsersOrderBy> & {
       select: UserSelect;
     }>(argv, defaultSelect);
     const client = getClient("auth");
@@ -3441,7 +3441,7 @@ const fieldSchema: FieldSchema = {
   id: "uuid",
   role: "string"
 };
-const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  find-first            Find first matching member record\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\nmember <command>\\n\\nCommands:\\n  list                  List member records\\n  find-first            Find first matching member record\\n  get                   Get a member by ID\\n  create                Create a new member\\n  update                Update an existing member\\n  delete                Delete a member\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3507,7 +3507,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       id: true,
       role: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<MemberSelect, MemberFilter> & {
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<MemberSelect, MemberFilter, MembersOrderBy> & {
       select: MemberSelect;
     }>(argv, defaultSelect);
     const client = getClient("members");
@@ -3661,7 +3661,7 @@ const fieldSchema: FieldSchema = {
   isElectric: "boolean",
   createdAt: "string"
 };
-const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n\\n  --help, -h            Show this help message\\n";
+const usage = "\\ncar <command>\\n\\nCommands:\\n  list                  List car records\\n  find-first            Find first matching car record\\n  get                   Get a car by ID\\n  create                Create a new car\\n  update                Update an existing car\\n  delete                Delete a car\\n\\nList Options:\\n  --limit <n>           Max number of records to return (forward pagination)\\n  --last <n>            Number of records from the end (backward pagination)\\n  --after <cursor>      Cursor for forward pagination\\n  --before <cursor>     Cursor for backward pagination\\n  --offset <n>          Number of records to skip\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\nFind-First Options:\\n  --select <fields>     Comma-separated list of fields to return\\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\\n  --condition.<f>.<op>  Condition filter (dot-notation)\\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\\n\\n  --help, -h            Show this help message\\n";
 export default async (argv: Partial<Record<string, unknown>>, prompter: Inquirerer, _options: CLIOptions) => {
   if (argv.help || argv.h) {
     console.log(usage);
@@ -3735,7 +3735,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       isElectric: true,
       createdAt: true
     };
-    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter> & {
+    const findFirstArgs = parseFindFirstArgs<FindFirstArgs<CarSelect, CarFilter, CarsOrderBy> & {
       select: CarSelect;
     }>(argv, defaultSelect);
     const client = getClient("app");
