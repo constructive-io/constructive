@@ -19,7 +19,6 @@ import {
   getGeneratedFileHeader,
   getOrderByTypeName,
   getPrimaryKeyInfo,
-  getSingleRowQueryName,
   getTableNames,
   hasValidPrimaryKey,
   lcFirst,
@@ -193,7 +192,10 @@ export function generateModelFile(
   const pkField = pkFields[0];
   const pluralQueryName = table.query?.all ?? pluralName;
   const singleQueryName = table.query?.one;
-  const singleResultFieldName = getSingleRowQueryName(table);
+  // The unwrapped result key for findFirst/findOne — must be the friendly
+  // singular noun (e.g. "animal"), NOT the GraphQL by-id query name (e.g.
+  // "animalById"), so the surface aligns with the rest of the SDK.
+  const singleResultFieldName = singularName;
   const createMutationName = table.query?.create ?? `create${typeName}`;
   const updateMutationName = table.query?.update;
   const deleteMutationName = table.query?.delete;
