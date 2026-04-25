@@ -70,13 +70,11 @@ export class IndexModel {
     });
   }
   findFirst<S extends IndexSelect>(
-    args: FindFirstArgs<S, IndexFilter> & {
+    args: FindFirstArgs<S, IndexFilter, IndexOrderBy> & {
       select: S;
     } & StrictSelect<S, IndexSelect>
   ): QueryBuilder<{
-    indices: {
-      nodes: InferSelectResult<IndexWithRelations, S>[];
-    };
+    index: InferSelectResult<IndexWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Index',
@@ -84,17 +82,26 @@ export class IndexModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'IndexFilter',
+      'IndexOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Index',
-      fieldName: 'indices',
+      fieldName: 'index',
       document,
       variables,
+      transform: (data: {
+        indices?: {
+          nodes?: InferSelectResult<IndexWithRelations, S>[];
+        };
+      }) => ({
+        index: data.indices?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends IndexSelect>(

@@ -70,13 +70,11 @@ export class ViewRuleModel {
     });
   }
   findFirst<S extends ViewRuleSelect>(
-    args: FindFirstArgs<S, ViewRuleFilter> & {
+    args: FindFirstArgs<S, ViewRuleFilter, ViewRuleOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewRuleSelect>
   ): QueryBuilder<{
-    viewRules: {
-      nodes: InferSelectResult<ViewRuleWithRelations, S>[];
-    };
+    viewRule: InferSelectResult<ViewRuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'ViewRule',
@@ -84,17 +82,26 @@ export class ViewRuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ViewRuleFilter',
+      'ViewRuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'ViewRule',
-      fieldName: 'viewRules',
+      fieldName: 'viewRule',
       document,
       variables,
+      transform: (data: {
+        viewRules?: {
+          nodes?: InferSelectResult<ViewRuleWithRelations, S>[];
+        };
+      }) => ({
+        viewRule: data.viewRules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ViewRuleSelect>(

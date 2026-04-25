@@ -70,13 +70,11 @@ export class OrgMemberModel {
     });
   }
   findFirst<S extends OrgMemberSelect>(
-    args: FindFirstArgs<S, OrgMemberFilter> & {
+    args: FindFirstArgs<S, OrgMemberFilter, OrgMemberOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgMemberSelect>
   ): QueryBuilder<{
-    orgMembers: {
-      nodes: InferSelectResult<OrgMemberWithRelations, S>[];
-    };
+    orgMember: InferSelectResult<OrgMemberWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgMember',
@@ -84,17 +82,26 @@ export class OrgMemberModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgMemberFilter',
+      'OrgMemberOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgMember',
-      fieldName: 'orgMembers',
+      fieldName: 'orgMember',
       document,
       variables,
+      transform: (data: {
+        orgMembers?: {
+          nodes?: InferSelectResult<OrgMemberWithRelations, S>[];
+        };
+      }) => ({
+        orgMember: data.orgMembers?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgMemberSelect>(

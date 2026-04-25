@@ -70,13 +70,11 @@ export class EmailModel {
     });
   }
   findFirst<S extends EmailSelect>(
-    args: FindFirstArgs<S, EmailFilter> & {
+    args: FindFirstArgs<S, EmailFilter, EmailOrderBy> & {
       select: S;
     } & StrictSelect<S, EmailSelect>
   ): QueryBuilder<{
-    emails: {
-      nodes: InferSelectResult<EmailWithRelations, S>[];
-    };
+    email: InferSelectResult<EmailWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Email',
@@ -84,17 +82,26 @@ export class EmailModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'EmailFilter',
+      'EmailOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Email',
-      fieldName: 'emails',
+      fieldName: 'email',
       document,
       variables,
+      transform: (data: {
+        emails?: {
+          nodes?: InferSelectResult<EmailWithRelations, S>[];
+        };
+      }) => ({
+        email: data.emails?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends EmailSelect>(

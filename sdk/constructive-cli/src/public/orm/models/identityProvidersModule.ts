@@ -72,13 +72,11 @@ export class IdentityProvidersModuleModel {
     });
   }
   findFirst<S extends IdentityProvidersModuleSelect>(
-    args: FindFirstArgs<S, IdentityProvidersModuleFilter> & {
+    args: FindFirstArgs<S, IdentityProvidersModuleFilter, IdentityProvidersModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, IdentityProvidersModuleSelect>
   ): QueryBuilder<{
-    identityProvidersModules: {
-      nodes: InferSelectResult<IdentityProvidersModuleWithRelations, S>[];
-    };
+    identityProvidersModule: InferSelectResult<IdentityProvidersModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'IdentityProvidersModule',
@@ -86,17 +84,26 @@ export class IdentityProvidersModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'IdentityProvidersModuleFilter',
+      'IdentityProvidersModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'IdentityProvidersModule',
-      fieldName: 'identityProvidersModules',
+      fieldName: 'identityProvidersModule',
       document,
       variables,
+      transform: (data: {
+        identityProvidersModules?: {
+          nodes?: InferSelectResult<IdentityProvidersModuleWithRelations, S>[];
+        };
+      }) => ({
+        identityProvidersModule: data.identityProvidersModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends IdentityProvidersModuleSelect>(

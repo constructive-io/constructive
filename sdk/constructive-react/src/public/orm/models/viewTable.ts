@@ -70,13 +70,11 @@ export class ViewTableModel {
     });
   }
   findFirst<S extends ViewTableSelect>(
-    args: FindFirstArgs<S, ViewTableFilter> & {
+    args: FindFirstArgs<S, ViewTableFilter, ViewTableOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewTableSelect>
   ): QueryBuilder<{
-    viewTables: {
-      nodes: InferSelectResult<ViewTableWithRelations, S>[];
-    };
+    viewTable: InferSelectResult<ViewTableWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'ViewTable',
@@ -84,17 +82,26 @@ export class ViewTableModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ViewTableFilter',
+      'ViewTableOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'ViewTable',
-      fieldName: 'viewTables',
+      fieldName: 'viewTable',
       document,
       variables,
+      transform: (data: {
+        viewTables?: {
+          nodes?: InferSelectResult<ViewTableWithRelations, S>[];
+        };
+      }) => ({
+        viewTable: data.viewTables?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ViewTableSelect>(

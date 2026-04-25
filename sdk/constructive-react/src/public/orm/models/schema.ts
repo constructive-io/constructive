@@ -70,13 +70,11 @@ export class SchemaModel {
     });
   }
   findFirst<S extends SchemaSelect>(
-    args: FindFirstArgs<S, SchemaFilter> & {
+    args: FindFirstArgs<S, SchemaFilter, SchemaOrderBy> & {
       select: S;
     } & StrictSelect<S, SchemaSelect>
   ): QueryBuilder<{
-    schemas: {
-      nodes: InferSelectResult<SchemaWithRelations, S>[];
-    };
+    schema: InferSelectResult<SchemaWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Schema',
@@ -84,17 +82,26 @@ export class SchemaModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SchemaFilter',
+      'SchemaOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Schema',
-      fieldName: 'schemas',
+      fieldName: 'schema',
       document,
       variables,
+      transform: (data: {
+        schemas?: {
+          nodes?: InferSelectResult<SchemaWithRelations, S>[];
+        };
+      }) => ({
+        schema: data.schemas?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SchemaSelect>(

@@ -70,13 +70,11 @@ export class RelationProvisionModel {
     });
   }
   findFirst<S extends RelationProvisionSelect>(
-    args: FindFirstArgs<S, RelationProvisionFilter> & {
+    args: FindFirstArgs<S, RelationProvisionFilter, RelationProvisionOrderBy> & {
       select: S;
     } & StrictSelect<S, RelationProvisionSelect>
   ): QueryBuilder<{
-    relationProvisions: {
-      nodes: InferSelectResult<RelationProvisionWithRelations, S>[];
-    };
+    relationProvision: InferSelectResult<RelationProvisionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'RelationProvision',
@@ -84,17 +82,26 @@ export class RelationProvisionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'RelationProvisionFilter',
+      'RelationProvisionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'RelationProvision',
-      fieldName: 'relationProvisions',
+      fieldName: 'relationProvision',
       document,
       variables,
+      transform: (data: {
+        relationProvisions?: {
+          nodes?: InferSelectResult<RelationProvisionWithRelations, S>[];
+        };
+      }) => ({
+        relationProvision: data.relationProvisions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends RelationProvisionSelect>(

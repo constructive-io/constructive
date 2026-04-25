@@ -70,13 +70,11 @@ export class DomainModel {
     });
   }
   findFirst<S extends DomainSelect>(
-    args: FindFirstArgs<S, DomainFilter> & {
+    args: FindFirstArgs<S, DomainFilter, DomainOrderBy> & {
       select: S;
     } & StrictSelect<S, DomainSelect>
   ): QueryBuilder<{
-    domains: {
-      nodes: InferSelectResult<DomainWithRelations, S>[];
-    };
+    domain: InferSelectResult<DomainWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'Domain',
@@ -84,17 +82,26 @@ export class DomainModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'DomainFilter',
+      'DomainOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'Domain',
-      fieldName: 'domains',
+      fieldName: 'domain',
       document,
       variables,
+      transform: (data: {
+        domains?: {
+          nodes?: InferSelectResult<DomainWithRelations, S>[];
+        };
+      }) => ({
+        domain: data.domains?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends DomainSelect>(

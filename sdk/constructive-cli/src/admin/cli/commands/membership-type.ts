@@ -24,7 +24,7 @@ const fieldSchema: FieldSchema = {
   hasUsersTableEntry: 'boolean',
 };
 const usage =
-  '\nmembership-type <command>\n\nCommands:\n  list                  List membershipType records\n  find-first            Find first matching membershipType record\n  get                   Get a membershipType by ID\n  create                Create a new membershipType\n  update                Update an existing membershipType\n  delete                Delete a membershipType\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n\n  --help, -h            Show this help message\n';
+  '\nmembership-type <command>\n\nCommands:\n  list                  List membershipType records\n  find-first            Find first matching membershipType record\n  get                   Get a membershipType by ID\n  create                Create a new membershipType\n  update                Update an existing membershipType\n  delete                Delete a membershipType\n\nList Options:\n  --limit <n>           Max number of records to return (forward pagination)\n  --last <n>            Number of records from the end (backward pagination)\n  --after <cursor>      Cursor for forward pagination\n  --before <cursor>     Cursor for backward pagination\n  --offset <n>          Number of records to skip\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.name.equalTo foo)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\nFind-First Options:\n  --select <fields>     Comma-separated list of fields to return\n  --where.<field>.<op>  Filter (dot-notation, e.g. --where.status.equalTo active)\n  --condition.<f>.<op>  Condition filter (dot-notation)\n  --orderBy <values>    Comma-separated ordering values (e.g. NAME_ASC,CREATED_AT_DESC)\n\n  --help, -h            Show this help message\n';
 export default async (
   argv: Partial<Record<string, unknown>>,
   prompter: Inquirerer,
@@ -108,7 +108,7 @@ async function handleFindFirst(argv: Partial<Record<string, unknown>>, _prompter
       hasUsersTableEntry: true,
     };
     const findFirstArgs = parseFindFirstArgs<
-      FindFirstArgs<MembershipTypeSelect, MembershipTypeFilter> & {
+      FindFirstArgs<MembershipTypeSelect, MembershipTypeFilter, MembershipTypeOrderBy> & {
         select: MembershipTypeSelect;
       }
     >(argv, defaultSelect);

@@ -72,13 +72,11 @@ export class ForeignKeyConstraintModel {
     });
   }
   findFirst<S extends ForeignKeyConstraintSelect>(
-    args: FindFirstArgs<S, ForeignKeyConstraintFilter> & {
+    args: FindFirstArgs<S, ForeignKeyConstraintFilter, ForeignKeyConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, ForeignKeyConstraintSelect>
   ): QueryBuilder<{
-    foreignKeyConstraints: {
-      nodes: InferSelectResult<ForeignKeyConstraintWithRelations, S>[];
-    };
+    foreignKeyConstraint: InferSelectResult<ForeignKeyConstraintWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'ForeignKeyConstraint',
@@ -86,17 +84,26 @@ export class ForeignKeyConstraintModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ForeignKeyConstraintFilter',
+      'ForeignKeyConstraintOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'ForeignKeyConstraint',
-      fieldName: 'foreignKeyConstraints',
+      fieldName: 'foreignKeyConstraint',
       document,
       variables,
+      transform: (data: {
+        foreignKeyConstraints?: {
+          nodes?: InferSelectResult<ForeignKeyConstraintWithRelations, S>[];
+        };
+      }) => ({
+        foreignKeyConstraint: data.foreignKeyConstraints?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ForeignKeyConstraintSelect>(

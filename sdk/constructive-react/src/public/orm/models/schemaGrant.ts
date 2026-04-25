@@ -70,13 +70,11 @@ export class SchemaGrantModel {
     });
   }
   findFirst<S extends SchemaGrantSelect>(
-    args: FindFirstArgs<S, SchemaGrantFilter> & {
+    args: FindFirstArgs<S, SchemaGrantFilter, SchemaGrantOrderBy> & {
       select: S;
     } & StrictSelect<S, SchemaGrantSelect>
   ): QueryBuilder<{
-    schemaGrants: {
-      nodes: InferSelectResult<SchemaGrantWithRelations, S>[];
-    };
+    schemaGrant: InferSelectResult<SchemaGrantWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'SchemaGrant',
@@ -84,17 +82,26 @@ export class SchemaGrantModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'SchemaGrantFilter',
+      'SchemaGrantOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'SchemaGrant',
-      fieldName: 'schemaGrants',
+      fieldName: 'schemaGrant',
       document,
       variables,
+      transform: (data: {
+        schemaGrants?: {
+          nodes?: InferSelectResult<SchemaGrantWithRelations, S>[];
+        };
+      }) => ({
+        schemaGrant: data.schemaGrants?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends SchemaGrantSelect>(

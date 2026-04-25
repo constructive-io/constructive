@@ -70,13 +70,11 @@ export class OrgPermissionModel {
     });
   }
   findFirst<S extends OrgPermissionSelect>(
-    args: FindFirstArgs<S, OrgPermissionFilter> & {
+    args: FindFirstArgs<S, OrgPermissionFilter, OrgPermissionOrderBy> & {
       select: S;
     } & StrictSelect<S, OrgPermissionSelect>
   ): QueryBuilder<{
-    orgPermissions: {
-      nodes: InferSelectResult<OrgPermissionWithRelations, S>[];
-    };
+    orgPermission: InferSelectResult<OrgPermissionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'OrgPermission',
@@ -84,17 +82,26 @@ export class OrgPermissionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'OrgPermissionFilter',
+      'OrgPermissionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'OrgPermission',
-      fieldName: 'orgPermissions',
+      fieldName: 'orgPermission',
       document,
       variables,
+      transform: (data: {
+        orgPermissions?: {
+          nodes?: InferSelectResult<OrgPermissionWithRelations, S>[];
+        };
+      }) => ({
+        orgPermission: data.orgPermissions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends OrgPermissionSelect>(

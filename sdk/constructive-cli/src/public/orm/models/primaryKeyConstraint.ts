@@ -72,13 +72,11 @@ export class PrimaryKeyConstraintModel {
     });
   }
   findFirst<S extends PrimaryKeyConstraintSelect>(
-    args: FindFirstArgs<S, PrimaryKeyConstraintFilter> & {
+    args: FindFirstArgs<S, PrimaryKeyConstraintFilter, PrimaryKeyConstraintOrderBy> & {
       select: S;
     } & StrictSelect<S, PrimaryKeyConstraintSelect>
   ): QueryBuilder<{
-    primaryKeyConstraints: {
-      nodes: InferSelectResult<PrimaryKeyConstraintWithRelations, S>[];
-    };
+    primaryKeyConstraint: InferSelectResult<PrimaryKeyConstraintWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'PrimaryKeyConstraint',
@@ -86,17 +84,26 @@ export class PrimaryKeyConstraintModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'PrimaryKeyConstraintFilter',
+      'PrimaryKeyConstraintOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'PrimaryKeyConstraint',
-      fieldName: 'primaryKeyConstraints',
+      fieldName: 'primaryKeyConstraint',
       document,
       variables,
+      transform: (data: {
+        primaryKeyConstraints?: {
+          nodes?: InferSelectResult<PrimaryKeyConstraintWithRelations, S>[];
+        };
+      }) => ({
+        primaryKeyConstraint: data.primaryKeyConstraints?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends PrimaryKeyConstraintSelect>(

@@ -70,13 +70,11 @@ export class WebauthnAuthModuleModel {
     });
   }
   findFirst<S extends WebauthnAuthModuleSelect>(
-    args: FindFirstArgs<S, WebauthnAuthModuleFilter> & {
+    args: FindFirstArgs<S, WebauthnAuthModuleFilter, WebauthnAuthModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, WebauthnAuthModuleSelect>
   ): QueryBuilder<{
-    webauthnAuthModules: {
-      nodes: InferSelectResult<WebauthnAuthModuleWithRelations, S>[];
-    };
+    webauthnAuthModule: InferSelectResult<WebauthnAuthModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'WebauthnAuthModule',
@@ -84,17 +82,26 @@ export class WebauthnAuthModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'WebauthnAuthModuleFilter',
+      'WebauthnAuthModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'WebauthnAuthModule',
-      fieldName: 'webauthnAuthModules',
+      fieldName: 'webauthnAuthModule',
       document,
       variables,
+      transform: (data: {
+        webauthnAuthModules?: {
+          nodes?: InferSelectResult<WebauthnAuthModuleWithRelations, S>[];
+        };
+      }) => ({
+        webauthnAuthModule: data.webauthnAuthModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends WebauthnAuthModuleSelect>(

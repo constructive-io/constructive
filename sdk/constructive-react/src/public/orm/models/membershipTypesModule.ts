@@ -72,13 +72,11 @@ export class MembershipTypesModuleModel {
     });
   }
   findFirst<S extends MembershipTypesModuleSelect>(
-    args: FindFirstArgs<S, MembershipTypesModuleFilter> & {
+    args: FindFirstArgs<S, MembershipTypesModuleFilter, MembershipTypesModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, MembershipTypesModuleSelect>
   ): QueryBuilder<{
-    membershipTypesModules: {
-      nodes: InferSelectResult<MembershipTypesModuleWithRelations, S>[];
-    };
+    membershipTypesModule: InferSelectResult<MembershipTypesModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'MembershipTypesModule',
@@ -86,17 +84,26 @@ export class MembershipTypesModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'MembershipTypesModuleFilter',
+      'MembershipTypesModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'MembershipTypesModule',
-      fieldName: 'membershipTypesModules',
+      fieldName: 'membershipTypesModule',
       document,
       variables,
+      transform: (data: {
+        membershipTypesModules?: {
+          nodes?: InferSelectResult<MembershipTypesModuleWithRelations, S>[];
+        };
+      }) => ({
+        membershipTypesModule: data.membershipTypesModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends MembershipTypesModuleSelect>(

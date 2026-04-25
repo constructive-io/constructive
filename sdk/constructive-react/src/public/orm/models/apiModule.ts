@@ -70,13 +70,11 @@ export class ApiModuleModel {
     });
   }
   findFirst<S extends ApiModuleSelect>(
-    args: FindFirstArgs<S, ApiModuleFilter> & {
+    args: FindFirstArgs<S, ApiModuleFilter, ApiModuleOrderBy> & {
       select: S;
     } & StrictSelect<S, ApiModuleSelect>
   ): QueryBuilder<{
-    apiModules: {
-      nodes: InferSelectResult<ApiModuleWithRelations, S>[];
-    };
+    apiModule: InferSelectResult<ApiModuleWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'ApiModule',
@@ -84,17 +82,26 @@ export class ApiModuleModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ApiModuleFilter',
+      'ApiModuleOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'ApiModule',
-      fieldName: 'apiModules',
+      fieldName: 'apiModule',
       document,
       variables,
+      transform: (data: {
+        apiModules?: {
+          nodes?: InferSelectResult<ApiModuleWithRelations, S>[];
+        };
+      }) => ({
+        apiModule: data.apiModules?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ApiModuleSelect>(

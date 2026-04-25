@@ -72,13 +72,11 @@ export class BlueprintConstructionModel {
     });
   }
   findFirst<S extends BlueprintConstructionSelect>(
-    args: FindFirstArgs<S, BlueprintConstructionFilter> & {
+    args: FindFirstArgs<S, BlueprintConstructionFilter, BlueprintConstructionOrderBy> & {
       select: S;
     } & StrictSelect<S, BlueprintConstructionSelect>
   ): QueryBuilder<{
-    blueprintConstructions: {
-      nodes: InferSelectResult<BlueprintConstructionWithRelations, S>[];
-    };
+    blueprintConstruction: InferSelectResult<BlueprintConstructionWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'BlueprintConstruction',
@@ -86,17 +84,26 @@ export class BlueprintConstructionModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'BlueprintConstructionFilter',
+      'BlueprintConstructionOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'BlueprintConstruction',
-      fieldName: 'blueprintConstructions',
+      fieldName: 'blueprintConstruction',
       document,
       variables,
+      transform: (data: {
+        blueprintConstructions?: {
+          nodes?: InferSelectResult<BlueprintConstructionWithRelations, S>[];
+        };
+      }) => ({
+        blueprintConstruction: data.blueprintConstructions?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends BlueprintConstructionSelect>(

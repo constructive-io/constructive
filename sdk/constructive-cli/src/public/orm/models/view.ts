@@ -70,13 +70,11 @@ export class ViewModel {
     });
   }
   findFirst<S extends ViewSelect>(
-    args: FindFirstArgs<S, ViewFilter> & {
+    args: FindFirstArgs<S, ViewFilter, ViewOrderBy> & {
       select: S;
     } & StrictSelect<S, ViewSelect>
   ): QueryBuilder<{
-    views: {
-      nodes: InferSelectResult<ViewWithRelations, S>[];
-    };
+    view: InferSelectResult<ViewWithRelations, S> | null;
   }> {
     const { document, variables } = buildFindFirstDocument(
       'View',
@@ -84,17 +82,26 @@ export class ViewModel {
       args.select,
       {
         where: args?.where,
+        orderBy: args?.orderBy as string[] | undefined,
       },
       'ViewFilter',
+      'ViewOrderBy',
       connectionFieldsMap
     );
     return new QueryBuilder({
       client: this.client,
       operation: 'query',
       operationName: 'View',
-      fieldName: 'views',
+      fieldName: 'view',
       document,
       variables,
+      transform: (data: {
+        views?: {
+          nodes?: InferSelectResult<ViewWithRelations, S>[];
+        };
+      }) => ({
+        view: data.views?.nodes?.[0] ?? null,
+      }),
     });
   }
   findOne<S extends ViewSelect>(
