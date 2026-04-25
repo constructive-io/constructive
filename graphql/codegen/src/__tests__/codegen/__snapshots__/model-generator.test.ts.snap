@@ -306,7 +306,7 @@ export class OrganizationModel {
   findFirst<S extends OrganizationSelect>(args: FindFirstArgs<S, OrganizationFilter, OrganizationsOrderBy> & {
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
-    organizationById: InferSelectResult<OrganizationWithRelations, S> | null;
+    organization: InferSelectResult<OrganizationWithRelations, S> | null;
   }> {
     const {
       document,
@@ -319,7 +319,7 @@ export class OrganizationModel {
       client: this.client,
       operation: "query",
       operationName: "Organization",
-      fieldName: "organizationById",
+      fieldName: "organization",
       document,
       variables,
       transform: (data: {
@@ -327,7 +327,7 @@ export class OrganizationModel {
           nodes?: InferSelectResult<OrganizationWithRelations, S>[];
         };
       }) => ({
-        "organizationById": data.allOrganizations?.nodes?.[0] ?? null
+        "organization": data.allOrganizations?.nodes?.[0] ?? null
       })
     });
   }
@@ -335,7 +335,7 @@ export class OrganizationModel {
     id: string;
     select: S;
   } & StrictSelect<S, OrganizationSelect>): QueryBuilder<{
-    organizationById: InferSelectResult<OrganizationWithRelations, S> | null;
+    organization: InferSelectResult<OrganizationWithRelations, S> | null;
   }> {
     const {
       document,
@@ -345,7 +345,7 @@ export class OrganizationModel {
       client: this.client,
       operation: "query",
       operationName: "Organization",
-      fieldName: "organizationById",
+      fieldName: "organization",
       document,
       variables
     });
