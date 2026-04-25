@@ -542,9 +542,8 @@ describe('CLI E2E — generated CLI against real DB', () => {
     );
 
     const raw = JSON.parse(output);
-    // find-first returns the connection result; extract first node
-    const result = raw.data?.animals ?? raw;
-    const node = result.nodes?.[0] ?? result;
+    // find-first returns a single record (or null) under the singular field name
+    const node = raw.data?.animal;
 
     expect(node.name).toBe('Buddy');
     expect(node.species).toBe('Dog');
