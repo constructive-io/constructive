@@ -326,8 +326,8 @@ export class UserModel {
   }
 
   findFirst<const S extends UserSelect>(
-    args?: FindFirstArgs<DeepExact<S, UserSelect>, UserFilter>
-  ): QueryBuilder<{ users: { nodes: InferSelectResult<UserWithRelations, S>[] } }> {
+    args?: FindFirstArgs<DeepExact<S, UserSelect>, UserFilter, UsersOrderBy>
+  ): QueryBuilder<{ user: InferSelectResult<UserWithRelations, S> | null }> {
     // ...
   }
 
