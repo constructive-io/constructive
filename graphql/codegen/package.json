@@ -29,29 +29,6 @@
   "main": "index.js",
   "module": "index.mjs",
   "types": "index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./esm/index.js",
-      "require": "./index.js",
-      "types": "./index.d.ts"
-    },
-    "./orm": {
-      "import": "./esm/core/codegen/orm/index.js",
-      "require": "./core/codegen/orm/index.js",
-      "types": "./core/codegen/orm/index.d.ts"
-    },
-    "./cli": {
-      "import": "./esm/core/codegen/cli/index.js",
-      "require": "./core/codegen/cli/index.js",
-      "types": "./core/codegen/cli/index.d.ts"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "orm": ["core/codegen/orm/index.d.ts"],
-      "cli": ["core/codegen/cli/index.d.ts"]
-    }
-  },
   "bin": {
     "graphql-codegen": "cli/index.js"
   },

@@ -6,18 +6,6 @@
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./esm/index.js",
-      "require": "./index.js",
-      "types": "./index.d.ts"
-    },
-    "./runtime": {
-      "import": "./esm/runtime/index.js",
-      "require": "./runtime/index.js",
-      "types": "./runtime/index.d.ts"
-    }
-  },
   "homepage": "https://github.com/constructive-io/constructive",
   "license": "MIT",
   "publishConfig": {

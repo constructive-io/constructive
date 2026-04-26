@@ -32,7 +32,7 @@ import {
 } from '@constructive-io/graphql-query';
 import type { Table } from '@constructive-io/graphql-query';
 
-import { generateOrm } from '@constructive-io/graphql-codegen/orm';
+import { generateOrm } from '@constructive-io/graphql-codegen/core/codegen/orm';
 
 export interface CodegenResult {
   /** Factory function to create an ORM client from a GraphQLAdapter */
