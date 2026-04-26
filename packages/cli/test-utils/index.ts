@@ -1,16 +1,4 @@
+// Local CLI fixture helpers. For inquirerer testing primitives
+// (KEY_SEQUENCES, setupTests, createTestEnvironment, snapshot utils, etc.),
+// import directly from `@inquirerer/test`.
 export * from './fixtures';
-
-// Re-export test utilities from @inquirerer/test
-export {
-  KEY_SEQUENCES,
-  setupTests,
-  createTestEnvironment,
-  normalizePackageJsonForSnapshot,
-  cleanAnsi
-} from '@inquirerer/test';
-
-export type {
-  TestEnvironment,
-  InputResponse,
-  NormalizeOptions
-} from '@inquirerer/test';
