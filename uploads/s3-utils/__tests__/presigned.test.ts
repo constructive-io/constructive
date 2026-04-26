@@ -5,12 +5,15 @@
  * Actual S3 integration is tested in the server-test suite.
  */
 
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { presignPutUrl, presignGetUrl, headObject } from '../src/presigned';
 
 // Mock the AWS SDK modules
 jest.mock('@aws-sdk/s3-request-presigner', () => ({
   getSignedUrl: jest.fn().mockResolvedValue('https://mock-presigned-url.example.com'),
 }));
+
+const mockGetSignedUrl = getSignedUrl as jest.MockedFunction<typeof getSignedUrl>;
 
 jest.mock('@aws-sdk/client-s3', () => {
   const actual = jest.requireActual('@aws-sdk/client-s3');
@@ -38,14 +41,13 @@ describe('presignPutUrl', () => {
   });
 
   it('uses default expiresIn of 900 seconds', async () => {
-    const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
     await presignPutUrl(mockClient, {
       bucket: 'test-bucket',
       key: 'test.txt',
       contentType: 'text/plain',
       contentLength: 100,
     });
-    expect(getSignedUrl).toHaveBeenCalledWith(
+    expect(mockGetSignedUrl).toHaveBeenCalledWith(
       mockClient,
       expect.anything(),
       { expiresIn: 900 },
@@ -53,7 +55,6 @@ describe('presignPutUrl', () => {
   });
 
   it('respects custom expiresIn', async () => {
-    const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
     await presignPutUrl(mockClient, {
       bucket: 'test-bucket',
       key: 'test.txt',
@@ -61,7 +62,7 @@ describe('presignPutUrl', () => {
       contentLength: 100,
       expiresIn: 1800,
     });
-    expect(getSignedUrl).toHaveBeenCalledWith(
+    expect(mockGetSignedUrl).toHaveBeenCalledWith(
       mockClient,
       expect.anything(),
       { expiresIn: 1800 },
@@ -79,12 +80,11 @@ describe('presignGetUrl', () => {
   });
 
   it('uses default expiresIn of 3600 seconds', async () => {
-    const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
     await presignGetUrl(mockClient, {
       bucket: 'test-bucket',
       key: 'test.txt',
     });
-    expect(getSignedUrl).toHaveBeenCalledWith(
+    expect(mockGetSignedUrl).toHaveBeenCalledWith(
       mockClient,
       expect.anything(),
       { expiresIn: 3600 },
