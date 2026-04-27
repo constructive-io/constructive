@@ -1,6 +1,7 @@
-/* eslint-disable no-console */
+import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { Client } from 'pg';
+import { getPgEnvOptions, type PgConfig } from 'pg-env';
 
 import { auditPg } from '../commands/pg';
 import { renderJson } from '../report/json';
@@ -8,15 +9,24 @@ import { renderPretty } from '../report/pretty';
 import type { Severity } from '../types';
 import { meetsThreshold, SEVERITY_ORDER } from '../types';
 
+const log = new Logger('safegres');
+
 const usage = `
 safegres pg — pure-PostgreSQL RLS auditor
 
   safegres pg [OPTIONS]
 
-Options:
-  --connection <url>       PostgreSQL connection string (or env DATABASE_URL)
+Connection (priority order, top wins):
+  --connection <url>       Full PostgreSQL connection string
+  --host <host>            PostgreSQL host        (else PGHOST,    default localhost)
+  --port <port>            PostgreSQL port        (else PGPORT,    default 5432)
+  --user <user>            PostgreSQL user        (else PGUSER,    default postgres)
+  --password <pw>          PostgreSQL password    (else PGPASSWORD,default password)
+  --database <db>          PostgreSQL database    (else PGDATABASE,default postgres)
+
+Audit options:
   --schemas <csv>          Limit to these schemas (default: all non-system)
-  --exclude-schemas <csv>  Skip these schemas (default: pg_catalog,information_schema,pg_toast)
+  --exclude-schemas <csv>  Skip these schemas
   --roles <csv>            Audit grants only for these roles (default: all)
   --exclude-roles <csv>    Skip grants for these roles
   --format <fmt>           "pretty" (default) | "json" | "json-pretty"
@@ -27,7 +37,7 @@ Options:
   --help, -h               Show this help message
 `;
 
-function csv(value: unknown): string[] | undefined {
+function csvList(value: unknown): string[] | undefined {
   if (typeof value !== 'string' || value.length === 0) return undefined;
   return value
     .split(',')
@@ -35,12 +45,17 @@ function csv(value: unknown): string[] | undefined {
     .filter(Boolean);
 }
 
-function string(value: unknown): string | undefined {
-  return typeof value === 'string' && value.length > 0 ? value : undefined;
-}
-
-function bool(value: unknown): boolean {
-  return value === true || value === 'true';
+function buildClient(argv: ParsedArgs): Client {
+  if (typeof argv.connection === 'string' && argv.connection.length > 0) {
+    return new Client({ connectionString: argv.connection });
+  }
+  const overrides: Partial<PgConfig> = {};
+  if (typeof argv.host === 'string') overrides.host = argv.host;
+  if (typeof argv.port === 'number') overrides.port = argv.port;
+  if (typeof argv.user === 'string') overrides.user = argv.user;
+  if (typeof argv.password === 'string') overrides.password = argv.password;
+  if (typeof argv.database === 'string') overrides.database = argv.database;
+  return new Client(getPgEnvOptions(overrides));
 }
 
 export default async (
@@ -49,31 +64,25 @@ export default async (
   _options: CLIOptions
 ): Promise<void> => {
   if (argv.help || argv.h) {
-    console.log(usage);
+    process.stdout.write(usage);
     return;
   }
 
-  const connection = string(argv.connection) ?? process.env.DATABASE_URL;
-  if (!connection) {
-    console.error('error: --connection <url> or DATABASE_URL env required');
-    process.exit(2);
-  }
+  // minimist parses `--no-color` as `color: false`.
+  const colorEnabled = argv.color !== false;
 
-  // `--no-color` is parsed by minimist as `color: false` (negation of `--color`).
-  const colorFlag = 'color' in argv ? argv.color !== false : !bool(argv['no-color']);
-
-  const client = new Client({ connectionString: connection });
+  const client = buildClient(argv);
   await client.connect();
   try {
     const report = await auditPg(client, {
-      schemas: csv(argv.schemas),
-      excludeSchemas: csv(argv['exclude-schemas']),
-      includeRoles: csv(argv.roles),
-      excludeRoles: csv(argv['exclude-roles']),
-      skipAstChecks: bool(argv['skip-ast'])
+      schemas: csvList(argv.schemas),
+      excludeSchemas: csvList(argv['exclude-schemas']),
+      includeRoles: csvList(argv.roles),
+      excludeRoles: csvList(argv['exclude-roles']),
+      skipAstChecks: argv['skip-ast'] === true
     });
 
-    const fmt = string(argv.format) ?? 'pretty';
+    const fmt = typeof argv.format === 'string' ? argv.format : 'pretty';
     let output: string;
     switch (fmt) {
     case 'json':
@@ -83,19 +92,19 @@ export default async (
       output = renderJson(report, { pretty: true });
       break;
     case 'pretty':
-      output = renderPretty(report, { color: colorFlag });
+      output = renderPretty(report, { color: colorEnabled });
       break;
     default:
-      console.error(`Unknown --format: ${fmt}`);
+      log.error(`Unknown --format: ${fmt}`);
       process.exit(2);
     }
     process.stdout.write(output);
     process.stdout.write('\n');
 
-    const failOn = string(argv['fail-on']) as Severity | undefined;
+    const failOn = typeof argv['fail-on'] === 'string' ? (argv['fail-on'] as Severity) : undefined;
     if (failOn) {
       if (!(failOn in SEVERITY_ORDER)) {
-        console.error(`Unknown --fail-on severity: ${failOn}`);
+        log.error(`Unknown --fail-on severity: ${failOn}`);
         process.exit(2);
       }
       if (report.findings.some((f) => meetsThreshold(f.severity, failOn))) {

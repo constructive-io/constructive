@@ -1,28 +1,38 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
+import { Logger } from '@pgpmjs/logger';
 import { CLI, CLIOptions, getPackageJson } from 'inquirerer';
 
 import { commands } from './cli/commands';
 
+const log = new Logger('safegres');
+
 if (process.argv.includes('--version') || process.argv.includes('-v')) {
   const pkg = getPackageJson(__dirname);
-  console.log(pkg.version);
+  process.stdout.write(`${pkg.version}\n`);
   process.exit(0);
 }
 
 const options: Partial<CLIOptions> = {
   minimistOpts: {
-    alias: {
-      v: 'version',
-      h: 'help'
-    },
-    boolean: ['skip-ast', 'no-color', 'color', 'help']
+    alias: { v: 'version', h: 'help' },
+    boolean: ['skip-ast', 'color', 'help', 'version'],
+    string: [
+      'connection',
+      'host',
+      'user',
+      'password',
+      'database',
+      'schemas',
+      'exclude-schemas',
+      'roles',
+      'exclude-roles',
+      'format',
+      'fail-on'
+    ]
   }
 };
 
-const app = new CLI(commands, options);
-
-app.run().catch((error) => {
-  console.error(error);
+new CLI(commands, options).run().catch((error) => {
+  log.error(error);
   process.exit(1);
 });

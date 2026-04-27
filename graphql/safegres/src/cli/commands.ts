@@ -1,7 +1,9 @@
-/* eslint-disable no-console */
+import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
 
 import pg from './pg';
+
+const log = new Logger('safegres');
 
 const usage = `
 safegres — pure-PostgreSQL RLS auditor
@@ -16,7 +18,10 @@ Commands:
 Run \`safegres <command> --help\` for command-specific options.
 `;
 
-const commandMap: Record<string, (argv: ParsedArgs, prompter: Inquirerer, options: CLIOptions) => unknown> = {
+const commandMap: Record<
+  string,
+  (argv: ParsedArgs, prompter: Inquirerer, options: CLIOptions) => unknown
+> = {
   pg
 };
 
@@ -28,13 +33,14 @@ export const commands = async (
   const { first: command, newArgv } = extractFirst(argv);
 
   if (!command || command === 'help' || argv.help || argv.h) {
-    console.log(usage);
+    process.stdout.write(usage);
     return;
   }
 
   const handler = commandMap[command];
   if (!handler) {
-    console.error(`Unknown command: ${command}\n${usage}`);
+    log.error(`Unknown command: ${command}`);
+    process.stdout.write(usage);
     process.exit(2);
   }
 

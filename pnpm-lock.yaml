@@ -1187,6 +1187,12 @@ importers:
       '@inquirerer/utils':
         specifier: ^3.3.5
         version: 3.3.5
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../../pgpm/logger/dist
+      '@pgsql/traverse':
+        specifier: ^17.2.5
+        version: 17.2.5
       '@pgsql/types':
         specifier: ^17.6.2
         version: 17.6.2
@@ -1199,12 +1205,18 @@ importers:
       pg:
         specifier: ^8.16.0
         version: 8.20.0
+      pg-env:
+        specifier: ^1.9.0
+        version: 1.9.0
       pgsql-deparser:
         specifier: ^17.18.2
         version: 17.18.2
       pgsql-parser:
         specifier: ^17.9.14
         version: 17.9.14
+      yanse:
+        specifier: ^0.2.1
+        version: 0.2.1
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -4462,6 +4474,9 @@ packages:
 
   '@pgsql/quotes@17.1.0':
     resolution: {integrity: sha512-J/H+LcrENBpYgL45WW6aTjb5Yk4tX4+AmB2/k8KZa+Zh3wiCtqmNIag+HZz5HmWaF6EZK9ZGC95NBD1fs+rUvg==}
+
+  '@pgsql/traverse@17.2.5':
+    resolution: {integrity: sha512-LJAkgoSCL5JDy9uFPFZ3duLCTYzYwu/FNxcRNIvwL1xwcSm2KLWu7SWWt+N5EJVbJd6LVA792Ei899a5RJH+7Q==}
 
   '@pgsql/types@17.6.2':
     resolution: {integrity: sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw==}
@@ -8741,6 +8756,9 @@ packages:
   pg-copy-streams@7.0.0:
     resolution: {integrity: sha512-zBvnY6wtaBRE2ae2xXWOOGMaNVPkXh1vhypAkNSKgMdciJeTyIQAHZaEeRAxUjs/p1El5jgzYmwG5u871Zj3dQ==}
 
+  pg-env@1.9.0:
+    resolution: {integrity: sha512-0XYbwyIzOihrh7/AJ/4V6cM1z1QGiSnL9pfiWaGNUcaPWec2T8VCg5/vc3ozfBYaI6SkbUZHu5hpiJ3M9OT+2g==}
+
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
@@ -12206,6 +12224,13 @@ snapshots:
   '@pgpm/verify@0.21.0': {}
 
   '@pgsql/quotes@17.1.0': {}
+
+  '@pgsql/traverse@17.2.5':
+    dependencies:
+      '@pgsql/types': 17.6.2
+      pg-proto-parser: 1.30.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@pgsql/types@17.6.2': {}
 
@@ -17412,6 +17437,8 @@ snapshots:
   pg-connection-string@2.12.0: {}
 
   pg-copy-streams@7.0.0: {}
+
+  pg-env@1.9.0: {}
 
   pg-int8@1.0.1: {}
 

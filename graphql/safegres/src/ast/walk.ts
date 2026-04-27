@@ -1,69 +1,38 @@
 /**
- * Tiny, typed AST walker for pgsql-parser v17 output.
- *
- * We deliberately do NOT depend on @pgsql/traverse here — keeping the walker
- * hand-rolled lets the package stay dependency-free at runtime (only
- * `pgsql-parser` + `pg`) which matters for the eventual open-source lift-out.
+ * Domain-specific AST helpers for the safegres auditor, layered on top of
+ * `@pgsql/traverse`'s `walk` / `NodePath`.
  */
+
+import { NodePath, walk } from '@pgsql/traverse';
 
 import type { PgAstNode } from './parse';
 
-export type Visitor = (node: Record<string, unknown>, key: string, parent: Record<string, unknown> | null) => void;
-
-/** Depth-first walk over every tagged node in the AST. */
-export function walk(root: PgAstNode, visit: Visitor): void {
-  walkNode(root, '__root__', null, visit);
-}
-
-function walkNode(
-  node: unknown,
-  key: string,
-  parent: Record<string, unknown> | null,
-  visit: Visitor
-): void {
-  if (node === null || node === undefined) return;
-  if (Array.isArray(node)) {
-    for (const item of node) walkNode(item, key, parent, visit);
-    return;
-  }
-  if (typeof node !== 'object') return;
-
-  const record = node as Record<string, unknown>;
-
-  // pgsql-parser emits discriminated-union objects like `{ FuncCall: {...} }`.
-  // We visit the *inner* object with the tag name as `key`, and recurse on its children.
-  const keys = Object.keys(record);
-  if (keys.length === 1 && isTaggedUnion(keys[0])) {
-    const tag = keys[0];
-    const inner = record[tag];
-    if (inner && typeof inner === 'object' && !Array.isArray(inner)) {
-      visit(inner as Record<string, unknown>, tag, parent);
-      for (const [childKey, childVal] of Object.entries(inner)) {
-        walkNode(childVal, childKey, inner as Record<string, unknown>, visit);
-      }
-      return;
-    }
-  }
-
-  // Otherwise it's a plain container — recurse over its values.
-  for (const [k, v] of Object.entries(record)) {
-    walkNode(v, k, record, visit);
-  }
-}
-
-function isTaggedUnion(key: string): boolean {
-  // pgsql-parser tag names are PascalCase: FuncCall, ColumnRef, A_Expr, etc.
-  // A_Expr starts with a capital + underscore, still PascalCase-ish.
-  return /^[A-Z]/.test(key);
-}
-
-/** Find every tagged node with the given tag name. */
+/** Find every node tagged with `tag` (e.g. `FuncCall`, `ColumnRef`). */
 export function findAll(root: PgAstNode, tag: string): Record<string, unknown>[] {
   const out: Record<string, unknown>[] = [];
-  walk(root, (node, key) => {
-    if (key === tag) out.push(node);
+  walk(root as object, (path: NodePath) => {
+    if (path.tag === tag) {
+      out.push(path.node as Record<string, unknown>);
+    }
   });
   return out;
+}
+
+/** Visit every tagged node. `visit(node, tag, parent)` matches the old API. */
+export type Visitor = (
+  node: Record<string, unknown>,
+  tag: string,
+  parent: Record<string, unknown> | null
+) => void;
+
+export function visitAll(root: PgAstNode, visit: Visitor): void {
+  walk(root as object, (path: NodePath) => {
+    visit(
+      path.node as Record<string, unknown>,
+      path.tag,
+      (path.parent?.node as Record<string, unknown> | undefined) ?? null
+    );
+  });
 }
 
 /**
@@ -76,12 +45,14 @@ export function funcNameParts(funcCall: Record<string, unknown>): { schema?: str
   const funcname = funcCall.funcname;
   if (!Array.isArray(funcname)) return { name: '<unknown>' };
 
-  const parts = funcname.map((n) => {
-    const rec = n as Record<string, unknown>;
-    const str = (rec.String ?? rec.string) as Record<string, unknown> | undefined;
-    if (!str) return '';
-    return String((str.sval ?? str.str) ?? '');
-  }).filter((s) => s.length > 0);
+  const parts = funcname
+    .map((n) => {
+      const rec = n as Record<string, unknown>;
+      const str = (rec.String ?? rec.string) as Record<string, unknown> | undefined;
+      if (!str) return '';
+      return String((str.sval ?? str.str) ?? '');
+    })
+    .filter((s) => s.length > 0);
 
   if (parts.length >= 2) return { schema: parts[0], name: parts[parts.length - 1] };
   if (parts.length === 1) return { name: parts[0] };

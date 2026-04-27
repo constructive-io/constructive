@@ -1,6 +1,6 @@
 import type { PgAstNode } from '../ast/parse';
 import { parsePolicyExpression } from '../ast/parse';
-import { columnRefPath, findAll, funcNameParts, funcNameQualified, walk } from '../ast/walk';
+import { columnRefPath, findAll, funcNameParts, funcNameQualified, visitAll } from '../ast/walk';
 import { boolConst } from '../ast/helpers';
 import type { PolicyInfo, TableSnapshot } from '../pg/introspect';
 import type { ProcVolatility } from '../pg/proc';
@@ -100,7 +100,7 @@ export function checkSessionUserGating(
   // session_user / current_user appear as CurrentOfExpr-adjacent nodes in some
   // parser versions, but the common form is `SQLValueFunction` with `op:
   // SVFOP_CURRENT_USER` (4) or SVFOP_SESSION_USER (6).
-  walk(expr, (node, tag) => {
+  visitAll(expr, (node, tag) => {
     if (tag === 'SQLValueFunction') {
       const op = node.op;
       const opStr = typeof op === 'string' ? op : String(op);

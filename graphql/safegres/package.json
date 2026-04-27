@@ -42,12 +42,16 @@
   ],
   "dependencies": {
     "@inquirerer/utils": "^3.3.5",
+    "@pgpmjs/logger": "workspace:^",
+    "@pgsql/traverse": "^17.2.5",
     "@pgsql/types": "^17.6.2",
     "inquirerer": "^4.7.0",
     "node-type-registry": "workspace:^",
     "pg": "^8.16.0",
+    "pg-env": "^1.9.0",
     "pgsql-deparser": "^17.18.2",
-    "pgsql-parser": "^17.9.14"
+    "pgsql-parser": "^17.9.14",
+    "yanse": "^0.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
