@@ -1,0 +1,56 @@
+{
+  "name": "safegres",
+  "version": "0.1.0",
+  "author": "Constructive <developers@constructive.io>",
+  "description": "Pure-PostgreSQL RLS auditor: grants, RLS flags, policy coverage, and AST-level anti-pattern detection. Re-exports the Authz*/Data*/Relation*/View* type registry for downstream auditors.",
+  "main": "index.js",
+  "module": "esm/index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/constructive-io/constructive",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/constructive-io/constructive"
+  },
+  "bugs": {
+    "url": "https://github.com/constructive-io/constructive/issues"
+  },
+  "bin": {
+    "safegres": "dist/cli.js"
+  },
+  "scripts": {
+    "clean": "makage clean",
+    "prepack": "npm run build",
+    "build": "makage build",
+    "build:dev": "makage build --dev",
+    "lint": "eslint . --fix",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "postgres",
+    "rls",
+    "row-level-security",
+    "audit",
+    "security",
+    "safegres",
+    "constructive"
+  ],
+  "dependencies": {
+    "@pgsql/types": "^17.6.2",
+    "node-type-registry": "workspace:^",
+    "pg": "^8.16.0",
+    "pgsql-deparser": "^17.18.2",
+    "pgsql-parser": "^17.9.14"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.10",
+    "makage": "^0.3.0",
+    "pgsql-test": "workspace:^"
+  }
+}
