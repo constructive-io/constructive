@@ -1182,53 +1182,6 @@ importers:
         version: 0.3.0
     publishDirectory: dist
 
-  graphql/safegres:
-    dependencies:
-      '@inquirerer/utils':
-        specifier: ^3.3.5
-        version: 3.3.5
-      '@pgpmjs/logger':
-        specifier: workspace:^
-        version: link:../../pgpm/logger/dist
-      '@pgsql/traverse':
-        specifier: ^17.2.5
-        version: 17.2.5
-      '@pgsql/types':
-        specifier: ^17.6.2
-        version: 17.6.2
-      inquirerer:
-        specifier: ^4.7.0
-        version: 4.7.0
-      pg:
-        specifier: ^8.16.0
-        version: 8.20.0
-      pg-env:
-        specifier: ^1.9.0
-        version: 1.9.0
-      pgsql-deparser:
-        specifier: ^17.18.2
-        version: 17.18.2
-      pgsql-parser:
-        specifier: ^17.9.14
-        version: 17.9.14
-      yanse:
-        specifier: ^0.2.1
-        version: 0.2.1
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.19.15
-      '@types/pg':
-        specifier: ^8.11.10
-        version: 8.18.0
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-      pgsql-test:
-        specifier: workspace:^
-        version: link:../../postgres/pgsql-test/dist
-    publishDirectory: dist
-
   graphql/server:
     dependencies:
       '@constructive-io/graphql-env':
@@ -2068,6 +2021,53 @@ importers:
       makage:
         specifier: ^0.3.0
         version: 0.3.0
+    publishDirectory: dist
+
+  packages/safegres:
+    dependencies:
+      '@inquirerer/utils':
+        specifier: ^3.3.5
+        version: 3.3.5
+      '@pgpmjs/logger':
+        specifier: workspace:^
+        version: link:../../pgpm/logger/dist
+      '@pgsql/traverse':
+        specifier: ^17.2.5
+        version: 17.2.5
+      '@pgsql/types':
+        specifier: ^17.6.2
+        version: 17.6.2
+      inquirerer:
+        specifier: ^4.7.0
+        version: 4.7.0
+      pg:
+        specifier: ^8.16.0
+        version: 8.20.0
+      pg-env:
+        specifier: ^1.9.0
+        version: 1.9.0
+      pgsql-deparser:
+        specifier: ^17.18.2
+        version: 17.18.2
+      pgsql-parser:
+        specifier: ^17.9.14
+        version: 17.9.14
+      yanse:
+        specifier: ^0.2.1
+        version: 0.2.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.15
+      '@types/pg':
+        specifier: ^8.11.10
+        version: 8.18.0
+      makage:
+        specifier: ^0.3.0
+        version: 0.3.0
+      pgsql-test:
+        specifier: workspace:^
+        version: link:../../postgres/pgsql-test/dist
     publishDirectory: dist
 
   packages/server-utils:

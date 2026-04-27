@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Safegres/brand/refs/heads/main/safegres.svg" alt="safegres" width="120" />
+</p>
+
 # safegres
 
 Pure-PostgreSQL Row-Level-Security auditor. Zero application dependencies — drop it on any Postgres database and get a structured report of grants, RLS flags, policy coverage, and AST-level anti-patterns.
