@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.22.1](https://github.com/constructive-io/constructive/compare/graphile-settings@4.22.0...graphile-settings@4.22.1) (2026-04-27)
+
+### Bug Fixes
+
+- remove phantom cyclic deps (@pgpmjs/core -> migrate-client, graphile-settings -> pgsql-test) ([0683ba6](https://github.com/constructive-io/constructive/commit/0683ba622edb984b7594f4062367b58910458636))
+
 # [4.22.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.21.8...graphile-settings@4.22.0) (2026-04-27)
 
 ### Features

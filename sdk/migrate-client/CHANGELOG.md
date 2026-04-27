@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.5.2...@pgpmjs/migrate-client@0.5.3) (2026-04-27)
+
+### Bug Fixes
+
+- add @constructive-io/graphql-query dep to SDK packages + regenerate ORM code ([62def8b](https://github.com/constructive-io/constructive/commit/62def8b58c8c46f34e9bdfa7ccba9a5c9cc675a8)), closes [#1023](https://github.com/constructive-io/constructive/issues/1023)
+
 ## [0.5.2](https://github.com/constructive-io/constructive/compare/@pgpmjs/migrate-client@0.5.1...@pgpmjs/migrate-client@0.5.2) (2026-04-20)
 
 **Note:** Version bump only for package @pgpmjs/migrate-client

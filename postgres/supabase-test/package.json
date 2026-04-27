@@ -1,6 +1,6 @@
 {
   "name": "supabase-test",
-  "version": "2.9.3",
+  "version": "2.9.4",
   "author": "Interweb <developers@interweb.io>",
   "description": "supabase-test offers isolated, role-aware, and rollback-friendly PostgreSQL environments for integration tests with Supabase defaults baked in",
   "main": "index.js",

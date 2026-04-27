@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.12.4](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.12.3...@pgpmjs/core@6.12.4) (2026-04-27)
+
+### Bug Fixes
+
+- remove phantom cyclic deps (@pgpmjs/core -> migrate-client, graphile-settings -> pgsql-test) ([0683ba6](https://github.com/constructive-io/constructive/commit/0683ba622edb984b7594f4062367b58910458636))
+
 ## [6.12.3](https://github.com/constructive-io/constructive/compare/@pgpmjs/core@6.12.2...@pgpmjs/core@6.12.3) (2026-04-20)
 
 **Note:** Version bump only for package @pgpmjs/core
