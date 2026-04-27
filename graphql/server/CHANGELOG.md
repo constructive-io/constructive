@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.20.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.19.2...@constructive-io/graphql-server@4.20.0) (2026-04-27)
+
+### Features
+
+- consolidate S3 client factory + presigned URL helpers into s3-utils ([cf436df](https://github.com/constructive-io/constructive/commit/cf436df711fb239c640a99655e0e1a572480feb7))
+
 ## [4.19.2](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-server@4.19.1...@constructive-io/graphql-server@4.19.2) (2026-04-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-server

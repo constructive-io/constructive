@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.14.8...@constructive-io/graphql-query@3.15.0) (2026-04-27)
+
+### Bug Fixes
+
+- add exports field to graphql-query for ./runtime sub-path resolution ([ec6080d](https://github.com/constructive-io/constructive/commit/ec6080d41c529a4730d0370134afde495d9183dd))
+- keep gql-ast as direct import to avoid namespace pollution ([34abe3e](https://github.com/constructive-io/constructive/commit/34abe3e76c842f06db5f06c25b2ec605759e3841))
+- remove exports map anti-pattern, use deep path imports per Constructive standard ([8b62982](https://github.com/constructive-io/constructive/commit/8b629820d641f20c5c90a2ad79f77ff84c3c15b1))
+
+### Features
+
+- consolidate codegen test helper + runtime sub-export ([e13cd76](https://github.com/constructive-io/constructive/commit/e13cd76230c09b21de14abf68ca5160375923abc)), closes [#1](https://github.com/constructive-io/constructive/issues/1) [#2](https://github.com/constructive-io/constructive/issues/2)
+
 ## [3.14.8](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-query@3.14.7...@constructive-io/graphql-query@3.14.8) (2026-04-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-query

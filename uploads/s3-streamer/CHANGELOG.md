@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.19.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.18.0...@constructive-io/s3-streamer@2.19.0) (2026-04-27)
+
+### Bug Fixes
+
+- remove anti-pattern of re-exporting third-party types from barrel ([2872096](https://github.com/constructive-io/constructive/commit/28720967fec32419b005cf1cab5833778d1058ba))
+
+### Features
+
+- consolidate S3 client factory + presigned URL helpers into s3-utils ([cf436df](https://github.com/constructive-io/constructive/commit/cf436df711fb239c640a99655e0e1a572480feb7))
+
 # [2.18.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-streamer@2.17.4...@constructive-io/s3-streamer@2.18.0) (2026-04-18)
 
 **Note:** Version bump only for package @constructive-io/s3-streamer

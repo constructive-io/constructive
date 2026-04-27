@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.22.0](https://github.com/constructive-io/constructive/compare/graphile-settings@4.21.8...graphile-settings@4.22.0) (2026-04-27)
+
+### Features
+
+- consolidate S3 client factory + presigned URL helpers into s3-utils ([cf436df](https://github.com/constructive-io/constructive/commit/cf436df711fb239c640a99655e0e1a572480feb7))
+
 ## [4.21.8](https://github.com/constructive-io/constructive/compare/graphile-settings@4.21.7...graphile-settings@4.21.8) (2026-04-20)
 
 **Note:** Version bump only for package graphile-settings

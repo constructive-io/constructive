@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.12.10](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.9...graphql-server-test@2.12.10) (2026-04-27)
+
+### Bug Fixes
+
+- add ./cli sub-path export to graphql-codegen and update imports ([0973c54](https://github.com/constructive-io/constructive/commit/0973c54331809ff848372f50b1210791e799906e))
+- add graphql-query as devDependency of server-test for runtime sub-path resolution ([7993fb7](https://github.com/constructive-io/constructive/commit/7993fb758d4a5856f3fb41948ee867ef34c0ce00))
+- add graphql-query to cli-e2e NODE_PATH for runtime sub-path resolution ([d4e917d](https://github.com/constructive-io/constructive/commit/d4e917d6777f18deba6c15eed9977ff3ab30dd82))
+- remove exports map anti-pattern, use deep path imports per Constructive standard ([8b62982](https://github.com/constructive-io/constructive/commit/8b629820d641f20c5c90a2ad79f77ff84c3c15b1))
+
 ## [2.12.9](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.8...graphql-server-test@2.12.9) (2026-04-20)
 
 **Note:** Version bump only for package graphql-server-test

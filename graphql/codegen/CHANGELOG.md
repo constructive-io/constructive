@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.31.0](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.9...@constructive-io/graphql-codegen@4.31.0) (2026-04-27)
+
+### Bug Fixes
+
+- add ./cli sub-path export to graphql-codegen and update imports ([0973c54](https://github.com/constructive-io/constructive/commit/0973c54331809ff848372f50b1210791e799906e))
+- add typesVersions for moduleResolution:node compatibility ([39b5612](https://github.com/constructive-io/constructive/commit/39b56122ff125f746d71a08a49b123625b33d2b6))
+- keep gql-ast as direct import to avoid namespace pollution ([34abe3e](https://github.com/constructive-io/constructive/commit/34abe3e76c842f06db5f06c25b2ec605759e3841))
+- remove exports map anti-pattern, use deep path imports per Constructive standard ([8b62982](https://github.com/constructive-io/constructive/commit/8b629820d641f20c5c90a2ad79f77ff84c3c15b1))
+- replace require.resolve hack with ./orm sub-path export ([5e99a7f](https://github.com/constructive-io/constructive/commit/5e99a7fb6c051e80c344a27bd39f65d87d40efdb))
+
+### Features
+
+- consolidate codegen test helper + runtime sub-export ([e13cd76](https://github.com/constructive-io/constructive/commit/e13cd76230c09b21de14abf68ca5160375923abc)), closes [#1](https://github.com/constructive-io/constructive/issues/1) [#2](https://github.com/constructive-io/constructive/issues/2)
+
 ## [4.30.9](https://github.com/constructive-io/constructive/compare/@constructive-io/graphql-codegen@4.30.8...@constructive-io/graphql-codegen@4.30.9) (2026-04-20)
 
 **Note:** Version bump only for package @constructive-io/graphql-codegen

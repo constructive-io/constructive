@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.12.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-utils@2.11.0...@constructive-io/s3-utils@2.12.0) (2026-04-27)
+
+### Bug Fixes
+
+- remove anti-pattern of re-exporting third-party types from barrel ([2872096](https://github.com/constructive-io/constructive/commit/28720967fec32419b005cf1cab5833778d1058ba))
+- replace require() with proper imports in presigned.test.ts ([0c37809](https://github.com/constructive-io/constructive/commit/0c3780965bf58aa6cb5534ec82511bdda9d29a55))
+
+### Features
+
+- consolidate S3 client factory + presigned URL helpers into s3-utils ([cf436df](https://github.com/constructive-io/constructive/commit/cf436df711fb239c640a99655e0e1a572480feb7))
+
 # [2.11.0](https://github.com/constructive-io/constructive/compare/@constructive-io/s3-utils@2.10.2...@constructive-io/s3-utils@2.11.0) (2026-04-18)
 
 **Note:** Version bump only for package @constructive-io/s3-utils
