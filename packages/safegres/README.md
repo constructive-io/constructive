@@ -8,8 +8,13 @@ Pure-PostgreSQL Row-Level-Security auditor. Zero application dependencies — dr
 
 ```bash
 npm install -g safegres
-safegres pg --connection postgresql://localhost/mydb
+
+# Standard libpq env vars (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
+export PGHOST=localhost PGUSER=postgres PGPASSWORD=password PGDATABASE=mydb
+safegres pg
 ```
+
+Per-field overrides (`--host`, `--port`, `--user`, `--password`, `--database`) and a full `--connection <url>` flag are also supported. See `safegres pg --help`.
 
 ## What it checks
 
@@ -31,9 +36,10 @@ Coverage is aggregated `(table, role) → { hasUsing, hasWithCheck }` across eve
 
 ```ts
 import { Client } from 'pg';
+import { getPgEnvOptions } from 'pg-env';
 import { auditPg, renderPretty } from 'safegres';
 
-const client = new Client({ connectionString: process.env.DATABASE_URL });
+const client = new Client(getPgEnvOptions());
 await client.connect();
 
 const report = await auditPg(client, {
@@ -44,14 +50,4 @@ console.log(renderPretty(report));
 console.log(`${report.findings.length} findings`);
 ```
 
-## Authz* type re-exports
 
-`safegres` re-exports the [`node-type-registry`](../node-type-registry) Authz* / Data* / Relation* / View* type registry so consumers building auditors on top of Constructive's type system can stay on a single dependency:
-
-```ts
-import { AuthzDirectOwner, type NodeTypeDefinition } from 'safegres';
-```
-
-## License
-
-MIT.
