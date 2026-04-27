@@ -1,7 +1,7 @@
 import { Logger } from '@pgpmjs/logger';
 import { CLIOptions, extractFirst, Inquirerer, ParsedArgs } from 'inquirerer';
 
-import pg from './pg';
+import audit from './audit';
 
 const log = new Logger('safegres');
 
@@ -12,7 +12,7 @@ Usage:
   safegres <command> [OPTIONS]
 
 Commands:
-  pg              Audit grants, RLS flags, policy coverage, and anti-patterns
+  audit           Audit grants, RLS flags, policy coverage, and anti-patterns
   help            Show this help message
 
 Run \`safegres <command> --help\` for command-specific options.
@@ -22,7 +22,7 @@ const commandMap: Record<
   string,
   (argv: ParsedArgs, prompter: Inquirerer, options: CLIOptions) => unknown
 > = {
-  pg
+  audit
 };
 
 export const commands = async (
@@ -32,7 +32,11 @@ export const commands = async (
 ): Promise<void> => {
   const { first: command, newArgv } = extractFirst(argv);
 
-  if (!command || command === 'help' || argv.help || argv.h) {
+  if (!command && (argv.help || argv.h)) {
+    process.stdout.write(usage);
+    return;
+  }
+  if (!command || command === 'help') {
     process.stdout.write(usage);
     return;
   }

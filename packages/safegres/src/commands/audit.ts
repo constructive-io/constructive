@@ -28,7 +28,7 @@ import { summarize } from '../types';
 
 import { version as PKG_VERSION } from '../version';
 
-export interface AuditPgOptions extends IntrospectOptions {
+export interface AuditOptions extends IntrospectOptions {
   /** If provided, bypass `pg_roles` enumeration. Otherwise enumerate roles dynamically. */
   includeRoles?: string[];
   /** Roles to drop after enumeration. */
@@ -40,9 +40,9 @@ export interface AuditPgOptions extends IntrospectOptions {
   skipAstChecks?: boolean;
 }
 
-export async function auditPg(
+export async function audit(
   client: QueryExecutor,
-  options: AuditPgOptions = {}
+  options: AuditOptions = {}
 ): Promise<Report> {
   const exec = asExecutor(client);
 

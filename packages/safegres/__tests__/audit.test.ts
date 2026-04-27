@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { getConnections, PgTestClient } from 'pgsql-test';
 
-import { auditPg } from '../src/commands/pg';
+import { audit } from '../src/commands/audit';
 import type { Finding } from '../src/types';
 
 jest.setTimeout(120000);
@@ -33,10 +33,10 @@ afterAll(async () => {
   if (teardown) await teardown();
 });
 
-describe('auditPg — Script A', () => {
+describe('audit — Script A', () => {
   it('A1: flags RLS enabled with zero policies', async () => {
     await applyFixture('a1-rls-enabled-no-policies.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_a1'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_a1'] });
     const found = findingsFor(report.findings, 'fx_a1');
     expect(codes(found)).toEqual(expect.arrayContaining(['A1']));
     expect(found.find((f) => f.code === 'A1')?.severity).toBe('critical');
@@ -44,7 +44,7 @@ describe('auditPg — Script A', () => {
 
   it('A2: flags grants on table with RLS disabled', async () => {
     await applyFixture('a2-grants-no-rls.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_a2'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_a2'] });
     const found = findingsFor(report.findings, 'fx_a2');
     const a2 = found.find((f) => f.code === 'A2');
     expect(a2).toBeDefined();
@@ -54,14 +54,14 @@ describe('auditPg — Script A', () => {
 
   it('A3: flags RLS enabled but not forced', async () => {
     await applyFixture('a3-rls-not-forced.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_a3'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_a3'] });
     const found = findingsFor(report.findings, 'fx_a3');
     expect(codes(found)).toEqual(expect.arrayContaining(['A3']));
   });
 
   it('A4: flags INSERT grant with no matching policy', async () => {
     await applyFixture('a4-insert-grant-no-policy.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_a4'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_a4'] });
     const found = findingsFor(report.findings, 'fx_a4');
     const a4 = found.find((f) => f.code === 'A4');
     expect(a4).toBeDefined();
@@ -73,7 +73,7 @@ describe('auditPg — Script A', () => {
 
   it('A6: flags UPDATE coverage missing WITH CHECK for role', async () => {
     await applyFixture('a6-update-no-with-check.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_a6'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_a6'] });
     const found = findingsFor(report.findings, 'fx_a6');
     const a6 = found.find((f) => f.code === 'A6');
     expect(a6).toBeDefined();
@@ -84,7 +84,7 @@ describe('auditPg — Script A', () => {
 
   it('A7: flags permissive policy with body = literal true (fail-open)', async () => {
     await applyFixture('a7-trivially-permissive.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_a7'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_a7'] });
     const found = findingsFor(report.findings, 'fx_a7');
     const a7 = found.find((f) => f.code === 'A7');
     expect(a7).toBeDefined();
@@ -95,7 +95,7 @@ describe('auditPg — Script A', () => {
 
   it('P1: flags policy using VOLATILE function', async () => {
     await applyFixture('p1-volatile-func.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_p1'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_p1'] });
     const found = findingsFor(report.findings, 'fx_p1');
     const p1 = found.find((f) => f.code === 'P1');
     expect(p1).toBeDefined();
@@ -105,7 +105,7 @@ describe('auditPg — Script A', () => {
 
   it('P5: flags current_user reference in policy', async () => {
     await applyFixture('p5-session-user.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_p5'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_p5'] });
     const found = findingsFor(report.findings, 'fx_p5');
     const p5 = found.find((f) => f.code === 'P5');
     expect(p5).toBeDefined();
@@ -114,7 +114,7 @@ describe('auditPg — Script A', () => {
 
   it('clean table produces no findings', async () => {
     await applyFixture('clean-table.sql');
-    const report = await auditPg(pg.client as never, { schemas: ['fx_clean'] });
+    const report = await audit(pg.client as never, { schemas: ['fx_clean'] });
     const found = findingsFor(report.findings, 'fx_clean');
     expect(found).toEqual([]);
   });

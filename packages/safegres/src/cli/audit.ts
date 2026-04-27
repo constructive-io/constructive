@@ -3,7 +3,7 @@ import { CLIOptions, Inquirerer, ParsedArgs } from 'inquirerer';
 import { Client } from 'pg';
 import { getPgEnvOptions, type PgConfig } from 'pg-env';
 
-import { auditPg } from '../commands/pg';
+import { audit } from '../commands/audit';
 import { renderJson } from '../report/json';
 import { renderPretty } from '../report/pretty';
 import type { Severity } from '../types';
@@ -12,9 +12,9 @@ import { meetsThreshold, SEVERITY_ORDER } from '../types';
 const log = new Logger('safegres');
 
 const usage = `
-safegres pg — pure-PostgreSQL RLS auditor
+safegres audit — pure-PostgreSQL RLS auditor
 
-  safegres pg [OPTIONS]
+  safegres audit [OPTIONS]
 
 Connection (priority order, top wins):
   --connection <url>       Full PostgreSQL connection string
@@ -74,7 +74,7 @@ export default async (
   const client = buildClient(argv);
   await client.connect();
   try {
-    const report = await auditPg(client, {
+    const report = await audit(client, {
       schemas: csvList(argv.schemas),
       excludeSchemas: csvList(argv['exclude-schemas']),
       includeRoles: csvList(argv.roles),

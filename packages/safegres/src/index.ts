@@ -6,8 +6,8 @@
  * application schema or policy DSL.
  */
 
-export { auditPg } from './commands/pg';
-export type { AuditPgOptions } from './commands/pg';
+export { audit } from './commands/audit';
+export type { AuditOptions } from './commands/audit';
 export { renderJson } from './report/json';
 export { renderPretty } from './report/pretty';
 export * from './types';

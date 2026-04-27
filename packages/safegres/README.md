@@ -4,17 +4,19 @@
 
 # safegres
 
-Pure-PostgreSQL Row-Level-Security auditor. Zero application dependencies — drop it on any Postgres database and get a structured report of grants, RLS flags, policy coverage, and AST-level anti-patterns.
+Pure-Postgres Row-Level Security auditor. No app framework required. Drop it on any PostgreSQL database and get a structured report on grants, RLS enforcement, policy coverage, and risky SQL policy patterns.
+
+safegres audits Row-Level Security from inside Postgres. It checks whether tables with grants are protected by RLS, whether policies actually cover the granted operations, and whether policy bodies contain risky patterns like permissive `true` checks, volatile functions, or role/session-based bypass logic.
 
 ```bash
 npm install -g safegres
 
 # Standard libpq env vars (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)
 export PGHOST=localhost PGUSER=postgres PGPASSWORD=password PGDATABASE=mydb
-safegres pg
+safegres audit
 ```
 
-Per-field overrides (`--host`, `--port`, `--user`, `--password`, `--database`) and a full `--connection <url>` flag are also supported. See `safegres pg --help`.
+Per-field overrides (`--host`, `--port`, `--user`, `--password`, `--database`) and a full `--connection <url>` flag are also supported. See `safegres audit --help`.
 
 ## What it checks
 
@@ -37,12 +39,12 @@ Coverage is aggregated `(table, role) → { hasUsing, hasWithCheck }` across eve
 ```ts
 import { Client } from 'pg';
 import { getPgEnvOptions } from 'pg-env';
-import { auditPg, renderPretty } from 'safegres';
+import { audit, renderPretty } from 'safegres';
 
 const client = new Client(getPgEnvOptions());
 await client.connect();
 
-const report = await auditPg(client, {
+const report = await audit(client, {
   excludeSchemas: ['my_private_schema']
 });
 
