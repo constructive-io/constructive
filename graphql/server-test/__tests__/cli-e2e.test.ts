@@ -53,6 +53,7 @@ function resolveNodePaths(): string[] {
     'nested-obj',
     'graphql',
     '@constructive-io/graphql-types',
+    '@constructive-io/graphql-query',
     '@agentic-kit/ollama',
   ];
   const dirs = new Set<string>();

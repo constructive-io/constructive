@@ -8,7 +8,7 @@
  * Any changes here will affect all generated ORM clients.
  */
 
-import { parseType, print } from '@0no-co/graphql.web';
+import { parseType, print } from '@constructive-io/graphql-query/runtime';
 import * as t from 'gql-ast';
 import type {
   ArgumentNode,

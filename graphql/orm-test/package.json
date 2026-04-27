@@ -12,6 +12,7 @@
     "@0no-co/graphql.web": "^1.1.2",
     "@constructive-io/graphql-codegen": "workspace:^",
     "@constructive-io/graphql-query": "workspace:^",
+    "@constructive-io/graphql-test": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@types/pg": "^8.18.0",
     "gql-ast": "workspace:^",
