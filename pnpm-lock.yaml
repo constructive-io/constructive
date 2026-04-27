@@ -1199,9 +1199,6 @@ importers:
       inquirerer:
         specifier: ^4.7.0
         version: 4.7.0
-      node-type-registry:
-        specifier: workspace:^
-        version: link:../node-type-registry/dist
       pg:
         specifier: ^8.16.0
         version: 8.20.0

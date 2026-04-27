@@ -4,10 +4,6 @@
  * The auditor introspects pg_class / pg_policy / role grants and emits
  * structured findings (A1–A7, P1, P5). It has no knowledge of any specific
  * application schema or policy DSL.
- *
- * For convenience, `node-type-registry`'s Authz* / Data* / Relation* / View*
- * type definitions are re-exported here so consumers building auditors on
- * top of Constructive's type system only need a single dependency.
  */
 
 export { auditPg } from './commands/pg';
@@ -31,23 +27,3 @@ export {
   type PgAstNode,
   type PolicyExpression
 } from './ast/parse';
-
-export type { JSONSchema, NodeTypeDefinition } from 'node-type-registry';
-export {
-  AuthzAllowAll,
-  AuthzComposite,
-  AuthzDenyAll,
-  AuthzDirectOwner,
-  AuthzDirectOwnerAny,
-  AuthzEntityMembership,
-  AuthzMemberList,
-  AuthzMembership,
-  AuthzNotReadOnly,
-  AuthzOrgHierarchy,
-  AuthzPeerOwnership,
-  AuthzPublishable,
-  AuthzRelatedEntityMembership,
-  AuthzRelatedMemberList,
-  AuthzRelatedPeerOwnership,
-  AuthzTemporal
-} from 'node-type-registry';

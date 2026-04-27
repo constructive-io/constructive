@@ -46,7 +46,6 @@
     "@pgsql/traverse": "^17.2.5",
     "@pgsql/types": "^17.6.2",
     "inquirerer": "^4.7.0",
-    "node-type-registry": "workspace:^",
     "pg": "^8.16.0",
     "pg-env": "^1.9.0",
     "pgsql-deparser": "^17.18.2",
