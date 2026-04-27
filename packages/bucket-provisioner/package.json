@@ -29,7 +29,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1009.0"
+    "@aws-sdk/client-s3": "^3.1009.0",
+    "@constructive-io/s3-utils": "workspace:^"
   },
   "devDependencies": {
     "makage": "^0.3.0"

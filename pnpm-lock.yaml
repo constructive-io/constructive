@@ -569,6 +569,9 @@ importers:
       '@constructive-io/s3-streamer':
         specifier: workspace:^
         version: link:../../uploads/s3-streamer/dist
+      '@constructive-io/s3-utils':
+        specifier: workspace:^
+        version: link:../../uploads/s3-utils/dist
       '@constructive-io/upload-names':
         specifier: workspace:^
         version: link:../../uploads/upload-names/dist
@@ -1804,6 +1807,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1009.0
         version: 3.1009.0
+      '@constructive-io/s3-utils':
+        specifier: workspace:^
+        version: link:../../uploads/s3-utils/dist
     devDependencies:
       makage:
         specifier: ^0.3.0
@@ -2863,13 +2869,13 @@ importers:
       '@constructive-io/content-type-stream':
         specifier: workspace:^
         version: link:../content-type-stream/dist
+      '@constructive-io/s3-utils':
+        specifier: workspace:^
+        version: link:../s3-utils/dist
       '@pgpmjs/types':
         specifier: workspace:^
         version: link:../../pgpm/types/dist
     devDependencies:
-      '@constructive-io/s3-utils':
-        specifier: workspace:^
-        version: link:../s3-utils/dist
       '@pgpmjs/env':
         specifier: workspace:^
         version: link:../../pgpm/env/dist
@@ -2889,6 +2895,9 @@ importers:
       '@aws-sdk/lib-storage':
         specifier: ^3.1009.0
         version: 3.1009.0(@aws-sdk/client-s3@3.1009.0)
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.1009.0
+        version: 3.1017.0
     devDependencies:
       '@types/node':
         specifier: ^22.19.11
