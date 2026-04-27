@@ -1184,9 +1184,15 @@ importers:
 
   graphql/safegres:
     dependencies:
+      '@inquirerer/utils':
+        specifier: ^3.3.5
+        version: 3.3.5
       '@pgsql/types':
         specifier: ^17.6.2
         version: 17.6.2
+      inquirerer:
+        specifier: ^4.7.0
+        version: 4.7.0
       node-type-registry:
         specifier: workspace:^
         version: link:../node-type-registry/dist
