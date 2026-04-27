@@ -42,6 +42,7 @@
   ],
   "dependencies": {
     "@0no-co/graphql.web": "^1.1.2",
+    "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "@tanstack/react-query": "^5.90.21",
     "gql-ast": "workspace:^",

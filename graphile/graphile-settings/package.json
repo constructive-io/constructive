@@ -75,7 +75,6 @@
     "graphile-test": "workspace:^",
     "makage": "^0.3.0",
     "nodemon": "^3.1.14",
-    "pgsql-test": "workspace:^",
     "ts-node": "^10.9.2"
   },
   "keywords": [
