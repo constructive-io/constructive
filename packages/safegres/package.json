@@ -1,6 +1,6 @@
 {
   "name": "safegres",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
   "description": "Pure-PostgreSQL RLS auditor: grants, RLS flags, policy coverage, and AST-level anti-pattern detection. Re-exports the Authz*/Data*/Relation*/View* type registry for downstream auditors.",
   "main": "index.js",
