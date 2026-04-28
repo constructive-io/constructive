@@ -2,7 +2,7 @@
   "name": "safegres",
   "version": "0.2.0",
   "author": "Constructive <developers@constructive.io>",
-  "description": "Pure-PostgreSQL RLS auditor: grants, RLS flags, policy coverage, and AST-level anti-pattern detection. Re-exports the Authz*/Data*/Relation*/View* type registry for downstream auditors.",
+  "description": "Pure-Postgres Row-Level Security auditor: grants, RLS enforcement, policy coverage, and risky SQL policy patterns. No app framework required.",
   "main": "index.js",
   "module": "esm/index.js",
   "types": "index.d.ts",
@@ -20,13 +20,13 @@
     "url": "https://github.com/constructive-io/constructive/issues"
   },
   "bin": {
-    "safegres": "dist/cli.js"
+    "safegres": "cli.js"
   },
   "scripts": {
     "clean": "makage clean",
     "prepack": "npm run build",
-    "build": "makage build",
-    "build:dev": "makage build --dev",
+    "build": "makage build && chmod +x dist/cli.js",
+    "build:dev": "makage build --dev && chmod +x dist/cli.js",
     "lint": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
