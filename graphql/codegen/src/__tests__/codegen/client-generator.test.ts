@@ -60,6 +60,22 @@ describe('client-generator', () => {
       expect(result.content).toContain('QueryResult<T>');
       expect(result.content).toContain('GraphQLRequestError');
     });
+
+    it('exposes an optional fetch injection in OrmClientConfig', () => {
+      const result = generateOrmClientFile();
+
+      expect(result.content).toContain('fetch?: typeof globalThis.fetch');
+      expect(result.content).toContain('config.fetch');
+    });
+
+    it('includes localhostFetch wrapper for *.localhost DNS rewriting', () => {
+      const result = generateOrmClientFile();
+
+      expect(result.content).toContain('function localhostFetch');
+      expect(result.content).toContain(".endsWith('.localhost')");
+      expect(result.content).toContain("url.hostname = 'localhost'");
+      expect(result.content).toContain("headers.set('host', originalHost)");
+    });
   });
 
   describe('generateQueryBuilderFile', () => {

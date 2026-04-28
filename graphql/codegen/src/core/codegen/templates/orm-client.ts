@@ -21,24 +21,67 @@ export type {
 } from '@constructive-io/graphql-query/runtime';
 
 /**
+ * Rewrite *.localhost URLs so they resolve in Node.js.
+ *
+ * Node's undici-backed fetch cannot resolve *.localhost subdomains
+ * (ENOTFOUND) and silently drops the Host header (forbidden by spec).
+ * This wrapper rewrites the URL to plain localhost and injects the
+ * original Host header as a best-effort (works with node:http-based
+ * fetch implementations; Node's built-in fetch may still drop it).
+ *
+ * In browsers *.localhost resolves natively, so this is a no-op.
+ */
+function localhostFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  const url = new URL(
+    typeof input === 'string'
+      ? input
+      : input instanceof URL
+        ? input.href
+        : input.url,
+  );
+
+  if (url.hostname.endsWith('.localhost') && url.hostname !== 'localhost') {
+    const originalHost = url.host;
+    url.hostname = 'localhost';
+    const headers = new Headers(init?.headers);
+    if (!headers.has('host')) {
+      headers.set('host', originalHost);
+    }
+    return fetch(url.toString(), { ...init, headers });
+  }
+
+  return fetch(input, init);
+}
+
+/**
  * Default adapter that uses fetch for HTTP requests.
- * This is used when no custom adapter is provided.
+ *
+ * When no custom fetch is provided, uses localhostFetch which rewrites
+ * *.localhost URLs to plain localhost for Node.js DNS compatibility.
+ * Pass a custom fetch to override (e.g. for Node.js Host header
+ * preservation via node:http, or for test mocking).
  */
 export class FetchAdapter implements GraphQLAdapter {
   private headers: Record<string, string>;
+  private fetchFn: typeof globalThis.fetch;
 
   constructor(
     private endpoint: string,
     headers?: Record<string, string>,
+    fetchFn?: typeof globalThis.fetch,
   ) {
     this.headers = headers ?? {};
+    this.fetchFn = fetchFn ?? localhostFetch;
   }
 
   async execute<T>(
     document: string,
     variables?: Record<string, unknown>,
   ): Promise<QueryResult<T>> {
-    const response = await fetch(this.endpoint, {
+    const response = await this.fetchFn(this.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -92,7 +135,7 @@ export class FetchAdapter implements GraphQLAdapter {
 
 /**
  * Configuration for creating an ORM client.
- * Either provide endpoint (and optional headers) for HTTP requests,
+ * Either provide endpoint (and optional headers/fetch) for HTTP requests,
  * or provide a custom adapter for alternative execution strategies.
  */
 export interface OrmClientConfig {
@@ -100,7 +143,14 @@ export interface OrmClientConfig {
   endpoint?: string;
   /** Default headers for HTTP requests (only used with endpoint) */
   headers?: Record<string, string>;
-  /** Custom adapter for GraphQL execution (overrides endpoint/headers) */
+  /**
+   * Custom fetch implementation. Defaults to a wrapper that rewrites
+   * *.localhost URLs for Node.js compatibility. Pass your own fetch
+   * for full Node.js Host header support (e.g. via node:http), test
+   * mocking, or custom proxy/credentials.
+   */
+  fetch?: typeof globalThis.fetch;
+  /** Custom adapter for GraphQL execution (overrides endpoint/headers/fetch) */
   adapter?: GraphQLAdapter;
 }
 
@@ -125,7 +175,11 @@ export class OrmClient {
     if (config.adapter) {
       this.adapter = config.adapter;
     } else if (config.endpoint) {
-      this.adapter = new FetchAdapter(config.endpoint, config.headers);
+      this.adapter = new FetchAdapter(
+        config.endpoint,
+        config.headers,
+        config.fetch,
+      );
     } else {
       throw new Error(
         'OrmClientConfig requires either an endpoint or a custom adapter',
