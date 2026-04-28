@@ -79,7 +79,7 @@ export async function uploadFile(options: UploadFileOptions): Promise<UploadResu
       fileId: requestPayload.fileId,
       key: requestPayload.key,
       deduplicated: true,
-      status: 'ready',
+      status: requestPayload.status,
     };
   }
 

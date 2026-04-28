@@ -105,6 +105,8 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt: string | null;
+  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files */
+  status: string;
 }
 
 /**

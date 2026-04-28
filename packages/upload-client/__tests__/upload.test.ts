@@ -59,6 +59,7 @@ describe('uploadFile', () => {
               key: HELLO_WORLD_HASH,
               deduplicated: false,
               expiresAt: new Date(Date.now() + 900_000).toISOString(),
+              status: 'pending',
             },
           };
         }
@@ -135,6 +136,7 @@ describe('uploadFile', () => {
               key: HELLO_WORLD_HASH,
               deduplicated: true,
               expiresAt: null,
+              status: 'ready',
             },
           };
         }
@@ -199,6 +201,7 @@ describe('uploadFile', () => {
               key: 'hash',
               deduplicated: false,
               expiresAt: new Date().toISOString(),
+              status: 'pending',
             },
           };
         }
@@ -230,6 +233,7 @@ describe('uploadFile', () => {
               key: 'hash',
               deduplicated: false,
               expiresAt: new Date().toISOString(),
+              status: 'pending',
             },
           };
         }
@@ -279,6 +283,7 @@ describe('uploadFile', () => {
               key: 'hash',
               deduplicated: false,
               expiresAt: new Date().toISOString(),
+              status: 'pending',
             },
           };
         }
