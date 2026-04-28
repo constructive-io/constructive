@@ -8,12 +8,12 @@
  * Any changes here will affect all generated ORM clients.
  */
 
-import { createFetch } from '@constructive-io/fetch';
 import type {
   GraphQLAdapter,
   GraphQLError,
   QueryResult,
 } from '@constructive-io/graphql-query/runtime';
+import { createFetch } from '@constructive-io/graphql-query/runtime';
 
 export type {
   GraphQLAdapter,
@@ -109,9 +109,10 @@ export interface OrmClientConfig {
   /** Default headers for HTTP requests (only used with endpoint) */
   headers?: Record<string, string>;
   /**
-   * Custom fetch implementation. Defaults to @constructive-io/fetch
-   * which handles *.localhost DNS and Host headers in Node.js.
-   * Pass your own for test mocking or custom proxy/credentials.
+   * Custom fetch implementation. Defaults to createFetch() from
+   * @constructive-io/graphql-query/runtime which handles *.localhost
+   * DNS and Host headers in Node.js. Pass your own for test mocking
+   * or custom proxy/credentials.
    */
   fetch?: typeof globalThis.fetch;
   /** Custom adapter for GraphQL execution (overrides endpoint/headers/fetch) */

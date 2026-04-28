@@ -1327,9 +1327,6 @@ importers:
 
   graphql/server-test:
     dependencies:
-      '@constructive-io/fetch':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../env/dist
@@ -2696,9 +2693,6 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.1.2
         version: 1.2.0(graphql@16.13.0)
-      '@constructive-io/fetch':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@constructive-io/graphql-query':
         specifier: workspace:^
         version: link:../../graphql/query/dist
@@ -2766,9 +2760,6 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.1.2
         version: 1.2.0(graphql@16.13.0)
-      '@constructive-io/fetch':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@constructive-io/graphql-query':
         specifier: workspace:^
         version: link:../../graphql/query/dist
@@ -2813,9 +2804,6 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.1.2
         version: 1.2.0(graphql@16.13.0)
-      '@constructive-io/fetch':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@constructive-io/graphql-query':
         specifier: workspace:^
         version: link:../../graphql/query/dist
@@ -2851,9 +2839,6 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.1.2
         version: 1.2.0(graphql@16.13.0)
-      '@constructive-io/fetch':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@constructive-io/graphql-query':
         specifier: workspace:^
         version: link:../../graphql/query/dist
@@ -3434,9 +3419,6 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
-
-  '@constructive-io/fetch@1.0.0':
-    resolution: {integrity: sha512-4W2lnDOzFiYRBLNit4wzSHFZu8eO68W6RIxBApwFIhChGfgdMwI9H68Ant3B9CXnIhxq4peY3mSCC2krS67ojw==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -10911,8 +10893,6 @@ snapshots:
       '@babel/helper-validator-identifier': 7.28.5
 
   '@bcoe/v8-coverage@0.2.3': {}
-
-  '@constructive-io/fetch@1.0.0': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:

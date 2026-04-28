@@ -68,11 +68,11 @@ describe('client-generator', () => {
       expect(result.content).toContain('config.fetch');
     });
 
-    it('imports createFetch from @constructive-io/fetch', () => {
+    it('imports createFetch from @constructive-io/graphql-query/runtime', () => {
       const result = generateOrmClientFile();
 
       expect(result.content).toContain(
-        "import { createFetch } from '@constructive-io/fetch'",
+        "import { createFetch } from '@constructive-io/graphql-query/runtime'",
       );
       expect(result.content).toContain('createFetch()');
     });

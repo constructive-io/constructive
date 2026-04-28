@@ -52,7 +52,6 @@ function resolveNodePaths(): string[] {
     'inquirerer',
     'nested-obj',
     'graphql',
-    '@constructive-io/fetch',
     '@constructive-io/graphql-types',
     '@constructive-io/graphql-query',
     '@agentic-kit/ollama',
