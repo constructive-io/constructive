@@ -42,6 +42,8 @@ export interface ApiOptions {
   isPublic?: boolean;
   /** Schemas containing metadata tables */
   metaSchemas?: string[];
+  /** Enable multi-tenancy cache (buildKey-based handler reuse across matching inputs) */
+  useMultiTenancyCache?: boolean;
 }
 
 /**

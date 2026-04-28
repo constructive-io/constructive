@@ -9,6 +9,13 @@ import type { GraphileConfig } from 'graphile-config';
 import { ConstructivePreset, makePgService } from 'graphile-settings';
 import { getPgPool } from 'pg-cache';
 import { getPgEnvOptions } from 'pg-env';
+import {
+  configureMultiTenancyCache,
+  getTenantInstance,
+  getOrCreateTenantInstance,
+  shutdownMultiTenancyCache,
+  flushByDatabaseId,
+} from 'graphile-multi-tenancy-cache';
 import './types'; // for Request type
 import { isGraphqlObservabilityEnabled } from '../diagnostics/observability';
 import { HandlerCreationError } from '../errors/api-errors';
@@ -382,6 +389,96 @@ export const graphile = (opts: ConstructiveOptions): RequestHandler => {
       }
     } catch (e: any) {
       log.error(`${label} PostGraphile middleware error`, e);
+      if (!res.headersSent) {
+        return res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }
+        });
+      }
+      next(e);
+    }
+  };
+};
+
+// =============================================================================
+// Multi-Tenancy Cache Handler
+// =============================================================================
+
+/**
+ * Check if multi-tenancy cache is enabled for these options.
+ */
+export function isMultiTenancyCacheEnabled(opts: ConstructiveOptions): boolean {
+  return opts.api?.useMultiTenancyCache === true;
+}
+
+/**
+ * Shutdown multi-tenancy cache resources.
+ */
+export async function shutdownMultiTenancy(): Promise<void> {
+  await shutdownMultiTenancyCache();
+}
+
+/**
+ * Multi-tenancy cache handler.
+ *
+ * Selected when opts.api.useMultiTenancyCache === true.
+ * Calls configureMultiTenancyCache() once at startup (package owns wrapping).
+ * Uses getTenantInstance() for fast-path cache hit.
+ * On miss, calls getOrCreateTenantInstance() — no preset builder passed from server.
+ * Routes request to tenant.handler — the package's Grafast context callback
+ * handles pgSqlTextTransform injection internally.
+ */
+export const multiTenancyHandler = (opts: ConstructiveOptions): RequestHandler => {
+  // One-time bootstrap: configure the multi-tenancy cache with our preset builder
+  configureMultiTenancyCache({
+    basePresetBuilder: buildPreset,
+  });
+
+  log.info('Multi-tenancy cache handler initialized');
+
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const label = reqLabel(req);
+    try {
+      const api = req.api;
+      if (!api) {
+        log.error(`${label} Missing API info`);
+        return res.status(500).send('Missing API info');
+      }
+      const key = req.svc_key;
+      if (!key) {
+        log.error(`${label} Missing service cache key`);
+        return res.status(500).send('Missing service cache key');
+      }
+      const { dbname, anonRole, roleName, schema } = api;
+      const schemaLabel = schema?.join(',') || 'unknown';
+
+      // Fast path: check tenant instance cache
+      const cached = getTenantInstance(key);
+      if (cached) {
+        log.debug(`${label} Multi-tenancy cache hit key=${key} db=${dbname} schemas=${schemaLabel}`);
+        return cached.handler(req, res, next);
+      }
+
+      log.debug(`${label} Multi-tenancy cache miss key=${key} db=${dbname} schemas=${schemaLabel}`);
+
+      // Cold path: create or coalesce tenant instance
+      const pgConfig = getPgEnvOptions({
+        ...opts.pg,
+        database: dbname,
+      });
+      const pool = getPgPool(pgConfig);
+
+      const tenant = await getOrCreateTenantInstance({
+        svcKey: key,
+        pool,
+        schemas: schema || [],
+        anonRole,
+        roleName,
+        databaseId: api.databaseId,
+      });
+
+      return tenant.handler(req, res, next);
+    } catch (e: any) {
+      log.error(`${label} Multi-tenancy middleware error`, e);
       if (!res.headersSent) {
         return res.status(500).json({
           error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' }

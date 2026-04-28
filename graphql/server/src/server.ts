@@ -25,8 +25,8 @@ import { createAuthenticateMiddleware } from './middleware/auth';
 import { cors } from './middleware/cors';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import { favicon } from './middleware/favicon';
-import { flush, flushService } from './middleware/flush';
-import { graphile } from './middleware/graphile';
+import { flush, createFlushMiddleware, flushService } from './middleware/flush';
+import { graphile, multiTenancyHandler, isMultiTenancyCacheEnabled, shutdownMultiTenancy } from './middleware/graphile';
 import { multipartBridge } from './middleware/multipart-bridge';
 import { createDebugDatabaseMiddleware } from './middleware/observability/debug-db';
 import { debugMemory } from './middleware/observability/debug-memory';
@@ -102,6 +102,7 @@ class Server {
       exposedSchemas: apiOpts.exposedSchemas?.join(',') || 'none',
       anonRole: apiOpts.anonRole,
       roleName: apiOpts.roleName,
+      useMultiTenancyCache: apiOpts.useMultiTenancyCache,
       observabilityEnabled,
     });
 
@@ -160,8 +161,15 @@ class Server {
     app.post('/upload', uploadAuthenticate, ...uploadRoute);
     app.use(authenticate);
     app.use(createCaptchaMiddleware());
-    app.use(graphile(effectiveOpts));
-    app.use(flush);
+    // Select handler based on multi-tenancy cache mode
+    if (isMultiTenancyCacheEnabled(effectiveOpts)) {
+      log.info('[server] Multi-tenancy cache ENABLED');
+      app.use(multiTenancyHandler(effectiveOpts));
+      app.use(createFlushMiddleware(effectiveOpts));
+    } else {
+      app.use(graphile(effectiveOpts));
+      app.use(flush);
+    }
 
     // Error handling - MUST be LAST
     app.use(notFoundHandler); // Catches unmatched routes (404)
@@ -292,6 +300,8 @@ class Server {
   static async closeCaches(opts: { closePools?: boolean } = {}): Promise<void> {
     const { closePools = false } = opts;
     svcCache.clear();
+    // Shutdown multi-tenancy cache if it was enabled
+    await shutdownMultiTenancy();
     // Use closeAllCaches to properly await async disposal of PostGraphile instances
     // before closing pg pools - this ensures all connections are released
     if (closePools) {

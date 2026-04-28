@@ -3,8 +3,13 @@ import { Logger } from '@pgpmjs/logger';
 import { svcCache } from '@pgpmjs/server-utils';
 import { NextFunction, Request, Response } from 'express';
 import { graphileCache } from 'graphile-cache';
+import {
+  flushTenantInstance,
+  flushByDatabaseId,
+} from 'graphile-multi-tenancy-cache';
 import { getPgPool } from 'pg-cache';
 import './types'; // for Request type
+import { isMultiTenancyCacheEnabled } from './graphile';
 
 const log = new Logger('flush');
 
@@ -23,11 +28,39 @@ export const flush = async (
   return next();
 };
 
+/**
+ * Enhanced flush middleware with multi-tenancy cache support.
+ * Replaces flush() when multi-tenancy cache is enabled.
+ */
+export const createFlushMiddleware = (opts: ConstructiveOptions) => {
+  const multiTenancyEnabled = isMultiTenancyCacheEnabled(opts);
+
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (req.url === '/flush') {
+      const key = (req as any).svc_key;
+
+      // Standard cache flush
+      graphileCache.delete(key);
+      svcCache.delete(key);
+
+      // Multi-tenancy cache flush
+      if (multiTenancyEnabled && key) {
+        flushTenantInstance(key);
+      }
+
+      res.status(200).send('OK');
+      return;
+    }
+    return next();
+  };
+};
+
 export const flushService = async (
   opts: ConstructiveOptions,
   databaseId: string
 ): Promise<void> => {
   const pgPool = getPgPool(opts.pg);
+  const multiTenancyEnabled = isMultiTenancyCacheEnabled(opts);
   log.info('flushing db ' + databaseId);
 
   const api = new RegExp(`^api:${databaseId}:.*`);
@@ -41,6 +74,11 @@ export const flushService = async (
         svcCache.delete(k);
       }
     });
+  }
+
+  // Flush all handlers associated with this databaseId via index
+  if (multiTenancyEnabled) {
+    flushByDatabaseId(databaseId);
   }
 
   const svc = await pgPool.query(
@@ -62,6 +100,11 @@ export const flushService = async (
     if (key) {
       graphileCache.delete(key);
       svcCache.delete(key);
+
+      // Multi-tenancy cache: flush tenant instance
+      if (multiTenancyEnabled) {
+        flushTenantInstance(key);
+      }
     }
   }
 };
