@@ -1,8 +1,16 @@
-<p align="center">
+# safegres
+
+<p align="center" width="100%">
   <img src="https://raw.githubusercontent.com/Safegres/brand/refs/heads/main/safegres.svg" alt="safegres" width="120" />
 </p>
 
-# safegres
+<p align="center" width="100%">
+  <a href="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml">
+    <img height="20" src="https://github.com/constructive-io/constructive/actions/workflows/run-tests.yaml/badge.svg" />
+  </a>
+   <a href="https://github.com/constructive-io/constructive/blob/main/LICENSE"><img height="20" src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
+   <a href="https://www.npmjs.com/package/safegres"><img height="20" src="https://img.shields.io/github/package-json/v/constructive-io/constructive?filename=packages%2Fsafegres%2Fpackage.json"/></a>
+</p>
 
 Pure-Postgres Row-Level Security auditor. No app framework required. Drop it on any PostgreSQL database and get a structured report on grants, RLS enforcement, policy coverage, and risky SQL policy patterns.
 
