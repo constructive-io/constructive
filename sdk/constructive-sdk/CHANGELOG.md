@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.14.12...@constructive-io/sdk@0.15.0) (2026-04-28)
+
+### Features
+
+- **codegen:** add localhostFetch wrapper and fetch? config option ([5142f53](https://github.com/constructive-io/constructive/commit/5142f53f1836d66c265a012ce91a591d440338da)), closes [#1025](https://github.com/constructive-io/constructive/issues/1025)
+
 ## [0.14.12](https://github.com/constructive-io/constructive/compare/@constructive-io/sdk@0.14.11...@constructive-io/sdk@0.14.12) (2026-04-27)
 
 ### Bug Fixes

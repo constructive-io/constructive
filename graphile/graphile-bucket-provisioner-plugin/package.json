@@ -1,6 +1,6 @@
 {
   "name": "graphile-bucket-provisioner-plugin",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Bucket provisioning plugin for PostGraphile v5 — auto-provisions S3 buckets on bucket table mutations",
   "author": "Constructive <developers@constructive.io>",
   "homepage": "https://github.com/constructive-io/constructive",
