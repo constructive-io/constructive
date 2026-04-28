@@ -46,6 +46,7 @@
   ],
   "dependencies": {
     "@0no-co/graphql.web": "^1.1.2",
+    "@constructive-io/fetch": "^0.1.0",
     "@constructive-io/graphql-query": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
     "appstash": "^0.7.0",

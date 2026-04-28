@@ -68,13 +68,13 @@ describe('client-generator', () => {
       expect(result.content).toContain('config.fetch');
     });
 
-    it('includes localhostFetch wrapper for *.localhost DNS rewriting', () => {
+    it('imports createFetch from @constructive-io/fetch', () => {
       const result = generateOrmClientFile();
 
-      expect(result.content).toContain('function localhostFetch');
-      expect(result.content).toContain(".endsWith('.localhost')");
-      expect(result.content).toContain("url.hostname = 'localhost'");
-      expect(result.content).toContain("headers.set('host', originalHost)");
+      expect(result.content).toContain(
+        "import { createFetch } from '@constructive-io/fetch'",
+      );
+      expect(result.content).toContain('createFetch()');
     });
   });
 
