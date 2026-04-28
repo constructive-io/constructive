@@ -1327,6 +1327,9 @@ importers:
 
   graphql/server-test:
     dependencies:
+      '@constructive-io/fetch':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@constructive-io/graphql-env':
         specifier: workspace:^
         version: link:../env/dist

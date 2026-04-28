@@ -43,6 +43,7 @@
     "nested-obj": "*"
   },
   "dependencies": {
+    "@constructive-io/fetch": "^1.0.0",
     "@constructive-io/graphql-env": "workspace:^",
     "@constructive-io/graphql-server": "workspace:^",
     "@constructive-io/graphql-types": "workspace:^",
