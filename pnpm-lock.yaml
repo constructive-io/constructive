@@ -2735,26 +2735,6 @@ importers:
         version: 5.9.3
     publishDirectory: dist
 
-  sdk/constructive-node:
-    dependencies:
-      '@constructive-io/graphql-types':
-        specifier: workspace:^
-        version: link:../../graphql/types/dist
-      '@constructive-io/sdk':
-        specifier: workspace:^
-        version: link:../constructive-sdk/dist
-    devDependencies:
-      '@types/node':
-        specifier: ^22.19.11
-        version: 22.19.11
-      makage:
-        specifier: ^0.3.0
-        version: 0.3.0
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-    publishDirectory: dist
-
   sdk/constructive-react:
     dependencies:
       '@0no-co/graphql.web':
