@@ -8,6 +8,7 @@ import type {
   GraphQLError,
   QueryResult,
 } from '@constructive-io/graphql-query/runtime';
+import { createFetch } from '@constructive-io/graphql-query/runtime';
 
 export type {
   GraphQLAdapter,
@@ -17,20 +18,30 @@ export type {
 
 /**
  * Default adapter that uses fetch for HTTP requests.
- * This is used when no custom adapter is provided.
+ *
+ * When no custom fetch is provided, uses @constructive-io/fetch which
+ * handles *.localhost DNS rewriting and Host header preservation in
+ * Node.js. Pass a custom fetch to override for test mocking or custom
+ * proxy/credentials.
  */
 export class FetchAdapter implements GraphQLAdapter {
   private headers: Record<string, string>;
+  private fetchFn: typeof globalThis.fetch;
 
   constructor(
     private endpoint: string,
-    headers?: Record<string, string>
+    headers?: Record<string, string>,
+    fetchFn?: typeof globalThis.fetch,
   ) {
     this.headers = headers ?? {};
+    this.fetchFn = fetchFn ?? createFetch();
   }
 
-  async execute<T>(document: string, variables?: Record<string, unknown>): Promise<QueryResult<T>> {
-    const response = await fetch(this.endpoint, {
+  async execute<T>(
+    document: string,
+    variables?: Record<string, unknown>,
+  ): Promise<QueryResult<T>> {
+    const response = await this.fetchFn(this.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +58,9 @@ export class FetchAdapter implements GraphQLAdapter {
       return {
         ok: false,
         data: null,
-        errors: [{ message: `HTTP ${response.status}: ${response.statusText}` }],
+        errors: [
+          { message: `HTTP ${response.status}: ${response.statusText}` },
+        ],
       };
     }
 
@@ -82,7 +95,7 @@ export class FetchAdapter implements GraphQLAdapter {
 
 /**
  * Configuration for creating an ORM client.
- * Either provide endpoint (and optional headers) for HTTP requests,
+ * Either provide endpoint (and optional headers/fetch) for HTTP requests,
  * or provide a custom adapter for alternative execution strategies.
  */
 export interface OrmClientConfig {
@@ -90,7 +103,14 @@ export interface OrmClientConfig {
   endpoint?: string;
   /** Default headers for HTTP requests (only used with endpoint) */
   headers?: Record<string, string>;
-  /** Custom adapter for GraphQL execution (overrides endpoint/headers) */
+  /**
+   * Custom fetch implementation. Defaults to createFetch() from
+   * @constructive-io/graphql-query/runtime which handles *.localhost
+   * DNS and Host headers in Node.js. Pass your own for test mocking
+   * or custom proxy/credentials.
+   */
+  fetch?: typeof globalThis.fetch;
+  /** Custom adapter for GraphQL execution (overrides endpoint/headers/fetch) */
   adapter?: GraphQLAdapter;
 }
 
@@ -100,7 +120,7 @@ export interface OrmClientConfig {
 export class GraphQLRequestError extends Error {
   constructor(
     public readonly errors: GraphQLError[],
-    public readonly data: unknown = null
+    public readonly data: unknown = null,
   ) {
     const messages = errors.map((e) => e.message).join('; ');
     super(`GraphQL Error: ${messages}`);
@@ -115,13 +135,22 @@ export class OrmClient {
     if (config.adapter) {
       this.adapter = config.adapter;
     } else if (config.endpoint) {
-      this.adapter = new FetchAdapter(config.endpoint, config.headers);
+      this.adapter = new FetchAdapter(
+        config.endpoint,
+        config.headers,
+        config.fetch,
+      );
     } else {
-      throw new Error('OrmClientConfig requires either an endpoint or a custom adapter');
+      throw new Error(
+        'OrmClientConfig requires either an endpoint or a custom adapter',
+      );
     }
   }
 
-  async execute<T>(document: string, variables?: Record<string, unknown>): Promise<QueryResult<T>> {
+  async execute<T>(
+    document: string,
+    variables?: Record<string, unknown>,
+  ): Promise<QueryResult<T>> {
     return this.adapter.execute<T>(document, variables);
   }
 

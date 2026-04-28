@@ -60,6 +60,22 @@ describe('client-generator', () => {
       expect(result.content).toContain('QueryResult<T>');
       expect(result.content).toContain('GraphQLRequestError');
     });
+
+    it('exposes an optional fetch injection in OrmClientConfig', () => {
+      const result = generateOrmClientFile();
+
+      expect(result.content).toContain('fetch?: typeof globalThis.fetch');
+      expect(result.content).toContain('config.fetch');
+    });
+
+    it('imports createFetch from @constructive-io/graphql-query/runtime', () => {
+      const result = generateOrmClientFile();
+
+      expect(result.content).toContain(
+        "import { createFetch } from '@constructive-io/graphql-query/runtime'",
+      );
+      expect(result.content).toContain('createFetch()');
+    });
   });
 
   describe('generateQueryBuilderFile', () => {
