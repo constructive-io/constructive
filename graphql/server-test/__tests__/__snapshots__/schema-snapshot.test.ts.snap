@@ -2106,6 +2106,11 @@ type RequestUploadUrlPayload {
 
   """Presigned URL expiry time (null if deduplicated)"""
   expiresAt: Datetime
+
+  """
+  File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable.
+  """
+  status: String!
 }
 
 input ConfirmUploadInput {
