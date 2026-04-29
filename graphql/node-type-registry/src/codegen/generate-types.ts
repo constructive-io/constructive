@@ -20,10 +20,10 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const generate = require('@babel/generator').default ?? require('@babel/generator');
 import * as t from '@babel/types';
-import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
+import { existsSync,mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { generateTypeScriptTypes } from 'schema-typescript';
 import type { JSONSchema as SchemaTS_JSONSchema } from 'schema-typescript';
+import { generateTypeScriptTypes } from 'schema-typescript';
 
 import { allNodeTypes } from '../index';
 import type { NodeTypeDefinition } from '../types';
@@ -55,7 +55,7 @@ interface MetaTableInfo {
 /** Attach a JSDoc-style leading comment to an AST node. */
 function addJSDoc<T extends t.Node>(node: T, description: string): T {
   node.leadingComments = [
-    { type: 'CommentBlock', value: `* ${description} ` } as t.CommentBlock,
+    { type: 'CommentBlock', value: `* ${description} ` } as t.CommentBlock
   ];
   return node;
 }
@@ -193,7 +193,7 @@ function generateParamsInterfaces(
     const astNodes = generateTypeScriptTypes(sanitized as SchemaTS_JSONSchema, {
       includePropertyComments: true,
       includeTypeComments: false,
-      strictTypeSafety: true,
+      strictTypeSafety: true
     });
 
     if (astNodes.length > 0) {
@@ -221,31 +221,31 @@ function generateParamsInterfaces(
 function pgTypeToTSType(pgType: string, isArray: boolean): t.TSType {
   let base: t.TSType;
   switch (pgType) {
-    case 'bool':
-    case 'boolean':
-      base = t.tsBooleanKeyword();
-      break;
-    case 'int2':
-    case 'int4':
-    case 'int8':
-    case 'integer':
-    case 'smallint':
-    case 'bigint':
-    case 'float4':
-    case 'float8':
-    case 'float':
-    case 'double precision':
-    case 'numeric':
-    case 'real':
-      base = t.tsNumberKeyword();
-      break;
-    case 'jsonb':
-    case 'json':
-      base = recordType(t.tsStringKeyword(), t.tsUnknownKeyword());
-      break;
-    default:
-      base = t.tsStringKeyword();
-      break;
+  case 'bool':
+  case 'boolean':
+    base = t.tsBooleanKeyword();
+    break;
+  case 'int2':
+  case 'int4':
+  case 'int8':
+  case 'integer':
+  case 'smallint':
+  case 'bigint':
+  case 'float4':
+  case 'float8':
+  case 'float':
+  case 'double precision':
+  case 'numeric':
+  case 'real':
+    base = t.tsNumberKeyword();
+    break;
+  case 'jsonb':
+  case 'json':
+    base = recordType(t.tsStringKeyword(), t.tsUnknownKeyword());
+    break;
+  default:
+    base = t.tsStringKeyword();
+    break;
   }
   return isArray ? t.tsArrayType(base) : base;
 }
@@ -306,7 +306,7 @@ function buildBlueprintField(
     return deriveInterfaceFromTable(
       table,
       'BlueprintField',
-      'A custom field (column) to add to a blueprint table. Derived from _meta.',
+      'A custom field (column) to add to a blueprint table. Derived from _meta.'
     );
   }
   // Static fallback
@@ -316,7 +316,7 @@ function buildBlueprintField(
       addJSDoc(requiredProp('type', t.tsStringKeyword()), 'The PostgreSQL type (e.g., "text", "integer", "boolean", "uuid").'),
       addJSDoc(optionalProp('is_required', t.tsBooleanKeyword()), 'Whether the column has a NOT NULL constraint.'),
       addJSDoc(optionalProp('default_value', t.tsStringKeyword()), 'SQL default value expression (e.g., "true", "now()").'),
-      addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.'),
+      addJSDoc(optionalProp('description', t.tsStringKeyword()), 'Comment/description for this field.')
     ]),
     'A custom field (column) to add to a blueprint table.'
   );
@@ -342,7 +342,7 @@ function buildBlueprintPolicy(
       addJSDoc(optionalProp('permissive', t.tsBooleanKeyword()), 'Whether this policy is permissive (true) or restrictive (false). Defaults to true.'),
       addJSDoc(optionalProp('policy_role', t.tsStringKeyword()), 'Role for this policy. Defaults to "authenticated".'),
       addJSDoc(optionalProp('policy_name', t.tsStringKeyword()), 'Optional custom name for this policy.'),
-      addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).'),
+      addJSDoc(optionalProp('data', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Policy-specific data (structure varies by policy type).')
     ]),
     'An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention.'
   );
@@ -362,7 +362,7 @@ function buildBlueprintFtsSource(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('lang', t.tsStringKeyword()),
         'Language for text search. Defaults to "english".'
-      ),
+      )
     ]),
     'A source field contributing to a full-text search tsvector column.'
   );
@@ -389,7 +389,7 @@ function buildBlueprintFullTextSearch(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintFtsSource')))
         ),
         'Source fields that feed into this tsvector.'
-      ),
+      )
     ]),
     'A full-text search configuration for a blueprint table (top-level, requires table_name).'
   );
@@ -412,7 +412,7 @@ function buildBlueprintTableFullTextSearch(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('schema_name', t.tsStringKeyword()),
         'Optional schema name override.'
-      ),
+      )
     ]),
     'A full-text search configuration nested inside a table definition (table_name not required).'
   );
@@ -431,8 +431,8 @@ function buildBlueprintIndex(
         // JSONB columns get Record<string, unknown> instead of the default
         index_params: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
         where_clause: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-        options: recordType(t.tsStringKeyword(), t.tsUnknownKeyword()),
-      },
+        options: recordType(t.tsStringKeyword(), t.tsUnknownKeyword())
+      }
     );
   }
   // Static fallback
@@ -446,7 +446,7 @@ function buildBlueprintIndex(
       addJSDoc(optionalProp('is_unique', t.tsBooleanKeyword()), 'Whether this is a unique index.'),
       addJSDoc(optionalProp('name', t.tsStringKeyword()), 'Optional custom name for the index.'),
       addJSDoc(optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())), 'Operator classes for the index columns.'),
-      addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.'),
+      addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.')
     ]),
     'An index definition within a blueprint (top-level, requires table_name).'
   );
@@ -462,7 +462,7 @@ function buildBlueprintTableIndex(): t.ExportNamedDeclaration {
       addJSDoc(optionalProp('name', t.tsStringKeyword()), 'Optional custom name for the index.'),
       addJSDoc(optionalProp('op_classes', t.tsArrayType(t.tsStringKeyword())), 'Operator classes for the index columns.'),
       addJSDoc(optionalProp('options', recordType(t.tsStringKeyword(), t.tsUnknownKeyword())), 'Additional index-specific options.'),
-      addJSDoc(optionalProp('schema_name', t.tsStringKeyword()), 'Optional schema name override.'),
+      addJSDoc(optionalProp('schema_name', t.tsStringKeyword()), 'Optional schema name override.')
     ]),
     'An index definition nested inside a table definition (table_name not required).'
   );
@@ -519,7 +519,7 @@ function buildNodeTypes(
         'BlueprintNode',
         t.tsUnionType([
           t.tsTypeReference(t.identifier('BlueprintNodeShorthand')),
-          t.tsTypeReference(t.identifier('BlueprintNodeObject')),
+          t.tsTypeReference(t.identifier('BlueprintNodeObject'))
         ])
       ),
       'A node entry in a blueprint table. Either a string shorthand or a typed object.'
@@ -542,7 +542,7 @@ function buildRelationTypes(
       requiredProp('source_table', t.tsStringKeyword()),
       requiredProp('target_table', t.tsStringKeyword()),
       optionalProp('source_schema_name', t.tsStringKeyword()),
-      optionalProp('target_schema_name', t.tsStringKeyword()),
+      optionalProp('target_schema_name', t.tsStringKeyword())
     ];
 
     // RelationSpatial is the only relation type that references *existing*
@@ -568,7 +568,7 @@ function buildRelationTypes(
 
     return t.tsIntersectionType([
       baseType,
-      partialOf(t.tsTypeReference(t.identifier(`${nt.name}Params`))),
+      partialOf(t.tsTypeReference(t.identifier(`${nt.name}Params`)))
     ]);
   });
 
@@ -576,7 +576,7 @@ function buildRelationTypes(
     addJSDoc(
       exportTypeAlias('BlueprintRelation', t.tsUnionType(relationMembers)),
       'A relation entry in a blueprint definition.'
-    ),
+    )
   ];
 }
 
@@ -598,7 +598,7 @@ function buildBlueprintUniqueConstraint(): t.ExportNamedDeclaration {
       addJSDoc(
         requiredProp('columns', t.tsArrayType(t.tsStringKeyword())),
         'Column names that form the unique constraint.'
-      ),
+      )
     ]),
     'A unique constraint definition within a blueprint (top-level, requires table_name).'
   );
@@ -614,7 +614,7 @@ function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('schema_name', t.tsStringKeyword()),
         'Optional schema name override.'
-      ),
+      )
     ]),
     'A unique constraint nested inside a table definition (table_name not required).'
   );
@@ -656,7 +656,7 @@ function buildBlueprintStoragePolicy(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('policy_name', t.tsStringKeyword()),
         'Custom RLS policy name suffix. Auto-derived from $type when omitted (pub/own/mem).'
-      ),
+      )
     ]),
     'A storage-specific RLS policy object for apply_storage_security(). Each entry defines an Authz* policy with explicit privileges, scoped to specific storage tables.'
   );
@@ -699,7 +699,7 @@ function buildBlueprintBucketSeed(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsStringKeyword())
         ),
         'CORS allowed origins for this bucket.'
-      ),
+      )
     ]),
     'A bucket seed entry for storage_config.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped).'
   );
@@ -749,7 +749,7 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsStringKeyword())
         ),
         'CORS allowed origins for the storage module.'
-      ),
+      )
     ]),
     'Storage configuration for an entity type. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS).'
   );
@@ -782,7 +782,7 @@ function buildBlueprintEntityTableProvision(): t.ExportNamedDeclaration {
           t.tsArrayType(
             t.tsTypeLiteral([
               requiredProp('roles', t.tsArrayType(t.tsStringKeyword())),
-              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword())),
+              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword()))
             ])
           )
         ),
@@ -794,7 +794,7 @@ function buildBlueprintEntityTableProvision(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintPolicy')))
         ),
         'RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op).'
-      ),
+      )
     ]),
     'Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely.'
   );
@@ -860,7 +860,7 @@ function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
           t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
         ),
         'Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS).'
-      ),
+      )
     ]),
     'A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
   );
@@ -904,7 +904,7 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
           t.tsArrayType(
             t.tsTypeLiteral([
               requiredProp('roles', t.tsArrayType(t.tsStringKeyword())),
-              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword())),
+              requiredProp('privileges', t.tsArrayType(t.tsUnknownKeyword()))
             ])
           )
         ),
@@ -934,7 +934,7 @@ function buildBlueprintTable(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsTypeReference(t.identifier('BlueprintTableUniqueConstraint')))
         ),
         'Table-level unique constraints (table_name inherited from parent).'
-      ),
+      )
     ]),
     'A table definition within a blueprint.'
   );
@@ -990,7 +990,7 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
           )
         ),
         'Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security.'
-      ),
+      )
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
   );
@@ -1005,8 +1005,8 @@ function sectionComment(title: string): t.Statement {
   empty.leadingComments = [
     {
       type: 'CommentBlock',
-      value: `*\n * ===========================================================================\n * ${title}\n * ===========================================================================\n `,
-    } as t.CommentBlock,
+      value: `*\n * ===========================================================================\n * ${title}\n * ===========================================================================\n `
+    } as t.CommentBlock
   ];
   return empty;
 }
@@ -1091,6 +1091,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
 
   const header = [
     '// GENERATED FILE \u2014 DO NOT EDIT',
+    '/* eslint-disable @typescript-eslint/no-empty-object-type */',
     '//',
     '// Regenerate with:',
     '//   cd graphql/node-type-registry && pnpm generate:types',
@@ -1098,10 +1099,10 @@ function buildProgram(meta?: MetaTableInfo[]): string {
     '// These types match the JSONB shape expected by construct_blueprint().',
     '// All field names are snake_case to match the SQL convention.',
     '',
-    '',
+    ''
   ].join('\n');
 
-  const output = generate(file, { comments: true });
+  const output = generate(file, { comments: true, jsescOption: { quotes: 'single' } });
   return header + output.code + '\n';
 }
 
