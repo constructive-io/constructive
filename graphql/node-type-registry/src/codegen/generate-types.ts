@@ -796,13 +796,13 @@ function buildBlueprintEntityTableProvision(): t.ExportNamedDeclaration {
         'RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op).'
       )
     ]),
-    'Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely.'
+    'Override object for the entity table created by a BlueprintEntityType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely.'
   );
 }
 
-function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
+function buildBlueprintEntityType(): t.ExportNamedDeclaration {
   return addJSDoc(
-    exportInterface('BlueprintMembershipType', [
+    exportInterface('BlueprintEntityType', [
       addJSDoc(
         requiredProp('name', t.tsStringKeyword()),
         'Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database.'
@@ -862,7 +862,7 @@ function buildBlueprintMembershipType(): t.ExportNamedDeclaration {
         'Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS).'
       )
     ]),
-    'A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
+    'An entity type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision.'
   );
 }
 
@@ -984,12 +984,19 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp(
-          'membership_types',
+          'entity_types',
           t.tsArrayType(
-            t.tsTypeReference(t.identifier('BlueprintMembershipType'))
+            t.tsTypeReference(t.identifier('BlueprintEntityType'))
           )
         ),
         'Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'storage',
+          t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
+        ),
+        'App-level storage configuration. Creates a storage_module (membership_type = NULL) with the specified policies, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead.'
       )
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
@@ -1066,7 +1073,7 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintBucketSeed());
   statements.push(buildBlueprintStorageConfig());
   statements.push(buildBlueprintEntityTableProvision());
-  statements.push(buildBlueprintMembershipType());
+  statements.push(buildBlueprintEntityType());
 
   // -- Node types discriminated union --
   statements.push(
