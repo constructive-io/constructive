@@ -830,6 +830,49 @@ export interface BlueprintTableUniqueConstraint {
   /** Optional schema name override. */
   schema_name?: string;
 }
+/** A storage-specific RLS policy object for apply_storage_security(). Each entry defines an Authz* policy with explicit privileges, scoped to specific storage tables. */
+export interface BlueprintStoragePolicy {
+  /** Authz* policy generator type (e.g., "AuthzPublishable", "AuthzDirectOwner", "AuthzEntityMembership"). */
+  $type: string;
+  /** Privilege array (e.g., ["select", "insert", "update", "delete"]). Intersected with each storage table's supported operations. */
+  privileges: string[];
+  /** Policy data config. Auto-derived from $type when omitted (e.g., AuthzPublishable defaults to {"is_published_field": "is_public", "require_published_at": false}). */
+  data?: Record<string, unknown>;
+  /** Which storage tables to apply this policy to. Defaults to all three when omitted. Uses logical names (not prefixed). */
+  tables?: ("buckets" | "files" | "upload_requests")[];
+  /** Custom RLS policy name suffix. Auto-derived from $type when omitted (pub/own/mem). */
+  policy_name?: string;
+}
+/** A bucket seed entry for storage_config.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped). */
+export interface BlueprintBucketSeed {
+  /** Bucket key name (e.g., "avatars", "documents"). Becomes the key column value. */
+  name: string;
+  /** Human-readable description of this bucket. */
+  description?: string;
+  /** Whether the bucket is publicly readable. Defaults to false. */
+  is_public?: boolean;
+  /** MIME type allowlist (e.g., ["image/png", "image/jpeg"]). NULL means all types allowed. */
+  allowed_mime_types?: string[];
+  /** Maximum file size in bytes for this bucket. NULL means no limit. */
+  max_file_size?: number;
+  /** CORS allowed origins for this bucket. */
+  allowed_origins?: string[];
+}
+/** Storage configuration for an entity type. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). */
+export interface BlueprintStorageConfig {
+  /** Custom RLS policies for storage tables. When provided, replaces the default policy set (AuthzPublishable + membership + AuthzDirectOwner). Each entry is a policy object with $type, privileges, and optional data/tables/policy_name. */
+  policies?: BlueprintStoragePolicy[];
+  /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. Only used for app-level storage (not entity-scoped). */
+  buckets?: BlueprintBucketSeed[];
+  /** Override for presigned upload URL expiry time in seconds. */
+  upload_url_expiry_seconds?: number;
+  /** Override for presigned download URL expiry time in seconds. */
+  download_url_expiry_seconds?: number;
+  /** Default maximum file size in bytes for the storage module. */
+  default_max_file_size?: number;
+  /** CORS allowed origins for the storage module. */
+  allowed_origins?: string[];
+}
 /** Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
 export interface BlueprintEntityTableProvision {
   /** Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true. */
@@ -866,10 +909,14 @@ export interface BlueprintMembershipType {
   has_profiles?: boolean;
   /** Whether to provision a levels module for this entity type. Defaults to false. */
   has_levels?: boolean;
+  /** Whether to provision a storage module (buckets, files, upload_requests tables) for this entity type. Defaults to false. */
+  has_storage?: boolean;
   /** Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false. */
   skip_entity_policies?: boolean;
   /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
   table_provision?: BlueprintEntityTableProvision;
+  /** Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). */
+  storage?: BlueprintStorageConfig;
 }
 /**
  * ===========================================================================
