@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.5...graphile-presigned-url-plugin@0.7.0) (2026-04-29)
+
+### Features
+
+- add status field to RequestUploadUrlPayload ([c61b5e9](https://github.com/constructive-io/constructive/commit/c61b5e9eef9a4e2f86ab859bd7f599f4abf8264d))
+
 ## [0.6.5](https://github.com/constructive-io/constructive/compare/graphile-presigned-url-plugin@0.6.4...graphile-presigned-url-plugin@0.6.5) (2026-04-28)
 
 **Note:** Version bump only for package graphile-presigned-url-plugin

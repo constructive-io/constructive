@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](https://github.com/constructive-io/constructive/compare/node-type-registry@0.17.1...node-type-registry@0.18.0) (2026-04-29)
+
+### Features
+
+- add storage types to node type registry ([513cea3](https://github.com/constructive-io/constructive/commit/513cea33acc7921b444996fed8ea2713f6659a4a))
+- tighten blueprint types — discriminated unions, typed privileges, FTS weights, grant tuples ([15172f5](https://github.com/constructive-io/constructive/commit/15172f57888c68e30dd6121b7a353afe9fe8541f))
+
 ## [0.17.1](https://github.com/constructive-io/constructive/compare/node-type-registry@0.17.0...node-type-registry@0.17.1) (2026-04-20)
 
 **Note:** Version bump only for package node-type-registry

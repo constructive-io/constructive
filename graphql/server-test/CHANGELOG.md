@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.13.0](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.12...graphql-server-test@2.13.0) (2026-04-29)
+
+### Bug Fixes
+
+- update server-test schema snapshot with status field ([47cc9b8](https://github.com/constructive-io/constructive/commit/47cc9b8ab7e45294212fc52b061ac6bc124194be))
+
+### Features
+
+- add status field to RequestUploadUrlPayload ([c61b5e9](https://github.com/constructive-io/constructive/commit/c61b5e9eef9a4e2f86ab859bd7f599f4abf8264d))
+
 ## [2.12.12](https://github.com/constructive-io/constructive/compare/graphql-server-test@2.12.11...graphql-server-test@2.12.12) (2026-04-28)
 
 **Note:** Version bump only for package graphql-server-test
