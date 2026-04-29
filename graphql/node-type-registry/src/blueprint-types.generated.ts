@@ -1,4 +1,5 @@
 // GENERATED FILE — DO NOT EDIT
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 //
 // Regenerate with:
 //   cd graphql/node-type-registry && pnpm generate:types
@@ -69,7 +70,7 @@ export interface DataJobTriggerParams {
   /* Job task identifier passed to add_job (e.g., process_invoice, sync_to_stripe) */
   task_identifier: string;
   /* How to build the job payload: row (full NEW/OLD), row_id (just id), fields (selected columns), custom (mapped columns) */
-  payload_strategy?: "row" | "row_id" | "fields" | "custom";
+  payload_strategy?: 'row' | 'row_id' | 'fields' | 'custom';
   /* Column names to include in payload (only for fields strategy) */
   payload_fields?: string[];
   /* Key-to-column mapping for custom payload (e.g., {"invoice_id": "id", "total": "amount"}) */
@@ -77,7 +78,7 @@ export interface DataJobTriggerParams {
     [key: string]: unknown;
   };
   /* Trigger events to create */
-  events?: ("INSERT" | "UPDATE" | "DELETE")[];
+  events?: ('INSERT' | 'UPDATE' | 'DELETE')[];
   /* Include OLD row in payload (for UPDATE triggers) */
   include_old?: boolean;
   /* Include table/schema metadata in payload */
@@ -144,7 +145,7 @@ export interface DataInflectionParams {
   /* Name of the field to transform */
   field_name: string;
   /* Inflection operations to apply in order */
-  ops: ("plural" | "singular" | "camel" | "pascal" | "dashed" | "slugify" | "underscore" | "lower" | "upper")[];
+  ops: ('plural' | 'singular' | 'camel' | 'pascal' | 'dashed' | 'slugify' | 'underscore' | 'lower' | 'upper')[];
 }
 /** Restricts which user can modify specific columns in shared objects. Creates an AFTER UPDATE trigger that throws OWNED_PROPS when a non-owner tries to change protected fields. References fields by name in data jsonb. */
 export interface DataOwnedFieldsParams {
@@ -181,7 +182,7 @@ export interface DataCompositeFieldParams {
   /* Array of source field names to concatenate into the target field */
   source_fields: string[];
   /* Output format: 'labeled' (field_name: value) or 'plain' (values only). Default: 'labeled' */
-  format?: "labeled" | "plain";
+  format?: 'labeled' | 'plain';
 }
 /** Creates a user profiles table with standard profile fields (profile_picture, bio, first_name, last_name, tags, desired). Uses AuthzDirectOwner for edit access and AuthzAllowAll for select. */
 export type TableUserProfilesParams = {};
@@ -202,9 +203,9 @@ export interface SearchVectorParams {
   /* Vector dimensions (e.g. 384, 768, 1536, 3072) */
   dimensions?: number;
   /* Index type for similarity search */
-  index_method?: "hnsw" | "ivfflat";
+  index_method?: 'hnsw' | 'ivfflat';
   /* Distance metric (cosine, l2, ip) */
-  metric?: "cosine" | "l2" | "ip";
+  metric?: 'cosine' | 'l2' | 'ip';
   /* Index-specific options. HNSW: {m, ef_construction}. IVFFlat: {lists}. */
   index_options?: {
     [key: string]: unknown;
@@ -218,13 +219,13 @@ export interface SearchVectorParams {
   /* Task identifier for the job queue */
   job_task_name?: string;
   /* Strategy for tracking embedding staleness. column: embedding_stale boolean. null: set embedding to NULL. hash: md5 hash of source fields. */
-  stale_strategy?: "column" | "null" | "hash";
+  stale_strategy?: 'column' | 'null' | 'hash';
   /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */
   chunks?: {
     /* Name of the text content column in the chunks table */content_field_name?: string;
     /* Maximum number of characters per chunk */chunk_size?: number;
     /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
-    /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
+    /* Strategy for splitting text into chunks */chunk_strategy?: 'fixed' | 'sentence' | 'paragraph' | 'semantic';
     /* Metadata fields from parent to copy into chunks */metadata_fields?: {
       [key: string]: unknown;
     };
@@ -239,7 +240,7 @@ export interface SearchFullTextParams {
   /* Source columns that feed the tsvector. Each has a field name, weight (A-D), and language config. */
   source_fields: {
     /* Name of the source column */field: string;
-    /* tsvector weight class (A=highest, D=lowest) */weight?: "A" | "B" | "C" | "D";
+    /* tsvector weight class (A=highest, D=lowest) */weight?: 'A' | 'B' | 'C' | 'D';
     /* PostgreSQL text search configuration */lang?: string;
   }[];
   /* Weight for this algorithm in composite searchScore */
@@ -265,7 +266,7 @@ export interface SearchUnifiedParams {
     field_name?: string;
     source_fields?: {
       field: string;
-      weight?: "A" | "B" | "C" | "D";
+      weight?: 'A' | 'B' | 'C' | 'D';
       lang?: string;
     }[];
     search_score_weight?: number;
@@ -282,15 +283,15 @@ export interface SearchUnifiedParams {
   embedding?: {
     field_name?: string;
     dimensions?: number;
-    index_method?: "hnsw" | "ivfflat";
-    metric?: "cosine" | "l2" | "ip";
+    index_method?: 'hnsw' | 'ivfflat';
+    metric?: 'cosine' | 'l2' | 'ip';
     source_fields?: string[];
     search_score_weight?: number;
     /* Chunking configuration for long-text embedding. Creates an embedding_chunks record that drives automatic text splitting and per-chunk embedding. Omit to skip chunking. */chunks?: {
       /* Name of the text content column in the chunks table */content_field_name?: string;
       /* Maximum number of characters per chunk */chunk_size?: number;
       /* Number of overlapping characters between consecutive chunks */chunk_overlap?: number;
-      /* Strategy for splitting text into chunks */chunk_strategy?: "fixed" | "sentence" | "paragraph" | "semantic";
+      /* Strategy for splitting text into chunks */chunk_strategy?: 'fixed' | 'sentence' | 'paragraph' | 'semantic';
       /* Metadata fields from parent to copy into chunks */metadata_fields?: {
         [key: string]: unknown;
       };
@@ -305,7 +306,7 @@ export interface SearchUnifiedParams {
     /* Per-algorithm weights: {tsv: 1.5, bm25: 1.0, pgvector: 0.8, trgm: 0.3} */weights?: {
       [key: string]: unknown;
     };
-    /* Score normalization strategy */normalization?: "linear" | "sigmoid";
+    /* Score normalization strategy */normalization?: 'linear' | 'sigmoid';
     /* Enable recency boost for search results */boost_recent?: boolean;
     /* Timestamp field for recency boost (e.g. created_at, updated_at) */boost_recency_field?: string;
     /* Decay rate for recency boost (0-1, lower = faster decay) */boost_recency_decay?: number;
@@ -316,7 +317,7 @@ export interface SearchSpatialParams {
   /* Name of the geometry/geography column */
   field_name?: string;
   /* PostGIS geometry type constraint */
-  geometry_type?: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection" | "Geometry";
+  geometry_type?: 'Point' | 'LineString' | 'Polygon' | 'MultiPoint' | 'MultiLineString' | 'MultiPolygon' | 'GeometryCollection' | 'Geometry';
   /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
   srid?: number;
   /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
@@ -324,7 +325,7 @@ export interface SearchSpatialParams {
   /* Use geography type instead of geometry (for geodetic calculations on the sphere) */
   use_geography?: boolean;
   /* Spatial index method */
-  index_method?: "gist" | "spgist";
+  index_method?: 'gist' | 'spgist';
 }
 /** Creates a derived/materialized geometry field on the parent table that automatically aggregates geometries from a source (child) table via triggers. When child rows are inserted/updated/deleted, the parent aggregate field is recalculated using the specified PostGIS aggregation function (ST_Union, ST_Collect, ST_ConvexHull, ST_ConcaveHull). Useful for materializing spatial boundaries from collections of points or polygons. */
 export interface SearchSpatialAggregateParams {
@@ -337,9 +338,9 @@ export interface SearchSpatialAggregateParams {
   /* Name of the foreign key column on the source table pointing to the parent */
   source_fk_field: string;
   /* PostGIS aggregation function: union (ST_Union, merges overlapping), collect (ST_Collect, groups without merging), convex_hull (smallest convex polygon), concave_hull (tighter boundary) */
-  aggregate_function?: "union" | "collect" | "convex_hull" | "concave_hull";
+  aggregate_function?: 'union' | 'collect' | 'convex_hull' | 'concave_hull';
   /* Output geometry type constraint for the aggregate field */
-  geometry_type?: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection" | "Geometry";
+  geometry_type?: 'Point' | 'LineString' | 'Polygon' | 'MultiPoint' | 'MultiLineString' | 'MultiPolygon' | 'GeometryCollection' | 'Geometry';
   /* Spatial Reference System Identifier (e.g. 4326 for WGS84) */
   srid?: number;
   /* Coordinate dimension (2=XY, 3=XYZ, 4=XYZM) */
@@ -347,7 +348,7 @@ export interface SearchSpatialAggregateParams {
   /* Use geography type instead of geometry */
   use_geography?: boolean;
   /* Spatial index method for the aggregate field */
-  index_method?: "gist" | "spgist";
+  index_method?: 'gist' | 'spgist';
 }
 /** Creates GIN trigram indexes (gin_trgm_ops) on specified text/citext fields for fuzzy LIKE/ILIKE/similarity search. Adds @trgmSearch smart tag for PostGraphile integration. Fields must already exist on the table. */
 export interface SearchTrgmParams {
@@ -432,7 +433,7 @@ export interface AuthzRelatedEntityMembershipParams {
 /** Organizational hierarchy visibility using closure table. Managers can see subordinate data or subordinates can see manager data. */
 export interface AuthzOrgHierarchyParams {
   /* down=manager sees subordinates, up=subordinate sees managers */
-  direction: "up" | "down";
+  direction: 'up' | 'down';
   /* Field referencing the org entity */
   entity_field?: string;
   /* Field referencing the user (e.g., owner_id) */
@@ -486,7 +487,7 @@ export type AuthzDenyAllParams = {};
 export interface AuthzCompositeParams {
   /* Boolean expression combining multiple authorization nodes */
   BoolExpr?: {
-    /* Boolean operator: AND_EXPR, OR_EXPR, or NOT_EXPR */boolop?: "AND_EXPR" | "OR_EXPR" | "NOT_EXPR";
+    /* Boolean operator: AND_EXPR, OR_EXPR, or NOT_EXPR */boolop?: 'AND_EXPR' | 'OR_EXPR' | 'NOT_EXPR';
     /* Array of authorization nodes to combine */args?: {
       [key: string]: unknown;
     }[];
@@ -560,7 +561,7 @@ export interface RelationBelongsToParams {
   /* FK field name on the source table. Auto-derived from target table name if omitted (e.g., projects → project_id) */
   field_name?: string;
   /* FK delete action: c=CASCADE, r=RESTRICT, n=SET NULL, d=SET DEFAULT, a=NO ACTION. Required. */
-  delete_action: "c" | "r" | "n" | "d" | "a";
+  delete_action: 'c' | 'r' | 'n' | 'd' | 'a';
   /* Whether the FK field is NOT NULL */
   is_required?: boolean;
 }
@@ -573,7 +574,7 @@ export interface RelationHasOneParams {
   /* FK field name on the source table. Auto-derived from target table name if omitted (e.g., users → user_id) */
   field_name?: string;
   /* FK delete action: c=CASCADE, r=RESTRICT, n=SET NULL, d=SET DEFAULT, a=NO ACTION. Required. */
-  delete_action: "c" | "r" | "n" | "d" | "a";
+  delete_action: 'c' | 'r' | 'n' | 'd' | 'a';
   /* Whether the FK field is NOT NULL */
   is_required?: boolean;
 }
@@ -586,7 +587,7 @@ export interface RelationHasManyParams {
   /* FK field name on the target table. Auto-derived from source table name if omitted (e.g., projects derives project_id) */
   field_name?: string;
   /* FK delete action: c=CASCADE, r=RESTRICT, n=SET NULL, d=SET DEFAULT, a=NO ACTION. Required. */
-  delete_action: "c" | "r" | "n" | "d" | "a";
+  delete_action: 'c' | 'r' | 'n' | 'd' | 'a';
   /* Whether the FK field is NOT NULL */
   is_required?: boolean;
 }
@@ -640,7 +641,7 @@ export interface RelationSpatialParams {
   /* Relation name (stable, snake_case). Becomes the generated filter field name in GraphQL (e.g. nearby_clinic). Unique per (source_table_id, name) — idempotency key. */
   name: string;
   /* PostGIS spatial predicate. One of the 8 whitelisted operators. st_dwithin requires param_name. */
-  operator: "st_contains" | "st_within" | "st_intersects" | "st_covers" | "st_coveredby" | "st_overlaps" | "st_touches" | "st_dwithin";
+  operator: 'st_contains' | 'st_within' | 'st_intersects' | 'st_covers' | 'st_coveredby' | 'st_overlaps' | 'st_touches' | 'st_dwithin';
   /* Parameter name for parametric operators (currently only st_dwithin, which needs a distance argument). Must be NULL for all other operators. Enforced by table CHECK. */
   param_name?: string;
 }
@@ -683,7 +684,7 @@ export interface ViewJoinedTablesParams {
   /* Array of join specifications */
   joins: {
     /* UUID of the joined table */table_id: string;
-    join_type?: "INNER" | "LEFT" | "RIGHT" | "FULL";
+    join_type?: 'INNER' | 'LEFT' | 'RIGHT' | 'FULL';
     /* Field on primary table */primary_field: string;
     /* Field on joined table */join_field: string;
     /* Optional column names to include from this joined table */columns?: string[];
@@ -699,7 +700,7 @@ export interface ViewAggregatedParams {
   group_by_fields: string[];
   /* Array of aggregate specifications */
   aggregates: {
-    function: "COUNT" | "SUM" | "AVG" | "MIN" | "MAX";
+    function: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
     /* Field to aggregate (or * for COUNT) */field?: string;
     /* Output column name */alias: string;
   }[];
@@ -733,7 +734,7 @@ export interface BlueprintField {
 /** An RLS policy entry for a blueprint table. Uses $type to match the blueprint JSON convention. */
 export interface BlueprintPolicy {
   /** Authz* policy type name (e.g., "AuthzDirectOwner", "AuthzAllowAll"). */
-  $type: "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzNotReadOnly" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership";
+  $type: 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzMembership' | 'AuthzEntityMembership' | 'AuthzRelatedEntityMembership' | 'AuthzOrgHierarchy' | 'AuthzTemporal' | 'AuthzPublishable' | 'AuthzMemberList' | 'AuthzRelatedMemberList' | 'AuthzAllowAll' | 'AuthzDenyAll' | 'AuthzComposite' | 'AuthzNotReadOnly' | 'AuthzPeerOwnership' | 'AuthzRelatedPeerOwnership';
   /** Privileges this policy applies to (e.g., ["select"], ["insert", "update", "delete"]). */
   privileges?: string[];
   /** Whether this policy is permissive (true) or restrictive (false). Defaults to true. */
@@ -830,6 +831,49 @@ export interface BlueprintTableUniqueConstraint {
   /** Optional schema name override. */
   schema_name?: string;
 }
+/** A storage-specific RLS policy object for apply_storage_security(). Each entry defines an Authz* policy with explicit privileges, scoped to specific storage tables. */
+export interface BlueprintStoragePolicy {
+  /** Authz* policy generator type (e.g., "AuthzPublishable", "AuthzDirectOwner", "AuthzEntityMembership"). */
+  $type: string;
+  /** Privilege array (e.g., ["select", "insert", "update", "delete"]). Intersected with each storage table's supported operations. */
+  privileges: string[];
+  /** Policy data config. Auto-derived from $type when omitted (e.g., AuthzPublishable defaults to {"is_published_field": "is_public", "require_published_at": false}). */
+  data?: Record<string, unknown>;
+  /** Which storage tables to apply this policy to. Defaults to all three when omitted. Uses logical names (not prefixed). */
+  tables?: ('buckets' | 'files' | 'upload_requests')[];
+  /** Custom RLS policy name suffix. Auto-derived from $type when omitted (pub/own/mem). */
+  policy_name?: string;
+}
+/** A bucket seed entry for storage_config.buckets[]. Creates an initial bucket row in the {prefix}_buckets table during entity type provisioning. Only used for app-level storage (not entity-scoped). */
+export interface BlueprintBucketSeed {
+  /** Bucket key name (e.g., "avatars", "documents"). Becomes the key column value. */
+  name: string;
+  /** Human-readable description of this bucket. */
+  description?: string;
+  /** Whether the bucket is publicly readable. Defaults to false. */
+  is_public?: boolean;
+  /** MIME type allowlist (e.g., ["image/png", "image/jpeg"]). NULL means all types allowed. */
+  allowed_mime_types?: string[];
+  /** Maximum file size in bytes for this bucket. NULL means no limit. */
+  max_file_size?: number;
+  /** CORS allowed origins for this bucket. */
+  allowed_origins?: string[];
+}
+/** Storage configuration for an entity type. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). */
+export interface BlueprintStorageConfig {
+  /** Custom RLS policies for storage tables. When provided, replaces the default policy set (AuthzPublishable + membership + AuthzDirectOwner). Each entry is a policy object with $type, privileges, and optional data/tables/policy_name. */
+  policies?: BlueprintStoragePolicy[];
+  /** Initial bucket seed entries. Each creates a row in {prefix}_buckets during provisioning. Only used for app-level storage (not entity-scoped). */
+  buckets?: BlueprintBucketSeed[];
+  /** Override for presigned upload URL expiry time in seconds. */
+  upload_url_expiry_seconds?: number;
+  /** Override for presigned download URL expiry time in seconds. */
+  download_url_expiry_seconds?: number;
+  /** Default maximum file size in bytes for the storage module. */
+  default_max_file_size?: number;
+  /** CORS allowed origins for the storage module. */
+  allowed_origins?: string[];
+}
 /** Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
 export interface BlueprintEntityTableProvision {
   /** Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true. */
@@ -866,10 +910,14 @@ export interface BlueprintMembershipType {
   has_profiles?: boolean;
   /** Whether to provision a levels module for this entity type. Defaults to false. */
   has_levels?: boolean;
+  /** Whether to provision a storage module (buckets, files, upload_requests tables) for this entity type. Defaults to false. */
+  has_storage?: boolean;
   /** Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false. */
   skip_entity_policies?: boolean;
   /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
   table_provision?: BlueprintEntityTableProvision;
+  /** Storage configuration. Only used when has_storage is true. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). */
+  storage?: BlueprintStorageConfig;
 }
 /**
  * ===========================================================================
@@ -878,142 +926,142 @@ export interface BlueprintMembershipType {
  */
 ;
 /** String shorthand -- just the node type name. */
-export type BlueprintNodeShorthand = "AuthzDirectOwner" | "AuthzDirectOwnerAny" | "AuthzMembership" | "AuthzEntityMembership" | "AuthzRelatedEntityMembership" | "AuthzOrgHierarchy" | "AuthzTemporal" | "AuthzPublishable" | "AuthzMemberList" | "AuthzRelatedMemberList" | "AuthzAllowAll" | "AuthzDenyAll" | "AuthzComposite" | "AuthzNotReadOnly" | "AuthzPeerOwnership" | "AuthzRelatedPeerOwnership" | "DataId" | "DataDirectOwner" | "DataEntityMembership" | "DataOwnershipInEntity" | "DataTimestamps" | "DataPeoplestamps" | "DataPublishable" | "DataSoftDelete" | "SearchVector" | "SearchFullText" | "SearchBm25" | "SearchUnified" | "SearchSpatial" | "SearchSpatialAggregate" | "DataJobTrigger" | "DataTags" | "DataStatusField" | "DataJsonb" | "SearchTrgm" | "DataSlug" | "DataInflection" | "DataOwnedFields" | "DataInheritFromParent" | "DataForceCurrentUser" | "DataImmutableFields" | "DataCompositeField" | "TableUserProfiles" | "TableOrganizationSettings" | "TableUserSettings";
+export type BlueprintNodeShorthand = 'AuthzDirectOwner' | 'AuthzDirectOwnerAny' | 'AuthzMembership' | 'AuthzEntityMembership' | 'AuthzRelatedEntityMembership' | 'AuthzOrgHierarchy' | 'AuthzTemporal' | 'AuthzPublishable' | 'AuthzMemberList' | 'AuthzRelatedMemberList' | 'AuthzAllowAll' | 'AuthzDenyAll' | 'AuthzComposite' | 'AuthzNotReadOnly' | 'AuthzPeerOwnership' | 'AuthzRelatedPeerOwnership' | 'DataId' | 'DataDirectOwner' | 'DataEntityMembership' | 'DataOwnershipInEntity' | 'DataTimestamps' | 'DataPeoplestamps' | 'DataPublishable' | 'DataSoftDelete' | 'SearchVector' | 'SearchFullText' | 'SearchBm25' | 'SearchUnified' | 'SearchSpatial' | 'SearchSpatialAggregate' | 'DataJobTrigger' | 'DataTags' | 'DataStatusField' | 'DataJsonb' | 'SearchTrgm' | 'DataSlug' | 'DataInflection' | 'DataOwnedFields' | 'DataInheritFromParent' | 'DataForceCurrentUser' | 'DataImmutableFields' | 'DataCompositeField' | 'TableUserProfiles' | 'TableOrganizationSettings' | 'TableUserSettings';
 /** Object form -- { $type, data } with typed parameters. */
 export type BlueprintNodeObject = {
-  $type: "AuthzDirectOwner";
+  $type: 'AuthzDirectOwner';
   data: AuthzDirectOwnerParams;
 } | {
-  $type: "AuthzDirectOwnerAny";
+  $type: 'AuthzDirectOwnerAny';
   data: AuthzDirectOwnerAnyParams;
 } | {
-  $type: "AuthzMembership";
+  $type: 'AuthzMembership';
   data: AuthzMembershipParams;
 } | {
-  $type: "AuthzEntityMembership";
+  $type: 'AuthzEntityMembership';
   data: AuthzEntityMembershipParams;
 } | {
-  $type: "AuthzRelatedEntityMembership";
+  $type: 'AuthzRelatedEntityMembership';
   data: AuthzRelatedEntityMembershipParams;
 } | {
-  $type: "AuthzOrgHierarchy";
+  $type: 'AuthzOrgHierarchy';
   data: AuthzOrgHierarchyParams;
 } | {
-  $type: "AuthzTemporal";
+  $type: 'AuthzTemporal';
   data: AuthzTemporalParams;
 } | {
-  $type: "AuthzPublishable";
+  $type: 'AuthzPublishable';
   data: AuthzPublishableParams;
 } | {
-  $type: "AuthzMemberList";
+  $type: 'AuthzMemberList';
   data: AuthzMemberListParams;
 } | {
-  $type: "AuthzRelatedMemberList";
+  $type: 'AuthzRelatedMemberList';
   data: AuthzRelatedMemberListParams;
 } | {
-  $type: "AuthzAllowAll";
+  $type: 'AuthzAllowAll';
   data?: Record<string, never>;
 } | {
-  $type: "AuthzDenyAll";
+  $type: 'AuthzDenyAll';
   data?: Record<string, never>;
 } | {
-  $type: "AuthzComposite";
+  $type: 'AuthzComposite';
   data: AuthzCompositeParams;
 } | {
-  $type: "AuthzNotReadOnly";
+  $type: 'AuthzNotReadOnly';
   data: AuthzNotReadOnlyParams;
 } | {
-  $type: "AuthzPeerOwnership";
+  $type: 'AuthzPeerOwnership';
   data: AuthzPeerOwnershipParams;
 } | {
-  $type: "AuthzRelatedPeerOwnership";
+  $type: 'AuthzRelatedPeerOwnership';
   data: AuthzRelatedPeerOwnershipParams;
 } | {
-  $type: "DataId";
+  $type: 'DataId';
   data: DataIdParams;
 } | {
-  $type: "DataDirectOwner";
+  $type: 'DataDirectOwner';
   data: DataDirectOwnerParams;
 } | {
-  $type: "DataEntityMembership";
+  $type: 'DataEntityMembership';
   data: DataEntityMembershipParams;
 } | {
-  $type: "DataOwnershipInEntity";
+  $type: 'DataOwnershipInEntity';
   data: DataOwnershipInEntityParams;
 } | {
-  $type: "DataTimestamps";
+  $type: 'DataTimestamps';
   data: DataTimestampsParams;
 } | {
-  $type: "DataPeoplestamps";
+  $type: 'DataPeoplestamps';
   data: DataPeoplestampsParams;
 } | {
-  $type: "DataPublishable";
+  $type: 'DataPublishable';
   data: DataPublishableParams;
 } | {
-  $type: "DataSoftDelete";
+  $type: 'DataSoftDelete';
   data: DataSoftDeleteParams;
 } | {
-  $type: "SearchVector";
+  $type: 'SearchVector';
   data: SearchVectorParams;
 } | {
-  $type: "SearchFullText";
+  $type: 'SearchFullText';
   data: SearchFullTextParams;
 } | {
-  $type: "SearchBm25";
+  $type: 'SearchBm25';
   data: SearchBm25Params;
 } | {
-  $type: "SearchUnified";
+  $type: 'SearchUnified';
   data: SearchUnifiedParams;
 } | {
-  $type: "SearchSpatial";
+  $type: 'SearchSpatial';
   data: SearchSpatialParams;
 } | {
-  $type: "SearchSpatialAggregate";
+  $type: 'SearchSpatialAggregate';
   data: SearchSpatialAggregateParams;
 } | {
-  $type: "DataJobTrigger";
+  $type: 'DataJobTrigger';
   data: DataJobTriggerParams;
 } | {
-  $type: "DataTags";
+  $type: 'DataTags';
   data: DataTagsParams;
 } | {
-  $type: "DataStatusField";
+  $type: 'DataStatusField';
   data: DataStatusFieldParams;
 } | {
-  $type: "DataJsonb";
+  $type: 'DataJsonb';
   data: DataJsonbParams;
 } | {
-  $type: "SearchTrgm";
+  $type: 'SearchTrgm';
   data: SearchTrgmParams;
 } | {
-  $type: "DataSlug";
+  $type: 'DataSlug';
   data: DataSlugParams;
 } | {
-  $type: "DataInflection";
+  $type: 'DataInflection';
   data: DataInflectionParams;
 } | {
-  $type: "DataOwnedFields";
+  $type: 'DataOwnedFields';
   data: DataOwnedFieldsParams;
 } | {
-  $type: "DataInheritFromParent";
+  $type: 'DataInheritFromParent';
   data: DataInheritFromParentParams;
 } | {
-  $type: "DataForceCurrentUser";
+  $type: 'DataForceCurrentUser';
   data: DataForceCurrentUserParams;
 } | {
-  $type: "DataImmutableFields";
+  $type: 'DataImmutableFields';
   data: DataImmutableFieldsParams;
 } | {
-  $type: "DataCompositeField";
+  $type: 'DataCompositeField';
   data: DataCompositeFieldParams;
 } | {
-  $type: "TableUserProfiles";
+  $type: 'TableUserProfiles';
   data?: Record<string, never>;
 } | {
-  $type: "TableOrganizationSettings";
+  $type: 'TableOrganizationSettings';
   data?: Record<string, never>;
 } | {
-  $type: "TableUserSettings";
+  $type: 'TableUserSettings';
   data?: Record<string, never>;
 };
 /** A node entry in a blueprint table. Either a string shorthand or a typed object. */
@@ -1026,31 +1074,31 @@ export type BlueprintNode = BlueprintNodeShorthand | BlueprintNodeObject;
 ;
 /** A relation entry in a blueprint definition. */
 export type BlueprintRelation = {
-  $type: "RelationBelongsTo";
+  $type: 'RelationBelongsTo';
   source_table: string;
   target_table: string;
   source_schema_name?: string;
   target_schema_name?: string;
 } & Partial<RelationBelongsToParams> | {
-  $type: "RelationHasOne";
+  $type: 'RelationHasOne';
   source_table: string;
   target_table: string;
   source_schema_name?: string;
   target_schema_name?: string;
 } & Partial<RelationHasOneParams> | {
-  $type: "RelationHasMany";
+  $type: 'RelationHasMany';
   source_table: string;
   target_table: string;
   source_schema_name?: string;
   target_schema_name?: string;
 } & Partial<RelationHasManyParams> | {
-  $type: "RelationManyToMany";
+  $type: 'RelationManyToMany';
   source_table: string;
   target_table: string;
   source_schema_name?: string;
   target_schema_name?: string;
 } & Partial<RelationManyToManyParams> | {
-  $type: "RelationSpatial";
+  $type: 'RelationSpatial';
   source_table: string;
   target_table: string;
   source_schema_name?: string;
