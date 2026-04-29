@@ -175,6 +175,8 @@ export function createPresignedUrlPlugin(
         deduplicated: Boolean!
         """Presigned URL expiry time (null if deduplicated)"""
         expiresAt: Datetime
+        """File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable."""
+        status: String!
       }
 
       input ConfirmUploadInput {
@@ -324,11 +326,12 @@ export function createPresignedUrlPlugin(
                   });
 
                   return {
-                    uploadUrl: null,
-                    fileId: existingFile.id,
+                    uploadUrl: null as string | null,
+                    fileId: existingFile.id as string,
                     key: s3Key,
                     deduplicated: true,
-                    expiresAt: null,
+                    expiresAt: null as string | null,
+                    status: existingFile.status as string,
                   };
                 }
 
@@ -396,6 +399,7 @@ export function createPresignedUrlPlugin(
                   key: s3Key,
                   deduplicated: false,
                   expiresAt,
+                  status: 'pending',
                 };
               });
             });

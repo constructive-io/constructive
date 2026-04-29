@@ -49,6 +49,7 @@ const REQUEST_UPLOAD_URL = `
       key
       deduplicated
       expiresAt
+      status
     }
   }
 `;
@@ -158,6 +159,7 @@ describe('Upload integration (presigned URL flow)', () => {
       expect(payload.key).toBe(contentHash);
       expect(payload.deduplicated).toBe(false);
       expect(payload.expiresAt).toBeTruthy();
+      expect(payload.status).toBe('pending');
 
       uploadUrl = payload.uploadUrl;
       fileId = payload.fileId;
@@ -216,6 +218,7 @@ describe('Upload integration (presigned URL flow)', () => {
       expect(payload.key).toBe(contentHash);
       expect(payload.deduplicated).toBe(false);
       expect(payload.expiresAt).toBeTruthy();
+      expect(payload.status).toBe('pending');
 
       uploadUrl = payload.uploadUrl;
       fileId = payload.fileId;
@@ -271,6 +274,7 @@ describe('Upload integration (presigned URL flow)', () => {
       expect(payload.uploadUrl).toBeNull();
       expect(payload.expiresAt).toBeNull();
       expect(payload.fileId).toBeTruthy();
+      expect(payload.status).toBe('ready');
     });
   });
 });

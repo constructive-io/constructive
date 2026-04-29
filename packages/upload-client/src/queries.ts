@@ -13,6 +13,7 @@ export const REQUEST_UPLOAD_URL_MUTATION = `
       key
       deduplicated
       expiresAt
+      status
     }
   }
 `;
