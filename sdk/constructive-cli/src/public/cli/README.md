@@ -2409,7 +2409,7 @@ CRUD operations for StorageModule records.
 | `filesTableName` | String |
 | `uploadRequestsTableName` | String |
 | `membershipType` | Int |
-| `policies` | String |
+| `policies` | JSON |
 | `entityTableId` | UUID |
 | `endpoint` | String |
 | `publicUrlPrefix` | String |
@@ -4950,6 +4950,7 @@ Composable table provisioning: creates or finds a table, then creates fields (so
   | `--input.indexes` | JSON |
   | `--input.fullTextSearches` | JSON |
   | `--input.uniqueConstraints` | JSON |
+  | `--input.description` | String |
 
 ### `send-verification-email`
 

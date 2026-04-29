@@ -8952,7 +8952,7 @@ export interface StorageModuleFilter {
   /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
   /** Filter by the object’s `policies` field. */
-  policies?: StringListFilter;
+  policies?: JSONFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -10083,6 +10083,7 @@ export interface ProvisionTableInput {
   indexes?: unknown;
   fullTextSearches?: unknown;
   uniqueConstraints?: unknown;
+  description?: string;
 }
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
@@ -12454,7 +12455,7 @@ export interface StorageModuleInput {
   filesTableName?: string;
   uploadRequestsTableName?: string;
   membershipType?: number;
-  policies?: string[];
+  policies?: unknown;
   entityTableId?: string;
   endpoint?: string;
   publicUrlPrefix?: string;
@@ -15190,7 +15191,7 @@ export interface StorageModulePatch {
   filesTableName?: string;
   uploadRequestsTableName?: string;
   membershipType?: number;
-  policies?: string[];
+  policies?: unknown;
   entityTableId?: string;
   endpoint?: string;
   publicUrlPrefix?: string;
@@ -19086,6 +19087,8 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
+  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable. */
+  status: string;
 }
 export interface ConfirmUploadPayload {
   /** The confirmed file ID */

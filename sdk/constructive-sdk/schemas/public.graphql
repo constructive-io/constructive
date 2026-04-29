@@ -14414,7 +14414,7 @@ input StorageModuleFilter {
   membershipType: IntFilter
 
   """Filter by the object’s `policies` field."""
-  policies: StringListFilter
+  policies: JSONFilter
 
   """Filter by the object’s `entityTableId` field."""
   entityTableId: UUIDFilter
@@ -20892,7 +20892,7 @@ type StorageModule {
   filesTableName: String!
   uploadRequestsTableName: String!
   membershipType: Int
-  policies: [String]
+  policies: JSON
   entityTableId: UUID
   endpoint: String
   publicUrlPrefix: String
@@ -27429,6 +27429,7 @@ input ProvisionTableInput {
   indexes: JSON
   fullTextSearches: JSON
   uniqueConstraints: JSON
+  description: String
 }
 
 """The output of our `sendVerificationEmail` mutation."""
@@ -33728,7 +33729,7 @@ input StorageModuleInput {
   filesTableName: String
   uploadRequestsTableName: String
   membershipType: Int
-  policies: [String]
+  policies: JSON
   entityTableId: UUID
   endpoint: String
   publicUrlPrefix: String
@@ -40900,7 +40901,7 @@ input StorageModulePatch {
   filesTableName: String
   uploadRequestsTableName: String
   membershipType: Int
-  policies: [String]
+  policies: JSON
   entityTableId: UUID
   endpoint: String
   publicUrlPrefix: String
@@ -45255,6 +45256,11 @@ type RequestUploadUrlPayload {
 
   """Presigned URL expiry time (null if deduplicated)"""
   expiresAt: Datetime
+
+  """
+  File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable.
+  """
+  status: String!
 }
 
 input ConfirmUploadInput {

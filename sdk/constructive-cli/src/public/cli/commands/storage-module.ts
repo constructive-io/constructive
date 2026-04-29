@@ -27,7 +27,7 @@ const fieldSchema: FieldSchema = {
   filesTableName: 'string',
   uploadRequestsTableName: 'string',
   membershipType: 'int',
-  policies: 'string',
+  policies: 'json',
   entityTableId: 'uuid',
   endpoint: 'string',
   publicUrlPrefix: 'string',
@@ -293,7 +293,7 @@ async function handleCreate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'policies',
         message: 'policies',
         required: false,
@@ -515,7 +515,7 @@ async function handleUpdate(argv: Partial<Record<string, unknown>>, prompter: In
         skipPrompt: true,
       },
       {
-        type: 'text',
+        type: 'json',
         name: 'policies',
         message: 'policies',
         required: false,

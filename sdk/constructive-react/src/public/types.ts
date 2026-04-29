@@ -878,7 +878,7 @@ export interface StorageModule {
   filesTableName: string | null;
   uploadRequestsTableName: string | null;
   membershipType: number | null;
-  policies: string[] | null;
+  policies: unknown | null;
   entityTableId: string | null;
   endpoint: string | null;
   publicUrlPrefix: string | null;

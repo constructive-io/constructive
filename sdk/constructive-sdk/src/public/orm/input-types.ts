@@ -1361,7 +1361,7 @@ export interface StorageModule {
   filesTableName?: string | null;
   uploadRequestsTableName?: string | null;
   membershipType?: number | null;
-  policies?: string[] | null;
+  policies?: Record<string, unknown> | null;
   entityTableId?: string | null;
   endpoint?: string | null;
   publicUrlPrefix?: string | null;
@@ -9422,7 +9422,7 @@ export interface StorageModuleFilter {
   /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
   /** Filter by the object’s `policies` field. */
-  policies?: StringListFilter;
+  policies?: JSONFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -16466,7 +16466,7 @@ export interface CreateStorageModuleInput {
     filesTableName?: string;
     uploadRequestsTableName?: string;
     membershipType?: number;
-    policies?: string[];
+    policies?: Record<string, unknown>;
     entityTableId?: string;
     endpoint?: string;
     publicUrlPrefix?: string;
@@ -16490,7 +16490,7 @@ export interface StorageModulePatch {
   filesTableName?: string | null;
   uploadRequestsTableName?: string | null;
   membershipType?: number | null;
-  policies?: string[] | null;
+  policies?: Record<string, unknown> | null;
   entityTableId?: string | null;
   endpoint?: string | null;
   publicUrlPrefix?: string | null;
@@ -18535,6 +18535,7 @@ export interface ProvisionTableInput {
   indexes?: Record<string, unknown>;
   fullTextSearches?: Record<string, unknown>;
   uniqueConstraints?: Record<string, unknown>;
+  description?: string;
 }
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
@@ -22806,7 +22807,7 @@ export interface StorageModuleFilter {
   /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
   /** Filter by the object’s `policies` field. */
-  policies?: StringListFilter;
+  policies?: JSONFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -25755,6 +25756,8 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
+  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable. */
+  status: string;
 }
 export type RequestUploadUrlPayloadSelect = {
   uploadUrl?: boolean;
@@ -25762,6 +25765,7 @@ export type RequestUploadUrlPayloadSelect = {
   key?: boolean;
   deduplicated?: boolean;
   expiresAt?: boolean;
+  status?: boolean;
 };
 export interface ConfirmUploadPayload {
   /** The confirmed file ID */
