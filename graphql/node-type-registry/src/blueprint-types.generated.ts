@@ -874,7 +874,7 @@ export interface BlueprintStorageConfig {
   /** CORS allowed origins for the storage module. */
   allowed_origins?: string[];
 }
-/** Override object for the entity table created by a BlueprintMembershipType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
+/** Override object for the entity table created by a BlueprintEntityType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
 export interface BlueprintEntityTableProvision {
   /** Whether to enable RLS on the entity table. Forwarded to secure_table_provision. Defaults to true. */
   use_rls?: boolean;
@@ -890,8 +890,8 @@ export interface BlueprintEntityTableProvision {
   /** RLS policies for the entity table. When present, these policies fully replace the five default entity-table policies (is_visible becomes a no-op). */
   policies?: BlueprintPolicy[];
 }
-/** A membership type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision. */
-export interface BlueprintMembershipType {
+/** An entity type entry for Phase 0 of construct_blueprint(). Provisions a full entity type with its own entity table, membership modules, and security policies via entity_type_provision. */
+export interface BlueprintEntityType {
   /** Entity type name (e.g., "data_room", "channel", "department"). Must be unique per database. */
   name: string;
   /** Short prefix for generated objects (e.g., "dr", "ch", "dept"). Used in table/trigger naming. */
@@ -1151,5 +1151,7 @@ export interface BlueprintDefinition {
   /** Unique constraints on table columns. */
   unique_constraints?: BlueprintUniqueConstraint[];
   /** Entity types to provision in Phase 0 (before tables). Each entry creates an entity table with membership modules and security. */
-  membership_types?: BlueprintMembershipType[];
+  entity_types?: BlueprintEntityType[];
+  /** App-level storage configuration. Creates a storage_module (membership_type = NULL) with the specified policies, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead. */
+  storage?: BlueprintStorageConfig;
 }
