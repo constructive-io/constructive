@@ -38,22 +38,16 @@ export interface RlsModule {
   currentUserAgent: string;
 }
 
-/**
- * Server-visible subset of app_auth_settings (lives in the tenant DB private schema).
- * Discovered dynamically via metaschema_modules_public.sessions_module.
- * Loaded once per API resolution and cached alongside the ApiStructure.
- */
 export interface AuthSettings {
-  /** Cookie configuration */
+  enableCookieAuth?: boolean;
+  requireCsrfForAuth?: boolean;
+  defaultSessionDuration?: string;
+  rememberMeDuration?: string;
   cookieSecure?: boolean;
-  cookieSamesite?: string;
-  cookieDomain?: string | null;
-  cookieHttponly?: boolean;
-  cookieMaxAge?: string | null;
+  cookieSameSite?: 'strict' | 'lax' | 'none';
+  cookieDomain?: string;
   cookiePath?: string;
-  /** reCAPTCHA / CAPTCHA */
   enableCaptcha?: boolean;
-  captchaSiteKey?: string | null;
 }
 
 export interface ApiStructure {
@@ -64,10 +58,10 @@ export interface ApiStructure {
   schema: string[];
   apiModules: ApiModule[];
   rlsModule?: RlsModule;
+  authSettings?: AuthSettings;
   domains?: string[];
   databaseId?: string;
   isPublic?: boolean;
-  authSettings?: AuthSettings;
 }
 
 export type ApiError = { errorHtml: string };
