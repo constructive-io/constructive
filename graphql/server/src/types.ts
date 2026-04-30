@@ -47,6 +47,7 @@ export interface AuthSettings {
   cookieSameSite?: 'strict' | 'lax' | 'none';
   cookieDomain?: string;
   cookiePath?: string;
+  enableCaptcha?: boolean;
 }
 
 export interface ApiStructure {
