@@ -878,7 +878,8 @@ export interface StorageModule {
   filesTableName: string | null;
   uploadRequestsTableName: string | null;
   membershipType: number | null;
-  policies: string[] | null;
+  policies: unknown | null;
+  skipDefaultPolicyTables: string[] | null;
   entityTableId: string | null;
   endpoint: string | null;
   publicUrlPrefix: string | null;
@@ -903,6 +904,7 @@ export interface EntityTypeProvision {
   hasProfiles: boolean | null;
   hasLevels: boolean | null;
   hasStorage: boolean | null;
+  hasInvites: boolean | null;
   storageConfig: unknown | null;
   skipEntityPolicies: boolean | null;
   tableProvision: unknown | null;
@@ -913,6 +915,7 @@ export interface EntityTypeProvision {
   outStorageModuleId: string | null;
   outBucketsTableId: string | null;
   outFilesTableId: string | null;
+  outInvitesModuleId: string | null;
 }
 export interface WebauthnCredentialsModule {
   id: string | null;

@@ -14414,7 +14414,10 @@ input StorageModuleFilter {
   membershipType: IntFilter
 
   """Filter by the object’s `policies` field."""
-  policies: StringListFilter
+  policies: JSONFilter
+
+  """Filter by the object’s `skipDefaultPolicyTables` field."""
+  skipDefaultPolicyTables: StringListFilter
 
   """Filter by the object’s `entityTableId` field."""
   entityTableId: UUIDFilter
@@ -14534,6 +14537,9 @@ input EntityTypeProvisionFilter {
   """Filter by the object’s `hasStorage` field."""
   hasStorage: BooleanFilter
 
+  """Filter by the object’s `hasInvites` field."""
+  hasInvites: BooleanFilter
+
   """Filter by the object’s `storageConfig` field."""
   storageConfig: JSONFilter
 
@@ -14563,6 +14569,9 @@ input EntityTypeProvisionFilter {
 
   """Filter by the object’s `outFilesTableId` field."""
   outFilesTableId: UUIDFilter
+
+  """Filter by the object’s `outInvitesModuleId` field."""
+  outInvitesModuleId: UUIDFilter
 
   """Checks for all expressions in this list."""
   and: [EntityTypeProvisionFilter!]
@@ -20892,7 +20901,8 @@ type StorageModule {
   filesTableName: String!
   uploadRequestsTableName: String!
   membershipType: Int
-  policies: [String]
+  policies: JSON
+  skipDefaultPolicyTables: [String]!
   entityTableId: UUID
   endpoint: String
   publicUrlPrefix: String
@@ -20964,6 +20974,8 @@ enum StorageModuleOrderBy {
   MEMBERSHIP_TYPE_DESC
   POLICIES_ASC
   POLICIES_DESC
+  SKIP_DEFAULT_POLICY_TABLES_ASC
+  SKIP_DEFAULT_POLICY_TABLES_DESC
   ENTITY_TABLE_ID_ASC
   ENTITY_TABLE_ID_DESC
   ENDPOINT_ASC
@@ -21023,8 +21035,8 @@ type EntityTypeProvision {
   databaseId: UUID!
 
   """
-  Human-readable name for this membership type, e.g. 'Data Room Member', 'Team Channel Member'. Required.
-       Stored in the membership_types registry table.
+  Human-readable name for this entity type, e.g. 'Data Room', 'Team Channel'. Required.
+       Stored in the entity_types registry table.
   """
   name: String!
 
@@ -21037,7 +21049,7 @@ type EntityTypeProvision {
   prefix: String!
 
   """
-  Description of this membership type. Stored in the membership_types registry table. Defaults to empty string.
+  Description of this entity type. Stored in the entity_types registry table. Defaults to empty string.
   """
   description: String!
 
@@ -21098,6 +21110,17 @@ type EntityTypeProvision {
   hasStorage: Boolean!
 
   """
+  Whether to provision invites_module for this type. Defaults to false.
+       When true, the trigger inserts a row into invites_module which in turn
+       (via insert_invites_module BEFORE INSERT) creates {prefix}_invites and
+       {prefix}_claimed_invites tables plus the submit_{prefix}_invite_code() function.
+       Symmetric counterpart of has_storage. Re-provisioning is idempotent: the
+       UNIQUE (database_id, membership_type) constraint on invites_module combined with
+       ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
+  """
+  hasInvites: Boolean!
+
+  """
   Optional jsonb object for storage module configuration and initial bucket seeding.
        Only used when has_storage = true; ignored otherwise. NULL = use defaults.
        Recognized keys (all optional):
@@ -21113,8 +21136,21 @@ type EntityTypeProvision {
          - allowed_mime_types  (text[])         whitelist of MIME types (null = any)
          - max_file_size       (bigint)         max file size in bytes (null = use scope default)
          - allowed_origins     (text[])         per-bucket CORS override
+         - provisions (jsonb object) optional: customize storage tables
+                                    with additional nodes, fields, grants, and policies.
+                                    Keyed by table role: "files", "buckets", "upload_requests".
+                                    Each value uses the same shape as table_provision:
+                                    { nodes, fields, grants, use_rls, policies }. Fanned out
+                                    to secure_table_provision targeting the corresponding table.
+                                    When a key includes policies[], those REPLACE the default
+                                    storage policies for that table; tables without a key still
+                                    get defaults. Missing "data" on policy entries is auto-populated
+                                    with storage-specific defaults (same as table_provision).
+                                    Example: add SearchBm25 for full-text search on files:
+                                    {"provisions": {"files": {"nodes": [{"$type":
+                                    "SearchBm25", "data": {"source_fields": ["description"]}}]}}}
        Example:
-         storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}]}'::jsonb
+         storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}], "provisions": {"files": {"nodes": [{"$type": "SearchBm25", "data": {"source_fields": ["description"]}}]}}}'::jsonb
   """
   storageConfig: JSON
 
@@ -21168,7 +21204,7 @@ type EntityTypeProvision {
 
   """
   Output: the auto-assigned integer membership type ID. Populated by the trigger after successful provisioning.
-       This is the ID used in membership_types, memberships_module, and all module tables.
+       This is the ID used in entity_types, memberships_module, and all module tables.
   """
   outMembershipType: Int
 
@@ -21203,6 +21239,13 @@ type EntityTypeProvision {
   Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true.
   """
   outFilesTableId: UUID
+
+  """
+  Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
+       NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
+       (i.e. the invites_module row was created in a previous run).
+  """
+  outInvitesModuleId: UUID
 
   """
   Reads a single `Database` that is related to this `EntityTypeProvision`.
@@ -21248,6 +21291,8 @@ enum EntityTypeProvisionOrderBy {
   HAS_LEVELS_DESC
   HAS_STORAGE_ASC
   HAS_STORAGE_DESC
+  HAS_INVITES_ASC
+  HAS_INVITES_DESC
   STORAGE_CONFIG_ASC
   STORAGE_CONFIG_DESC
   SKIP_ENTITY_POLICIES_ASC
@@ -21268,6 +21313,8 @@ enum EntityTypeProvisionOrderBy {
   OUT_BUCKETS_TABLE_ID_DESC
   OUT_FILES_TABLE_ID_ASC
   OUT_FILES_TABLE_ID_DESC
+  OUT_INVITES_MODULE_ID_ASC
+  OUT_INVITES_MODULE_ID_DESC
 }
 
 type RateLimitsModule {
@@ -27429,6 +27476,7 @@ input ProvisionTableInput {
   indexes: JSON
   fullTextSearches: JSON
   uniqueConstraints: JSON
+  description: String
 }
 
 """The output of our `sendVerificationEmail` mutation."""
@@ -33454,6 +33502,126 @@ input ForeignKeyConstraintInput {
   updatedAt: Datetime
 }
 
+"""The output of our create `Table` mutation."""
+type CreateTablePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Table` that was created by this mutation."""
+  table: Table
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `Table`. May be used by Relay 1."""
+  tableEdge(
+    """The method to use when ordering `Table`."""
+    orderBy: [TableOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TableEdge
+}
+
+"""All input for the create `Table` mutation."""
+input CreateTableInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Table` to be created by this mutation."""
+  table: TableInput!
+}
+
+"""An input for mutations affecting `Table`"""
+input TableInput {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID!
+  name: String!
+  label: String
+  description: String
+  smartTags: JSON
+  category: ObjectCategory
+  module: String
+  scope: Int
+  useRls: Boolean
+  timestamps: Boolean
+  peoplestamps: Boolean
+  pluralName: String
+  singularName: String
+  tags: [String]
+  inheritsId: UUID
+  createdAt: Datetime
+  updatedAt: Datetime
+}
+
+"""The output of our create `StorageModule` mutation."""
+type CreateStorageModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `StorageModule` that was created by this mutation."""
+  storageModule: StorageModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `StorageModule`. May be used by Relay 1."""
+  storageModuleEdge(
+    """The method to use when ordering `StorageModule`."""
+    orderBy: [StorageModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StorageModuleEdge
+}
+
+"""All input for the create `StorageModule` mutation."""
+input CreateStorageModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `StorageModule` to be created by this mutation."""
+  storageModule: StorageModuleInput!
+}
+
+"""An input for mutations affecting `StorageModule`"""
+input StorageModuleInput {
+  id: UUID
+  databaseId: UUID!
+  schemaId: UUID
+  privateSchemaId: UUID
+  bucketsTableId: UUID
+  filesTableId: UUID
+  uploadRequestsTableId: UUID
+  bucketsTableName: String
+  filesTableName: String
+  uploadRequestsTableName: String
+  membershipType: Int
+  policies: JSON
+  skipDefaultPolicyTables: [String]
+  entityTableId: UUID
+  endpoint: String
+  publicUrlPrefix: String
+  provider: String
+  allowedOrigins: [String]
+  uploadUrlExpirySeconds: Int
+  downloadUrlExpirySeconds: Int
+  defaultMaxFileSize: BigInt
+  maxFilenameLength: Int
+  cacheTtlSeconds: Int
+}
+
 """The output of our create `EntityTypeProvision` mutation."""
 type CreateEntityTypeProvisionPayload {
   """
@@ -33498,8 +33666,8 @@ input EntityTypeProvisionInput {
   databaseId: UUID!
 
   """
-  Human-readable name for this membership type, e.g. 'Data Room Member', 'Team Channel Member'. Required.
-       Stored in the membership_types registry table.
+  Human-readable name for this entity type, e.g. 'Data Room', 'Team Channel'. Required.
+       Stored in the entity_types registry table.
   """
   name: String!
 
@@ -33512,7 +33680,7 @@ input EntityTypeProvisionInput {
   prefix: String!
 
   """
-  Description of this membership type. Stored in the membership_types registry table. Defaults to empty string.
+  Description of this entity type. Stored in the entity_types registry table. Defaults to empty string.
   """
   description: String
 
@@ -33573,6 +33741,17 @@ input EntityTypeProvisionInput {
   hasStorage: Boolean
 
   """
+  Whether to provision invites_module for this type. Defaults to false.
+       When true, the trigger inserts a row into invites_module which in turn
+       (via insert_invites_module BEFORE INSERT) creates {prefix}_invites and
+       {prefix}_claimed_invites tables plus the submit_{prefix}_invite_code() function.
+       Symmetric counterpart of has_storage. Re-provisioning is idempotent: the
+       UNIQUE (database_id, membership_type) constraint on invites_module combined with
+       ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
+  """
+  hasInvites: Boolean
+
+  """
   Optional jsonb object for storage module configuration and initial bucket seeding.
        Only used when has_storage = true; ignored otherwise. NULL = use defaults.
        Recognized keys (all optional):
@@ -33588,8 +33767,21 @@ input EntityTypeProvisionInput {
          - allowed_mime_types  (text[])         whitelist of MIME types (null = any)
          - max_file_size       (bigint)         max file size in bytes (null = use scope default)
          - allowed_origins     (text[])         per-bucket CORS override
+         - provisions (jsonb object) optional: customize storage tables
+                                    with additional nodes, fields, grants, and policies.
+                                    Keyed by table role: "files", "buckets", "upload_requests".
+                                    Each value uses the same shape as table_provision:
+                                    { nodes, fields, grants, use_rls, policies }. Fanned out
+                                    to secure_table_provision targeting the corresponding table.
+                                    When a key includes policies[], those REPLACE the default
+                                    storage policies for that table; tables without a key still
+                                    get defaults. Missing "data" on policy entries is auto-populated
+                                    with storage-specific defaults (same as table_provision).
+                                    Example: add SearchBm25 for full-text search on files:
+                                    {"provisions": {"files": {"nodes": [{"$type":
+                                    "SearchBm25", "data": {"source_fields": ["description"]}}]}}}
        Example:
-         storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}]}'::jsonb
+         storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}], "provisions": {"files": {"nodes": [{"$type": "SearchBm25", "data": {"source_fields": ["description"]}}]}}}'::jsonb
   """
   storageConfig: JSON
 
@@ -33643,7 +33835,7 @@ input EntityTypeProvisionInput {
 
   """
   Output: the auto-assigned integer membership type ID. Populated by the trigger after successful provisioning.
-       This is the ID used in membership_types, memberships_module, and all module tables.
+       This is the ID used in entity_types, memberships_module, and all module tables.
   """
   outMembershipType: Int
 
@@ -33678,125 +33870,13 @@ input EntityTypeProvisionInput {
   Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true.
   """
   outFilesTableId: UUID
-}
-
-"""The output of our create `StorageModule` mutation."""
-type CreateStorageModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `StorageModule` that was created by this mutation."""
-  storageModule: StorageModule
 
   """
-  Our root query field type. Allows us to run any query from our mutation payload.
+  Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
+       NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
+       (i.e. the invites_module row was created in a previous run).
   """
-  query: Query
-
-  """An edge for our `StorageModule`. May be used by Relay 1."""
-  storageModuleEdge(
-    """The method to use when ordering `StorageModule`."""
-    orderBy: [StorageModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StorageModuleEdge
-}
-
-"""All input for the create `StorageModule` mutation."""
-input CreateStorageModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `StorageModule` to be created by this mutation."""
-  storageModule: StorageModuleInput!
-}
-
-"""An input for mutations affecting `StorageModule`"""
-input StorageModuleInput {
-  id: UUID
-  databaseId: UUID!
-  schemaId: UUID
-  privateSchemaId: UUID
-  bucketsTableId: UUID
-  filesTableId: UUID
-  uploadRequestsTableId: UUID
-  bucketsTableName: String
-  filesTableName: String
-  uploadRequestsTableName: String
-  membershipType: Int
-  policies: [String]
-  entityTableId: UUID
-  endpoint: String
-  publicUrlPrefix: String
-  provider: String
-  allowedOrigins: [String]
-  uploadUrlExpirySeconds: Int
-  downloadUrlExpirySeconds: Int
-  defaultMaxFileSize: BigInt
-  maxFilenameLength: Int
-  cacheTtlSeconds: Int
-}
-
-"""The output of our create `Table` mutation."""
-type CreateTablePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Table` that was created by this mutation."""
-  table: Table
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Table`. May be used by Relay 1."""
-  tableEdge(
-    """The method to use when ordering `Table`."""
-    orderBy: [TableOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TableEdge
-}
-
-"""All input for the create `Table` mutation."""
-input CreateTableInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Table` to be created by this mutation."""
-  table: TableInput!
-}
-
-"""An input for mutations affecting `Table`"""
-input TableInput {
-  id: UUID
-  databaseId: UUID
-  schemaId: UUID!
-  name: String!
-  label: String
-  description: String
-  smartTags: JSON
-  category: ObjectCategory
-  module: String
-  scope: Int
-  useRls: Boolean
-  timestamps: Boolean
-  peoplestamps: Boolean
-  pluralName: String
-  singularName: String
-  tags: [String]
-  inheritsId: UUID
-  createdAt: Datetime
-  updatedAt: Datetime
+  outInvitesModuleId: UUID
 }
 
 """The output of our create `RelationProvision` mutation."""
@@ -40614,305 +40694,6 @@ input ForeignKeyConstraintPatch {
   updatedAt: Datetime
 }
 
-"""The output of our update `EntityTypeProvision` mutation."""
-type UpdateEntityTypeProvisionPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `EntityTypeProvision` that was updated by this mutation."""
-  entityTypeProvision: EntityTypeProvision
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `EntityTypeProvision`. May be used by Relay 1."""
-  entityTypeProvisionEdge(
-    """The method to use when ordering `EntityTypeProvision`."""
-    orderBy: [EntityTypeProvisionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): EntityTypeProvisionEdge
-}
-
-"""All input for the `updateEntityTypeProvision` mutation."""
-input UpdateEntityTypeProvisionInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """Unique identifier for this provision row."""
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `EntityTypeProvision` being updated.
-  """
-  entityTypeProvisionPatch: EntityTypeProvisionPatch!
-}
-
-"""
-Represents an update to a `EntityTypeProvision`. Fields that are set will be updated.
-"""
-input EntityTypeProvisionPatch {
-  """Unique identifier for this provision row."""
-  id: UUID
-
-  """The database to provision this entity type in. Required."""
-  databaseId: UUID
-
-  """
-  Human-readable name for this membership type, e.g. 'Data Room Member', 'Team Channel Member'. Required.
-       Stored in the membership_types registry table.
-  """
-  name: String
-
-  """
-  SQL prefix used for table and module naming, e.g. 'data_room', 'team_channel'. Required.
-       Drives entity table name (prefix || 's' by default), module labels (permissions_module:prefix),
-       and membership table names (prefix_memberships, prefix_members, etc.).
-       Must be unique per database — the (database_id, prefix) constraint ensures graceful ON CONFLICT DO NOTHING.
-  """
-  prefix: String
-
-  """
-  Description of this membership type. Stored in the membership_types registry table. Defaults to empty string.
-  """
-  description: String
-
-  """
-  Prefix of the parent entity type. The trigger resolves this to a membership_type integer
-       by looking up memberships_module WHERE prefix = parent_entity.
-       Defaults to 'org' (the organization-level type). For nested types, set to the parent's prefix
-       (e.g. 'data_room' for a team_channel nested under data_room).
-       The parent type must already be provisioned before this INSERT.
-  """
-  parentEntity: String
-
-  """
-  Override the entity table name. When NULL (default), the table name is derived as prefix || 's'
-       (e.g. prefix 'data_room' produces table 'data_rooms').
-       Set this when the pluralization rule doesn't apply (e.g. prefix 'staff' should produce 'staff' not 'staffs').
-  """
-  tableName: String
-
-  """
-  Whether members of the parent entity can see child entities. Defaults to true.
-       When true: a SELECT policy allows parent members to list child entities (e.g. org members can see all data rooms).
-       When false: only direct members of the entity itself can see it (private entity mode).
-       Controls whether the parent_member SELECT policy is created on the entity table.
-       Only meaningful on the defaults path — ignored (no-op) when table_provision is non-NULL or
-       skip_entity_policies=true, since no default policies are being applied in those cases.
-  """
-  isVisible: Boolean
-
-  """
-  Whether to apply limits_module security for this type. Defaults to false.
-       The limits_module table structure is always created (memberships_module requires it),
-       but when false, no RLS policies are applied to the limits tables.
-       Set to true if this entity type needs configurable resource limits per membership.
-  """
-  hasLimits: Boolean
-
-  """
-  Whether to provision profiles_module for this type. Defaults to false.
-       Profiles provide named permission roles (e.g. 'Editor', 'Viewer') with pre-configured permission bitmasks.
-       When true, creates profile tables and applies profiles security.
-  """
-  hasProfiles: Boolean
-
-  """
-  Whether to provision levels_module for this type. Defaults to false.
-       Levels provide gamification/achievement tracking for members.
-       When true, creates level steps, achievements, and level tables with security.
-  """
-  hasLevels: Boolean
-
-  """
-  Whether to provision storage_module for this type. Defaults to false.
-       When true, creates {prefix}_buckets, {prefix}_files, and {prefix}_upload_requests tables
-       with entity-scoped RLS (AuthzEntityMembership) using the entity's membership_type.
-       Storage tables get owner_id FK to the entity table, so files are owned by the entity.
-  """
-  hasStorage: Boolean
-
-  """
-  Optional jsonb object for storage module configuration and initial bucket seeding.
-       Only used when has_storage = true; ignored otherwise. NULL = use defaults.
-       Recognized keys (all optional):
-         - upload_url_expiry_seconds    (integer) presigned PUT URL expiry override
-         - download_url_expiry_seconds  (integer) presigned GET URL expiry override
-         - default_max_file_size        (bigint)  global max file size in bytes for this scope
-         - allowed_origins              (text[])  default CORS origins for all buckets in this scope
-         - buckets                      (jsonb[]) array of initial bucket definitions to seed
-       Each bucket in the buckets array recognizes:
-         - name               (text, required) bucket name e.g. 'documents'
-         - description         (text)           human-readable description
-         - is_public           (boolean)        whether files are publicly readable (default false)
-         - allowed_mime_types  (text[])         whitelist of MIME types (null = any)
-         - max_file_size       (bigint)         max file size in bytes (null = use scope default)
-         - allowed_origins     (text[])         per-bucket CORS override
-       Example:
-         storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}]}'::jsonb
-  """
-  storageConfig: JSON
-
-  """
-  Escape hatch: when true, apply zero RLS policies to the entity table. Defaults to false.
-       Use this only when you want the entity table provisioned with zero policies (e.g. because you
-       plan to insert secure_table_provision rows yourself later). In most cases, prefer leaving this
-       false and either accepting the five defaults (table_provision=NULL) or overriding them via
-       table_provision.
-       Defaults (applied when table_provision IS NULL and skip_entity_policies=false):
-         - SELECT (parent_member): parent entity members can see child entities (only when is_visible=true)
-         - SELECT (self_member):   direct members of the entity can see it
-         - INSERT:                 create_entity permission on the parent entity
-         - UPDATE:                 admin_entity permission on the entity itself
-         - DELETE:                 owner of the entity can delete it
-  """
-  skipEntityPolicies: Boolean
-
-  """
-  Single jsonb object describing the full security setup to apply to the entity table.
-       Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
-       entries, so an entity table is configured the same way an ordinary blueprint table is.
-       Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
-       table_provision.policies[] (is_visible becomes a no-op on this path).
-       Recognized keys (all optional):
-         - use_rls          (boolean, default true)
-         - nodes            (jsonb array of {"$type","data"} Data* module entries)
-         - fields           (jsonb array of field objects: name,type,is_required,default,min,max,regexp,index)
-         - grants           (jsonb array of grant objects; each with roles[] and privileges[])
-         - policies         (jsonb array of policy objects; each with $type, privileges, data, name, role, permissive)
-       The trigger forwards all setup (nodes/fields/grants/policies) as a single secure_table_provision row
-       against the newly created entity table.
-       Example — override with two SELECT policies:
-         table_provision := jsonb_build_object(
-           'policies', jsonb_build_array(
-             jsonb_build_object(
-               '$type', 'AuthzEntityMembership',
-               'privileges', jsonb_build_array('select'),
-               'data', jsonb_build_object('entity_field', 'id', 'membership_type', 3),
-               'name', 'self_member'
-             ),
-             jsonb_build_object(
-               '$type', 'AuthzDirectOwner',
-               'privileges', jsonb_build_array('select', 'update'),
-               'data', jsonb_build_object('owner_field', 'owner_id')
-             )
-           )
-         )
-  """
-  tableProvision: JSON
-
-  """
-  Output: the auto-assigned integer membership type ID. Populated by the trigger after successful provisioning.
-       This is the ID used in membership_types, memberships_module, and all module tables.
-  """
-  outMembershipType: Int
-
-  """
-  Output: the UUID of the created entity table. Populated by the trigger.
-       Use this to reference the entity table in subsequent relation_provision or secure_table_provision rows.
-  """
-  outEntityTableId: UUID
-
-  """
-  Output: the name of the created entity table (e.g. 'data_rooms'). Populated by the trigger.
-  """
-  outEntityTableName: String
-
-  """
-  Output: array of installed module labels (e.g. ARRAY['permissions_module:data_room', 'memberships_module:data_room', 'invites_module:data_room']).
-       Populated by the trigger. Useful for verifying which modules were provisioned.
-  """
-  outInstalledModules: [String]
-
-  """
-  Output: the UUID of the storage_module row created for this entity type. Populated by the trigger when has_storage=true.
-  """
-  outStorageModuleId: UUID
-
-  """
-  Output: the UUID of the generated buckets table (e.g. data_room_buckets). Populated by the trigger when has_storage=true.
-  """
-  outBucketsTableId: UUID
-
-  """
-  Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true.
-  """
-  outFilesTableId: UUID
-}
-
-"""The output of our update `StorageModule` mutation."""
-type UpdateStorageModulePayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `StorageModule` that was updated by this mutation."""
-  storageModule: StorageModule
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `StorageModule`. May be used by Relay 1."""
-  storageModuleEdge(
-    """The method to use when ordering `StorageModule`."""
-    orderBy: [StorageModuleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StorageModuleEdge
-}
-
-"""All input for the `updateStorageModule` mutation."""
-input UpdateStorageModuleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: UUID!
-
-  """
-  An object where the defined keys will be set on the `StorageModule` being updated.
-  """
-  storageModulePatch: StorageModulePatch!
-}
-
-"""
-Represents an update to a `StorageModule`. Fields that are set will be updated.
-"""
-input StorageModulePatch {
-  id: UUID
-  databaseId: UUID
-  schemaId: UUID
-  privateSchemaId: UUID
-  bucketsTableId: UUID
-  filesTableId: UUID
-  uploadRequestsTableId: UUID
-  bucketsTableName: String
-  filesTableName: String
-  uploadRequestsTableName: String
-  membershipType: Int
-  policies: [String]
-  entityTableId: UUID
-  endpoint: String
-  publicUrlPrefix: String
-  provider: String
-  allowedOrigins: [String]
-  uploadUrlExpirySeconds: Int
-  downloadUrlExpirySeconds: Int
-  defaultMaxFileSize: BigInt
-  maxFilenameLength: Int
-  cacheTtlSeconds: Int
-}
-
 """The output of our update `Table` mutation."""
 type UpdateTablePayload {
   """
@@ -40974,6 +40755,337 @@ input TablePatch {
   inheritsId: UUID
   createdAt: Datetime
   updatedAt: Datetime
+}
+
+"""The output of our update `StorageModule` mutation."""
+type UpdateStorageModulePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `StorageModule` that was updated by this mutation."""
+  storageModule: StorageModule
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `StorageModule`. May be used by Relay 1."""
+  storageModuleEdge(
+    """The method to use when ordering `StorageModule`."""
+    orderBy: [StorageModuleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StorageModuleEdge
+}
+
+"""All input for the `updateStorageModule` mutation."""
+input UpdateStorageModuleInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `StorageModule` being updated.
+  """
+  storageModulePatch: StorageModulePatch!
+}
+
+"""
+Represents an update to a `StorageModule`. Fields that are set will be updated.
+"""
+input StorageModulePatch {
+  id: UUID
+  databaseId: UUID
+  schemaId: UUID
+  privateSchemaId: UUID
+  bucketsTableId: UUID
+  filesTableId: UUID
+  uploadRequestsTableId: UUID
+  bucketsTableName: String
+  filesTableName: String
+  uploadRequestsTableName: String
+  membershipType: Int
+  policies: JSON
+  skipDefaultPolicyTables: [String]
+  entityTableId: UUID
+  endpoint: String
+  publicUrlPrefix: String
+  provider: String
+  allowedOrigins: [String]
+  uploadUrlExpirySeconds: Int
+  downloadUrlExpirySeconds: Int
+  defaultMaxFileSize: BigInt
+  maxFilenameLength: Int
+  cacheTtlSeconds: Int
+}
+
+"""The output of our update `EntityTypeProvision` mutation."""
+type UpdateEntityTypeProvisionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `EntityTypeProvision` that was updated by this mutation."""
+  entityTypeProvision: EntityTypeProvision
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `EntityTypeProvision`. May be used by Relay 1."""
+  entityTypeProvisionEdge(
+    """The method to use when ordering `EntityTypeProvision`."""
+    orderBy: [EntityTypeProvisionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EntityTypeProvisionEdge
+}
+
+"""All input for the `updateEntityTypeProvision` mutation."""
+input UpdateEntityTypeProvisionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique identifier for this provision row."""
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `EntityTypeProvision` being updated.
+  """
+  entityTypeProvisionPatch: EntityTypeProvisionPatch!
+}
+
+"""
+Represents an update to a `EntityTypeProvision`. Fields that are set will be updated.
+"""
+input EntityTypeProvisionPatch {
+  """Unique identifier for this provision row."""
+  id: UUID
+
+  """The database to provision this entity type in. Required."""
+  databaseId: UUID
+
+  """
+  Human-readable name for this entity type, e.g. 'Data Room', 'Team Channel'. Required.
+       Stored in the entity_types registry table.
+  """
+  name: String
+
+  """
+  SQL prefix used for table and module naming, e.g. 'data_room', 'team_channel'. Required.
+       Drives entity table name (prefix || 's' by default), module labels (permissions_module:prefix),
+       and membership table names (prefix_memberships, prefix_members, etc.).
+       Must be unique per database — the (database_id, prefix) constraint ensures graceful ON CONFLICT DO NOTHING.
+  """
+  prefix: String
+
+  """
+  Description of this entity type. Stored in the entity_types registry table. Defaults to empty string.
+  """
+  description: String
+
+  """
+  Prefix of the parent entity type. The trigger resolves this to a membership_type integer
+       by looking up memberships_module WHERE prefix = parent_entity.
+       Defaults to 'org' (the organization-level type). For nested types, set to the parent's prefix
+       (e.g. 'data_room' for a team_channel nested under data_room).
+       The parent type must already be provisioned before this INSERT.
+  """
+  parentEntity: String
+
+  """
+  Override the entity table name. When NULL (default), the table name is derived as prefix || 's'
+       (e.g. prefix 'data_room' produces table 'data_rooms').
+       Set this when the pluralization rule doesn't apply (e.g. prefix 'staff' should produce 'staff' not 'staffs').
+  """
+  tableName: String
+
+  """
+  Whether members of the parent entity can see child entities. Defaults to true.
+       When true: a SELECT policy allows parent members to list child entities (e.g. org members can see all data rooms).
+       When false: only direct members of the entity itself can see it (private entity mode).
+       Controls whether the parent_member SELECT policy is created on the entity table.
+       Only meaningful on the defaults path — ignored (no-op) when table_provision is non-NULL or
+       skip_entity_policies=true, since no default policies are being applied in those cases.
+  """
+  isVisible: Boolean
+
+  """
+  Whether to apply limits_module security for this type. Defaults to false.
+       The limits_module table structure is always created (memberships_module requires it),
+       but when false, no RLS policies are applied to the limits tables.
+       Set to true if this entity type needs configurable resource limits per membership.
+  """
+  hasLimits: Boolean
+
+  """
+  Whether to provision profiles_module for this type. Defaults to false.
+       Profiles provide named permission roles (e.g. 'Editor', 'Viewer') with pre-configured permission bitmasks.
+       When true, creates profile tables and applies profiles security.
+  """
+  hasProfiles: Boolean
+
+  """
+  Whether to provision levels_module for this type. Defaults to false.
+       Levels provide gamification/achievement tracking for members.
+       When true, creates level steps, achievements, and level tables with security.
+  """
+  hasLevels: Boolean
+
+  """
+  Whether to provision storage_module for this type. Defaults to false.
+       When true, creates {prefix}_buckets, {prefix}_files, and {prefix}_upload_requests tables
+       with entity-scoped RLS (AuthzEntityMembership) using the entity's membership_type.
+       Storage tables get owner_id FK to the entity table, so files are owned by the entity.
+  """
+  hasStorage: Boolean
+
+  """
+  Whether to provision invites_module for this type. Defaults to false.
+       When true, the trigger inserts a row into invites_module which in turn
+       (via insert_invites_module BEFORE INSERT) creates {prefix}_invites and
+       {prefix}_claimed_invites tables plus the submit_{prefix}_invite_code() function.
+       Symmetric counterpart of has_storage. Re-provisioning is idempotent: the
+       UNIQUE (database_id, membership_type) constraint on invites_module combined with
+       ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
+  """
+  hasInvites: Boolean
+
+  """
+  Optional jsonb object for storage module configuration and initial bucket seeding.
+       Only used when has_storage = true; ignored otherwise. NULL = use defaults.
+       Recognized keys (all optional):
+         - upload_url_expiry_seconds    (integer) presigned PUT URL expiry override
+         - download_url_expiry_seconds  (integer) presigned GET URL expiry override
+         - default_max_file_size        (bigint)  global max file size in bytes for this scope
+         - allowed_origins              (text[])  default CORS origins for all buckets in this scope
+         - buckets                      (jsonb[]) array of initial bucket definitions to seed
+       Each bucket in the buckets array recognizes:
+         - name               (text, required) bucket name e.g. 'documents'
+         - description         (text)           human-readable description
+         - is_public           (boolean)        whether files are publicly readable (default false)
+         - allowed_mime_types  (text[])         whitelist of MIME types (null = any)
+         - max_file_size       (bigint)         max file size in bytes (null = use scope default)
+         - allowed_origins     (text[])         per-bucket CORS override
+         - provisions (jsonb object) optional: customize storage tables
+                                    with additional nodes, fields, grants, and policies.
+                                    Keyed by table role: "files", "buckets", "upload_requests".
+                                    Each value uses the same shape as table_provision:
+                                    { nodes, fields, grants, use_rls, policies }. Fanned out
+                                    to secure_table_provision targeting the corresponding table.
+                                    When a key includes policies[], those REPLACE the default
+                                    storage policies for that table; tables without a key still
+                                    get defaults. Missing "data" on policy entries is auto-populated
+                                    with storage-specific defaults (same as table_provision).
+                                    Example: add SearchBm25 for full-text search on files:
+                                    {"provisions": {"files": {"nodes": [{"$type":
+                                    "SearchBm25", "data": {"source_fields": ["description"]}}]}}}
+       Example:
+         storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}], "provisions": {"files": {"nodes": [{"$type": "SearchBm25", "data": {"source_fields": ["description"]}}]}}}'::jsonb
+  """
+  storageConfig: JSON
+
+  """
+  Escape hatch: when true, apply zero RLS policies to the entity table. Defaults to false.
+       Use this only when you want the entity table provisioned with zero policies (e.g. because you
+       plan to insert secure_table_provision rows yourself later). In most cases, prefer leaving this
+       false and either accepting the five defaults (table_provision=NULL) or overriding them via
+       table_provision.
+       Defaults (applied when table_provision IS NULL and skip_entity_policies=false):
+         - SELECT (parent_member): parent entity members can see child entities (only when is_visible=true)
+         - SELECT (self_member):   direct members of the entity can see it
+         - INSERT:                 create_entity permission on the parent entity
+         - UPDATE:                 admin_entity permission on the entity itself
+         - DELETE:                 owner of the entity can delete it
+  """
+  skipEntityPolicies: Boolean
+
+  """
+  Single jsonb object describing the full security setup to apply to the entity table.
+       Uses the same vocabulary as metaschema_modules_public.provision_table() and blueprint tables[]
+       entries, so an entity table is configured the same way an ordinary blueprint table is.
+       Defaults to NULL; when non-NULL, the five default policies are implicitly replaced by
+       table_provision.policies[] (is_visible becomes a no-op on this path).
+       Recognized keys (all optional):
+         - use_rls          (boolean, default true)
+         - nodes            (jsonb array of {"$type","data"} Data* module entries)
+         - fields           (jsonb array of field objects: name,type,is_required,default,min,max,regexp,index)
+         - grants           (jsonb array of grant objects; each with roles[] and privileges[])
+         - policies         (jsonb array of policy objects; each with $type, privileges, data, name, role, permissive)
+       The trigger forwards all setup (nodes/fields/grants/policies) as a single secure_table_provision row
+       against the newly created entity table.
+       Example — override with two SELECT policies:
+         table_provision := jsonb_build_object(
+           'policies', jsonb_build_array(
+             jsonb_build_object(
+               '$type', 'AuthzEntityMembership',
+               'privileges', jsonb_build_array('select'),
+               'data', jsonb_build_object('entity_field', 'id', 'membership_type', 3),
+               'name', 'self_member'
+             ),
+             jsonb_build_object(
+               '$type', 'AuthzDirectOwner',
+               'privileges', jsonb_build_array('select', 'update'),
+               'data', jsonb_build_object('owner_field', 'owner_id')
+             )
+           )
+         )
+  """
+  tableProvision: JSON
+
+  """
+  Output: the auto-assigned integer membership type ID. Populated by the trigger after successful provisioning.
+       This is the ID used in entity_types, memberships_module, and all module tables.
+  """
+  outMembershipType: Int
+
+  """
+  Output: the UUID of the created entity table. Populated by the trigger.
+       Use this to reference the entity table in subsequent relation_provision or secure_table_provision rows.
+  """
+  outEntityTableId: UUID
+
+  """
+  Output: the name of the created entity table (e.g. 'data_rooms'). Populated by the trigger.
+  """
+  outEntityTableName: String
+
+  """
+  Output: array of installed module labels (e.g. ARRAY['permissions_module:data_room', 'memberships_module:data_room', 'invites_module:data_room']).
+       Populated by the trigger. Useful for verifying which modules were provisioned.
+  """
+  outInstalledModules: [String]
+
+  """
+  Output: the UUID of the storage_module row created for this entity type. Populated by the trigger when has_storage=true.
+  """
+  outStorageModuleId: UUID
+
+  """
+  Output: the UUID of the generated buckets table (e.g. data_room_buckets). Populated by the trigger when has_storage=true.
+  """
+  outBucketsTableId: UUID
+
+  """
+  Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true.
+  """
+  outFilesTableId: UUID
+
+  """
+  Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
+       NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
+       (i.e. the invites_module row was created in a previous run).
+  """
+  outInvitesModuleId: UUID
 }
 
 """The output of our update `RelationProvision` mutation."""
@@ -44947,38 +45059,36 @@ input DeleteForeignKeyConstraintInput {
   id: UUID!
 }
 
-"""The output of our delete `EntityTypeProvision` mutation."""
-type DeleteEntityTypeProvisionPayload {
+"""The output of our delete `Table` mutation."""
+type DeleteTablePayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `EntityTypeProvision` that was deleted by this mutation."""
-  entityTypeProvision: EntityTypeProvision
+  """The `Table` that was deleted by this mutation."""
+  table: Table
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `EntityTypeProvision`. May be used by Relay 1."""
-  entityTypeProvisionEdge(
-    """The method to use when ordering `EntityTypeProvision`."""
-    orderBy: [EntityTypeProvisionOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): EntityTypeProvisionEdge
+  """An edge for our `Table`. May be used by Relay 1."""
+  tableEdge(
+    """The method to use when ordering `Table`."""
+    orderBy: [TableOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): TableEdge
 }
 
-"""All input for the `deleteEntityTypeProvision` mutation."""
-input DeleteEntityTypeProvisionInput {
+"""All input for the `deleteTable` mutation."""
+input DeleteTableInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """Unique identifier for this provision row."""
   id: UUID!
 }
 
@@ -45015,36 +45125,38 @@ input DeleteStorageModuleInput {
   id: UUID!
 }
 
-"""The output of our delete `Table` mutation."""
-type DeleteTablePayload {
+"""The output of our delete `EntityTypeProvision` mutation."""
+type DeleteEntityTypeProvisionPayload {
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The `Table` that was deleted by this mutation."""
-  table: Table
+  """The `EntityTypeProvision` that was deleted by this mutation."""
+  entityTypeProvision: EntityTypeProvision
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our `Table`. May be used by Relay 1."""
-  tableEdge(
-    """The method to use when ordering `Table`."""
-    orderBy: [TableOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TableEdge
+  """An edge for our `EntityTypeProvision`. May be used by Relay 1."""
+  entityTypeProvisionEdge(
+    """The method to use when ordering `EntityTypeProvision`."""
+    orderBy: [EntityTypeProvisionOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): EntityTypeProvisionEdge
 }
 
-"""All input for the `deleteTable` mutation."""
-input DeleteTableInput {
+"""All input for the `deleteEntityTypeProvision` mutation."""
+input DeleteEntityTypeProvisionInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+
+  """Unique identifier for this provision row."""
   id: UUID!
 }
 
@@ -45255,6 +45367,11 @@ type RequestUploadUrlPayload {
 
   """Presigned URL expiry time (null if deduplicated)"""
   expiresAt: Datetime
+
+  """
+  File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable.
+  """
+  status: String!
 }
 
 input ConfirmUploadInput {
@@ -48622,8 +48739,8 @@ type Query {
     orderBy: [ForeignKeyConstraintOrderBy!] = [PRIMARY_KEY_ASC]
   ): ForeignKeyConstraintConnection
 
-  """Reads and enables pagination through a set of `EntityTypeProvision`."""
-  entityTypeProvisions(
+  """Reads and enables pagination through a set of `Table`."""
+  tables(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -48645,11 +48762,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: EntityTypeProvisionFilter
+    where: TableFilter
 
-    """The method to use when ordering `EntityTypeProvision`."""
-    orderBy: [EntityTypeProvisionOrderBy!] = [PRIMARY_KEY_ASC]
-  ): EntityTypeProvisionConnection
+    """The method to use when ordering `Table`."""
+    orderBy: [TableOrderBy!] = [PRIMARY_KEY_ASC]
+  ): TableConnection
 
   """Reads and enables pagination through a set of `StorageModule`."""
   storageModules(
@@ -48680,8 +48797,8 @@ type Query {
     orderBy: [StorageModuleOrderBy!] = [PRIMARY_KEY_ASC]
   ): StorageModuleConnection
 
-  """Reads and enables pagination through a set of `Table`."""
-  tables(
+  """Reads and enables pagination through a set of `EntityTypeProvision`."""
+  entityTypeProvisions(
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -48703,11 +48820,11 @@ type Query {
     """
     A filter to be used in determining which values should be returned by the collection.
     """
-    where: TableFilter
+    where: EntityTypeProvisionFilter
 
-    """The method to use when ordering `Table`."""
-    orderBy: [TableOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TableConnection
+    """The method to use when ordering `EntityTypeProvision`."""
+    orderBy: [EntityTypeProvisionOrderBy!] = [PRIMARY_KEY_ASC]
+  ): EntityTypeProvisionConnection
 
   """Reads and enables pagination through a set of `RelationProvision`."""
   relationProvisions(
@@ -50053,13 +50170,13 @@ type Mutation {
     input: CreateForeignKeyConstraintInput!
   ): CreateForeignKeyConstraintPayload
 
-  """Creates a single `EntityTypeProvision`."""
-  createEntityTypeProvision(
+  """Creates a single `Table`."""
+  createTable(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateEntityTypeProvisionInput!
-  ): CreateEntityTypeProvisionPayload
+    input: CreateTableInput!
+  ): CreateTablePayload
 
   """Creates a single `StorageModule`."""
   createStorageModule(
@@ -50069,13 +50186,13 @@ type Mutation {
     input: CreateStorageModuleInput!
   ): CreateStorageModulePayload
 
-  """Creates a single `Table`."""
-  createTable(
+  """Creates a single `EntityTypeProvision`."""
+  createEntityTypeProvision(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateTableInput!
-  ): CreateTablePayload
+    input: CreateEntityTypeProvisionInput!
+  ): CreateEntityTypeProvisionPayload
 
   """Creates a single `RelationProvision`."""
   createRelationProvision(
@@ -50985,13 +51102,13 @@ type Mutation {
     input: UpdateForeignKeyConstraintInput!
   ): UpdateForeignKeyConstraintPayload
 
-  """Updates a single `EntityTypeProvision` using a unique key and a patch."""
-  updateEntityTypeProvision(
+  """Updates a single `Table` using a unique key and a patch."""
+  updateTable(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateEntityTypeProvisionInput!
-  ): UpdateEntityTypeProvisionPayload
+    input: UpdateTableInput!
+  ): UpdateTablePayload
 
   """Updates a single `StorageModule` using a unique key and a patch."""
   updateStorageModule(
@@ -51001,13 +51118,13 @@ type Mutation {
     input: UpdateStorageModuleInput!
   ): UpdateStorageModulePayload
 
-  """Updates a single `Table` using a unique key and a patch."""
-  updateTable(
+  """Updates a single `EntityTypeProvision` using a unique key and a patch."""
+  updateEntityTypeProvision(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateTableInput!
-  ): UpdateTablePayload
+    input: UpdateEntityTypeProvisionInput!
+  ): UpdateEntityTypeProvisionPayload
 
   """Updates a single `RelationProvision` using a unique key and a patch."""
   updateRelationProvision(
@@ -51881,13 +51998,13 @@ type Mutation {
     input: DeleteForeignKeyConstraintInput!
   ): DeleteForeignKeyConstraintPayload
 
-  """Deletes a single `EntityTypeProvision` using a unique key."""
-  deleteEntityTypeProvision(
+  """Deletes a single `Table` using a unique key."""
+  deleteTable(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteEntityTypeProvisionInput!
-  ): DeleteEntityTypeProvisionPayload
+    input: DeleteTableInput!
+  ): DeleteTablePayload
 
   """Deletes a single `StorageModule` using a unique key."""
   deleteStorageModule(
@@ -51897,13 +52014,13 @@ type Mutation {
     input: DeleteStorageModuleInput!
   ): DeleteStorageModulePayload
 
-  """Deletes a single `Table` using a unique key."""
-  deleteTable(
+  """Deletes a single `EntityTypeProvision` using a unique key."""
+  deleteEntityTypeProvision(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteTableInput!
-  ): DeleteTablePayload
+    input: DeleteEntityTypeProvisionInput!
+  ): DeleteEntityTypeProvisionPayload
 
   """Deletes a single `RelationProvision` using a unique key."""
   deleteRelationProvision(

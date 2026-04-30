@@ -1361,7 +1361,8 @@ export interface StorageModule {
   filesTableName?: string | null;
   uploadRequestsTableName?: string | null;
   membershipType?: number | null;
-  policies?: string[] | null;
+  policies?: Record<string, unknown> | null;
+  skipDefaultPolicyTables?: string[] | null;
   entityTableId?: string | null;
   endpoint?: string | null;
   publicUrlPrefix?: string | null;
@@ -1389,8 +1390,8 @@ export interface EntityTypeProvision {
   /** The database to provision this entity type in. Required. */
   databaseId?: string | null;
   /**
-   * Human-readable name for this membership type, e.g. 'Data Room Member', 'Team Channel Member'. Required.
-   *      Stored in the membership_types registry table.
+   * Human-readable name for this entity type, e.g. 'Data Room', 'Team Channel'. Required.
+   *      Stored in the entity_types registry table.
    */
   name?: string | null;
   /**
@@ -1400,7 +1401,7 @@ export interface EntityTypeProvision {
    *      Must be unique per database — the (database_id, prefix) constraint ensures graceful ON CONFLICT DO NOTHING.
    */
   prefix?: string | null;
-  /** Description of this membership type. Stored in the membership_types registry table. Defaults to empty string. */
+  /** Description of this entity type. Stored in the entity_types registry table. Defaults to empty string. */
   description?: string | null;
   /**
    * Prefix of the parent entity type. The trigger resolves this to a membership_type integer
@@ -1452,6 +1453,16 @@ export interface EntityTypeProvision {
    */
   hasStorage?: boolean | null;
   /**
+   * Whether to provision invites_module for this type. Defaults to false.
+   *      When true, the trigger inserts a row into invites_module which in turn
+   *      (via insert_invites_module BEFORE INSERT) creates {prefix}_invites and
+   *      {prefix}_claimed_invites tables plus the submit_{prefix}_invite_code() function.
+   *      Symmetric counterpart of has_storage. Re-provisioning is idempotent: the
+   *      UNIQUE (database_id, membership_type) constraint on invites_module combined with
+   *      ON CONFLICT DO NOTHING in the fan-out makes repeated INSERTs safe.
+   */
+  hasInvites?: boolean | null;
+  /**
    * Optional jsonb object for storage module configuration and initial bucket seeding.
    *      Only used when has_storage = true; ignored otherwise. NULL = use defaults.
    *      Recognized keys (all optional):
@@ -1467,8 +1478,21 @@ export interface EntityTypeProvision {
    *        - allowed_mime_types  (text[])         whitelist of MIME types (null = any)
    *        - max_file_size       (bigint)         max file size in bytes (null = use scope default)
    *        - allowed_origins     (text[])         per-bucket CORS override
+   *        - provisions (jsonb object) optional: customize storage tables
+   *                                   with additional nodes, fields, grants, and policies.
+   *                                   Keyed by table role: "files", "buckets", "upload_requests".
+   *                                   Each value uses the same shape as table_provision:
+   *                                   { nodes, fields, grants, use_rls, policies }. Fanned out
+   *                                   to secure_table_provision targeting the corresponding table.
+   *                                   When a key includes policies[], those REPLACE the default
+   *                                   storage policies for that table; tables without a key still
+   *                                   get defaults. Missing "data" on policy entries is auto-populated
+   *                                   with storage-specific defaults (same as table_provision).
+   *                                   Example: add SearchBm25 for full-text search on files:
+   *                                   {"provisions": {"files": {"nodes": [{"$type":
+   *                                   "SearchBm25", "data": {"source_fields": ["description"]}}]}}}
    *      Example:
-   *        storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}]}'::jsonb
+   *        storage_config := '{"buckets": [{"name": "documents", "is_public": false, "allowed_mime_types": ["application/pdf"]}], "provisions": {"files": {"nodes": [{"$type": "SearchBm25", "data": {"source_fields": ["description"]}}]}}}'::jsonb
    */
   storageConfig?: Record<string, unknown> | null;
   /**
@@ -1519,7 +1543,7 @@ export interface EntityTypeProvision {
   tableProvision?: Record<string, unknown> | null;
   /**
    * Output: the auto-assigned integer membership type ID. Populated by the trigger after successful provisioning.
-   *      This is the ID used in membership_types, memberships_module, and all module tables.
+   *      This is the ID used in entity_types, memberships_module, and all module tables.
    */
   outMembershipType?: number | null;
   /**
@@ -1540,6 +1564,12 @@ export interface EntityTypeProvision {
   outBucketsTableId?: string | null;
   /** Output: the UUID of the generated files table (e.g. data_room_files). Populated by the trigger when has_storage=true. */
   outFilesTableId?: string | null;
+  /**
+   * Output: the UUID of the invites_module row created for this entity type. Populated by the trigger when has_invites=true.
+   *      NULL when has_invites=false, or when re-provisioning hits ON CONFLICT DO NOTHING
+   *      (i.e. the invites_module row was created in a previous run).
+   */
+  outInvitesModuleId?: string | null;
 }
 /** Config row for the webauthn_credentials_module, which provisions the per-user WebAuthn/passkey credentials table (public key, counter, transports, device type, backup state) mirroring crypto_addresses_module. The sibling webauthn_auth_module holds RP config and the registration/sign-in challenge state. */
 export interface WebauthnCredentialsModule {
@@ -5321,6 +5351,7 @@ export type StorageModuleSelect = {
   uploadRequestsTableName?: boolean;
   membershipType?: boolean;
   policies?: boolean;
+  skipDefaultPolicyTables?: boolean;
   entityTableId?: boolean;
   endpoint?: boolean;
   publicUrlPrefix?: boolean;
@@ -5366,6 +5397,7 @@ export type EntityTypeProvisionSelect = {
   hasProfiles?: boolean;
   hasLevels?: boolean;
   hasStorage?: boolean;
+  hasInvites?: boolean;
   storageConfig?: boolean;
   skipEntityPolicies?: boolean;
   tableProvision?: boolean;
@@ -5376,6 +5408,7 @@ export type EntityTypeProvisionSelect = {
   outStorageModuleId?: boolean;
   outBucketsTableId?: boolean;
   outFilesTableId?: boolean;
+  outInvitesModuleId?: boolean;
   database?: {
     select: DatabaseSelect;
   };
@@ -9422,7 +9455,9 @@ export interface StorageModuleFilter {
   /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
   /** Filter by the object’s `policies` field. */
-  policies?: StringListFilter;
+  policies?: JSONFilter;
+  /** Filter by the object’s `skipDefaultPolicyTables` field. */
+  skipDefaultPolicyTables?: StringListFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -9491,6 +9526,8 @@ export interface EntityTypeProvisionFilter {
   hasLevels?: BooleanFilter;
   /** Filter by the object’s `hasStorage` field. */
   hasStorage?: BooleanFilter;
+  /** Filter by the object’s `hasInvites` field. */
+  hasInvites?: BooleanFilter;
   /** Filter by the object’s `storageConfig` field. */
   storageConfig?: JSONFilter;
   /** Filter by the object’s `skipEntityPolicies` field. */
@@ -9511,6 +9548,8 @@ export interface EntityTypeProvisionFilter {
   outBucketsTableId?: UUIDFilter;
   /** Filter by the object’s `outFilesTableId` field. */
   outFilesTableId?: UUIDFilter;
+  /** Filter by the object’s `outInvitesModuleId` field. */
+  outInvitesModuleId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: EntityTypeProvisionFilter[];
   /** Checks for any expressions in this list. */
@@ -13014,6 +13053,8 @@ export type StorageModuleOrderBy =
   | 'MEMBERSHIP_TYPE_DESC'
   | 'POLICIES_ASC'
   | 'POLICIES_DESC'
+  | 'SKIP_DEFAULT_POLICY_TABLES_ASC'
+  | 'SKIP_DEFAULT_POLICY_TABLES_DESC'
   | 'ENTITY_TABLE_ID_ASC'
   | 'ENTITY_TABLE_ID_DESC'
   | 'ENDPOINT_ASC'
@@ -13062,6 +13103,8 @@ export type EntityTypeProvisionOrderBy =
   | 'HAS_LEVELS_DESC'
   | 'HAS_STORAGE_ASC'
   | 'HAS_STORAGE_DESC'
+  | 'HAS_INVITES_ASC'
+  | 'HAS_INVITES_DESC'
   | 'STORAGE_CONFIG_ASC'
   | 'STORAGE_CONFIG_DESC'
   | 'SKIP_ENTITY_POLICIES_ASC'
@@ -13081,7 +13124,9 @@ export type EntityTypeProvisionOrderBy =
   | 'OUT_BUCKETS_TABLE_ID_ASC'
   | 'OUT_BUCKETS_TABLE_ID_DESC'
   | 'OUT_FILES_TABLE_ID_ASC'
-  | 'OUT_FILES_TABLE_ID_DESC';
+  | 'OUT_FILES_TABLE_ID_DESC'
+  | 'OUT_INVITES_MODULE_ID_ASC'
+  | 'OUT_INVITES_MODULE_ID_DESC';
 export type WebauthnCredentialsModuleOrderBy =
   | 'NATURAL'
   | 'PRIMARY_KEY_ASC'
@@ -16466,7 +16511,8 @@ export interface CreateStorageModuleInput {
     filesTableName?: string;
     uploadRequestsTableName?: string;
     membershipType?: number;
-    policies?: string[];
+    policies?: Record<string, unknown>;
+    skipDefaultPolicyTables?: string[];
     entityTableId?: string;
     endpoint?: string;
     publicUrlPrefix?: string;
@@ -16490,7 +16536,8 @@ export interface StorageModulePatch {
   filesTableName?: string | null;
   uploadRequestsTableName?: string | null;
   membershipType?: number | null;
-  policies?: string[] | null;
+  policies?: Record<string, unknown> | null;
+  skipDefaultPolicyTables?: string[] | null;
   entityTableId?: string | null;
   endpoint?: string | null;
   publicUrlPrefix?: string | null;
@@ -16525,6 +16572,7 @@ export interface CreateEntityTypeProvisionInput {
     hasProfiles?: boolean;
     hasLevels?: boolean;
     hasStorage?: boolean;
+    hasInvites?: boolean;
     storageConfig?: Record<string, unknown>;
     skipEntityPolicies?: boolean;
     tableProvision?: Record<string, unknown>;
@@ -16535,6 +16583,7 @@ export interface CreateEntityTypeProvisionInput {
     outStorageModuleId?: string;
     outBucketsTableId?: string;
     outFilesTableId?: string;
+    outInvitesModuleId?: string;
   };
 }
 export interface EntityTypeProvisionPatch {
@@ -16549,6 +16598,7 @@ export interface EntityTypeProvisionPatch {
   hasProfiles?: boolean | null;
   hasLevels?: boolean | null;
   hasStorage?: boolean | null;
+  hasInvites?: boolean | null;
   storageConfig?: Record<string, unknown> | null;
   skipEntityPolicies?: boolean | null;
   tableProvision?: Record<string, unknown> | null;
@@ -16559,6 +16609,7 @@ export interface EntityTypeProvisionPatch {
   outStorageModuleId?: string | null;
   outBucketsTableId?: string | null;
   outFilesTableId?: string | null;
+  outInvitesModuleId?: string | null;
 }
 export interface UpdateEntityTypeProvisionInput {
   clientMutationId?: string;
@@ -18535,6 +18586,7 @@ export interface ProvisionTableInput {
   indexes?: Record<string, unknown>;
   fullTextSearches?: Record<string, unknown>;
   uniqueConstraints?: Record<string, unknown>;
+  description?: string;
 }
 export interface SendVerificationEmailInput {
   clientMutationId?: string;
@@ -22806,7 +22858,9 @@ export interface StorageModuleFilter {
   /** Filter by the object’s `membershipType` field. */
   membershipType?: IntFilter;
   /** Filter by the object’s `policies` field. */
-  policies?: StringListFilter;
+  policies?: JSONFilter;
+  /** Filter by the object’s `skipDefaultPolicyTables` field. */
+  skipDefaultPolicyTables?: StringListFilter;
   /** Filter by the object’s `entityTableId` field. */
   entityTableId?: UUIDFilter;
   /** Filter by the object’s `endpoint` field. */
@@ -22876,6 +22930,8 @@ export interface EntityTypeProvisionFilter {
   hasLevels?: BooleanFilter;
   /** Filter by the object’s `hasStorage` field. */
   hasStorage?: BooleanFilter;
+  /** Filter by the object’s `hasInvites` field. */
+  hasInvites?: BooleanFilter;
   /** Filter by the object’s `storageConfig` field. */
   storageConfig?: JSONFilter;
   /** Filter by the object’s `skipEntityPolicies` field. */
@@ -22896,6 +22952,8 @@ export interface EntityTypeProvisionFilter {
   outBucketsTableId?: UUIDFilter;
   /** Filter by the object’s `outFilesTableId` field. */
   outFilesTableId?: UUIDFilter;
+  /** Filter by the object’s `outInvitesModuleId` field. */
+  outInvitesModuleId?: UUIDFilter;
   /** Checks for all expressions in this list. */
   and?: EntityTypeProvisionFilter[];
   /** Checks for any expressions in this list. */
@@ -25755,6 +25813,8 @@ export interface RequestUploadUrlPayload {
   deduplicated: boolean;
   /** Presigned URL expiry time (null if deduplicated) */
   expiresAt?: string | null;
+  /** File status — 'pending' for fresh uploads, 'ready' or 'processed' for deduplicated files. Clients can use this to know immediately whether the file is usable. */
+  status: string;
 }
 export type RequestUploadUrlPayloadSelect = {
   uploadUrl?: boolean;
@@ -25762,6 +25822,7 @@ export type RequestUploadUrlPayloadSelect = {
   key?: boolean;
   deduplicated?: boolean;
   expiresAt?: boolean;
+  status?: boolean;
 };
 export interface ConfirmUploadPayload {
   /** The confirmed file ID */
