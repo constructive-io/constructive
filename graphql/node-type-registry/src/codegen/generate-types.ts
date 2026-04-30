@@ -749,6 +749,26 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
           t.tsArrayType(t.tsStringKeyword())
         ),
         'CORS allowed origins for the storage module.'
+      ),
+      addJSDoc(
+        optionalProp(
+          'storage_table_provisions',
+          t.tsTypeLiteral([
+            optionalProp(
+              'files',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'buckets',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            ),
+            optionalProp(
+              'upload_requests',
+              t.tsTypeReference(t.identifier('BlueprintEntityTableProvision'))
+            )
+          ])
+        ),
+        'Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table.'
       )
     ]),
     'Storage configuration for an entity type. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS).'
@@ -842,6 +862,10 @@ function buildBlueprintEntityType(): t.ExportNamedDeclaration {
       addJSDoc(
         optionalProp('has_storage', t.tsBooleanKeyword()),
         'Whether to provision a storage module (buckets, files, upload_requests tables) for this entity type. Defaults to false.'
+      ),
+      addJSDoc(
+        optionalProp('has_invites', t.tsBooleanKeyword()),
+        'Whether to provision entity-scoped invite tables ({prefix}_invites, {prefix}_claimed_invites) and a submit_{prefix}_invite_code() function. Defaults to false.'
       ),
       addJSDoc(
         optionalProp('skip_entity_policies', t.tsBooleanKeyword()),

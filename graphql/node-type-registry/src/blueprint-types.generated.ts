@@ -873,6 +873,12 @@ export interface BlueprintStorageConfig {
   default_max_file_size?: number;
   /** CORS allowed origins for the storage module. */
   allowed_origins?: string[];
+  /** Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. */
+  storage_table_provisions?: {
+    files?: BlueprintEntityTableProvision;
+    buckets?: BlueprintEntityTableProvision;
+    upload_requests?: BlueprintEntityTableProvision;
+  };
 }
 /** Override object for the entity table created by a BlueprintEntityType. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, policies[] replaces the default entity-table policies entirely. */
 export interface BlueprintEntityTableProvision {
@@ -912,6 +918,8 @@ export interface BlueprintEntityType {
   has_levels?: boolean;
   /** Whether to provision a storage module (buckets, files, upload_requests tables) for this entity type. Defaults to false. */
   has_storage?: boolean;
+  /** Whether to provision entity-scoped invite tables ({prefix}_invites, {prefix}_claimed_invites) and a submit_{prefix}_invite_code() function. Defaults to false. */
+  has_invites?: boolean;
   /** Escape hatch: when true AND table_provision is NULL, zero policies are provisioned on the entity table. Defaults to false. */
   skip_entity_policies?: boolean;
   /** Override for the entity table. Shape mirrors BlueprintTable / secure_table_provision vocabulary. When supplied, its policies[] replaces the five default entity-table policies; is_visible becomes a no-op. When NULL (default), the five default policies are applied (gated by is_visible). */
