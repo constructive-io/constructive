@@ -74,7 +74,8 @@ export default async function runWorkspaceSetup(
     process.stdout.write('\n');
   }
 
-  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${dirName}\n`);
+  const relPath = path.relative(process.cwd(), targetPath);
+  process.stdout.write(`\n✨ Enjoy!\n\ncd ./${relPath}\n`);
 
   return { ...argv, ...answers, cwd: targetPath };
 }
