@@ -621,48 +621,6 @@ function buildBlueprintTableUniqueConstraint(): t.ExportNamedDeclaration {
 }
 
 /**
- * Build the BlueprintStoragePolicy interface.
- *
- * Matches the jsonb policy objects accepted by apply_storage_security():
- *   { "$type": "AuthzPublishable", "privileges": ["select"], "data": {...}, "tables": [...], "policy_name": "pub" }
- */
-function buildBlueprintStoragePolicy(): t.ExportNamedDeclaration {
-  return addJSDoc(
-    exportInterface('BlueprintStoragePolicy', [
-      addJSDoc(
-        requiredProp('$type', t.tsStringKeyword()),
-        'Authz* policy generator type (e.g., "AuthzPublishable", "AuthzDirectOwner", "AuthzEntityMembership").'
-      ),
-      addJSDoc(
-        requiredProp('privileges', t.tsArrayType(t.tsStringKeyword())),
-        'Privilege array (e.g., ["select", "insert", "update", "delete"]). Intersected with each storage table\'s supported operations.'
-      ),
-      addJSDoc(
-        optionalProp(
-          'data',
-          recordType(t.tsStringKeyword(), t.tsUnknownKeyword())
-        ),
-        'Policy data config. Auto-derived from $type when omitted (e.g., AuthzPublishable defaults to {"is_published_field": "is_public", "require_published_at": false}).'
-      ),
-      addJSDoc(
-        optionalProp(
-          'tables',
-          t.tsArrayType(
-            strUnion(['buckets', 'files', 'upload_requests'])
-          )
-        ),
-        'Which storage tables to apply this policy to. Defaults to all three when omitted. Uses logical names (not prefixed).'
-      ),
-      addJSDoc(
-        optionalProp('policy_name', t.tsStringKeyword()),
-        'Custom RLS policy name suffix. Auto-derived from $type when omitted (pub/own/mem).'
-      )
-    ]),
-    'A storage-specific RLS policy object for apply_storage_security(). Each entry defines an Authz* policy with explicit privileges, scoped to specific storage tables.'
-  );
-}
-
-/**
  * Build the BlueprintBucketSeed interface.
  *
  * Matches the bucket entries in storage_config.buckets[].
@@ -715,15 +673,6 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
     exportInterface('BlueprintStorageConfig', [
       addJSDoc(
         optionalProp(
-          'policies',
-          t.tsArrayType(
-            t.tsTypeReference(t.identifier('BlueprintStoragePolicy'))
-          )
-        ),
-        'Custom RLS policies for storage tables. When provided, replaces the default policy set (AuthzPublishable + membership + AuthzDirectOwner). Each entry is a policy object with $type, privileges, and optional data/tables/policy_name.'
-      ),
-      addJSDoc(
-        optionalProp(
           'buckets',
           t.tsArrayType(
             t.tsTypeReference(t.identifier('BlueprintBucketSeed'))
@@ -752,7 +701,7 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
       ),
       addJSDoc(
         optionalProp(
-          'storage_table_provisions',
+          'provisions',
           t.tsTypeLiteral([
             optionalProp(
               'files',
@@ -768,10 +717,10 @@ function buildBlueprintStorageConfig(): t.ExportNamedDeclaration {
             )
           ])
         ),
-        'Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table.'
+        'Per-table overrides for storage tables. Each key targets a specific storage table (files, buckets, upload_requests) and uses the same shape as table_provision: { nodes, fields, grants, use_rls, policies }. Fanned out to secure_table_provision targeting the corresponding table. When a key includes policies[], those REPLACE the default storage policies for that table; tables without a key still get defaults.'
       )
     ]),
-    'Storage configuration for an entity type. Controls RLS policies on storage tables, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS).'
+    'Storage configuration for an entity type. Seeds initial buckets, overrides module-level settings (expiry times, file size limits, CORS), and provides per-table provisioning overrides via provisions.'
   );
 }
 
@@ -1020,7 +969,7 @@ function buildBlueprintDefinition(): t.ExportNamedDeclaration {
           'storage',
           t.tsTypeReference(t.identifier('BlueprintStorageConfig'))
         ),
-        'App-level storage configuration. Creates a storage_module (membership_type = NULL) with the specified policies, seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead.'
+        'App-level storage configuration. Creates a storage_module (membership_type = NULL), seeds initial buckets, and overrides module-level settings (expiry times, file size limits, CORS). Use provisions for per-table policy overrides. For entity-scoped storage, use entity_types[].has_storage + entity_types[].storage instead.'
       )
     ]),
     'The complete blueprint definition -- the JSONB shape accepted by construct_blueprint().'
@@ -1093,7 +1042,6 @@ function buildProgram(meta?: MetaTableInfo[]): string {
   statements.push(buildBlueprintTableIndex());
   statements.push(buildBlueprintUniqueConstraint());
   statements.push(buildBlueprintTableUniqueConstraint());
-  statements.push(buildBlueprintStoragePolicy());
   statements.push(buildBlueprintBucketSeed());
   statements.push(buildBlueprintStorageConfig());
   statements.push(buildBlueprintEntityTableProvision());
